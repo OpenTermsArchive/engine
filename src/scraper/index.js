@@ -1,7 +1,3 @@
-function scrape(url) {
+export function scrape(url) {
   return '';
 }
-
-module.exports = {
-  scrape
-};
