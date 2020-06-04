@@ -1,19 +1,17 @@
 import fetch from 'node-fetch';
 
-const headers = new fetch.Headers({
-  'Accept-Language': 'en',
-});
+const LANGUAGE = 'en'
 
-
-export function scrape(url) {
-  return fetch(url, headers)
+export default function scrape(url) {
+  return fetch(url, {
+      headers: {'Accept-Language': LANGUAGE}
+    })
     .then(function(response) {
       if (!response.ok) {
         throw new Error(`Received HTTP code ${response.status} when trying to fetch '${url}'`);
       }
       return response.blob();
-    })
-    .then(function(response) {
+    }).then(function(response) {
       return response.text();
     });
 }
