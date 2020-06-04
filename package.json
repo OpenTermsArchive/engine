@@ -4,7 +4,8 @@
   "description": "Tracks and makes visible all changes to the Terms Of Service of online service providers.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha \"./src/**/*.test.js\"",
+    "test:debug": "mocha \"./src/**/*.test.js\" --inspect-brk --exit"
   },
   "repository": {
     "type": "git",
@@ -18,6 +19,7 @@
   "homepage": "https://github.com/ambanum/CGUs#readme",
   "devDependencies": {
     "chai": "^4.2.0",
-    "mocha": "^7.2.0"
+    "mocha": "^7.2.0",
+    "nock": "^12.0.3"
   }
 }
