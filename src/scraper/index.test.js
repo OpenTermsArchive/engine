@@ -1,8 +1,10 @@
-const { expect } = require('chai');
-const nock = require('nock')
+import chai from 'chai';
+import nock from 'nock';
 
-const scraper = require('./index');
-const { facebookTermsHTML } = require('./fixtures');
+import { scrape } from './index.js';
+import { facebookTermsHTML } from './fixtures.js';
+
+const expect = chai.expect;
 
 const scope = nock('https://www.facebook.com')
   .get('/terms.php')
@@ -11,7 +13,7 @@ const scope = nock('https://www.facebook.com')
 describe('Scraper', () => {
   describe('#scrape', () => {
     it("returns the page content of the given URL", () => {
-      expect(scraper.scrape('https://www.facebook.com/terms.php')).to.be.equal(facebookTermsHTML);
+      expect(scrape('https://www.facebook.com/terms.php')).to.be.equal(facebookTermsHTML);
     });
   });
 });
