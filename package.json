@@ -1,0 +1,19 @@
+{
+  "name": "cgus",
+  "version": "0.0.1",
+  "description": "Tracks and makes visible changes to the Terms Of Service of the main online service providers.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ambanum/CGUs.git"
+  },
+  "author": "ambanum",
+  "license": "EUPL-1.2",
+  "bugs": {
+    "url": "https://github.com/ambanum/CGUs/issues"
+  },
+  "homepage": "https://github.com/ambanum/CGUs#readme"
+}
