@@ -6,14 +6,32 @@ import { facebookTermsHTML } from './fixtures.js';
 
 const expect = chai.expect;
 
-const scope = nock('https://www.facebook.com')
+nock('https://www.facebook.com')
   .get('/terms.php')
   .reply(200, facebookTermsHTML);
 
+nock('https://not.available.document.com')
+  .get('/')
+  .reply(404);
+
 describe('Scraper', () => {
   describe('#scrape', () => {
-    it("returns the page content of the given URL", () => {
-      expect(scrape('https://www.facebook.com/terms.php')).to.be.equal(facebookTermsHTML);
+    it('returns the page content of the given URL', async () => {
+      const result = await scrape('https://www.facebook.com/terms.php');
+      expect(result).to.be.equal(facebookTermsHTML);
     });
+
+    context('when document is not available', () => {
+      it('throws an error', async () => {
+        try {
+          await scrape('https://not.available.document.com');
+        } catch (e) {
+          expect(e).to.be.an('error');
+          expect(e.message).to.contain('404');
+          return;
+        }
+        expect.fail('No error was thrown');
+      });
+    })
   });
 });
