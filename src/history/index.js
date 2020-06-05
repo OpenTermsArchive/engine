@@ -7,6 +7,10 @@ import * as git from './git.js';
 export const ROOT_DIRECTORY = path.resolve() + '/data';
 export const RAW_DIRECTORY = `${ROOT_DIRECTORY}/raw`;
 
+export async function persistRaw(serviceProviderId, policyType, fileContent) {
+  await storeRaw(serviceProviderId, policyType, fileContent);
+  return await commitRaw(serviceProviderId, policyType);
+}
 
 export async function storeRaw(serviceProviderId, policyType, fileContent) {
   const dir = `${RAW_DIRECTORY}/${serviceProviderId}`;

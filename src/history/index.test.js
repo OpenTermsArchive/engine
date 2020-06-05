@@ -1,7 +1,7 @@
 import fs from 'fs';
 import chai from 'chai';
 
-import { RAW_DIRECTORY, storeRaw, commitRaw } from './index.js';
+import { RAW_DIRECTORY, storeRaw, commitRaw, persistRaw } from './index.js';
 
 const expect = chai.expect;
 
@@ -53,6 +53,24 @@ describe('History', () => {
     it('commits the file for the given service provider', async () => {
       const sha = await commitRaw(SERVICE_PROVIDER_ID, POLICY_TYPE);
       expect(sha).to.not.be.null;
+    });
+  });
+
+  describe('#persistRaw', () => {
+    before(async () => {
+      await persistRaw(SERVICE_PROVIDER_ID, POLICY_TYPE, FILE_CONTENT);
+    });
+
+    after(() => {
+      fs.unlinkSync(EXPECTED_FILE_PATH);
+    });
+
+    it('creates a file for the given service provider', async () => {
+      expect(fs.readFileSync(EXPECTED_FILE_PATH, { encoding: 'utf8' })).to.equal(FILE_CONTENT);
+    });
+
+    it('commits the file for the given service provider', async () => {
+      expect(fs.readFileSync(EXPECTED_FILE_PATH, { encoding: 'utf8' })).to.equal(FILE_CONTENT);
     });
   });
 });
