@@ -14,6 +14,10 @@ const EXPECTED_FILE_PATH = `${RAW_DIRECTORY}/${SERVICE_PROVIDER_ID}/${POLICY_TYP
 
 describe('History', () => {
   describe('#store', () => {
+    after(() => {
+      fs.unlinkSync(EXPECTED_FILE_PATH);
+    });
+
     it('creates a file for the given service provider', async () => {
       await storeRaw(SERVICE_PROVIDER_ID, POLICY_TYPE, FILE_CONTENT);
 
