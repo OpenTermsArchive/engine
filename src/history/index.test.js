@@ -1,16 +1,15 @@
 import fs from 'fs';
-import path from 'path';
 
 import chai from 'chai';
 
-import { storeRaw } from './index.js';
+import { storeRaw, RAW_DIRECTORY } from './index.js';
 
 const expect = chai.expect;
 
 const SERVICE_PROVIDER_ID = 'test_service_provider';
 const POLICY_TYPE = 'terms_of_service';
 const FILE_CONTENT = 'ToS fixture data with UTF-8 çhãràčtęrs';
-const EXPECTED_FILE_PATH = path.resolve('../../data/raw/test_service_provider/terms_of_service.html');
+const EXPECTED_FILE_PATH = `${RAW_DIRECTORY}/${SERVICE_PROVIDER_ID}/${POLICY_TYPE}.html`;
 
 
 describe('History', () => {
