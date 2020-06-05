@@ -1,4 +1,3 @@
-
 export const facebookTermsHTML = {
   en: `<!DOCTYPE html>
   <html lang="en" id="facebook" class="no_js">
