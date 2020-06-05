@@ -9,7 +9,13 @@ export const RAW_DIRECTORY = `${ROOT_DIRECTORY}/raw`;
 
 
 export async function storeRaw(serviceProviderId, policyType, fileContent) {
-  return fs.writeFile(`${RAW_DIRECTORY}/${serviceProviderId}/${policyType}.html`, fileContent);
+  const dir = `${RAW_DIRECTORY}/${serviceProviderId}`;
+
+  if (!fsApi.existsSync(dir)){
+    fsApi.mkdirSync(dir);
+  }
+
+  return fs.writeFile(`${dir}/${policyType}.html`, fileContent);
 }
 
 export async function commitRaw(serviceProviderId, policyType) {
