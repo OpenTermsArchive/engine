@@ -1,8 +1,7 @@
 import fs from 'fs';
-
 import chai from 'chai';
 
-import { storeRaw, RAW_DIRECTORY } from './index.js';
+import { RAW_DIRECTORY, storeRaw, commitRaw } from './index.js';
 
 const expect = chai.expect;
 
@@ -13,7 +12,7 @@ const EXPECTED_FILE_PATH = `${RAW_DIRECTORY}/${SERVICE_PROVIDER_ID}/${POLICY_TYP
 
 
 describe('History', () => {
-  describe('#store', () => {
+  describe('#storeRaw', () => {
     after(() => {
       fs.unlinkSync(EXPECTED_FILE_PATH);
     });
@@ -22,6 +21,21 @@ describe('History', () => {
       await storeRaw(SERVICE_PROVIDER_ID, POLICY_TYPE, FILE_CONTENT);
 
       expect(fs.readFileSync(EXPECTED_FILE_PATH, { encoding: 'utf8' })).to.equal(FILE_CONTENT);
+    });
+  });
+
+  describe('#commitRaw', () => {
+    before(async () => {
+      await storeRaw(SERVICE_PROVIDER_ID, POLICY_TYPE, FILE_CONTENT);
+    });
+
+    after(() => {
+      fs.unlinkSync(EXPECTED_FILE_PATH);
+    });
+
+    it('commits the file for the given service provider', async () => {
+      const sha = await commitRaw(SERVICE_PROVIDER_ID, POLICY_TYPE);
+      expect(sha).to.not.be.null;
     });
   });
 });
