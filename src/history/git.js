@@ -8,6 +8,9 @@ const DEFAULT_GIT_OPTIONS = {
   dryRun: process.env.NODE_ENV === 'test'
 };
 
+const AUTHOR_NAME = 'AmbaNum Bot';
+const AUTHOR_EMAIL = 'ambanum.bot@disinfo.quaidorsay.fr';
+
 export async function add({ filepath }) {
   return await git.add({ ...DEFAULT_GIT_OPTIONS, filepath });
 }
@@ -17,8 +20,8 @@ export async function status({ filepath }) {
 }
 
 export async function commit(options) {
-  let name = 'AmbaNum Bot';
-  let email = 'ambanum.bot@disinfo.quaidorsay.fr';
+  let name = AUTHOR_NAME;
+  let email = AUTHOR_EMAIL;
 
   if (options.author) {
     name = options.author.name || name;
