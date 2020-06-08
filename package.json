@@ -5,7 +5,7 @@
   "main": "index.js",
   "type": "module",
   "engines": {
-    "node": ">=13"
+    "node": ">=12.17"
   },
   "scripts": {
     "test": "mocha \"./src/**/*.test.js\"",
