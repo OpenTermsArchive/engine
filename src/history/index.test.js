@@ -13,7 +13,7 @@ const EXPECTED_FILE_PATH = `${RAW_DIRECTORY}/${SERVICE_PROVIDER_ID}/${POLICY_TYP
 
 describe('History', () => {
   describe('#storeRaw', () => {
-    context("when service provider's directory already exist", () => {
+    context('when service provider’s directory already exist', () => {
       after(() => {
         fs.unlinkSync(EXPECTED_FILE_PATH);
       });
@@ -25,7 +25,7 @@ describe('History', () => {
       });
     });
 
-    context("when service provider's directory not already exist", () => {
+    context('when service provider’s directory not already exist', () => {
       const NOT_EXISTING_SERVICE_PROVIDER_ID = 'test_not_existing_service_provider';
       const NOT_EXISTING_SERVICE_PROVIDER_EXPECTED_FILE_PATH = `${RAW_DIRECTORY}/${NOT_EXISTING_SERVICE_PROVIDER_ID}/${POLICY_TYPE}.html`;
 
