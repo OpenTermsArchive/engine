@@ -1,20 +1,19 @@
 import chai from 'chai';
 import nock from 'nock';
+import fs from 'fs';
+import path from 'path';
+
+const __dirname = path.dirname(new URL(import.meta.url).pathname);
 
 import scrape from './index.js';
-import { facebookTermsHTML } from './fixtures.js';
 
 const expect = chai.expect;
+const facebookTermsHTML = fs.readFileSync(path.resolve(__dirname, '../../fixtures/facebook_terms_raw.html'), { encoding: 'utf8' });
 
 nock('https://www.facebook.com', {
     reqheaders: { 'Accept-Language': 'en' }
   }).get('/terms.php')
-  .reply(200, facebookTermsHTML.en);
-
-nock('https://www.facebook.com', {
-    reqheaders: { 'Accept-Language': 'fr' }
-  }).get('/terms.php')
-  .reply(200, facebookTermsHTML.fr);
+  .reply(200, facebookTermsHTML);
 
 nock('https://not.available.document.com')
   .get('/')
@@ -24,7 +23,7 @@ describe('Scraper', () => {
   describe('#scrape', () => {
     it('returns the page content of the given URL', async () => {
       const result = await scrape('https://www.facebook.com/terms.php');
-      expect(result).to.be.equal(facebookTermsHTML.en);
+      expect(result).to.be.equal(facebookTermsHTML);
     });
 
     context('when document is not available', () => {
