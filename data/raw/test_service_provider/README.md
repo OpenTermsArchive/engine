@@ -1,1 +1,1 @@
-Ensures the current directory is tracked with git as for testing purpose we need this directory stays empty.
+This directory does not contain actual terms of services, but it should be left in place. It is here to support testing.
