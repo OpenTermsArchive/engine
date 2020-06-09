@@ -2,10 +2,13 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 import scrape from './scraper/index.js';
-import { persistRaw } from './history/index.js';
+import { persistRaw, persistSanitized } from './history/index.js';
+import sanitize from './sanitizer/index.js';
 
-export async function updateTerms() {
+export default async function updateTerms() {
   console.log('Start scraping and saving terms of service…')
-  const result = await scrape('https://www.facebook.com/legal/terms/plain_text_terms');
-  return persistRaw('facebook', 'terms_of_service', result);
-}
+  const content = await scrape('https://www.facebook.com/legal/terms/plain_text_terms');
+  await persistRaw('facebook', 'terms_of_service', content);
+  const sanitizedContent = await sanitize(content, '.UIFullPage_Container');
+  await persistSanitized('facebook', 'terms_of_service', sanitizedContent);
+};
