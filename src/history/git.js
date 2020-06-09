@@ -10,11 +10,11 @@ const DEFAULT_GIT_OPTIONS = {
   dryRun: process.env.NODE_ENV === 'test',
 };
 
-export async function add({ filepath }) {
+export async function add(filepath) {
   return git.add({ ...DEFAULT_GIT_OPTIONS, filepath });
 }
 
-export async function status({ filepath }) {
+export async function status(filepath) {
   return git.status({ ...DEFAULT_GIT_OPTIONS, filepath });
 }
 

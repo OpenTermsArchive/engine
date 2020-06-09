@@ -28,12 +28,12 @@ export async function commitRaw(serviceProviderId, policyType) {
   try {
     const filepath = path.relative(path.resolve(__dirname, '../..'), `${RAW_DIRECTORY}/${serviceProviderId}/${policyType}.html`);
 
-    const status = await git.status({ filepath });
+    const status = await git.status(filepath);
     if (!(status.includes('modified') || status.includes('added'))) {
       return;
     }
 
-    await git.add({ filepath });
+    await git.add(filepath);
 
     return git.commit(`Update for ${serviceProviderId} ${policyType} document`);
   } catch (e) {
