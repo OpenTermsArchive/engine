@@ -1,2 +1,2 @@
-Ensures the current directory is tracked with git.
-Will contain sanitized service providers terms.
+Tracked terms of services are stored in a pure text format in this folder.
+This enables better diffs and readability.
