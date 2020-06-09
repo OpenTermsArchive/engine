@@ -25,7 +25,7 @@ describe('History', () => {
       });
     });
 
-    context('when service provider’s directory not already exist', () => {
+    context('when service provider’s directory does not already exist', () => {
       const NEW_SERVICE_PROVIDER_ID = 'test_not_existing_service_provider';
       const NEW_SERVICE_PROVIDER_EXPECTED_FILE_PATH = `${RAW_DIRECTORY}/${NEW_SERVICE_PROVIDER_ID}/${POLICY_TYPE}.html`;
 
