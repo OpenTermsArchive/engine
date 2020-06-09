@@ -8,7 +8,7 @@ const __dirname = path.dirname(new URL(import.meta.url).pathname);
 import scrape from './index.js';
 
 const expect = chai.expect;
-const facebookTermsHTML = fs.readFileSync(path.resolve(__dirname, '../../fixtures/facebook_terms_raw.html'), { encoding: 'utf8' });
+const facebookTermsHTML = fs.readFileSync(path.resolve(__dirname, '../../test/fixtures/facebook_terms_raw.html'), { encoding: 'utf8' });
 
 nock('https://www.facebook.com', {
     reqheaders: { 'Accept-Language': 'en' }
