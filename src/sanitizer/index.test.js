@@ -14,8 +14,8 @@ describe('Sanitizer', () => {
 
   describe('#sanitize', () => {
     before(() => {
-      facebookTermsHTML = fs.readFileSync(path.resolve(__dirname, '../../fixtures/facebook_terms_raw.html'), { encoding: 'utf8' });
-      facebookTermsMarkdown = fs.readFileSync(path.resolve(__dirname, '../../fixtures/facebook_terms_sanitized.md'), { encoding: 'utf8' });
+      facebookTermsHTML = fs.readFileSync(path.resolve(__dirname, '../../test/fixtures/facebook_terms_raw.html'), { encoding: 'utf8' });
+      facebookTermsMarkdown = fs.readFileSync(path.resolve(__dirname, '../../test/fixtures/facebook_terms_sanitized.md'), { encoding: 'utf8' });
     });
 
     it('returns the page content of the given URL', async () => {

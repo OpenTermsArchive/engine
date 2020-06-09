@@ -9,8 +9,8 @@ const expect = chai.expect;
 import updateTerms from './index.js';
 import { RAW_DIRECTORY, SANITIZED_DIRECTORY } from './history/history.js';
 
-const facebookTermsHTML = fs.readFileSync(path.resolve(__dirname, '../fixtures/facebook_terms_raw.html'), { encoding: 'utf8' });
-const facebookTermsMD = fs.readFileSync(path.resolve(__dirname, '../fixtures/facebook_terms_sanitized.md'), { encoding: 'utf8' });
+const facebookTermsHTML = fs.readFileSync(path.resolve(__dirname, '../test/fixtures/facebook_terms_raw.html'), { encoding: 'utf8' });
+const facebookTermsMD = fs.readFileSync(path.resolve(__dirname, '../test/fixtures/facebook_terms_sanitized.md'), { encoding: 'utf8' });
 
 nock('https://www.facebook.com', {
     reqheaders: { 'Accept-Language': 'en' }
@@ -28,7 +28,7 @@ describe('CGUs', () => {
     before(async () => {
       await updateTerms();
     });
-    
+
     after(() => {
       fs.unlinkSync(EXPECTED_RAW_FILE_PATH);
       fs.unlinkSync(EXPECTED_SANITIZED_FILE_PATH);
@@ -38,7 +38,7 @@ describe('CGUs', () => {
       const resultingRawTerms = fs.readFileSync(path.resolve(__dirname, EXPECTED_RAW_FILE_PATH), { encoding: 'utf8' });
       expect(resultingRawTerms).to.be.equal(facebookTermsHTML);
     });
-    
+
     it('persists terms in sanitized format', async () => {
       const resultingSanitizedTerms = fs.readFileSync(path.resolve(__dirname, EXPECTED_SANITIZED_FILE_PATH), { encoding: 'utf8' });
       expect(resultingSanitizedTerms).to.be.equal(facebookTermsMD);
