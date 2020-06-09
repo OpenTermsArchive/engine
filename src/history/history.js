@@ -6,7 +6,7 @@ import * as git from './git.js';
 
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
 
-const ROOT_DIRECTORY = path.resolve(__dirname, '../../data');
+const ROOT_DIRECTORY = path.resolve(__dirname, `../../data${process.env.NODE_ENV === 'test' && '_test'}`);
 export const RAW_DIRECTORY = `${ROOT_DIRECTORY}/raw`;
 export const SANITIZED_DIRECTORY = `${ROOT_DIRECTORY}/sanitized`;
 

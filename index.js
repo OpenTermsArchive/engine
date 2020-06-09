@@ -1,4 +1,4 @@
-import { updateTerms } from './src/index.js';
+import updateTerms from './src/index.js';
 
 (async () => {
   try {
