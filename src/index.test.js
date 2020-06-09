@@ -4,13 +4,11 @@ import path from 'path';
 import nock from 'nock';
 
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
+const expect = chai.expect;
 
 import updateTerms from './index.js';
 import { RAW_DIRECTORY, SANITIZED_DIRECTORY } from './history/history.js';
 
-const expect = chai.expect;
-
-console.log(__dirname);
 const facebookTermsHTML = fs.readFileSync(path.resolve(__dirname, '../fixtures/facebook_terms_raw.html'), { encoding: 'utf8' });
 const facebookTermsMD = fs.readFileSync(path.resolve(__dirname, '../fixtures/facebook_terms_sanitized.md'), { encoding: 'utf8' });
 
@@ -22,10 +20,7 @@ nock('https://www.facebook.com', {
 const SERVICE_PROVIDER_ID = 'facebook';
 const POLICY_TYPE = 'terms_of_service';
 
-const RAW_FILE_CONTENT = '<html><h1>ToS fixture data with UTF-8 çhãràčtęrs</h1></html>';
 const EXPECTED_RAW_FILE_PATH = `${RAW_DIRECTORY}/${SERVICE_PROVIDER_ID}/${POLICY_TYPE}.html`;
-
-const SANITIZED_FILE_CONTENT = '# ToS fixture data with UTF-8 çhãràčtęrs';
 const EXPECTED_SANITIZED_FILE_PATH = `${SANITIZED_DIRECTORY}/${SERVICE_PROVIDER_ID}/${POLICY_TYPE}.md`;
 
 describe('CGUs', () => {
