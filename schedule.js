@@ -1,6 +1,6 @@
 import schedule from 'node-schedule';
 
-import { updateTerms } from './src/index.js'
+import updateTerms from './src/index.js';
 
 const rule = new schedule.RecurrenceRule();
 rule.minute = 30; // at minute 30 past every hour.
