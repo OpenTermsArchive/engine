@@ -65,7 +65,7 @@ describe('History', () => {
       fs.unlinkSync(EXPECTED_FILE_PATH);
     });
 
-    it('creates a file for the given service provider', async () => {
+    it('creates a file for the given service provider', () => {
       expect(fs.readFileSync(EXPECTED_FILE_PATH, { encoding: 'utf8' })).to.equal(FILE_CONTENT);
     });
 
