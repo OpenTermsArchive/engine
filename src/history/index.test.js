@@ -57,8 +57,9 @@ describe('History', () => {
   });
 
   describe('#persistRaw', () => {
+    let sha;
     before(async () => {
-      await persistRaw(SERVICE_PROVIDER_ID, POLICY_TYPE, FILE_CONTENT);
+      sha = await persistRaw(SERVICE_PROVIDER_ID, POLICY_TYPE, FILE_CONTENT);
     });
 
     after(() => {
@@ -69,8 +70,9 @@ describe('History', () => {
       expect(fs.readFileSync(EXPECTED_FILE_PATH, { encoding: 'utf8' })).to.equal(FILE_CONTENT);
     });
 
-    it('commits the file for the given service provider', async () => {
-      expect(fs.readFileSync(EXPECTED_FILE_PATH, { encoding: 'utf8' })).to.equal(FILE_CONTENT);
+    it('commits the file for the given service provider', () => {
+      expect(sha).to.exist;
+      expect(sha).to.be.a('string');
     });
   });
 });
