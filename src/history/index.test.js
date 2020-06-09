@@ -26,17 +26,17 @@ describe('History', () => {
     });
 
     context('when service provider’s directory not already exist', () => {
-      const NOT_EXISTING_SERVICE_PROVIDER_ID = 'test_not_existing_service_provider';
-      const NOT_EXISTING_SERVICE_PROVIDER_EXPECTED_FILE_PATH = `${RAW_DIRECTORY}/${NOT_EXISTING_SERVICE_PROVIDER_ID}/${POLICY_TYPE}.html`;
+      const NEW_SERVICE_PROVIDER_ID = 'test_not_existing_service_provider';
+      const NEW_SERVICE_PROVIDER_EXPECTED_FILE_PATH = `${RAW_DIRECTORY}/${NEW_SERVICE_PROVIDER_ID}/${POLICY_TYPE}.html`;
 
       after(() => {
-        fs.unlinkSync(NOT_EXISTING_SERVICE_PROVIDER_EXPECTED_FILE_PATH);
+        fs.unlinkSync(NEW_SERVICE_PROVIDER_EXPECTED_FILE_PATH);
       });
 
       it('creates a directory and file for the given service provider', async () => {
-        await storeRaw(NOT_EXISTING_SERVICE_PROVIDER_ID, POLICY_TYPE, FILE_CONTENT);
+        await storeRaw(NEW_SERVICE_PROVIDER_ID, POLICY_TYPE, FILE_CONTENT);
 
-        expect(fs.readFileSync(NOT_EXISTING_SERVICE_PROVIDER_EXPECTED_FILE_PATH, { encoding: 'utf8' })).to.equal(FILE_CONTENT);
+        expect(fs.readFileSync(NEW_SERVICE_PROVIDER_EXPECTED_FILE_PATH, { encoding: 'utf8' })).to.equal(FILE_CONTENT);
       });
     });
   });
