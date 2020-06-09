@@ -33,7 +33,7 @@ export async function commitRaw(serviceProviderId, policyType) {
 
     await git.add({ filepath });
 
-    return git.commit(`Changes for ${serviceProviderId} ${policyType} document`);
+    return git.commit(`Update for ${serviceProviderId} ${policyType} document`);
   } catch (e) {
     console.log(e);
   }
