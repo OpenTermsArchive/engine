@@ -1,7 +1,7 @@
 import fs from 'fs';
 import chai from 'chai';
 
-import { RAW_DIRECTORY, SANITIZED_DIRECTORY } from './history.js';
+import { RAW_DIRECTORY, SANITIZED_DIRECTORY } from './persistor.js';
 import { persistRaw, persistSanitized } from './index.js';
 
 const expect = chai.expect;

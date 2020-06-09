@@ -1,4 +1,4 @@
-import { persist } from './history.js';
+import { persist } from './persistor.js';
 
 export async function persistRaw(serviceProviderId, policyType, fileContent) {
   return persist({
