@@ -43,7 +43,7 @@ describe('History', () => {
 
   describe('#commitRaw', () => {
     before(async () => {
-      await storeRaw(SERVICE_PROVIDER_ID, POLICY_TYPE, FILE_CONTENT);
+      return storeRaw(SERVICE_PROVIDER_ID, POLICY_TYPE, FILE_CONTENT);
     });
 
     after(() => {
