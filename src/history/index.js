@@ -9,7 +9,7 @@ export const RAW_DIRECTORY = `${ROOT_DIRECTORY}/raw`;
 
 export async function persistRaw(serviceProviderId, policyType, fileContent) {
   await storeRaw(serviceProviderId, policyType, fileContent);
-  return await commitRaw(serviceProviderId, policyType);
+  return commitRaw(serviceProviderId, policyType);
 }
 
 export async function storeRaw(serviceProviderId, policyType, fileContent) {
@@ -33,9 +33,7 @@ export async function commitRaw(serviceProviderId, policyType) {
 
     await git.add({ filepath });
 
-    const sha = await git.commit({ message: `Changes for ${serviceProviderId} ${policyType} document` });
-
-    return sha;
+    return git.commit(`Changes for ${serviceProviderId} ${policyType} document`);
   } catch (e) {
     console.log(e);
   }

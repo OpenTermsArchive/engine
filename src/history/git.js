@@ -9,30 +9,20 @@ const DEFAULT_GIT_OPTIONS = {
 };
 
 export async function add({ filepath }) {
-  return await git.add({ ...DEFAULT_GIT_OPTIONS, filepath });
+  return git.add({ ...DEFAULT_GIT_OPTIONS, filepath });
 }
 
 export async function status({ filepath }) {
-  return await git.status({ ...DEFAULT_GIT_OPTIONS, filepath });
+  return git.status({ ...DEFAULT_GIT_OPTIONS, filepath });
 }
 
-export async function commit(options) {
-  let name = process.env.AUTHOR_NAME;
-  let email = process.env.AUTHOR_EMAIL;
-
-  if (options.author) {
-    name = options.author.name || name;
-    email = options.author.email || email;
-  }
-
-  const sha = await git.commit({
+export async function commit(message) {
+  return git.commit({
     ...DEFAULT_GIT_OPTIONS,
     author: {
-      name,
-      email,
+      name: process.env.AUTHOR_NAME,
+      email: process.env.AUTHOR_EMAIL,
     },
-    message: options.message
+    message
   });
-
-  return sha;
 }
