@@ -29,6 +29,7 @@
   "dependencies": {
     "dotenv": "^8.2.0",
     "isomorphic-git": "^1.4.0",
-    "node-fetch": "^2.6.0"
+    "node-fetch": "^2.6.0",
+    "node-schedule": "^1.3.2"
   }
 }
