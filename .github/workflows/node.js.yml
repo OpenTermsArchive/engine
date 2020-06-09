@@ -9,6 +9,10 @@ on:
   pull_request:
     branches: [ master ]
 
+env:
+  AUTHOR_NAME: 'AmbaNum Bot'
+  AUTHOR_EMAIL: 'ambanum.bot@disinfo.quaidorsay.fr'
+
 jobs:
   build:
 
