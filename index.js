@@ -1,3 +1,6 @@
+import dotenv from 'dotenv';
+dotenv.config();
+
 import scrape from './src/scraper/index.js';
 import { persistRaw } from './src/history/index.js';
 
