@@ -1,7 +1,7 @@
 import fs from 'fs';
 import chai from 'chai';
 
-import { RAW_DIRECTORY, store, commit, persist } from './index.js';
+import { RAW_DIRECTORY, save, commit, persist } from './history.js';
 
 const expect = chai.expect;
 
@@ -12,14 +12,14 @@ const EXPECTED_FILE_PATH = `${RAW_DIRECTORY}/${SERVICE_PROVIDER_ID}/${POLICY_TYP
 
 
 describe('History', () => {
-  describe('#store', () => {
+  describe('#save', () => {
     context('when service provider’s directory already exist', () => {
       after(() => {
         fs.unlinkSync(EXPECTED_FILE_PATH);
       });
 
       it('creates a file for the given service provider', async () => {
-        await store({
+        await save({
           serviceProviderId: SERVICE_PROVIDER_ID,
           policyType: POLICY_TYPE,
           fileContent: FILE_CONTENT,
@@ -39,7 +39,7 @@ describe('History', () => {
       });
 
       it('creates a directory and file for the given service provider', async () => {
-        await store({
+        await save({
           serviceProviderId: NEW_SERVICE_PROVIDER_ID,
           policyType: POLICY_TYPE,
           fileContent: FILE_CONTENT,
@@ -53,7 +53,7 @@ describe('History', () => {
 
   describe('#commit', () => {
     before(async () => {
-      return store({
+      return save({
         serviceProviderId: SERVICE_PROVIDER_ID,
         policyType: POLICY_TYPE,
         fileContent: FILE_CONTENT,
