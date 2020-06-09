@@ -4,7 +4,9 @@ const fs = fsApi.promises;
 
 import * as git from './git.js';
 
-export const ROOT_DIRECTORY = path.resolve() + '/data';
+const __dirname = path.dirname(new URL(import.meta.url).pathname);
+
+export const ROOT_DIRECTORY = path.resolve(__dirname, '../../data');
 export const RAW_DIRECTORY = `${ROOT_DIRECTORY}/raw`;
 
 export async function persistRaw(serviceProviderId, policyType, fileContent) {
@@ -24,7 +26,7 @@ export async function storeRaw(serviceProviderId, policyType, fileContent) {
 
 export async function commitRaw(serviceProviderId, policyType) {
   try {
-    const filepath = path.relative(path.resolve(), `${RAW_DIRECTORY}/${serviceProviderId}/${policyType}.html`);
+    const filepath = path.relative(path.resolve(__dirname, '../..'), `${RAW_DIRECTORY}/${serviceProviderId}/${policyType}.html`);
 
     const status = await git.status({ filepath });
     if (!(status.includes('modified') || status.includes('added'))) {
