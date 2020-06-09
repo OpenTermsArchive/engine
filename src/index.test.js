@@ -7,7 +7,7 @@ const __dirname = path.dirname(new URL(import.meta.url).pathname);
 const expect = chai.expect;
 
 import updateTerms from './index.js';
-import { RAW_DIRECTORY, SANITIZED_DIRECTORY } from './history/history.js';
+import { RAW_DIRECTORY, SANITIZED_DIRECTORY } from './history/persistor.js';
 
 const facebookTermsHTML = fs.readFileSync(path.resolve(__dirname, '../test/fixtures/facebook_terms_raw.html'), { encoding: 'utf8' });
 const facebookTermsMD = fs.readFileSync(path.resolve(__dirname, '../test/fixtures/facebook_terms_sanitized.md'), { encoding: 'utf8' });
