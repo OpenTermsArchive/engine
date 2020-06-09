@@ -2,10 +2,12 @@ import fs from 'fs';
 import path from 'path';
 import git from 'isomorphic-git';
 
+const __dirname = path.dirname(new URL(import.meta.url).pathname);
+
 const DEFAULT_GIT_OPTIONS = {
   fs,
-  dir: path.resolve(),
-  dryRun: process.env.NODE_ENV === 'test'
+  dir: path.resolve(__dirname, '../..'),
+  dryRun: process.env.NODE_ENV === 'test',
 };
 
 export async function add({ filepath }) {
