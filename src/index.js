@@ -5,7 +5,7 @@ import scrape from './scraper/index.js';
 import { persistRaw, persistSanitized } from './history/index.js';
 import sanitize from './sanitizer/index.js';
 
-export async function updateTerms() {
+export default async function updateTerms() {
   console.log('Start scraping and saving terms of service…')
   const content = await scrape('https://www.facebook.com/legal/terms/plain_text_terms');
   await persistRaw('facebook', 'terms_of_service', content);
