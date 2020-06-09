@@ -1,13 +1,14 @@
 import TurndownService from 'turndown';
-import cheerio from 'cheerio';
+import jsdom from 'jsdom';
+const { JSDOM } = jsdom;
 
 export default async function sanitize(content, selector) {
   const turndownService = new TurndownService();
   let contentToSanitize = content;
 
   if (selector) {
-    const $ = await cheerio.load(content);
-    contentToSanitize = $(selector).html();
+    const { document } = new JSDOM(contentToSanitize).window;
+    contentToSanitize = document.querySelector(selector);
   }
 
   const markdown = turndownService.turndown(contentToSanitize);
