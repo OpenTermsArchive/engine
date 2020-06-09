@@ -8,8 +8,8 @@
     "node": ">=12.17"
   },
   "scripts": {
-    "test": "mocha \"./src/**/*.test.js\"",
-    "test:debug": "mocha \"./src/**/*.test.js\" --inspect-brk --exit"
+    "test": "NODE_ENV=test mocha \"./src/**/*.test.js\"",
+    "test:debug": "NODE_ENV=test mocha \"./src/**/*.test.js\" --inspect-brk --exit"
   },
   "repository": {
     "type": "git",
@@ -27,6 +27,8 @@
     "nock": "^12.0.3"
   },
   "dependencies": {
+    "dotenv": "^8.2.0",
+    "isomorphic-git": "^1.4.0",
     "node-fetch": "^2.6.0"
   }
 }
