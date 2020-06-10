@@ -53,3 +53,24 @@ For example, you can update `CGUs` by running:
 ```
 ansible-playbook ops/app.yml -t update
 ```
+
+### Troubleshooting
+
+If you have the following error:
+
+```
+Failed to connect to the host via ssh: Received disconnect from 127.0.0.1 port 2222:2: Too many authentication failures
+```
+
+Modify ansible ssh options to the `ops/inventories/dev.yml` file like this:
+```
+all:
+  children:
+    dev:
+      hosts:
+        '127.0.0.1':
+          […]
+          ansible_ssh_private_key_file: .vagrant/machines/default/virtualbox/private_key
+          ansible_ssh_extra_args: -o StrictHostKeyChecking=no -o IdentitiesOnly=yes
+          […]
+```
