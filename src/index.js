@@ -1,6 +1,9 @@
 import dotenv from 'dotenv';
 dotenv.config();
 
+import consoleStamp from 'console-stamp';
+consoleStamp(console);
+
 import scrape from './scraper/index.js';
 import { persistRaw, persistSanitized } from './history/index.js';
 import sanitize from './sanitizer/index.js';
