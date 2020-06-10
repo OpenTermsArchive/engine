@@ -1,0 +1,7 @@
+---
+- name: Setup CGUs infra
+  hosts: all
+  become: yes
+
+  roles:
+    - infra

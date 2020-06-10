@@ -1,0 +1,6 @@
+---
+- name: Setup CGUs app
+  hosts: all
+
+  roles:
+    - cgus

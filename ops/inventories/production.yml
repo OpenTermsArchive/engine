@@ -1,0 +1,7 @@
+all:
+  children:
+    dev:
+      hosts:
+        51.75.169.235:
+          ansible_user: debian
+          ansible_ssh_extra_args: -o StrictHostKeyChecking=no

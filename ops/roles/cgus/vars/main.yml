@@ -1,0 +1,3 @@
+repo: https://github.com/ambanum/CGUs.git
+app: cgus
+app_port: 3000
