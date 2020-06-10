@@ -1,5 +1,5 @@
 ---
-- name: Setup CGUs infra
+- name: Setup CGUs infrastructure
   hosts: all
   become: yes
 

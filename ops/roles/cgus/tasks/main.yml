@@ -1,4 +1,4 @@
-- name: Git Clone Repo
+- name: Clone Repo
   git:
     repo: "{{ repo }}"
     dest: "/home/{{ ansible_user }}/{{ app }}"
@@ -24,7 +24,7 @@
   tags:
     - setup
 
-- name: Stop APP
+- name: Stop CGUs
   command: forever stop "{{ app }}"
   ignore_errors: yes
   tags:
@@ -32,7 +32,7 @@
     - stop
     - update
 
-- name: Start APP
+- name: Start CGUs
   command:
     cmd: forever start -a --uid "{{ app }}" schedule.js
     chdir: "/home/{{ ansible_user }}/{{ app }}"
