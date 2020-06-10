@@ -1,0 +1,45 @@
+- name: Git Clone Repo
+  git:
+    repo: "{{ repo }}"
+    dest: "/home/{{ ansible_user }}/{{ app }}"
+    force: yes
+  register: git_clone_app_finished
+  tags:
+    - setup
+    - update
+
+- name: Install NPM packages
+  npm:
+    path: "/home/{{ ansible_user }}/{{ app }}"
+    unsafe_perm: yes
+    production: yes
+  tags:
+    - setup
+    - update
+
+- name: Add .env file
+  copy:
+    src: .env
+    dest: "/home/{{ ansible_user }}/{{ app }}/.env"
+  tags:
+    - setup
+
+- name: Stop APP
+  command: forever stop "{{ app }}"
+  ignore_errors: yes
+  tags:
+    - restart
+    - stop
+    - update
+
+- name: Start APP
+  command:
+    cmd: forever start -a --uid "{{ app }}" schedule.js
+    chdir: "/home/{{ ansible_user }}/{{ app }}"
+  environment:
+    NODE_ENV: production
+    PORT: "{{ app_port }}"
+  tags:
+    - restart
+    - start
+    - update
