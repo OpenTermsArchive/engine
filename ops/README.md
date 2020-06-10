@@ -1,6 +1,6 @@
 # CGUs-ops
 
-Recipes to setup infrastructure and deploy CGUs app
+Recipes to set up the infrastructure for the CGUs app and deploy it.
 
 > Recettes pour mettre en place l'infrastructure et déployer l'application CGUs
 
@@ -8,7 +8,7 @@ Recipes to setup infrastructure and deploy CGUs app
 
 - Install [Ansible](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html)
 
-### [For developement only] Additionals dependencies
+### [For developement only] Additional dependencies
 
 To test the changes without impacting the production server, a Vagrantfile is provided to test the changes locally in a virtual machine. VirtualBox and Vagrant are therefore required.
 
@@ -17,10 +17,10 @@ To test the changes without impacting the production server, a Vagrantfile is pr
 
 ## Usage
 
-To avoid making changes on the production server by mistake, by default all commands will only affect the vagrant developement VM. Note that the VM need to be started before with `vagrant up`.\
-To execute commands on the production server you should specify it by adding the option `-i inventories/production.yml` to the following commands:
+To avoid making changes on the production server by mistake, by default all commands will only affect the Vagrant development virtual machine (VM). Note that the VM needs to be started before with `vagrant up`.\
+To execute commands on the production server you should specify it by adding the option `-i ops/inventories/production.yml` to the following commands:
 
-- To setup a phoenix server:
+- To setup a full [(phoenix)](https://martinfowler.com/bliki/PhoenixServer.html) server:
 ```
 ansible-playbook ops/site.yml
 ```
