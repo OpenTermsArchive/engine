@@ -29,7 +29,7 @@
     "nock": "^12.0.3"
   },
   "dependencies": {
-    "console-stamp": "^3.0.0-rc4.2",
+    "console-stamp": "^0.2.9",
     "dotenv": "^8.2.0",
     "isomorphic-git": "^1.4.0",
     "jsdom": "^16.2.2",
