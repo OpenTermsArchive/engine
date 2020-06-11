@@ -40,7 +40,7 @@ export async function commit({ serviceProviderId, policyType, isSanitized }) {
 
   await git.add(filePath);
 
-  return git.commit(`${isSanitized ? 'Sanitized update' : 'Update'} for ${serviceProviderId} ${policyType} document`).then((sha) => {
+  return git.commit(`${isSanitized ? 'Update sanitized' : 'Update'} ${serviceProviderId} ${policyType} document`).then((sha) => {
     console.log(`Commit ID for document "${serviceProviderId}/${policyType}.${fileExtension}": ${sha}`);
     return sha;
   });

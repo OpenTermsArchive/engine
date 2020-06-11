@@ -17,7 +17,7 @@ export async function updateServiceProviderDocument(serviceProviderId, documentT
 };
 
 export default async function updateTerms() {
-  console.log('Start scraping and saving terms of service…')
+  console.log('Start scraping and saving terms of service…');
 
   const promises = [];
   const serviceProvidersManifests = serviceProviders();
