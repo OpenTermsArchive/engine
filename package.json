@@ -8,6 +8,8 @@
     "node": ">=12.17"
   },
   "scripts": {
+    "start": "node index.js",
+    "start:scheduler": "node schedule.js",
     "test": "NODE_ENV=test mocha --file './test/helper.js' --recursive \"./src/**/*.test.js\"",
     "test:debug": "NODE_ENV=test mocha --file './test/helper.js' --recursive \"./src/**/*.test.js\" --inspect-brk --exit"
   },
@@ -27,6 +29,7 @@
     "nock": "^12.0.3"
   },
   "dependencies": {
+    "console-stamp": "^0.2.9",
     "dotenv": "^8.2.0",
     "isomorphic-git": "^1.4.0",
     "jsdom": "^16.2.2",
