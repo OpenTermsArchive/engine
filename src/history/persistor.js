@@ -34,7 +34,7 @@ export async function commit({ serviceProviderId, policyType, isSanitized }) {
   const filePath = path.relative(path.resolve(__dirname, '../..'), `${directory}/${policyType}.${fileExtension}`);
 
   const status = await git.status(filePath);
-  if (!(status.includes('modified') || status.includes('added'))) {
+  if (!status.match(/^\*?(modified|added)/)) {
     return;
   }
 
