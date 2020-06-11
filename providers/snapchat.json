@@ -1,0 +1,9 @@
+{
+  "serviceProviderName": "Snapchat",
+  "documents": {
+    "tos": {
+      "url": "https://www.snap.com/terms/",
+      "contentSelector": ".textarticle-container"
+    }
+  }
+}
