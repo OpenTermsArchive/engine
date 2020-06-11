@@ -28,6 +28,7 @@ export async function save({ serviceProviderId, policyType, fileContent, isSanit
   });
 }
 
+let lock = Promise.resolve('Initial Promise');
 export async function commit({ serviceProviderId, policyType, isSanitized }) {
   const directory = `${isSanitized ? SANITIZED_DIRECTORY : RAW_DIRECTORY}/${serviceProviderId}`;
   const fileExtension = isSanitized ? 'md' : 'html'
@@ -38,10 +39,17 @@ export async function commit({ serviceProviderId, policyType, isSanitized }) {
     return;
   }
 
-  await git.add(filePath);
-
-  return git.commit(`${isSanitized ? 'Update sanitized' : 'Update'} ${serviceProviderId} ${policyType} document`).then((sha) => {
-    console.log(`Commit ID for document "${serviceProviderId}/${policyType}.${fileExtension}": ${sha}`);
-    return sha;
+  // Ensure asynchronous functions `git.add` and `git.commit` will always be called in sequence…
+  // …and others caller of `persistor.commit` will wait
+  await lock;
+  lock = new Promise(resolveLock => {
+    git.add(filePath).then(() => {
+      git.commit(`${isSanitized ? 'Update sanitized' : 'Update'} ${serviceProviderId} ${policyType} document`).then((sha) => {
+        console.log(`Commit ID for document "${serviceProviderId}/${policyType}.${fileExtension}": ${sha}`);
+        resolveLock(sha);
+      });
+    });
   });
+
+  return lock;
 }
