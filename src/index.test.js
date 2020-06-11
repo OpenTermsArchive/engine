@@ -9,19 +9,25 @@ const expect = chai.expect;
 import updateTerms from './index.js';
 import { RAW_DIRECTORY, SANITIZED_DIRECTORY } from './history/persistor.js';
 
-const facebookTermsHTML = fs.readFileSync(path.resolve(__dirname, '../test/fixtures/facebook_terms_raw.html'), { encoding: 'utf8' });
-const facebookTermsMD = fs.readFileSync(path.resolve(__dirname, '../test/fixtures/facebook_terms_sanitized.md'), { encoding: 'utf8' });
+const FIRST_SERVICE_PROVIDER_ID = 'first_provider';
+const FIRST_SERVICE_PROVIDER_POLICY_TYPE = 'tos';
+const FIRST_SERVICE_PROVIDER_EXPECTED_RAW_FILE_PATH = `${RAW_DIRECTORY}/${FIRST_SERVICE_PROVIDER_ID}/${FIRST_SERVICE_PROVIDER_POLICY_TYPE}.html`;
+const FIRST_SERVICE_PROVIDER_EXPECTED_SANITIZED_FILE_PATH = `${SANITIZED_DIRECTORY}/${FIRST_SERVICE_PROVIDER_ID}/${FIRST_SERVICE_PROVIDER_POLICY_TYPE}.md`;
+const FIRST_SERVICE_PROVIDER_TOS_RAW = fs.readFileSync(path.resolve(__dirname, '../test/fixtures/first_provider_terms_raw.html'), { encoding: 'utf8' });
+const FIRST_SERVICE_PROVIDER_TOS_SANITIZED = fs.readFileSync(path.resolve(__dirname, '../test/fixtures/first_provider_terms_sanitized.md'), { encoding: 'utf8' });
 
-nock('https://www.facebook.com', {
-    reqheaders: { 'Accept-Language': 'en' }
-  }).get('/legal/terms/plain_text_terms')
-  .reply(200, facebookTermsHTML);
+const SECOND_SERVICE_PROVIDER_ID = 'second_provider';
+const SECOND_SERVICE_PROVIDER_POLICY_TYPE = 'tos';
+const SECOND_SERVICE_PROVIDER_EXPECTED_RAW_FILE_PATH = `${RAW_DIRECTORY}/${SECOND_SERVICE_PROVIDER_ID}/${SECOND_SERVICE_PROVIDER_POLICY_TYPE}.html`;
+const SECOND_SERVICE_PROVIDER_EXPECTED_SANITIZED_FILE_PATH = `${SANITIZED_DIRECTORY}/${SECOND_SERVICE_PROVIDER_ID}/${SECOND_SERVICE_PROVIDER_POLICY_TYPE}.md`;
+const SECOND_SERVICE_PROVIDER_TOS_RAW = fs.readFileSync(path.resolve(__dirname, '../test/fixtures/second_provider_terms_raw.html'), { encoding: 'utf8' });
+const SECOND_SERVICE_PROVIDER_TOS_SANITIZED = fs.readFileSync(path.resolve(__dirname, '../test/fixtures/second_provider_terms_sanitized.md'), { encoding: 'utf8' });
 
-const SERVICE_PROVIDER_ID = 'facebook';
-const POLICY_TYPE = 'terms_of_service';
+nock('https://www.firstprovider.com').get('/tos')
+  .reply(200, FIRST_SERVICE_PROVIDER_TOS_RAW);
 
-const EXPECTED_RAW_FILE_PATH = `${RAW_DIRECTORY}/${SERVICE_PROVIDER_ID}/${POLICY_TYPE}.html`;
-const EXPECTED_SANITIZED_FILE_PATH = `${SANITIZED_DIRECTORY}/${SERVICE_PROVIDER_ID}/${POLICY_TYPE}.md`;
+nock('https://www.secondprovider.com').get('/tos')
+  .reply(200, SECOND_SERVICE_PROVIDER_TOS_RAW);
 
 describe('CGUs', () => {
   describe('#updateTerms', () => {
@@ -30,18 +36,30 @@ describe('CGUs', () => {
     });
 
     after(() => {
-      fs.unlinkSync(EXPECTED_RAW_FILE_PATH);
-      fs.unlinkSync(EXPECTED_SANITIZED_FILE_PATH);
+      fs.unlinkSync(FIRST_SERVICE_PROVIDER_EXPECTED_RAW_FILE_PATH);
+      fs.unlinkSync(FIRST_SERVICE_PROVIDER_EXPECTED_SANITIZED_FILE_PATH);
+      fs.unlinkSync(SECOND_SERVICE_PROVIDER_EXPECTED_RAW_FILE_PATH);
+      fs.unlinkSync(SECOND_SERVICE_PROVIDER_EXPECTED_SANITIZED_FILE_PATH);
     });
 
-    it('persists terms in raw format', async () => {
-      const resultingRawTerms = fs.readFileSync(path.resolve(__dirname, EXPECTED_RAW_FILE_PATH), { encoding: 'utf8' });
-      expect(resultingRawTerms).to.be.equal(facebookTermsHTML);
+    it('persists terms in raw format for first service provider', () => {
+      const resultingRawTerms = fs.readFileSync(path.resolve(__dirname, FIRST_SERVICE_PROVIDER_EXPECTED_RAW_FILE_PATH), { encoding: 'utf8' });
+      expect(resultingRawTerms).to.be.equal(FIRST_SERVICE_PROVIDER_TOS_RAW);
     });
 
-    it('persists terms in sanitized format', async () => {
-      const resultingSanitizedTerms = fs.readFileSync(path.resolve(__dirname, EXPECTED_SANITIZED_FILE_PATH), { encoding: 'utf8' });
-      expect(resultingSanitizedTerms).to.be.equal(facebookTermsMD);
+    it('persists terms in sanitized format for first service provider', () => {
+      const resultingSanitizedTerms = fs.readFileSync(path.resolve(__dirname, FIRST_SERVICE_PROVIDER_EXPECTED_SANITIZED_FILE_PATH), { encoding: 'utf8' });
+      expect(resultingSanitizedTerms).to.be.equal(FIRST_SERVICE_PROVIDER_TOS_SANITIZED);
+    });
+
+    it('persists terms in raw format for second service provider', async () => {
+      const resultingRawTerms = fs.readFileSync(path.resolve(__dirname, SECOND_SERVICE_PROVIDER_EXPECTED_RAW_FILE_PATH), { encoding: 'utf8' });
+      expect(resultingRawTerms).to.be.equal(SECOND_SERVICE_PROVIDER_TOS_RAW);
+    });
+
+    it('persists terms in sanitized format for second service provider', async () => {
+      const resultingSanitizedTerms = fs.readFileSync(path.resolve(__dirname, SECOND_SERVICE_PROVIDER_EXPECTED_SANITIZED_FILE_PATH), { encoding: 'utf8' });
+      expect(resultingSanitizedTerms).to.be.equal(SECOND_SERVICE_PROVIDER_TOS_SANITIZED);
     });
   });
 });
