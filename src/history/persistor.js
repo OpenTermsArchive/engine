@@ -40,15 +40,14 @@ export async function commit({ serviceProviderId, policyType, isSanitized }) {
   }
 
   // Ensure asynchronous functions `git.add` and `git.commit` will always be called in sequence…
-  // …and others caller of `persistor.commit` will wait
+  // …and other callers of `persistor.commit` will wait
   await lock;
-  lock = new Promise(resolveLock => {
-    git.add(filePath).then(() => {
-      git.commit(`${isSanitized ? 'Update sanitized' : 'Update'} ${serviceProviderId} ${policyType} document`).then((sha) => {
-        console.log(`Commit ID for document "${serviceProviderId}/${policyType}.${fileExtension}": ${sha}`);
-        resolveLock(sha);
-      });
-    });
+
+  lock = new Promise(async (resolve) => {
+    await git.add(filePath);
+    const sha = await git.commit(`${isSanitized ? 'Update sanitized' : 'Update'} ${serviceProviderId} ${policyType} document`);
+    console.log(`Commit ID for document "${serviceProviderId}/${policyType}.${fileExtension}": ${sha}`);
+    resolve(sha);
   });
 
   return lock;
