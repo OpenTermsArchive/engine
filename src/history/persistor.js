@@ -22,7 +22,10 @@ export async function save({ serviceProviderId, policyType, fileContent, isSanit
     fsApi.mkdirSync(directory);
   }
 
-  return fs.writeFile(`${directory}/${policyType}.${isSanitized ? 'md' : 'html'}`, fileContent);
+  const filePath = `${directory}/${policyType}.${isSanitized ? 'md' : 'html'}`;
+  return fs.writeFile(filePath, fileContent).then(() => {
+    console.log(`File ${filePath} saved.`)
+  });
 }
 
 export async function commit({ serviceProviderId, policyType, isSanitized }) {
@@ -37,5 +40,8 @@ export async function commit({ serviceProviderId, policyType, isSanitized }) {
 
   await git.add(filePath);
 
-  return git.commit(`${isSanitized ? 'Sanitized update' : 'Update'} for ${serviceProviderId} ${policyType} document`);
+  return git.commit(`${isSanitized ? 'Sanitized update' : 'Update'} for ${serviceProviderId} ${policyType} document`).then((sha) => {
+    console.log(`Commit ID for document "${serviceProviderId}/${policyType}.${fileExtension}": ${sha}`);
+    return sha;
+  });
 }
