@@ -57,12 +57,26 @@ ansible-playbook ops/app.yml -t update
 ### Troubleshooting
 
 If you have the following error:
-
 ```
-Failed to connect to the host via ssh: Received disconnect from 127.0.0.1 port 2222:2: Too many authentication failures
+Failed to connect to the host via ssh: ssh: connect to host 127.0.0.1 port 2222: Connection refused
 ```
 
-Modify ansible ssh options to the `ops/inventories/dev.yml` file like this:
+You may have a collision on the default port `2222` used by vagrant to forward ssh commands.
+Run the following command to know which ports are forwarded for the virtual machine:
+```
+vagrant port
+```
+
+It should display something like that:
+```
+The forwarded ports for the machine are listed below. Please note that
+these values may differ from values configured in the Vagrantfile if the
+provider supports automatic port collision detection and resolution.
+
+    22 (guest) => 2200 (host)
+```
+
+Modify ansible ssh options to the `ops/inventories/dev.yml` file with the proper `ansible_ssh_port`:
 ```
 all:
   children:
@@ -70,7 +84,6 @@ all:
       hosts:
         '127.0.0.1':
           […]
-          ansible_ssh_private_key_file: .vagrant/machines/default/virtualbox/private_key
-          ansible_ssh_extra_args: -o StrictHostKeyChecking=no -o IdentitiesOnly=yes
+          ansible_ssh_port: 2200
           […]
 ```
