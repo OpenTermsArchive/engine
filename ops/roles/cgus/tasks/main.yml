@@ -1,0 +1,45 @@
+- name: Clone Repo
+  git:
+    repo: "{{ repo }}"
+    dest: "/home/{{ ansible_user }}/{{ app }}"
+    force: yes
+  register: git_clone_app_finished
+  tags:
+    - setup
+    - update
+
+- name: Install NPM packages
+  npm:
+    path: "/home/{{ ansible_user }}/{{ app }}"
+    unsafe_perm: yes
+    production: yes
+  tags:
+    - setup
+    - update
+
+- name: Add .env file
+  copy:
+    src: .env
+    dest: "/home/{{ ansible_user }}/{{ app }}/.env"
+  tags:
+    - setup
+
+- name: Stop CGUs
+  command: forever stop "{{ app }}"
+  ignore_errors: yes
+  tags:
+    - restart
+    - stop
+    - update
+
+- name: Start CGUs
+  command:
+    cmd: forever start -a --uid "{{ app }}" -c "npm run start:scheduler" ./
+    chdir: "/home/{{ ansible_user }}/{{ app }}"
+  environment:
+    NODE_ENV: production
+    PORT: "{{ app_port }}"
+  tags:
+    - restart
+    - start
+    - update
