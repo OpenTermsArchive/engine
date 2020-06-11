@@ -2,6 +2,13 @@ import path from 'path';
 import fsApi from 'fs';
 const fs = fsApi.promises;
 
+import async from 'async';
+
+const commitQueue = async.queue(_commit, 1);
+commitQueue.error((err, { serviceProviderId, policyType, isSanitized, reject }) => {
+  reject(new Error(`_commit for ${serviceProviderId}${isSanitized ? ' sanitized ' : ' '}document ${policyType} experienced an error: ${err}`));
+});
+
 import * as git from './git.js';
 
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
@@ -28,7 +35,6 @@ export async function save({ serviceProviderId, policyType, fileContent, isSanit
   });
 }
 
-let lock = Promise.resolve('Initial Promise');
 export async function commit({ serviceProviderId, policyType, isSanitized }) {
   const directory = `${isSanitized ? SANITIZED_DIRECTORY : RAW_DIRECTORY}/${serviceProviderId}`;
   const fileExtension = isSanitized ? 'md' : 'html'
@@ -39,17 +45,14 @@ export async function commit({ serviceProviderId, policyType, isSanitized }) {
     return;
   }
 
-  // Ensure asynchronous functions `git.add` and `git.commit` will always be called in sequence…
-  // …and others caller of `persistor.commit` will wait
-  await lock;
-  lock = new Promise(resolveLock => {
-    git.add(filePath).then(() => {
-      git.commit(`${isSanitized ? 'Update sanitized' : 'Update'} ${serviceProviderId} ${policyType} document`).then((sha) => {
-        console.log(`Commit ID for document "${serviceProviderId}/${policyType}.${fileExtension}": ${sha}`);
-        resolveLock(sha);
-      });
-    });
-  });
+  return new Promise((resolve, reject) => {
+    commitQueue.push({ serviceProviderId, policyType, isSanitized, fileExtension, filePath, resolve, reject });
+  })
+}
 
-  return lock;
+async function _commit({ serviceProviderId, policyType, isSanitized, fileExtension, filePath, resolve }) {
+  await git.add(filePath)
+  const sha = await git.commit(`${isSanitized ? 'Update sanitized' : 'Update'} ${serviceProviderId} ${policyType} document`);
+  console.log(`Commit ID for document "${serviceProviderId}/${policyType}.${fileExtension}": ${sha}`);
+  resolve(sha);
 }
