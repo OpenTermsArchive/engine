@@ -16,9 +16,9 @@ export async function persist({ serviceProviderId, policyType, fileContent, isSa
 }
 
 export async function save({ serviceProviderId, policyType, fileContent, isSanitized }) {
-const directory = `${isSanitized ? SANITIZED_DIRECTORY : RAW_DIRECTORY}/${serviceProviderId}`;
+  const directory = `${isSanitized ? SANITIZED_DIRECTORY : RAW_DIRECTORY}/${serviceProviderId}`;
 
-if (!fsApi.existsSync(directory)){
+  if (!fsApi.existsSync(directory)){
     fsApi.mkdirSync(directory);
   }
 
