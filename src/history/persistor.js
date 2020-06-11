@@ -28,14 +28,14 @@ export async function save({ serviceProviderId, policyType, fileContent, isSanit
 export async function commit({ serviceProviderId, policyType, isSanitized }) {
   const directory = `${isSanitized ? SANITIZED_DIRECTORY : RAW_DIRECTORY}/${serviceProviderId}`;
   const fileExtension = isSanitized ? 'md' : 'html'
-  const filepath = path.relative(path.resolve(__dirname, '../..'), `${directory}/${policyType}.${fileExtension}`);
+  const filePath = path.relative(path.resolve(__dirname, '../..'), `${directory}/${policyType}.${fileExtension}`);
 
-  const status = await git.status(filepath);
+  const status = await git.status(filePath);
   if (!(status.includes('modified') || status.includes('added'))) {
     return;
   }
 
-  await git.add(filepath);
+  await git.add(filePath);
 
   return git.commit(`${isSanitized ? 'Sanitized update' : 'Update'} for ${serviceProviderId} ${policyType} document`);
 }
