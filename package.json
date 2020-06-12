@@ -36,6 +36,7 @@
     "jsdom": "^16.2.2",
     "node-fetch": "^2.6.0",
     "node-schedule": "^1.3.2",
+    "simple-git": "^2.6.0",
     "turndown": "^6.0.0"
   }
 }
