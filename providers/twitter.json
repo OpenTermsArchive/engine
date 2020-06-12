@@ -1,0 +1,9 @@
+{
+  "serviceProviderName": "Twitter",
+  "documents": {
+    "tos": {
+      "url": "https://twitter.com/tos",
+      "contentSelector": "main"
+    }
+  }
+}

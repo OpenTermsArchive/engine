@@ -2,6 +2,13 @@ import path from 'path';
 import fsApi from 'fs';
 const fs = fsApi.promises;
 
+import async from 'async';
+
+const commitQueue = async.queue(_commit, 1);
+commitQueue.error((err, { serviceProviderId, policyType, isSanitized, reject }) => {
+  reject(new Error(`Could not commit ${policyType} for ${serviceProviderId} (${isSanitized ? 'sanitized' : 'raw'} version) due to error: ${err}`));
+});
+
 import * as git from './git.js';
 
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
@@ -16,26 +23,37 @@ export async function persist({ serviceProviderId, policyType, fileContent, isSa
 }
 
 export async function save({ serviceProviderId, policyType, fileContent, isSanitized }) {
-const directory = `${isSanitized ? SANITIZED_DIRECTORY : RAW_DIRECTORY}/${serviceProviderId}`;
+  const directory = `${isSanitized ? SANITIZED_DIRECTORY : RAW_DIRECTORY}/${serviceProviderId}`;
 
-if (!fsApi.existsSync(directory)){
-    fsApi.mkdirSync(directory);
+  if (!fsApi.existsSync(directory)) {
+    await fs.mkdir(directory);
   }
 
-  return fs.writeFile(`${directory}/${policyType}.${isSanitized ? 'md' : 'html'}`, fileContent);
+  const filePath = `${directory}/${policyType}.${isSanitized ? 'md' : 'html'}`;
+  return fs.writeFile(filePath, fileContent).then(() => {
+    console.log(`File ${filePath} saved.`)
+  });
 }
 
 export async function commit({ serviceProviderId, policyType, isSanitized }) {
   const directory = `${isSanitized ? SANITIZED_DIRECTORY : RAW_DIRECTORY}/${serviceProviderId}`;
   const fileExtension = isSanitized ? 'md' : 'html'
-  const filepath = path.relative(path.resolve(__dirname, '../..'), `${directory}/${policyType}.${fileExtension}`);
+  // Git needs a path relative to the .git directory, not an absolute one
+  const filePath = path.relative(path.resolve(__dirname, '../..'), `${directory}/${policyType}.${fileExtension}`);
 
-  const status = await git.status(filepath);
-  if (!(status.includes('modified') || status.includes('added'))) {
+  const status = await git.status(filePath);
+  if (!status.match(/^\*?(modified|added)/)) {
     return;
   }
 
-  await git.add(filepath);
+  return new Promise((resolve, reject) => {
+    commitQueue.push({ serviceProviderId, policyType, isSanitized, fileExtension, filePath, resolve, reject });
+  });
+}
 
-  return git.commit(`${isSanitized ? 'Sanitized update' : 'Update'} for ${serviceProviderId} ${policyType} document`);
+async function _commit({ serviceProviderId, policyType, isSanitized, fileExtension, filePath, resolve }) {
+  await git.add(filePath);
+  const sha = await git.commit(`Update ${isSanitized ? 'sanitized' : 'raw'} ${policyType} for ${serviceProviderId}`);
+  console.log(`Commit ID for document "${serviceProviderId}/${policyType}.${fileExtension}": ${sha}`);
+  resolve(sha);
 }
