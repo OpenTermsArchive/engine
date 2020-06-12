@@ -1,0 +1,9 @@
+{
+  "serviceProviderName": "Second Provider",
+  "documents": {
+    "tos": {
+      "url": "https://www.secondprovider.example/tos",
+      "contentSelector": "main"
+    }
+  }
+}

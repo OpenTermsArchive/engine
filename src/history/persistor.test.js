@@ -10,8 +10,7 @@ const POLICY_TYPE = 'terms_of_service';
 const FILE_CONTENT = 'ToS fixture data with UTF-8 çhãràčtęrs';
 const EXPECTED_FILE_PATH = `${RAW_DIRECTORY}/${SERVICE_PROVIDER_ID}/${POLICY_TYPE}.html`;
 
-
-describe('History', () => {
+describe('Persistor', () => {
   describe('#save', () => {
     context('when service provider’s directory already exist', () => {
       after(() => {
