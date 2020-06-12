@@ -45,18 +45,19 @@ export async function commit(filePath, message) {
   // Git needs a path relative to the .git directory, not an absolute one
   const relativeFilePath = path.relative(path.resolve(__dirname, '../..'), filePath);
 
-  const status = await git.status(relativeFilePath);
-  if (!status.match(/^\*?(modified|added)/)) {
+  const status = await git.status();
+  if ((status.modified.indexOf(relativeFilePath) === -1) &&
+      (status.not_added.indexOf(relativeFilePath) === -1)) {
     return;
   }
 
   return new Promise((resolve, reject) => {
     commitQueue.push({ filePath: relativeFilePath, message, resolve, reject });
-  })
+  });
 }
 
 async function _commit({ filePath, message, resolve }) {
   await git.add(filePath);
-  const sha = await git.commit(message);
-  resolve(sha);
+  const commitSummary = await git.commit(filePath, message);
+  resolve(commitSummary.commit);
 }
