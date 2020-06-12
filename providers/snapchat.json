@@ -2,7 +2,11 @@
   "serviceProviderName": "Snapchat",
   "documents": {
     "tos": {
-      "url": "https://www.snap.com/terms/",
+      "url": "https://www.snap.com/terms",
+      "contentSelector": ".textarticle-container"
+    },
+    "privacy": {
+      "url": "https://www.snap.com/privacy/privacy-policy",
       "contentSelector": ".textarticle-container"
     }
   }
