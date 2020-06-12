@@ -2,7 +2,7 @@
   "serviceProviderName": "Second Provider",
   "documents": {
     "tos": {
-      "url": "https://www.secondprovider.com/tos",
+      "url": "https://www.secondprovider.example/tos",
       "contentSelector": "main"
     }
   }

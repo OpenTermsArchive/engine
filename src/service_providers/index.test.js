@@ -3,16 +3,16 @@ import nock from 'nock';
 import fs from 'fs';
 import path from 'path';
 
-import serviceProviders from './index.js';
+import getServiceProviders from './index.js';
 
 const expect = chai.expect;
 
-const expectResult = {
+const expected = {
   first_provider: {
     serviceProviderName: 'First Provider',
     documents: {
       tos: {
-        url: 'https://www.firstprovider.com/tos',
+        url: 'https://www.firstprovider.example/tos',
         contentSelector: 'main'
       }
     }
@@ -21,7 +21,7 @@ const expectResult = {
     serviceProviderName: 'Second Provider',
     documents: {
       tos: {
-        url: 'https://www.secondprovider.com/tos',
+        url: 'https://www.secondprovider.example/tos',
         contentSelector: 'main'
       }
     }
@@ -30,10 +30,10 @@ const expectResult = {
 }
 
 describe('ServiceProviders', () => {
-  describe('#serviceProviders', () => {
+  describe('#getServiceProviders', () => {
     it('returns an object with all service providers manifests', () => {
-      const result = serviceProviders();
-      expect(result).to.deep.equal(expectResult);
+      const result = getServiceProviders();
+      expect(result).to.deep.equal(expected);
     });
   });
 });

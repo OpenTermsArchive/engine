@@ -23,10 +23,10 @@ const SECOND_SERVICE_PROVIDER_EXPECTED_SANITIZED_FILE_PATH = `${SANITIZED_DIRECT
 const SECOND_SERVICE_PROVIDER_TOS_RAW = fs.readFileSync(path.resolve(__dirname, '../test/fixtures/second_provider_terms_raw.html'), { encoding: 'utf8' });
 const SECOND_SERVICE_PROVIDER_TOS_SANITIZED = fs.readFileSync(path.resolve(__dirname, '../test/fixtures/second_provider_terms_sanitized.md'), { encoding: 'utf8' });
 
-nock('https://www.firstprovider.com').get('/tos')
+nock('https://www.firstprovider.example').get('/tos')
   .reply(200, FIRST_SERVICE_PROVIDER_TOS_RAW);
 
-nock('https://www.secondprovider.com').get('/tos')
+nock('https://www.secondprovider.example').get('/tos')
   .reply(200, SECOND_SERVICE_PROVIDER_TOS_RAW);
 
 describe('CGUs', () => {

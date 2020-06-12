@@ -14,7 +14,7 @@ export default async function sanitize(content, selector) {
     if (selectedContent) {
       contentToSanitize = selectedContent;
     } else {
-      console.log(`Warning: the provider selector "${selector}" has no match in the document.`)
+      console.warn(`The provider selector "${selector}" has no match in the document.`)
     }
   }
 

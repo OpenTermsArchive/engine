@@ -1,13 +1,13 @@
-import dotenv from 'dotenv';
-dotenv.config();
-
 import fs from 'fs';
 import path from 'path';
 
-const __dirname = path.dirname(new URL(import.meta.url).pathname);
-const dirPath = path.resolve(__dirname, `../..${process.env.NODE_ENV === 'test' ? '/test/' : '/'}providers`)
+import dotenv from 'dotenv';
+dotenv.config();
 
-export default function serviceProviders() {
+const __dirname = path.dirname(new URL(import.meta.url).pathname);
+const dirPath = path.resolve(__dirname, '../..', process.env.NODE_ENV === 'test' ? 'test' : '', 'providers');
+
+export default function getServiceProviders() {
   const result = {};
 
   fs.readdirSync(dirPath).forEach((filename) => {
