@@ -3,24 +3,26 @@ import chai from 'chai';
 
 import { RAW_DIRECTORY, SANITIZED_DIRECTORY } from './persistor.js';
 import { persistRaw, persistSanitized } from './index.js';
+import { DOCUMENTS_TYPES } from '../constants.js';
 
 const expect = chai.expect;
 
 const SERVICE_PROVIDER_ID = 'test_service_provider';
-const POLICY_TYPE = 'terms_of_service';
+const POLICY_TYPE = 'tos';
 
 const RAW_FILE_CONTENT = '<html><h1>ToS fixture data with UTF-8 çhãràčtęrs</h1></html>';
-const EXPECTED_RAW_FILE_PATH = `${RAW_DIRECTORY}/${SERVICE_PROVIDER_ID}/${POLICY_TYPE}.html`;
+const EXPECTED_RAW_FILE_PATH = `${RAW_DIRECTORY}/${SERVICE_PROVIDER_ID}/${DOCUMENTS_TYPES[POLICY_TYPE].fileName}.html`;
 
 const SANITIZED_FILE_CONTENT = '# ToS fixture data with UTF-8 çhãràčtęrs';
-const EXPECTED_SANITIZED_FILE_PATH = `${SANITIZED_DIRECTORY}/${SERVICE_PROVIDER_ID}/${POLICY_TYPE}.md`;
+const EXPECTED_SANITIZED_FILE_PATH = `${SANITIZED_DIRECTORY}/${SERVICE_PROVIDER_ID}/${DOCUMENTS_TYPES[POLICY_TYPE].fileName}.md`;
 
 
 describe('History', () => {
   describe('#persistRaw', () => {
     let sha;
     before(async () => {
-      sha = await persistRaw(SERVICE_PROVIDER_ID, POLICY_TYPE, RAW_FILE_CONTENT);
+      const { sha: persistSha } = await persistRaw(SERVICE_PROVIDER_ID, POLICY_TYPE, RAW_FILE_CONTENT);
+      sha = persistSha;
     });
 
     after(() => {
@@ -40,7 +42,8 @@ describe('History', () => {
   describe('#persistSanitized', () => {
     let sha;
     before(async () => {
-      sha = await persistSanitized(SERVICE_PROVIDER_ID, POLICY_TYPE, SANITIZED_FILE_CONTENT);
+      const { sha: persistSha } = await persistSanitized(SERVICE_PROVIDER_ID, POLICY_TYPE, SANITIZED_FILE_CONTENT);
+      sha = persistSha;
     });
 
     after(() => {
