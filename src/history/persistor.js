@@ -6,7 +6,7 @@ import async from 'async';
 
 const commitQueue = async.queue(_commit, 1);
 commitQueue.error((err, { serviceProviderId, policyType, isSanitized, reject }) => {
-  reject(new Error(`_commit for ${serviceProviderId}${isSanitized ? ' sanitized ' : ' '}document ${policyType} experienced an error: ${err}`));
+  reject(new Error(`Could not commit ${policyType} for ${serviceProviderId} (${isSanitized ? 'sanitized' : 'raw'} version) due to error: ${err}`));
 });
 
 import * as git from './git.js';
@@ -25,8 +25,8 @@ export async function persist({ serviceProviderId, policyType, fileContent, isSa
 export async function save({ serviceProviderId, policyType, fileContent, isSanitized }) {
   const directory = `${isSanitized ? SANITIZED_DIRECTORY : RAW_DIRECTORY}/${serviceProviderId}`;
 
-  if (!fsApi.existsSync(directory)){
-    fsApi.mkdirSync(directory);
+  if (!fsApi.existsSync(directory)) {
+    await fs.mkdir(directory);
   }
 
   const filePath = `${directory}/${policyType}.${isSanitized ? 'md' : 'html'}`;
@@ -38,6 +38,7 @@ export async function save({ serviceProviderId, policyType, fileContent, isSanit
 export async function commit({ serviceProviderId, policyType, isSanitized }) {
   const directory = `${isSanitized ? SANITIZED_DIRECTORY : RAW_DIRECTORY}/${serviceProviderId}`;
   const fileExtension = isSanitized ? 'md' : 'html'
+  // Git needs a path relative to the .git directory, not an absolute one
   const filePath = path.relative(path.resolve(__dirname, '../..'), `${directory}/${policyType}.${fileExtension}`);
 
   const status = await git.status(filePath);
@@ -47,12 +48,12 @@ export async function commit({ serviceProviderId, policyType, isSanitized }) {
 
   return new Promise((resolve, reject) => {
     commitQueue.push({ serviceProviderId, policyType, isSanitized, fileExtension, filePath, resolve, reject });
-  })
+  });
 }
 
 async function _commit({ serviceProviderId, policyType, isSanitized, fileExtension, filePath, resolve }) {
-  await git.add(filePath)
-  const sha = await git.commit(`${isSanitized ? 'Update sanitized' : 'Update'} ${serviceProviderId} ${policyType} document`);
+  await git.add(filePath);
+  const sha = await git.commit(`Update ${isSanitized ? 'sanitized' : 'raw'} ${policyType} for ${serviceProviderId}`);
   console.log(`Commit ID for document "${serviceProviderId}/${policyType}.${fileExtension}": ${sha}`);
   resolve(sha);
 }
