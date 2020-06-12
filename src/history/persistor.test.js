@@ -2,13 +2,14 @@ import fs from 'fs';
 import chai from 'chai';
 
 import { RAW_DIRECTORY, save, commit, persist } from './persistor.js';
+import { DOCUMENTS_TYPES } from '../constants.js';
 
 const expect = chai.expect;
 
 const SERVICE_PROVIDER_ID = 'test_service_provider';
-const POLICY_TYPE = 'terms_of_service';
+const POLICY_TYPE = 'tos';
 const FILE_CONTENT = 'ToS fixture data with UTF-8 çhãràčtęrs';
-const EXPECTED_FILE_PATH = `${RAW_DIRECTORY}/${SERVICE_PROVIDER_ID}/${POLICY_TYPE}.html`;
+const EXPECTED_FILE_PATH = `${RAW_DIRECTORY}/${SERVICE_PROVIDER_ID}/${DOCUMENTS_TYPES[POLICY_TYPE].fileName}.html`;
 
 describe('Persistor', () => {
   describe('#save', () => {
@@ -31,7 +32,7 @@ describe('Persistor', () => {
 
     context('when service provider’s directory does not already exist', () => {
       const NEW_SERVICE_PROVIDER_ID = 'test_not_existing_service_provider';
-      const NEW_SERVICE_PROVIDER_EXPECTED_FILE_PATH = `${RAW_DIRECTORY}/${NEW_SERVICE_PROVIDER_ID}/${POLICY_TYPE}.html`;
+      const NEW_SERVICE_PROVIDER_EXPECTED_FILE_PATH = `${RAW_DIRECTORY}/${NEW_SERVICE_PROVIDER_ID}/${DOCUMENTS_TYPES[POLICY_TYPE].fileName}.html`;
 
       after(() => {
         fs.unlinkSync(NEW_SERVICE_PROVIDER_EXPECTED_FILE_PATH);
@@ -51,11 +52,13 @@ describe('Persistor', () => {
   });
 
   describe('#commit', () => {
+    const COMMIT_FILE_CONTENT = FILE_CONTENT + 'commit';
+
     before(async () => {
       return save({
         serviceProviderId: SERVICE_PROVIDER_ID,
         policyType: POLICY_TYPE,
-        fileContent: FILE_CONTENT,
+        fileContent: COMMIT_FILE_CONTENT,
         isSanitized: false
       });
     });
@@ -65,24 +68,23 @@ describe('Persistor', () => {
     });
 
     it('commits the file for the given service provider', async () => {
-      const sha = await commit({
-        serviceProviderId: SERVICE_PROVIDER_ID,
-        policyType: POLICY_TYPE,
-        isSanitized: false
-      });
+      const sha = await commit(EXPECTED_FILE_PATH, 'message');
       expect(sha).to.not.be.null;
     });
   });
 
   describe('#persist', () => {
     let sha;
+    const PERSIST_FILE_CONTENT = FILE_CONTENT + 'persist';
+
     before(async () => {
-      sha = await persist({
+      const { sha: persistSha } = await persist({
         serviceProviderId: SERVICE_PROVIDER_ID,
         policyType: POLICY_TYPE,
-        fileContent: FILE_CONTENT,
+        fileContent: PERSIST_FILE_CONTENT,
         isSanitized: false
       });
+      sha = persistSha;
     });
 
     after(() => {
@@ -90,7 +92,7 @@ describe('Persistor', () => {
     });
 
     it('creates a file for the given service provider', () => {
-      expect(fs.readFileSync(EXPECTED_FILE_PATH, { encoding: 'utf8' })).to.equal(FILE_CONTENT);
+      expect(fs.readFileSync(EXPECTED_FILE_PATH, { encoding: 'utf8' })).to.equal(PERSIST_FILE_CONTENT);
     });
 
     it('commits the file for the given service provider', () => {
