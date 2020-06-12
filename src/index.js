@@ -8,19 +8,31 @@ import scrape from './scraper/index.js';
 import { persistRaw, persistSanitized } from './history/index.js';
 import sanitize from './sanitizer/index.js';
 import getServiceProviders from './service_providers/index.js';
+import { DOCUMENTS_TYPES } from './constants.js';
 
 export async function updateServiceProviderDocument(serviceProviderId, serviceProviderName, documentType, documentUrl, documentContentSelector) {
-  console.log(`${serviceProviderName}: Scrape '${documentUrl}'.`);
+  const logPrefix = `[${serviceProviderName}-${DOCUMENTS_TYPES[documentType].name}]`;
+
+  console.log(`${logPrefix} Scrape '${documentUrl}'.`);
   const content = await scrape(documentUrl);
 
-  console.log(`${serviceProviderName}: Persist raw document '${documentType}'.`);
-  persistRaw(serviceProviderId, documentType, content);
+  const { sha: rawSha, filePath: rawFilePath} = await persistRaw(serviceProviderId, documentType, content);
+  if (rawSha) {
+    console.log(`${logPrefix} Save raw file '${rawFilePath}'.`);
+    console.log(`${logPrefix} Commit raw file in '${rawSha}'.`);
+  } else {
+    console.log(`${logPrefix} No raw changes, didn't commit.`);
+  }
 
-  console.log(`${serviceProviderName}: Sanitize raw document '${documentType}'.`);
   const sanitizedContent = await sanitize(content, documentContentSelector);
 
-  console.log(`${serviceProviderName}: Persist sanitized document '${documentType}'.`);
-  persistSanitized(serviceProviderId, documentType, sanitizedContent);
+  const { sha: sanitizedSha, filePath: sanitizedFilePath} = await persistSanitized(serviceProviderId, documentType, sanitizedContent);
+  if (sanitizedSha) {
+    console.log(`${logPrefix} Save sanitized file '${sanitizedFilePath}'.`);
+    console.log(`${logPrefix} Commit sanitized file in '${sanitizedSha}'.`);
+  } else {
+    console.log(`${logPrefix} No sanitized changes, didn't commit.`);
+  }
 };
 
 export default async function updateTerms() {
