@@ -33,8 +33,8 @@ export async function pushChanges() {
 
 export async function fileNeedsCommit(filepath) {
   const status = await git.status();
-  return !((status.modified.indexOf(relativePath(filepath)) === -1) &&
-           (status.not_added.indexOf(relativePath(filepath)) === -1));
+  return (status.modified.indexOf(relativePath(filepath)) > -1) ||
+           (status.not_added.indexOf(relativePath(filepath)) > -1);
 }
 
 export function relativePath(absolutePath) {
