@@ -9,6 +9,11 @@ const __dirname = path.dirname(new URL(import.meta.url).pathname);
 
 export const git = simpleGit(path.resolve(__dirname, '../..'));
 
+if (process.env.CI) {
+  git.addConfig('user.name', process.env.AUTHOR_NAME)
+     .addConfig('user.email', process.env.AUTHOR_EMAIL);
+}
+
 export async function add(filepath) {
   return git.add(filepath);
 }
