@@ -7,7 +7,7 @@ import simpleGit from 'simple-git';
 
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
 
-const git = simpleGit(path.resolve(__dirname, '../..'))
+export const git = simpleGit(path.resolve(__dirname, '../..'))
   .addConfig('user.name', process.env.AUTHOR_NAME)
   .addConfig('user.email', process.env.AUTHOR_EMAIL);
 
