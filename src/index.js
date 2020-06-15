@@ -10,7 +10,7 @@ import sanitize from './sanitizer/index.js';
 import getServiceProviders from './service_providers/index.js';
 import { DOCUMENTS_TYPES } from './documents_types.js';
 
-export async function updateServiceProviderDocument(serviceProviderId, serviceProviderName, documentType, documentUrl, documentContentSelector) {
+export async function updateServiceProviderDocument(serviceProviderId, serviceProviderName, documentType, documentUrl, documentContentSelector, sanitizationPipeline) {
   const logPrefix = `[${serviceProviderName}-${DOCUMENTS_TYPES[documentType].name}]`;
 
   console.log(`${logPrefix} Scrape '${documentUrl}'.`);
@@ -24,7 +24,7 @@ export async function updateServiceProviderDocument(serviceProviderId, servicePr
     console.log(`${logPrefix} No raw changes, didn't commit.`);
   }
 
-  const sanitizedContent = await sanitize(content, documentContentSelector);
+  const sanitizedContent = await sanitize(content, documentContentSelector, sanitizationPipeline);
 
   const { sha: sanitizedSha, filePath: sanitizedFilePath} = await persistSanitized(serviceProviderId, documentType, sanitizedContent);
   if (sanitizedSha) {
@@ -45,8 +45,8 @@ export default async function updateTerms() {
     const { documents, serviceProviderName } = serviceProvidersManifests[serviceProviderId];
 
     Object.keys(documents).forEach((documentType) => {
-      const { url, contentSelector } = documents[documentType];
-      documentUpdatePromises.push(updateServiceProviderDocument(serviceProviderId, serviceProviderName, documentType, url, contentSelector));
+      const { url, contentSelector, sanitizationPipeline } = documents[documentType];
+      documentUpdatePromises.push(updateServiceProviderDocument(serviceProviderId, serviceProviderName, documentType, url, contentSelector, sanitizationPipeline));
     });
   });
 
