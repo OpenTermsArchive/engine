@@ -27,6 +27,10 @@ export async function commit(filepath, message) {
   return git.commit(message, relativePath(filepath), { '--author': `${process.env.AUTHOR_NAME} <${process.env.AUTHOR_EMAIL}>` });
 }
 
+export async function pushChanges() {
+  return git.push('origin', 'master');
+}
+
 export async function fileNeedsCommit(filepath) {
   const status = await git.status();
   return !((status.modified.indexOf(relativePath(filepath)) === -1) &&
