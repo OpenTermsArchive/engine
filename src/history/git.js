@@ -10,7 +10,7 @@ const DATA_PATH = '../../data';
 
 export const git = simpleGit(path.resolve(__dirname, DATA_PATH));
 
-if (process.env.CI || process.env.PRODUCTION) {
+if (process.env.CI || process.env.NODE_ENV === 'production') {
   git.addConfig('user.name', process.env.AUTHOR_NAME)
      .addConfig('user.email', process.env.AUTHOR_EMAIL);
 }
