@@ -20,7 +20,7 @@ export const SANITIZED_DIRECTORY = `${ROOT_DIRECTORY}/sanitized`;
 
 export async function persist({ serviceProviderId, policyType, fileContent, isSanitized }) {
   const filePath = await save({ serviceProviderId, policyType, fileContent, isSanitized });
-  const message = `${isSanitized ? 'Update sanitized' : 'Update'} ${serviceProviderId} ${DOCUMENTS_TYPES[policyType].name} document`;
+  const message = `Update ${isSanitized ? 'sanitized' : 'raw'} ${serviceProviderId} ${DOCUMENTS_TYPES[policyType].name} document`;
   const sha = await commit(filePath, message);
   return {
     filePath,
