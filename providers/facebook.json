@@ -4,6 +4,14 @@
     "tos": {
       "url": "https://www.facebook.com/legal/terms/plain_text_terms",
       "contentSelector": ".UIFullPage_Container"
+    },
+    "privacy": {
+      "url": "https://www.facebook.com/about/privacy",
+      "contentSelector": "._5tkp"
+    },
+    "devPolicy": {
+      "url": "https://developers.facebook.com/policy",
+      "contentSelector": "._4bl9"
     }
   }
 }

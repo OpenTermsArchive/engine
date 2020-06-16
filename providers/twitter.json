@@ -4,6 +4,18 @@
     "tos": {
       "url": "https://twitter.com/tos",
       "contentSelector": "main"
+    },
+    "privacy": {
+      "url": "https://twitter.com/privacy",
+      "contentSelector": "main"
+    },
+    "devAgreement": {
+      "url": "https://developer.twitter.com/developer-terms/agreement",
+      "contentSelector": "main"
+    },
+    "devPolicy": {
+      "url": "https://developer.twitter.com/developer-terms/policy",
+      "contentSelector": "main"
     }
   }
 }
