@@ -23,5 +23,5 @@ export async function status() {
 }
 
 export async function commit(filepath, message) {
-  return git.commit(message, filepath, { '--author': `"${process.env.AUTHOR_NAME} <${process.env.AUTHOR_EMAIL}>"` });
+  return git.commit(message, filepath, { '--author': `${process.env.AUTHOR_NAME} <${process.env.AUTHOR_EMAIL}>` });
 }
