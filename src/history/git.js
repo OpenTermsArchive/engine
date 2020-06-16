@@ -24,7 +24,8 @@ export async function status() {
 }
 
 export async function commit(filepath, message) {
-  return git.commit(message, relativePath(filepath), { '--author': `${process.env.AUTHOR_NAME} <${process.env.AUTHOR_EMAIL}>` });
+  const summary = await git.commit(message, relativePath(filepath), { '--author': `${process.env.AUTHOR_NAME} <${process.env.AUTHOR_EMAIL}>` });
+  return summary.commit.replace('HEAD ', '');
 }
 
 export async function pushChanges() {
