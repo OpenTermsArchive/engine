@@ -14,7 +14,7 @@ import { DOCUMENTS_TYPES } from '../documents_types.js';
 
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
 
-const ROOT_DIRECTORY = path.resolve(__dirname, `../..${process.env.NODE_ENV === 'test' ? '/test/' : '/'}data`);
+const ROOT_DIRECTORY = path.resolve(__dirname, `../../data`);
 export const RAW_DIRECTORY = `${ROOT_DIRECTORY}/raw`;
 export const SANITIZED_DIRECTORY = `${ROOT_DIRECTORY}/sanitized`;
 
@@ -40,17 +40,12 @@ export async function save({ serviceProviderId, policyType, fileContent, isSanit
 }
 
 export async function commit(filePath, message) {
-  // Git needs a path relative to the .git directory, not an absolute one
-  const relativeFilePath = path.relative(path.resolve(__dirname, '../..'), filePath);
-
-  const status = await git.status();
-  if ((status.modified.indexOf(relativeFilePath) === -1) &&
-      (status.not_added.indexOf(relativeFilePath) === -1)) {
+  if (!await git.fileNeedsCommit(filePath)) {
     return;
   }
 
   return new Promise((resolve, reject) => {
-    commitQueue.push({ filePath: relativeFilePath, message, resolve, reject });
+    commitQueue.push({ filePath, message, resolve, reject });
   });
 }
 

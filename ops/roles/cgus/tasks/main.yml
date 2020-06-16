@@ -34,7 +34,7 @@
 
 - name: Start CGUs
   command:
-    cmd: forever start -a --uid "{{ app }}" -c "npm run start:scheduler" ./
+    cmd: forever start -a --uid "{{ app }}" -c "npm run start:scheduler:prod" ./
     chdir: "/home/{{ ansible_user }}/{{ app }}"
   environment:
     NODE_ENV: production

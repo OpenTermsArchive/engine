@@ -1,4 +1,5 @@
 import { persist } from './persistor.js';
+export { pushChanges } from './git.js';
 
 export async function persistRaw(serviceProviderId, policyType, fileContent) {
   return persist({
