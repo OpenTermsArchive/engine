@@ -3,7 +3,7 @@ import chai from 'chai';
 
 import { RAW_DIRECTORY, SANITIZED_DIRECTORY } from './persistor.js';
 import { persistRaw, persistSanitized } from './index.js';
-import { DOCUMENTS_TYPES } from '../constants.js';
+import { DOCUMENTS_TYPES } from '../documents_types.js';
 
 const expect = chai.expect;
 

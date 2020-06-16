@@ -2,7 +2,7 @@ import fs from 'fs';
 import chai from 'chai';
 
 import { RAW_DIRECTORY, save, commit, persist } from './persistor.js';
-import { DOCUMENTS_TYPES } from '../constants.js';
+import { DOCUMENTS_TYPES } from '../documents_types.js';
 
 const expect = chai.expect;
 

@@ -1,18 +1,18 @@
 export const DOCUMENTS_TYPES = {
   tos: {
-    name: "Terms of service",
+    name: 'Terms of service',
     fileName: 'terms_of_service'
   },
   privacy: {
-    name: "Privacy Policy",
+    name: 'Privacy Policy',
     fileName: 'privacy_policy'
   },
   devAgreement: {
-    name: "Developer Agreement",
+    name: 'Developer Agreement',
     fileName: 'developer_agreement'
   },
   devPolicy: {
-    name: "Developer Policy",
+    name: 'Developer Policy',
     fileName: 'developer_policy'
   }
-}
+};

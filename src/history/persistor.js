@@ -10,7 +10,7 @@ commitQueue.error((err, { serviceProviderId, policyType, isSanitized, reject }) 
 });
 
 import * as git from './git.js';
-import { DOCUMENTS_TYPES } from '../constants.js';
+import { DOCUMENTS_TYPES } from '../documents_types.js';
 
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
 
