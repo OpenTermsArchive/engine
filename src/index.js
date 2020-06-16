@@ -8,7 +8,7 @@ import scrape from './scraper/index.js';
 import { persistRaw, persistSanitized } from './history/index.js';
 import sanitize from './sanitizer/index.js';
 import getServiceProviders from './service_providers/index.js';
-import { DOCUMENTS_TYPES } from './constants.js';
+import { DOCUMENTS_TYPES } from './documents_types.js';
 
 export async function updateServiceProviderDocument(serviceProviderId, serviceProviderName, documentType, documentUrl, documentContentSelector) {
   const logPrefix = `[${serviceProviderName}-${DOCUMENTS_TYPES[documentType].name}]`;

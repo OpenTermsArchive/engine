@@ -8,7 +8,7 @@ const expect = chai.expect;
 
 import updateTerms from './index.js';
 import { RAW_DIRECTORY, SANITIZED_DIRECTORY } from './history/persistor.js';
-import { DOCUMENTS_TYPES } from './constants.js';
+import { DOCUMENTS_TYPES } from './documents_types.js';
 
 const FIRST_SERVICE_PROVIDER_ID = 'first_provider';
 const FIRST_SERVICE_PROVIDER_POLICY_TYPE = 'tos';
