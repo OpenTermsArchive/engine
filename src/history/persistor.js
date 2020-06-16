@@ -36,9 +36,7 @@ export async function save({ serviceProviderId, policyType, fileContent, isSanit
   }
 
   const filePath = `${directory}/${DOCUMENTS_TYPES[policyType].fileName}.${isSanitized ? 'md' : 'html'}`;
-  return fs.writeFile(filePath, fileContent).then(() => {
-    return filePath;
-  });
+  return fs.writeFile(filePath, fileContent).then(() => filePath);
 }
 
 export async function commit(filePath, message) {
