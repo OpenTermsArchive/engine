@@ -22,4 +22,5 @@ jobs:
       with:
         node-version: '12.17'
     - run: npm ci
+    - run: git submodule update --init --recursive
     - run: npm test
