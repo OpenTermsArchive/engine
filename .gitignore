@@ -2,4 +2,3 @@
 node_modules
 /.env
 .vagrant
-vault.key
