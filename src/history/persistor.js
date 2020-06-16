@@ -51,6 +51,5 @@ export async function commit(filePath, message) {
 
 async function _commit({ filePath, message, resolve }) {
   await git.add(filePath);
-  const commitSummary = await git.commit(filePath, message);
-  resolve(commitSummary.commit);
+  resolve(await git.commit(filePath, message));
 }
