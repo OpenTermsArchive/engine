@@ -1,8 +1,12 @@
-name: Deploy
+name: Test & Deploy
 
 on:
   push:
     branches: [ master ]
+
+env:
+  AUTHOR_NAME: 'AmbaNum Bot'
+  AUTHOR_EMAIL: 'ambanum.bot@disinfo.quaidorsay.fr'
 
 jobs:
   deploy:
@@ -20,6 +24,9 @@ jobs:
       with:
         key: ${{ secrets.SSH_KEY }}
         known_hosts: ${{ secrets.KNOWN_HOSTS }}
+    - run: npm ci
+    - run: git submodule update --init --recursive
+    - run: npm test
     - run: pip install --upgrade setuptools
     - run: pip install ansible
     - run: ansible-playbook ops/app.yml -i ops/inventories/production.yml -t update
