@@ -1,30 +1,27 @@
 import fs from 'fs';
 import path from 'path';
-import git from 'isomorphic-git';
+
+import dotenv from 'dotenv';
+dotenv.config();
+import simpleGit from 'simple-git';
 
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
 
-const DEFAULT_GIT_OPTIONS = {
-  fs,
-  dir: path.resolve(__dirname, '../..'),
-  dryRun: process.env.NODE_ENV === 'test',
-};
+export const git = simpleGit(path.resolve(__dirname, '../..'));
+
+if (process.env.CI) {
+  git.addConfig('user.name', process.env.AUTHOR_NAME)
+     .addConfig('user.email', process.env.AUTHOR_EMAIL);
+}
 
 export async function add(filepath) {
-  return git.add({ ...DEFAULT_GIT_OPTIONS, filepath });
+  return git.add(filepath);
 }
 
-export async function status(filepath) {
-  return git.status({ ...DEFAULT_GIT_OPTIONS, filepath });
+export async function status() {
+  return git.status();
 }
 
-export async function commit(message) {
-  return git.commit({
-    ...DEFAULT_GIT_OPTIONS,
-    author: {
-      name: process.env.AUTHOR_NAME,
-      email: process.env.AUTHOR_EMAIL,
-    },
-    message
-  });
+export async function commit(filepath, message) {
+  return git.commit(message, filepath, { '--author': `${process.env.AUTHOR_NAME} <${process.env.AUTHOR_EMAIL}>` });
 }
