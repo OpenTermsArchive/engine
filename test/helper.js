@@ -9,7 +9,7 @@ let stashResult;
 before(async () => {
   const { latest: { hash } } = await git.log(['-1']);
   lastCommitId = hash;
-  stashResult = await git.stash(['-u']);
+  stashResult = await git.stash(['--include-untracked']);
 });
 
 after(async () => {
