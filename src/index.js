@@ -55,7 +55,7 @@ export default async function updateTerms() {
   if (process.env.PRODUCTION) {
     await pushChanges();
     console.log('・・・・・・・');
-    console.log('Push changes on the repository');
+    console.log('Pushed changes to the repository');
     console.log('______________________________');
   }
 };
