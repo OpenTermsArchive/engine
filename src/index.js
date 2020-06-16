@@ -52,7 +52,7 @@ export default async function updateTerms() {
 
   await Promise.all(documentUpdatePromises);
 
-  if (process.env.PRODUCTION) {
+  if (process.env.NODE_ENV === 'production') {
     await pushChanges();
     console.log('・・・・・・・');
     console.log('Pushed changes to the repository');
