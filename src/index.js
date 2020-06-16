@@ -26,7 +26,7 @@ export async function updateServiceProviderDocument(serviceProviderId, servicePr
 
   const sanitizedContent = await sanitize(content, documentContentSelector);
 
-  const { sha: sanitizedSha, filePath: sanitizedFilePath} = await persistSanitized(serviceProviderId, documentType, sanitizedContent);
+  const { sha: sanitizedSha, filePath: sanitizedFilePath} = await persistSanitized(serviceProviderId, documentType, sanitizedContent, rawSha);
   if (sanitizedSha) {
     console.log(`${logPrefix} Save sanitized file to '${sanitizedFilePath}'.`);
     console.log(`${logPrefix} Commit sanitized file in '${sanitizedSha}'.`);

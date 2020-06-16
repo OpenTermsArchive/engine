@@ -18,9 +18,16 @@ const ROOT_DIRECTORY = path.resolve(__dirname, `../../data`);
 export const RAW_DIRECTORY = `${ROOT_DIRECTORY}/raw`;
 export const SANITIZED_DIRECTORY = `${ROOT_DIRECTORY}/sanitized`;
 
-export async function persist({ serviceProviderId, policyType, fileContent, isSanitized }) {
+export async function persist({ serviceProviderId, policyType, fileContent, relatedRawCommit, isSanitized }) {
   const filePath = await save({ serviceProviderId, policyType, fileContent, isSanitized });
-  const message = `Update ${isSanitized ? 'sanitized' : 'raw'} ${serviceProviderId} ${DOCUMENTS_TYPES[policyType].name} document`;
+  let message = `Update ${isSanitized ? 'sanitized' : 'raw'} ${serviceProviderId} ${DOCUMENTS_TYPES[policyType].name} document`;
+
+  if (relatedRawCommit) {
+    message += `
+
+Find related raw file changes in this commit: https://github.com/ambanum/CGUs-data/tree/${relatedRawCommit}`;
+  }
+
   const sha = await commit(filePath, message);
   return {
     filePath,
