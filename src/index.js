@@ -5,7 +5,7 @@ import consoleStamp from 'console-stamp';
 consoleStamp(console);
 
 import scrape from './scraper/index.js';
-import { persistRaw, persistSanitized } from './history/index.js';
+import { persistRaw, persistSanitized, pushChanges } from './history/index.js';
 import sanitize from './sanitizer/index.js';
 import getServiceProviders from './service_providers/index.js';
 import { DOCUMENTS_TYPES } from './documents_types.js';
@@ -50,5 +50,12 @@ export default async function updateTerms() {
     });
   });
 
-  return Promise.all(documentUpdatePromises);
+  await Promise.all(documentUpdatePromises);
+
+  if (process.env.PRODUCTION) {
+    await pushChanges();
+    console.log('・・・・・・・');
+    console.log('Pushed changes to the repository');
+    console.log('______________________________');
+  }
 };
