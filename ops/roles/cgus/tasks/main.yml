@@ -1,8 +1,20 @@
+- name: Ensure private ssh key for github is present
+  copy:
+    src: cgus-data
+    dest: "/home/{{ ansible_user }}/.ssh/cgus-data"
+    mode: 0600
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+  tags:
+    - setup
+
 - name: Clone Repo
   git:
     repo: "{{ repo }}"
     dest: "/home/{{ ansible_user }}/{{ app }}"
     force: yes
+    accept_hostkey: yes
+    key_file: "/home/{{ ansible_user }}/.ssh/cgus-data"
   register: git_clone_app_finished
   tags:
     - setup
