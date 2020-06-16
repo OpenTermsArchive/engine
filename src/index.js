@@ -18,7 +18,7 @@ export async function updateServiceProviderDocument(serviceProviderId, servicePr
 
   const { sha: rawSha, filePath: rawFilePath} = await persistRaw(serviceProviderId, documentType, content);
   if (rawSha) {
-    console.log(`${logPrefix} Save raw file '${rawFilePath}'.`);
+    console.log(`${logPrefix} Save raw file to '${rawFilePath}'.`);
     console.log(`${logPrefix} Commit raw file in '${rawSha}'.`);
   } else {
     console.log(`${logPrefix} No raw changes, didn't commit.`);
@@ -28,10 +28,10 @@ export async function updateServiceProviderDocument(serviceProviderId, servicePr
 
   const { sha: sanitizedSha, filePath: sanitizedFilePath} = await persistSanitized(serviceProviderId, documentType, sanitizedContent);
   if (sanitizedSha) {
-    console.log(`${logPrefix} Save sanitized file '${sanitizedFilePath}'.`);
+    console.log(`${logPrefix} Save sanitized file to '${sanitizedFilePath}'.`);
     console.log(`${logPrefix} Commit sanitized file in '${sanitizedSha}'.`);
   } else {
-    console.log(`${logPrefix} No sanitized changes, didn't commit.`);
+    console.log(`${logPrefix} No changes after sanitization, didn't commit.`);
   }
 };
 
