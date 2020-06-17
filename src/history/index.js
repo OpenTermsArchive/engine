@@ -10,12 +10,12 @@ export async function persistRaw(serviceProviderId, policyType, fileContent) {
   });
 }
 
-export async function persistSanitized(serviceProviderId, policyType, fileContent, relatedRawCommit) {
+export async function persistSanitized(serviceProviderId, policyType, fileContent, relatedRawCommitSha) {
   return persist({
     serviceProviderId,
     policyType,
     fileContent,
-    relatedRawCommit,
+    relatedRawCommitSha,
     isSanitized: true
   });
 }
