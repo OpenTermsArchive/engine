@@ -1,0 +1,13 @@
+{
+    "serviceProviderName": "Goodreads",
+    "documents": {
+        "tos": {
+            "url": "https://www.goodreads.com/about/terms",
+            "contentSelector": ".guidelines"
+        },
+        "privacy": {
+            "url": "https://www.goodreads.com/about/privacy",
+            "contentSelector": ".guidelines"
+        }
+    }
+}

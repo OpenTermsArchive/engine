@@ -1,0 +1,13 @@
+{
+    "serviceProviderName": "SoundCloud",
+    "documents": {
+        "tos": {
+            "url": "https://soundcloud.com/terms-of-use",
+            "contentSelector": ".staticPage > div:nth-child(1)"
+        },
+        "privacy": {
+            "url": "https://soundcloud.com/pages/privacy",
+            "contentSelector": ".staticPage > div:nth-child(1)"
+        }
+    }
+}

@@ -1,0 +1,13 @@
+{
+    "serviceProviderName": "Vkontakte",
+    "documents": {
+        "tos": {
+            "url": "Err :522",
+            "contentSelector": "#terms_box_content"
+        },
+        "privacy": {
+            "url": "https://vk.com/privacy",
+            "contentSelector": "div#privacy_box_content"
+        }
+    }
+}

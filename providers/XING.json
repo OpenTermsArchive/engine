@@ -1,0 +1,13 @@
+{
+    "serviceProviderName": "XING",
+    "documents": {
+        "tos": {
+            "url": "https://www.xing.com/terms",
+            "contentSelector": "#maincontent"
+        },
+        "privacy": {
+            "url": "https://privacy.xing.com/en/privacy-policy",
+            "contentSelector": ".content"
+        }
+    }
+}

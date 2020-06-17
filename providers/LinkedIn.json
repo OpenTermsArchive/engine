@@ -1,0 +1,13 @@
+{
+    "serviceProviderName": "LinkedIn",
+    "documents": {
+        "tos": {
+            "url": "https://www.linkedin.com/legal/user-agreement",
+            "contentSelector": ".legal-content"
+        },
+        "privacy": {
+            "url": "https://www.linkedin.com/legal/privacy-policy",
+            "contentSelector": ".legal-content"
+        }
+    }
+}

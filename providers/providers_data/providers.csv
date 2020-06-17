@@ -1,0 +1,40 @@
+name,TosURL,TosSelector,PrivacyURL,PrivacySelector
+Reddit,https://www.redditinc.com/policies/user-agreement,#content,https://www.redditinc.com/policies/privacy-policy,div#content
+LinkedIn,https://www.linkedin.com/legal/user-agreement,.legal-content,https://www.linkedin.com/legal/privacy-policy,.legal-content
+Tumblr,https://www.tumblr.com/policy/en/terms-of-service,#left_column,https://www.tumblr.com/privacy/en,#left_column
+Vkontakte,Err :522,#terms_box_content,https://vk.com/privacy,div#privacy_box_content
+Pinterest,https://policy.pinterest.com/en/terms-of-service,article,https://policy.pinterest.com/en/privacy-policy,article
+StackOverflow,https://stackoverflow.com/legal/terms-of-service,.grid--cell9,https://stackoverflow.com/legal/privacy-policy,.grid--cell9
+Instagram,https://help.instagram.com/581066165581870,#faq-page,https://help.instagram.com/519522125107875,#faq-page
+Livemocha,https://livemochas.com/terms/,.well,https://livemochas.com/privacy/,.well
+Flickr,https://www.flickr.com/help/terms,.help-page-container,https://www.flickr.com/help/privacy/,.help-page-container
+Odnoklassniki,https://ok.ru/regulations,#mainContent,https://ok.ru/privacypolicy,#mainContent
+LibraryThing,https://www.librarything.com/privacy,.content > table:nth-child(1) > tbody:nth-child(1) > tr:nth-child(1) > td:nth-child(2),https://www.librarything.com/privacy,.content > table:nth-child(1) > tbody:nth-child(1) > tr:nth-child(1) > td:nth-child(2)
+LiveJournal,https://www.livejournal.com/legal/tos-en.bml,.s-main,,
+deviantART,https://about.deviantart.com/policy/service/,.bubbleview,https://about.deviantart.com/policy/privacy/,.bubbleview
+Mix,https://mix.com/tos,.TosPage,https://mix.com/privacy,.PrivacyPage
+Myspace,https://myspace.com/pages/terms,#nms_legal,https://myspace.com/pages/privacy,#nms_legal
+Match,https://uk.match.com/pages/misc/cge,#article_content,https://uk.match.com/pages/misc/privacy,#article_content
+Yelp,https://terms.yelp.com/tos/fr_fr/20200101_fr_fr/,#page,https://terms.yelp.com/privacy/fr_fr/20200101_fr_fr/,#page
+Care2,https://www.care2.com/privacy-policy,#care2_main_container > table:nth-child(2),https://www.care2.com/privacy-policy,.privacy_policy_page
+Taringa,https://www.taringa.net/terms-and-conditions,._9palU,,._9palU
+XING,https://www.xing.com/terms,#maincontent,https://privacy.xing.com/en/privacy-policy,.content
+Tagged,http://www.tagged.com/terms_of_service.html,#terms_of_service,http://www.tagged.com/terms_of_service.html,#privacy_policy
+SoundCloud,https://soundcloud.com/terms-of-use,.staticPage > div:nth-child(1),https://soundcloud.com/pages/privacy,.staticPage > div:nth-child(1)
+Goodreads,https://www.goodreads.com/about/terms,.guidelines,https://www.goodreads.com/about/privacy,.guidelines
+MouthShut,https://www.mouthshut.com/help/tos.php,.box-module,https://www.mouthshut.com/help/privacy.php,.box-module
+Ning,https://www.ning.com/termsofservice/,.page__article,https://www.ning.com/privacy/,.page__article
+Viadeo,http://www.viadeo.com/en/conditions-generales-utilisation,.gu-2of3 > div:nth-child(1),http://www.viadeo.com/en/politique-de-confidentialite,.gu-2of3 > div:nth-child(1)
+Meetup,https://help.meetup.com/hc/en-us/articles/360027447252,.article,https://help.meetup.com/hc/en-us/articles/360044422391,.article
+Duolingo,https://www.duolingo.com/terms,.AFNxJ,https://www.duolingo.com/privacy,.AFNxJ
+Skyrock,https://www.skyrock.com/safety/terms.php,.cgufr > pre:nth-child(1),https://www.skyrock.com/safety/privacy.php,#wrap
+LinguaLeo,https://corp.lingualeo.com/terms-of-use-en/,#main,https://corp.lingualeo.com/privacy-policy-en/,#main
+LastFm,https://www.last.fm/legal/terms,div.container:nth-child(3),https://privacy.cbs/,.post-content
+Badoo,https://badoo.com/terms/,.formatted-text,https://badoo.com/privacy/,.formatted-text
+Foursquare,https://foursquare.com/legal/terms,#blankPage,https://foursquare.com/legal/privacy,#blankPage
+PlentyofFish,https://pof.com/terms,.css-hz8qco,https://pof.com/privacypolicy,#main-body
+WeHeartIt,https://weheartit.com/about/terms-of-service,div.cel:nth-child(2),https://weheartit.com/about/privacy-policy,div.cel:nth-child(2)
+hi5,http://www.hi5.com/terms_of_service.html,#terms_of_service,http://www.hi5.com/terms_of_service.html,#privacy_policy
+OkCupid,https://www.okcupid.com/legal/terms,.legal,https://www.okcupid.com/legal/privacy,.legal
+Ibibo,https://www.goibibo.com/info/terms-of-services/,div.container:nth-child(3),https://www.goibibo.com/info/privacy/,#top-content > div:nth-child(1)
+CafeMom,https://www.wildskymedia.com/terms-of-service/,.terms-of-service__TosWrapper-sc-1gh82mo-0,https://www.wildskymedia.com/privacy-policy/,.privacy-policy__PrivacyPolicyWrapper-o94py9-0

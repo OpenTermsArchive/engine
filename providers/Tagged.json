@@ -1,0 +1,13 @@
+{
+    "serviceProviderName": "Tagged",
+    "documents": {
+        "tos": {
+            "url": "http://www.tagged.com/terms_of_service.html",
+            "contentSelector": "#terms_of_service"
+        },
+        "privacy": {
+            "url": "http://www.tagged.com/terms_of_service.html",
+            "contentSelector": "#privacy_policy"
+        }
+    }
+}

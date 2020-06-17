@@ -1,0 +1,13 @@
+{
+    "serviceProviderName": "Flickr",
+    "documents": {
+        "tos": {
+            "url": "https://www.flickr.com/help/terms",
+            "contentSelector": ".help-page-container"
+        },
+        "privacy": {
+            "url": "https://www.flickr.com/help/privacy/",
+            "contentSelector": ".help-page-container"
+        }
+    }
+}

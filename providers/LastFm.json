@@ -1,0 +1,13 @@
+{
+    "serviceProviderName": "LastFm",
+    "documents": {
+        "tos": {
+            "url": "https://www.last.fm/legal/terms",
+            "contentSelector": "div.container:nth-child(3)"
+        },
+        "privacy": {
+            "url": "https://privacy.cbs/",
+            "contentSelector": ".post-content"
+        }
+    }
+}

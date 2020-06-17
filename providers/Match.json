@@ -1,0 +1,13 @@
+{
+    "serviceProviderName": "Match",
+    "documents": {
+        "tos": {
+            "url": "https://uk.match.com/pages/misc/cge",
+            "contentSelector": "#article_content"
+        },
+        "privacy": {
+            "url": "https://uk.match.com/pages/misc/privacy",
+            "contentSelector": "#article_content"
+        }
+    }
+}

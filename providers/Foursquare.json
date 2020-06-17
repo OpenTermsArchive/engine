@@ -1,0 +1,13 @@
+{
+    "serviceProviderName": "Foursquare",
+    "documents": {
+        "tos": {
+            "url": "https://foursquare.com/legal/terms",
+            "contentSelector": "#blankPage"
+        },
+        "privacy": {
+            "url": "https://foursquare.com/legal/privacy",
+            "contentSelector": "#blankPage"
+        }
+    }
+}
