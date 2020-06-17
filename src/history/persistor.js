@@ -25,7 +25,7 @@ export async function persist({ serviceProviderId, policyType, fileContent, rela
   if (relatedRawCommitSha) {
     message += `
 
-Find related raw file changes in this commit: https://github.com/ambanum/CGUs-data/tree/${relatedRawCommitSha}`;
+Find related raw file changes in this commit ${relatedRawCommitSha}`;
   }
 
   const sha = await commit(filePath, message);
