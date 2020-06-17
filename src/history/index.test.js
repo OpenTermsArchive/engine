@@ -61,7 +61,7 @@ describe('History', () => {
     });
 
     context('when related raw commit SHA is not provided', () => {
-      it.only('throws an error', async () => {
+      it('throws an error', async () => {
         try {
           await persistSanitized(SERVICE_PROVIDER_ID, POLICY_TYPE, SANITIZED_FILE_CONTENT);
         } catch (e) {
