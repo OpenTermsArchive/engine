@@ -10,7 +10,7 @@ authentication.apiKey = process.env.SENDINBLUE_API_KEY;
 const apiInstance = new sendInBlue.SMTPApi();
 const contactsInstance = new sendInBlue.ContactsApi();
 
-const LIST_FOLDER_ID = Number.parseInt(process.env.LIST_FOLDER_ID, 10);
+const LIST_FOLDER_ID = Number.parseInt(process.env.NODE_ENV === 'test' ? process.env.LIST_TEST_FOLDER_ID : process.env.LIST_FOLDER_ID, 10);
 const UPDATE_TEMPLATE_ID = Number.parseInt(process.env.UPDATE_TEMPLATE_ID, 10);
 const ERROR_TEMPLATE_ID = Number.parseInt(process.env.ERROR_TEMPLATE_ID, 10);
 const BASE_URL = process.env.BASE_URL;
