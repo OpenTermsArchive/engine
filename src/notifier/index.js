@@ -79,9 +79,6 @@ export function onRawDocumentChange() {
 };
 
 export async function onDocumentScrappingError(serviceProviderId, documentTypeId, error) {
-  const baseListContacts = await getListContacts(serviceProvidersMailingLists[serviceProviderId].baseListId);
-  const errorListContacts = await getListContacts(serviceProvidersMailingLists[serviceProviderId][documentTypeId].errorListId);
-
   const sendParams = {
     templateId: ERROR_TEMPLATE_ID,
     params: {
@@ -92,29 +89,13 @@ ${error}`
     },
   }
 
-  const sendPromises = [];
-
-  if (baseListContacts.length) {
-    sendPromises.push(apiInstance.sendTransacEmail({
-      ...sendParams,
-      to: baseListContacts.map(contact => ({ email: contact.email }))
-    }));
-  }
-
-  if (errorListContacts.length) {
-    sendPromises.push(apiInstance.sendTransacEmail({
-      ...sendParams,
-      to: errorListContacts.map(contact => ({ email: contact.email }))
-    }));
-  }
-
-  return Promise.all(sendPromises);
+  return send([
+    serviceProvidersMailingLists[serviceProviderId].baseListId,
+    serviceProvidersMailingLists[serviceProviderId][documentTypeId].errorListId
+  ], sendParams);
 }
 
 export async function onSanitizedDocumentChange(serviceProviderId, documentTypeId, sanitizedSha) {
-  const baseListContacts = await getListContacts(serviceProvidersMailingLists[serviceProviderId].baseListId);
-  const updateListContacts = await getListContacts(serviceProvidersMailingLists[serviceProviderId][documentTypeId].updateListId);
-
   const sendParams = {
     templateId: UPDATE_TEMPLATE_ID,
     params: {
@@ -124,24 +105,27 @@ export async function onSanitizedDocumentChange(serviceProviderId, documentTypeI
     },
   }
 
+  return send([
+    serviceProvidersMailingLists[serviceProviderId].baseListId,
+    serviceProvidersMailingLists[serviceProviderId][documentTypeId].updateListId
+  ], sendParams);
+};
+
+async function send(lists, sendParams) {
   const sendPromises = [];
 
-  if (baseListContacts.length) {
-    sendPromises.push(apiInstance.sendTransacEmail({
-      ...sendParams,
-      to: baseListContacts.map(contact => ({ email: contact.email }))
-    }));
-  }
-
-  if (updateListContacts.length) {
-    sendPromises.push(apiInstance.sendTransacEmail({
-      ...sendParams,
-      to: updateListContacts.map(contact => ({ email: contact.email }))
-    }));
-  }
+  lists.forEach(async listId => {
+    const listContacts = await getListContacts(listId);
+    if (listContacts.length) {
+      sendPromises.push(apiInstance.sendTransacEmail({
+        ...sendParams,
+        to: listContacts.map(contact => ({ email: contact.email }))
+      }));
+    }
+  });
 
   return Promise.all(sendPromises);
-};
+}
 
 export async function createListIfNotExists(listName) {
   const lists = await getFolderLists(LIST_FOLDER_ID);
