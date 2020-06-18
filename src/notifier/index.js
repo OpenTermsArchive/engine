@@ -74,10 +74,6 @@ async function generateDocumentsLists({ serviceProviderName, serviceProviderId, 
   };
 }
 
-export function onRawDocumentChange() {
-  //noop;
-};
-
 export async function onDocumentScrappingError(serviceProviderId, documentTypeId, error) {
   const sendParams = {
     templateId: ERROR_TEMPLATE_ID,
@@ -142,10 +138,6 @@ export async function createListIfNotExists(listName) {
   return list.id;
 }
 
-export async function deleteList(listId) {
-  return contactsInstance.deleteList(listId);
-}
-
 async function getListContacts(listId) {
   let offset = 0;
   let limit = 50;
@@ -178,8 +170,4 @@ async function _aggregate(functionName, resultKey, resourceId, limit, offset, ag
   const result = await contactsInstance[functionName](resourceId, { limit, offset });
   aggregator = aggregator.concat(result[resultKey]);
   return _aggregate(functionName, resultKey, resourceId, limit, offset + limit, aggregator, count);
-}
-
-export function getServiceProvidersMailingLists() {
-  return serviceProvidersMailingLists;
 }
