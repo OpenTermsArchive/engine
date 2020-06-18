@@ -1,0 +1,13 @@
+{
+    "serviceProviderName": "Odnoklassniki",
+    "documents": {
+        "tos": {
+            "url": "https://ok.ru/regulations",
+            "contentSelector": "#mainContent"
+        },
+        "privacy": {
+            "url": "https://ok.ru/privacypolicy",
+            "contentSelector": "#mainContent"
+        }
+    }
+}
