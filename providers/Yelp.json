@@ -1,0 +1,13 @@
+{
+    "serviceProviderName": "Yelp",
+    "documents": {
+        "tos": {
+            "url": "https://terms.yelp.com/tos/fr_fr/20200101_fr_fr/",
+            "contentSelector": "#page"
+        },
+        "privacy": {
+            "url": "https://terms.yelp.com/privacy/fr_fr/20200101_fr_fr/",
+            "contentSelector": "#page"
+        }
+    }
+}

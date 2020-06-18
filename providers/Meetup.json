@@ -1,0 +1,13 @@
+{
+    "serviceProviderName": "Meetup",
+    "documents": {
+        "tos": {
+            "url": "https://help.meetup.com/hc/en-us/articles/360027447252",
+            "contentSelector": ".article"
+        },
+        "privacy": {
+            "url": "https://help.meetup.com/hc/en-us/articles/360044422391",
+            "contentSelector": ".article"
+        }
+    }
+}
