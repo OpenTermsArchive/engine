@@ -2,7 +2,7 @@
     "serviceProviderName": "Vkontakte",
     "documents": {
         "tos": {
-            "url": "Err :522",
+            "url": "https://vk.com/terms",
             "contentSelector": "#terms_box_content"
         },
         "privacy": {
