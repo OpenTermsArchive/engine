@@ -5,22 +5,22 @@
       "url": "https://www.facebook.com/legal/terms/plain_text_terms",
       "contentSelector": ".UIFullPage_Container",
       "sanitizationPipeline": [
-        "cleanFacebookUrls"
+        "cleanUrls"
       ]
     },
     "privacy": {
       "url": "https://www.facebook.com/about/privacy",
       "contentSelector": "._5tkp",
       "sanitizationPipeline": [
-        "cleanFacebookUrls"
+        "cleanUrls"
       ]
     },
     "devPolicy": {
       "url": "https://developers.facebook.com/policy",
       "contentSelector": "._4bl9",
       "sanitizationPipeline": [
-        "removeFacebookHelpButtons",
-        "cleanFacebookUrls"
+        "removeHelpButtons",
+        "cleanUrls"
       ]
     }
   }
