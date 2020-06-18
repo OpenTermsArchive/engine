@@ -18,12 +18,14 @@ export async function updateServiceProviderDocument(serviceProviderId, servicePr
   const content = await scrape(documentUrl);
 
   const { sha: rawSha, filePath: rawFilePath} = await persistRaw(serviceProviderId, documentType, content);
-  if (rawSha) {
-    console.log(`${logPrefix} Save raw file to '${rawFilePath}'.`);
-    console.log(`${logPrefix} Commit raw file in '${rawSha}'.`);
-  } else {
-    console.log(`${logPrefix} No raw changes, didn't commit.`);
+
+  console.log(`${logPrefix} Save raw file to '${rawFilePath}'.`);
+
+  if (!rawSha) {
+    return console.log(`${logPrefix} No raw changes, didn't commit.`);
   }
+
+  console.log(`${logPrefix} Commit raw file in '${rawSha}'.`);
 
   const sanitizedContent = await sanitize(content, documentContentSelector);
 
