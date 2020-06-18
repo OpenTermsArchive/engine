@@ -15,7 +15,13 @@ export async function updateServiceProviderDocument(serviceProviderId, servicePr
   const logPrefix = `[${serviceProviderName}-${DOCUMENTS_TYPES[documentType].name}]`;
 
   console.log(`${logPrefix} Scrape '${documentUrl}'.`);
-  const content = await scrape(documentUrl);
+  let content;
+  try {
+    content = await scrape(documentUrl);
+  } catch (e) {
+    console.error(`${logPrefix} Can't scrape url: ${e}`);
+    return notifier.onDocumentScrappingError(serviceProviderId, documentType, e);
+  }
 
   const { sha: rawSha, filePath: rawFilePath} = await persistRaw(serviceProviderId, documentType, content);
 

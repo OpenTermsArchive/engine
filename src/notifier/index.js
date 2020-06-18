@@ -12,6 +12,7 @@ const contactsInstance = new sendInBlue.ContactsApi();
 
 const LIST_FOLDER_ID = Number.parseInt(process.env.LIST_FOLDER_ID, 10);
 const UPDATE_TEMPLATE_ID = Number.parseInt(process.env.UPDATE_TEMPLATE_ID, 10);
+const ERROR_TEMPLATE_ID = Number.parseInt(process.env.ERROR_TEMPLATE_ID, 10);
 const BASE_URL = process.env.BASE_URL;
 
 const serviceProvidersMailingLists = {};
@@ -76,6 +77,39 @@ async function generateDocumentsLists({ serviceProviderName, serviceProviderId, 
 export function onRawDocumentChange() {
   //noop;
 };
+
+export async function onDocumentScrappingError(serviceProviderId, documentTypeId, error) {
+  const baseListContacts = await getListContacts(serviceProvidersMailingLists[serviceProviderId].baseListId);
+  const errorListContacts = await getListContacts(serviceProvidersMailingLists[serviceProviderId][documentTypeId].errorListId);
+
+  const sendParams = {
+    templateId: ERROR_TEMPLATE_ID,
+    params: {
+      "SERVICE_PROVIDER_NAME": serviceProviders[serviceProviderId].serviceProviderName,
+      "DOCUMENT_TYPE": documentTypes[documentTypeId].name,
+      "ERROR_TEXT": `An error has occured when trying to scrape the document:
+${error}`
+    },
+  }
+
+  const sendPromises = [];
+
+  if (baseListContacts.length) {
+    sendPromises.push(apiInstance.sendTransacEmail({
+      ...sendParams,
+      to: baseListContacts.map(contact => ({ email: contact.email }))
+    }));
+  }
+
+  if (errorListContacts.length) {
+    sendPromises.push(apiInstance.sendTransacEmail({
+      ...sendParams,
+      to: errorListContacts.map(contact => ({ email: contact.email }))
+    }));
+  }
+
+  return Promise.all(sendPromises);
+}
 
 export async function onSanitizedDocumentChange(serviceProviderId, documentTypeId, sanitizedSha) {
   const baseListContacts = await getListContacts(serviceProvidersMailingLists[serviceProviderId].baseListId);
@@ -172,4 +206,8 @@ async function _getFolderList(folderId, limit, offset, aggregator, count) {
   aggregator = aggregator.concat(lists);
 
   return _getFolderList(folderId, limit, offset + limit, aggregator, count);
+}
+
+export function getServiceProvidersMailingLists() {
+  return serviceProvidersMailingLists;
 }
