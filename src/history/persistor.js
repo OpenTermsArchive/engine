@@ -18,9 +18,17 @@ const ROOT_DIRECTORY = path.resolve(__dirname, `../../data`);
 export const RAW_DIRECTORY = `${ROOT_DIRECTORY}/raw`;
 export const SANITIZED_DIRECTORY = `${ROOT_DIRECTORY}/sanitized`;
 
-export async function persist({ serviceProviderId, policyType, fileContent, isSanitized }) {
+export async function persist({ serviceProviderId, policyType, fileContent, relatedRawCommitSha }) {
+  const isSanitized = !!relatedRawCommitSha;
   const filePath = await save({ serviceProviderId, policyType, fileContent, isSanitized });
-  const message = `Update ${isSanitized ? 'sanitized' : 'raw'} ${serviceProviderId} ${DOCUMENTS_TYPES[policyType].name} document`;
+  let message = `Update ${isSanitized ? 'sanitized' : 'raw'} ${serviceProviderId} ${DOCUMENTS_TYPES[policyType].name} document`;
+
+  if (relatedRawCommitSha) {
+    message += `
+
+Find related raw file changes in this commit ${relatedRawCommitSha}`;
+  }
+
   const sha = await commit(filePath, message);
   return {
     filePath,
@@ -51,6 +59,5 @@ export async function commit(filePath, message) {
 
 async function _commit({ filePath, message, resolve }) {
   await git.add(filePath);
-  const commitSummary = await git.commit(filePath, message);
-  resolve(commitSummary.commit);
+  resolve(await git.commit(filePath, message));
 }
