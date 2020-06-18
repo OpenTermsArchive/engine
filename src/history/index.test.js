@@ -41,8 +41,9 @@ describe('History', () => {
 
   describe('#persistSanitized', () => {
     let sha;
+    const relatedRawSha = 'commit-sha';
     before(async () => {
-      const { sha: persistSha } = await persistSanitized(SERVICE_PROVIDER_ID, POLICY_TYPE, SANITIZED_FILE_CONTENT);
+      const { sha: persistSha } = await persistSanitized(SERVICE_PROVIDER_ID, POLICY_TYPE, SANITIZED_FILE_CONTENT, relatedRawSha);
       sha = persistSha;
     });
 
@@ -57,6 +58,19 @@ describe('History', () => {
     it('commits the file for the given service provider', () => {
       expect(sha).to.exist;
       expect(sha).to.be.a('string');
+    });
+
+    context('when related raw commit SHA is not provided', () => {
+      it('throws an error', async () => {
+        try {
+          await persistSanitized(SERVICE_PROVIDER_ID, POLICY_TYPE, SANITIZED_FILE_CONTENT);
+        } catch (e) {
+          expect(e).to.be.an('error');
+          expect(e.message).to.contain('raw commit SHA');
+          return;
+        }
+        expect.fail('No error was thrown');
+      });
     });
   });
 });
