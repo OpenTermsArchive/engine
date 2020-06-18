@@ -11,6 +11,7 @@ const apiInstance = new sendInBlue.SMTPApi();
 const contactsInstance = new sendInBlue.ContactsApi();
 
 const LIST_FOLDER_ID = 44;
+const UPDATE_TEMPLATE_ID = 21;
 const serviceProvidersMailingLists = {};
 let serviceProviders;
 let documentTypes;
@@ -74,9 +75,36 @@ export function onRawDocumentChange() {
   //noop;
 };
 
-export async function onSanitizedDocumentChange() {
-  //noop;
-  console.log('TODO: Notify sanitized document changed');
+export async function onSanitizedDocumentChange(serviceProviderId, documentTypeId, sanitizedSha) {
+  const baseListContacts = await getListContacts(serviceProvidersMailingLists[serviceProviderId].baseListId);
+  const updateListContacts = await getListContacts(serviceProvidersMailingLists[serviceProviderId][documentTypeId].updateListId);
+
+  const sendParams = {
+    templateId: UPDATE_TEMPLATE_ID,
+    params: {
+      "SERVICE_PROVIDER_NAME": serviceProviders[serviceProviderId].serviceProviderName,
+      "DOCUMENT_TYPE": documentTypes[documentTypeId].name,
+      "URL": `github.com/ambanum/CGUs-data/commit/${sanitizedSha}`
+    },
+  }
+
+  const sendPromises = [];
+
+  if (baseListContacts.length) {
+    sendPromises.push(apiInstance.sendTransacEmail({
+      ...sendParams,
+      to: baseListContacts.map(contact => ({ email: contact.email }))
+    }));
+  }
+
+  if (updateListContacts.length) {
+    sendPromises.push(apiInstance.sendTransacEmail({
+      ...sendParams,
+      to: updateListContacts.map(contact => ({ email: contact.email }))
+    }));
+  }
+
+  return Promise.all(sendPromises);
 };
 
 export async function createListIfNotExists(listName) {
