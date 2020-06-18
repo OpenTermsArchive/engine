@@ -9,7 +9,7 @@ env:
   AUTHOR_EMAIL: 'ambanum.bot@disinfo.quaidorsay.fr'
   SENDINBLUE_API_KEY: ${{ secrets.SENDINBLUE_API_KEY }}
   LIST_FOLDER_ID: 44
-  LIST_TEST_FOLDER_ID: 188
+  LIST_TEST_FOLDER_ID: 184
   UPDATE_TEMPLATE_ID: 21
   ERROR_TEMPLATE_ID: 22
   BASE_URL: "github.com/ambanum/CGUs-data/commit/"
