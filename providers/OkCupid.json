@@ -1,0 +1,13 @@
+{
+    "serviceProviderName": "OkCupid",
+    "documents": {
+        "tos": {
+            "url": "https://www.okcupid.com/legal/terms",
+            "contentSelector": ".legal"
+        },
+        "privacy": {
+            "url": "https://www.okcupid.com/legal/privacy",
+            "contentSelector": ".legal"
+        }
+    }
+}

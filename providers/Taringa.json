@@ -1,0 +1,9 @@
+{
+    "serviceProviderName": "Taringa",
+    "documents": {
+        "tos": {
+            "url": "https://www.taringa.net/terms-and-conditions",
+            "contentSelector": "._9palU"
+        }
+    }
+}
