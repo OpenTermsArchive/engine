@@ -9,6 +9,7 @@ import { persistRaw, persistSanitized, pushChanges } from './history/index.js';
 import sanitize from './sanitizer/index.js';
 import getServiceProviders from './service_providers/index.js';
 import { DOCUMENTS_TYPES } from './documents_types.js';
+import * as notifier from './notifier/index.js';
 
 export async function updateServiceProviderDocument(serviceProviderId, serviceProviderName, documentType, documentUrl, documentContentSelector) {
   const logPrefix = `[${serviceProviderName}-${DOCUMENTS_TYPES[documentType].name}]`;
@@ -30,17 +31,20 @@ export async function updateServiceProviderDocument(serviceProviderId, servicePr
   if (sanitizedSha) {
     console.log(`${logPrefix} Save sanitized file to '${sanitizedFilePath}'.`);
     console.log(`${logPrefix} Commit sanitized file in '${sanitizedSha}'.`);
+    await notifier.onSanitizedDocumentChange(serviceProviderId, documentType, sanitizedSha);
   } else {
     console.log(`${logPrefix} No changes after sanitization, didn't commit.`);
   }
 };
 
 export default async function updateTerms() {
+  await init();
+
   console.log('Start scraping and saving terms of service…');
 
   const documentUpdatePromises = [];
-  const serviceProvidersManifests = getServiceProviders();
 
+  const serviceProvidersManifests = getServiceProviders();
   Object.keys(serviceProvidersManifests).forEach((serviceProviderId) => {
     const { documents, serviceProviderName } = serviceProvidersManifests[serviceProviderId];
 
@@ -59,3 +63,15 @@ export default async function updateTerms() {
     console.log('______________________________');
   }
 };
+
+let initialized = false;
+async function init() {
+  if (!initialized) {
+    const serviceProvidersManifests = getServiceProviders();
+    return Promise.all([notifier.init(serviceProvidersManifests, DOCUMENTS_TYPES)]).then(() => {
+      initialized = true;
+    });
+  }
+
+  return Promise.resolve();
+}

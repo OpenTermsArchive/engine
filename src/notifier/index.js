@@ -12,11 +12,15 @@ const contactsInstance = new sendInBlue.ContactsApi();
 
 const LIST_FOLDER_ID = 44;
 const serviceProvidersMailingLists = {};
+let serviceProviders;
+let documentTypes;
 
 let initialized = false;
-export async function init(serviceProviders, documentTypes) {
+export async function init(passedServiceProviders, passedDocumentTypes) {
   if (!initialized) {
-    return bootstrapMailingLists(serviceProviders, documentTypes).then(() => {
+    serviceProviders = passedServiceProviders;
+    documentTypes = passedDocumentTypes;
+    return bootstrapMailingLists().then(() => {
       initialized = true;
     });
   }
@@ -24,7 +28,7 @@ export async function init(serviceProviders, documentTypes) {
   return Promise.resolve();
 }
 
-async function bootstrapMailingLists(serviceProviders, documentTypes) {
+async function bootstrapMailingLists() {
   const listsPromises = [];
 
   Object.keys(serviceProviders).forEach((serviceProviderId) => {
@@ -95,10 +99,10 @@ export async function deleteList(listId) {
 }
 
 async function getListContacts(listId) {
+  let offset = 0;
+  let limit = 50;
   const list = await contactsInstance.getList(listId);
 
-  let offset = 0;
-  let limit = 1;
   return _getListContacts(listId, limit, offset, [], list.totalSubscribers);
 }
 
@@ -116,6 +120,7 @@ async function _getListContacts(listId, limit, offset, contactsAggregator, conta
 export async function getFolderLists(folderId) {
   let offset = 0;
   let limit = 20;
+
   const { lists, count } = await contactsInstance.getFolderLists(folderId, {
     limit,
     offset
