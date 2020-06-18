@@ -29,6 +29,7 @@ export async function commit(filepath, message) {
 }
 
 export async function pushChanges() {
+  await git.checkout('master');
   return git.push('origin', 'master');
 }
 
