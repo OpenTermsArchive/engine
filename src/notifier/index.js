@@ -151,23 +151,12 @@ async function getListContacts(listId) {
   let limit = 50;
   const list = await contactsInstance.getList(listId);
 
-  return _getListContacts(listId, limit, offset, [], list.totalSubscribers);
-}
-
-async function _getListContacts(listId, limit, offset, contactsAggregator, contactsTotal) {
-  if (contactsAggregator.length === contactsTotal) {
-    return contactsAggregator;
-  }
-
-  const { contacts } = await contactsInstance.getContactsFromList(listId, { limit, offset });
-  contactsAggregator = contactsAggregator.concat(contacts);
-
-  return _getListContacts(listId, limit, offset + limit, contactsAggregator, contactsTotal);
+  return _aggregate('getContactsFromList', 'contacts', listId, limit, offset, [], list.totalSubscribers);
 }
 
 export async function getFolderLists(folderId) {
   let offset = 0;
-  let limit = 20;
+  let limit = 50;
 
   const { lists, count } = await contactsInstance.getFolderLists(folderId, {
     limit,
@@ -178,18 +167,17 @@ export async function getFolderLists(folderId) {
     return [];
   }
 
-  return _getFolderList(folderId, limit, offset + limit, [...lists], count);
+  return _aggregate('getFolderLists', 'lists', folderId, limit, offset + limit, [...lists], count);
 }
 
-async function _getFolderList(folderId, limit, offset, aggregator, count) {
+async function _aggregate(functionName, resultKey, resourceId, limit, offset, aggregator, count) {
   if (aggregator.length >= count) {
     return aggregator;
   }
 
-  const { lists } = await contactsInstance.getFolderLists(folderId, { limit, offset });
-  aggregator = aggregator.concat(lists);
-
-  return _getFolderList(folderId, limit, offset + limit, aggregator, count);
+  const result = await contactsInstance[functionName](resourceId, { limit, offset });
+  aggregator = aggregator.concat(result[resultKey]);
+  return _aggregate(functionName, resultKey, resourceId, limit, offset + limit, aggregator, count);
 }
 
 export function getServiceProvidersMailingLists() {
