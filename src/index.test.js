@@ -32,7 +32,8 @@ nock('https://www.secondprovider.example').get('/tos')
 
 describe('CGUs', () => {
   describe('#updateTerms', () => {
-    before(async () => {
+    before(async function () {
+      this.timeout(10000);
       await updateTerms();
     });
 
