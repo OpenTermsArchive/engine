@@ -40,10 +40,10 @@ async function bootstrapMailingLists() {
 
     serviceProvidersMailingLists[serviceProviderId] = {};
 
-    listsPromises.push(generateServiceProviderList({ serviceProviderName, serviceProviderId }));
+    listsPromises.push(generateServiceProviderMailingList({ serviceProviderName, serviceProviderId }));
 
     Object.keys(documents).forEach((documentId) => {
-      listsPromises.push(generateDocumentsLists({
+      listsPromises.push(generateDocumentsMailingLists({
         serviceProviderName,
         serviceProviderId,
         documentName: documentTypes[documentId].name,
@@ -55,13 +55,13 @@ async function bootstrapMailingLists() {
   return Promise.all(listsPromises);
 }
 
-async function generateServiceProviderList({ serviceProviderName, serviceProviderId }) {
+async function generateServiceProviderMailingList({ serviceProviderName, serviceProviderId }) {
   const baseListId = await createListIfNotExists(serviceProviderName);
 
   serviceProvidersMailingLists[serviceProviderId].baseListId = baseListId;
 }
 
-async function generateDocumentsLists({ serviceProviderName, serviceProviderId, documentName, documentId }) {
+async function generateDocumentsMailingLists({ serviceProviderName, serviceProviderId, documentName, documentId }) {
   const baseListName = `${serviceProviderName} ${documentName}`;
   const updateListName = `${baseListName} update`;
   const errorListName = `${baseListName} error`;
@@ -74,7 +74,7 @@ async function generateDocumentsLists({ serviceProviderName, serviceProviderId, 
   };
 }
 
-export async function onDocumentScrappingError(serviceProviderId, documentTypeId, error) {
+export async function onDocumentScrapingError(serviceProviderId, documentTypeId, error) {
   const sendParams = {
     templateId: ERROR_TEMPLATE_ID,
     params: {
