@@ -3,15 +3,25 @@
   "documents": {
     "tos": {
       "url": "https://www.facebook.com/legal/terms/plain_text_terms",
-      "contentSelector": ".UIFullPage_Container"
+      "contentSelector": ".UIFullPage_Container",
+      "sanitizationPipeline": [
+        "cleanUrls"
+      ]
     },
     "privacy": {
       "url": "https://www.facebook.com/about/privacy",
-      "contentSelector": "._5tkp"
+      "contentSelector": "._5tkp",
+      "sanitizationPipeline": [
+        "cleanUrls"
+      ]
     },
     "devPolicy": {
       "url": "https://developers.facebook.com/policy",
-      "contentSelector": "._4bl9"
+      "contentSelector": "._4bl9",
+      "sanitizationPipeline": [
+        "removeHelpButtons",
+        "cleanUrls"
+      ]
     }
   }
 }

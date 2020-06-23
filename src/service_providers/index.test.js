@@ -31,8 +31,8 @@ const expected = {
 
 describe('ServiceProviders', () => {
   describe('#getServiceProviders', () => {
-    it('returns an object with all service providers manifests', () => {
-      const result = getServiceProviders();
+    it('returns an object with all service providers manifests', async () => {
+      const result = await getServiceProviders();
       expect(result).to.deep.equal(expected);
     });
   });
