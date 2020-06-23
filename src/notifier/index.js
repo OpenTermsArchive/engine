@@ -55,25 +55,6 @@ async function bootstrapMailingLists() {
   return Promise.all(listsPromises);
 }
 
-async function generateServiceProviderMailingList({ serviceProviderName, serviceProviderId }) {
-  const baseListId = await createListIfNotExists(serviceProviderName);
-
-  serviceProvidersMailingLists[serviceProviderId].baseListId = baseListId;
-}
-
-async function generateDocumentsMailingLists({ serviceProviderName, serviceProviderId, documentName, documentId }) {
-  const baseListName = `${serviceProviderName} ${documentName}`;
-  const updateListName = `${baseListName} update`;
-  const errorListName = `${baseListName} error`;
-  const updateListId = await createListIfNotExists(updateListName);
-  const errorListId = await createListIfNotExists(errorListName);
-
-  serviceProvidersMailingLists[serviceProviderId][documentId] = {
-    updateListId,
-    errorListId
-  };
-}
-
 export async function onDocumentScrapingError(serviceProviderId, documentTypeId, error) {
   const sendParams = {
     templateId: ERROR_TEMPLATE_ID,
@@ -121,6 +102,25 @@ async function send(lists, sendParams) {
   });
 
   return Promise.all(sendPromises);
+}
+
+async function generateServiceProviderMailingList({ serviceProviderName, serviceProviderId }) {
+  const baseListId = await createListIfNotExists(serviceProviderName);
+
+  serviceProvidersMailingLists[serviceProviderId].baseListId = baseListId;
+}
+
+async function generateDocumentsMailingLists({ serviceProviderName, serviceProviderId, documentName, documentId }) {
+  const baseListName = `${serviceProviderName} ${documentName}`;
+  const updateListName = `${baseListName} update`;
+  const errorListName = `${baseListName} error`;
+  const updateListId = await createListIfNotExists(updateListName);
+  const errorListId = await createListIfNotExists(errorListName);
+
+  serviceProvidersMailingLists[serviceProviderId][documentId] = {
+    updateListId,
+    errorListId
+  };
 }
 
 export async function createListIfNotExists(listName) {
