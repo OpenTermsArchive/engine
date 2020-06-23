@@ -10,9 +10,9 @@ import sanitize from './sanitizer/index.js';
 import getServiceProviders, { getSanitizers } from './service_providers/index.js';
 import { DOCUMENTS_TYPES } from './documents_types.js';
 
-export async function updateServiceProviderDocument({ serviceProviderId, serviceProviderName, documentType, documentParams }) {
+export async function updateServiceProviderDocument({ serviceProviderId, serviceProviderName, document }) {
+  const { documentType, url, contentSelector, sanitizationPipeline } = document;
   const logPrefix = `[${serviceProviderName}-${DOCUMENTS_TYPES[documentType].name}]`;
-  const { url, contentSelector, sanitizationPipeline } = documentParams;
   console.log(`${logPrefix} Scrape '${url}'.`);
   const content = await scrape(url);
 
@@ -49,8 +49,10 @@ export default async function updateTerms() {
       documentUpdatePromises.push(updateServiceProviderDocument({
         serviceProviderId,
         serviceProviderName,
-        documentType,
-        documentParams: documents[documentType],
+        document: {
+          documentType,
+          ...documents[documentType]
+        }
       }));
     });
   });
