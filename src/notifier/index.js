@@ -78,9 +78,9 @@ export async function onDocumentScrapingError(serviceProviderId, documentTypeId,
   const sendParams = {
     templateId: ERROR_TEMPLATE_ID,
     params: {
-      "SERVICE_PROVIDER_NAME": serviceProviders[serviceProviderId].serviceProviderName,
-      "DOCUMENT_TYPE": documentTypes[documentTypeId].name,
-      "ERROR_TEXT": `An error has occured when trying to scrape the document:
+      SERVICE_PROVIDER_NAME: serviceProviders[serviceProviderId].serviceProviderName,
+      DOCUMENT_TYPE: documentTypes[documentTypeId].name,
+      ERROR_TEXT: `An error has occured when trying to scrape the document:
 ${error}`
     },
   }
@@ -95,9 +95,9 @@ export async function onSanitizedDocumentChange(serviceProviderId, documentTypeI
   const sendParams = {
     templateId: UPDATE_TEMPLATE_ID,
     params: {
-      "SERVICE_PROVIDER_NAME": serviceProviders[serviceProviderId].serviceProviderName,
-      "DOCUMENT_TYPE": documentTypes[documentTypeId].name,
-      "URL": `${BASE_URL}${sanitizedSha}`
+      SERVICE_PROVIDER_NAME: serviceProviders[serviceProviderId].serviceProviderName,
+      DOCUMENT_TYPE: documentTypes[documentTypeId].name,
+      URL: `${BASE_URL}${sanitizedSha}`
     },
   }
 
