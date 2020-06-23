@@ -18,8 +18,8 @@ export async function updateServiceProviderDocument(serviceProviderId, servicePr
   let content;
   try {
     content = await scrape(documentUrl);
-  } catch (e) {
-    console.error(`${logPrefix} Can't scrape url: ${e}`);
+  } catch (error) {
+    console.error(`${logPrefix} Can't scrape url: ${error}`);
     return notifier.onDocumentScrappingError(serviceProviderId, documentType, e);
   }
 
