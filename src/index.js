@@ -72,14 +72,14 @@ export default async function updateTerms() {
   }
 };
 
-let initialized = false;
+let initialized;
 async function init() {
   if (!initialized) {
     const serviceProvidersManifests = getServiceProviders();
     return Promise.all([notifier.init(serviceProvidersManifests, DOCUMENTS_TYPES)]).then(() => {
-      initialized = true;
+      initialized = Promise.resolve();
     });
   }
 
-  return Promise.resolve();
+  return initialized;
 }

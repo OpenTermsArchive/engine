@@ -19,17 +19,17 @@ const serviceProvidersMailingLists = {};
 let serviceProviders;
 let documentTypes;
 
-let initialized = false;
+let initialized;
 export async function init(passedServiceProviders, passedDocumentTypes) {
   if (!initialized) {
     serviceProviders = passedServiceProviders;
     documentTypes = passedDocumentTypes;
     return bootstrapMailingLists().then(() => {
-      initialized = true;
+      initialized = Promise.resolve();
     });
   }
 
-  return Promise.resolve();
+  return initialized;
 }
 
 async function bootstrapMailingLists() {
