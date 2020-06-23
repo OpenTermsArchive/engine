@@ -6,7 +6,7 @@ import simpleGit from 'simple-git';
 
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
 
-const DATA_PATH = '../../data';
+const DATA_PATH = '../../../CGUs-data';
 
 export const git = simpleGit(path.resolve(__dirname, DATA_PATH));
 
