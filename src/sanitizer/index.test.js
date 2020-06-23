@@ -8,19 +8,48 @@ import sanitize from './index.js';
 
 const expect = chai.expect;
 
-describe('Sanitizer', () => {
-  let facebookTermsHTML;
-  let facebookTermsMarkdown;
+const rawHTML = `
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>TOS</title>
+  </head>
+  <body>
+    <h1>Title</h1>
+    <a href="">link 1</a>
+  </body>
+</html>`;
 
+const expectedSanitized = `Title
+=====
+
+link 1`;
+
+const expectedSanitizedWithAditional = `Title
+=====`;
+
+const additionalSanitizer = {
+  removeLinks: function removeLinks(document) {
+    const links = document.querySelectorAll('a');
+    links.forEach(link => {
+      link.remove();
+    });
+  }
+}
+
+describe('Sanitizer', () => {
   describe('#sanitize', () => {
-    before(() => {
-      facebookTermsHTML = fs.readFileSync(path.resolve(__dirname, '../../test/fixtures/facebook_terms_raw.html'), { encoding: 'utf8' });
-      facebookTermsMarkdown = fs.readFileSync(path.resolve(__dirname, '../../test/fixtures/facebook_terms_sanitized.md'), { encoding: 'utf8' });
+    it('sanitizes the given HTML content', async () => {
+      const result = await sanitize(rawHTML, 'body');
+      expect(result).to.be.equal(expectedSanitized);
     });
 
-    it('returns the page content of the given URL', async () => {
-      const result = await sanitize(facebookTermsHTML, '.UIFullPage_Container');
-      expect(result).to.be.equal(facebookTermsMarkdown);
+    context('With an additional sanitizer', () => {
+      it('sanitizes the given HTML content also with given additional sanitizers', async () => {
+        const result = await sanitize(rawHTML, 'body', ['removeLinks'], additionalSanitizer);
+        expect(result).to.be.equal(expectedSanitizedWithAditional);
+      });
     });
   });
 });
