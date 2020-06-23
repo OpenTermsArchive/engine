@@ -4,14 +4,14 @@ import jsdom from 'jsdom';
 const { JSDOM } = jsdom;
 const turndownService = new TurndownService();
 
-export default async function sanitize(content, selector, sanitizationPipeline, additionalSanitizers) {
+export default async function sanitize(content, selector, sanitizationPipeline, providerSpecificSanitizers) {
   let contentToSanitize = content;
   let { document } = new JSDOM(contentToSanitize).window;
 
   if (sanitizationPipeline) {
     sanitizationPipeline.forEach(sanitizerId => {
       // Sanitizers work in place
-      additionalSanitizers[sanitizerId](document);
+      providerSpecificSanitizers[sanitizerId](document);
     });
   }
 
