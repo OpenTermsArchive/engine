@@ -143,7 +143,7 @@ async function getListContacts(listId) {
   let limit = 50;
   const list = await contactsInstance.getList(listId);
 
-  return _aggregate('getContactsFromList', 'contacts', listId, limit, offset, [], list.totalSubscribers);
+  return recursivePaginationAccumulator('getContactsFromList', 'contacts', listId, limit, offset, [], list.totalSubscribers);
 }
 
 export async function getFolderLists(folderId) {
@@ -159,15 +159,15 @@ export async function getFolderLists(folderId) {
     return [];
   }
 
-  return _aggregate('getFolderLists', 'lists', folderId, limit, offset + limit, [...lists], count);
+  return recursivePaginationAccumulator('getFolderLists', 'lists', folderId, limit, offset + limit, [...lists], count);
 }
 
-async function _aggregate(functionName, resultKey, resourceId, limit, offset, aggregator, count) {
-  if (aggregator.length >= count) {
-    return aggregator;
+async function recursivePaginationAccumulator(apiFunctionName, resultKey, resourceId, limit, offset, accumulator, count) {
+  if (accumulator.length >= count) {
+    return accumulator;
   }
 
-  const result = await contactsInstance[functionName](resourceId, { limit, offset });
-  aggregator = aggregator.concat(result[resultKey]);
-  return _aggregate(functionName, resultKey, resourceId, limit, offset + limit, aggregator, count);
+  const result = await contactsInstance[apiFunctionName](resourceId, { limit, offset });
+  accumulator = accumulator.concat(result[resultKey]);
+  return recursivePaginationAccumulator(apiFunctionName, resultKey, resourceId, limit, offset + limit, accumulator, count);
 }
