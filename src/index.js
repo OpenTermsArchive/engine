@@ -7,14 +7,14 @@ consoleStamp(console);
 import scrape from './scraper/index.js';
 import { persistRaw, persistSanitized, pushChanges } from './history/index.js';
 import sanitize from './sanitizer/index.js';
-import getServiceProviders from './service_providers/index.js';
+import getServiceProviders, { getSanitizers } from './service_providers/index.js';
 import { DOCUMENTS_TYPES } from './documents_types.js';
 
-export async function updateServiceProviderDocument(serviceProviderId, serviceProviderName, documentType, documentUrl, documentContentSelector) {
+export async function updateServiceProviderDocument({ serviceProviderId, serviceProviderName, document }) {
+  const { documentType, url, contentSelector, sanitizationPipeline } = document;
   const logPrefix = `[${serviceProviderName}-${DOCUMENTS_TYPES[documentType].name}]`;
-
-  console.log(`${logPrefix} Scrape '${documentUrl}'.`);
-  const content = await scrape(documentUrl);
+  console.log(`${logPrefix} Scrape '${url}'.`);
+  const content = await scrape(url);
 
   const { sha: rawSha, filePath: rawFilePath} = await persistRaw(serviceProviderId, documentType, content);
   if (rawSha) {
@@ -24,7 +24,8 @@ export async function updateServiceProviderDocument(serviceProviderId, servicePr
     console.log(`${logPrefix} No raw changes, didn't commit.`);
   }
 
-  const sanitizedContent = await sanitize(content, documentContentSelector);
+  const sanitizers = getSanitizers(serviceProviderId);
+  const sanitizedContent = await sanitize(content, contentSelector, sanitizationPipeline, sanitizers);
 
   const { sha: sanitizedSha, filePath: sanitizedFilePath} = await persistSanitized(serviceProviderId, documentType, sanitizedContent, rawSha);
   if (sanitizedSha) {
@@ -39,14 +40,20 @@ export default async function updateTerms() {
   console.log('Start scraping and saving terms of service…');
 
   const documentUpdatePromises = [];
-  const serviceProvidersManifests = getServiceProviders();
+  const serviceProvidersManifests = await getServiceProviders();
 
   Object.keys(serviceProvidersManifests).forEach((serviceProviderId) => {
     const { documents, serviceProviderName } = serviceProvidersManifests[serviceProviderId];
 
     Object.keys(documents).forEach((documentType) => {
-      const { url, contentSelector } = documents[documentType];
-      documentUpdatePromises.push(updateServiceProviderDocument(serviceProviderId, serviceProviderName, documentType, url, contentSelector));
+      documentUpdatePromises.push(updateServiceProviderDocument({
+        serviceProviderId,
+        serviceProviderName,
+        document: {
+          documentType,
+          ...documents[documentType]
+        }
+      }));
     });
   });
 

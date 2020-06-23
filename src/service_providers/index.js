@@ -6,18 +6,26 @@ dotenv.config();
 
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
 const dirPath = path.resolve(__dirname, '../..', process.env.NODE_ENV === 'test' ? 'test' : '', 'providers');
+const sanitizers = {};
 
-export default function getServiceProviders() {
-  const result = {};
+export default async function getServiceProviders() {
+  const serviceProviders = {};
 
-  fs.readdirSync(dirPath).forEach((filename) => {
-    const serviceProviderId = path.basename(filename, '.json');
-    if (serviceProviderId.indexOf('.') === 0) {
-      return;  // ignore invisible files such as .DS_Store
+  const filenames = fs.readdirSync(dirPath);
+
+  for (let filename of filenames) {
+    if (filename.indexOf('.sanitizers.js') !== -1) {
+      const serviceProviderId = path.basename(filename, '.sanitizers.js');
+      sanitizers[serviceProviderId] = await import(path.join(dirPath, filename));
+    } else if (filename.indexOf('.json') !== -1) {
+      const serviceProviderId = path.basename(filename, '.json');
+      serviceProviders[serviceProviderId] = JSON.parse(fs.readFileSync(path.join(dirPath, filename)));
     }
+  }
 
-    result[serviceProviderId] = JSON.parse(fs.readFileSync(path.join(dirPath, filename)));
-  });
+  return serviceProviders;
+}
 
-  return result;
+export function getSanitizers(serviceProviderId) {
+  return sanitizers[serviceProviderId];
 }
