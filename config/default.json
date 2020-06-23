@@ -1,0 +1,17 @@
+{
+  "history": {
+    "author": {
+      "name": "AmbNum Bot",
+      "email": "ambnum.bot@disinfo.quaidorsay.fr"
+    }
+  },
+  "notifier": {
+    "sendInBlue": {
+      "listFolderId": 44,
+      "updateTemplateId": 21,
+      "errorTemplateId": 22,
+      "baseUrl": "github.com/ambanum/CGUs-data/commit/"
+    }
+  }
+}
+
