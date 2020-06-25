@@ -3,7 +3,7 @@ import nock from 'nock';
 import fs from 'fs';
 import path from 'path';
 
-import getServiceProviders from './index.js';
+import { getServiceProviders } from './index.js';
 
 const expect = chai.expect;
 

@@ -8,7 +8,7 @@ const __dirname = path.dirname(new URL(import.meta.url).pathname);
 const dirPath = path.resolve(__dirname, '../..', process.env.NODE_ENV === 'test' ? 'test' : '', 'providers');
 const sanitizers = {};
 
-export default async function getServiceProviders() {
+export async function getServiceProviders() {
   const serviceProviders = {};
 
   const filenames = fs.readdirSync(dirPath);
