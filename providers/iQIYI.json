@@ -1,0 +1,13 @@
+{
+    "serviceProviderName": "iQIYI",
+    "documents": {
+        "tos": {
+            "url": "https://www.iq.com/intl-common/international-useragreement.html?lang=en_us",
+            "contentSelector": "#app"
+        },
+        "privacy": {
+            "url": "https://www.iq.com/intl-common/international-privacyagreement.html?lang=en_us",
+            "contentSelector": "#write"
+        }
+    }
+}
