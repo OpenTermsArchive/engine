@@ -7,6 +7,7 @@
   },
   "notifier": {
     "sendInBlue": {
+      "administratorsListId": 9,
       "listFolderId": 44,
       "updateTemplateId": 21,
       "errorTemplateId": 22,

@@ -61,36 +61,40 @@ export default class CGUs extends events.EventEmitter {
   async updateServiceProviderDocument({ serviceProviderId, serviceProviderName, document }) {
     const { documentType, url, contentSelector, sanitizationPipeline } = document;
     const logPrefix = `[${serviceProviderName}-${DOCUMENTS_TYPES[documentType].name}]`;
-
-    console.log(`${logPrefix} Scrape '${url}'.`);
-    let content;
     try {
-      content = await scrape(url);
+      console.log(`${logPrefix} Scrape '${url}'.`);
+      let content;
+      try {
+        content = await scrape(url);
+      } catch (error) {
+        console.error(`${logPrefix} Can't scrape url: ${error}`);
+        return this.emit('documentScrapingError', serviceProviderId, documentType, error);
+      }
+
+      const { sha: rawSha, filePath: rawFilePath} = await persistRaw(serviceProviderId, documentType, content);
+
+      console.log(`${logPrefix} Save raw file to '${rawFilePath}'.`);
+
+      if (!rawSha) {
+        return console.log(`${logPrefix} No raw changes, didn't commit.`);
+      }
+
+      console.log(`${logPrefix} Commit raw file in '${rawSha}'.`);
+
+      const sanitizers = serviceProviders.getSanitizers(serviceProviderId);
+      const sanitizedContent = await sanitize(content, contentSelector, sanitizationPipeline, sanitizers);
+
+      const { sha: sanitizedSha, filePath: sanitizedFilePath} = await persistSanitized(serviceProviderId, documentType, sanitizedContent, rawSha);
+      if (sanitizedSha) {
+        console.log(`${logPrefix} Save sanitized file to '${sanitizedFilePath}'.`);
+        console.log(`${logPrefix} Commit sanitized file in '${sanitizedSha}'.`);
+        this.emit('sanitizedDocumentChange', serviceProviderId, documentType, sanitizedSha);
+      } else {
+        console.log(`${logPrefix} No changes after sanitization, didn't commit.`);
+      }
     } catch (error) {
-      console.error(`${logPrefix} Can't scrape url: ${error}`);
-      return this.emit('documentScrapingError', serviceProviderId, documentType, error);
-    }
-
-    const { sha: rawSha, filePath: rawFilePath} = await persistRaw(serviceProviderId, documentType, content);
-
-    console.log(`${logPrefix} Save raw file to '${rawFilePath}'.`);
-
-    if (!rawSha) {
-      return console.log(`${logPrefix} No raw changes, didn't commit.`);
-    }
-
-    console.log(`${logPrefix} Commit raw file in '${rawSha}'.`);
-
-    const sanitizers = serviceProviders.getSanitizers(serviceProviderId);
-    const sanitizedContent = await sanitize(content, contentSelector, sanitizationPipeline, sanitizers);
-
-    const { sha: sanitizedSha, filePath: sanitizedFilePath} = await persistSanitized(serviceProviderId, documentType, sanitizedContent, rawSha);
-    if (sanitizedSha) {
-      console.log(`${logPrefix} Save sanitized file to '${sanitizedFilePath}'.`);
-      console.log(`${logPrefix} Commit sanitized file in '${sanitizedSha}'.`);
-      this.emit('sanitizedDocumentChange', serviceProviderId, documentType, sanitizedSha);
-    } else {
-      console.log(`${logPrefix} No changes after sanitization, didn't commit.`);
+      console.error(`${logPrefix} Error:`, error);
+      this.emit('applicationError', serviceProviderId, documentType, error);
     }
   }
 

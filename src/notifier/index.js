@@ -11,6 +11,7 @@ authentication.apiKey = process.env.SENDINBLUE_API_KEY;
 const apiInstance = new sendInBlue.SMTPApi();
 const contactsInstance = new sendInBlue.ContactsApi();
 
+const ADMINISTRATORS_LIST_ID = config.get('notifier.sendInBlue.administratorsListId');
 const LIST_FOLDER_ID = config.get('notifier.sendInBlue.listFolderId');
 const UPDATE_TEMPLATE_ID = config.get('notifier.sendInBlue.updateTemplateId');
 const ERROR_TEMPLATE_ID = config.get('notifier.sendInBlue.errorTemplateId');
@@ -88,6 +89,20 @@ export async function onSanitizedDocumentChange(serviceProviderId, documentTypeI
     serviceProvidersMailingLists[serviceProviderId][documentTypeId].updateListId
   ], sendParams);
 };
+
+export async function onApplicationError(serviceProviderId, documentTypeId, error) {
+  const sendParams = {
+    templateId: ERROR_TEMPLATE_ID,
+    params: {
+      SERVICE_PROVIDER_NAME: serviceProviders[serviceProviderId].serviceProviderName,
+      DOCUMENT_TYPE: documentTypes[documentTypeId].name,
+      ERROR_TEXT: `An error has occured when trying to update the document:
+${error}`
+    },
+  }
+
+  return send([ADMINISTRATORS_LIST_ID], sendParams);
+}
 
 async function send(lists, sendParams) {
   const sendPromises = [];
