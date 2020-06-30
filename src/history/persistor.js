@@ -2,6 +2,7 @@ import path from 'path';
 import fsApi from 'fs';
 const fs = fsApi.promises;
 
+import config from 'config';
 import async from 'async';
 
 const commitQueue = async.queue(_commit, 1);
@@ -14,10 +15,7 @@ import { DOCUMENTS_TYPES } from '../documents_types.js';
 
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
 
-const ROOT_DIRECTORY = path.resolve(
-    __dirname,
-    (process.env.DATA_PATH ? process.env.DATA_PATH : (process.env.CI ? '' : '../') + '../../cgus-data')
-);
+const ROOT_DIRECTORY = path.resolve(__dirname, '../..', config.get('history.dataPath'));
 export const RAW_DIRECTORY = `${ROOT_DIRECTORY}/raw`;
 export const SANITIZED_DIRECTORY = `${ROOT_DIRECTORY}/sanitized`;
 
