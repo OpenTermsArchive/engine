@@ -7,7 +7,7 @@ import simpleGit from 'simple-git';
 dotenv.config();
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
 
-const DATA_PATH = '../../data';
+const DATA_PATH = (process.env.CI ? '' : '../') + '../../cgus-data';
 
 export const git = simpleGit(path.resolve(__dirname, DATA_PATH));
 

@@ -6,6 +6,7 @@ on:
 
 env:
   SENDINBLUE_API_KEY: ${{ secrets.SENDINBLUE_API_KEY }}
+  ANSIBLE_VAULT_PASSWORD: ${{ secrets.ANSIBLE_VAULT_PASSWORD }}
 
 jobs:
   deploy:
@@ -23,8 +24,13 @@ jobs:
       with:
         key: ${{ secrets.SSH_KEY }}
         known_hosts: ${{ secrets.KNOWN_HOSTS }}
+    - name: Checkout data repo
+      uses: actions/checkout@v2
+      with:
+        repository: ambanum/CGUs-data
+        path: cgus-data
+    - run: echo "$ANSIBLE_VAULT_PASSWORD" > vault.key
     - run: npm ci
-    - run: git submodule update --init --recursive
     - run: npm test
     - run: pip install --upgrade setuptools
     - run: pip install ansible
