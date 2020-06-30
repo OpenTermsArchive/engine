@@ -1,0 +1,13 @@
+{
+    "serviceProviderName": "Smule",
+    "documents": {
+        "tos": {
+            "url": "https://www.smule.com/termsofservice",
+            "contentSelector": "._r5gaeu"
+        },
+        "privacy": {
+            "url": "https://www.smule.com/en/privacy",
+            "contentSelector": "._r5gaeu"
+        }
+    }
+}
