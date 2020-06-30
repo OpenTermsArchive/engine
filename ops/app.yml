@@ -3,4 +3,5 @@
   hosts: all
 
   roles:
+    - cgus-data
     - cgus
