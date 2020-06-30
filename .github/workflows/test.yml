@@ -23,6 +23,6 @@ jobs:
       uses: actions/checkout@v2
       with:
         repository: ambanum/CGUs-data
-        path: CGUs-data
+        path: cgus-data
     - run: npm ci
     - run: npm test
