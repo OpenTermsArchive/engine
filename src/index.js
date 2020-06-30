@@ -1,5 +1,7 @@
+import path from 'path';
 import events from 'events';
 
+import config from 'config';
 import dotenv from 'dotenv';
 dotenv.config();
 
@@ -9,8 +11,12 @@ consoleStamp(console);
 import scrape from './scraper/index.js';
 import { persistRaw, persistSanitized, pushChanges } from './history/index.js';
 import sanitize from './sanitizer/index.js';
-import getServiceProviders, { getSanitizers } from './service_providers/index.js';
+import loadServiceProviders from './service_providers/index.js';
 import { DOCUMENTS_TYPES } from './documents_types.js';
+
+const __dirname = path.dirname(new URL(import.meta.url).pathname);
+const SERVICE_PROVIDERS_PATH = path.resolve(__dirname, '../', config.get('serviceProvidersPath'));
+
 export default class CGUs extends events.EventEmitter {
   constructor() {
     super();
@@ -27,7 +33,7 @@ export default class CGUs extends events.EventEmitter {
 
   async init() {
     if (!this.initialized) {
-      this.serviceProvidersManifests = await getServiceProviders();
+      this.serviceProvidersManifests = await loadServiceProviders(SERVICE_PROVIDERS_PATH);
       this.initialized = Promise.resolve();
     }
 
@@ -87,8 +93,7 @@ export default class CGUs extends events.EventEmitter {
 
       console.log(`${logPrefix} Commit raw file in '${rawSha}'.`);
 
-      const sanitizers = getSanitizers(serviceProviderId);
-      const sanitizedContent = await sanitize(content, contentSelector, sanitizationPipeline, sanitizers);
+      const sanitizedContent = await sanitize(content, contentSelector, sanitizationPipeline, this.serviceProvidersManifests[serviceProviderId].sanitizers);
 
       const { sha: sanitizedSha, filePath: sanitizedFilePath} = await persistSanitized(serviceProviderId, documentType, sanitizedContent, rawSha);
       if (sanitizedSha) {
