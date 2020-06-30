@@ -5,5 +5,14 @@
       "email": "ambnum.bot@disinfo.quaidorsay.fr"
     }
   },
+  "notifier": {
+    "sendInBlue": {
+      "administratorsListId": 9,
+      "updatesListId": 191,
+      "updateTemplateId": 21,
+      "errorTemplateId": 22,
+      "baseUrl": "github.com/ambanum/CGUs-data/commit/"
+    }
+  }
 }
 

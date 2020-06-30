@@ -5,6 +5,7 @@ on:
     branches: [ master ]
 
 env:
+  SENDINBLUE_API_KEY: ${{ secrets.SENDINBLUE_API_KEY }}
 
 jobs:
   test:
