@@ -1,0 +1,9 @@
+{
+    "serviceProviderName": "Telegram",
+    "documents": {
+        "privacy": {
+            "url": "https://telegram.org/privacy",
+            "contentSelector": "#dev_page_content_wrap"
+        }
+    }
+}
