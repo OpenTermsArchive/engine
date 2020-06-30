@@ -32,6 +32,7 @@
   },
   "dependencies": {
     "async": "^3.2.0",
+    "config": "^3.3.1",
     "console-stamp": "^0.2.9",
     "dotenv": "^8.2.0",
     "jsdom": "^16.2.2",
