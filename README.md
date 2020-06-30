@@ -4,9 +4,9 @@ Tracks and makes visible all changes to the Terms Of Service of online service p
 
 > Suit et rend visibles les modifications des Conditions Générales d'Utilisations des principaux fournisseurs de services en ligne.
 
-## Installation
+## Installing
 
-This API is built with [Node](https://nodejs.org/en/). You will need to [install it](https://nodejs.org/en/download/) to run this application.
+This module is built with [Node](https://nodejs.org/en/). You will need to [install Node](https://nodejs.org/en/download/) to run it.
 
 Clone the repository and install dependencies:
 
@@ -18,13 +18,13 @@ npm install
 
 ## Usage
 
-To get lastest versions of service providers' terms:
+To get the latest versions of all service providers' terms:
 
 ```
 npm start
 ```
 
-The lastest version will be available in `/data/sanitized/<service_provider_name>/<document_type>.md`.
+The latest version will be available in `/data/sanitized/$service_provider_name/$document_type.md`.
 
 To hourly update documents:
 
@@ -32,26 +32,26 @@ To hourly update documents:
 npm run start:scheduler
 ```
 
-## Add a service provider
+## Adding a service provider
 
-In the folder `providers`, create a JSON file with the name of the service provider who want to add with following structure:
+In the folder `providers`, create a JSON file with the name of the service provider you want to add, with the following structure:
 
 ```json
 {
   "serviceProviderName": "<the public name of the service provider>",
   "documents": {
     "<document type>": {
-      "url": "<the url where the document can be found>",
-      "contentSelector": "<the css selector on the meaningful content of the document>",
+      "url": "<the URL where the document can be found>",
+      "contentSelector": "<a CSS selector that targets the meaningful part of the document, excluding elements such as headers, footers and navigation>",
     }
   }
 }
 ```
 
-For document type [there is a list of available documents types](/src/documents_types.js)
-You can find examples in `providers` folder.
+For the `<document type>` key, you will have to use one of those listed in `/src/documents_types.js` (or create a new one there if it is not already referenced).
+You can find examples in the `providers` folder.
 
-## Deployment
+## Deploying
 
 See [Ops Readme](ops/README.md).
 
