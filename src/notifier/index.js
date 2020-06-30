@@ -105,19 +105,19 @@ ${error}`
 }
 
 async function send(lists, sendParams) {
-  const sendPromises = [];
+  let contacts = [];
 
-  lists.forEach(async listId => {
+  for (let listId of lists) {
     const listContacts = await getListContacts(listId);
-    if (listContacts.length) {
-      sendPromises.push(apiInstance.sendTransacEmail({
-        ...sendParams,
-        to: listContacts.map(contact => ({ email: contact.email }))
-      }));
-    }
-  });
+    contacts = contacts.concat(...listContacts);
+  }
 
-  return Promise.all(sendPromises);
+  const uniqueContacts = contacts.reduce((acc, current) => acc.find(contact => contact.id === current.id) ? acc : acc.concat([current]), []);
+
+  return apiInstance.sendTransacEmail({
+    ...sendParams,
+    to: uniqueContacts.map(contact => ({ email: contact.email }))
+  });
 }
 
 async function generateServiceProviderMailingList({ serviceProviderName, serviceProviderId }) {
