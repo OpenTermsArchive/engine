@@ -1,9 +1,11 @@
-import chai from 'chai';
-import nock from 'nock';
-import fs from 'fs';
 import path from 'path';
+import config from 'config';
+import chai from 'chai';
 
-import getServiceProviders from './index.js';
+import loadServiceProviders from './index.js';
+
+const __dirname = path.dirname(new URL(import.meta.url).pathname);
+const SERVICE_PROVIDERS_PATH = path.resolve(__dirname, '../..', config.get('serviceProvidersPath'));
 
 const expect = chai.expect;
 
@@ -26,13 +28,12 @@ const expected = {
       }
     }
   }
-
 }
 
 describe('ServiceProviders', () => {
-  describe('#getServiceProviders', () => {
+  describe('#loadServiceProviders', () => {
     it('returns an object with all service providers manifests', async () => {
-      const result = await getServiceProviders();
+      const result = await loadServiceProviders(SERVICE_PROVIDERS_PATH);
       expect(result).to.deep.equal(expected);
     });
   });
