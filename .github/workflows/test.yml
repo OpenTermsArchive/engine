@@ -24,4 +24,4 @@ jobs:
         repository: ambanum/CGUs-data
         path: cgus-data
     - run: npm ci
-    - run: npm test
+    - run: npm run test:ci

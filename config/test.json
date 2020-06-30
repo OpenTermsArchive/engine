@@ -1,6 +1,7 @@
 {
   "serviceProvidersPath": "./test/providers",
   "history": {
+    "dataPath": "./test/data",
     "author": {
       "name": "AmbNum Bot Test",
       "email": "ambnum.bot.test@disinfo.quaidorsay.fr"

@@ -2,8 +2,6 @@ import path from 'path';
 import events from 'events';
 
 import config from 'config';
-import dotenv from 'dotenv';
-dotenv.config();
 
 import consoleStamp from 'console-stamp';
 consoleStamp(console);
@@ -56,8 +54,8 @@ export default class CGUs extends events.EventEmitter {
 
     await Promise.all(documentUpdatePromises);
 
-    if (process.env.NODE_ENV === 'production') {
       await pushChanges();
+    if (config.get('history.exportChanges')) {
       console.log('・・・・・・・');
       console.log('Pushed changes to the repository');
       console.log('______________________________');
