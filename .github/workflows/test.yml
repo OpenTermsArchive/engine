@@ -19,11 +19,10 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: '12.17'
-    - name: Install SSH key
-      uses: shimataro/ssh-key-action@v2
+    - name: Checkout data repo
+      uses: actions/checkout@v2
       with:
-        key: ${{ secrets.SSH_KEY }}
-        known_hosts: ${{ secrets.KNOWN_HOSTS }}
+        repository: ambanum/CGUs-data
+        path: CGUs-data
     - run: npm ci
-    - run: git submodule update --init --recursive
     - run: npm test
