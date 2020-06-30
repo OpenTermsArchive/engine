@@ -1,4 +1,8 @@
 {
+  "serviceProvidersPath": "./test/providers",
+  "history": {
+    "dataPath": "./test/data"
+  },
   "notifier": {
     "sendInBlue": {
       "listFolderId": 184

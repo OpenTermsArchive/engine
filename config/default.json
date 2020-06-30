@@ -1,6 +1,9 @@
 {
   "serviceProvidersPath": "./providers",
   "history": {
+    "dataPath": "../cgus-data",
+    "configureAuthor": false,
+    "exportChanges": false,
     "author": {
       "name": "AmbNum Bot",
       "email": "ambnum.bot@disinfo.quaidorsay.fr"
