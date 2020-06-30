@@ -1,4 +1,5 @@
 {
+  "serviceProvidersPath": "./test/providers",
   "history": {
     "author": {
       "name": "AmbNum Bot Test",
