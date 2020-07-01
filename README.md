@@ -41,15 +41,15 @@ To get the latest versions of all service providers' terms:
 npm start
 ```
 
-The latest version will be available in `/data/sanitized/$service_provider_name/$document_type.md`.
+> You can use the `DATA_PATH` environment variable to specify the absolute location of the database repository (defaults to `../cgus-data` from the root of this repository).
+
+The latest version of a document will be available in `/data/sanitized/$service_provider_name/$document_type.md`.
 
 To hourly update documents:
 
 ```
 npm run start:scheduler
 ```
-
-_Note_: You can use the `DATA_PATH` environment variable to specify the absolute location of the `cgus-data` repository (defaults to `../cgus-data` from the root of this repository).
 
 
 ## Adding a service provider
