@@ -8,7 +8,7 @@ const __dirname = path.dirname(new URL(import.meta.url).pathname);
 
 const DATA_PATH = (process.env.DATA_PATH ? process.env.DATA_PATH : (process.env.CI ? '' : '../') + '../../cgus-data');
 
-console.log(path.resolve(__dirname, DATA_PATH));
+console.log('Using database:', path.resolve(__dirname, DATA_PATH));
 export const git = simpleGit(path.resolve(__dirname, DATA_PATH));
 
 if (process.env.CI || process.env.NODE_ENV === 'production') {
