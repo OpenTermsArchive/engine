@@ -14,7 +14,14 @@ Clone the repository and install dependencies:
 git clone https://github.com/ambanum/CGUs.git
 cd CGUs
 npm install
+# Git clone CGUs data
+cd ..
+git clone https://github.com/ambanum/cgus-data/
 ```
+
+_Note:_ Instead of cloning CGUs data, you can also start with an empty git
+repository.
+
 
 ## Usage
 
@@ -31,6 +38,11 @@ To hourly update documents:
 ```
 npm run start:scheduler
 ```
+
+_Note_: You can use the `DATA_PATH` environment variable to specify the
+absolue location of the `cgus-data` repository (defaults to `../cgus-data`
+from the root of this repository).
+
 
 ## Adding a service provider
 
