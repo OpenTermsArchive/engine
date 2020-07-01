@@ -3,3 +3,5 @@ node_modules
 /.env
 .vagrant
 vault.key
+cgus-data
+*.lock
