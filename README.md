@@ -39,9 +39,7 @@ To hourly update documents:
 npm run start:scheduler
 ```
 
-_Note_: You can use the `DATA_PATH` environment variable to specify the
-absolue location of the `cgus-data` repository (defaults to `../cgus-data`
-from the root of this repository).
+_Note_: You can use the `DATA_PATH` environment variable to specify the absolute location of the `cgus-data` repository (defaults to `../cgus-data` from the root of this repository).
 
 
 ## Adding a service provider
