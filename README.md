@@ -15,13 +15,23 @@ git clone https://github.com/ambanum/CGUs.git
 cd CGUs
 npm install
 # Git clone CGUs data
+```
+
+## Setting up the database
+
+You can create a new database to start your own history from now:
+
+```sh
+cd ..
+git init
+```
+
+Or you can download the entire history of terms of services:
+
+```sh
 cd ..
 git clone https://github.com/ambanum/cgus-data/
 ```
-
-_Note:_ Instead of cloning CGUs data, you can also start with an empty git
-repository.
-
 
 ## Usage
 
