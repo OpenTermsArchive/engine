@@ -23,6 +23,8 @@ You can create a new database to start your own history from now:
 
 ```sh
 cd ..
+mkdir cgus-data
+cd cgus-data
 git init
 ```
 
