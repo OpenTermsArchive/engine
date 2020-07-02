@@ -62,7 +62,7 @@ export default class CGUs extends events.EventEmitter {
       console.log('Pushed changes to the repository');
       console.log('______________________________');
     }
-  };
+  }
 
   async updateServiceProviderDocument({ serviceProviderId, serviceProviderName, document }) {
     const { documentType, url, contentSelector, sanitizationPipeline } = document;

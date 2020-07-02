@@ -3,96 +3,89 @@ import config from 'config';
 dotenv.config();
 
 import sendInBlue from 'sib-api-v3-sdk';
-const defaultClient = sendInBlue.ApiClient.instance;
 
-const authentication = defaultClient.authentications['api-key'];
-authentication.apiKey = process.env.SENDINBLUE_API_KEY;
+export default class Notifier {
+  constructor(passedServiceProviders, passedDocumentTypes) {
+    const defaultClient = sendInBlue.ApiClient.instance;
+    const authentication = defaultClient.authentications['api-key'];
+    authentication.apiKey = process.env.SENDINBLUE_API_KEY;
 
-const apiInstance = new sendInBlue.SMTPApi();
-const contactsInstance = new sendInBlue.ContactsApi();
+    this.apiInstance = new sendInBlue.SMTPApi();
+    this.contactsInstance = new sendInBlue.ContactsApi();
 
-const ADMINISTRATORS_LIST_ID = config.get('notifier.sendInBlue.administratorsListId');
-const UPDATES_LIST_ID = config.get('notifier.sendInBlue.updatesListId');
-const UPDATE_TEMPLATE_ID = config.get('notifier.sendInBlue.updateTemplateId');
-const ERROR_TEMPLATE_ID = config.get('notifier.sendInBlue.errorTemplateId');
-const BASE_URL = config.get('notifier.sendInBlue.baseUrl');
-
-let serviceProviders;
-let documentTypes;
-
-export async function init(passedServiceProviders, passedDocumentTypes) {
-  serviceProviders = passedServiceProviders;
-  documentTypes = passedDocumentTypes;
-}
-
-export async function onDocumentScrapingError(serviceProviderId, documentTypeId, error) {
-  const sendParams = {
-    templateId: ERROR_TEMPLATE_ID,
-    params: {
-      SERVICE_PROVIDER_NAME: serviceProviders[serviceProviderId].serviceProviderName,
-      DOCUMENT_TYPE: documentTypes[documentTypeId].name,
-      ERROR_TEXT: `An error occured when trying to scrape the document:
-${error}`
-    },
+    this.serviceProviders = passedServiceProviders;
+    this.documentTypes = passedDocumentTypes;
   }
 
-  return send([ADMINISTRATORS_LIST_ID], sendParams);
-}
+  async onDocumentScrapingError(serviceProviderId, documentTypeId, error) {
+    const sendParams = {
+      templateId: config.get('notifier.sendInBlue.errorTemplateId'),
+      params: {
+        SERVICE_PROVIDER_NAME: this.serviceProviders[serviceProviderId].serviceProviderName,
+        DOCUMENT_TYPE: this.documentTypes[documentTypeId].name,
+        ERROR_TEXT: `An error occured when trying to scrape the document:
+  ${error}`
+      },
+    }
 
-export async function onSanitizedDocumentChange(serviceProviderId, documentTypeId, sanitizedSha) {
-  const sendParams = {
-    templateId: UPDATE_TEMPLATE_ID,
-    params: {
-      SERVICE_PROVIDER_NAME: serviceProviders[serviceProviderId].serviceProviderName,
-      DOCUMENT_TYPE: documentTypes[documentTypeId].name,
-      URL: `${BASE_URL}${sanitizedSha}`
-    },
+    return send([config.get('notifier.sendInBlue.administratorsListId')], sendParams);
   }
 
-  return send([ADMINISTRATORS_LIST_ID, UPDATES_LIST_ID], sendParams);
-};
+  async onSanitizedDocumentChange(serviceProviderId, documentTypeId, sanitizedSha) {
+    const sendParams = {
+      templateId: config.get('notifier.sendInBlue.updateTemplateId'),
+      params: {
+        SERVICE_PROVIDER_NAME: this.serviceProviders[serviceProviderId].serviceProviderName,
+        DOCUMENT_TYPE: this.documentTypes[documentTypeId].name,
+        URL: `${config.get('notifier.sendInBlue.baseUrl')}${sanitizedSha}`
+      },
+    }
 
-export async function onApplicationError(serviceProviderId, documentTypeId, error) {
-  const sendParams = {
-    templateId: ERROR_TEMPLATE_ID,
-    params: {
-      SERVICE_PROVIDER_NAME: serviceProviders[serviceProviderId].serviceProviderName,
-      DOCUMENT_TYPE: documentTypes[documentTypeId].name,
-      ERROR_TEXT: `An error has occured when trying to update the document:
-${error}`
-    },
+    return this.send([config.get('notifier.sendInBlue.administratorsListId'), config.get('notifier.sendInBlue.updatesListId')], sendParams);
   }
 
-  return send([ADMINISTRATORS_LIST_ID], sendParams);
-}
+  async onApplicationError(serviceProviderId, documentTypeId, error) {
+    const sendParams = {
+      templateId: config.get('notifier.sendInBlue.errorTemplateId'),
+      params: {
+        SERVICE_PROVIDER_NAME: this.serviceProviders[serviceProviderId].serviceProviderName,
+        DOCUMENT_TYPE: this.documentTypes[documentTypeId].name,
+        ERROR_TEXT: `An error occured when trying to update the document:
+  ${error}`
+      },
+    }
 
-async function send(lists, sendParams) {
-  let contacts = [];
-
-  for (let listId of lists) {
-    const listContacts = await getListContacts(listId);
-    contacts = contacts.concat(...listContacts);
+    return this.send([config.get('notifier.sendInBlue.administratorsListId')], sendParams);
   }
 
-  const uniqueContacts = contacts.reduce((acc, current) => acc.find(contact => contact.id === current.id) ? acc : acc.concat([current]), []);
+  async send(lists, sendParams) {
+    let contacts = [];
 
-  const sendPromises = uniqueContacts.map(contact => apiInstance.sendTransacEmail({...sendParams, to: [{ email: contact.email }] }));
+    for (let listId of lists) {
+      const listContacts = await this.getListContacts(listId);
+      contacts = contacts.concat(...listContacts);
+    }
 
-  return Promise.all(sendPromises);
-}
+    const uniqueContacts = contacts.reduce((acc, current) => acc.find(contact => contact.id === current.id) ? acc : acc.concat([current]), []);
 
-async function getListContacts(listId) {
-  const list = await contactsInstance.getList(listId);
+    const sendPromises = uniqueContacts.map(contact => this.apiInstance.sendTransacEmail({...sendParams, to: [{ email: contact.email }] }));
 
-  return getAllPaginatedEntries('getContactsFromList', listId, 'contacts', [], list.totalSubscribers);
-}
-
-async function getAllPaginatedEntries(functionName, resourceIdParameter, resultKey, accumulator, count, offset = 0, paginationSize = 50) {
-  if (accumulator.length >= count) {
-    return accumulator;
+    return Promise.all(sendPromises);
   }
 
-  const result = await contactsInstance[functionName](resourceIdParameter, { limit: paginationSize, offset });
-  accumulator = accumulator.concat(result[resultKey]);
-  return getAllPaginatedEntries(functionName, resourceIdParameter, resultKey, accumulator, count, offset + paginationSize, paginationSize);
+  async getListContacts(listId) {
+    const list = await this.contactsInstance.getList(listId);
+
+    return this.getAllPaginatedEntries('getContactsFromList', listId, 'contacts', [], list.totalSubscribers);
+  }
+
+  async getAllPaginatedEntries(functionName, resourceIdParameter, resultKey, accumulator, count, offset = 0, paginationSize = 50) {
+    if (accumulator.length >= count) {
+      return accumulator;
+    }
+
+    const result = await this.contactsInstance[functionName](resourceIdParameter, { limit: paginationSize, offset });
+    accumulator = accumulator.concat(result[resultKey]);
+    return this.getAllPaginatedEntries(functionName, resourceIdParameter, resultKey, accumulator, count, offset + paginationSize, paginationSize);
+  }
 }
