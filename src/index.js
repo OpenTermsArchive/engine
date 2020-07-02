@@ -14,9 +14,15 @@ import { DOCUMENTS_TYPES } from './documents_types.js';
 export default class CGUs extends events.EventEmitter {
   constructor() {
     super();
-    this.initialized;
-    this.serviceProvidersManifests;
     this.documentTypes = DOCUMENTS_TYPES;
+  }
+
+  get serviceProviders() {
+    return this.serviceProvidersManifests;
+  }
+
+  get documentsTypes() {
+    return this.documentTypes;
   }
 
   async init() {
@@ -96,12 +102,5 @@ export default class CGUs extends events.EventEmitter {
       console.error(`${logPrefix} Error:`, error);
       this.emit('applicationError', serviceProviderId, documentType, error);
     }
-  }
-
-  get serviceProviders() {
-    return this.serviceProvidersManifests;
-  }
-  get documentsTypes() {
-    return this.documentTypes;
   }
 }
