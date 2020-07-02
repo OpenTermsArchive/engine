@@ -1,0 +1,13 @@
+{
+    "serviceProviderName": "TikTok",
+    "documents": {
+        "tos": {
+            "url": "https://www.tiktok.com/legal/terms-of-use?lang=en",
+            "contentSelector": "div.jsx-3775720204"
+        },
+        "privacy": {
+            "url": "https://www.tiktok.com/legal/privacy-policy?lang=en",
+            "contentSelector": "div.jsx-3775720204"
+        }
+    }
+}
