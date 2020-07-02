@@ -18,6 +18,7 @@ import CGUs from './src/index.js';
 
     app.on('sanitizedDocumentChange', notifier.onSanitizedDocumentChange);
     app.on('documentScrapingError', notifier.onDocumentScrapingError);
+    app.on('applicationError', notifier.onApplicationError);
 
     schedule.scheduleJob(rule, app.updateTerms);
   } catch (error) {
