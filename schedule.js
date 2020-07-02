@@ -12,8 +12,6 @@ import CGUs from './src/index.js';
     console.log('Jobs will run at minute 30 past every hour.');
 
     const app = new CGUs();
-    await app.init();
-
     const notifier = new Notifier(app.serviceProviders, app.documentsTypes);
 
     app.on('sanitizedDocumentChange', notifier.onSanitizedDocumentChange.bind(notifier));
