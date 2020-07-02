@@ -23,6 +23,33 @@ Initialize the database:
 npm run setup
 ```
 
+## Configuration
+
+Some configs are available and can be changed in `config/default.json`:
+
+```json
+{
+  "serviceProvidersPath": "Directory containing providers definition and associated sanitizers.",
+  "history": {
+    "dataPath": "Database directory path relative to the root of this project",
+    "configureAuthor": "Boolean. Set to true to automatically configure the git author. Used in production and CI envs.",
+    "exportChanges": "Boolean. Set to true to export documents changes on the CGUs-data repository. Should be true only in production.",
+    "author": {
+      "name": "Commits' author name",
+      "email": "Commits' author email"
+    }
+  },
+  "notifier": {
+    "sendInBlue": {
+      "administratorsListId": "SendInBlue contacts list ID of administrators",
+      "updatesListId": "SendInBlue contacts list ID of persons to notify on document updates",
+      "updateTemplateId": "SendInBlue email template ID used for updates notifications",
+      "errorTemplateId": "SendInBlue email template ID used for error notifications",
+    }
+  }
+}
+```
+
 ## Usage
 
 To get the latest versions of all service providers' terms:
@@ -30,8 +57,6 @@ To get the latest versions of all service providers' terms:
 ```
 npm start
 ```
-
-> You can use the `DATA_PATH` environment variable to specify the absolute location of the database repository (defaults to `../cgus-data` from the root of this repository).
 
 The latest version of a document will be available in `/data/sanitized/$service_provider_name/$document_type.md`.
 
