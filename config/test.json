@@ -1,10 +1,4 @@
 {
-  "history": {
-    "author": {
-      "name": "AmbNum Bot Test",
-      "email": "ambnum.bot.test@disinfo.quaidorsay.fr"
-    }
-  },
   "notifier": {
     "sendInBlue": {
       "listFolderId": 184
