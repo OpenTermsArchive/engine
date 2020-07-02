@@ -1,1 +1,1 @@
-This module is intended to be considered as a simple consumer of the CGU application's events API and therefore to be extracted from this repository. It is still in this repository to facilitate quick iterations but should be extracted as soon as the CGUs app is stabilized.
+This module is intended to be considered as a simple consumer of the CGU application's events API and therefore to be extracted from this repository. It is still in this repository to facilitate quick iterations but is expected to be extracted as soon as the CGUs app is stabilized.

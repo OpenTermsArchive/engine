@@ -32,7 +32,7 @@ export async function onDocumentScrapingError(serviceProviderId, documentTypeId,
     params: {
       SERVICE_PROVIDER_NAME: serviceProviders[serviceProviderId].serviceProviderName,
       DOCUMENT_TYPE: documentTypes[documentTypeId].name,
-      ERROR_TEXT: `An error has occured when trying to scrape the document:
+      ERROR_TEXT: `An error occured when trying to scrape the document:
 ${error}`
     },
   }
