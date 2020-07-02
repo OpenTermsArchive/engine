@@ -1,5 +1,6 @@
 {
   "history": {
+    "dataPath": "../cgus-data",
     "configureAuthor": true,
     "exportChanges": true
   }

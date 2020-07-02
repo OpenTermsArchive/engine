@@ -1,7 +1,7 @@
 {
   "serviceProvidersPath": "./providers",
   "history": {
-    "dataPath": "../cgus-data",
+    "dataPath": "./data",
     "configureAuthor": false,
     "exportChanges": false,
     "author": {
