@@ -6,7 +6,7 @@ import nock from 'nock';
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
 const expect = chai.expect;
 
-import updateTerms from './index.js';
+import CGUs from './index.js';
 import { RAW_DIRECTORY, SANITIZED_DIRECTORY } from './history/persistor.js';
 import { DOCUMENTS_TYPES } from './documents_types.js';
 
@@ -33,7 +33,9 @@ nock('https://www.secondprovider.example').get('/tos')
 describe('CGUs', () => {
   describe('#updateTerms', () => {
     before(async () => {
-      await updateTerms();
+      const app = new CGUs();
+      await app.init();
+      return app.updateTerms();
     });
 
     after(() => {
