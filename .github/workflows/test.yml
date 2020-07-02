@@ -5,8 +5,7 @@ on:
     branches: [ master ]
 
 env:
-  AUTHOR_NAME: 'AmbaNum Bot'
-  AUTHOR_EMAIL: 'ambanum.bot@disinfo.quaidorsay.fr'
+  SENDINBLUE_API_KEY: ${{ secrets.SENDINBLUE_API_KEY }}
 
 jobs:
   test:
