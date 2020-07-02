@@ -82,19 +82,17 @@ async function send(lists, sendParams) {
 }
 
 async function getListContacts(listId) {
-  let offset = 0;
-  let limit = 50;
   const list = await contactsInstance.getList(listId);
 
-  return recursivePaginationAccumulator('getContactsFromList', 'contacts', listId, limit, offset, [], list.totalSubscribers);
+  return getAllPaginatedEntries('getContactsFromList', listId, 'contacts', [], list.totalSubscribers);
 }
 
-async function recursivePaginationAccumulator(apiFunctionName, resultKey, resourceId, limit, offset, accumulator, count) {
+async function getAllPaginatedEntries(functionName, resourceIdParameter, resultKey, accumulator, count, offset = 0, paginationSize = 50) {
   if (accumulator.length >= count) {
     return accumulator;
   }
 
-  const result = await contactsInstance[apiFunctionName](resourceId, { limit, offset });
+  const result = await contactsInstance[functionName](resourceIdParameter, { limit: paginationSize, offset });
   accumulator = accumulator.concat(result[resultKey]);
-  return recursivePaginationAccumulator(apiFunctionName, resultKey, resourceId, limit, offset + limit, accumulator, count);
+  return getAllPaginatedEntries(functionName, resourceIdParameter, resultKey, accumulator, count, offset + paginationSize, paginationSize);
 }
