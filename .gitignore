@@ -4,4 +4,4 @@ node_modules
 .vagrant
 vault.key
 cgus-data
-*.lock
+yarn.lock
