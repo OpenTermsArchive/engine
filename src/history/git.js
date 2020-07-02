@@ -1,7 +1,7 @@
 import path from 'path';
 
-import dotenv from 'dotenv';
 import config from 'config';
+import dotenv from 'dotenv';
 import simpleGit from 'simple-git';
 
 dotenv.config();
