@@ -76,13 +76,7 @@ async function send(lists, sendParams) {
 
   const uniqueContacts = contacts.reduce((acc, current) => acc.find(contact => contact.id === current.id) ? acc : acc.concat([current]), []);
 
-  const sendPromises = [];
-  uniqueContacts.forEach(contact => {
-    sendPromises.push(apiInstance.sendTransacEmail({
-      ...sendParams,
-      to: [{ email: contact.email }]
-    }));
-  });
+  const sendPromises = uniqueContacts.map(contact => apiInstance.sendTransacEmail({...sendParams, to: [{ email: contact.email }] }));
 
   return Promise.all(sendPromises);
 }
