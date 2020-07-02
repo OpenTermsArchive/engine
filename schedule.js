@@ -1,6 +1,6 @@
 import schedule from 'node-schedule';
 
-import * as notifier from './src/notifier/index.js';
+import Notifier from './src/notifier/index.js';
 import CGUs from './src/index.js';
 
 (async () => {
@@ -14,11 +14,11 @@ import CGUs from './src/index.js';
     const app = new CGUs();
     await app.init();
 
-    await notifier.init(app.serviceProviders, app.documentsTypes);
+    const notifier = new Notifier(app.serviceProviders, app.documentsTypes);
 
-    app.on('sanitizedDocumentChange', notifier.onSanitizedDocumentChange);
-    app.on('documentScrapingError', notifier.onDocumentScrapingError);
-    app.on('applicationError', notifier.onApplicationError);
+    app.on('sanitizedDocumentChange', notifier.onSanitizedDocumentChange.bind(notifier));
+    app.on('documentScrapingError', notifier.onDocumentScrapingError.bind(notifier));
+    app.on('applicationError', notifier.onApplicationError.bind(notifier));
 
     schedule.scheduleJob(rule, app.updateTerms);
   } catch (error) {
