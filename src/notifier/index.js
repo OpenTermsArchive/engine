@@ -21,7 +21,7 @@ const serviceProvidersMailingLists = {};
 let serviceProviders;
 let documentTypes;
 
-export function init(passedServiceProviders, passedDocumentTypes) {
+export async function init(passedServiceProviders, passedDocumentTypes) {
   serviceProviders = passedServiceProviders;
   documentTypes = passedDocumentTypes;
 }
