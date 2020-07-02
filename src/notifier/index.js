@@ -17,7 +17,6 @@ const UPDATE_TEMPLATE_ID = config.get('notifier.sendInBlue.updateTemplateId');
 const ERROR_TEMPLATE_ID = config.get('notifier.sendInBlue.errorTemplateId');
 const BASE_URL = config.get('notifier.sendInBlue.baseUrl');
 
-const serviceProvidersMailingLists = {};
 let serviceProviders;
 let documentTypes;
 
