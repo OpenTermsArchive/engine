@@ -2,7 +2,6 @@
   "serviceProvidersPath": "./providers",
   "history": {
     "dataPath": "./data",
-    "configureAuthor": false,
     "authoritative": false,
     "author": {
       "name": "AmbNum Bot",
