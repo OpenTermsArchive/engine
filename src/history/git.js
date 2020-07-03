@@ -8,11 +8,7 @@ const __dirname = path.dirname(new URL(import.meta.url).pathname);
 const DATA_PATH = path.resolve(__dirname, '../..', config.get('history.dataPath'));
 console.log('Using database:', path.resolve(__dirname, DATA_PATH));
 
-const AUTHOR = config.get('history.author');
 export const git = simpleGit(DATA_PATH);
-
-git.addConfig('user.name', AUTHOR.name)
-   .addConfig('user.email', AUTHOR.email);
 
 export async function add(filepath) {
   return git.add(relativePath(filepath));
@@ -23,7 +19,7 @@ export async function status() {
 }
 
 export async function commit(filepath, message) {
-  const summary = await git.commit(message, relativePath(filepath));
+  const summary = await git.commit(message, relativePath(filepath), { '--author': `${config.get('history.author').name} <${config.get('history.author').email}>` });
   return summary.commit.replace('HEAD ', '');
 }
 
