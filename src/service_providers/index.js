@@ -1,10 +1,11 @@
-import fs from 'fs';
+import fsApi from 'fs';
+const fs = fsApi.promises;
 import path from 'path';
 
 export default async function loadServiceProviders(dirPath) {
   const serviceProviders = {};
 
-  const filenames = fs.readdirSync(dirPath);
+  const filenames = await fs.readdir(dirPath);
 
   for (let filename of filenames) {
     if (filename.indexOf('.sanitizers.js') !== -1) {
@@ -19,7 +20,7 @@ export default async function loadServiceProviders(dirPath) {
 
       serviceProviders[serviceProviderId] = {
         ...serviceProviders[serviceProviderId],
-        ...JSON.parse(fs.readFileSync(path.join(dirPath, filename))),
+        ...JSON.parse(await fs.readFile(path.join(dirPath, filename))),
       };
     }
   }
