@@ -7,7 +7,10 @@ import simpleGit from 'simple-git';
 import shell from 'shelljs';
 
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
-const dataRepositoryUrl = `https://github.com/ambanum/CGUs-data.git`;
+
+const DATA_REPOSITORY_URL = `https://github.com/ambanum/CGUs-data.git`;
+const NEW_HISTORY_MESSAGE = 'Start a new local empty history';
+const DOWNLOAD_HISTORY_MESSAGE = `Download the entire history of terms of services from ${DATA_REPOSITORY_URL}`;
 
 (async () => {
   try {
@@ -15,26 +18,24 @@ const dataRepositoryUrl = `https://github.com/ambanum/CGUs-data.git`;
       return console.log(`It's seems that the database is already initialized as the "${config.get('history.dataPath')}" directory already exists. Erase that folder first if you’d like to set up a new database.`);
     }
 
-    const newHistoryMessage = 'Start a new local empty history';
-    const downloadHistoryMessage = `Download the entire history of terms of services from ${dataRepositoryUrl}`;
     const answer = await inquirer.prompt([{
       type: 'list',
       message: 'How would you like to set up the database?',
       name: 'history',
       choices: [
-        { name: newHistoryMessage },
-        { name: downloadHistoryMessage }
+        { name: NEW_HISTORY_MESSAGE },
+        { name: DOWNLOAD_HISTORY_MESSAGE }
       ]
     }]);
 
-    if (answer.history === newHistoryMessage) {
+    if (answer.history === NEW_HISTORY_MESSAGE) {
       shell.mkdir(config.get('history.dataPath'));
       shell.cd(config.get('history.dataPath'));
       const git = simpleGit(path.resolve(__dirname, '../', config.get('history.dataPath')));
       await git.init();
     } else {
       const git = simpleGit();
-      await git.clone(dataRepositoryUrl, config.get('history.dataPath'));
+      await git.clone(DATA_REPOSITORY_URL, config.get('history.dataPath'));
     }
 
     console.log('Database initialized.')
