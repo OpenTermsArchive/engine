@@ -60,7 +60,7 @@ export default class CGUs extends events.EventEmitter {
 
     await Promise.all(documentUpdatePromises);
 
-    if (config.get('history.exportChanges')) {
+    if (config.get('history.authoritative')) {
       await pushChanges();
       console.log('・・・・・・・');
       console.log('Pushed changes to the repository');

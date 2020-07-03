@@ -3,7 +3,7 @@
   "history": {
     "dataPath": "./data",
     "configureAuthor": false,
-    "exportChanges": false,
+    "authoritative": false,
     "author": {
       "name": "AmbNum Bot",
       "email": "ambnum.bot@disinfo.quaidorsay.fr"
