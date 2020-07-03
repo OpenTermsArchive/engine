@@ -1,9 +1,11 @@
-import updateTerms from './src/index.js';
+import CGUs from './src/index.js';
 
 (async () => {
   try {
-    await updateTerms();
-  } catch (e) {
-    console.log(e);
+    const app = new CGUs();
+    await app.init();
+    await app.updateTerms();
+  } catch (error) {
+    console.log(error);
   }
 })();

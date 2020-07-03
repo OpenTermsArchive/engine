@@ -14,19 +14,22 @@ import { DOCUMENTS_TYPES } from '../documents_types.js';
 
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
 
-const ROOT_DIRECTORY = path.resolve(__dirname, process.env.CI ? '' : '..', '../../cgus-data');
+const ROOT_DIRECTORY = path.resolve(
+    __dirname,
+    (process.env.DATA_PATH ? process.env.DATA_PATH : (process.env.CI ? '' : '../') + '../../cgus-data')
+);
 export const RAW_DIRECTORY = `${ROOT_DIRECTORY}/raw`;
 export const SANITIZED_DIRECTORY = `${ROOT_DIRECTORY}/sanitized`;
 
 export async function persist({ serviceProviderId, policyType, fileContent, relatedRawCommitSha }) {
   const isSanitized = !!relatedRawCommitSha;
   const filePath = await save({ serviceProviderId, policyType, fileContent, isSanitized });
-  let message = `Update ${isSanitized ? 'sanitized' : 'raw'} ${serviceProviderId} ${DOCUMENTS_TYPES[policyType].name} document`;
+  let message = `Update ${isSanitized ? '' : 'raw '}${serviceProviderId} ${DOCUMENTS_TYPES[policyType].name}`;
 
   if (relatedRawCommitSha) {
     message += `
 
-Find related raw file changes in this commit ${relatedRawCommitSha}`;
+Find related raw file changes in commit ${relatedRawCommitSha}`;
   }
 
   const sha = await commit(filePath, message);
@@ -40,7 +43,7 @@ export async function save({ serviceProviderId, policyType, fileContent, isSanit
   const directory = `${isSanitized ? SANITIZED_DIRECTORY : RAW_DIRECTORY}/${serviceProviderId}`;
 
   if (!fsApi.existsSync(directory)) {
-    await fs.mkdir(directory);
+    await fs.mkdir(directory, { recursive: true });
   }
 
   const filePath = `${directory}/${DOCUMENTS_TYPES[policyType].fileName}.${isSanitized ? 'md' : 'html'}`;

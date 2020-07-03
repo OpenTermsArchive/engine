@@ -11,7 +11,7 @@ export async function persistRaw(serviceProviderId, policyType, fileContent) {
 
 export async function persistSanitized(serviceProviderId, policyType, fileContent, relatedRawCommitSha) {
   if (!relatedRawCommitSha) {
-    throw new Error('A related raw commit SHA is required to ensure data consistency');
+    throw new Error(`A related raw commit SHA is required to ensure data consistency for ${serviceProviderId}'s ${policyType}`);
   }
 
   return persist({
