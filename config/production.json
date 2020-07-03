@@ -1,7 +1,6 @@
 {
   "history": {
     "dataPath": "../cgus-data",
-    "configureAuthor": true,
     "authoritative": true
   }
 }

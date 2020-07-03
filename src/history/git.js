@@ -11,10 +11,8 @@ console.log('Using database:', path.resolve(__dirname, DATA_PATH));
 const AUTHOR = config.get('history.author');
 export const git = simpleGit(DATA_PATH);
 
-if (config.get('history.configureAuthor')) {
-  git.addConfig('user.name', AUTHOR.name)
-     .addConfig('user.email', AUTHOR.email);
-}
+git.addConfig('user.name', AUTHOR.name)
+   .addConfig('user.email', AUTHOR.email);
 
 export async function add(filepath) {
   return git.add(relativePath(filepath));
@@ -25,7 +23,7 @@ export async function status() {
 }
 
 export async function commit(filepath, message) {
-  const summary = await git.commit(message, relativePath(filepath), { '--author': `${AUTHOR.name} <${AUTHOR.email}>` });
+  const summary = await git.commit(message, relativePath(filepath));
   return summary.commit.replace('HEAD ', '');
 }
 

@@ -14,7 +14,6 @@
     "start:scheduler:prod": "NODE_ENV=production node schedule.js",
     "setup": "node scripts/setup.js",
     "test": "NODE_ENV=test mocha --file './test/helper.js' --recursive \"./src/**/*.test.js\"",
-    "test:ci": "NODE_ENV=ci mocha --file './test/helper.js' --recursive \"./src/**/*.test.js\"",
     "test:debug": "NODE_ENV=test mocha --file './test/helper.js' --recursive \"./src/**/*.test.js\" --inspect-brk --exit"
   },
   "repository": {

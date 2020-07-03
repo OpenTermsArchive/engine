@@ -31,7 +31,7 @@ jobs:
         path: data
     - run: echo "$ANSIBLE_VAULT_PASSWORD" > vault.key
     - run: npm ci
-    - run: npm run test:ci
+    - run: npm test
     - run: pip install --upgrade setuptools
     - run: pip install ansible
     - run: ansible-playbook ops/app.yml -i ops/inventories/production.yml -t update
