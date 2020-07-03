@@ -33,7 +33,7 @@ Some configs are available and can be changed in `config/default.json`:
   "history": {
     "dataPath": "Database directory path relative to the root of this project",
     "configureAuthor": "Boolean. Set to true to automatically configure the git author. Used in production and CI envs.",
-    "exportChanges": "Boolean. Set to true to export documents changes on the CGUs-data repository. Should be true only in production.",
+    "authoritative": "Boolean. Set to true to push tracked changes to the shared, global database. Should be true only in production.",
     "author": {
       "name": "Commits' author name",
       "email": "Commits' author email"
