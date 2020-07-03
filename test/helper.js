@@ -8,8 +8,10 @@ import { git } from '../src/history/git.js';
 
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
 
-before(() => {
-  return git.init();
+before(async () => {
+  await git.init();
+  git.addConfig('user.name', config.get('history.author').name)
+     .addConfig('user.email', config.get('history.author').email);
 });
 
 after(() => {
