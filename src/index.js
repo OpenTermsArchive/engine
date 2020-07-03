@@ -35,8 +35,6 @@ export default class CGUs extends events.EventEmitter {
   }
 
   async updateTerms() {
-    await this.init();
-
     console.log('Start scraping and saving terms of service…');
 
     const documentUpdatePromises = [];
@@ -67,8 +65,6 @@ export default class CGUs extends events.EventEmitter {
   }
 
   async updateServiceProviderDocument({ serviceProviderId, serviceProviderName, document }) {
-    await this.init();
-
     const { documentType, url, contentSelector, sanitizationPipeline } = document;
     const logPrefix = `[${serviceProviderName}-${DOCUMENTS_TYPES[documentType].name}]`;
     try {
