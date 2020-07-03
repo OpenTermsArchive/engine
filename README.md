@@ -32,7 +32,6 @@ Some configs are available and can be changed in `config/default.json`:
   "serviceProvidersPath": "Directory containing providers definition and associated sanitizers.",
   "history": {
     "dataPath": "Database directory path relative to the root of this project",
-    "configureAuthor": "Boolean. Set to true to automatically configure the git author. Used in production and CI envs.",
     "authoritative": "Boolean. Set to true to push tracked changes to the shared, global database. Should be true only in production.",
     "author": {
       "name": "Commits' author name",
