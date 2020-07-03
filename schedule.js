@@ -20,7 +20,7 @@ import CGUs from './src/index.js';
     app.on('documentScrapingError', notifier.onDocumentScrapingError.bind(notifier));
     app.on('applicationError', notifier.onApplicationError.bind(notifier));
 
-    schedule.scheduleJob(rule, app.updateTerms);
+    schedule.scheduleJob(rule, app.updateTerms.bind(app));
   } catch (error) {
     console.log(error);
   }
