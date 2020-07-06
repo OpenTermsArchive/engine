@@ -22,6 +22,6 @@ import CGUs from './src/index.js';
 
     schedule.scheduleJob(rule, app.updateTerms.bind(app));
   } catch (error) {
-    console.log(error);
+    console.error(error);
   }
 })();
