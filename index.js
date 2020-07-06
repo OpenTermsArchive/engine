@@ -6,6 +6,6 @@ import CGUs from './src/index.js';
     await app.init();
     await app.updateTerms();
   } catch (error) {
-    console.log(error);
+    console.error(error);
   }
 })();
