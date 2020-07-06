@@ -25,17 +25,17 @@ npm run setup
 
 ## Configuration
 
-Some configs are available and can be changed in `config/default.json`:
+The default configuration can be read and changed in `config/default.json`:
 
 ```json
 {
   "serviceProvidersPath": "Directory containing providers definition and associated sanitizers.",
   "history": {
-    "dataPath": "Database directory path relative to the root of this project",
+    "dataPath": "Database directory path, relative to the root of this project",
     "authoritative": "Boolean. Set to true to push tracked changes to the shared, global database. Should be true only in production.",
     "author": {
-      "name": "Commits' author name",
-      "email": "Commits' author email"
+      "name": "Name to which changes in tracked documents will be credited",
+      "email": "Email to which changes in tracked documents will be credited"
     }
   },
   "notifier": {
@@ -95,5 +95,4 @@ See [Ops Readme](ops/README.md).
 
 The code for this software is distributed under the European Union Public Licence (EUPL) v1.2.
 Contact the author if you have any specific need or question regarding licensing.
-
 
