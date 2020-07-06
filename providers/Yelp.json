@@ -2,12 +2,30 @@
     "serviceProviderName": "Yelp",
     "documents": {
         "tos": {
+<<<<<<< master
+<<<<<<< master
             "url": "https://terms.yelp.com/tos/en_gb/20200101_en_gb/",
             "contentSelector": ".article"
         },
         "privacy": {
             "url": "https://terms.yelp.com/privacy/en_gb/20200101_en_gb/",
             "contentSelector": ".article"
+=======
+            "url": "https://terms.yelp.com/tos/fr_fr/20200101_fr_fr/",
+            "contentSelector": "#page"
+        },
+        "privacy": {
+            "url": "https://terms.yelp.com/privacy/fr_fr/20200101_fr_fr/",
+            "contentSelector": "#page"
+>>>>>>> Added 39 new providers in JSON format :  various social networks and equivalents
+=======
+            "url": "https://terms.yelp.com/tos/en_gb/20200101_en_gb/",
+            "contentSelector": ".article"
+        },
+        "privacy": {
+            "url": "https://terms.yelp.com/privacy/en_gb/20200101_en_gb/",
+            "contentSelector": ".article"
+>>>>>>> Added 39 new providers in JSON format :  various social networks and equivalents
         }
     }
 }
