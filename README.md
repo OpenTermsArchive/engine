@@ -14,25 +14,39 @@ Clone the repository and install dependencies:
 git clone https://github.com/ambanum/CGUs.git
 cd CGUs
 npm install
-# Git clone CGUs data
 ```
 
 ## Setting up the database
 
-You can create a new database to start your own history from now:
-
+Initialize the database:
 ```sh
-cd ..
-mkdir cgus-data
-cd cgus-data
-git init
+npm run setup
 ```
 
-Or you can download the entire history of terms of services:
+## Configuration
 
-```sh
-cd ..
-git clone https://github.com/ambanum/cgus-data/
+The default configuration can be read and changed in `config/default.json`:
+
+```json
+{
+  "serviceProvidersPath": "Directory containing providers definition and associated sanitizers.",
+  "history": {
+    "dataPath": "Database directory path, relative to the root of this project",
+    "authoritative": "Boolean. Set to true to push tracked changes to the shared, global database. Should be true only in production.",
+    "author": {
+      "name": "Name to which changes in tracked documents will be credited",
+      "email": "Email to which changes in tracked documents will be credited"
+    }
+  },
+  "notifier": {
+    "sendInBlue": {
+      "administratorsListId": "SendInBlue contacts list ID of administrators",
+      "updatesListId": "SendInBlue contacts list ID of persons to notify on document updates",
+      "updateTemplateId": "SendInBlue email template ID used for updates notifications",
+      "errorTemplateId": "SendInBlue email template ID used for error notifications",
+    }
+  }
+}
 ```
 
 ## Usage
@@ -42,8 +56,6 @@ To get the latest versions of all service providers' terms:
 ```
 npm start
 ```
-
-> You can use the `DATA_PATH` environment variable to specify the absolute location of the database repository (defaults to `../cgus-data` from the root of this repository).
 
 The latest version of a document will be available in `/data/sanitized/$service_provider_name/$document_type.md`.
 
@@ -83,5 +95,4 @@ See [Ops Readme](ops/README.md).
 
 The code for this software is distributed under the European Union Public Licence (EUPL) v1.2.
 Contact the author if you have any specific need or question regarding licensing.
-
 
