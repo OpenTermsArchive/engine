@@ -12,6 +12,7 @@
     "start:prod": "NODE_ENV=production node index.js",
     "start:scheduler": "node schedule.js",
     "start:scheduler:prod": "NODE_ENV=production node schedule.js",
+    "setup": "node scripts/setup.js",
     "test": "NODE_ENV=test mocha --file './test/helper.js' --recursive \"./src/**/*.test.js\"",
     "test:debug": "NODE_ENV=test mocha --file './test/helper.js' --recursive \"./src/**/*.test.js\" --inspect-brk --exit"
   },
@@ -27,6 +28,7 @@
   "homepage": "https://github.com/ambanum/CGUs#readme",
   "devDependencies": {
     "chai": "^4.2.0",
+    "inquirer": "^7.3.0",
     "mocha": "^7.2.0",
     "nock": "^12.0.3"
   },

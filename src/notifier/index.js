@@ -3,7 +3,6 @@ import config from 'config';
 dotenv.config();
 
 import sendInBlue from 'sib-api-v3-sdk';
-
 export default class Notifier {
   constructor(passedServiceProviders, passedDocumentTypes) {
     const defaultClient = sendInBlue.ApiClient.instance;
@@ -37,7 +36,7 @@ export default class Notifier {
       params: {
         SERVICE_PROVIDER_NAME: this.serviceProviders[serviceProviderId].serviceProviderName,
         DOCUMENT_TYPE: this.documentTypes[documentTypeId].name,
-        URL: `${config.get('notifier.sendInBlue.baseUrl')}${sanitizedSha}`
+        SHA: sanitizedSha
       },
     }
 

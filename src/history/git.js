@@ -1,21 +1,14 @@
 import path from 'path';
-
 import config from 'config';
-import dotenv from 'dotenv';
+
 import simpleGit from 'simple-git';
 
-dotenv.config();
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
 
-const DATA_PATH = (process.env.DATA_PATH ? process.env.DATA_PATH : (process.env.CI ? '' : '../') + '../../cgus-data');
-
+const DATA_PATH = path.resolve(__dirname, '../..', config.get('history.dataPath'));
 console.log('Using database:', path.resolve(__dirname, DATA_PATH));
-export const git = simpleGit(path.resolve(__dirname, DATA_PATH));
 
-if (process.env.CI || process.env.NODE_ENV === 'production') {
-  git.addConfig('user.name', config.get('history.author.name'))
-     .addConfig('user.email', config.get('history.author.email'));
-}
+export const git = simpleGit(DATA_PATH);
 
 export async function add(filepath) {
   return git.add(relativePath(filepath));
@@ -26,7 +19,7 @@ export async function status() {
 }
 
 export async function commit(filepath, message) {
-  const summary = await git.commit(message, relativePath(filepath), { '--author': `${config.get('history.author.name')} <${config.get('history.author.email')}>` });
+  const summary = await git.commit(message, relativePath(filepath), { '--author': `${config.get('history.author').name} <${config.get('history.author').email}>` });
   return summary.commit.replace('HEAD ', '');
 }
 

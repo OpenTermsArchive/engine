@@ -28,7 +28,7 @@ jobs:
       uses: actions/checkout@v2
       with:
         repository: ambanum/CGUs-data
-        path: cgus-data
+        path: data
     - run: echo "$ANSIBLE_VAULT_PASSWORD" > vault.key
     - run: npm ci
     - run: npm test
