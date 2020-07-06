@@ -15,7 +15,7 @@ const DOWNLOAD_HISTORY_MESSAGE = `Download the entire history of terms of servic
 (async () => {
   try {
     if (fs.existsSync(config.get('history.dataPath'))) {
-      return console.log(`It's seems that the database is already initialized as the "${config.get('history.dataPath')}" directory already exists. Erase that folder first if you’d like to set up a new database.`);
+      return console.log(`It seems that the database is already initialized as the "${config.get('history.dataPath')}" directory already exists. Erase that folder first if you’d like to set up a new database.`);
     }
 
     const answer = await inquirer.prompt([{
