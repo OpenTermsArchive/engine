@@ -1,6 +1,10 @@
 {
     "serviceProviderName": "Google Play Store",
     "documents": {
+        "devPolicy": {
+            "url": "https://play.google.com/intl/ALL_fr/about/developer-distribution-agreement.html",
+            "contentSelector": "body > .play-contained"
+        },
         "tos": {
             "url": "https://play.google.com/intl/fr_fr/about/play-terms/index.html",
             "contentSelector": "body > .play-contained"
