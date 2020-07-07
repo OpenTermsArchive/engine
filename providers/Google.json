@@ -1,0 +1,9 @@
+{
+    "serviceProviderName": "Google",
+    "documents": {
+        "privacy": {
+            "url": "https://policies.google.com/privacy?hl=fr-FR",
+            "contentSelector": "div[role=article]"
+        }
+    }
+}
