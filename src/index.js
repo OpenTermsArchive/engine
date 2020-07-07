@@ -6,104 +6,103 @@ import config from 'config';
 import consoleStamp from 'console-stamp';
 consoleStamp(console);
 
-import scrape from './scraper/index.js';
-import { persistRaw, persistSanitized, pushChanges } from './history/index.js';
-import sanitize from './sanitizer/index.js';
-import loadServiceProviders from './service_providers/index.js';
-import { DOCUMENTS_TYPES } from './documents_types.js';
+import fetch from './fetcher/index.js';
+import { recordSnapshot, recordVersion, publish } from './history/index.js';
+import filter from './filter/index.js';
+import loadServiceDeclarations from './loader/index.js';
+import { TYPES } from './types.js';
 
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
-const SERVICE_PROVIDERS_PATH = path.resolve(__dirname, '../', config.get('serviceProvidersPath'));
+const SERVICE_DECLARATIONS_PATH = path.resolve(__dirname, '../', config.get('serviceDeclarationsPath'));
 
 export default class CGUs extends events.EventEmitter {
   constructor() {
     super();
-    this.documentTypes = DOCUMENTS_TYPES;
+    this._types = TYPES;
   }
 
-  get serviceProviders() {
-    return this.serviceProvidersManifests;
+  get serviceDeclarations() {
+    return this._serviceDeclarations;
   }
 
-  get documentsTypes() {
-    return this.documentTypes;
+  get documentTypes() {
+    return this._types;
   }
 
   async init() {
     if (!this.initialized) {
-      this.serviceProvidersManifests = await loadServiceProviders(SERVICE_PROVIDERS_PATH);
+      this._serviceDeclarations = await loadServiceDeclarations(SERVICE_DECLARATIONS_PATH);
       this.initialized = Promise.resolve();
     }
 
     return this.initialized;
   }
 
-  async updateTerms() {
+  async trackChanges() {
     console.log('Start scraping and saving terms of service…');
 
-    const documentUpdatePromises = [];
+    const documentTrackingPromises = [];
 
-    Object.keys(this.serviceProvidersManifests).forEach((serviceProviderId) => {
-      const { documents, serviceProviderName } = this.serviceProvidersManifests[serviceProviderId];
+    Object.keys(this._serviceDeclarations).forEach((serviceId) => {
+      const { documents, name: serviceName } = this._serviceDeclarations[serviceId];
 
-      Object.keys(documents).forEach((documentType) => {
-        documentUpdatePromises.push(this.updateServiceProviderDocument({
-          serviceProviderId,
-          serviceProviderName,
+      Object.keys(documents).forEach((type) => {
+        documentTrackingPromises.push(this.trackDocumentChanges({
+          serviceId,
+          serviceName,
           document: {
-            documentType,
-            ...documents[documentType]
+            type,
+            ...documents[type]
           }
         }));
       });
     });
 
-    await Promise.all(documentUpdatePromises);
+    await Promise.all(documentTrackingPromises);
 
-    if (config.get('history.authoritative')) {
-      await pushChanges();
+    if (config.get('history.publish')) {
+      await publish();
       console.log('・・・・・・・');
-      console.log('Pushed changes to the repository');
+      console.log('Published changes');
       console.log('______________________________');
     }
   }
 
-  async updateServiceProviderDocument({ serviceProviderId, serviceProviderName, document }) {
-    const { documentType, url, contentSelector, sanitizationPipeline } = document;
-    const logPrefix = `[${serviceProviderName}-${DOCUMENTS_TYPES[documentType].name}]`;
+  async trackDocumentChanges({ serviceId, serviceName, document }) {
+    const { type, location, contentSelector, filters } = document;
+    const logPrefix = `[${serviceName}-${this._types[type].name}]`;
     try {
-      console.log(`${logPrefix} Scrape '${url}'.`);
-      let content;
+      console.log(`${logPrefix} Fetch '${location}'.`);
+      let pageContent;
       try {
-        content = await scrape(url);
+        pageContent = await fetch(location);
       } catch (error) {
-        console.error(`${logPrefix} Can't scrape url: ${error}`);
-        return this.emit('documentScrapingError', serviceProviderId, documentType, error);
+        console.error(`${logPrefix} Could not fetch location: ${error}`);
+        return this.emit('fetchingError', serviceId, type, error);
       }
 
-      const { sha: rawSha, filePath: rawFilePath} = await persistRaw(serviceProviderId, documentType, content);
+      const { id: snapshotId, path: snapshotPath} = await recordSnapshot(serviceId, type, pageContent);
 
-      console.log(`${logPrefix} Save raw file to '${rawFilePath}'.`);
+      console.log(`${logPrefix} Fetched web page to ${snapshotPath}.`);
 
-      if (!rawSha) {
-        return console.log(`${logPrefix} No raw changes, didn't commit.`);
+      if (!snapshotId) {
+        return console.log(`${logPrefix} No changes, did not record snapshot.`);
       }
 
-      console.log(`${logPrefix} Commit raw file in '${rawSha}'.`);
+      console.log(`${logPrefix} Recorded snapshot with id ${snapshotId}.`);
 
-      const sanitizedContent = await sanitize(content, contentSelector, sanitizationPipeline, this.serviceProvidersManifests[serviceProviderId].sanitizers);
+      const document = await filter(pageContent, contentSelector, filters, this._serviceDeclarations[serviceId].filters);
 
-      const { sha: sanitizedSha, filePath: sanitizedFilePath} = await persistSanitized(serviceProviderId, documentType, sanitizedContent, rawSha);
-      if (sanitizedSha) {
-        console.log(`${logPrefix} Save sanitized file to '${sanitizedFilePath}'.`);
-        console.log(`${logPrefix} Commit sanitized file in '${sanitizedSha}'.`);
-        this.emit('sanitizedDocumentChange', serviceProviderId, documentType, sanitizedSha);
+      const { id: versionId, path: documentPath} = await recordVersion(serviceId, type, document, snapshotId);
+      if (versionId) {
+        console.log(`${logPrefix} Recorded version in ${documentPath} with id ${versionId}.`);
+        this.emit('versionRecorded', serviceId, type, versionId);
       } else {
-        console.log(`${logPrefix} No changes after sanitization, didn't commit.`);
+        console.log(`${logPrefix} No changes after filtering, did not record version.`);
       }
     } catch (error) {
       console.error(`${logPrefix} Error:`, error);
-      this.emit('applicationError', serviceProviderId, documentType, error);
+      this.emit('error', serviceId, type, error);
     }
   }
 }

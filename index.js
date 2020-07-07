@@ -4,7 +4,7 @@ import CGUs from './src/index.js';
   try {
     const app = new CGUs();
     await app.init();
-    await app.updateTerms();
+    await app.trackChanges();
   } catch (error) {
     console.error(error);
   }

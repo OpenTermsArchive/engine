@@ -1,12 +1,12 @@
 {
-    "serviceProviderName": "Twitch",
+    "name": "Twitch",
     "documents": {
         "tos": {
-            "url": "https://www.twitch.tv/p/legal/terms-of-service/",
+            "location": "https://www.twitch.tv/p/legal/terms-of-service/",
             "contentSelector": ".editable"
         },
         "privacy": {
-            "url": "https://www.twitch.tv/p/legal/privacy-notice/",
+            "location": "https://www.twitch.tv/p/legal/privacy-notice/",
             "contentSelector": ".editable"
         }
     }

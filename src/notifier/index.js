@@ -20,7 +20,7 @@ export default class Notifier {
     const sendParams = {
       templateId: config.get('notifier.sendInBlue.errorTemplateId'),
       params: {
-        SERVICE_PROVIDER_NAME: this.serviceProviders[serviceProviderId].serviceProviderName,
+        SERVICE_PROVIDER_NAME: this.serviceProviders[serviceProviderId].name,
         DOCUMENT_TYPE: this.documentTypes[documentTypeId].name,
         ERROR_TEXT: `An error occured when trying to scrape the document:
   ${error}`
@@ -34,7 +34,7 @@ export default class Notifier {
     const sendParams = {
       templateId: config.get('notifier.sendInBlue.updateTemplateId'),
       params: {
-        SERVICE_PROVIDER_NAME: this.serviceProviders[serviceProviderId].serviceProviderName,
+        SERVICE_PROVIDER_NAME: this.serviceProviders[serviceProviderId].name,
         DOCUMENT_TYPE: this.documentTypes[documentTypeId].name,
         SHA: sanitizedSha
       },
@@ -47,7 +47,7 @@ export default class Notifier {
     const sendParams = {
       templateId: config.get('notifier.sendInBlue.errorTemplateId'),
       params: {
-        SERVICE_PROVIDER_NAME: this.serviceProviders[serviceProviderId].serviceProviderName,
+        SERVICE_PROVIDER_NAME: this.serviceProviders[serviceProviderId].name,
         DOCUMENT_TYPE: this.documentTypes[documentTypeId].name,
         ERROR_TEXT: `An error occured when trying to update the document:
   ${error}`

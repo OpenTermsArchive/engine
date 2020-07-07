@@ -1,23 +1,23 @@
-import { persist } from './persistor.js';
-export { pushChanges } from './git.js';
+import { record } from './recorder.js';
+export { pushChanges as publish } from './git.js';
 
-export async function persistRaw(serviceProviderId, policyType, fileContent) {
-  return persist({
-    serviceProviderId,
-    policyType,
-    fileContent
+export async function recordSnapshot(serviceId, documentType, content) {
+  return record({
+    serviceId,
+    documentType,
+    content
   });
 }
 
-export async function persistSanitized(serviceProviderId, policyType, fileContent, relatedRawCommitSha) {
-  if (!relatedRawCommitSha) {
-    throw new Error(`A related raw commit SHA is required to ensure data consistency for ${serviceProviderId}'s ${policyType}`);
+export async function recordVersion(serviceId, documentType, content, snapshotId) {
+  if (!snapshotId) {
+    throw new Error(`A snapshot ID is required to ensure data consistency for ${serviceId}'s ${documentType}`);
   }
 
-  return persist({
-    serviceProviderId,
-    policyType,
-    fileContent,
-    relatedRawCommitSha
+  return record({
+    serviceId,
+    documentType,
+    content,
+    snapshotId
   });
 }
