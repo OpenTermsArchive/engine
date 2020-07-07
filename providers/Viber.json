@@ -1,0 +1,13 @@
+{
+    "serviceProviderName": "Viber",
+    "documents": {
+        "tos": {
+            "url": "https://www.viber.com/en/terms/viber-terms-use/",
+            "contentSelector": ".post-114"
+        },
+        "privacy": {
+            "url": "https://www.viber.com/en/terms/viber-privacy-policy/",
+            "contentSelector": ".post-115"
+        }
+    }
+}
