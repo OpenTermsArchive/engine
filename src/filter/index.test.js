@@ -40,7 +40,7 @@ const additionalFilter = {
 describe('Filter', () => {
   describe('#filter', () => {
     it('filters the given HTML content', async () => {
-      const result = await filter(rawHTML, 'body');
+      const result = await filter(undefined, rawHTML, 'body');
       expect(result).to.equal(expectedFiltered);
     });
 
@@ -53,7 +53,7 @@ describe('Filter', () => {
 
     context('With an additional filter', () => {
       it('filters the given HTML content also with given additional filter', async () => {
-        const result = await filter(rawHTML, 'body', ['removeLinks'], additionalFilter);
+        const result = await filter(undefined, rawHTML, 'body', ['removeLinks'], additionalFilter);
         expect(result).to.equal(expectedFilteredWithAdditional);
       });
     });
