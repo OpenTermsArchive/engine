@@ -14,5 +14,9 @@ export const TYPES = {
   devPolicy: {
     name: 'Developer Policy',
     fileName: 'developer_policy'
+  },
+  reviewGuidelines: {
+    name: 'Review Guidelines',
+    fileName: 'review_guidelines'
   }
 };
