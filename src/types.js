@@ -1,4 +1,4 @@
-export const DOCUMENTS_TYPES = {
+export const TYPES = {
   tos: {
     name: 'Terms of service',
     fileName: 'terms_of_service'

@@ -1,12 +1,12 @@
 {
-    "serviceProviderName": "Reddit",
+    "name": "Reddit",
     "documents": {
         "tos": {
-            "url": "https://www.redditinc.com/policies/user-agreement",
+            "location": "https://www.redditinc.com/policies/user-agreement",
             "contentSelector": "#content"
         },
         "privacy": {
-            "url": "https://www.redditinc.com/policies/privacy-policy",
+            "location": "https://www.redditinc.com/policies/privacy-policy",
             "contentSelector": "div#content"
         }
     }

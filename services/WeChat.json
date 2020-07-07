@@ -1,12 +1,12 @@
 {
-    "serviceProviderName": "WeChat",
+    "name": "WeChat",
     "documents": {
         "tos": {
-            "url": "https://www.wechat.com/en/service_terms.html",
+            "location": "https://www.wechat.com/en/service_terms.html",
             "contentSelector": "#agreement"
         },
         "privacy": {
-            "url": "https://www.wechat.com/en/privacy_policy.html",
+            "location": "https://www.wechat.com/en/privacy_policy.html",
             "contentSelector": "#agreement6"
         }
     }

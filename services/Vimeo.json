@@ -1,12 +1,12 @@
 {
-    "serviceProviderName": "Vimeo",
+    "name": "Vimeo",
     "documents": {
         "tos": {
-            "url": "https://vimeo.com/terms",
+            "location": "https://vimeo.com/terms",
             "contentSelector": "#legal_doc"
         },
         "privacy": {
-            "url": "https://vimeo.com/privacy",
+            "location": "https://vimeo.com/privacy",
             "contentSelector": "#legal_doc"
         }
     }

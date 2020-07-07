@@ -1,12 +1,12 @@
 {
-    "serviceProviderName": "Tencent",
+    "name": "Tencent",
     "documents": {
         "tos": {
-            "url": "https://www.tencent.com/en-us/service-agreement.html",
+            "location": "https://www.tencent.com/en-us/service-agreement.html",
             "contentSelector": ".page-content"
         },
         "privacy": {
-            "url": "https://www.tencent.com/en-us/privacy-policy.html",
+            "location": "https://www.tencent.com/en-us/privacy-policy.html",
             "contentSelector": ".page-content"
         }
     }

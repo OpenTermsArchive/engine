@@ -1,8 +1,8 @@
 {
-  "serviceProvidersPath": "./providers",
+  "serviceDeclarationsPath": "./services",
   "history": {
     "dataPath": "./data",
-    "authoritative": false,
+    "publish": false,
     "author": {
       "name": "AmbNum Bot",
       "email": "ambnum.bot@disinfo.quaidorsay.fr"

@@ -1,12 +1,12 @@
 {
-    "serviceProviderName": "Quora",
+    "name": "Quora",
     "documents": {
         "tos": {
-            "url": "https://www.quora.com/about/tos",
+            "location": "https://www.quora.com/about/tos",
             "contentSelector": ".section"
         },
         "privacy": {
-            "url": "https://www.quora.com/about/privacy",
+            "location": "https://www.quora.com/about/privacy",
             "contentSelector": ".section"
         }
     }

@@ -1,12 +1,12 @@
 {
-    "serviceProviderName": "Myspace",
+    "name": "Myspace",
     "documents": {
         "tos": {
-            "url": "https://myspace.com/pages/terms",
+            "location": "https://myspace.com/pages/terms",
             "contentSelector": "#nms_legal"
         },
         "privacy": {
-            "url": "https://myspace.com/pages/privacy",
+            "location": "https://myspace.com/pages/privacy",
             "contentSelector": "#nms_legal"
         }
     }

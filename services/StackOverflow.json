@@ -1,12 +1,12 @@
 {
-    "serviceProviderName": "StackOverflow",
+    "name": "StackOverflow",
     "documents": {
         "tos": {
-            "url": "https://stackoverflow.com/legal/terms-of-service",
+            "location": "https://stackoverflow.com/legal/terms-of-service",
             "contentSelector": ".grid--cell9"
         },
         "privacy": {
-            "url": "https://stackoverflow.com/legal/privacy-policy",
+            "location": "https://stackoverflow.com/legal/privacy-policy",
             "contentSelector": ".grid--cell9"
         }
     }
