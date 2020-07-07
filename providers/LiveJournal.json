@@ -1,0 +1,9 @@
+{
+    "serviceProviderName": "LiveJournal",
+    "documents": {
+        "tos": {
+            "url": "https://www.livejournal.com/legal/tos-en.bml",
+            "contentSelector": ".s-main"
+        }
+    }
+}
