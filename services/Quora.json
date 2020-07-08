@@ -1,0 +1,13 @@
+{
+    "name": "Quora",
+    "documents": {
+        "tos": {
+            "location": "https://www.quora.com/about/tos",
+            "contentSelector": ".section"
+        },
+        "privacy": {
+            "location": "https://www.quora.com/about/privacy",
+            "contentSelector": ".section"
+        }
+    }
+}

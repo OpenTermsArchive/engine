@@ -1,0 +1,13 @@
+{
+    "name": "Yelp",
+    "documents": {
+        "tos": {
+            "location": "https://terms.yelp.com/tos/en_gb/20200101_en_gb/",
+            "contentSelector": ".article"
+        },
+        "privacy": {
+            "location": "https://terms.yelp.com/privacy/en_gb/20200101_en_gb/",
+            "contentSelector": ".article"
+        }
+    }
+}

@@ -1,5 +1,5 @@
 {
-  "serviceProvidersPath": "./test/providers",
+  "serviceDeclarationsPath": "./test/services",
   "history": {
     "dataPath": "./test/data"
   },

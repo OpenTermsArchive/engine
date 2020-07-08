@@ -1,0 +1,13 @@
+{
+    "name": "Instagram",
+    "documents": {
+        "tos": {
+            "location": "https://help.instagram.com/581066165581870",
+            "contentSelector": "#faq-page"
+        },
+        "privacy": {
+            "location": "https://help.instagram.com/519522125107875",
+            "contentSelector": "#faq-page"
+        }
+    }
+}

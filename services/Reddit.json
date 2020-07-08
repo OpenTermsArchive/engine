@@ -1,0 +1,13 @@
+{
+    "name": "Reddit",
+    "documents": {
+        "tos": {
+            "location": "https://www.redditinc.com/policies/user-agreement",
+            "contentSelector": "#content"
+        },
+        "privacy": {
+            "location": "https://www.redditinc.com/policies/privacy-policy",
+            "contentSelector": "div#content"
+        }
+    }
+}

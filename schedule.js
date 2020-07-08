@@ -14,13 +14,13 @@ import CGUs from './src/index.js';
     const app = new CGUs();
     await app.init();
 
-    const notifier = new Notifier(app.serviceProviders, app.documentsTypes);
+    const notifier = new Notifier(app.serviceDeclarations, app.documentTypes);
 
-    app.on('sanitizedDocumentChange', notifier.onSanitizedDocumentChange.bind(notifier));
-    app.on('documentScrapingError', notifier.onDocumentScrapingError.bind(notifier));
-    app.on('applicationError', notifier.onApplicationError.bind(notifier));
+    app.on('versionRecorded', notifier.onSanitizedDocumentChange.bind(notifier));
+    app.on('fetchingError', notifier.onDocumentScrapingError.bind(notifier));
+    app.on('error', notifier.onApplicationError.bind(notifier));
 
-    schedule.scheduleJob(rule, app.updateTerms.bind(app));
+    schedule.scheduleJob(rule, app.trackChanges.bind(app));
   } catch (error) {
     console.error(error);
   }
