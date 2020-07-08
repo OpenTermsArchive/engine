@@ -22,7 +22,7 @@ const expectedFiltered = `Title
 
 link 1`;
 
-const expectedFilteredWithAditional = `Title
+const expectedFilteredWithAdditional = `Title
 =====`;
 
 const additionalFilter = {
@@ -44,7 +44,7 @@ describe('Filter', () => {
     context('With an additional filter', () => {
       it('filters the given HTML content also with given additional filter', async () => {
         const result = await filter(rawHTML, 'body', ['removeLinks'], additionalFilter);
-        expect(result).to.be.equal(expectedFilteredWithAditional);
+        expect(result).to.be.equal(expectedFilteredWithAdditional);
       });
     });
   });
