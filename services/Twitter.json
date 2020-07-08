@@ -1,0 +1,24 @@
+{
+  "name": "Twitter",
+  "documents": {
+    "tos": {
+      "location": "https://twitter.com/tos",
+      "contentSelector": "main",
+      "sanitizationPipeline": [
+        "removeNotDisplayedElements"
+      ]
+    },
+    "privacy": {
+      "location": "https://twitter.com/privacy",
+      "contentSelector": "main"
+    },
+    "devAgreement": {
+      "location": "https://developer.twitter.com/developer-terms/agreement",
+      "contentSelector": "main"
+    },
+    "devPolicy": {
+      "location": "https://developer.twitter.com/developer-terms/policy",
+      "contentSelector": "main"
+    }
+  }
+}

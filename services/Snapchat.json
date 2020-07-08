@@ -1,0 +1,13 @@
+{
+  "name": "Snapchat",
+  "documents": {
+    "tos": {
+      "location": "https://www.snap.com/terms",
+      "contentSelector": ".textarticle-container"
+    },
+    "privacy": {
+      "location": "https://www.snap.com/privacy/privacy-policy",
+      "contentSelector": ".textarticle-container"
+    }
+  }
+}

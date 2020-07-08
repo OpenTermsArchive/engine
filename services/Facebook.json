@@ -1,0 +1,27 @@
+{
+  "name": "Facebook",
+  "documents": {
+    "tos": {
+      "location": "https://www.facebook.com/legal/terms/plain_text_terms",
+      "contentSelector": ".fb_content",
+      "sanitizationPipeline": [
+        "cleanUrls"
+      ]
+    },
+    "privacy": {
+      "location": "https://www.facebook.com/about/privacy",
+      "contentSelector": "._5tkp",
+      "sanitizationPipeline": [
+        "cleanUrls"
+      ]
+    },
+    "devPolicy": {
+      "location": "https://developers.facebook.com/policy",
+      "contentSelector": "._4bl9",
+      "sanitizationPipeline": [
+        "removeHelpButtons",
+        "cleanUrls"
+      ]
+    }
+  }
+}

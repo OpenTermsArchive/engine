@@ -1,0 +1,13 @@
+{
+    "name": "Twitch",
+    "documents": {
+        "tos": {
+            "location": "https://www.twitch.tv/p/legal/terms-of-service/",
+            "contentSelector": ".editable"
+        },
+        "privacy": {
+            "location": "https://www.twitch.tv/p/legal/privacy-notice/",
+            "contentSelector": ".editable"
+        }
+    }
+}

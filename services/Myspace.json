@@ -1,0 +1,13 @@
+{
+    "name": "Myspace",
+    "documents": {
+        "tos": {
+            "location": "https://myspace.com/pages/terms",
+            "contentSelector": "#nms_legal"
+        },
+        "privacy": {
+            "location": "https://myspace.com/pages/privacy",
+            "contentSelector": "#nms_legal"
+        }
+    }
+}

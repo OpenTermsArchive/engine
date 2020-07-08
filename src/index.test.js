@@ -7,62 +7,62 @@ const __dirname = path.dirname(new URL(import.meta.url).pathname);
 const expect = chai.expect;
 
 import CGUs from './index.js';
-import { RAW_DIRECTORY, SANITIZED_DIRECTORY } from './history/persistor.js';
-import { DOCUMENTS_TYPES } from './documents_types.js';
+import { SNAPSHOTS_DIRECTORY, VERSIONS_DIRECTORY } from './history/recorder.js';
+import { TYPES } from './types.js';
 
-const FIRST_SERVICE_PROVIDER_ID = 'first_provider';
-const FIRST_SERVICE_PROVIDER_POLICY_TYPE = 'tos';
-const FIRST_SERVICE_PROVIDER_EXPECTED_RAW_FILE_PATH = `${RAW_DIRECTORY}/${FIRST_SERVICE_PROVIDER_ID}/${DOCUMENTS_TYPES[FIRST_SERVICE_PROVIDER_POLICY_TYPE].fileName}.html`;
-const FIRST_SERVICE_PROVIDER_EXPECTED_SANITIZED_FILE_PATH = `${SANITIZED_DIRECTORY}/${FIRST_SERVICE_PROVIDER_ID}/${DOCUMENTS_TYPES[FIRST_SERVICE_PROVIDER_POLICY_TYPE].fileName}.md`;
-const FIRST_SERVICE_PROVIDER_TOS_RAW = fs.readFileSync(path.resolve(__dirname, '../test/fixtures/first_provider_terms_raw.html'), { encoding: 'utf8' });
-const FIRST_SERVICE_PROVIDER_TOS_SANITIZED = fs.readFileSync(path.resolve(__dirname, '../test/fixtures/first_provider_terms_sanitized.md'), { encoding: 'utf8' });
+const SERVICE_A_ID = 'service_A';
+const SERVICE_A_TYPE = 'tos';
+const SERVICE_A_EXPECTED_SNAPSHOT_FILE_PATH = `${SNAPSHOTS_DIRECTORY}/${SERVICE_A_ID}/${TYPES[SERVICE_A_TYPE].fileName}.html`;
+const SERVICE_A_EXPECTED_VERSION_FILE_PATH = `${VERSIONS_DIRECTORY}/${SERVICE_A_ID}/${TYPES[SERVICE_A_TYPE].fileName}.md`;
+const SERVICE_A_TOS_SNAPSHOT = fs.readFileSync(path.resolve(__dirname, '../test/fixtures/service_A_terms_snapshot.html'), { encoding: 'utf8' });
+const SERVICE_A_TOS_VERSION = fs.readFileSync(path.resolve(__dirname, '../test/fixtures/service_A_terms.md'), { encoding: 'utf8' });
 
-const SECOND_SERVICE_PROVIDER_ID = 'second_provider';
-const SECOND_SERVICE_PROVIDER_POLICY_TYPE = 'tos';
-const SECOND_SERVICE_PROVIDER_EXPECTED_RAW_FILE_PATH = `${RAW_DIRECTORY}/${SECOND_SERVICE_PROVIDER_ID}/${DOCUMENTS_TYPES[SECOND_SERVICE_PROVIDER_POLICY_TYPE].fileName}.html`;
-const SECOND_SERVICE_PROVIDER_EXPECTED_SANITIZED_FILE_PATH = `${SANITIZED_DIRECTORY}/${SECOND_SERVICE_PROVIDER_ID}/${DOCUMENTS_TYPES[SECOND_SERVICE_PROVIDER_POLICY_TYPE].fileName}.md`;
-const SECOND_SERVICE_PROVIDER_TOS_RAW = fs.readFileSync(path.resolve(__dirname, '../test/fixtures/second_provider_terms_raw.html'), { encoding: 'utf8' });
-const SECOND_SERVICE_PROVIDER_TOS_SANITIZED = fs.readFileSync(path.resolve(__dirname, '../test/fixtures/second_provider_terms_sanitized.md'), { encoding: 'utf8' });
+const SERVICE_B_ID = 'service_B';
+const SERVICE_B_TYPE = 'tos';
+const SERVICE_B_EXPECTED_SNAPSHOT_FILE_PATH = `${SNAPSHOTS_DIRECTORY}/${SERVICE_B_ID}/${TYPES[SERVICE_B_TYPE].fileName}.html`;
+const SERVICE_B_EXPECTED_VERSION_FILE_PATH = `${VERSIONS_DIRECTORY}/${SERVICE_B_ID}/${TYPES[SERVICE_B_TYPE].fileName}.md`;
+const SERVICE_B_TOS_SNAPSHOT = fs.readFileSync(path.resolve(__dirname, '../test/fixtures/service_B_terms_snapshot.html'), { encoding: 'utf8' });
+const SERVICE_B_TOS_VERSION = fs.readFileSync(path.resolve(__dirname, '../test/fixtures/service_B_terms.md'), { encoding: 'utf8' });
 
-nock('https://www.firstprovider.example').get('/tos')
-  .reply(200, FIRST_SERVICE_PROVIDER_TOS_RAW);
+nock('https://www.servicea.example').get('/tos')
+  .reply(200, SERVICE_A_TOS_SNAPSHOT);
 
-nock('https://www.secondprovider.example').get('/tos')
-  .reply(200, SECOND_SERVICE_PROVIDER_TOS_RAW);
+nock('https://www.serviceb.example').get('/tos')
+  .reply(200, SERVICE_B_TOS_SNAPSHOT);
 
 describe('CGUs', () => {
-  describe('#updateTerms', () => {
+  describe('#trackChanges', () => {
     before(async () => {
       const app = new CGUs();
       await app.init();
-      return app.updateTerms();
+      return app.trackChanges();
     });
 
     after(() => {
-      fs.unlinkSync(FIRST_SERVICE_PROVIDER_EXPECTED_RAW_FILE_PATH);
-      fs.unlinkSync(FIRST_SERVICE_PROVIDER_EXPECTED_SANITIZED_FILE_PATH);
-      fs.unlinkSync(SECOND_SERVICE_PROVIDER_EXPECTED_RAW_FILE_PATH);
-      fs.unlinkSync(SECOND_SERVICE_PROVIDER_EXPECTED_SANITIZED_FILE_PATH);
+      fs.unlinkSync(SERVICE_A_EXPECTED_SNAPSHOT_FILE_PATH);
+      fs.unlinkSync(SERVICE_A_EXPECTED_VERSION_FILE_PATH);
+      fs.unlinkSync(SERVICE_B_EXPECTED_SNAPSHOT_FILE_PATH);
+      fs.unlinkSync(SERVICE_B_EXPECTED_VERSION_FILE_PATH);
     });
 
-    it('persists terms in raw format for first service provider', () => {
-      const resultingRawTerms = fs.readFileSync(path.resolve(__dirname, FIRST_SERVICE_PROVIDER_EXPECTED_RAW_FILE_PATH), { encoding: 'utf8' });
-      expect(resultingRawTerms).to.be.equal(FIRST_SERVICE_PROVIDER_TOS_RAW);
+    it('record snapshot terms for service A', () => {
+      const resultingSnapshotTerms = fs.readFileSync(path.resolve(__dirname, SERVICE_A_EXPECTED_SNAPSHOT_FILE_PATH), { encoding: 'utf8' });
+      expect(resultingSnapshotTerms).to.be.equal(SERVICE_A_TOS_SNAPSHOT);
     });
 
-    it('persists terms in sanitized format for first service provider', () => {
-      const resultingSanitizedTerms = fs.readFileSync(path.resolve(__dirname, FIRST_SERVICE_PROVIDER_EXPECTED_SANITIZED_FILE_PATH), { encoding: 'utf8' });
-      expect(resultingSanitizedTerms).to.be.equal(FIRST_SERVICE_PROVIDER_TOS_SANITIZED);
+    it('record version for service A', () => {
+      const resultingTerms = fs.readFileSync(path.resolve(__dirname, SERVICE_A_EXPECTED_VERSION_FILE_PATH), { encoding: 'utf8' });
+      expect(resultingTerms).to.be.equal(SERVICE_A_TOS_VERSION);
     });
 
-    it('persists terms in raw format for second service provider', async () => {
-      const resultingRawTerms = fs.readFileSync(path.resolve(__dirname, SECOND_SERVICE_PROVIDER_EXPECTED_RAW_FILE_PATH), { encoding: 'utf8' });
-      expect(resultingRawTerms).to.be.equal(SECOND_SERVICE_PROVIDER_TOS_RAW);
+    it('record snapshot terms for service B', async () => {
+      const resultingSnapshotTerms = fs.readFileSync(path.resolve(__dirname, SERVICE_B_EXPECTED_SNAPSHOT_FILE_PATH), { encoding: 'utf8' });
+      expect(resultingSnapshotTerms).to.be.equal(SERVICE_B_TOS_SNAPSHOT);
     });
 
-    it('persists terms in sanitized format for second service provider', async () => {
-      const resultingSanitizedTerms = fs.readFileSync(path.resolve(__dirname, SECOND_SERVICE_PROVIDER_EXPECTED_SANITIZED_FILE_PATH), { encoding: 'utf8' });
-      expect(resultingSanitizedTerms).to.be.equal(SECOND_SERVICE_PROVIDER_TOS_SANITIZED);
+    it('record version for service B', async () => {
+      const resultingTerms = fs.readFileSync(path.resolve(__dirname, SERVICE_B_EXPECTED_VERSION_FILE_PATH), { encoding: 'utf8' });
+      expect(resultingTerms).to.be.equal(SERVICE_B_TOS_VERSION);
     });
   });
 });
