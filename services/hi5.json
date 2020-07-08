@@ -1,12 +1,12 @@
 {
-    "serviceProviderName": "hi5",
+    "name": "hi5",
     "documents": {
         "tos": {
-            "url": "http://www.hi5.com/terms_of_service.html",
+            "location": "http://www.hi5.com/terms_of_service.html",
             "contentSelector": "#terms_of_service"
         },
         "privacy": {
-            "url": "http://www.hi5.com/terms_of_service.html",
+            "location": "http://www.hi5.com/terms_of_service.html",
             "contentSelector": "#privacy_policy"
         }
     }
