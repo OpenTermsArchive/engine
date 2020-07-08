@@ -1,12 +1,12 @@
 {
-    "serviceProviderName": "WhatsApp",
+    "name": "WhatsApp",
     "documents": {
         "tos": {
-            "url": "https://www.whatsapp.com/legal/",
+            "location": "https://www.whatsapp.com/legal/",
             "contentSelector": "div._-pj:nth-child(3)"
         },
         "privacy": {
-            "url": "https://www.whatsapp.com/legal/",
+            "location": "https://www.whatsapp.com/legal/",
             "contentSelector": "div._-pj:nth-child(4)"
         }
     }
