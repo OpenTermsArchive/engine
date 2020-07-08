@@ -1,12 +1,12 @@
 {
-    "serviceProviderName": "deviantART",
+    "name": "deviantART",
     "documents": {
         "tos": {
-            "url": "https://about.deviantart.com/policy/service/",
+            "location": "https://about.deviantart.com/policy/service/",
             "contentSelector": ".bubbleview"
         },
         "privacy": {
-            "url": "https://about.deviantart.com/policy/privacy/",
+            "location": "https://about.deviantart.com/policy/privacy/",
             "contentSelector": ".bubbleview"
         }
     }
