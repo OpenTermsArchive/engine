@@ -3,7 +3,7 @@
   "documents": {
     "tos": {
       "url": "https://www.facebook.com/legal/terms/plain_text_terms",
-      "contentSelector": ".UIFullPage_Container",
+      "contentSelector": ".fb_content",
       "sanitizationPipeline": [
         "cleanUrls"
       ]
