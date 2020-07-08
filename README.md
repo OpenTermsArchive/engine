@@ -7,14 +7,16 @@
 
 ## How it works
 
+_Note: Words in bold are [business domain names](https://en.wikipedia.org/wiki/Domain-driven_design)._
+
 **Services** are **declared** within _CGUs_ with a **declaration file** listing all the **documents** that, together, constitute the **terms** under which this **service** can be used. These **documents** all have a **type**, such as “terms and conditions”, “privacy policy”, “developer agreement”…
-In order to **track** their **changes**, **documents** are periodically obtained by **fetching** a web **location** and **selecting content** within the **web page** to remove the **noise** (ads, navigation menu, login fields…).
-Beyond selecting a subset of a page, some **documents** have additional **noise** (hashes in links, CSRF tokens…) that would be false positives for **changes**. _CGUs_ thus supports specific **filters** for each **document**.
-However, the shape of that **noise** can change over time. In order to recover in case of information loss during the **noise filtering** step, a **snapshot** is **recorded** every time there is a **change**.
-After the **noise** is **filtered out** from the **snapshot**, if there are **changes** in the resulting **document**, a new **version** of the **document** is **recorded**.
+
+In order to **track** their **changes**, **documents** are periodically obtained by **fetching** a web **location** and **selecting content** within the **web page** to remove the **noise** (ads, navigation menu, login fields…). Beyond selecting a subset of a page, some **documents** have additional **noise** (hashes in links, CSRF tokens…) that would be false positives for **changes**. _CGUs_ thus supports specific **filters** for each **document**.
+
+However, the shape of that **noise** can change over time. In order to recover in case of information loss during the **noise filtering** step, a **snapshot** is **recorded** every time there is a **change**. After the **noise** is **filtered out** from the **snapshot**, if there are **changes** in the resulting **document**, a new **version** of the **document** is **recorded**.
+
 Anyone can run their own **private** instance and track changes on their own. However, we also **publish** each **version** on a **public** instance that makes it easy to explore the entire **history** and enables **notifying** over email whenever a new **version** is **recorded**.
 Users can **subscribe** to **notifications** through a web interface.
-
 
 ## Installing
 
@@ -78,7 +80,7 @@ npm run start:scheduler
 ```
 
 
-## Adding a service declarations
+## Declaring a new service
 
 In the folder `services`, create a JSON file with the name of the service you want to add, with the following structure:
 
@@ -87,7 +89,7 @@ In the folder `services`, create a JSON file with the name of the service you wa
   "name": "<the public name of the service>",
   "documents": {
     "<document type>": {
-      "location": "<the location where the document can be found>",
+      "location": "<the URL where the document can be found>",
       "contentSelector": "<a CSS selector that targets the meaningful part of the document, excluding elements such as headers, footers and navigation>",
     }
   }
