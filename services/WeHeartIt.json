@@ -1,12 +1,12 @@
 {
-    "serviceProviderName": "WeHeartIt",
+    "name": "WeHeartIt",
     "documents": {
         "tos": {
-            "url": "https://weheartit.com/about/terms-of-service",
+            "location": "https://weheartit.com/about/terms-of-service",
             "contentSelector": "div.cel:nth-child(2)"
         },
         "privacy": {
-            "url": "https://weheartit.com/about/privacy-policy",
+            "location": "https://weheartit.com/about/privacy-policy",
             "contentSelector": "div.cel:nth-child(2)"
         }
     }

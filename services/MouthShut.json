@@ -1,12 +1,12 @@
 {
-    "serviceProviderName": "MouthShut",
+    "name": "MouthShut",
     "documents": {
         "tos": {
-            "url": "https://www.mouthshut.com/help/tos.php",
+            "location": "https://www.mouthshut.com/help/tos.php",
             "contentSelector": ".box-module"
         },
         "privacy": {
-            "url": "https://www.mouthshut.com/help/privacy.php",
+            "location": "https://www.mouthshut.com/help/privacy.php",
             "contentSelector": ".box-module"
         }
     }

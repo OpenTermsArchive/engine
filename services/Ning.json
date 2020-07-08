@@ -1,12 +1,12 @@
 {
-    "serviceProviderName": "Ning",
+    "name": "Ning",
     "documents": {
         "tos": {
-            "url": "https://www.ning.com/termsofservice/",
+            "location": "https://www.ning.com/termsofservice/",
             "contentSelector": ".page__article"
         },
         "privacy": {
-            "url": "https://www.ning.com/privacy/",
+            "location": "https://www.ning.com/privacy/",
             "contentSelector": ".page__article"
         }
     }

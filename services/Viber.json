@@ -1,0 +1,13 @@
+{
+    "name": "Viber",
+    "documents": {
+        "tos": {
+            "location": "https://www.viber.com/en/terms/viber-terms-use/",
+            "contentSelector": ".post-114"
+        },
+        "privacy": {
+            "location": "https://www.viber.com/en/terms/viber-privacy-policy/",
+            "contentSelector": ".post-115"
+        }
+    }
+}

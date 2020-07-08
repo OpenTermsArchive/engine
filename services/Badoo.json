@@ -1,12 +1,12 @@
 {
-    "serviceProviderName": "Badoo",
+    "name": "Badoo",
     "documents": {
         "tos": {
-            "url": "https://badoo.com/terms/",
+            "location": "https://badoo.com/terms/",
             "contentSelector": ".formatted-text"
         },
         "privacy": {
-            "url": "https://badoo.com/privacy/",
+            "location": "https://badoo.com/privacy/",
             "contentSelector": ".formatted-text"
         }
     }

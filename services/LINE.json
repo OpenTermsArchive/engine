@@ -1,12 +1,12 @@
 {
-    "serviceProviderName": "LINE",
+    "name": "LINE",
     "documents": {
         "tos": {
-            "url": "https://terms.line.me/line_terms/?lang=en",
+            "location": "https://terms.line.me/line_terms/?lang=en",
             "contentSelector": ".mdContents01Body"
         },
         "privacy": {
-            "url": "https://terms.line.me/line_rules/?lang=en",
+            "location": "https://terms.line.me/line_rules/?lang=en",
             "contentSelector": ".mdContents01Body"
         }
     }

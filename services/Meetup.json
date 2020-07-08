@@ -1,15 +1,15 @@
 {
-    "serviceProviderName": "Meetup",
+    "name": "Meetup",
     "documents": {
         "tos": {
-            "url": "https://help.meetup.com/hc/en-us/articles/360027447252",
+            "location": "https://help.meetup.com/hc/en-us/articles/360027447252",
             "contentSelector": ".article",
             "sanitizationPipeline": [
                 "removeFooter"
             ]
         },
         "privacy": {
-            "url": "https://help.meetup.com/hc/en-us/articles/360044422391",
+            "location": "https://help.meetup.com/hc/en-us/articles/360044422391",
             "contentSelector": ".article",
             "sanitizationPipeline": [
                 "removeFooter"
