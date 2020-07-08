@@ -3,7 +3,10 @@
   "documents": {
     "tos": {
       "url": "https://twitter.com/tos",
-      "contentSelector": "main"
+      "contentSelector": "main",
+      "sanitizationPipeline": [
+        "removeNotDisplayedElements"
+      ]
     },
     "privacy": {
       "url": "https://twitter.com/privacy",
