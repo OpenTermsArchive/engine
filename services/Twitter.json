@@ -4,7 +4,7 @@
     "tos": {
       "location": "https://twitter.com/tos",
       "contentSelector": "main",
-      "sanitizationPipeline": [
+      "filters": [
         "removeNotDisplayedElements"
       ]
     },

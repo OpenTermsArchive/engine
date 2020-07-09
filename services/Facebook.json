@@ -4,21 +4,21 @@
     "tos": {
       "location": "https://www.facebook.com/legal/terms/plain_text_terms",
       "contentSelector": ".fb_content",
-      "sanitizationPipeline": [
+      "filters": [
         "cleanUrls"
       ]
     },
     "privacy": {
       "location": "https://www.facebook.com/about/privacy",
       "contentSelector": "._5tkp",
-      "sanitizationPipeline": [
+      "filters": [
         "cleanUrls"
       ]
     },
     "devPolicy": {
       "location": "https://developers.facebook.com/policy",
       "contentSelector": "._4bl9",
-      "sanitizationPipeline": [
+      "filters": [
         "removeHelpButtons",
         "cleanUrls"
       ]
