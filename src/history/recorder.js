@@ -56,7 +56,7 @@ export async function save({ serviceId, documentType, content, isFiltered }) {
 }
 
 export async function commit(filePath, message) {
-  if (!await git.fileNeedsCommit(filePath)) {
+  if (!await git.hasChanges(filePath)) {
     return;
   }
 
