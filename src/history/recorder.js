@@ -25,7 +25,7 @@ export async function record({ serviceId, documentType, content, snapshotId }) {
   const filePath = await save({ serviceId, documentType, content, isFiltered });
   const isNewFile = await git.isNew(filePath);
 
-  let message = `Update ${isFiltered ? '' : 'snapshot of '}${serviceId} ${DOCUMENT_TYPES[documentType].name}`;
+  let message = `${isNewFile ? 'Start tracking' : 'Update'} ${isFiltered ? '' : 'snapshot of '}${serviceId} ${DOCUMENT_TYPES[documentType].name}`;
 
   if (snapshotId) {
     message += `
