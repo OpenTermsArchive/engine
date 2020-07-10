@@ -27,10 +27,17 @@ export async function pushChanges() {
   return git.push('origin', 'master');
 }
 
-export async function fileNeedsCommit(filepath) {
+export async function hasChanges(filepath) {
   const status = await git.status();
   return (status.modified.indexOf(relativePath(filepath)) > -1) ||
-           (status.not_added.indexOf(relativePath(filepath)) > -1);
+         (status.not_added.indexOf(relativePath(filepath)) > -1) ||
+         (status.created.indexOf(relativePath(filepath)) > -1);
+}
+
+export async function isNew(filepath) {
+  const status = await git.status();
+  return (status.created.indexOf(relativePath(filepath)) > -1) ||
+         (status.not_added.indexOf(relativePath(filepath)) > -1);
 }
 
 export function relativePath(absolutePath) {

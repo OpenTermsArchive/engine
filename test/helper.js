@@ -8,13 +8,23 @@ import { git } from '../src/history/git.js';
 
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
 
-before(async () => {
+
+before(initRepo);
+after(eraseRepo);
+
+export async function resetGitRepository() {
+  await eraseRepo();
+  return initRepo();
+}
+
+async function initRepo() {
   await git.init();
   git.addConfig('user.name', config.get('history.author').name)
      .addConfig('user.email', config.get('history.author').email);
-});
+}
 
-after(() => {
+async function eraseRepo() {
   const DATA_PATH = path.resolve(__dirname, '../', config.get('history.dataPath'), '.git');
   return fs.rmdir(DATA_PATH, { recursive: true });
-});
+}
+
