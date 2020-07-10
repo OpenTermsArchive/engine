@@ -42,7 +42,7 @@ This version was recorded after filtering snapshot ${snapshotId}`;
 export async function save({ serviceId, documentType, content, isFiltered }) {
   const directory = `${isFiltered ? VERSIONS_DIRECTORY : SNAPSHOTS_DIRECTORY}/${serviceId}`;
 
-  if (!fsApi.existsSync(directory)) {
+  if (!await fileExists(directory)) {
     await fs.mkdir(directory, { recursive: true });
   }
 
