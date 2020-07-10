@@ -3,11 +3,14 @@
     "documents": {
         "tos": {
             "location": "https://terms.line.me/line_terms/?lang=en",
-            "contentSelector": ".mdContents01Body"
+            "contentSelector": ".MdTerms01"
         },
         "privacy": {
             "location": "https://terms.line.me/line_rules/?lang=en",
-            "contentSelector": ".mdContents01Body"
+            "contentSelector": ".MdTerms01 > h1:nth-child(1)",
+            "filters": [
+                "removeStyleTag"
+            ]
         }
     }
 }
