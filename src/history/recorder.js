@@ -15,15 +15,17 @@ export const SNAPSHOTS_DIRECTORY = `${DATABASE_DIRECTORY}/raw`;
 export const VERSIONS_DIRECTORY = `${DATABASE_DIRECTORY}/sanitized`;
 
 const commitQueue = async.queue(_commit, 1);
-commitQueue.error((error, { serviceId, documentType, isFiltered, reject }) => {
-  reject(new Error(`Could not record ${isFiltered ? 'version' : 'snapshot'} for ${serviceId} ${documentType} due to error: ${error}`));
+commitQueue.error((error, { filePath, message, reject }) => {
+  reject(new Error(`Could not commit ${filePath} with message "${message}" due to error: ${error}`));
 });
 
 
 export async function record({ serviceId, documentType, content, snapshotId }) {
   const isFiltered = !!snapshotId;
   const filePath = await save({ serviceId, documentType, content, isFiltered });
-  let message = `Update ${isFiltered ? '' : 'snapshot of '}${serviceId} ${DOCUMENT_TYPES[documentType].name}`;
+  const isNewFile = await git.isNew(filePath);
+
+  let message = `${isNewFile ? 'Start tracking' : 'Update'} ${isFiltered ? '' : 'snapshot of '}${serviceId} ${DOCUMENT_TYPES[documentType].name}`;
 
   if (snapshotId) {
     message += `
@@ -34,23 +36,27 @@ This version was recorded after filtering snapshot ${snapshotId}`;
   const sha = await commit(filePath, message);
   return {
     path: filePath,
-    id: sha
+    id: sha,
+    isFirstRecord: isNewFile
   };
 }
 
 export async function save({ serviceId, documentType, content, isFiltered }) {
   const directory = `${isFiltered ? VERSIONS_DIRECTORY : SNAPSHOTS_DIRECTORY}/${serviceId}`;
 
-  if (!fsApi.existsSync(directory)) {
+  if (!await fileExists(directory)) {
     await fs.mkdir(directory, { recursive: true });
   }
 
   const filePath = `${directory}/${DOCUMENT_TYPES[documentType].fileName}.${isFiltered ? 'md' : 'html'}`;
-  return fs.writeFile(filePath, content).then(() => filePath);
+
+  await fs.writeFile(filePath, content);
+
+  return filePath;
 }
 
 export async function commit(filePath, message) {
-  if (!await git.fileNeedsCommit(filePath)) {
+  if (!await git.hasChanges(filePath)) {
     return;
   }
 
@@ -62,4 +68,15 @@ export async function commit(filePath, message) {
 async function _commit({ filePath, message, resolve }) {
   await git.add(filePath);
   resolve(await git.commit(filePath, message));
+}
+
+async function fileExists(filePath) {
+  try {
+    await fs.access(filePath);
+    return true;
+  } catch (error) {
+    if (error.code === 'ENOENT') {
+      return false;
+    }
+  }
 }

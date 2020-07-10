@@ -1,6 +1,7 @@
 import fs from 'fs';
 import chai from 'chai';
 
+import { resetGitRepository } from '../../test/helper.js';
 import { SNAPSHOTS_DIRECTORY, save, commit, record } from './recorder.js';
 import { TYPES } from '../types.js';
 
@@ -14,18 +15,19 @@ const EXPECTED_FILE_PATH = `${SNAPSHOTS_DIRECTORY}/${SERVICE_PROVIDER_ID}/${TYPE
 describe('Recorder', () => {
   describe('#save', () => {
     context('when service’s directory already exist', () => {
-      after(() => {
-        fs.unlinkSync(EXPECTED_FILE_PATH);
-      });
-
-      it('creates a file for the given service', async () => {
-        await save({
+      let saveResult;
+      before(async () => {
+        saveResult = await save({
           serviceId: SERVICE_PROVIDER_ID,
           documentType: TYPE,
           content: FILE_CONTENT,
           isFiltered: false
         });
+      });
 
+      after(resetGitRepository);
+
+      it('creates a file for the given service', async () => {
         expect(fs.readFileSync(EXPECTED_FILE_PATH, { encoding: 'utf8' })).to.equal(FILE_CONTENT);
       });
     });
@@ -63,9 +65,7 @@ describe('Recorder', () => {
       });
     });
 
-    after(() => {
-      fs.unlinkSync(EXPECTED_FILE_PATH);
-    });
+    after(resetGitRepository);
 
     it('commits the file for the given service', async () => {
       const id = await commit(EXPECTED_FILE_PATH, 'message');
@@ -75,21 +75,21 @@ describe('Recorder', () => {
 
   describe('#record', () => {
     let id;
+    let isFirstRecord;
     const PERSIST_FILE_CONTENT = FILE_CONTENT + 'record';
 
     before(async () => {
-      const { id: recordId } = await record({
+      const { id: recordId, isFirstRecord: firstRecord } = await record({
         serviceId: SERVICE_PROVIDER_ID,
         documentType: TYPE,
         content: PERSIST_FILE_CONTENT,
         isFiltered: false
       });
       id = recordId;
+      isFirstRecord = firstRecord;
     });
 
-    after(() => {
-      fs.unlinkSync(EXPECTED_FILE_PATH);
-    });
+    after(resetGitRepository);
 
     it('creates a file for the given service', () => {
       expect(fs.readFileSync(EXPECTED_FILE_PATH, { encoding: 'utf8' })).to.equal(PERSIST_FILE_CONTENT);
@@ -98,6 +98,24 @@ describe('Recorder', () => {
     it('commits the file for the given service', () => {
       expect(id).to.exist;
       expect(id).to.be.a('string');
+    });
+
+    context('when this is the first record', () => {
+      it('returns a boolean to specify this is the first one', () => {
+        expect(isFirstRecord).to.equal(true);
+      });
+    });
+
+    context('when this is not the first record', () => {
+      it('returns a boolean to specify this is not the first one', async () => {
+        const recordResult = await record({
+          serviceId: SERVICE_PROVIDER_ID,
+          documentType: TYPE,
+          content: PERSIST_FILE_CONTENT,
+          isFiltered: false
+        });
+        expect(recordResult.isFirstRecord).to.equal(false);
+      });
     });
   });
 });

@@ -81,7 +81,7 @@ export default class CGUs extends events.EventEmitter {
         return this.emit('fetchingError', serviceId, type, error);
       }
 
-      const { id: snapshotId, path: snapshotPath} = await recordSnapshot(serviceId, type, pageContent);
+      const { id: snapshotId, path: snapshotPath } = await recordSnapshot(serviceId, type, pageContent);
 
       console.log(`${logPrefix} Fetched web page to ${snapshotPath}.`);
 
@@ -93,10 +93,13 @@ export default class CGUs extends events.EventEmitter {
 
       const document = await filter(pageContent, contentSelector, filters, this._serviceDeclarations[serviceId].filters);
 
-      const { id: versionId, path: documentPath} = await recordVersion(serviceId, type, document, snapshotId);
+      const { id: versionId, path: documentPath, isFirstRecord } = await recordVersion(serviceId, type, document, snapshotId);
       if (versionId) {
-        console.log(`${logPrefix} Recorded version in ${documentPath} with id ${versionId}.`);
-        this.emit('versionRecorded', serviceId, type, versionId);
+        const message = isFirstRecord ?
+          `${logPrefix} First version recorded in ${documentPath} with id ${versionId}.` :
+          `${logPrefix} Recorded version in ${documentPath} with id ${versionId}.`;
+        console.log(message);
+        this.emit(isFirstRecord ? 'documentAdded' : 'versionRecorded', serviceId, type, versionId);
       } else {
         console.log(`${logPrefix} No changes after filtering, did not record version.`);
       }
