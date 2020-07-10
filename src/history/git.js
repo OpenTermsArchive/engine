@@ -34,6 +34,12 @@ export async function fileNeedsCommit(filepath) {
          (status.created.indexOf(relativePath(filepath)) > -1);
 }
 
+export async function isNew(filepath) {
+  const status = await git.status();
+  return (status.created.indexOf(relativePath(filepath)) > -1) ||
+         (status.not_added.indexOf(relativePath(filepath)) > -1);
+}
+
 export function relativePath(absolutePath) {
   // Git needs a path relative to the .git directory, not an absolute one
   return path.relative(path.resolve(__dirname, DATA_PATH), absolutePath);
