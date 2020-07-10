@@ -15,8 +15,8 @@ export const SNAPSHOTS_DIRECTORY = `${DATABASE_DIRECTORY}/raw`;
 export const VERSIONS_DIRECTORY = `${DATABASE_DIRECTORY}/sanitized`;
 
 const commitQueue = async.queue(_commit, 1);
-commitQueue.error((error, { serviceId, documentType, isFiltered, reject }) => {
-  reject(new Error(`Could not record ${isFiltered ? 'version' : 'snapshot'} for ${serviceId} ${documentType} due to error: ${error}`));
+commitQueue.error((error, { filePath, message, reject }) => {
+  reject(new Error(`Could not commit ${filePath} with message "${message}" due to error: ${error}`));
 });
 
 
