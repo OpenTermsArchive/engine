@@ -22,7 +22,7 @@ commitQueue.error((error, { serviceId, documentType, isFiltered, reject }) => {
 
 export async function record({ serviceId, documentType, content, snapshotId }) {
   const isFiltered = !!snapshotId;
-  const filePath = await save({ serviceId, documentType, content, isFiltered });
+  const { filePath, isNewFile } = await save({ serviceId, documentType, content, isFiltered });
   let message = `Update ${isFiltered ? '' : 'snapshot of '}${serviceId} ${DOCUMENT_TYPES[documentType].name}`;
 
   if (snapshotId) {
@@ -34,7 +34,8 @@ This version was recorded after filtering snapshot ${snapshotId}`;
   const sha = await commit(filePath, message);
   return {
     path: filePath,
-    id: sha
+    id: sha,
+    isFirstRecord: isNewFile
   };
 }
 
@@ -46,7 +47,11 @@ export async function save({ serviceId, documentType, content, isFiltered }) {
   }
 
   const filePath = `${directory}/${DOCUMENT_TYPES[documentType].fileName}.${isFiltered ? 'md' : 'html'}`;
-  return fs.writeFile(filePath, content).then(() => filePath);
+  const isNewFile = !await isFileExists(filePath);
+  return fs.writeFile(filePath, content).then(() => ({
+    filePath,
+    isNewFile
+  }));
 }
 
 export async function commit(filePath, message) {
@@ -62,4 +67,17 @@ export async function commit(filePath, message) {
 async function _commit({ filePath, message, resolve }) {
   await git.add(filePath);
   resolve(await git.commit(filePath, message));
+}
+
+async function isFileExists(filePath) {
+  let fileExists = true;
+  try {
+    await fs.access(filePath);
+  } catch(error) {
+    if (error.code === 'ENOENT') {
+      fileExists = false;
+    }
+  } finally {
+    return fileExists;
+  }
 }
