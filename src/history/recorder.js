@@ -47,11 +47,15 @@ export async function save({ serviceId, documentType, content, isFiltered }) {
   }
 
   const filePath = `${directory}/${DOCUMENT_TYPES[documentType].fileName}.${isFiltered ? 'md' : 'html'}`;
-  const isNewFile = !await isFileExists(filePath);
-  return fs.writeFile(filePath, content).then(() => ({
+
+  const isNewFile = !await fileExists(filePath);
+
+  await fs.writeFile(filePath, content);
+
+  return {
     filePath,
     isNewFile
-  }));
+  };
 }
 
 export async function commit(filePath, message) {
@@ -69,15 +73,13 @@ async function _commit({ filePath, message, resolve }) {
   resolve(await git.commit(filePath, message));
 }
 
-async function isFileExists(filePath) {
-  let fileExists = true;
+async function fileExists(filePath) {
   try {
     await fs.access(filePath);
-  } catch(error) {
+    return true;
+  } catch (error) {
     if (error.code === 'ENOENT') {
-      fileExists = false;
+      return false;
     }
-  } finally {
-    return fileExists;
   }
 }
