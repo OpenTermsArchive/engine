@@ -9,15 +9,15 @@ import CGUs from './src/index.js';
     rule.minute = 30; // at minute 30 past every hour.
 
     console.log('The scheduler is running…');
-    console.log('Jobs will run at minute 30 past every hour.');
+    console.log('Documents will be tracked at minute 30 past every hour.');
 
     const app = new CGUs();
     await app.init();
 
     const notifier = new Notifier(app.serviceDeclarations, app.documentTypes);
 
-    app.on('versionRecorded', notifier.onSanitizedDocumentChange.bind(notifier));
-    app.on('fetchingError', notifier.onDocumentScrapingError.bind(notifier));
+    app.on('versionRecorded', notifier.onVersionRecorded.bind(notifier));
+    app.on('fetchingError', notifier.onDocumentFetchError.bind(notifier));
     app.on('error', notifier.onApplicationError.bind(notifier));
 
     schedule.scheduleJob(rule, app.trackChanges.bind(app));

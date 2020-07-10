@@ -16,7 +16,7 @@ export default class Notifier {
     this.documentTypes = passedDocumentTypes;
   }
 
-  async onDocumentScrapingError(serviceProviderId, documentTypeId, error) {
+  async onDocumentFetchError(serviceProviderId, documentTypeId, error) {
     const sendParams = {
       templateId: config.get('notifier.sendInBlue.errorTemplateId'),
       params: {
@@ -30,13 +30,13 @@ export default class Notifier {
     return send([config.get('notifier.sendInBlue.administratorsListId')], sendParams);
   }
 
-  async onSanitizedDocumentChange(serviceProviderId, documentTypeId, sanitizedSha) {
+  async onVersionRecorded(serviceProviderId, documentTypeId, versionId) {
     const sendParams = {
       templateId: config.get('notifier.sendInBlue.updateTemplateId'),
       params: {
         SERVICE_PROVIDER_NAME: this.serviceProviders[serviceProviderId].name,
         DOCUMENT_TYPE: this.documentTypes[documentTypeId].name,
-        SHA: sanitizedSha
+        SHA: versionId
       },
     }
 
