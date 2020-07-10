@@ -22,7 +22,9 @@ commitQueue.error((error, { filePath, message, reject }) => {
 
 export async function record({ serviceId, documentType, content, snapshotId }) {
   const isFiltered = !!snapshotId;
-  const { filePath, isNewFile } = await save({ serviceId, documentType, content, isFiltered });
+  const filePath = await save({ serviceId, documentType, content, isFiltered });
+  const isNewFile = await git.isNew(filePath);
+
   let message = `Update ${isFiltered ? '' : 'snapshot of '}${serviceId} ${DOCUMENT_TYPES[documentType].name}`;
 
   if (snapshotId) {
@@ -48,14 +50,9 @@ export async function save({ serviceId, documentType, content, isFiltered }) {
 
   const filePath = `${directory}/${DOCUMENT_TYPES[documentType].fileName}.${isFiltered ? 'md' : 'html'}`;
 
-  const isNewFile = !await fileExists(filePath);
-
   await fs.writeFile(filePath, content);
 
-  return {
-    filePath,
-    isNewFile
-  };
+  return filePath;
 }
 
 export async function commit(filePath, message) {

@@ -1,6 +1,7 @@
 import fs from 'fs';
 import chai from 'chai';
 
+import { resetGitRepository } from '../../test/helper.js';
 import { SNAPSHOTS_DIRECTORY, save, commit, record } from './recorder.js';
 import { TYPES } from '../types.js';
 
@@ -24,30 +25,10 @@ describe('Recorder', () => {
         });
       });
 
-      after(() => {
-        fs.unlinkSync(EXPECTED_FILE_PATH);
-      });
+      after(resetGitRepository);
 
       it('creates a file for the given service', async () => {
         expect(fs.readFileSync(EXPECTED_FILE_PATH, { encoding: 'utf8' })).to.equal(FILE_CONTENT);
-      });
-
-      context('when the file does not exists', () => {
-        it('returns a boolean to indicate the file is new', async () => {
-          expect(saveResult.isNewFile).to.equal(true);
-        });
-      });
-
-      context('when the file exists', () => {
-        it('returns a boolean to indicate the file is not new', async () => {
-          const newSaveResult = await save({
-            serviceId: SERVICE_PROVIDER_ID,
-            documentType: TYPE,
-            content: FILE_CONTENT,
-            isFiltered: false
-          });
-          expect(newSaveResult.isNewFile).to.equal(false);
-        });
       });
     });
 
@@ -84,9 +65,7 @@ describe('Recorder', () => {
       });
     });
 
-    after(() => {
-      fs.unlinkSync(EXPECTED_FILE_PATH);
-    });
+    after(resetGitRepository);
 
     it('commits the file for the given service', async () => {
       const id = await commit(EXPECTED_FILE_PATH, 'message');
@@ -110,9 +89,7 @@ describe('Recorder', () => {
       isFirstRecord = firstRecord;
     });
 
-    after(() => {
-      fs.unlinkSync(EXPECTED_FILE_PATH);
-    });
+    after(resetGitRepository);
 
     it('creates a file for the given service', () => {
       expect(fs.readFileSync(EXPECTED_FILE_PATH, { encoding: 'utf8' })).to.equal(PERSIST_FILE_CONTENT);
