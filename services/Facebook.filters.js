@@ -1,4 +1,3 @@
-
 export function removeHelpButtons(document) {
   const links = document.querySelectorAll('a[href="#"][id*="-markdown-internal-id"]');
   links.forEach(link => {
