@@ -42,10 +42,12 @@ const schema = {
       "properties": {
         "location": {
           "type": "string",
+          "format": "uri",
           "description": "The URL where the document can be found"
         },
         "contentSelector": {
           "type": "string",
+          "pattern": "^.+$",
           "description": "The CSS selector that targets the meaningful part of the document, excluding elements such as headers, footers and navigation"
         },
         "filters": {
