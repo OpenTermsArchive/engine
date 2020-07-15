@@ -8,9 +8,9 @@
         "privacy": {
             "location": "https://terms.line.me/line_rules/?lang=en",
             "contentSelector": ".MdTerms01 > h1:nth-child(1)",
-	    "filters": [
-		"removeStyleTag"
-	    ]
+            "filters": [
+                "removeStyleTag"
+            ]
         }
     }
 }
