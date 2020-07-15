@@ -61,7 +61,7 @@ describe('Service validation', () => {
       describe(TYPES[type].name, function() {
         before(function() {
           if (!service.documents[type]) {
-            console.log('Tests skipped for this document type as it is not declared for this service.');
+            console.log('      (Tests skipped for this document type as it is not declared for this service)');
             this.skip();
           }
         });
