@@ -81,6 +81,12 @@ To hourly update documents:
 npm run start:scheduler
 ```
 
+To get the latest version of a specific service's terms:
+
+```
+npm start $service_id
+```
+
 ## Contributing
 
 ### You want to add a new service?
