@@ -19,7 +19,7 @@ const expect = chai.expect;
 const AVAILABLE_TYPE_NAMES = Object.keys(TYPES);
 const rootPath = path.join(__dirname, '../..');
 
-describe('Service validations', () => {
+describe('Service validation', () => {
   const serviceId = process.argv.slice(process.argv.indexOf('--serviceId'))[1];
   let service;
 
@@ -28,7 +28,7 @@ describe('Service validations', () => {
     service = serviceDeclarations[serviceId];
 
     if (!service) {
-      throw new Error(`There are no service declared with the name ${serviceId}`);
+      throw new Error(`There is no service declared with the name ${serviceId}`);
     }
   })
 
@@ -73,7 +73,7 @@ describe('Service validations', () => {
           await fetch(location);
         });
 
-        it('has a selector which match an element in the web page', async function() {
+        it('has a selector that matches an element in the web page', async function() {
           this.timeout(10000);
 
           const { contentSelector, location } = service.documents[type];
@@ -94,7 +94,7 @@ describe('Service validations', () => {
               filteredContent[i] = await filter(content, contentSelector, filters, service.filters);
             }
 
-            expect(filteredContent[0]).to.be.equal(filteredContent[1]);
+            expect(filteredContent[0]).to.equal(filteredContent[1]);
           });
         });
       });
