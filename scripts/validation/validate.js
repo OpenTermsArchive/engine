@@ -1,23 +1,22 @@
 import fsApi from 'fs';
 import path from 'path';
 
-import config from 'config';
-import chai from 'chai';
 import Ajv from 'ajv';
-import jsonSourceMap from 'json-source-map';
+import chai from 'chai';
+import config from 'config';
 import jsdom from 'jsdom';
+import jsonSourceMap from 'json-source-map';
 
 import fetch from '../../src/fetcher/index.js';
 import filter from '../../src/filter/index.js';
 import loadServiceDeclarations from '../../src/loader/index.js';
 import serviceSchema from './service.schema.js'
 import { TYPES } from '../../src/types.js';
-const AVAILABLE_TYPE_NAMES = Object.keys(TYPES);
 
 const fs = fsApi.promises;
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
 const expect = chai.expect;
-
+const AVAILABLE_TYPE_NAMES = Object.keys(TYPES);
 const rootPath = path.join(__dirname, '../..');
 
 describe('Service validations', () => {
