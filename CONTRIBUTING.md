@@ -23,11 +23,11 @@ You can find examples in the `services` folder.
 
 Test the declaration by running the following command with the service id:
 
-_Note: the service id is the case sensitive name of the service declaration file without the extension. For example, for `Twitter.json`, the service id is `Twitter`._
-
 ```
 npm run validate $service_id
 ```
+
+> The service id is the case sensitive name of the service declaration file without the extension. For example, for `Twitter.json`, the service id is `Twitter`.
 
 ## Filters
 
