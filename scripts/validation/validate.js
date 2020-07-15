@@ -34,27 +34,8 @@ describe('Service validation', () => {
 
   describe(serviceId, () => {
     it('has a valid declaration', async () => {
-      const file = JSON.parse(await fs.readFile(path.join(rootPath, config.get('serviceDeclarationsPath'), `${serviceId}.json`)));
-      const validator = new Ajv({
-        allErrors: true,
-        jsonPointers: true,
-      });
-      const valid = validator.validate(serviceSchema, file);
-      if (!valid) {
-        let errorMessage = '';
-        const sourceMap = jsonSourceMap.stringify(file, null, 2);
-        const jsonLines = sourceMap.json.split('\n');
-        validator.errors.forEach(error => {
-          errorMessage += '\n\n' + validator.errorsText([error]);
-          let errorPointer = sourceMap.pointers[error.dataPath];
-          if (errorPointer) {
-            errorMessage += '\n> ' + jsonLines.slice(errorPointer.value.line, errorPointer.valueEnd.line).join('\n> ');
-          } else {
-            errorMessage += ' (in entire file)\n';
-          }
-        });
-        throw new Error(errorMessage);
-      }
+      const declaration = JSON.parse(await fs.readFile(path.join(rootPath, config.get('serviceDeclarationsPath'), `${serviceId}.json`)));
+      assertValid(serviceSchema, declaration);
     });
 
     AVAILABLE_TYPE_NAMES.forEach(type => {
@@ -101,3 +82,34 @@ describe('Service validation', () => {
     });
   });
 });
+
+
+const validator = new Ajv({
+  allErrors: true,
+  jsonPointers: true,
+});
+
+function assertValid(schema, subject) {
+  const valid = validator.validate(schema, subject);
+
+  if (!valid) {
+    const errorPointers = new Set();
+    let errorMessage = '';
+    const sourceMap = jsonSourceMap.stringify(subject, null, 2);
+    const jsonLines = sourceMap.json.split('\n');
+    validator.errors.forEach(error => {
+      errorMessage += '\n\n' + validator.errorsText([ error ]);
+      let errorPointer = sourceMap.pointers[error.dataPath];
+      if (errorPointer) {
+        errorMessage += '\n> ' + jsonLines.slice(errorPointer.value.line, errorPointer.valueEnd.line).join('\n> ');
+        errorPointers.add(errorPointer);
+      } else {
+        errorMessage += ' (in entire file)\n';
+      }
+    });
+
+    errorMessage += `\n\n${errorPointers.size} features have errors in total`;
+
+    throw new Error(errorMessage);
+  }
+}
