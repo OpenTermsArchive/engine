@@ -21,21 +21,21 @@ const expect = chai.expect;
 const rootPath = path.join(__dirname, '../..');
 
 describe('Service validations', () => {
-  const subject = process.argv.slice(process.argv.indexOf('--serviceId'))[1];
+  const serviceId = process.argv.slice(process.argv.indexOf('--serviceId'))[1];
   let service;
 
   before(async () => {
     const serviceDeclarations = await loadServiceDeclarations(path.join(rootPath, config.get('serviceDeclarationsPath')));
-    service = serviceDeclarations[subject];
+    service = serviceDeclarations[serviceId];
 
     if (!service) {
-      throw new Error(`There are no service declared with the name ${subject}`);
+      throw new Error(`There are no service declared with the name ${serviceId}`);
     }
   })
 
-  describe(subject, () => {
+  describe(serviceId, () => {
     it('has a valid declaration', async () => {
-      const file = JSON.parse(await fs.readFile(path.join(rootPath, config.get('serviceDeclarationsPath'), `${subject}.json`)));
+      const file = JSON.parse(await fs.readFile(path.join(rootPath, config.get('serviceDeclarationsPath'), `${serviceId}.json`)));
       const validator = new Ajv({
         allErrors: true,
         jsonPointers: true,
