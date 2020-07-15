@@ -1,10 +1,9 @@
 
 export function removeHelpButtons(document) {
-  const links = document.querySelectorAll('a[href="#"][id*="-markdown-internal-id"]');
-  links.forEach(link => {
-    // Helps buttons do not have text content
-    if (!link.text) {
-      link.remove();
+  const imgs = document.querySelectorAll('img[src*="https://scontent"]');
+  imgs.forEach(img => {
+    if(img.parentNode.tagName == 'A' && !img.parentNode.text){
+      img.parentNode.remove();
     }
   });
 }
