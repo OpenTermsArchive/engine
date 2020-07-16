@@ -45,22 +45,22 @@ describe('CGUs', () => {
       fs.unlinkSync(SERVICE_B_EXPECTED_VERSION_FILE_PATH);
     });
 
-    it('record snapshot terms for service A', () => {
+    it('records snapshot for service A', () => {
       const resultingSnapshotTerms = fs.readFileSync(path.resolve(__dirname, SERVICE_A_EXPECTED_SNAPSHOT_FILE_PATH), { encoding: 'utf8' });
       expect(resultingSnapshotTerms).to.be.equal(SERVICE_A_TOS_SNAPSHOT);
     });
 
-    it('record version for service A', () => {
+    it('records version for service A', () => {
       const resultingTerms = fs.readFileSync(path.resolve(__dirname, SERVICE_A_EXPECTED_VERSION_FILE_PATH), { encoding: 'utf8' });
       expect(resultingTerms).to.be.equal(SERVICE_A_TOS_VERSION);
     });
 
-    it('record snapshot terms for service B', async () => {
+    it('records snapshot for service B', async () => {
       const resultingSnapshotTerms = fs.readFileSync(path.resolve(__dirname, SERVICE_B_EXPECTED_SNAPSHOT_FILE_PATH), { encoding: 'utf8' });
       expect(resultingSnapshotTerms).to.be.equal(SERVICE_B_TOS_SNAPSHOT);
     });
 
-    it('record version for service B', async () => {
+    it('records version for service B', async () => {
       const resultingTerms = fs.readFileSync(path.resolve(__dirname, SERVICE_B_EXPECTED_VERSION_FILE_PATH), { encoding: 'utf8' });
       expect(resultingTerms).to.be.equal(SERVICE_B_TOS_VERSION);
     });

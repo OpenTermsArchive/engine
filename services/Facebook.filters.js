@@ -1,4 +1,3 @@
-
 export function removeHelpButtons(document) {
   const imgs = document.querySelectorAll('img[src*="https://scontent"]');
     imgs.forEach(img => {
