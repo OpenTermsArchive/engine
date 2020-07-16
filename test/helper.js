@@ -4,9 +4,12 @@ const fs = fsApi.promises;
 
 import config from 'config';
 
-import { git } from '../src/history/git.js';
+import Git from '../src/history/git.js';
 
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
+
+export const SNAPSHOTS_PATH = path.resolve(__dirname, '../', config.get('history.snapshotsPath'));
+export const VERSIONS_PATH = path.resolve(__dirname, '../', config.get('history.versionsPath'));
 
 before(initRepo);
 after(eraseRepo);
@@ -17,25 +20,31 @@ export async function resetGitRepository() {
 }
 
 async function initRepo() {
-  await git.init();
-  git.addConfig('user.name', config.get('history.author').name)
-     .addConfig('user.email', config.get('history.author').email);
+  for (const repoPath of [VERSIONS_PATH, SNAPSHOTS_PATH]) {
+    const git = new Git(repoPath);
+    await git.init();
+    git.addConfig('user.name', config.get('history.author').name)
+       .addConfig('user.email', config.get('history.author').email);
+  }
 }
 
 async function eraseRepo() {
-  const DATA_PATH = path.resolve(__dirname, '../', config.get('history.dataPath'));
-  const files = await fs.readdir(DATA_PATH, { withFileTypes: true });
+  const promises = [];
 
-  const promises = files.map(file => {
-    const filePath = path.join(DATA_PATH, file.name);
+  for (const repoPath of [VERSIONS_PATH, SNAPSHOTS_PATH]) {
+    const files = await fs.readdir(repoPath, { withFileTypes: true });
 
-    if (file.isDirectory()) {
-      return fs.rmdir(filePath, { recursive: true });
-    } else if (file.name !== 'README.md') {
-      return fs.unlink(filePath);
-    }
-  });
+    promises.push(...files.map(file => {
+      const filePath = path.join(repoPath, file.name);
 
-  return Promise.all(promises);
+      if (file.isDirectory()) {
+        return fs.rmdir(filePath, { recursive: true });
+      } else if (file.name !== 'README.md') {
+        return fs.unlink(filePath);
+      }
+    }));
+  }
+
+  return await Promise.all(promises);
 }
 
