@@ -38,12 +38,14 @@ export default class CGUs extends events.EventEmitter {
     return this.initialized;
   }
 
-  async trackChanges() {
+  async trackChanges(serviceToTrack) {
     console.log('Start scraping and saving terms of service…');
 
     const documentTrackingPromises = [];
 
-    Object.keys(this._serviceDeclarations).forEach((serviceId) => {
+    const services = serviceToTrack ? {[serviceToTrack]: this._serviceDeclarations[serviceToTrack]} : this._serviceDeclarations;
+
+    Object.keys(services).forEach((serviceId) => {
       const { documents, name: serviceName } = this._serviceDeclarations[serviceId];
 
       Object.keys(documents).forEach((type) => {
