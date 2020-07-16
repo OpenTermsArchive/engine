@@ -1,7 +1,8 @@
 {
   "serviceDeclarationsPath": "./test/services",
   "history": {
-    "dataPath": "./test/data"
+    "snapshotsPath": "./test/data/snapshots",
+    "versionsPath": "./test/data/versions"
   },
   "notifier": {
     "sendInBlue": {
