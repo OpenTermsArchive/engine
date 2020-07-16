@@ -18,6 +18,8 @@ However, the shape of that **noise** can change over time. In order to recover i
 Anyone can run their own **private** instance and track changes on their own. However, we also **publish** each **version** on a **public** instance that makes it easy to explore the entire **history** and enables **notifying** over email whenever a new **version** is **recorded**.
 Users can **subscribe** to **notifications** through a web interface.
 
+_Note: For now, when multiple versions coexist, **terms** are only **tracked** in their English version and for the European jurisdiction._
+
 ## Installing
 
 This module is built with [Node](https://nodejs.org/en/). You will need to [install Node](https://nodejs.org/en/download/) to run it.
@@ -79,25 +81,11 @@ To hourly update documents:
 npm run start:scheduler
 ```
 
+## Contributing
 
-## Declaring a new service
+### You want to add a new service?
 
-In the folder `services`, create a JSON file with the name of the service you want to add, with the following structure:
-
-```json
-{
-  "name": "<the public name of the service>",
-  "documents": {
-    "<document type>": {
-      "location": "<the URL where the document can be found>",
-      "contentSelector": "<a CSS selector that targets the meaningful part of the document, excluding elements such as headers, footers and navigation>",
-    }
-  }
-}
-```
-
-For the `<document type>` key, you will have to use one of those listed in `/src/types.js` (or create a new one there if it is not already referenced).
-You can find examples in the `services` folder.
+See [CONTRIBUTING](CONTRIBUTING.md).
 
 ## Deploying
 
