@@ -87,6 +87,8 @@ To get the latest version of a specific service's terms:
 npm start $service_id
 ```
 
+> The service id is the case sensitive name of the service declaration file without the extension. For example, for `Twitter.json`, the service id is `Twitter`.
+
 ## Contributing
 
 ### You want to add a new service?
