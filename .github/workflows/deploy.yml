@@ -26,6 +26,9 @@ jobs:
         known_hosts: ${{ secrets.KNOWN_HOSTS }}
     - run: echo "$ANSIBLE_VAULT_PASSWORD" > vault.key
     - run: npm ci
+    - run: |
+        git config --global user.name 'AmbNum Bot'
+        git config --global user.email 'ambnum.bot@disinfo.quaidorsay.fr'
     - run: npm test
     - run: pip install --upgrade setuptools
     - run: pip install ansible

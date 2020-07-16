@@ -19,4 +19,7 @@ jobs:
       with:
         node-version: '12.17'
     - run: npm ci
+    - run: |
+        git config --global user.name 'AmbNum Bot'
+        git config --global user.email 'ambnum.bot@disinfo.quaidorsay.fr'
     - run: npm test
