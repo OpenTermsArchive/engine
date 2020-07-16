@@ -1,0 +1,31 @@
+- name: Add GitHub SSH key
+  copy:
+    src: cgus-data-snapshots.private_key
+    dest: "/home/{{ ansible_user }}/.ssh/cgus-data-snapshots"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: 0600
+  tags:
+    - setup
+
+- name: Configure SSH to use Ansible key for github.com
+  template:
+    src: ssh_config.j2
+    dest: "/home/{{ ansible_user }}/.ssh/config"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: 0644
+  tags:
+    - setup
+
+- name: Clone repository
+  git:
+    repo: "{{ repo }}"
+    dest: "/home/{{ ansible_user }}/{{ app }}"
+    force: no
+    accept_hostkey: yes
+    key_file: "/home/{{ ansible_user }}/.ssh/cgus-data-snapshots"
+  register: git_clone_app_finished
+  tags:
+    - setup
+    - update
