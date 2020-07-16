@@ -18,7 +18,7 @@ However, the shape of that **noise** can change over time. In order to recover i
 Anyone can run their own **private** instance and track changes on their own. However, we also **publish** each **version** on a **public** instance that makes it easy to explore the entire **history** and enables **notifying** over email whenever a new **version** is **recorded**.
 Users can **subscribe** to **notifications** through a web interface.
 
-_Note: For now, **terms** are only **tracked** in English language and for the European jurisdiction._
+_Note: For now, when multiple versions coexist, **terms** are only **tracked** in their English version and for the European jurisdiction._
 
 ## Installing
 

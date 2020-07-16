@@ -28,7 +28,7 @@ describe('Service validation', () => {
     service = serviceDeclarations[serviceId];
 
     if (!service) {
-      throw new Error(`There is no service declared with the name ${serviceId}`);
+      throw new Error(`There is no service declared with id ${serviceId}`);
     }
   })
 
