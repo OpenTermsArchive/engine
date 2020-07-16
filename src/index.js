@@ -64,9 +64,7 @@ export default class CGUs extends events.EventEmitter {
 
     if (config.get('history.publish')) {
       await publish();
-      console.log('・・・・・・・');
       console.log('Published changes');
-      console.log('______________________________');
     }
   }
 
