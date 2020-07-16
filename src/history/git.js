@@ -2,45 +2,52 @@ import path from 'path';
 import config from 'config';
 
 import simpleGit from 'simple-git';
+export default class Git {
+  constructor(repositoryPath) {
+    this.path = repositoryPath;
+    this.git = simpleGit(repositoryPath);
+  }
 
-const __dirname = path.dirname(new URL(import.meta.url).pathname);
+  async init() {
+    return this.git.init();
+  }
 
-const DATA_PATH = path.resolve(__dirname, '../..', config.get('history.dataPath'));
-console.log('Using database:', path.resolve(__dirname, DATA_PATH));
+  async add(filepath) {
+    return this.git.add(this.relativePath(filepath));
+  }
 
-export const git = simpleGit(DATA_PATH);
+  async status() {
+    return this.git.status();
+  }
 
-export async function add(filepath) {
-  return git.add(relativePath(filepath));
-}
+  async commit(filepath, message) {
+    const summary = await this.git.commit(message, this.relativePath(filepath), { '--author': `${config.get('history.author').name} <${config.get('history.author').email}>` });
+    return summary.commit.replace('HEAD ', '');
+  }
 
-export async function status() {
-  return git.status();
-}
+  async pushChanges() {
+    return this.git.push('origin', 'master');
+  }
 
-export async function commit(filepath, message) {
-  const summary = await git.commit(message, relativePath(filepath), { '--author': `${config.get('history.author').name} <${config.get('history.author').email}>` });
-  return summary.commit.replace('HEAD ', '');
-}
+  async hasChanges(filepath) {
+    const status = await this.git.status();
+    return (status.modified.indexOf(this.relativePath(filepath)) > -1) ||
+           (status.not_added.indexOf(this.relativePath(filepath)) > -1) ||
+           (status.created.indexOf(this.relativePath(filepath)) > -1);
+  }
 
-export async function pushChanges() {
-  return git.push('origin', 'master');
-}
+  async isNew(filepath) {
+    const status = await this.git.status();
+    return (status.created.indexOf(this.relativePath(filepath)) > -1) ||
+           (status.not_added.indexOf(this.relativePath(filepath)) > -1);
+  }
 
-export async function hasChanges(filepath) {
-  const status = await git.status();
-  return (status.modified.indexOf(relativePath(filepath)) > -1) ||
-         (status.not_added.indexOf(relativePath(filepath)) > -1) ||
-         (status.created.indexOf(relativePath(filepath)) > -1);
-}
+  addConfig() {
+    return this.git.addConfig();
+  }
 
-export async function isNew(filepath) {
-  const status = await git.status();
-  return (status.created.indexOf(relativePath(filepath)) > -1) ||
-         (status.not_added.indexOf(relativePath(filepath)) > -1);
-}
-
-export function relativePath(absolutePath) {
-  // Git needs a path relative to the .git directory, not an absolute one
-  return path.relative(path.resolve(__dirname, DATA_PATH), absolutePath);
+  relativePath(absolutePath) {
+    // Git needs a path relative to the .git directory, not an absolute one
+    return path.relative(this.path, absolutePath);
+  }
 }
