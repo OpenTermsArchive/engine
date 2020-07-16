@@ -7,20 +7,20 @@ const __dirname = path.dirname(new URL(import.meta.url).pathname);
 const expect = chai.expect;
 
 import CGUs from './index.js';
-import { SNAPSHOTS_DIRECTORY, VERSIONS_DIRECTORY } from './history/recorder.js';
+import { SNAPSHOTS_PATH, VERSIONS_PATH } from './history/index.js';
 import { TYPES } from './types.js';
 
 const SERVICE_A_ID = 'service_A';
 const SERVICE_A_TYPE = 'tos';
-const SERVICE_A_EXPECTED_SNAPSHOT_FILE_PATH = `${SNAPSHOTS_DIRECTORY}/${SERVICE_A_ID}/${TYPES[SERVICE_A_TYPE].fileName}.html`;
-const SERVICE_A_EXPECTED_VERSION_FILE_PATH = `${VERSIONS_DIRECTORY}/${SERVICE_A_ID}/${TYPES[SERVICE_A_TYPE].fileName}.md`;
+const SERVICE_A_EXPECTED_SNAPSHOT_FILE_PATH = `${SNAPSHOTS_PATH}/${SERVICE_A_ID}/${TYPES[SERVICE_A_TYPE].fileName}.html`;
+const SERVICE_A_EXPECTED_VERSION_FILE_PATH = `${VERSIONS_PATH}/${SERVICE_A_ID}/${TYPES[SERVICE_A_TYPE].fileName}.md`;
 const SERVICE_A_TOS_SNAPSHOT = fs.readFileSync(path.resolve(__dirname, '../test/fixtures/service_A_terms_snapshot.html'), { encoding: 'utf8' });
 const SERVICE_A_TOS_VERSION = fs.readFileSync(path.resolve(__dirname, '../test/fixtures/service_A_terms.md'), { encoding: 'utf8' });
 
 const SERVICE_B_ID = 'service_B';
 const SERVICE_B_TYPE = 'tos';
-const SERVICE_B_EXPECTED_SNAPSHOT_FILE_PATH = `${SNAPSHOTS_DIRECTORY}/${SERVICE_B_ID}/${TYPES[SERVICE_B_TYPE].fileName}.html`;
-const SERVICE_B_EXPECTED_VERSION_FILE_PATH = `${VERSIONS_DIRECTORY}/${SERVICE_B_ID}/${TYPES[SERVICE_B_TYPE].fileName}.md`;
+const SERVICE_B_EXPECTED_SNAPSHOT_FILE_PATH = `${SNAPSHOTS_PATH}/${SERVICE_B_ID}/${TYPES[SERVICE_B_TYPE].fileName}.html`;
+const SERVICE_B_EXPECTED_VERSION_FILE_PATH = `${VERSIONS_PATH}/${SERVICE_B_ID}/${TYPES[SERVICE_B_TYPE].fileName}.md`;
 const SERVICE_B_TOS_SNAPSHOT = fs.readFileSync(path.resolve(__dirname, '../test/fixtures/service_B_terms_snapshot.html'), { encoding: 'utf8' });
 const SERVICE_B_TOS_VERSION = fs.readFileSync(path.resolve(__dirname, '../test/fixtures/service_B_terms.md'), { encoding: 'utf8' });
 
