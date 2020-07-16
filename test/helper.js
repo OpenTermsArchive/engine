@@ -45,6 +45,6 @@ async function eraseRepo() {
     }));
   }
 
-  return await Promise.all(promises);
+  return Promise.all(promises);
 }
 
