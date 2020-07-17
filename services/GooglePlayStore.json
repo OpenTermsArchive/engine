@@ -2,11 +2,11 @@
     "name": "Google Play Store",
     "documents": {
         "devPolicy": {
-            "location": "https://play.google.com/intl/ALL_fr/about/developer-distribution-agreement.html",
+            "location": "https://play.google.com/intl/ALL_en/about/developer-distribution-agreement.html",
             "contentSelector": "body > .play-contained"
         },
         "tos": {
-            "location": "https://play.google.com/intl/fr_fr/about/play-terms/index.html",
+            "location": "https://play.google.com/intl/en_US/about/play-terms/index.html",
             "contentSelector": "body > .play-contained"
         },
         "brandGuidelines": {
@@ -14,7 +14,7 @@
             "contentSelector": "article.devsite-article-inner"
         },
         "reviewGuidelines": {
-            "location": "https://support.google.com/googleplay/android-developer/answer/9904549",
+            "location": "https://support.google.com/googleplay/android-developer/answer/9904549?hl=en",
             "contentSelector": "article.page"
         }
     }

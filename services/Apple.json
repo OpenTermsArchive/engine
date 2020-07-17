@@ -2,7 +2,7 @@
     "name": "Apple",
     "documents": {
         "privacy": {
-            "location": "https://www.apple.com/legal/privacy/fr-ww/",
+            "location": "https://www.apple.com/legal/privacy/en-ww/",
             "contentSelector": "main[role=main]"
         }
     }

@@ -2,11 +2,11 @@
     "name": "Google",
     "documents": {
         "privacy": {
-            "location": "https://policies.google.com/privacy?hl=fr-FR",
+            "location": "https://policies.google.com/privacy?hl=en-US",
             "contentSelector": "div[role=article]"
         },
         "tos": {
-            "location": "https://policies.google.com/terms?hl=fr-FR",
+            "location": "https://policies.google.com/terms?hl=en-US",
             "contentSelector": "div[role=article]"
         }
     }
