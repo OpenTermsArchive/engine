@@ -16,8 +16,7 @@ export default async function filter(content, selector, filterNames, filterFunct
   }
 
   if (selector) {
-    const selectedContent = webPageDOM.querySelector(selector);
-
+    const selectedContent = webPageDOM.querySelectorAll(selector);
     if (selectedContent) {
       contentToFilter = selectedContent;
     } else {
@@ -25,6 +24,8 @@ export default async function filter(content, selector, filterNames, filterFunct
     }
   }
 
-  const markdown = turndownService.turndown(contentToFilter);
-  return markdown;
+  let markdown = "";
+  contentToFilter.forEach(next_content => {markdown += turndownService.turndown(next_content)+"\n";});
+  const markdown_final = markdown;
+  return markdown_final;
 }
