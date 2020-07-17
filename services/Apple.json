@@ -1,8 +1,8 @@
 {
-    "serviceProviderName": "Apple",
+    "name": "Apple",
     "documents": {
         "privacy": {
-            "url": "https://www.apple.com/legal/privacy/fr-ww/",
+            "location": "https://www.apple.com/legal/privacy/fr-ww/",
             "contentSelector": "main[role=main]"
         }
     }

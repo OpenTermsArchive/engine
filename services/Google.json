@@ -1,12 +1,12 @@
 {
-    "serviceProviderName": "Google",
+    "name": "Google",
     "documents": {
         "privacy": {
-            "url": "https://policies.google.com/privacy?hl=fr-FR",
+            "location": "https://policies.google.com/privacy?hl=fr-FR",
             "contentSelector": "div[role=article]"
         },
         "tos": {
-            "url": "https://policies.google.com/terms?hl=fr-FR",
+            "location": "https://policies.google.com/terms?hl=fr-FR",
             "contentSelector": "div[role=article]"
         }
     }
