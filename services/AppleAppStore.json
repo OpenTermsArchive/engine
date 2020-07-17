@@ -1,0 +1,9 @@
+{
+    "name": "Apple App Store",
+    "documents": {
+        "reviewGuidelines": {
+            "location": "https://developer.apple.com/app-store/review/guidelines/",
+            "contentSelector": "main[role=main]"
+        }
+    }
+}

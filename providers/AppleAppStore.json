@@ -1,9 +1,0 @@
-{
-    "serviceProviderName": "Apple App Store",
-    "documents": {
-        "reviewGuidelines": {
-            "url": "https://developer.apple.com/app-store/review/guidelines/",
-            "contentSelector": "main[role=main]"
-        }
-    }
-}
