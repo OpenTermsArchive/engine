@@ -15,7 +15,7 @@ const expected = {
     documents: {
       tos: {
         location: 'https://www.servicea.example/tos',
-        contentSelector: 'main'
+        contentSelector: 'body'
       }
     }
   },
@@ -24,7 +24,7 @@ const expected = {
     documents: {
       tos: {
         location: 'https://www.serviceb.example/tos',
-        contentSelector: 'main'
+        contentSelector: 'body'
       }
     }
   }
