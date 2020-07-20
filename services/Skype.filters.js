@@ -1,6 +1,5 @@
-export function removeIrrelevantModulesPrivacyPolicy(document) {
-    const moduleDescriptions = document.querySelectorAll('.divModuleDescription');
-    const toDelete = [
+export function removeIrrelevantModulesFromPrivacyPolicy(document) {
+    const OTHER_SERVICES_POLICIES = [
         "mainenterprisedeveloperproductsmodule",
         "mainenterpriseservicesmodule",
         "mainenterprisedevsoftwareappsmodule",
@@ -42,28 +41,27 @@ export function removeIrrelevantModulesPrivacyPolicy(document) {
         "mainsilverlightmodule",
         "mainwindowsmixedrealitymodule"
     ];
-    moduleDescriptions.forEach(moduleDescription => {
+
+    document.querySelectorAll('.divModuleDescription').forEach(moduleDescription => {
         let moduleName = moduleDescription.querySelector('#moduleName');
         if (moduleName) {
             moduleName = moduleName.textContent;
         }
-        if (moduleName && toDelete.includes(moduleName)) {
+        if (moduleName && OTHER_SERVICES_POLICIES.includes(moduleName)) {
             moduleDescription.remove();
         }
     });
 }
 
-export function removeIrrelevantModulesParentTos(document) {
-    const moduleDescriptions = document.querySelectorAll('.divModuleDescription');
-    moduleDescriptions.forEach(moduleDescription => {
-        var name = moduleDescription.querySelector('.FileName');
-        if (name) {
-            name = name.textContent;
+export function removeIrrelevantModulesFromParentTos(document) {
+    const OTHER_SERVICES_TOS = /^14[^e_]/;  // match all section 14 entities except "Terms14_service-SpecificTerms" and "14e_Skype"
+
+    document.querySelectorAll('.divModuleDescription').forEach(moduleDescription => {
+        let moduleName = moduleDescription.querySelector('.FileName');
+        if (moduleName) {
+            moduleName = moduleName.textContent;
         }
-        if (name.substr(0,2)=="14" && name.substr(0,3)!="14e" && name.substr(0,3)!="14_") {
-            moduleDescription.remove();
-        }
-        if (name=="serviceslist") {
+        if (moduleName.match(OTHER_SERVICES_TOS) || moduleName == 'serviceslist') {
             moduleDescription.remove();
         }
     });
@@ -78,17 +76,16 @@ export function removeModuleIDs(document) {
 }
 
 export function removeInvisibleText(document) {
-    const notDisplayed = document.querySelectorAll('.displayNone');
-    const summaries = document.querySelectorAll('.printsummary');
-    const fulltexts = document.querySelectorAll('.printDetailedContent');
-    notDisplayed.forEach(element => element.remove());
-    summaries.forEach(summary =>  {
-        if (summary.textContent=="Summary") {
+    document.querySelectorAll('.displayNone').forEach(element => element.remove());
+
+    document.querySelectorAll('.printsummary').forEach(summary => {
+        if (summary.textContent == 'Summary') {
             summary.remove();
         }
     });
-    fulltexts.forEach(fulltext => {
-        if (fulltext.textContent=="Full text") {
+
+    document.querySelectorAll('.printDetailedContent').forEach(fulltext => {
+        if (fulltext.textContent == 'Full text') {
             fulltext.remove();
         }
     });

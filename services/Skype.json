@@ -9,7 +9,7 @@
             "location": "https://privacy.microsoft.com/en-gb/privacystatement",
             "contentSelector": "h1, #psp_last_updated, span.Description:nth-child(1), .div_content",
             "filters": [
-                "removeIrrelevantModulesPrivacyPolicy",
+                "removeIrrelevantModulesFromPrivacyPolicy",
                 "removeNavigationHeaders",
                 "removeModuleIDs",
                 "removeInvisibleText"
@@ -19,7 +19,7 @@
             "location": "https://www.microsoft.com/en-gb/servicesagreement/",
             "contentSelector": ".pageIntro, .div_content",
             "filters": [
-            	"removeIrrelevantModulesParentTos",
+            	"removeIrrelevantModulesFromParentTos",
                 "removeNavigationHeaders",
                 "removeModuleIDs",
                 "removeInvisibleText"
