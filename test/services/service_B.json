@@ -3,7 +3,7 @@
   "documents": {
     "tos": {
       "location": "https://www.serviceb.example/tos",
-      "contentSelector": "main"
+      "contentSelector": "body"
     }
   }
 }
