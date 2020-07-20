@@ -3,11 +3,11 @@
     "documents": {
         "tos": {
             "location": "https://www.skype.com/en/legal/ios/tos/",
-            "contentSelector": "div.row:nth-child(2) > div:nth-child(1)"
+            "contentSelector": "div.row:nth-child(2) > div"
         },
         "privacy": {
             "location": "https://privacy.microsoft.com/en-gb/privacystatement",
-            "contentSelector": "h1, #psp_last_updated, span.Description:nth-child(1), .div_content",
+            "contentSelector": "h1, #psp_last_updated, span.Description, .div_content",
             "filters": [
                 "removeIrrelevantModulesFromPrivacyPolicy",
                 "removeNavigationHeaders",
