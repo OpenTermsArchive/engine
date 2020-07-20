@@ -76,14 +76,7 @@ export function removeModuleIDs(document) {
 }
 
 export function removeInvisibleText(document) {
-    document.querySelectorAll('.displayNone')
-        .forEach(element => element.remove());
-
-    document.querySelectorAll('.printsummary')
-        .filter(element => element.textContent == 'Summary')
-        .forEach(element => element.remove());
-
-    document.querySelectorAll('.printDetailedContent')
-        .filter(element => element.textContent == 'Full text')
-        .forEach(element => element.remove());
+    document.querySelectorAll('.displayNone').forEach(element => element.remove());
+    document.querySelectorAll('.printsummary').forEach(element => element.remove());
+    document.querySelectorAll('.printDetailedContent').forEach(element => element.remove());
 }
