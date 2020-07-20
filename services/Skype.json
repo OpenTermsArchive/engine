@@ -7,9 +7,11 @@
         },
         "privacy": {
             "location": "https://privacy.microsoft.com/en-gb/privacystatement",
-            "contentSelector": ".l-col-10-12, span.Description:nth-child(1), .div_content",
+            "contentSelector": "h1, #psp_last_updated, #ShortDescription, .div_content",
             "filters": [
-                "cleanPP",
+                "removeIrrelevantModules",
+                "removeNavigationHeaders",
+                "removeModuleIDs",
                 "removeInvisibleText"
             ]
         },

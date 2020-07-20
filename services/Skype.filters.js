@@ -1,6 +1,5 @@
-
-export function cleanPP(document) {
-    const divs = document.querySelectorAll('div[class="divModuleDescription"]');
+export function removeIrrelevantModules(document) {
+    const moduleDescriptions = document.querySelectorAll('.divModuleDescription');
     const toDelete = [
         "mainenterprisedeveloperproductsmodule",
         "mainenterpriseservicesmodule",
@@ -43,17 +42,23 @@ export function cleanPP(document) {
         "mainsilverlightmodule",
         "mainwindowsmixedrealitymodule"
     ];
-    divs.forEach(element => {
-        var name = element.querySelector('span[id="moduleName"]');
-        if(name){name = name.textContent;}
-        if(name && toDelete.includes(name)){element.remove();}
+    moduleDescriptions.forEach(moduleDescription => {
+        let moduleName = element.querySelector('#moduleName');
+        if (moduleName) {
+            moduleName = moduleName.textContent;
+        }
+        if (moduleName && toDelete.includes(moduleName)) {
+            element.remove();
+        }
     });
-    const navDoublons = document.querySelectorAll('span[id="navigationHeader"]');
-    const moduleDoublons = document.querySelectorAll('span[id="moduleName"]');
-    const notuseful = document.querySelectorAll('div[class="displayNone"]');
-    navDoublons.forEach(element => element.remove());
-    moduleDoublons.forEach(element =>element.remove());
-    notuseful.forEach(element => element.remove());
+}
+
+export function removeNavigationHeaders(document) {
+    document.querySelectorAll('#navigationHeader').forEach(element => element.remove());
+}
+
+export function removeModuleIDs(document) {
+    document.querySelectorAll('#moduleName').forEach(element => element.remove());
 }
 
 export function cleanSecondaryTos(document) {
@@ -65,17 +70,19 @@ export function cleanSecondaryTos(document) {
         if(name=="serviceslist"){element.remove();}
     });
 
-    const navDoublons = document.querySelectorAll('span[class="navigationHeader"]');
-    const moduleDoublons = document.querySelectorAll('span[class="FileName"]');
+    const navDuplicates = document.querySelectorAll('span[class="navigationHeader"]');
+    const moduleDuplicates = document.querySelectorAll('span[class="FileName"]');
     const notuseful = document.querySelectorAll('div[class="displayNone"]');
-    navDoublons.forEach(element => element.remove());
-    moduleDoublons.forEach(element => element.remove());
+    navDuplicates.forEach(element => element.remove());
+    moduleDuplicates.forEach(element => element.remove());
     notuseful.forEach(element => element.remove());
 }
 
 export function removeInvisibleText(document) {
+    const notDisplayed = document.querySelectorAll('div[class="displayNone"]');
     const summaries = document.querySelectorAll('div[class="printsummary"]');
     const fulltexts = document.querySelectorAll('div[class="printDetailedContent"]');
+    notDisplayed.forEach(element => element.remove());
     summaries.forEach(summary =>  {if (summary.textContent=="Summary") {summary.remove();}});
     fulltexts.forEach(fulltext => {if (fulltext.textContent=="Full text") {fulltext.remove();}});
 }
