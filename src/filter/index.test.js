@@ -13,8 +13,8 @@ const rawHTML = `
   </head>
   <body>
     <h1>Title</h1>
-    <a href="">link 1</a>
-    <a id="link2" href="">link 2</a>
+    <p><a href="">link 1</a></p>
+    <p><a id="link2" href="">link 2</a></p>
   </body>
 </html>`;
 
@@ -22,6 +22,7 @@ const expectedFiltered = `Title
 =====
 
 link 1
+
 link 2`;
 
 const expectedFilteredWithAdditional = `Title
@@ -41,6 +42,13 @@ describe('Filter', () => {
     it('filters the given HTML content', async () => {
       const result = await filter(rawHTML, 'body');
       expect(result).to.equal(expectedFiltered);
+    });
+
+    context('With no selector', () => {
+      it('returns the entire document', async () => {
+        const result = await filter(rawHTML);
+        expect(result).to.equal(expectedFiltered);
+      });
     });
 
     context('With no match for the given selector', () => {
