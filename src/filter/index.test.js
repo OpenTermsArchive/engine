@@ -44,13 +44,6 @@ describe('Filter', () => {
       expect(result).to.equal(expectedFiltered);
     });
 
-    context('With no selector', () => {
-      it('returns the entire document', async () => {
-        const result = await filter(rawHTML);
-        expect(result).to.equal(expectedFiltered);
-      });
-    });
-
     context('With no match for the given selector', () => {
       it('returns an empty string', async () => {
         const result = await filter(rawHTML, '#thisAnchorDoesNotExist');
