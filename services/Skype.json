@@ -1,0 +1,29 @@
+{
+    "name": "Skype",
+    "documents": {
+        "tos": {
+            "location": "https://www.skype.com/en/legal/ios/tos/",
+            "contentSelector": "div.row:nth-child(2) > div"
+        },
+        "privacy": {
+            "location": "https://privacy.microsoft.com/en-gb/privacystatement",
+            "contentSelector": "h1, #psp_last_updated, span.Description, .div_content",
+            "filters": [
+                "removeIrrelevantModulesFromPrivacyPolicy",
+                "removeNavigationHeaders",
+                "removeModuleIDs",
+                "removeInvisibleText"
+            ]
+        },
+        "tosParent": {
+            "location": "https://www.microsoft.com/en-gb/servicesagreement/",
+            "contentSelector": ".pageIntro, .div_content",
+            "filters": [
+            	"removeIrrelevantModulesFromParentTos",
+                "removeNavigationHeaders",
+                "removeModuleIDs",
+                "removeInvisibleText"
+            ]
+        }
+    }
+}
