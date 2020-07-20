@@ -15,13 +15,9 @@ export default async function filter(content, selector, filterNames, filterFunct
     });
   }
 
-  let selectedContent = [ webPageDOM ];
-
-  if (selector) {
-    selectedContent = Array.from(webPageDOM.querySelectorAll(selector));
-    if (!selectedContent.length) {
-      console.warn(`The provided selector "${selector}" has no match in the web page.`);
-    }
+  const selectedContent = Array.from(webPageDOM.querySelectorAll(selector));
+  if (!selectedContent.length) {
+    console.warn(`The provided selector "${selector}" has no match in the web page.`);
   }
 
   return selectedContent.map(domFragment => turndownService.turndown(domFragment)).join('\n');
