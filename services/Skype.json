@@ -7,7 +7,7 @@
         },
         "privacy": {
             "location": "https://privacy.microsoft.com/en-gb/privacystatement",
-            "contentSelector": "h1, #psp_last_updated, span.Description, .div_content",
+            "contentSelector": "h1, #psp_last_updated, span.Description:nth-child(1), .div_content",
             "filters": [
                 "removeIrrelevantModulesFromPrivacyPolicy",
                 "removeNavigationHeaders",
