@@ -3,11 +3,17 @@
     "documents": {
         "tos": {
             "location": "https://www.redditinc.com/policies/user-agreement",
-            "contentSelector": "#content"
+            "contentSelector": "#content",
+            "filters": [
+                "removeOptionsList"
+            ]
         },
         "privacy": {
             "location": "https://www.redditinc.com/policies/privacy-policy",
-            "contentSelector": "div#content"
+            "contentSelector": "div#content",
+            "filters": [
+                "removeOptionsList"
+            ]
         }
     }
 }
