@@ -7,6 +7,9 @@ export function removeHelpButtons(document) {
       }
   });
 }
+export function removeReturnToTopButtons(document) {
+  document.querySelectorAll('._t3o').forEach(element => element.remove());
+}
 
 export function cleanUrls(document) {
   const links = document.querySelectorAll('[href*="https://l.facebook.com/l.php?"]');

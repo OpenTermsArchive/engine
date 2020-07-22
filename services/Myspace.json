@@ -6,7 +6,7 @@
             "contentSelector": "#nms_legal"
         },
         "privacy": {
-            "location": "https://myspace.com/pages/privacy",
+            "location": "https://myspace.com/pages/eeaprivacy",
             "contentSelector": "#nms_legal"
         }
     }
