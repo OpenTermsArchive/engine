@@ -16,7 +16,7 @@ In order to **track** their **changes**, **documents** are periodically obtained
 However, the shape of that **noise** can change over time. In order to recover in case of information loss during the **noise filtering** step, a **snapshot** is **recorded** every time there is a **change**. After the **noise** is **filtered out** from the **snapshot**, if there are **changes** in the resulting **document**, a new **version** of the **document** is **recorded**.
 
 Anyone can run their own **private** instance and track changes on their own. However, we also **publish** each **version** on a [**public** instance](https://github.com/ambanum/CGUs-data) that makes it easy to explore the entire **history** and enables **notifying** over email whenever a new **version** is **recorded**.
-Users can **subscribe** to **notifications** [here](https://59692a77.sibforms.com/serve/MUIEAKuTv3y67e27PkjAiw7UkHCn0qVrcD188cQb-ofHVBGpvdUWQ6EraZ5AIb6vJqz3L8LDvYhEzPb2SE6eGWP35zXrpwEFVJCpGuER9DKPBUrifKScpF_ENMqwE_OiOZ3FdCV2ra-TXQNxB2sTEL13Zj8HU7U0vbbeF7TnbFiW8gGbcOa5liqmMvw_rghnEB2htMQRCk6A3eyj). **Beware, this is an early beta and you are likely to receive a large amount of notifications!** You can unsubscribe by replying to any email you will get.
+Users can [**subscribe** to **notifications**](https://github.com/ambanum/CGUs-data#be-notified).
 
 _Note: For now, when multiple versions coexist, **terms** are only **tracked** in their English version and for the European jurisdiction._
 
@@ -105,4 +105,3 @@ See [Ops Readme](ops/README.md).
 
 The code for this software is distributed under the European Union Public Licence (EUPL) v1.2.
 Contact the author if you have any specific need or question regarding licensing.
-
