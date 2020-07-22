@@ -10,7 +10,10 @@
     },
     "privacy": {
       "location": "https://twitter.com/privacy",
-      "contentSelector": "main"
+      "contentSelector": "main",
+      "filters": [
+        "removeNotDisplayedElements"
+      ]
     },
     "devAgreement": {
       "location": "https://developer.twitter.com/developer-terms/agreement",
