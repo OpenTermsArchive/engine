@@ -19,7 +19,7 @@
             "location": "https://www.microsoft.com/en-gb/servicesagreement/",
             "contentSelector": ".pageIntro, .div_content",
             "filters": [
-            	"removeIrrelevantModulesFromParentTos",
+                "removeIrrelevantModulesFromParentTos",
                 "removeNavigationHeaders",
                 "removeModuleIDs",
                 "removeInvisibleText"
