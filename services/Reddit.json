@@ -10,7 +10,7 @@
         },
         "privacy": {
             "location": "https://www.redditinc.com/policies/privacy-policy",
-            "contentSelector": "div#content",
+            "contentSelector": "#content",
             "filters": [
                 "removeOptionsList"
             ]
