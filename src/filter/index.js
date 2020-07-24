@@ -1,5 +1,5 @@
 import TurndownService from 'turndown';
-import turndownPluginGithubFlavouredMarkdown from 'turndown-plugin-gfm';
+import turndownPluginGithubFlavouredMarkdown from 'joplin-turndown-plugin-gfm';
 import jsdom from 'jsdom';
 
 const { JSDOM } = jsdom;
