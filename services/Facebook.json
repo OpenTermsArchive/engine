@@ -12,6 +12,7 @@
       "location": "https://www.facebook.com/about/privacy",
       "contentSelector": "._5tkp",
       "filters": [
+        "removeReturnToTopButtons",
         "cleanUrls"
       ]
     },

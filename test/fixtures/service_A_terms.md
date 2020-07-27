@@ -1,5 +1,3 @@
- First provider TOS
-
 Terms of service
 ================
 
