@@ -4,9 +4,9 @@ import jsdom from 'jsdom';
 const { JSDOM } = jsdom;
 const turndownService = new TurndownService();
 
+
 export default async function filter(content, selector, filterNames, filterFunctions) {
-  let contentToFilter = content;
-  let { document: webPageDOM } = new JSDOM(contentToFilter).window;
+  let { document: webPageDOM } = new JSDOM(content).window;
 
   if (filterNames) {
     filterNames.forEach(filterName => {
@@ -15,16 +15,10 @@ export default async function filter(content, selector, filterNames, filterFunct
     });
   }
 
-  if (selector) {
-    const selectedContent = webPageDOM.querySelector(selector);
-
-    if (selectedContent) {
-      contentToFilter = selectedContent;
-    } else {
-      console.warn(`The provided selector "${selector}" has no match in the web page.`)
-    }
+  const selectedContent = Array.from(webPageDOM.querySelectorAll(selector));
+  if (!selectedContent.length) {
+    console.warn(`The provided selector "${selector}" has no match in the web page.`);
   }
 
-  const markdown = turndownService.turndown(contentToFilter);
-  return markdown;
+  return selectedContent.map(domFragment => turndownService.turndown(domFragment)).join('\n');
 }
