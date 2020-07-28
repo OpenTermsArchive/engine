@@ -14,7 +14,7 @@ const DOWNLOAD_HISTORY_MESSAGE = `Download the entire history of terms of servic
 (async () => {
   try {
     if (fsApi.existsSync(config.get('history.versionsPath')) || fsApi.existsSync(config.get('history.snapshotsPath'))) {
-      return console.log(`It seems that the database is already initialized as the "${config.get('history.versionsPath')}" directory already exists. Erase that folder first if you’d like to set up a new database.`);
+      return console.log(`It seems that the database is already initialized as the "${config.get('history.versionsPath')}" or the "${config.get('history.snapshotsPath')}" directories already exist. Erase these folders first (or change the source path in the config) if you’d like to set up a new database.`);
     }
 
     const answer = await inquirer.prompt([{
