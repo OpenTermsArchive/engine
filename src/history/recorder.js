@@ -16,14 +16,14 @@ export default class Recorder {
     this.commitQueue.error(this._commitQueueErrorHandler);
   }
 
-  async record({ serviceId, documentType, content, messageToAppend }) {
+  async record({ serviceId, documentType, content, details }) {
     const filePath = await this.save({ serviceId, documentType, content });
     const isNewFile = await this.git.isNew(filePath);
 
     let message = `${isNewFile ? 'Start tracking' : 'Update'} ${serviceId} ${DOCUMENT_TYPES[documentType].name}`;
 
-    if (messageToAppend) {
-      message += `\n\n${messageToAppend}`;
+    if (details) {
+      message += `\n\n${details}`;
     }
 
     const sha = await this.commit(filePath, message);
