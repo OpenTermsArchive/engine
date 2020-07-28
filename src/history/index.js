@@ -36,7 +36,7 @@ export async function recordVersion(serviceId, documentType, content, snapshotId
     serviceId,
     documentType,
     content,
-    messageToAppend: `This version was recorded after filtering snapshot ${id}`
+    details: `This version was recorded after filtering snapshot ${id}`
   });
 }
 
