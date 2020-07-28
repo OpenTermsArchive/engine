@@ -24,13 +24,7 @@ export async function recordVersion(serviceId, documentType, content, snapshotId
     throw new Error(`A snapshot ID is required to ensure data consistency for ${serviceId}'s ${documentType}`);
   }
 
-  let id = '';
-  if (config.get('history.publish')) {
-    id += config.get('history.publicSnapshotsRepository')
-      .replace('git@github.com:', 'https://github.com/')
-      .replace('.git', '/commit/');
-  }
-  id += snapshotId;
+  const id = `${config.get('history.publish') ? config.get('history.snapshotsBaseUrl') : ''}${snapshotId}`;
 
   return versionRecorder.record({
     serviceId,
