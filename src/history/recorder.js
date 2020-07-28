@@ -13,7 +13,7 @@ export default class Recorder {
     this.fileExtension = fileExtension;
     this.git = new Git(this.path);
     this.commitQueue = async.queue(this._commit.bind(this), 1);
-    this.commitQueue.error(this._commitQueueErrorHandler);
+    this.commitQueue.error(Recorder.commitQueueErrorHandler);
   }
 
   async record({ serviceId, documentType, content, details }) {
@@ -64,12 +64,12 @@ export default class Recorder {
     resolve(await this.git.commit(filePath, message));
   }
 
-  _commitQueueErrorHandler(error, { filePath, message, reject }) {
-    reject(new Error(`Could not commit ${filePath} with message "${message}" due to error: ${error}`));
-  }
-
   async publish() {
     return this.git.pushChanges();
+  }
+
+  static commitQueueErrorHandler(error, { filePath, message, reject }) {
+    reject(new Error(`Could not commit ${filePath} with message "${message}" due to error: ${error}`));
   }
 }
 
