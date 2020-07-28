@@ -36,8 +36,8 @@ const DOWNLOAD_HISTORY_MESSAGE = `Download the entire history of terms of servic
       await git.init();
     } else {
       const git = simpleGit();
-      await git.clone(config.get('history.publicSnapshotsRepository'), config.get('history.snapshotsPath'));
       await git.clone(config.get('history.publicVersionsRepository'), config.get('history.versionsPath'));
+      await git.clone(config.get('history.publicSnapshotsRepository'), config.get('history.snapshotsPath'));
     }
 
     console.log('Database initialized.')
