@@ -21,8 +21,6 @@ async function initRepo() {
   for (const repoPath of [VERSIONS_PATH, SNAPSHOTS_PATH]) {
     const git = new Git(repoPath);
     await git.init();
-    git.addConfig('user.name', config.get('history.author').name)
-       .addConfig('user.email', config.get('history.author').email);
   }
 }
 
