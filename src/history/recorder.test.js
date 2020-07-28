@@ -1,17 +1,14 @@
 import fs from 'fs';
-import path from 'path';
 
 import chai from 'chai';
-import config from 'config';
 
 import { resetGitRepository } from '../../test/helper.js';
+import { SNAPSHOTS_PATH } from './index.js';
 import Recorder from './recorder.js';
 import { TYPES } from '../types.js';
 
 const expect = chai.expect;
-const __dirname = path.dirname(new URL(import.meta.url).pathname);
 
-const SNAPSHOTS_PATH = path.resolve(__dirname, '../..', config.get('history.versionsPath'));
 const SERVICE_PROVIDER_ID = 'test_service';
 const TYPE = 'tos';
 const FILE_CONTENT = 'ToS fixture data with UTF-8 çhãràčtęrs';

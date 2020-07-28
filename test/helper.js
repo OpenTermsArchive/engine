@@ -5,11 +5,9 @@ const fs = fsApi.promises;
 import config from 'config';
 
 import Git from '../src/history/git.js';
+import { SNAPSHOTS_PATH, VERSIONS_PATH } from '../src/history/index.js';
 
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
-
-export const SNAPSHOTS_PATH = path.resolve(__dirname, '../', config.get('history.snapshotsPath'));
-export const VERSIONS_PATH = path.resolve(__dirname, '../', config.get('history.versionsPath'));
 
 before(initRepo);
 after(eraseRepo);
