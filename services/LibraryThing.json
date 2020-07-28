@@ -3,11 +3,17 @@
     "documents": {
         "tos": {
             "location": "https://www.librarything.com/privacy",
-            "contentSelector": ".content > table:nth-child(1) > tbody:nth-child(1) > tr:nth-child(1) > td:nth-child(2)"
+            "contentSelector": ".content > table:nth-child(1) > tbody:nth-child(1) > tr:nth-child(1) > td:nth-child(2)",
+            "filters": [
+                "selectOnlyTOS"
+            ]
         },
         "privacy": {
             "location": "https://www.librarything.com/privacy",
-            "contentSelector": ".content > table:nth-child(1) > tbody:nth-child(1) > tr:nth-child(1) > td:nth-child(2)"
+            "contentSelector": ".content > table:nth-child(1) > tbody:nth-child(1) > tr:nth-child(1) > td:nth-child(2)",
+            "filters": [
+                "selectOnlyPrivacyPolicy"
+            ]
         }
     }
 }
