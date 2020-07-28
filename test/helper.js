@@ -16,7 +16,7 @@ export async function resetGitRepository() {
 }
 
 async function initRepo() {
-  for (const repoPath of [VERSIONS_PATH, SNAPSHOTS_PATH]) {
+  for (const repoPath of [ VERSIONS_PATH, SNAPSHOTS_PATH ]) {
     const git = new Git(repoPath);
     await git.init();
   }
@@ -25,7 +25,7 @@ async function initRepo() {
 async function eraseRepo() {
   const promises = [];
 
-  for (const repoPath of [VERSIONS_PATH, SNAPSHOTS_PATH]) {
+  for (const repoPath of [ VERSIONS_PATH, SNAPSHOTS_PATH ]) {
     const files = await fs.readdir(repoPath, { withFileTypes: true });
 
     promises.push(...files.map(file => {
