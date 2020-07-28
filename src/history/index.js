@@ -41,6 +41,8 @@ export async function recordVersion(serviceId, documentType, content, snapshotId
 }
 
 export async function publish() {
-  snapshotRecorder.publish();
-  return versionRecorder.publish();
+  return Promise.all([
+    snapshotRecorder.publish(),
+    versionRecorder.publish()
+  ]);
 }
