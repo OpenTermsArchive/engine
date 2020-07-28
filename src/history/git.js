@@ -42,10 +42,6 @@ export default class Git {
            (status.not_added.indexOf(this.relativePath(filepath)) > -1);
   }
 
-  addConfig() {
-    return this.git.addConfig();
-  }
-
   relativePath(absolutePath) {
     // Git needs a path relative to the .git directory, not an absolute one
     return path.relative(this.path, absolutePath);
