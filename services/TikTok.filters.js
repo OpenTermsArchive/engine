@@ -1,52 +1,32 @@
 export function selectOnlyEuropeanTOS(document) {
-	//Select titles for juridictions
-	const titleAmerican = document.querySelector('#terms-us');
+	const firstElement = document.querySelector('article > *:first-child')
 	const titleEuropean = document.querySelector('#terms-eea');
 	const titleIndia = document.querySelector('#terms-in')
-	//Delete useless paragraphs
-	let currentNode = titleAmerican.previousElementSibling;
-	while (currentNode) {
-		let toRemove = currentNode;
-		currentNode = currentNode.previousElementSibling;
-		toRemove.remove();
-	}
-	//Delete others jurisdictions
-	currentNode = titleAmerican;
-	while (currentNode != titleEuropean) {
-		let toRemove = currentNode;
-		currentNode = currentNode.nextElementSibling;
-		toRemove.remove();
-	}
-	currentNode = titleIndia;
-	while (currentNode) {
-		let toRemove = currentNode;
-		currentNode = currentNode.nextElementSibling;
-		toRemove.remove();
-	}
+	const lastElement = document.querySelector('article > *:last-child')
+
+	const range1 = document.createRange();
+	range1.setStartBefore(firstElement);
+	range1.setEndBefore(europeanSectionTitle);
+	range1.deleteContents();
+
+	const range2 = document.createRange();
+	range2.setStartBefore(titleIndia);
+	range2.setEndBefore(lastElement);
+	range2.deleteContents();
 }
 export function selectOnlyEuropeanPrivacyPolicy(document) {
-	//Select titles for juridictions
-	const titleAmerican = document.querySelector('#privacy-us');
+	const firstElement = document.querySelector('article > *:first-child')
 	const titleEuropean = document.querySelector('#privacy-eea');
-	const titleOther = document.querySelector('#privacy-row')
-	//Delete useless paragraphs
-	let currentNode = titleAmerican.previousElementSibling;
-	while (currentNode) {
-		let toRemove = currentNode;
-		currentNode = currentNode.previousElementSibling;
-		toRemove.remove();
-	}
-	//Delete others jurisdictions
-	currentNode = titleAmerican;
-	while (currentNode != titleEuropean) {
-		let toRemove = currentNode;
-		currentNode = currentNode.nextElementSibling;
-		toRemove.remove();
-	}
-	currentNode = titleOther;
-	while (currentNode) {
-		let toRemove = currentNode;
-		currentNode = currentNode.nextElementSibling;
-		toRemove.remove();
-	}
+	const titleIndia = document.querySelector('#privacy-in')
+	const lastElement = document.querySelector('article > *:last-child')
+
+	const range1 = document.createRange();
+	range1.setStartBefore(firstElement);
+	range1.setEndBefore(europeanSectionTitle);
+	range1.deleteContents();
+
+	const range2 = document.createRange();
+	range2.setStartBefore(titleIndia);
+	range2.setEndBefore(lastElement);
+	range2.deleteContents();
 }
