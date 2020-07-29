@@ -15,9 +15,6 @@
       "updateTemplateId": 21,
       "errorTemplateId": 22
     }
-  },
-  "sanitizer": {
-    "downloadImages": true
   }
 }
 
