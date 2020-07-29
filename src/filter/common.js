@@ -8,21 +8,26 @@ function cleanAttribute (attribute) {
 }
 
 export async function convertImagesToDataURI(document, url) {
-  const imgs = document.querySelectorAll('img[src]');
-  imgs.forEach(img => {
-    const src = img.src;
+  const imgs = document.querySelectorAll('img');
 
-    let localSrc = src;
-    if (!src.startsWith('data:')) {  // Not a data-URI, download content
-      let queryUrl = src;
-      if (!src.startsWith('http:') && !src.startsWith('https:')) {  // Relative URL
-        queryUrl = new URL(src, url).href;
+  const promises = [];
+  imgs.forEach((img, index) => {
+    promises.push((async () => {
+      const src = img.src;
+
+      let localSrc = src;
+      if (!src.startsWith('data:')) {  // Not a data-URI, download content
+        let queryUrl = src;
+        if (!src.startsWith('http:') && !src.startsWith('https:')) {  // Relative URL
+          queryUrl = new URL(src, url).href;
+        }
+        const blob = await fetch(queryUrl, false);
+        const type = blob.type;
+        const arrayBuffer = await blob.arrayBuffer();
+        localSrc = dataUriParser.format(`.${type.split('/')[1].split('+')[0]}`, arrayBuffer);
       }
-      const blob = await fetch(queryUrl, false);
-      const type = blob.type;
-      const arrayBuffer = await blob.arrayBuffer();
-      localSrc = dataUriParser.format(`.${type.split('/')[1]}`, arrayBuffer);
-    }
-    img.src = localSrc;
+      imgs[index].src = localSrc.content;
+    })());
   });
+  return Promise.all(promises);
 }

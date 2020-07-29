@@ -8,10 +8,9 @@ export default async function filter(url, content, selector, filterNames, filter
   let { document: webPageDOM } = new JSDOM(content).window;
 
   if (filterNames) {
-    filterNames.forEach(filterName => {
-      // Filters work in place
-      filterFunctions[filterName](webPageDOM, url);
-    });
+    for (let filterName of filterNames) {
+      await filterFunctions[filterName](webPageDOM, url);
+    }
   }
 
   const selectedContent = Array.from(webPageDOM.querySelectorAll(selector));
