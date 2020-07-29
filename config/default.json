@@ -4,8 +4,8 @@
     "snapshotsPath": "./data/snapshots",
     "versionsPath": "./data/versions",
     "publish": false,
-    "publicSnapshotsRepository": "https://github.com/ambanum/CGUs-data-snapshots.git",
-    "publicVersionsRepository": "https://github.com/ambanum/CGUs-data.git",
+    "publicSnapshotsRepository": "https://github.com/ambanum/CGUs-snapshots.git",
+    "publicVersionsRepository": "https://github.com/ambanum/CGUs-versions.git",
     "snapshotsBaseUrl": "https://github.com/ambanum/CGUs-snapshots/commit/",
     "author": {
       "name": "AmbNum Bot",

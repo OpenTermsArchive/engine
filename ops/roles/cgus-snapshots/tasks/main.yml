@@ -1,0 +1,11 @@
+- name: Clone repository
+  git:
+    repo: "{{ repo }}"
+    dest: "/home/{{ ansible_user }}/{{ app }}"
+    force: no
+    accept_hostkey: yes
+    key_file: "/home/{{ ansible_user }}/.ssh/cgus-bot-key"
+  register: git_clone_app_finished
+  tags:
+    - setup
+    - update

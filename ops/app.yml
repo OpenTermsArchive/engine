@@ -1,8 +1,8 @@
 ---
-- name: Setup CGUs app
+- name: Setup CGUs app and databases
   hosts: all
 
   roles:
-    - cgus-data
-    - cgus-data-snapshots
+    - cgus-versions
+    - cgus-snapshots
     - cgus
