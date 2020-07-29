@@ -1,8 +1,12 @@
 {
   "serviceDeclarationsPath": "./services",
   "history": {
-    "dataPath": "./data",
+    "snapshotsPath": "./data/snapshots",
+    "versionsPath": "./data/versions",
     "publish": false,
+    "publicSnapshotsRepository": "https://github.com/ambanum/CGUs-snapshots.git",
+    "publicVersionsRepository": "https://github.com/ambanum/CGUs-versions.git",
+    "snapshotsBaseUrl": "https://github.com/ambanum/CGUs-snapshots/commit/",
     "author": {
       "name": "AmbNum Bot",
       "email": "ambnum.bot@disinfo.quaidorsay.fr"

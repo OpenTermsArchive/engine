@@ -1,73 +1,76 @@
-import path from 'path';
 import fsApi from 'fs';
-const fs = fsApi.promises;
 
-import config from 'config';
 import async from 'async';
 
-import * as git from './git.js';
+import Git from './git.js';
 import { TYPES as DOCUMENT_TYPES } from '../types.js';
 
-const __dirname = path.dirname(new URL(import.meta.url).pathname);
+const fs = fsApi.promises;
 
-const DATABASE_DIRECTORY = path.resolve(__dirname, '../..', config.get('history.dataPath'));
-export const SNAPSHOTS_DIRECTORY = `${DATABASE_DIRECTORY}/raw`;
-export const VERSIONS_DIRECTORY = `${DATABASE_DIRECTORY}/sanitized`;
-
-const commitQueue = async.queue(_commit, 1);
-commitQueue.error((error, { filePath, message, reject }) => {
-  reject(new Error(`Could not commit ${filePath} with message "${message}" due to error: ${error}`));
-});
-
-
-export async function record({ serviceId, documentType, content, snapshotId }) {
-  const isFiltered = !!snapshotId;
-  const filePath = await save({ serviceId, documentType, content, isFiltered });
-  const isNewFile = await git.isNew(filePath);
-
-  let message = `${isNewFile ? 'Start tracking' : 'Update'} ${isFiltered ? '' : 'snapshot of '}${serviceId} ${DOCUMENT_TYPES[documentType].name}`;
-
-  if (snapshotId) {
-    message += `
-
-This version was recorded after filtering snapshot ${snapshotId}`;
+export default class Recorder {
+  constructor({ path, fileExtension }) {
+    this.path = path;
+    this.fileExtension = fileExtension;
+    this.git = new Git(this.path);
+    this.commitQueue = async.queue(this._commit.bind(this), 1);
+    this.commitQueue.error(Recorder.commitQueueErrorHandler);
   }
 
-  const sha = await commit(filePath, message);
-  return {
-    path: filePath,
-    id: sha,
-    isFirstRecord: isNewFile
-  };
-}
+  async record({ serviceId, documentType, content, details }) {
+    const filePath = await this.save({ serviceId, documentType, content });
+    const isNewFile = await this.git.isNew(filePath);
 
-export async function save({ serviceId, documentType, content, isFiltered }) {
-  const directory = `${isFiltered ? VERSIONS_DIRECTORY : SNAPSHOTS_DIRECTORY}/${serviceId}`;
+    let message = `${isNewFile ? 'Start tracking' : 'Update'} ${serviceId} ${DOCUMENT_TYPES[documentType].name}`;
 
-  if (!await fileExists(directory)) {
-    await fs.mkdir(directory, { recursive: true });
+    if (details) {
+      message += `\n\n${details}`;
+    }
+
+    const sha = await this.commit(filePath, message);
+
+    return {
+      path: filePath,
+      id: sha,
+      isFirstRecord: isNewFile
+    };
   }
 
-  const filePath = `${directory}/${DOCUMENT_TYPES[documentType].fileName}.${isFiltered ? 'md' : 'html'}`;
+  async save({ serviceId, documentType, content }) {
+    const directory = `${this.path}/${serviceId}`;
 
-  await fs.writeFile(filePath, content);
+    if (!await fileExists(directory)) {
+      await fs.mkdir(directory, { recursive: true });
+    }
 
-  return filePath;
-}
+    const filePath = `${directory}/${DOCUMENT_TYPES[documentType].fileName}.${this.fileExtension}`;
 
-export async function commit(filePath, message) {
-  if (!await git.hasChanges(filePath)) {
-    return;
+    await fs.writeFile(filePath, content);
+
+    return filePath;
   }
 
-  return new Promise((resolve, reject) => {
-    commitQueue.push({ filePath, message, resolve, reject });
-  });
-}
+  async commit(filePath, message) {
+    if (!await this.git.hasChanges(filePath)) {
+      return;
+    }
 
-async function _commit({ filePath, message, resolve }) {
-  await git.add(filePath);
-  resolve(await git.commit(filePath, message));
+    return new Promise((resolve, reject) => {
+      this.commitQueue.push({ filePath, message, resolve, reject });
+    });
+  }
+
+  async _commit({ filePath, message, resolve }) {
+    await this.git.add(filePath);
+    resolve(await this.git.commit(filePath, message));
+  }
+
+  async publish() {
+    return this.git.pushChanges();
+  }
+
+  static commitQueueErrorHandler(error, { filePath, message, reject }) {
+    reject(new Error(`Could not commit ${filePath} with message "${message}" due to error: "${error}"`));
+  }
 }
 
 async function fileExists(filePath) {

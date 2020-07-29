@@ -8,14 +8,13 @@ import simpleGit from 'simple-git';
 
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
 
-const DATA_REPOSITORY_URL = `https://github.com/ambanum/CGUs-data.git`;
 const NEW_HISTORY_MESSAGE = 'Start a new local empty history';
-const DOWNLOAD_HISTORY_MESSAGE = `Download the entire history of terms of services from ${DATA_REPOSITORY_URL}`;
+const DOWNLOAD_HISTORY_MESSAGE = `Download the entire history of terms of services from ${config.get('history.publicSnapshotsRepository')} and ${config.get('history.publicVersionsRepository')}`;
 
 (async () => {
   try {
-    if (fsApi.existsSync(config.get('history.dataPath'))) {
-      return console.log(`It seems that the database is already initialized as the "${config.get('history.dataPath')}" directory already exists. Erase that folder first if you’d like to set up a new database.`);
+    if (fsApi.existsSync(config.get('history.versionsPath')) || fsApi.existsSync(config.get('history.snapshotsPath'))) {
+      return console.log(`It seems that the database is already initialized as the "${config.get('history.versionsPath')}" or the "${config.get('history.snapshotsPath')}" directories already exist. Erase these folders first (or change the source path in the config) if you’d like to set up a new database.`);
     }
 
     const answer = await inquirer.prompt([{
@@ -29,12 +28,16 @@ const DOWNLOAD_HISTORY_MESSAGE = `Download the entire history of terms of servic
     }]);
 
     if (answer.history === NEW_HISTORY_MESSAGE) {
-      await fs.mkdir(config.get('history.dataPath'), { recursive: true });
-      const git = simpleGit(path.resolve(__dirname, '../', config.get('history.dataPath')));
+      await fs.mkdir(config.get('history.snapshotsPath'), { recursive: true });
+      await fs.mkdir(config.get('history.versionsPath'), { recursive: true });
+      let git = simpleGit(path.resolve(__dirname, '../', config.get('history.snapshotsPath')));
+      await git.init();
+      git = simpleGit(path.resolve(__dirname, '../', config.get('history.versionsPath')));
       await git.init();
     } else {
       const git = simpleGit();
-      await git.clone(DATA_REPOSITORY_URL, config.get('history.dataPath'));
+      await git.clone(config.get('history.publicVersionsRepository'), config.get('history.versionsPath'));
+      await git.clone(config.get('history.publicSnapshotsRepository'), config.get('history.snapshotsPath'));
     }
 
     console.log('Database initialized.')
