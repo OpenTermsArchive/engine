@@ -1,10 +1,10 @@
 - name: Clone Repo
   git:
     repo: "{{ repo }}"
-    dest: "/home/{{ ansible_user }}/{{ app }}"
+    dest: "/home/{{ ansible_user }}/{{ app }}"
     force: yes
     accept_hostkey: yes
-    key_file: "/home/{{ ansible_user }}/.ssh/cgus-data"
+    key_file: "/home/{{ ansible_user }}/.ssh/cgus-bot-key"
   register: git_clone_app_finished
   tags:
     - setup
@@ -12,7 +12,7 @@
 
 - name: Install NPM packages
   npm:
-    path: "/home/{{ ansible_user }}/{{ app }}"
+    path: "/home/{{ ansible_user }}/{{ app }}"
     unsafe_perm: yes
     production: yes
   tags:
@@ -22,7 +22,7 @@
 - name: Add .env file
   copy:
     src: .env
-    dest: "/home/{{ ansible_user }}/{{ app }}/.env"
+    dest: "/home/{{ ansible_user }}/{{ app }}/.env"
   tags:
     - setup
 
@@ -37,7 +37,7 @@
 - name: Start CGUs
   command:
     cmd: forever start -a --uid "{{ app }}" -c "npm run start:scheduler:prod" ./
-    chdir: "/home/{{ ansible_user }}/{{ app }}"
+    chdir: "/home/{{ ansible_user }}/{{ app }}"
   environment:
     NODE_ENV: production
     PORT: "{{ app_port }}"
