@@ -1,7 +1,7 @@
 {
   "history": {
-    "snapshotsPath": "../cgus-data-snapshots",
-    "versionsPath": "../cgus-data",
+    "snapshotsPath": "../cgus-snapshots",
+    "versionsPath": "../cgus-versions",
     "publish": true
   }
 }
