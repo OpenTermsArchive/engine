@@ -27,7 +27,7 @@ export default class Notifier {
       },
     }
 
-    return send([config.get('notifier.sendInBlue.administratorsListId')], sendParams);
+    return this.send([config.get('notifier.sendInBlue.administratorsListId')], sendParams);
   }
 
   async onVersionRecorded(serviceProviderId, documentTypeId, versionId) {
