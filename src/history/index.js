@@ -24,13 +24,11 @@ export async function recordVersion(serviceId, documentType, content, snapshotId
     throw new Error(`A snapshot ID is required to ensure data consistency for ${serviceId}'s ${documentType}`);
   }
 
-  const id = `${config.get('history.publish') ? config.get('history.snapshotsBaseUrl') : ''}${snapshotId}`;
-
   return versionRecorder.record({
     serviceId,
     documentType,
     content,
-    details: `This version was recorded after filtering snapshot ${id}`
+    details: `This version was recorded after filtering snapshot ${config.get('history.publish') ? config.get('history.snapshotsBaseUrl') : ''}${snapshotId}`
   });
 }
 
