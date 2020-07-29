@@ -69,7 +69,7 @@ export default class Recorder {
   }
 
   static commitQueueErrorHandler(error, { filePath, message, reject }) {
-    reject(new Error(`Could not commit ${filePath} with message "${message}" due to error: ${error}`));
+    reject(new Error(`Could not commit ${filePath} with message "${message}" due to error: "${error}"`));
   }
 }
 
