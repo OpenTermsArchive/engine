@@ -1,19 +1,19 @@
 {
-    "name": "Myspace",
-    "documents": {
-        "tos": {
-            "location": "https://myspace.com/pages/terms",
-            "contentSelector": "#nms_legal",
-            "filters": [
-                "numberListCorrectly"
-            ]
-        },
-        "privacy": {
-            "location": "https://myspace.com/pages/eeaprivacy",
-            "contentSelector": "#nms_legal",
-            "filters": [
-                "numberListCorrectly"
-            ]
-        }
+  "name": "Myspace",
+  "documents": {
+    "tos": {
+      "location": "https://myspace.com/pages/terms",
+      "contentSelector": "#nms_legal",
+      "filters": [
+        "numberListCorrectly"
+      ]
+    },
+    "privacy": {
+      "location": "https://myspace.com/pages/eeaprivacy",
+      "contentSelector": "#nms_legal",
+      "filters": [
+        "numberListCorrectly"
+      ]
     }
+  }
 }
