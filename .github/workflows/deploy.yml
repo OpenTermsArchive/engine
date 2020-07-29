@@ -24,14 +24,12 @@ jobs:
       with:
         key: ${{ secrets.SSH_KEY }}
         known_hosts: ${{ secrets.KNOWN_HOSTS }}
-    - name: Checkout data repo
-      uses: actions/checkout@v2
-      with:
-        repository: ambanum/CGUs-data
-        path: data
     - run: echo "$ANSIBLE_VAULT_PASSWORD" > vault.key
     - run: npm ci
+    - run: |
+        git config --global user.name 'AmbNum Bot'
+        git config --global user.email 'ambnum.bot@disinfo.quaidorsay.fr'
     - run: npm test
     - run: pip install --upgrade setuptools
     - run: pip install ansible
-    - run: ansible-playbook ops/app.yml -i ops/inventories/production.yml -t update
+    - run: ansible-playbook ops/site.yml -i ops/inventories/production.yml

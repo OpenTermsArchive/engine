@@ -1,6 +1,7 @@
 {
   "history": {
-    "dataPath": "../cgus-data",
+    "snapshotsPath": "../cgus-snapshots",
+    "versionsPath": "../cgus-versions",
     "publish": true
   }
 }

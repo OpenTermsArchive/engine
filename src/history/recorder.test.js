@@ -1,8 +1,10 @@
 import fs from 'fs';
+
 import chai from 'chai';
 
 import { resetGitRepository } from '../../test/helper.js';
-import { SNAPSHOTS_DIRECTORY, save, commit, record } from './recorder.js';
+import { SNAPSHOTS_PATH } from './index.js';
+import Recorder from './recorder.js';
 import { TYPES } from '../types.js';
 
 const expect = chai.expect;
@@ -10,14 +12,20 @@ const expect = chai.expect;
 const SERVICE_PROVIDER_ID = 'test_service';
 const TYPE = 'tos';
 const FILE_CONTENT = 'ToS fixture data with UTF-8 çhãràčtęrs';
-const EXPECTED_FILE_PATH = `${SNAPSHOTS_DIRECTORY}/${SERVICE_PROVIDER_ID}/${TYPES[TYPE].fileName}.html`;
+const EXPECTED_FILE_PATH = `${SNAPSHOTS_PATH}/${SERVICE_PROVIDER_ID}/${TYPES[TYPE].fileName}.html`;
 
 describe('Recorder', () => {
+  let subject;
+
+  before(() => {
+    subject = new Recorder({ path: SNAPSHOTS_PATH, fileExtension: 'html' });
+  });
+
   describe('#save', () => {
     context('when service’s directory already exist', () => {
       let saveResult;
       before(async () => {
-        saveResult = await save({
+        saveResult = await subject.save({
           serviceId: SERVICE_PROVIDER_ID,
           documentType: TYPE,
           content: FILE_CONTENT,
@@ -34,14 +42,14 @@ describe('Recorder', () => {
 
     context('when service’s directory does not already exist', () => {
       const NEW_SERVICE_ID = 'test_not_existing_service';
-      const NEW_SERVICE_EXPECTED_FILE_PATH = `${SNAPSHOTS_DIRECTORY}/${NEW_SERVICE_ID}/${TYPES[TYPE].fileName}.html`;
+      const NEW_SERVICE_EXPECTED_FILE_PATH = `${SNAPSHOTS_PATH}/${NEW_SERVICE_ID}/${TYPES[TYPE].fileName}.html`;
 
       after(() => {
         fs.unlinkSync(NEW_SERVICE_EXPECTED_FILE_PATH);
       });
 
       it('creates a directory and file for the given service', async () => {
-        await save({
+        await subject.save({
           serviceId: NEW_SERVICE_ID,
           documentType: TYPE,
           content: FILE_CONTENT,
@@ -57,7 +65,7 @@ describe('Recorder', () => {
     const COMMIT_FILE_CONTENT = FILE_CONTENT + 'commit';
 
     before(async () => {
-      return save({
+      return subject.save({
         serviceId: SERVICE_PROVIDER_ID,
         documentType: TYPE,
         content: COMMIT_FILE_CONTENT,
@@ -68,7 +76,7 @@ describe('Recorder', () => {
     after(resetGitRepository);
 
     it('commits the file for the given service', async () => {
-      const id = await commit(EXPECTED_FILE_PATH, 'message');
+      const id = await subject.commit(EXPECTED_FILE_PATH, 'message');
       expect(id).to.not.be.null;
     });
   });
@@ -79,7 +87,7 @@ describe('Recorder', () => {
     const PERSIST_FILE_CONTENT = FILE_CONTENT + 'record';
 
     before(async () => {
-      const { id: recordId, isFirstRecord: firstRecord } = await record({
+      const { id: recordId, isFirstRecord: firstRecord } = await subject.record({
         serviceId: SERVICE_PROVIDER_ID,
         documentType: TYPE,
         content: PERSIST_FILE_CONTENT,
@@ -108,7 +116,7 @@ describe('Recorder', () => {
 
     context('when this is not the first record', () => {
       it('returns a boolean to specify this is not the first one', async () => {
-        const recordResult = await record({
+        const recordResult = await subject.record({
           serviceId: SERVICE_PROVIDER_ID,
           documentType: TYPE,
           content: PERSIST_FILE_CONTENT,

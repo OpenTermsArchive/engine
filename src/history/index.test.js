@@ -1,8 +1,7 @@
 import fs from 'fs';
 import chai from 'chai';
 
-import { SNAPSHOTS_DIRECTORY, VERSIONS_DIRECTORY } from './recorder.js';
-import { recordSnapshot, recordVersion } from './index.js';
+import { SNAPSHOTS_PATH, VERSIONS_PATH, recordSnapshot, recordVersion } from './index.js';
 import { TYPES } from '../types.js';
 
 const expect = chai.expect;
@@ -11,10 +10,10 @@ const SERVICE_ID = 'test_service';
 const TYPE = 'tos';
 
 const SNAPSHOT_FILE_CONTENT = '<html><h1>ToS fixture data with UTF-8 çhãràčtęrs</h1></html>';
-const EXPECTED_SNAPSHOT_FILE_PATH = `${SNAPSHOTS_DIRECTORY}/${SERVICE_ID}/${TYPES[TYPE].fileName}.html`;
+const EXPECTED_SNAPSHOT_FILE_PATH = `${SNAPSHOTS_PATH}/${SERVICE_ID}/${TYPES[TYPE].fileName}.html`;
 
 const VERSION_FILE_CONTENT = '# ToS fixture data with UTF-8 çhãràčtęrs';
-const EXPECTED_VERSION_FILE_PATH = `${VERSIONS_DIRECTORY}/${SERVICE_ID}/${TYPES[TYPE].fileName}.md`;
+const EXPECTED_VERSION_FILE_PATH = `${VERSIONS_PATH}/${SERVICE_ID}/${TYPES[TYPE].fileName}.md`;
 
 
 describe('History', () => {
