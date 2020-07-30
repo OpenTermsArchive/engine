@@ -4,6 +4,7 @@ import filter from './index.js';
 
 const expect = chai.expect;
 
+const virtualLocation = "https://exemple.com/main";
 const rawHTML = `
 <!DOCTYPE html>
 <html>
@@ -13,7 +14,7 @@ const rawHTML = `
   </head>
   <body>
     <h1>Title</h1>
-    <p><a href="">link 1</a></p>
+    <p><a href="/relative/link">link 1</a></p>
     <p><a id="link2" href="">link 2</a></p>
   </body>
 </html>`;
@@ -21,7 +22,7 @@ const rawHTML = `
 const expectedFiltered = `Title
 =====
 
-link 1
+[link 1](https://exemple.com/relative/link)
 
 link 2`;
 
@@ -40,27 +41,27 @@ const additionalFilter = {
 describe('Filter', () => {
   describe('#filter', () => {
     it('filters the given HTML content', async () => {
-      const result = await filter(rawHTML, 'body');
+      const result = await filter(rawHTML, 'body', virtualLocation);
       expect(result).to.equal(expectedFiltered);
     });
 
     context('With no match for the given selector', () => {
       it('returns an empty string', async () => {
-        const result = await filter(rawHTML, '#thisAnchorDoesNotExist');
+        const result = await filter(rawHTML, '#thisAnchorDoesNotExist', virtualLocation);
         expect(result).to.equal('');
       });
     });
 
     context('With an additional filter', () => {
       it('filters the given HTML content also with given additional filter', async () => {
-        const result = await filter(rawHTML, 'body', ['removeLinks'], additionalFilter);
+        const result = await filter(rawHTML, 'body', virtualLocation, ['removeLinks'], additionalFilter);
         expect(result).to.equal(expectedFilteredWithAdditional);
       });
     });
 
     context('With multiple selectors', () => {
       it('filters the given HTML content', async () => {
-        const result = await filter(rawHTML, 'h1, #link2');
+        const result = await filter(rawHTML, 'h1, #link2', virtualLocation);
         expect(result).to.equal(`Title
 link 2`);
       });
