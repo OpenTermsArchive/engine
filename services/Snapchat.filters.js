@@ -1,8 +1,8 @@
 export function selectOnlyEuropeanTOS(document) {
-  const range = document.createRange();
+  const USJuridictionContent = document.createRange();
   const firstElement = document.querySelector('.textarticle-container > *:first-child');
-  const europeanSectionTitle = document.querySelector('#terms-row');
-  range.setStartBefore(firstElement);
-  range.setEndBefore(europeanSectionTitle);
-  range.deleteContents();
+  const EuropeanTitle = document.querySelector('#terms-row');
+  USJuridictionContent.setStartBefore(firstElement);
+  USJuridictionContent.setEndBefore(EuropeanTitle);
+  USJuridictionContent.deleteContents();
 }
