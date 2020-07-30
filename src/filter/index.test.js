@@ -60,7 +60,7 @@ describe('Filter', () => {
 
     context('With multiple selectors', () => {
       it('filters the given HTML content', async () => {
-        const result = await filter(rawHTML, 'h1, #link2');
+        const result = await filter(undefined, rawHTML, 'h1, #link2');
         expect(result).to.equal(`Title
 link 2`);
       });
