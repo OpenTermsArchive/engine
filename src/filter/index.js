@@ -1,8 +1,10 @@
 import TurndownService from 'turndown';
+import turndownPluginGithubFlavouredMarkdown from 'joplin-turndown-plugin-gfm';
 import jsdom from 'jsdom';
 
 const { JSDOM } = jsdom;
 const turndownService = new TurndownService();
+turndownService.use(turndownPluginGithubFlavouredMarkdown.gfm);
 
 export default async function filter(url, content, selector, filterNames, filterFunctions) {
   let { document: webPageDOM } = new JSDOM(content).window;

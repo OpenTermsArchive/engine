@@ -18,10 +18,8 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: '12.17'
-    - name: Checkout data repo
-      uses: actions/checkout@v2
-      with:
-        repository: ambanum/CGUs-data
-        path: data
     - run: npm ci
+    - run: |
+        git config --global user.name 'AmbNum Bot'
+        git config --global user.email 'ambnum.bot@disinfo.quaidorsay.fr'
     - run: npm test
