@@ -1,32 +1,32 @@
 export function selectOnlyEuropeanTOS(document) {
-  const firstElement = document.querySelector('article > *:first-child')
-  const titleEuropean = document.querySelector('#terms-eea');
-  const titleIndia = document.querySelector('#terms-in')
-  const lastElement = document.querySelector('article > *:last-child')
+  const firstElement = document.querySelector('article > *:first-child');
+  const EuropeanTitle = document.querySelector('#terms-eea');
+  const IndiaTitle = document.querySelector('#terms-in');
+  const lastElement = document.querySelector('article > *:last-child');
 
-  const range1 = document.createRange();
-  range1.setStartBefore(firstElement);
-  range1.setEndBefore(europeanSectionTitle);
-  range1.deleteContents();
+  const USJuridictionContent = document.createRange();
+  USJuridictionContent.setStartBefore(firstElement);
+  USJuridictionContent.setEndBefore(EuropeanTitle);
+  USJuridictionContent.deleteContents();
 
-  const range2 = document.createRange();
-  range2.setStartBefore(titleIndia);
-  range2.setEndBefore(lastElement);
-  range2.deleteContents();
+  const IndiaJuridictionContent = document.createRange();
+  IndiaJuridictionContent.setStartBefore(IndiaTitle);
+  IndiaJuridictionContent.setEndAfter(lastElement);
+  IndiaJuridictionContent.deleteContents();
 }
 export function selectOnlyEuropeanPrivacyPolicy(document) {
-  const firstElement = document.querySelector('article > *:first-child')
-  const titleEuropean = document.querySelector('#privacy-eea');
-  const titleIndia = document.querySelector('#privacy-in')
-  const lastElement = document.querySelector('article > *:last-child')
+  const firstElement = document.querySelector('article > *:first-child');
+  const EuropeanTitle = document.querySelector('#privacy-eea');
+  const otherJuridictionsTitle = document.querySelector('#privacy-row');
+  const lastElement = document.querySelector('article > *:last-child');
 
-  const range1 = document.createRange();
-  range1.setStartBefore(firstElement);
-  range1.setEndBefore(europeanSectionTitle);
-  range1.deleteContents();
+  const USJuridictionContent = document.createRange();
+  USJuridictionContent.setStartBefore(firstElement);
+  USJuridictionContent.setEndBefore(EuropeanTitle);
+  USJuridictionContent.deleteContents();
 
-  const range2 = document.createRange();
-  range2.setStartBefore(titleIndia);
-  range2.setEndBefore(lastElement);
-  range2.deleteContents();
+  const othersJuridictionContent = document.createRange();
+  othersJuridictionContent.setStartBefore(otherJuridictionsTitle);
+  othersJuridictionContent.setEndAfter(lastElement);
+  othersJuridictionContent.deleteContents();
 }
