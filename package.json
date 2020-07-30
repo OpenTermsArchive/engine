@@ -42,12 +42,14 @@
     "dotenv": "^8.2.0",
     "http-proxy-agent": "^4.0.1",
     "https-proxy-agent": "^5.0.0",
+    "is-relative-url": "^3.0.0",
     "joplin-turndown-plugin-gfm": "^1.0.12",
     "jsdom": "^16.2.2",
     "node-fetch": "^2.6.0",
     "node-schedule": "^1.3.2",
     "sib-api-v3-sdk": "^7.2.3",
     "simple-git": "^2.6.0",
-    "turndown": "^6.0.0"
+    "turndown": "^6.0.0",
+    "url-toolkit": "^2.2.0"
   }
 }
