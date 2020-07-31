@@ -22,12 +22,12 @@ export default async function filter(content, location, selector, removeElements
 
   convertRelativeURLsToAbsolute(webPageDOM, location);
 
-  let selectedContent = webPageDOM;
+  const selectedContent = webPageDOM;
 
   if (removeElements) {
     let elementsToRemove = removeElements;
 
-    if (typeof elementsToRemove === 'string') {
+    if (!Array.isArray(elementsToRemove)) {
       elementsToRemove = [elementsToRemove];
     }
 
@@ -41,21 +41,29 @@ export default async function filter(content, location, selector, removeElements
     });
   }
 
-  if (typeof selector === 'string') {
-    selectedContent = Array.from(webPageDOM.querySelectorAll(selector));
-    if (!selectedContent) {
-      console.warn(`The provided selector "${selector}" has no match in the web page.`);
+  const selectedContents = [];
+  if (selector) {
+    let elementsToSelect = selector;
+
+    if (!Array.isArray(elementsToSelect)) {
+      elementsToSelect = [elementsToSelect];
     }
-  } else if (typeof selector === 'object') {
-    const rangeSelection = getRangeSelection(selectedContent, selector);
-    selectedContent = [rangeSelection.extractContents()];
+
+    elementsToSelect.forEach(elementSelector => {
+      if (typeof elementSelector === 'object') {
+        const rangeSelection = getRangeSelection(selectedContent, elementSelector);
+        selectedContents.push(rangeSelection.cloneContents());
+      } else {
+        selectedContents.push(...Array.from(webPageDOM.querySelectorAll(elementSelector)));
+      }
+    });
   }
 
-  if (!selectedContent.length) {
+  if (!selectedContents.length) {
     throw new Error(`The provided selector "${selector}" has no match in the web page.`);
   }
 
-  return selectedContent.map(domFragment => turndownService.turndown(domFragment)).join('\n');
+  return selectedContents.map(domFragment => turndownService.turndown(domFragment)).join('\n');
 }
 
 function getRangeSelection(document, rangeSelector) {
