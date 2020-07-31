@@ -75,7 +75,7 @@ export default class CGUs extends events.EventEmitter {
       console.log(`${logPrefix} Fetch '${location}'.`);
       let pageContent;
       try {
-        pageContent = await fetch(location);
+        pageContent = await fetch(location, { serviceId: serviceId, documentType: type });
       } catch (error) {
         console.error(`${logPrefix} Could not fetch location: ${error}`);
         return this.emit('fetchingError', serviceId, type, error);

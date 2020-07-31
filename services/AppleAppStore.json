@@ -4,6 +4,10 @@
         "reviewGuidelines": {
             "location": "https://developer.apple.com/app-store/review/guidelines/",
             "contentSelector": "main"
+        },
+        "devPolicy": {
+            "location": "https://developer.apple.com/terms/apple-developer-agreement/Apple-Developer-Agreement-English.pdf",
+            "contentSelector": "body"
         }
     }
 }

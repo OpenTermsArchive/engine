@@ -21,7 +21,7 @@ export async function convertImagesToDataURI(document, url) {
         if (!src.startsWith('http:') && !src.startsWith('https:')) {  // Relative URL
           queryUrl = new URL(src, url).href;
         }
-        const blob = await fetch(queryUrl, false);
+        const blob = await fetch(queryUrl);
         const type = blob.type;
         const arrayBuffer = await blob.arrayBuffer();
         localSrc = dataUriParser.format(`.${type.split('/')[1].split('+')[0]}`, arrayBuffer);

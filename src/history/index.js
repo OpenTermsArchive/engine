@@ -9,10 +9,19 @@ export const SNAPSHOTS_PATH = path.resolve(__dirname, '../..', config.get('histo
 export const VERSIONS_PATH = path.resolve(__dirname, '../..', config.get('history.versionsPath'));
 
 const snapshotRecorder = new Recorder({ path: SNAPSHOTS_PATH, fileExtension: 'html' });
+const PDFsnapshotRecorder = new Recorder({ path: SNAPSHOTS_PATH, fileExtension: 'pdf' });
 const versionRecorder = new Recorder({ path: VERSIONS_PATH, fileExtension: 'md' });
 
 export async function recordSnapshot(serviceId, documentType, content) {
   return snapshotRecorder.record({
+    serviceId,
+    documentType,
+    content
+  });
+}
+
+export async function recordPDFSnapshot(serviceId, documentType, content) {
+  return PDFsnapshotRecorder.record({
     serviceId,
     documentType,
     content
