@@ -22,13 +22,18 @@ export default async function filter(content, location, selector, removeElements
 
   convertRelativeURLsToAbsolute(webPageDOM, location);
 
+  let selectedContent = webPageDOM;
+
   if (removeElements) {
-    removeElements.forEach(element => {
-      Array.from(webPageDOM.querySelectorAll(element)).forEach(node => node.remove());
+    removeElements.forEach(elementSelector => {
+      if (typeof elementSelector === 'object') {
+        const rangeSelection = getRangeSelection(selectedContent, elementSelector);
+        rangeSelection.deleteContents();
+      } else {
+        Array.from(webPageDOM.querySelectorAll(elementSelector)).forEach(node => node.remove());
+      }
     });
   }
-
-  let selectedContent = webPageDOM;
 
   if (typeof selector === 'string') {
     selectedContent = Array.from(webPageDOM.querySelectorAll(selector));
@@ -36,20 +41,8 @@ export default async function filter(content, location, selector, removeElements
       console.warn(`The provided selector "${selector}" has no match in the web page.`);
     }
   } else if (typeof selector === 'object') {
-    const { startBefore, startAfter, endBefore, endAfter } = selector;
-
-    if (startBefore && startAfter) {
-      throw new Error('Content selectors "startBefore" and "startAfter" cannot both be defined. Specify only one.');
-    }
-
-    if (endBefore && endAfter) {
-      throw new Error('Content selectors "endBefore" and "endAfter" cannot both be defined. Specify only one.');
-    }
-
-    const selection = selectedContent.createRange();
-    selection[startBefore ? 'setStartBefore' : 'setStartAfter'](selectedContent.querySelector(startBefore || startAfter));
-    selection[endBefore ? 'setEndBefore' : 'setEndAfter'](selectedContent.querySelector(endBefore || endAfter));
-    selectedContent = [selection.extractContents()];
+    const rangeSelection = getRangeSelection(selectedContent, selector);
+    selectedContent = [rangeSelection.extractContents()];
   }
 
   if (!selectedContent.length) {
@@ -57,6 +50,24 @@ export default async function filter(content, location, selector, removeElements
   }
 
   return selectedContent.map(domFragment => turndownService.turndown(domFragment)).join('\n');
+}
+
+function getRangeSelection(document, rangeSelector) {
+  const { startBefore, startAfter, endBefore, endAfter } = rangeSelector;
+
+  if (startBefore && startAfter) {
+    throw new Error('Content selectors "startBefore" and "startAfter" cannot both be defined. Specify only one.');
+  }
+
+  if (endBefore && endAfter) {
+    throw new Error('Content selectors "endBefore" and "endAfter" cannot both be defined. Specify only one.');
+  }
+
+  const selection = document.createRange();
+  selection[startBefore ? 'setStartBefore' : 'setStartAfter'](document.querySelector(startBefore || startAfter));
+  selection[endBefore ? 'setEndBefore' : 'setEndAfter'](document.querySelector(endBefore || endAfter));
+
+  return selection;
 }
 
 export function convertRelativeURLsToAbsolute(document, baseURL) {

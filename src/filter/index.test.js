@@ -133,12 +133,43 @@ describe('Filter', () => {
       });
     });
 
-    context('With removeElements', () => {
-      it('filters the given HTML content', async () => {
-        const result = await filter(rawHTML, virtualLocation, 'body', [
-          'h1', '#link3'
-        ]);
-        expect(result).to.equal('[link 1](https://exemple.com/relative/link)\n\n[link 2](#anchor)');
+    describe('Remove elements', () => {
+      context('With an array of string selectors', () => {
+        it('removes the specified elements', async () => {
+          const result = await filter(rawHTML, virtualLocation, 'body', [
+            'h1', '#link3'
+          ]);
+          expect(result).to.equal('[link 1](https://exemple.com/relative/link)\n\n[link 2](#anchor)');
+        });
+      });
+
+      context('With an array of range selectors', () => {
+        it('removes all the selections', async () => {
+          const result = await filter(rawHTML, virtualLocation, 'body', [
+            {
+              startBefore: 'h1',
+              endBefore: '#link1'
+            },
+            {
+              startBefore: '#link3',
+              endAfter: '#link3'
+            }
+          ]);
+          expect(result).to.equal('[link 1](https://exemple.com/relative/link)\n\n[link 2](#anchor)');
+        });
+      });
+
+      context('With an array of mixed selectors and range selectors', () => {
+        it('removes all the selections', async () => {
+          const result = await filter(rawHTML, virtualLocation, 'body', [
+            'h1',
+            {
+              startBefore: '#link3',
+              endAfter: '#link3'
+            }
+          ]);
+          expect(result).to.equal('[link 1](https://exemple.com/relative/link)\n\n[link 2](#anchor)');
+        });
       });
     });
   });
