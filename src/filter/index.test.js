@@ -16,9 +16,9 @@ const rawHTML = `
   </head>
   <body>
     <h1>Title</h1>
-    <p><a href="/relative/link">link 1</a></p>
+    <p><a id="link1" href="/relative/link">link 1</a></p>
     <p><a id="link2" href="#anchor">link 2</a></p>
-    <p><a href="http://absolute.url/link">link 3</a></p>
+    <p><a id="link3" href="http://absolute.url/link">link 3</a></p>
   </body>
 </html>`;
 
@@ -90,8 +90,46 @@ describe('Filter', () => {
     context('With multiple selectors', () => {
       it('filters the given HTML content', async () => {
         const result = await filter(rawHTML, 'h1, #link2', virtualLocation);
-        expect(result).to.equal(`Title
-link 2`);
+        expect(result).to.equal('Title\nlink 2');
+      });
+    });
+
+    context('With range selector', () => {
+      context('With startBefore and endBefore', () => {
+        it('filters the given HTML content', async () => {
+          const result = await filter(rawHTML, {
+            startBefore: '#link1',
+            endBefore: '#link2'
+          }, virtualLocation);
+          expect(result).to.equal('[link 1](https://exemple.com/relative/link)');
+        });
+      });
+      context('With startBefore and endAfter', () => {
+        it('filters the given HTML content', async () => {
+          const result = await filter(rawHTML, {
+            startBefore: '#link2',
+            endAfter: '#link2'
+          }, virtualLocation);
+          expect(result).to.equal('[link 2](#anchor)');
+        });
+      });
+      context('With startAfter and endBefore', () => {
+        it('filters the given HTML content', async () => {
+          const result = await filter(rawHTML, {
+            startAfter: '#link1',
+            endBefore: '#link3'
+          }, virtualLocation);
+          expect(result).to.equal('[link 2](#anchor)');
+        });
+      });
+      context('With startAfter and endAfter', () => {
+        it('filters the given HTML content', async () => {
+          const result = await filter(rawHTML, {
+            startAfter: '#link2',
+            endAfter: '#link3'
+          }, virtualLocation);
+          expect(result).to.equal('[link 3](http://absolute.url/link)');
+        });
       });
     });
   });

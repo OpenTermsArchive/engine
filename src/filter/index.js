@@ -22,7 +22,30 @@ export default async function filter(content, selector, location, filterNames, f
 
   convertRelativeURLsToAbsolute(webPageDOM, location);
 
-  const selectedContent = Array.from(webPageDOM.querySelectorAll(selector));
+  let selectedContent = webPageDOM;
+
+  if (typeof selector === 'string') {
+    selectedContent = Array.from(webPageDOM.querySelectorAll(selector));
+    if (!selectedContent) {
+      console.warn(`The provided selector "${selector}" has no match in the web page.`);
+    }
+  } else if (typeof selector === 'object') {
+    const { startBefore, startAfter, endBefore, endAfter } = selector;
+
+    if (startBefore && startAfter) {
+      throw new Error('Content selectors "startBefore" and "startAfter" cannot both be defined. Specify only one.');
+    }
+
+    if (endBefore && endAfter) {
+      throw new Error('Content selectors "endBefore" and "endAfter" cannot both be defined. Specify only one.');
+    }
+
+    const selection = selectedContent.createRange();
+    selection[startBefore ? 'setStartBefore' : 'setStartAfter'](selectedContent.querySelector(startBefore || startAfter));
+    selection[endBefore ? 'setEndBefore' : 'setEndAfter'](selectedContent.querySelector(endBefore || endAfter));
+    selectedContent = [selection.extractContents()];
+  }
+
   if (!selectedContent.length) {
     throw new Error(`The provided selector "${selector}" has no match in the web page.`);
   }
