@@ -44,7 +44,7 @@ export default async function fetch(url, recorderParams) {
         }
       });
     });
-    return await pdf2htmlPromise;
+    return pdf2htmlPromise;
   } else {
     return blob;
   }

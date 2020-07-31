@@ -13,7 +13,7 @@ const facebookTermsHTML = fs.readFileSync(path.resolve(__dirname, '../../test/fi
 nock('https://www.facebook.com', {
     reqheaders: { 'Accept-Language': 'en' }
   }).get('/terms.php')
-  .reply(200, facebookTermsHTML);
+  .reply(200, facebookTermsHTML, { 'Content-Type': 'text/html' });
 
 nock('https://not.available.document.com')
   .get('/')

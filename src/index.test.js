@@ -25,10 +25,10 @@ const SERVICE_B_TOS_SNAPSHOT = fs.readFileSync(path.resolve(__dirname, '../test/
 const SERVICE_B_TOS_VERSION = fs.readFileSync(path.resolve(__dirname, '../test/fixtures/service_B_terms.md'), { encoding: 'utf8' });
 
 nock('https://www.servicea.example').get('/tos')
-  .reply(200, SERVICE_A_TOS_SNAPSHOT);
+  .reply(200, SERVICE_A_TOS_SNAPSHOT, { 'Content-Type': 'text/html' });
 
 nock('https://www.serviceb.example').get('/tos')
-  .reply(200, SERVICE_B_TOS_SNAPSHOT);
+  .reply(200, SERVICE_B_TOS_SNAPSHOT, { 'Content-Type': 'text/html' });
 
 describe('CGUs', () => {
   describe('#trackChanges', () => {
