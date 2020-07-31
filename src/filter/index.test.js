@@ -87,9 +87,16 @@ describe('Filter', () => {
       });
     });
 
-    context('With multiple selectors', () => {
+    context('With multiple selectors in one string', () => {
       it('filters the given HTML content', async () => {
         const result = await filter(rawHTML, virtualLocation, 'h1, #link2');
+        expect(result).to.equal('Title\nlink 2');
+      });
+    });
+
+    context('With an array of selectors', () => {
+      it('filters the given HTML content', async () => {
+        const result = await filter(rawHTML, virtualLocation, [ 'h1', '#link2' ]);
         expect(result).to.equal('Title\nlink 2');
       });
     });
@@ -133,6 +140,29 @@ describe('Filter', () => {
       });
     });
 
+    context('With an array of range selector', () => {
+      it('filters the given HTML content', async () => {
+        const result = await filter(rawHTML, virtualLocation, [{
+          startAfter: '#link1',
+          endAfter: '#link2'
+        }, {
+          startAfter: '#link2',
+          endAfter: '#link3'
+        }]);
+        expect(result).to.equal('[link 2](#anchor)\n[link 3](http://absolute.url/link)');
+      });
+    });
+
+    context('With an array of mixed string selectors and range selector', () => {
+      it('filters the given HTML content', async () => {
+        const result = await filter(rawHTML, virtualLocation, [ 'h1', {
+          startAfter: '#link2',
+          endAfter: '#link3'
+        }]);
+        expect(result).to.equal('Title\n[link 3](http://absolute.url/link)');
+      });
+    });
+
     describe('Remove elements', () => {
       context('With a simple selector', () => {
         it('removes the specified elements', async () => {
@@ -147,6 +177,16 @@ describe('Filter', () => {
             'h1', '#link3'
           ]);
           expect(result).to.equal('[link 1](https://exemple.com/relative/link)\n\n[link 2](#anchor)');
+        });
+      });
+
+      context('With a simple range selector', () => {
+        it('removes the specified elements', async () => {
+          const result = await filter(rawHTML, virtualLocation, 'body', {
+            startBefore: '#link1',
+            endAfter: '#link3'
+          });
+          expect(result).to.equal('Title\n=====');
         });
       });
 
