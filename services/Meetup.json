@@ -4,15 +4,17 @@
         "tos": {
             "location": "https://help.meetup.com/hc/en-us/articles/360027447252",
             "contentSelector": ".article",
-            "filters": [
-                "removeFooter"
+            "removeElements": [
+                "footer",
+                ".article-subscribe"
             ]
         },
         "privacy": {
             "location": "https://help.meetup.com/hc/en-us/articles/360044422391",
             "contentSelector": ".article",
-            "filters": [
-                "removeFooter"
+            "removeElements": [
+                "footer",
+                ".article-subscribe"
             ]
         }
     }

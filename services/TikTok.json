@@ -3,17 +3,17 @@
   "documents": {
     "tos": {
       "location": "https://www.tiktok.com/legal/terms-of-use?lang=en",
-      "contentSelector": "article",
-      "filters": [
-        "selectOnlyEuropeanTOS"
-      ]
+      "contentSelector": {
+        "startBefore": "#terms-eea",
+        "endBefore": "#terms-in"
+      }
     },
     "privacy": {
       "location": "https://www.tiktok.com/legal/privacy-policy?lang=en",
-      "contentSelector": "article",
-      "filters": [
-        "selectOnlyEuropeanPrivacyPolicy"
-      ]
+      "contentSelector": {
+        "startBefore": "#privacy-eea",
+        "endBefore": "#privacy-row"
+      }
     }
   }
 }

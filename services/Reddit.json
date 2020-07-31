@@ -4,15 +4,15 @@
         "tos": {
             "location": "https://www.redditinc.com/policies/user-agreement",
             "contentSelector": "#content",
-            "filters": [
-                "removeOptionsList"
+            "removeElements": [
+                ".filter-holder"
             ]
         },
         "privacy": {
             "location": "https://www.redditinc.com/policies/privacy-policy",
             "contentSelector": "#content",
-            "filters": [
-                "removeOptionsList"
+            "removeElements": [
+                ".filter-holder"
             ]
         }
     }
