@@ -25,7 +25,13 @@ export default async function filter(content, location, selector, removeElements
   let selectedContent = webPageDOM;
 
   if (removeElements) {
-    removeElements.forEach(elementSelector => {
+    let elementsToRemove = removeElements;
+
+    if (typeof elementsToRemove === 'string') {
+      elementsToRemove = [elementsToRemove];
+    }
+
+    elementsToRemove.forEach(elementSelector => {
       if (typeof elementSelector === 'object') {
         const rangeSelection = getRangeSelection(selectedContent, elementSelector);
         rangeSelection.deleteContents();
