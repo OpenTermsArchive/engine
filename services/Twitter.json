@@ -4,15 +4,15 @@
     "tos": {
       "location": "https://twitter.com/tos",
       "contentSelector": ".p22__item > .cr01-section:nth-child(7), .p23-chapter:nth-child(8)",
-      "filters": [
-        "removeNotDisplayedElements"
+      "removeElements": [
+        "[style='display: none;']"
       ]
     },
     "privacy": {
       "location": "https://twitter.com/privacy",
       "contentSelector": "main",
-      "filters": [
-        "removeNotDisplayedElements"
+      "removeElements": [
+        "[style='display: none;']"
       ]
     },
     "devAgreement": {

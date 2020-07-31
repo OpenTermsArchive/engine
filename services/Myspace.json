@@ -4,15 +4,15 @@
     "tos": {
       "location": "https://myspace.com/pages/terms",
       "contentSelector": "#nms_legal",
-      "filters": [
-        "numberListCorrectly"
+      "removeElements": [
+        "ol > *:not(li)"
       ]
     },
     "privacy": {
       "location": "https://myspace.com/pages/eeaprivacy",
       "contentSelector": "#nms_legal",
-      "filters": [
-        "numberListCorrectly"
+      "removeElements": [
+        "ol > *:not(li)"
       ]
     }
   }

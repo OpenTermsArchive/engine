@@ -3,10 +3,10 @@
   "documents": {
     "tos": {
       "location": "https://www.snap.com/terms",
-      "contentSelector": ".textarticle-container",
-      "filters": [
-        "selectOnlyEuropeanTOS"
-      ]
+      "contentSelector": {
+        "startBefore": "#terms-row",
+        "endAfter": ".textarticle-container > *:last-child"
+      }
     },
     "privacy": {
       "location": "https://www.snap.com/privacy/privacy-policy",
