@@ -134,6 +134,13 @@ describe('Filter', () => {
     });
 
     describe('Remove elements', () => {
+      context('With a simple selector', () => {
+        it('removes the specified elements', async () => {
+          const result = await filter(rawHTML, virtualLocation, 'body', 'h1');
+          expect(result).to.equal('[link 1](https://exemple.com/relative/link)\n\n[link 2](#anchor)\n\n[link 3](http://absolute.url/link)');
+        });
+      });
+
       context('With an array of string selectors', () => {
         it('removes the specified elements', async () => {
           const result = await filter(rawHTML, virtualLocation, 'body', [
