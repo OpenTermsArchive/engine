@@ -7,7 +7,7 @@ import { SNAPSHOTS_PATH } from './index.js';
 import Recorder from './recorder.js';
 import { TYPES } from '../types.js';
 
-const expect = chai.expect;
+const { expect } = chai;
 
 const SERVICE_PROVIDER_ID = 'test_service';
 const TYPE = 'tos';
@@ -23,15 +23,12 @@ describe('Recorder', () => {
 
   describe('#save', () => {
     context('when service’s directory already exist', () => {
-      let saveResult;
-      before(async () => {
-        saveResult = await subject.save({
-          serviceId: SERVICE_PROVIDER_ID,
-          documentType: TYPE,
-          content: FILE_CONTENT,
-          isFiltered: false
-        });
-      });
+      before(async () => subject.save({
+        serviceId: SERVICE_PROVIDER_ID,
+        documentType: TYPE,
+        content: FILE_CONTENT,
+        isFiltered: false
+      }));
 
       after(resetGitRepository);
 
@@ -62,16 +59,14 @@ describe('Recorder', () => {
   });
 
   describe('#commit', () => {
-    const COMMIT_FILE_CONTENT = FILE_CONTENT + 'commit';
+    const COMMIT_FILE_CONTENT = `${FILE_CONTENT}commit`;
 
-    before(async () => {
-      return subject.save({
-        serviceId: SERVICE_PROVIDER_ID,
-        documentType: TYPE,
-        content: COMMIT_FILE_CONTENT,
-        isFiltered: false
-      });
-    });
+    before(async () => subject.save({
+      serviceId: SERVICE_PROVIDER_ID,
+      documentType: TYPE,
+      content: COMMIT_FILE_CONTENT,
+      isFiltered: false
+    }));
 
     after(resetGitRepository);
 
@@ -84,7 +79,7 @@ describe('Recorder', () => {
   describe('#record', () => {
     let id;
     let isFirstRecord;
-    const PERSIST_FILE_CONTENT = FILE_CONTENT + 'record';
+    const PERSIST_FILE_CONTENT = `${FILE_CONTENT}record`;
 
     before(async () => {
       const { id: recordId, isFirstRecord: firstRecord } = await subject.record({

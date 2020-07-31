@@ -4,8 +4,8 @@ export const TYPES = {
     fileName: 'terms_of_service'
   },
   tosParent: {
-  	name: 'Terms of service of the parent company',
-  	fileName: 'terms_of_service_parent_company'
+    name: 'Terms of service of the parent company',
+    fileName: 'terms_of_service_parent_company'
   },
   privacy: {
     name: 'Privacy Policy',
