@@ -7,7 +7,7 @@ import loadServiceDeclarations from './index.js';
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
 const SERVICE_DECLARATIONS_PATH = path.resolve(__dirname, '../..', config.get('serviceDeclarationsPath'));
 
-const expect = chai.expect;
+const { expect } = chai;
 
 const expected = {
   service_A: {
@@ -28,7 +28,7 @@ const expected = {
       }
     }
   }
-}
+};
 
 describe('Loader', () => {
   describe('#loadServiceDeclarations', () => {

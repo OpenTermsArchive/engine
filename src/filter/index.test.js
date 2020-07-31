@@ -4,7 +4,7 @@ import jsdom from 'jsdom';
 import filter, { convertRelativeURLsToAbsolute } from './index.js';
 
 const { JSDOM } = jsdom;
-const expect = chai.expect;
+const { expect } = chai;
 
 const virtualLocation = "https://exemple.com/main";
 const rawHTML = `
@@ -37,20 +37,20 @@ const expectedFilteredWithAdditional = `Title
 const additionalFilter = {
   removeLinks: function removeLinks(document) {
     const links = document.querySelectorAll('a');
-    links.forEach(link => {
+    links.forEach((link) => {
       link.remove();
     });
   }
-}
+};
 
 describe('Filter', () => {
   describe('#convertRelativeURLsToAbsolute', () => {
     let subject;
     before(() => {
-      let { document: webPageDOM } = new JSDOM(rawHTML).window;
+      const { document: webPageDOM } = new JSDOM(rawHTML).window;
       convertRelativeURLsToAbsolute(webPageDOM, virtualLocation);
       subject = Array.from(webPageDOM.querySelectorAll('a[href]')).map(el => el.href);
-    })
+    });
 
     it('converts relative urls', async () => {
       expect(subject).to.include('https://exemple.com/relative/link');
