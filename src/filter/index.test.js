@@ -63,14 +63,14 @@ describe('Filter', () => {
 
   describe('#filter', () => {
     it('filters the given HTML content', async () => {
-      const result = await filter(rawHTML, 'body', virtualLocation);
+      const result = await filter(rawHTML, virtualLocation, 'body');
       expect(result).to.equal(expectedFiltered);
     });
 
     context('With no match for the given selector', () => {
       it('throws an error', async () => {
         try {
-          await filter(rawHTML, '#thisAnchorDoesNotExist', virtualLocation);
+          await filter(rawHTML, virtualLocation, '#thisAnchorDoesNotExist');
         } catch (e) {
           expect(e).to.be.an('error');
           expect(e.message).to.have.string('provided selector', 'has no match');
@@ -82,14 +82,14 @@ describe('Filter', () => {
 
     context('With an additional filter', () => {
       it('filters the given HTML content also with given additional filter', async () => {
-        const result = await filter(rawHTML, 'body', virtualLocation, ['removeLinks'], additionalFilter);
+        const result = await filter(rawHTML, virtualLocation, 'body', null, ['removeLinks'], additionalFilter);
         expect(result).to.equal(expectedFilteredWithAdditional);
       });
     });
 
     context('With multiple selectors', () => {
       it('filters the given HTML content', async () => {
-        const result = await filter(rawHTML, 'h1, #link2', virtualLocation);
+        const result = await filter(rawHTML, virtualLocation, 'h1, #link2');
         expect(result).to.equal('Title\nlink 2');
       });
     });
@@ -97,39 +97,48 @@ describe('Filter', () => {
     context('With range selector', () => {
       context('With startBefore and endBefore', () => {
         it('filters the given HTML content', async () => {
-          const result = await filter(rawHTML, {
+          const result = await filter(rawHTML, virtualLocation, {
             startBefore: '#link1',
             endBefore: '#link2'
-          }, virtualLocation);
+          });
           expect(result).to.equal('[link 1](https://exemple.com/relative/link)');
         });
       });
       context('With startBefore and endAfter', () => {
         it('filters the given HTML content', async () => {
-          const result = await filter(rawHTML, {
+          const result = await filter(rawHTML, virtualLocation, {
             startBefore: '#link2',
             endAfter: '#link2'
-          }, virtualLocation);
+          });
           expect(result).to.equal('[link 2](#anchor)');
         });
       });
       context('With startAfter and endBefore', () => {
         it('filters the given HTML content', async () => {
-          const result = await filter(rawHTML, {
+          const result = await filter(rawHTML, virtualLocation, {
             startAfter: '#link1',
             endBefore: '#link3'
-          }, virtualLocation);
+          });
           expect(result).to.equal('[link 2](#anchor)');
         });
       });
       context('With startAfter and endAfter', () => {
         it('filters the given HTML content', async () => {
-          const result = await filter(rawHTML, {
+          const result = await filter(rawHTML, virtualLocation, {
             startAfter: '#link2',
             endAfter: '#link3'
-          }, virtualLocation);
+          });
           expect(result).to.equal('[link 3](http://absolute.url/link)');
         });
+      });
+    });
+
+    context('With removeElements', () => {
+      it('filters the given HTML content', async () => {
+        const result = await filter(rawHTML, virtualLocation, 'body', [
+          'h1', '#link3'
+        ]);
+        expect(result).to.equal('[link 1](https://exemple.com/relative/link)\n\n[link 2](#anchor)');
       });
     });
   });
