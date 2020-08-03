@@ -1,13 +1,15 @@
 import TurndownService from 'turndown';
 import turndownPluginGithubFlavouredMarkdown from 'joplin-turndown-plugin-gfm';
 import jsdom from 'jsdom';
+import urlToolkit from 'url-toolkit';
 
 const { JSDOM } = jsdom;
 const turndownService = new TurndownService();
 turndownService.use(turndownPluginGithubFlavouredMarkdown.gfm);
 
+export const LINKS_TO_CONVERT_SELECTOR = 'a[href]:not([href^="#"])';
 
-export default async function filter(content, selector, filterNames, filterFunctions) {
+export default async function filter(content, selector, location, filterNames, filterFunctions) {
   let { document: webPageDOM } = new JSDOM(content).window;
 
   if (filterNames) {
@@ -17,10 +19,18 @@ export default async function filter(content, selector, filterNames, filterFunct
     });
   }
 
+  convertRelativeURLsToAbsolute(webPageDOM, location);
+
   const selectedContent = Array.from(webPageDOM.querySelectorAll(selector));
   if (!selectedContent.length) {
     console.warn(`The provided selector "${selector}" has no match in the web page.`);
   }
 
   return selectedContent.map(domFragment => turndownService.turndown(domFragment)).join('\n');
+}
+
+export function convertRelativeURLsToAbsolute(document, baseURL) {
+  Array.from(document.querySelectorAll(LINKS_TO_CONVERT_SELECTOR)).forEach(link => {
+    link.href = urlToolkit.buildAbsoluteURL(baseURL, link.href);
+  });
 }
