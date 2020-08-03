@@ -7,6 +7,7 @@ const { JSDOM } = jsdom;
 const turndownService = new TurndownService();
 turndownService.use(turndownPluginGithubFlavouredMarkdown.gfm);
 
+export const LINKS_TO_CONVERT_SELECTOR = 'a[href]:not([href^="#"])';
 
 export default async function filter(content, selector, location, filterNames, filterFunctions) {
   let { document: webPageDOM } = new JSDOM(content).window;
@@ -29,7 +30,7 @@ export default async function filter(content, selector, location, filterNames, f
 }
 
 export function convertRelativeURLsToAbsolute(document, baseURL) {
-  Array.from(document.querySelectorAll('a[href]:not([href=""]')).forEach(link => {
+  Array.from(document.querySelectorAll(LINKS_TO_CONVERT_SELECTOR)).forEach(link => {
     link.href = urlToolkit.buildAbsoluteURL(baseURL, link.href);
   });
 }

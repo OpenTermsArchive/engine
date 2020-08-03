@@ -17,7 +17,7 @@ const rawHTML = `
   <body>
     <h1>Title</h1>
     <p><a href="/relative/link">link 1</a></p>
-    <p><a id="link2" href="">link 2</a></p>
+    <p><a id="link2" href="#anchor">link 2</a></p>
     <p><a href="http://absolute.url/link">link 3</a></p>
   </body>
 </html>`;
@@ -27,7 +27,7 @@ const expectedFiltered = `Title
 
 [link 1](https://exemple.com/relative/link)
 
-link 2
+[link 2](#anchor)
 
 [link 3](http://absolute.url/link)`;
 
