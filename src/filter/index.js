@@ -20,11 +20,11 @@ export default async function filter(content, selector, location, filterNames, f
   }
 
   Array.from(webPageDOM.querySelectorAll('a')).map(link => {
-    if (link.href && isRelativeUrl(link.href)) {
+    if (link.href) {
       link.href = urlToolkit.buildAbsoluteURL(location, link.href);
     }
   });
-  
+
 
   const selectedContent = Array.from(webPageDOM.querySelectorAll(selector));
   if (!selectedContent.length) {
