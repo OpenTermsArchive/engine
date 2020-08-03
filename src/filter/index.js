@@ -1,8 +1,7 @@
 import TurndownService from 'turndown';
 import turndownPluginGithubFlavouredMarkdown from 'joplin-turndown-plugin-gfm';
 import jsdom from 'jsdom';
-import urlToolkit from 'url-toolkit'
-import isRelativeUrl from 'is-relative-url'
+import urlToolkit from 'url-toolkit';
 
 const { JSDOM } = jsdom;
 const turndownService = new TurndownService();
@@ -19,12 +18,7 @@ export default async function filter(content, selector, location, filterNames, f
     });
   }
 
-  Array.from(webPageDOM.querySelectorAll('a')).map(link => {
-    if (link.href) {
-      link.href = urlToolkit.buildAbsoluteURL(location, link.href);
-    }
-  });
-
+  convertRelativeURLsToAbsolute(webPageDOM, location);
 
   const selectedContent = Array.from(webPageDOM.querySelectorAll(selector));
   if (!selectedContent.length) {
@@ -32,4 +26,10 @@ export default async function filter(content, selector, location, filterNames, f
   }
 
   return selectedContent.map(domFragment => turndownService.turndown(domFragment)).join('\n');
+}
+
+export function convertRelativeURLsToAbsolute(document, baseURL) {
+  Array.from(document.querySelectorAll('a[href]:not([href=""]')).forEach(link => {
+    link.href = urlToolkit.buildAbsoluteURL(baseURL, link.href);
+  });
 }

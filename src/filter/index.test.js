@@ -1,7 +1,9 @@
 import chai from 'chai';
+import jsdom from 'jsdom';
 
-import filter from './index.js';
+import filter, { convertRelativeURLsToAbsolute } from './index.js';
 
+const { JSDOM } = jsdom;
 const expect = chai.expect;
 
 const virtualLocation = "https://exemple.com/main";
@@ -16,6 +18,7 @@ const rawHTML = `
     <h1>Title</h1>
     <p><a href="/relative/link">link 1</a></p>
     <p><a id="link2" href="">link 2</a></p>
+    <p><a href="http://absolute.url/link">link 3</a></p>
   </body>
 </html>`;
 
@@ -24,7 +27,9 @@ const expectedFiltered = `Title
 
 [link 1](https://exemple.com/relative/link)
 
-link 2`;
+link 2
+
+[link 3](http://absolute.url/link)`;
 
 const expectedFilteredWithAdditional = `Title
 =====`;
@@ -39,6 +44,23 @@ const additionalFilter = {
 }
 
 describe('Filter', () => {
+  describe('#convertRelativeURLsToAbsolute', () => {
+    let subject;
+    before(() => {
+      let { document: webPageDOM } = new JSDOM(rawHTML).window;
+      convertRelativeURLsToAbsolute(webPageDOM, virtualLocation);
+      subject = Array.from(webPageDOM.querySelectorAll('a[href]')).map(el => el.href);
+    })
+
+    it('converts relative urls', async () => {
+      expect(subject).to.include('https://exemple.com/relative/link');
+    });
+
+    it('leaves absolute urls untouched', async () => {
+      expect(subject).to.include('http://absolute.url/link');
+    });
+  });
+
   describe('#filter', () => {
     it('filters the given HTML content', async () => {
       const result = await filter(rawHTML, 'body', virtualLocation);
