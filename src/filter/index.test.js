@@ -138,6 +138,96 @@ describe('Filter', () => {
           expect(result).to.equal('[link 3](http://absolute.url/link)');
         });
       });
+      context('With both "startAfter" and "startBefore" defined', () => {
+        it('throws an error', async () => {
+          try {
+            await filter(rawHTML, virtualLocation, {
+              startBefore: '#link3',
+              startAfter: '#link3',
+              endAfter: '#link3'
+            });
+          } catch (e) {
+            expect(e).to.be.an('error');
+            expect(e.message).to.have.string('startBefore', 'startAfter');
+            return;
+          }
+          expect.fail('No error was thrown');
+        });
+      });
+      context('With both "endAfter" and "endBefore" defined', () => {
+        it('throws an error', async () => {
+          try {
+            await filter(rawHTML, virtualLocation, {
+              endBefore: '#link3',
+              endAfter: '#link3',
+              startAfter: '#link1'
+            });
+          } catch (e) {
+            expect(e).to.be.an('error');
+            expect(e.message).to.have.string('endBefore', 'endAfter');
+            return;
+          }
+          expect.fail('No error was thrown');
+        });
+      });
+      context('With no "endAfter" or "endBefore" defined', () => {
+        it('throws an error', async () => {
+          try {
+            await filter(rawHTML, virtualLocation, {
+              startAfter: '#link1'
+            });
+          } catch (e) {
+            expect(e).to.be.an('error');
+            expect(e.message).to.have.string('start', 'end');
+            return;
+          }
+          expect.fail('No error was thrown');
+        });
+      });
+      context('With no "startAfter" or "startBefore" defined', () => {
+        it('throws an error', async () => {
+          try {
+            await filter(rawHTML, virtualLocation, {
+              endAfter: '#link1'
+            });
+          } catch (e) {
+            expect(e).to.be.an('error');
+            expect(e.message).to.have.string('start', 'end');
+            return;
+          }
+          expect.fail('No error was thrown');
+        });
+      });
+      context('With a "start" selector that has no match', () => {
+        it('throws an error', async () => {
+          try {
+            await filter(rawHTML, virtualLocation, {
+              startAfter: '#paragraph1',
+              endAfter: '#link2'
+            });
+          } catch (e) {
+            expect(e).to.be.an('error');
+            expect(e.message).to.have.string('"start" selector has no match');
+            return;
+          }
+          expect.fail('No error was thrown');
+        });
+      });
+      context('With an "end" selector that has no match', () => {
+        it('throws an error', async () => {
+          try {
+            await filter(rawHTML, virtualLocation, {
+              startAfter: '#link2',
+              endAfter: '#paragraph1'
+            });
+          } catch (e) {
+            expect(e).to.be.an('error');
+            expect(e.message).to.have.string('"end" selector has no match');
+            return;
+          }
+          expect.fail('No error was thrown');
+        });
+      });
     });
 
     context('With an array of range selector', () => {
@@ -188,8 +278,97 @@ describe('Filter', () => {
           });
           expect(result).to.equal('Title\n=====');
         });
+        context('With both "startAfter" and "startBefore" defined', () => {
+          it('throws an error', async () => {
+            try {
+              await filter(rawHTML, virtualLocation, 'body', {
+                startBefore: '#link3',
+                startAfter: '#link3',
+                endAfter: '#link3'
+              });
+            } catch (e) {
+              expect(e).to.be.an('error');
+              expect(e.message).to.have.string('startBefore', 'startAfter');
+              return;
+            }
+            expect.fail('No error was thrown');
+          });
+        });
+        context('With both "endAfter" and "endBefore" defined', () => {
+          it('throws an error', async () => {
+            try {
+              await filter(rawHTML, virtualLocation, 'body', {
+                endBefore: '#link3',
+                endAfter: '#link3',
+                startAfter: '#link1'
+              });
+            } catch (e) {
+              expect(e).to.be.an('error');
+              expect(e.message).to.have.string('endBefore', 'endAfter');
+              return;
+            }
+            expect.fail('No error was thrown');
+          });
+        });
+        context('With no "endAfter" or "endBefore" defined', () => {
+          it('throws an error', async () => {
+            try {
+              await filter(rawHTML, virtualLocation, 'body', {
+                startAfter: '#link1'
+              });
+            } catch (e) {
+              expect(e).to.be.an('error');
+              expect(e.message).to.have.string('start', 'end');
+              return;
+            }
+            expect.fail('No error was thrown');
+          });
+        });
+        context('With no "startAfter" or "startBefore" defined', () => {
+          it('throws an error', async () => {
+            try {
+              await filter(rawHTML, virtualLocation, 'body', {
+                endAfter: '#link1'
+              });
+            } catch (e) {
+              expect(e).to.be.an('error');
+              expect(e.message).to.have.string('start', 'end');
+              return;
+            }
+            expect.fail('No error was thrown');
+          });
+        });
+        context('With a "start" selector that has no match', () => {
+          it('throws an error', async () => {
+            try {
+              await filter(rawHTML, virtualLocation, 'body', {
+                startAfter: '#paragraph1',
+                endAfter: '#link2'
+              });
+            } catch (e) {
+              expect(e).to.be.an('error');
+              expect(e.message).to.have.string('"start" selector has no match');
+              return;
+            }
+            expect.fail('No error was thrown');
+          });
+        });
+        context('With an "end" selector that has no match', () => {
+          it('throws an error', async () => {
+            try {
+              await filter(rawHTML, virtualLocation, 'body', {
+                startAfter: '#link2',
+                endAfter: '#paragraph1'
+              });
+            } catch (e) {
+              expect(e).to.be.an('error');
+              expect(e.message).to.have.string('"end" selector has no match');
+              return;
+            }
+            expect.fail('No error was thrown');
+          });
+        });
       });
-
       context('With an array of range selectors', () => {
         it('removes all the selections', async () => {
           const result = await filter(rawHTML, virtualLocation, 'body', [
