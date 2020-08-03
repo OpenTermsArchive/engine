@@ -91,7 +91,7 @@ export default class CGUs extends events.EventEmitter {
 
       console.log(`${logPrefix} Recorded snapshot with id ${snapshotId}.`);
 
-      const document = await filter(pageContent, contentSelector, filters, this._serviceDeclarations[serviceId].filters);
+      const document = await filter(pageContent, contentSelector, location, filters, this._serviceDeclarations[serviceId].filters);
 
       const { id: versionId, path: documentPath, isFirstRecord } = await recordVersion(serviceId, type, document, snapshotId);
       if (versionId) {
