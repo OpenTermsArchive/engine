@@ -19,7 +19,7 @@ export default class Notifier {
 
   async onDocumentFetchError(serviceProviderId, documentTypeId, error) {
     const sendParams = {
-      templateId: config.get('notifier.sendInBlue.errorTemplateId'),
+      templateId: config.get('notifier.sendInBlue.updateErrorTemplateId'),
       params: {
         SERVICE_PROVIDER_NAME: this.serviceProviders[serviceProviderId].name,
         DOCUMENT_TYPE: this.documentTypes[documentTypeId].name,
@@ -44,9 +44,9 @@ export default class Notifier {
     return this.send([ config.get('notifier.sendInBlue.administratorsListId'), config.get('notifier.sendInBlue.updatesListId') ], sendParams);
   }
 
-  async onApplicationError(serviceProviderId, documentTypeId, error) {
+  async onDocumentUpdateError(serviceProviderId, documentTypeId, error) {
     const sendParams = {
-      templateId: config.get('notifier.sendInBlue.errorTemplateId'),
+      templateId: config.get('notifier.sendInBlue.updateErrorTemplateId'),
       params: {
         SERVICE_PROVIDER_NAME: this.serviceProviders[serviceProviderId].name,
         DOCUMENT_TYPE: this.documentTypes[documentTypeId].name,

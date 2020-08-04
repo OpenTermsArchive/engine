@@ -79,7 +79,7 @@ export default class CGUs extends events.EventEmitter {
         pageContent = await fetch(location);
       } catch (error) {
         console.error(`${logPrefix} Could not fetch location: ${error}`);
-        return this.emit('fetchingError', serviceId, type, error);
+        return this.emit('documentFetchError', serviceId, type, error);
       }
 
       const { id: snapshotId, path: snapshotPath } = await recordSnapshot(serviceId, type, pageContent);
@@ -106,7 +106,7 @@ export default class CGUs extends events.EventEmitter {
       }
     } catch (error) {
       console.error(`${logPrefix} Error:`, error);
-      this.emit('error', serviceId, type, error);
+      this.emit('documentUpdateError', serviceId, type, error);
     }
   }
 }

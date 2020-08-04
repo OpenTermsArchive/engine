@@ -17,9 +17,9 @@ import CGUs from './src/index.js';
     const notifier = new Notifier(app.serviceDeclarations, app.documentTypes);
 
     app.on('versionRecorded', notifier.onVersionRecorded.bind(notifier));
-    app.on('fetchingError', notifier.onDocumentFetchError.bind(notifier));
-    app.on('error', notifier.onApplicationError.bind(notifier));
 
+    app.on('documentFetchError', notifier.onDocumentFetchError.bind(notifier));
+    app.on('documentUpdateError', notifier.onDocumentUpdateError.bind(notifier));
     schedule.scheduleJob(rule, () => {
       app.trackChanges();
     });
