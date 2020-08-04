@@ -17,7 +17,7 @@
       "administratorsListId": 9,
       "updatesListId": 191,
       "updateTemplateId": 21,
-      "errorTemplateId": 22
+      "updateErrorTemplateId": 22,
     }
   }
 }
