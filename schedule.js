@@ -13,10 +13,19 @@ import CGUs from './src/index.js';
 
     const app = new CGUs();
     await app.init();
-
     const notifier = new Notifier(app.serviceDeclarations, app.documentTypes);
 
-    app.on('versionRecorded', notifier.onVersionRecorded.bind(notifier));
+    const delayedVersionNotitificationsParams = [];
+
+    app.on('versionRecorded', (serviceId, type, versionId) => {
+      delayedVersionNotitificationsParams.push({ serviceId, type, versionId });
+    });
+
+    app.on('changesPublished', () => {
+      delayedVersionNotitificationsParams.forEach(({ serviceId, type, versionId }) => {
+        notifier.onVersionRecorded(serviceId, type, versionId);
+      });
+    });
 
     app.on('documentFetchError', notifier.onDocumentFetchError.bind(notifier));
     app.on('documentUpdateError', notifier.onDocumentUpdateError.bind(notifier));
