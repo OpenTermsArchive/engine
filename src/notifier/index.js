@@ -59,15 +59,15 @@ export default class Notifier {
   }
 
   async send(lists, sendParams) {
-    const promises = lists.map((listId) => this.getListContacts(listId));
+    const promises = lists.map(listId => this.getListContacts(listId));
 
     let contacts = await Promise.all(promises);
 
     contacts = contacts.flat();
 
-    const uniqueContacts = contacts.reduce((acc, current) => (acc.find((contact) => contact.id === current.id) ? acc : acc.concat([current])), []);
+    const uniqueContacts = contacts.reduce((acc, current) => (acc.find(contact => contact.id === current.id) ? acc : acc.concat([current])), []);
 
-    const sendPromises = uniqueContacts.map((contact) => this.apiInstance.sendTransacEmail({ ...sendParams, to: [{ email: contact.email }] }));
+    const sendPromises = uniqueContacts.map(contact => this.apiInstance.sendTransacEmail({ ...sendParams, to: [{ email: contact.email }] }));
 
     return Promise.all(sendPromises);
   }

@@ -42,7 +42,7 @@ export function removeIrrelevantModulesFromPrivacyPolicy(document) {
     'mainwindowsmixedrealitymodule'
   ];
 
-  document.querySelectorAll('.divModuleDescription').forEach((moduleDescription) => {
+  document.querySelectorAll('.divModuleDescription').forEach(moduleDescription => {
     let moduleName = moduleDescription.querySelector('#moduleName');
     if (moduleName) {
       moduleName = moduleName.textContent;
@@ -56,7 +56,7 @@ export function removeIrrelevantModulesFromPrivacyPolicy(document) {
 export function removeIrrelevantModulesFromParentTos(document) {
   const OTHER_SERVICES_TOS = /^14[^e_]/; // match all section 14 entities except "Terms14_service-SpecificTerms" and "14e_Skype"
 
-  document.querySelectorAll('.divModuleDescription').forEach((moduleDescription) => {
+  document.querySelectorAll('.divModuleDescription').forEach(moduleDescription => {
     let moduleName = moduleDescription.querySelector('.FileName');
     if (moduleName) {
       moduleName = moduleName.textContent;
@@ -68,15 +68,15 @@ export function removeIrrelevantModulesFromParentTos(document) {
 }
 
 export function removeNavigationHeaders(document) {
-  document.querySelectorAll('#navigationHeader, .navigationHeader').forEach((element) => element.remove());
+  document.querySelectorAll('#navigationHeader, .navigationHeader').forEach(element => element.remove());
 }
 
 export function removeModuleIDs(document) {
-  document.querySelectorAll('#moduleName, .FileName').forEach((element) => element.remove());
+  document.querySelectorAll('#moduleName, .FileName').forEach(element => element.remove());
 }
 
 export function removeInvisibleText(document) {
-  document.querySelectorAll('.displayNone').forEach((element) => element.remove());
-  document.querySelectorAll('.printsummary').forEach((element) => element.remove());
-  document.querySelectorAll('.printDetailedContent').forEach((element) => element.remove());
+  document.querySelectorAll('.displayNone').forEach(element => element.remove());
+  document.querySelectorAll('.printsummary').forEach(element => element.remove());
+  document.querySelectorAll('.printDetailedContent').forEach(element => element.remove());
 }

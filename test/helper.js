@@ -27,7 +27,7 @@ async function eraseRepo() {
   for (const repoPath of [ VERSIONS_PATH, SNAPSHOTS_PATH ]) {
     const files = await fs.readdir(repoPath, { withFileTypes: true }); /* eslint-disable-line no-await-in-loop */
 
-    promises.push(...files.map((file) => {
+    promises.push(...files.map(file => {
       const filePath = path.join(repoPath, file.name);
 
       if (file.isDirectory()) {

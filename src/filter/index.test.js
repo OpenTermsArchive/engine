@@ -37,7 +37,7 @@ const expectedFilteredWithAdditional = `Title
 const additionalFilter = {
   removeLinks: function removeLinks(document) {
     const links = document.querySelectorAll('a');
-    links.forEach((link) => {
+    links.forEach(link => {
       link.remove();
     });
   }
