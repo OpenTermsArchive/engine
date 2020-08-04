@@ -23,6 +23,47 @@
         "removeHelpButtons",
         "cleanUrls"
       ]
+    },
+    "devPaymentsTos": {
+      "location": "https://developers.facebook.com/policy/credits",
+      "contentSelector": "._4bl9",
+      "filters": [
+        "removeHelpButtons",
+        "cleanUrls"
+      ]
+    },
+    "communityPaymentsTos": {
+      "location": "https://www.facebook.com/payments_terms",
+      "contentSelector": ".prl",
+      "filters": [
+        "removeHelpButtons",
+        "cleanUrls"
+      ]
+    },
+
+    "cookiesPolicy": {
+      "location": "https://www.facebook.com/policies/cookies",
+      "contentSelector": "._5tkp",
+      "filters": [
+        "removeHelpButtons",
+        "cleanUrls"
+      ]
+    },
+    "commercialTerms": {
+      "location": "https://www.facebook.com/legal/commercial_terms",
+      "contentSelector": "#content",
+      "filters": [
+        "removeHelpButtons",
+        "cleanUrls"
+      ]
+    },
+    "adsBuyerTerms": {
+      "location": "https://www.facebook.com/legal/self_service_ads_terms",
+      "contentSelector": "#content",
+      "filters": [
+        "removeHelpButtons",
+        "cleanUrls"
+      ]
     }
   }
 }
