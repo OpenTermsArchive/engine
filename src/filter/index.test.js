@@ -6,7 +6,7 @@ import filter, { convertRelativeURLsToAbsolute } from './index.js';
 const { JSDOM } = jsdom;
 const { expect } = chai;
 
-const virtualLocation = "https://exemple.com/main";
+const virtualLocation = 'https://exemple.com/main';
 const rawHTML = `
 <!DOCTYPE html>
 <html>
