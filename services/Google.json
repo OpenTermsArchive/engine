@@ -3,11 +3,17 @@
     "documents": {
         "privacy": {
             "location": "https://policies.google.com/privacy?hl=en-US",
-            "contentSelector": "div[role=article]"
+            "contentSelector": "div[role=article]",
+            "filters": [
+                "removeUTMfromUrls"
+            ]
         },
         "tos": {
             "location": "https://policies.google.com/terms?hl=en-US",
-            "contentSelector": "div[role=article]"
+            "contentSelector": "div[role=article]",
+            "filters": [
+                "removeUTMfromUrls"
+            ]
         }
     }
 }
