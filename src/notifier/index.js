@@ -1,8 +1,9 @@
 import dotenv from 'dotenv';
 import config from 'config';
-dotenv.config();
 
 import sendInBlue from 'sib-api-v3-sdk';
+
+dotenv.config();
 export default class Notifier {
   constructor(passedServiceProviders, passedDocumentTypes) {
     const defaultClient = sendInBlue.ApiClient.instance;
@@ -25,7 +26,7 @@ export default class Notifier {
         ERROR_TEXT: `An error occured when trying to scrape the document:
   ${error}`
       },
-    }
+    };
 
     return this.send([config.get('notifier.sendInBlue.administratorsListId')], sendParams);
   }
@@ -38,9 +39,9 @@ export default class Notifier {
         DOCUMENT_TYPE: this.documentTypes[documentTypeId].name,
         SHA: versionId
       },
-    }
+    };
 
-    return this.send([config.get('notifier.sendInBlue.administratorsListId'), config.get('notifier.sendInBlue.updatesListId')], sendParams);
+    return this.send([ config.get('notifier.sendInBlue.administratorsListId'), config.get('notifier.sendInBlue.updatesListId') ], sendParams);
   }
 
   async onApplicationError(serviceProviderId, documentTypeId, error) {
@@ -52,22 +53,21 @@ export default class Notifier {
         ERROR_TEXT: `An error occured when trying to update the document:
   ${error}`
       },
-    }
+    };
 
     return this.send([config.get('notifier.sendInBlue.administratorsListId')], sendParams);
   }
 
   async send(lists, sendParams) {
-    let contacts = [];
+    const promises = lists.map(listId => this.getListContacts(listId));
 
-    for (let listId of lists) {
-      const listContacts = await this.getListContacts(listId);
-      contacts = contacts.concat(...listContacts);
-    }
+    let contacts = await Promise.all(promises);
 
-    const uniqueContacts = contacts.reduce((acc, current) => acc.find(contact => contact.id === current.id) ? acc : acc.concat([current]), []);
+    contacts = contacts.flat();
 
-    const sendPromises = uniqueContacts.map(contact => this.apiInstance.sendTransacEmail({...sendParams, to: [{ email: contact.email }] }));
+    const uniqueContacts = contacts.reduce((acc, current) => (acc.find(contact => contact.id === current.id) ? acc : acc.concat([current])), []);
+
+    const sendPromises = uniqueContacts.map(contact => this.apiInstance.sendTransacEmail({ ...sendParams, to: [{ email: contact.email }] }));
 
     return Promise.all(sendPromises);
   }
@@ -83,7 +83,7 @@ export default class Notifier {
       return accumulator;
     }
 
-    const result = await this.contactsInstance[functionName](resourceIdParameter, { limit: paginationSize, offset });
+    const result = await this.contactsInstance[functionName](resourceIdParameter, { limit: paginationSize, offset });
     accumulator = accumulator.concat(result[resultKey]);
     return this.getAllPaginatedEntries(functionName, resourceIdParameter, resultKey, accumulator, count, offset + paginationSize, paginationSize);
   }

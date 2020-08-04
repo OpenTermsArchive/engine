@@ -4,13 +4,14 @@ import events from 'events';
 import config from 'config';
 
 import consoleStamp from 'console-stamp';
-consoleStamp(console);
 
+import { publish, recordSnapshot, recordVersion } from './history/index.js';
 import fetch from './fetcher/index.js';
-import { recordSnapshot, recordVersion, publish } from './history/index.js';
 import filter from './filter/index.js';
 import loadServiceDeclarations from './loader/index.js';
 import { TYPES } from './types.js';
+
+consoleStamp(console);
 
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
 const SERVICE_DECLARATIONS_PATH = path.resolve(__dirname, '../', config.get('serviceDeclarationsPath'));
@@ -43,12 +44,12 @@ export default class CGUs extends events.EventEmitter {
 
     const documentTrackingPromises = [];
 
-    const services = serviceToTrack ? {[serviceToTrack]: this._serviceDeclarations[serviceToTrack]} : this._serviceDeclarations;
+    const services = serviceToTrack ? { [serviceToTrack]: this._serviceDeclarations[serviceToTrack] } : this._serviceDeclarations;
 
-    Object.keys(services).forEach((serviceId) => {
+    Object.keys(services).forEach(serviceId => {
       const { documents, name: serviceName } = this._serviceDeclarations[serviceId];
 
-      Object.keys(documents).forEach((type) => {
+      Object.keys(documents).forEach(type => {
         documentTrackingPromises.push(this.trackDocumentChanges({
           serviceId,
           serviceName,
@@ -95,9 +96,9 @@ export default class CGUs extends events.EventEmitter {
 
       const { id: versionId, path: documentPath, isFirstRecord } = await recordVersion(serviceId, type, document, snapshotId);
       if (versionId) {
-        const message = isFirstRecord ?
-          `${logPrefix} First version recorded in ${documentPath} with id ${versionId}.` :
-          `${logPrefix} Recorded version in ${documentPath} with id ${versionId}.`;
+        const message = isFirstRecord
+          ? `${logPrefix} First version recorded in ${documentPath} with id ${versionId}.`
+          : `${logPrefix} Recorded version in ${documentPath} with id ${versionId}.`;
         console.log(message);
         this.emit(isFirstRecord ? 'documentAdded' : 'versionRecorded', serviceId, type, versionId);
       } else {

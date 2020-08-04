@@ -4,7 +4,6 @@ import TurndownService from 'turndown';
 import turndownPluginGithubFlavouredMarkdown from 'joplin-turndown-plugin-gfm';
 import jsdom from 'jsdom';
 
-
 const { JSDOM } = jsdom;
 const turndownService = new TurndownService();
 turndownService.use(turndownPluginGithubFlavouredMarkdown.gfm);
@@ -12,7 +11,7 @@ turndownService.use(turndownPluginGithubFlavouredMarkdown.gfm);
 export const LINKS_TO_CONVERT_SELECTOR = 'a[href]:not([href^="#"])';
 
 export default async function filter(content, selector, location, filterNames, filterFunctions) {
-  let { document: webPageDOM } = new JSDOM(content).window;
+  const { document: webPageDOM } = new JSDOM(content).window;
 
   if (filterNames) {
     filterNames.forEach(filterName => {

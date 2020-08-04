@@ -13,6 +13,8 @@
     "start:scheduler": "node schedule.js",
     "start:scheduler:prod": "NODE_ENV=production node schedule.js",
     "setup": "node scripts/setup.js",
+    "lint": "./node_modules/eslint/bin/eslint.js ./test/**/*.js ./src/**/*.js ./services/**/*.js",
+    "posttest": "npm run lint",
     "test": "NODE_ENV=test mocha --file './test/helper.js' --recursive \"./src/**/*.test.js\"",
     "test:debug": "NODE_ENV=test mocha --file './test/helper.js' --recursive \"./src/**/*.test.js\" --inspect-brk --exit",
     "validate": "NODE_ENV=validation mocha --file './test/helper.js' scripts/validation/validate.js --serviceId"
@@ -30,6 +32,10 @@
   "devDependencies": {
     "ajv": "^6.12.3",
     "chai": "^4.2.0",
+    "eslint": "^7.5.0",
+    "eslint-config-airbnb-base": "^14.2.0",
+    "eslint-plugin-chai-friendly": "^0.6.0",
+    "eslint-plugin-import": "^2.22.0",
     "inquirer": "^7.3.0",
     "json-source-map": "^0.6.1",
     "mocha": "^7.2.0",

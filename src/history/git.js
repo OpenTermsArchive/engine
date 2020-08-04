@@ -2,6 +2,7 @@ import path from 'path';
 import config from 'config';
 
 import simpleGit from 'simple-git';
+
 export default class Git {
   constructor(repositoryPath) {
     this.path = repositoryPath;
@@ -31,15 +32,15 @@ export default class Git {
 
   async hasChanges(filepath) {
     const status = await this.git.status();
-    return (status.modified.indexOf(this.relativePath(filepath)) > -1) ||
-           (status.not_added.indexOf(this.relativePath(filepath)) > -1) ||
-           (status.created.indexOf(this.relativePath(filepath)) > -1);
+    return (status.modified.indexOf(this.relativePath(filepath)) > -1)
+           || (status.not_added.indexOf(this.relativePath(filepath)) > -1)
+           || (status.created.indexOf(this.relativePath(filepath)) > -1);
   }
 
   async isNew(filepath) {
     const status = await this.git.status();
-    return (status.created.indexOf(this.relativePath(filepath)) > -1) ||
-           (status.not_added.indexOf(this.relativePath(filepath)) > -1);
+    return (status.created.indexOf(this.relativePath(filepath)) > -1)
+           || (status.not_added.indexOf(this.relativePath(filepath)) > -1);
   }
 
   relativePath(absolutePath) {
