@@ -15,8 +15,8 @@ In order to **track** their **changes**, **documents** are periodically obtained
 
 However, the shape of that **noise** can change over time. In order to recover in case of information loss during the **noise filtering** step, a **snapshot** is **recorded** every time there is a **change**. After the **noise** is **filtered out** from the **snapshot**, if there are **changes** in the resulting **document**, a new **version** of the **document** is **recorded**.
 
-Anyone can run their own **private** instance and track changes on their own. However, we also **publish** each **version** on a [**public** instance](https://github.com/ambanum/CGUs-data) that makes it easy to explore the entire **history** and enables **notifying** over email whenever a new **version** is **recorded**.
-Users can [**subscribe** to **notifications**](https://github.com/ambanum/CGUs-data#be-notified).
+Anyone can run their own **private** instance and track changes on their own. However, we also **publish** each **version** on a [**public** instance](https://github.com/ambanum/CGUs-versions) that makes it easy to explore the entire **history** and enables **notifying** over email whenever a new **version** is **recorded**.
+Users can [**subscribe** to **notifications**](https://github.com/ambanum/CGUs-versions#be-notified).
 
 _Note: For now, when multiple versions coexist, **terms** are only **tracked** in their English version and for the European jurisdiction._
 
