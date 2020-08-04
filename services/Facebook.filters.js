@@ -12,7 +12,8 @@ export function removeReturnToTopButtons(document) {
 }
 
 export function cleanUrls(document) {
-  const links = document.querySelectorAll('[href*="https://l.facebook.com/l.php?"]');
+  const links = document.querySelectorAll('[href*="https://l.facebook.com/l.php?"],[href*="http://l.facebook.com/l.php?"]');
+
   links.forEach(link => {
     link.href = link.href.replace(/&h=\S*/, '');
   });
