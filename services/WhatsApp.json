@@ -2,11 +2,11 @@
     "name": "WhatsApp",
     "documents": {
         "tos": {
-            "location": "https://www.whatsapp.com/legal/",
+            "location": "https://www.whatsapp.com/legal?eea=1",
             "contentSelector": "div._-pj:nth-child(3)"
         },
         "privacy": {
-            "location": "https://www.whatsapp.com/legal/",
+            "location": "https://www.whatsapp.com/legal?eea=1",
             "contentSelector": "div._-pj:nth-child(4)"
         }
     }
