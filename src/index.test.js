@@ -3,12 +3,12 @@ import fs from 'fs';
 import path from 'path';
 import nock from 'nock';
 
-const __dirname = path.dirname(new URL(import.meta.url).pathname);
-const expect = chai.expect;
-
 import CGUs from './index.js';
 import { SNAPSHOTS_PATH, VERSIONS_PATH } from './history/index.js';
 import { TYPES } from './types.js';
+
+const __dirname = path.dirname(new URL(import.meta.url).pathname);
+const { expect } = chai;
 
 const SERVICE_A_ID = 'service_A';
 const SERVICE_A_TYPE = 'tos';

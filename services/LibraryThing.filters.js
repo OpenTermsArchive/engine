@@ -2,7 +2,7 @@ export function selectOnlyTOS(document) {
   const sectionTitles = Array.from(document.querySelectorAll('h2'));
   const privacyPolicyTitle = sectionTitles.filter(el => el.textContent === 'Privacy Policy')[0].firstChild;
   const TermsOfServiceTitle = sectionTitles.filter(el => el.textContent === 'Terms of Service')[0].firstChild;
-  const mobilePrivacyPolicyTitle = Array.from(document.querySelectorAll('h3')).filter(title => title.textContent == 'Mobile Apps (Android and iOS)')[0];
+  const mobilePrivacyPolicyTitle = Array.from(document.querySelectorAll('h3')).filter(title => title.textContent === 'Mobile Apps (Android and iOS)')[0];
 
   const privacyPolicyContent = document.createRange();
   privacyPolicyContent.setStartBefore(privacyPolicyTitle);
@@ -18,7 +18,7 @@ export function selectOnlyTOS(document) {
 export function selectOnlyPrivacyPolicy(document) {
   const sectionTitles = Array.from(document.querySelectorAll('h2'));
   const communityRulesTitle = sectionTitles.filter(el => el.textContent === 'Community Rules')[0].firstChild;
-  const mobilePrivacyPolicyTitle = Array.from(document.querySelectorAll('h3')).filter(title => title.textContent == 'Mobile Apps (Android and iOS)')[0];
+  const mobilePrivacyPolicyTitle = Array.from(document.querySelectorAll('h3')).filter(title => title.textContent === 'Mobile Apps (Android and iOS)')[0];
   const lastTitle = sectionTitles.filter(el => el.textContent === 'Tired, yet?\n\n')[0].firstChild;
 
   const communityRulesContent = document.createRange();
