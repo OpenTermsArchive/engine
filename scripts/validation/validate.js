@@ -72,7 +72,7 @@ describe('Service validation', () => {
 
             for (let i = 0; i < 2; i++) {
               const content = await fetch(location);
-              filteredContent[i] = await filter(content, contentSelector, filters, service.filters);
+              filteredContent[i] = await filter(content, contentSelector, location, filters, service.filters);
             }
 
             expect(filteredContent[0]).to.equal(filteredContent[1]);
