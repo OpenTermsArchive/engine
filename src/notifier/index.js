@@ -58,6 +58,18 @@ export default class Notifier {
     return this.send([config.get('notifier.sendInBlue.administratorsListId')], sendParams);
   }
 
+  async onApplicationError(error) {
+    const sendParams = {
+      templateId: config.get('notifier.sendInBlue.applicationErrorTemplateId'),
+      params: {
+        ERROR_TEXT: `An error occured:
+  ${error}`
+      },
+    };
+
+    return this.send([config.get('notifier.sendInBlue.administratorsListId')], sendParams);
+  }
+
   async send(lists, sendParams) {
     const promises = lists.map(listId => this.getListContacts(listId));
 

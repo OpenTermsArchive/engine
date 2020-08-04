@@ -20,6 +20,8 @@ import CGUs from './src/index.js';
 
     app.on('documentFetchError', notifier.onDocumentFetchError.bind(notifier));
     app.on('documentUpdateError', notifier.onDocumentUpdateError.bind(notifier));
+    app.on('publicationError', error => notifier.onApplicationError(error));
+
     schedule.scheduleJob(rule, () => {
       app.trackChanges();
     });

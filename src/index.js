@@ -64,8 +64,14 @@ export default class CGUs extends events.EventEmitter {
     await Promise.all(documentTrackingPromises);
 
     if (config.get('history.publish')) {
-      await publish();
-      console.log('Published changes');
+      try {
+        await publish();
+        this.emit('changesPublished');
+        console.log('Changes published');
+      } catch (error) {
+        console.error(`Error when trying to publish changes: ${error}`);
+        this.emit('publicationError', error);
+      }
     }
   }
 
