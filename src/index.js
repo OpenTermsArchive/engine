@@ -46,10 +46,10 @@ export default class CGUs extends events.EventEmitter {
 
     const services = serviceToTrack ? { [serviceToTrack]: this._serviceDeclarations[serviceToTrack] } : this._serviceDeclarations;
 
-    Object.keys(services).forEach((serviceId) => {
+    Object.keys(services).forEach(serviceId => {
       const { documents, name: serviceName } = this._serviceDeclarations[serviceId];
 
-      Object.keys(documents).forEach((type) => {
+      Object.keys(documents).forEach(type => {
         documentTrackingPromises.push(this.trackDocumentChanges({
           serviceId,
           serviceName,
