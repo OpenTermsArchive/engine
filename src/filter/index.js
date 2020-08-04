@@ -1,7 +1,9 @@
+import url from 'url';
+
 import TurndownService from 'turndown';
 import turndownPluginGithubFlavouredMarkdown from 'joplin-turndown-plugin-gfm';
 import jsdom from 'jsdom';
-import urlToolkit from 'url-toolkit';
+
 
 const { JSDOM } = jsdom;
 const turndownService = new TurndownService();
@@ -31,6 +33,6 @@ export default async function filter(content, selector, location, filterNames, f
 
 export function convertRelativeURLsToAbsolute(document, baseURL) {
   Array.from(document.querySelectorAll(LINKS_TO_CONVERT_SELECTOR)).forEach(link => {
-    link.href = urlToolkit.buildAbsoluteURL(baseURL, link.href);
+    link.href = url.resolve(baseURL, link.href);
   });
 }
