@@ -40,38 +40,43 @@ export default class CGUs extends events.EventEmitter {
   }
 
   async trackChanges(serviceToTrack) {
-    console.log('Start scraping and saving terms of service…');
+    try {
+      console.log('Start scraping and saving terms of service…');
 
-    const documentTrackingPromises = [];
+      const documentTrackingPromises = [];
 
-    const services = serviceToTrack ? { [serviceToTrack]: this._serviceDeclarations[serviceToTrack] } : this._serviceDeclarations;
+      const services = serviceToTrack ? { [serviceToTrack]: this._serviceDeclarations[serviceToTrack] } : this._serviceDeclarations;
 
-    Object.keys(services).forEach(serviceId => {
-      const { documents, name: serviceName } = this._serviceDeclarations[serviceId];
+      Object.keys(services).forEach(serviceId => {
+        const { documents, name: serviceName } = this._serviceDeclarations[serviceId];
 
-      Object.keys(documents).forEach(type => {
-        documentTrackingPromises.push(this.trackDocumentChanges({
-          serviceId,
-          serviceName,
-          document: {
-            type,
-            ...documents[type]
-          }
-        }));
+        Object.keys(documents).forEach(type => {
+          documentTrackingPromises.push(this.trackDocumentChanges({
+            serviceId,
+            serviceName,
+            document: {
+              type,
+              ...documents[type]
+            }
+          }));
+        });
       });
-    });
 
-    await Promise.all(documentTrackingPromises);
+      await Promise.all(documentTrackingPromises);
 
-    if (config.get('history.publish')) {
-      try {
-        await publish();
-        this.emit('changesPublished');
-        console.log('Changes published');
-      } catch (error) {
-        console.error(`Error when trying to publish changes: ${error}`);
-        this.emit('publicationError', error);
+      if (config.get('history.publish')) {
+        try {
+          await publish();
+          this.emit('changesPublished');
+          console.log('Changes published');
+        } catch (error) {
+          console.error(`Error when trying to publish changes: ${error}`);
+          this.emit('publicationError', error);
+        }
       }
+    } catch (error) {
+      console.error(`Error when trying to track changes: ${error}`);
+      this.emit('error', error);
     }
   }
 
