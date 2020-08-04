@@ -14,14 +14,14 @@ export default async function loadServiceDeclarations(dirPath) {
 
       services[serviceId] = {
         ...services[serviceId],
-        filters: await import(path.join(dirPath, filename)), /* eslint-disable-line no-await-in-loop */
+        filters: await import(path.join(dirPath, filename)), // eslint-disable-line no-await-in-loop
       };
     } else if (filename.indexOf('.json') !== -1) {
       const serviceId = path.basename(filename, '.json');
 
       services[serviceId] = {
         ...services[serviceId],
-        ...JSON.parse(await fs.readFile(path.join(dirPath, filename))), /* eslint-disable-line no-await-in-loop */
+        ...JSON.parse(await fs.readFile(path.join(dirPath, filename))), // eslint-disable-line no-await-in-loop
       };
     }
   }
