@@ -76,7 +76,7 @@ export default class CGUs extends events.EventEmitter {
       }
     } catch (error) {
       console.error(`Error when trying to track changes: ${error}`);
-      this.emit('error', error);
+      this.emit('applicationError', error);
     }
   }
 
