@@ -53,8 +53,8 @@ export function removeIrrelevantModulesFromPrivacyPolicy(document) {
   });
 }
 
-export function removeIrrelevantModulesFromParentTos(document) {
-  const OTHER_SERVICES_TOS = /^14[^e_]/; // match all section 14 entities except "Terms14_service-SpecificTerms" and "14e_Skype"
+export function removeIrrelevantModulesFromTos(document) {
+  const OTHER_SERVICES_TOS = /^14[^e_]/;// match all section 14 entities except "Terms14_service-SpecificTerms" and "14e_Skype"
 
   document.querySelectorAll('.divModuleDescription').forEach(moduleDescription => {
     let moduleName = moduleDescription.querySelector('.FileName');
