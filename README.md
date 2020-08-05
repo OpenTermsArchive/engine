@@ -91,7 +91,8 @@ The default configuration can be read and changed in `config/default.json`:
 {
   "serviceDeclarationsPath": "Directory containing services declarations and associated filters.",
   "history": {
-    "dataPath": "Database directory path, relative to the root of this project",
+    "snapshotsPath": "Snapshots database directory path, relative to the root of this project",
+    "versionsPath": "Versions database directory path, relative to the root of this project",
     "publish": "Boolean. Set to true to publish changes to the shared, global database. Should be true only in production.",
     "author": {
       "name": "Name to which changes in tracked documents will be credited",
@@ -103,7 +104,8 @@ The default configuration can be read and changed in `config/default.json`:
       "administratorsListId": "SendInBlue contacts list ID of administrators",
       "updatesListId": "SendInBlue contacts list ID of persons to notify on document updates",
       "updateTemplateId": "SendInBlue email template ID used for updates notifications",
-      "errorTemplateId": "SendInBlue email template ID used for error notifications",
+      "updateErrorTemplateId": "SendInBlue email template ID used for updates error notifications",
+      "applicationErrorTemplateId": "SendInBlue email template ID used for application error notifications"
     }
   }
 }
@@ -117,7 +119,7 @@ To get the latest versions of all services' terms:
 npm start
 ```
 
-The latest version of a document will be available in `/data/sanitized/$service_provider_name/$document_type.md`.
+The latest version of a document will be available in `/data/versions/$service_provider_name/$document_type.md`.
 
 To hourly update documents:
 
