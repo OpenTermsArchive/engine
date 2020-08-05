@@ -14,7 +14,8 @@
       "contentSelector": "._4bl9",
       "filters": [
         "cleanUrls",
-        "numberListCorrectly"
+        "numberListCorrectly",
+        "correctTitleIndentation"
       ]
     }
   }
