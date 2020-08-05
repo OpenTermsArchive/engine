@@ -76,7 +76,7 @@ export default class CGUs extends events.EventEmitter {
       }
     } catch (error) {
       console.error(`Error when trying to track changes: ${error}`);
-      this.emit('error', error);
+      this.emit('applicationError', error);
     }
   }
 
@@ -116,7 +116,7 @@ export default class CGUs extends events.EventEmitter {
         console.log(`${logPrefix} No changes after filtering, did not record version.`);
       }
     } catch (error) {
-      console.error(`${logPrefix} Error:`, error);
+      console.error(`${logPrefix} Error:`, error.message);
       this.emit('documentUpdateError', serviceId, type, error);
     }
   }
