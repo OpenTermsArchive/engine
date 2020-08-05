@@ -67,8 +67,8 @@ export default class CGUs extends events.EventEmitter {
       if (config.get('history.publish')) {
         try {
           await publish();
-          this.emit('changesPublished');
           console.log('Changes published');
+          this.emit('changesPublished');
         } catch (error) {
           console.error(`Error when trying to publish changes: ${error}`);
           this.emit('publicationError', error);
