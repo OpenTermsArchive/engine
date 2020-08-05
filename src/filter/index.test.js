@@ -68,9 +68,15 @@ describe('Filter', () => {
     });
 
     context('With no match for the given selector', () => {
-      it('returns an empty string', async () => {
-        const result = await filter(rawHTML, '#thisAnchorDoesNotExist', virtualLocation);
-        expect(result).to.equal('');
+      it('throws an error', async () => {
+        try {
+          await filter(rawHTML, '#thisAnchorDoesNotExist', virtualLocation);
+        } catch (e) {
+          expect(e).to.be.an('error');
+          expect(e.message).to.have.string('provided selector', 'has no match');
+          return;
+        }
+        expect.fail('No error was thrown');
       });
     });
 

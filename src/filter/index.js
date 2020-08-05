@@ -24,7 +24,7 @@ export default async function filter(content, selector, location, filterNames, f
 
   const selectedContent = Array.from(webPageDOM.querySelectorAll(selector));
   if (!selectedContent.length) {
-    console.warn(`The provided selector "${selector}" has no match in the web page.`);
+    throw new Error(`The provided selector "${selector}" has no match in the web page.`);
   }
 
   return selectedContent.map(domFragment => turndownService.turndown(domFragment)).join('\n');
