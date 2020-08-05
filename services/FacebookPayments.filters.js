@@ -1,17 +1,6 @@
 export function removeHelpButtons(document) {
-  const imgs = document.querySelectorAll('img[src*="https://scontent"]');
-  imgs.forEach(img => {
-    const parent = img.parentNode;
-    if (parent.tagName === 'A' && !parent.text) {
-      parent.remove();
-    }
-  });
+  const imgs = document.querySelectorAll('._254').forEach(img => img.remove());
 }
-
-export function removeImgFromCookiesPolicy(document){
-  document.querySelector('._vpi').remove();
-}
-
 export function removeReturnToTopButtons(document) {
   document.querySelectorAll('._t3o').forEach(element => element.remove());
 }
