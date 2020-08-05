@@ -92,8 +92,11 @@ We provide a database of snapshots recorded each time there is a change in the t
 
 **Attention, ce service est en version bêta et vous risquez de recevoir de nombreuses notifications !** Vous pourrez vous désabonner en répondant à n'importe quel courriel reçu.
 
+## Contributing
 
+### Adding a new service
 
+See [CONTRIBUTING](CONTRIBUTING.md).
 
 
 ## Using locally
@@ -166,12 +169,6 @@ npm start $service_id
 ```
 
 > The service id is the case sensitive name of the service declaration file without the extension. For example, for `Twitter.json`, the service id is `Twitter`.
-
-### Contributing
-
-#### You want to add a new service?
-
-See [CONTRIBUTING](CONTRIBUTING.md).
 
 ### Deploying
 
