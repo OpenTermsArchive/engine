@@ -8,7 +8,7 @@ export function removeHelpButtons(document) {
   });
 }
 
-export function removeImgFromCookiesPolicy(document){
+export function removeImgFromCookiesPolicy(document) {
   document.querySelector('._vpi').remove();
 }
 

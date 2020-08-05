@@ -1,5 +1,5 @@
 export function removeHelpButtons(document) {
-  const imgs = document.querySelectorAll('._254').forEach(img => img.remove());
+  document.querySelectorAll('._254').forEach(img => img.remove());
 }
 export function removeReturnToTopButtons(document) {
   document.querySelectorAll('._t3o').forEach(element => element.remove());
