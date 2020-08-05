@@ -5,3 +5,6 @@ export { numberListCorrectly } from './Facebook.filters.js';
 export function removeHelpButtons(document) {
   document.querySelectorAll('._254').forEach(img => img.remove());
 }
+export function correctTitleIndentation(document) {
+  document.querySelectorAll('h3 + ol > *:last-child').forEach(element => console.log(element.innerHTML+='<br>'));
+}
