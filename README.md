@@ -15,8 +15,8 @@ In order to **track** their **changes**, **documents** are periodically obtained
 
 However, the shape of that **noise** can change over time. In order to recover in case of information loss during the **noise filtering** step, a **snapshot** is **recorded** every time there is a **change**. After the **noise** is **filtered out** from the **snapshot**, if there are **changes** in the resulting **document**, a new **version** of the **document** is **recorded**.
 
-Anyone can run their own **private** instance and track changes on their own. However, we also **publish** each **version** on a [**public** instance](https://github.com/ambanum/CGUs-data) that makes it easy to explore the entire **history** and enables **notifying** over email whenever a new **version** is **recorded**.
-Users can [**subscribe** to **notifications**](https://github.com/ambanum/CGUs-data#be-notified).
+Anyone can run their own **private** instance and track changes on their own. However, we also **publish** each **version** on a [**public** instance](https://github.com/ambanum/CGUs-versions) that makes it easy to explore the entire **history** and enables **notifying** over email whenever a new **version** is **recorded**.
+Users can [**subscribe** to **notifications**](https://github.com/ambanum/CGUs-versions#be-notified).
 
 _Note: For now, when multiple versions coexist, **terms** are only **tracked** in their English version and for the European jurisdiction._
 
@@ -24,13 +24,13 @@ _Note: For now, when multiple versions coexist, **terms** are only **tracked** i
 
 _Note: Les mots en gras sont les [termes du domaine](https://en.wikipedia.org/wiki/Domain-driven_design)._
 
-Les **services** sont **déclarées** dans l'outil _CGUs_ grâce à un **fichier de déclaration** listant les **documents** qui forment l'ensemble des **conditions** régissant l'usage de la **service**. Ces **documents** peuvent être de plusieurs **types**: “conditions d'utilisation”, “politique de confidentialité”, “contrat de développeur”…
+Les **services** sont **déclarés** dans l'outil _CGUs_ grâce à un **fichier de déclaration** listant les **documents** qui forment l'ensemble des **conditions** régissant l'usage du **service**. Ces **documents** peuvent être de plusieurs **types**: “conditions d'utilisation”, “politique de confidentialité”, “contrat de développeur”…
 
-Afin de **suivre** leurs **évolutions**, les **documents** sont régulièrement mis à jour, en les **récupérant** depuis une **adresse** Web et en **sélectionnant leur contenu** dans la **page Web** pour supprimer le **bruit** (publicités, menus de navigation, champs de connexion...). En plus de simplement sélectionner une zone de la page, certains documents possèdent du **bruit** supplémentaire (hashs dans des liens, tokens CSRF...) créant de faux positifs en terme de **changements**. En conséquence, _CGUs_ supporte des **filtres** spécifiques pour chaque **document**.
+Afin de **suivre** leurs **évolutions**, les **documents** sont régulièrement mis à jour, en les **téléchargeant** depuis une **adresse** Web et en **sélectionnant leur contenu** dans la **page Web** pour supprimer le **bruit** (publicités, menus de navigation, champs de connexion…). En plus de simplement sélectionner une zone de la page, certains documents possèdent du **bruit** supplémentaire (hashs dans des liens, jetons CSRF...) créant de faux positifs en terme d'**évolutions**. En conséquence, _CGUs_ supporte des **filtres** spécifiques pour chaque **document**.
 
-Néanmoins, le **bruit** peut changer de forme avec le temps. Afin d'éviter des pertes d'information irrécupérables pendant l'étape de **filtrage du bruit**, un **instantané** de la page Web est **enregistré** à chaque **changement**. Une fois **l'instantané filtré** de son **bruit**, si le **document** résultant a changé par rapport à sa **version** précédente, une nouvelle **version** est **enregistrée**.
+Néanmoins, le **bruit** peut changer de forme avec le temps. Afin d'éviter des pertes d'information irrécupérables pendant l'étape de **filtrage du bruit**, un **instantané** de la page Web est **enregistré** à chaque **évolution**. Après avoir **filtré l'instantané** de son **bruit**, si le **document** résultant a changé par rapport à sa **version** précédente, une nouvelle **version** est **enregistrée**.
 
-Vous pouvez disposer de votre propre instance **privée** de l'outil _CGUs_ et suivre vous-même les changements. Néanmoins, nous **publions** chaque **version** sur une [instance **publique**](https://github.com/ambanum/CGUs-data) facilitant l'exploration de l'**historique** et **notifiant** par mails l'**enregistrement** de nouvelles **versions**. Les **utilisateurs** peuvent [**s'abonner** aux **notifications**](https://github.com/ambanum/CGUs-data#be-notified).
+Vous pouvez disposer de votre propre instance **privée** de l'outil _CGUs_ et suivre vous-même les évolutions. Néanmoins, nous **publions** chaque **version** sur une [instance **publique**](https://github.com/ambanum/CGUs-versions) facilitant l'exploration de l'**historique** et **notifiant** par courriels l'**enregistrement** de nouvelles **versions**. Les **utilisateurs** peuvent [**s'abonner** aux **notifications**](https://github.com/ambanum/CGUs-versions#be-notified).
 
 
 _Note: Actuellement, nous privilégions les **conditions** rédigées en anglais et concernant la juridiction européenne._
