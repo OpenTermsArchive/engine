@@ -59,8 +59,8 @@ describe('Service validation', () => {
 
           const { contentSelector, location, removeElements, filters } = service.documents[type];
           const content = await fetch(location);
-          expect(filtredContent).to.exist;
           const filteredContent = await filter(content, contentSelector, removeElements, filters, service.filters);
+          expect(filteredContent).to.not.be.empty;
         });
 
         context('When fetched and filtered twice in a row', () => {
