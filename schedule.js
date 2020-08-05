@@ -15,14 +15,14 @@ import CGUs from './src/index.js';
     await app.init();
     const notifier = new Notifier(app.serviceDeclarations, app.documentTypes);
 
-    const delayedVersionNotitificationsParams = [];
+    const delayedVersionNotificationsParams = [];
 
     app.on('versionRecorded', (serviceId, type, versionId) => {
-      delayedVersionNotitificationsParams.push({ serviceId, type, versionId });
+      delayedVersionNotificationsParams.push({ serviceId, type, versionId });
     });
 
     app.on('changesPublished', () => {
-      delayedVersionNotitificationsParams.forEach(({ serviceId, type, versionId }) => {
+      delayedVersionNotificationsParams.forEach(({ serviceId, type, versionId }) => {
         notifier.onVersionRecorded(serviceId, type, versionId);
       });
     });
