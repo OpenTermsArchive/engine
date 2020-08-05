@@ -51,6 +51,7 @@ You can subscribe to receive an email when a document is updated by [filling the
 
 
 ## Fonctionnement
+## Analysing the snapshots history
 
 _Note: Les mots en gras sont les [termes du domaine](https://fr.wikipedia.org/wiki/Conception_pilot%C3%A9e_par_le_domaine)._
 
@@ -87,17 +88,15 @@ Cliquez sur une modification pour voir en quoi elle consiste (par exemple [celle
 ## Recevoir des notifications
 
 Vous pouvez vous abonner pour recevoir un courriel lorsqu'un document est modifié en [remplissant ce formulaire](https://59692a77.sibforms.com/serve/MUIEAKuTv3y67e27PkjAiw7UkHCn0qVrcD188cQb-ofHVBGpvdUWQ6EraZ5AIb6vJqz3L8LDvYhEzPb2SE6eGWP35zXrpwEFVJCpGuER9DKPBUrifKScpF_ENMqwE_OiOZ3FdCV2ra-TXQNxB2sTEL13Zj8HU7U0vbbeF7TnbFiW8gGbcOa5liqmMvw_rghnEB2htMQRCk6A3eyj).
+We provide a database of snapshots recorded each time there is a change in the terms of service and other contractual documents of tracked services: [CGUs-Snapshots](https://github.com/ambanum/CGUs-snapshots).
 
 **Attention, ce service est en version bêta et vous risquez de recevoir de nombreuses notifications !** Vous pourrez vous désabonner en répondant à n'importe quel courriel reçu.
 
 
-## Analysing the entire history
 
-We provide a database of snapshots recorded each time there is a change in the terms of service and other contractual documents of tracked services: [CGUs-Snapshots](https://github.com/ambanum/CGUs-snapshots).
 
-- - -
 
-## Development
+## Using locally
 
 ### Installing
 
@@ -118,7 +117,7 @@ Initialize the database:
 npm run setup
 ```
 
-### Configuration
+### Configuring
 
 The default configuration can be read and changed in `config/default.json`:
 
@@ -144,7 +143,7 @@ The default configuration can be read and changed in `config/default.json`:
 }
 ```
 
-### Usage
+### Running
 
 To get the latest versions of all services' terms:
 
