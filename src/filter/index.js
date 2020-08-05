@@ -25,13 +25,7 @@ export default async function filter(content, location, selector, removeElements
   const selectedContent = webPageDOM;
 
   if (removeElements) {
-    let elementsToRemove = removeElements;
-
-    if (!Array.isArray(elementsToRemove)) {
-      elementsToRemove = [elementsToRemove];
-    }
-
-    elementsToRemove.forEach(elementSelector => {
+    [].concat(removeElements).forEach(elementSelector => {
       if (typeof elementSelector === 'object') {
         const rangeSelection = getRangeSelection(selectedContent, elementSelector);
         rangeSelection.deleteContents();
@@ -43,13 +37,7 @@ export default async function filter(content, location, selector, removeElements
 
   const selectedContents = [];
   if (selector) {
-    let elementsToSelect = selector;
-
-    if (!Array.isArray(elementsToSelect)) {
-      elementsToSelect = [elementsToSelect];
-    }
-
-    elementsToSelect.forEach(elementSelector => {
+    [].concat(selector).forEach(elementSelector => {
       if (typeof elementSelector === 'object') {
         const rangeSelection = getRangeSelection(selectedContent, elementSelector);
         selectedContents.push(rangeSelection.cloneContents());
