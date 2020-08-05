@@ -13,7 +13,8 @@
       "location": "https://developers.facebook.com/policy/credits",
       "contentSelector": "._4bl9",
       "filters": [
-        "cleanUrls"
+        "cleanUrls",
+        "numberListCorrectly"
       ]
     }
   }

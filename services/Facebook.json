@@ -37,6 +37,7 @@
       "location": "https://www.facebook.com/legal/commercial_terms",
       "contentSelector": "#content",
       "filters": [
+        "numberListCorrectly",
         "removeHelpButtons",
         "cleanUrls"
       ]
