@@ -30,5 +30,13 @@ export const TYPES = {
   commercialTerms: {
     name: 'Commercial Terms',
     fileName: 'commercial_terms'
+  },
+  copyrightPolicy: {
+    name: 'Copyright Policy',
+    fileName: 'copyright_policy'
+  },
+  lawEnforcementPolicy: {
+    name: 'Law Enforcement Policy',
+    fileName: 'law_enforcement_policy'
   }
 };
