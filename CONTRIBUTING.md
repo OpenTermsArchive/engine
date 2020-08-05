@@ -29,6 +29,11 @@ npm run validate $service_id
 
 > The service id is the case sensitive name of the service declaration file without the extension. For example, for `Twitter.json`, the service id is `Twitter`.
 
+### Selecting jurisdiction and language
+
+For now, when multiple versions coexist, terms are only tracked in their English version and for the European (EEA) jurisdiction.
+
+
 ## Filters
 
 Some documents will need additional filtering beyond simple element selection to remove noise (changes in textual content that are not meaningful to the terms of services).
