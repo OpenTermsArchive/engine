@@ -104,7 +104,7 @@ Database of snapshots recorded each time there is a change in the Terms of Servi
 
 - - -
 
-## Developement
+## Development
 
 ### Installing
 
