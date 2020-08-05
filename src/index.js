@@ -80,8 +80,8 @@ export default class CGUs extends events.EventEmitter {
     }
   }
 
-  async trackDocumentChanges({ serviceId, serviceName, document }) {
-    const { type, location, contentSelector, filters, removeElements } = document;
+  async trackDocumentChanges({ serviceId, serviceName, document: documentDeclaration }) {
+    const { type, fetch: location } = documentDeclaration;
     const logPrefix = `[${serviceName}-${this._types[type].name}]`;
     try {
       console.log(`${logPrefix} Fetch '${location}'.`);
@@ -103,7 +103,7 @@ export default class CGUs extends events.EventEmitter {
 
       console.log(`${logPrefix} Recorded snapshot with id ${snapshotId}.`);
 
-      const document = await filter(pageContent, location, contentSelector, removeElements, filters, this._serviceDeclarations[serviceId].filters);
+      const document = await filter(pageContent, documentDeclaration, this._serviceDeclarations[serviceId].filters);
 
       const { id: versionId, path: documentPath, isFirstRecord } = await recordVersion(serviceId, type, document, snapshotId);
       if (versionId) {

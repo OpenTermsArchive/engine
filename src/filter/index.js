@@ -10,7 +10,7 @@ turndownService.use(turndownPluginGithubFlavouredMarkdown.gfm);
 
 export const LINKS_TO_CONVERT_SELECTOR = 'a[href]:not([href^="#"])';
 
-export default async function filter(content, location, selector, removeElements, filterNames, filterFunctions) {
+export default async function filter(content, { fetch: location, select: selectElements, remove: removeElements, filter: filterNames}, filterFunctions) {
   const { document: webPageDOM } = new JSDOM(content).window;
 
   if (filterNames) {
@@ -36,8 +36,8 @@ export default async function filter(content, location, selector, removeElements
   }
 
   const selectedContents = [];
-  if (selector) {
-    [].concat(selector).forEach(elementSelector => {
+  if (selectElements) {
+    [].concat(selectElements).forEach(elementSelector => {
       if (typeof elementSelector === 'object') {
         const rangeSelection = getRangeSelection(selectedContent, elementSelector);
         selectedContents.push(rangeSelection.cloneContents());
@@ -48,7 +48,7 @@ export default async function filter(content, location, selector, removeElements
   }
 
   if (!selectedContents.length) {
-    throw new Error(`The provided selector "${selector}" has no match in the web page.`);
+    throw new Error(`The provided selector "${selectElements}" has no match in the web page.`);
   }
 
   return selectedContents.map(domFragment => turndownService.turndown(domFragment)).join('\n');
