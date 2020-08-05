@@ -40,32 +40,43 @@ export default class CGUs extends events.EventEmitter {
   }
 
   async trackChanges(serviceToTrack) {
-    console.log('Start scraping and saving terms of service…');
+    try {
+      console.log('Start scraping and saving terms of service…');
 
-    const documentTrackingPromises = [];
+      const documentTrackingPromises = [];
 
-    const services = serviceToTrack ? { [serviceToTrack]: this._serviceDeclarations[serviceToTrack] } : this._serviceDeclarations;
+      const services = serviceToTrack ? { [serviceToTrack]: this._serviceDeclarations[serviceToTrack] } : this._serviceDeclarations;
 
-    Object.keys(services).forEach(serviceId => {
-      const { documents, name: serviceName } = this._serviceDeclarations[serviceId];
+      Object.keys(services).forEach(serviceId => {
+        const { documents, name: serviceName } = this._serviceDeclarations[serviceId];
 
-      Object.keys(documents).forEach(type => {
-        documentTrackingPromises.push(this.trackDocumentChanges({
-          serviceId,
-          serviceName,
-          document: {
-            type,
-            ...documents[type]
-          }
-        }));
+        Object.keys(documents).forEach(type => {
+          documentTrackingPromises.push(this.trackDocumentChanges({
+            serviceId,
+            serviceName,
+            document: {
+              type,
+              ...documents[type]
+            }
+          }));
+        });
       });
-    });
 
-    await Promise.all(documentTrackingPromises);
+      await Promise.all(documentTrackingPromises);
 
-    if (config.get('history.publish')) {
-      await publish();
-      console.log('Published changes');
+      if (config.get('history.publish')) {
+        try {
+          await publish();
+          console.log('Changes published');
+          this.emit('changesPublished');
+        } catch (error) {
+          console.error(`Error when trying to publish changes: ${error}`);
+          this.emit('publicationError', error);
+        }
+      }
+    } catch (error) {
+      console.error(`Error when trying to track changes: ${error}`);
+      this.emit('error', error);
     }
   }
 
@@ -79,7 +90,7 @@ export default class CGUs extends events.EventEmitter {
         pageContent = await fetch(location);
       } catch (error) {
         console.error(`${logPrefix} Could not fetch location: ${error}`);
-        return this.emit('fetchingError', serviceId, type, error);
+        return this.emit('documentFetchError', serviceId, type, error);
       }
 
       const { id: snapshotId, path: snapshotPath } = await recordSnapshot(serviceId, type, pageContent);
@@ -106,7 +117,7 @@ export default class CGUs extends events.EventEmitter {
       }
     } catch (error) {
       console.error(`${logPrefix} Error:`, error);
-      this.emit('error', serviceId, type, error);
+      this.emit('documentUpdateError', serviceId, type, error);
     }
   }
 }

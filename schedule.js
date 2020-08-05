@@ -13,12 +13,24 @@ import CGUs from './src/index.js';
 
     const app = new CGUs();
     await app.init();
-
     const notifier = new Notifier(app.serviceDeclarations, app.documentTypes);
 
-    app.on('versionRecorded', notifier.onVersionRecorded.bind(notifier));
-    app.on('fetchingError', notifier.onDocumentFetchError.bind(notifier));
-    app.on('error', notifier.onApplicationError.bind(notifier));
+    const delayedVersionNotificationsParams = [];
+
+    app.on('versionRecorded', (serviceId, type, versionId) => {
+      delayedVersionNotificationsParams.push({ serviceId, type, versionId });
+    });
+
+    app.on('changesPublished', () => {
+      delayedVersionNotificationsParams.forEach(({ serviceId, type, versionId }) => {
+        notifier.onVersionRecorded(serviceId, type, versionId);
+      });
+    });
+
+    app.on('documentFetchError', notifier.onDocumentFetchError.bind(notifier));
+    app.on('documentUpdateError', notifier.onDocumentUpdateError.bind(notifier));
+    app.on('publicationError', error => notifier.onApplicationError(error));
+    app.on('error', error => notifier.onApplicationError(error));
 
     schedule.scheduleJob(rule, () => {
       app.trackChanges();
