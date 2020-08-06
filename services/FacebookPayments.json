@@ -3,7 +3,7 @@
   "documents": {
     "tos": {
       "location": "https://www.facebook.com/payments_terms",
-      "contentSelector": ".prl",
+      "contentSelector": "#content",
       "filters": [
         "removeHelpButtons",
         "cleanUrls"
@@ -11,7 +11,7 @@
     },
     "devPolicy": {
       "location": "https://developers.facebook.com/policy/credits",
-      "contentSelector": "._4bl9",
+      "contentSelector": "._4bl7, ._4bl9",
       "filters": [
         "cleanUrls",
         "numberListCorrectly",
