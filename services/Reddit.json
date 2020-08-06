@@ -3,17 +3,13 @@
     "documents": {
         "tos": {
             "fetch": "https://www.redditinc.com/policies/user-agreement",
-            "select": "#content",
-            "remove": [
-                ".filter-holder"
-            ]
+            "remove": ".filter-holder",
+            "select": "#content"
         },
         "privacy": {
             "fetch": "https://www.redditinc.com/policies/privacy-policy",
-            "select": "#content",
-            "remove": [
-                ".filter-holder"
-            ]
+            "remove": ".filter-holder",
+            "select": "#content"
         }
     }
 }

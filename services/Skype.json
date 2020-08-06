@@ -3,23 +3,23 @@
     "documents": {
         "tos": {
             "fetch": "https://www.microsoft.com/en-gb/servicesagreement/",
-            "select": ".pageIntro, .div_content",
             "filter": [
                 "removeIrrelevantModulesFromTos",
                 "removeNavigationHeaders",
                 "removeModuleIDs",
                 "removeInvisibleText"
-            ]
+            ],
+            "select": ".pageIntro, .div_content"
         },
         "privacy": {
             "fetch": "https://privacy.microsoft.com/en-gb/privacystatement",
-            "select": "h1, #psp_last_updated, .header_content .Description, .div_content",
             "filter": [
                 "removeIrrelevantModulesFromPrivacyPolicy",
                 "removeNavigationHeaders",
                 "removeModuleIDs",
                 "removeInvisibleText"
-            ]
+            ],
+            "select": "h1, #psp_last_updated, .header_content .Description, .div_content"
         }
     }
 }

@@ -3,17 +3,17 @@
     "documents": {
         "privacy": {
             "fetch": "https://policies.google.com/privacy?hl=en-US",
-            "select": "div[role=article]",
             "filter": [
                 "removeUTMfromUrls"
-            ]
+            ],
+            "select": "div[role=article]"
         },
         "tos": {
             "fetch": "https://policies.google.com/terms?hl=en-US",
-            "select": "div[role=article]",
             "filter": [
                 "removeUTMfromUrls"
-            ]
+            ],
+            "select": "div[role=article]"
         }
     }
 }

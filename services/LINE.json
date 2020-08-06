@@ -7,10 +7,8 @@
         },
         "privacy": {
             "fetch": "https://terms.line.me/line_rules/?lang=en",
-            "select": ".MdTerms01 > h1:nth-child(1)",
-            "remove": [
-                "style"
-            ]
+            "remove": "style",
+            "select": ".MdTerms01 > h1:nth-child(1)"
         }
     }
 }
