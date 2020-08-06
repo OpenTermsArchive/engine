@@ -2,12 +2,12 @@
     "name": "LinguaLeo",
     "documents": {
         "tos": {
-            "location": "https://corp.lingualeo.com/terms-of-use-en/",
-            "contentSelector": "#main"
+            "fetch": "https://corp.lingualeo.com/terms-of-use-en/",
+            "select": "#main"
         },
         "privacy": {
-            "location": "https://corp.lingualeo.com/privacy-policy-en/",
-            "contentSelector": "#main"
+            "fetch": "https://corp.lingualeo.com/privacy-policy-en/",
+            "select": "#main"
         }
     }
 }

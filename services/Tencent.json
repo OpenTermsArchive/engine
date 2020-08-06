@@ -2,12 +2,12 @@
     "name": "Tencent",
     "documents": {
         "tos": {
-            "location": "https://www.tencent.com/en-us/service-agreement.html",
-            "contentSelector": ".page-content"
+            "fetch": "https://www.tencent.com/en-us/service-agreement.html",
+            "select": ".page-content"
         },
         "privacy": {
-            "location": "https://www.tencent.com/en-us/privacy-policy.html",
-            "contentSelector": ".page-content"
+            "fetch": "https://www.tencent.com/en-us/privacy-policy.html",
+            "select": ".page-content"
         }
     }
 }

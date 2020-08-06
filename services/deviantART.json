@@ -2,12 +2,12 @@
     "name": "deviantART",
     "documents": {
         "tos": {
-            "location": "https://about.deviantart.com/policy/service/",
-            "contentSelector": ".bubbleview"
+            "fetch": "https://about.deviantart.com/policy/service/",
+            "select": ".bubbleview"
         },
         "privacy": {
-            "location": "https://about.deviantart.com/policy/privacy/",
-            "contentSelector": ".bubbleview"
+            "fetch": "https://about.deviantart.com/policy/privacy/",
+            "select": ".bubbleview"
         }
     }
 }

@@ -2,12 +2,12 @@
     "name": "LastFm",
     "documents": {
         "tos": {
-            "location": "https://www.last.fm/legal/terms",
-            "contentSelector": "div.container:nth-child(3)"
+            "fetch": "https://www.last.fm/legal/terms",
+            "select": "div.container:nth-child(3)"
         },
         "privacy": {
-            "location": "https://privacy.cbs/",
-            "contentSelector": ".post-content"
+            "fetch": "https://privacy.cbs/",
+            "select": ".post-content"
         }
     }
 }

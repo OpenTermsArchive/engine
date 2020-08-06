@@ -2,15 +2,15 @@
   "name": "Snapchat",
   "documents": {
     "tos": {
-      "location": "https://www.snap.com/terms",
-      "contentSelector": {
+      "fetch": "https://www.snap.com/terms",
+      "select": {
         "startBefore": "#terms-row",
         "endAfter": ".textarticle-container > *:last-child"
       }
     },
     "privacy": {
-      "location": "https://www.snap.com/privacy/privacy-policy",
-      "contentSelector": ".textarticle-container"
+      "fetch": "https://www.snap.com/privacy/privacy-policy",
+      "select": ".textarticle-container"
     }
   }
 }

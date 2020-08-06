@@ -2,12 +2,12 @@
     "name": "Goodreads",
     "documents": {
         "tos": {
-            "location": "https://www.goodreads.com/about/terms",
-            "contentSelector": ".guidelines"
+            "fetch": "https://www.goodreads.com/about/terms",
+            "select": ".guidelines"
         },
         "privacy": {
-            "location": "https://www.goodreads.com/about/privacy",
-            "contentSelector": ".guidelines"
+            "fetch": "https://www.goodreads.com/about/privacy",
+            "select": ".guidelines"
         }
     }
 }

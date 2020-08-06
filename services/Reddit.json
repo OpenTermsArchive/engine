@@ -2,16 +2,16 @@
     "name": "Reddit",
     "documents": {
         "tos": {
-            "location": "https://www.redditinc.com/policies/user-agreement",
-            "contentSelector": "#content",
-            "removeElements": [
+            "fetch": "https://www.redditinc.com/policies/user-agreement",
+            "select": "#content",
+            "remove": [
                 ".filter-holder"
             ]
         },
         "privacy": {
-            "location": "https://www.redditinc.com/policies/privacy-policy",
-            "contentSelector": "#content",
-            "removeElements": [
+            "fetch": "https://www.redditinc.com/policies/privacy-policy",
+            "select": "#content",
+            "remove": [
                 ".filter-holder"
             ]
         }

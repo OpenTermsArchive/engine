@@ -2,16 +2,16 @@
   "name": "Myspace",
   "documents": {
     "tos": {
-      "location": "https://myspace.com/pages/terms",
-      "contentSelector": "#nms_legal",
-      "removeElements": [
+      "fetch": "https://myspace.com/pages/terms",
+      "select": "#nms_legal",
+      "remove": [
         "ol > *:not(li)"
       ]
     },
     "privacy": {
-      "location": "https://myspace.com/pages/eeaprivacy",
-      "contentSelector": "#nms_legal",
-      "removeElements": [
+      "fetch": "https://myspace.com/pages/eeaprivacy",
+      "select": "#nms_legal",
+      "remove": [
         "ol > *:not(li)"
       ]
     }

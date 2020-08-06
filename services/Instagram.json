@@ -2,12 +2,12 @@
     "name": "Instagram",
     "documents": {
         "tos": {
-            "location": "https://help.instagram.com/581066165581870",
-            "contentSelector": "#faq-page"
+            "fetch": "https://help.instagram.com/581066165581870",
+            "select": "#faq-page"
         },
         "privacy": {
-            "location": "https://help.instagram.com/519522125107875",
-            "contentSelector": "#faq-page"
+            "fetch": "https://help.instagram.com/519522125107875",
+            "select": "#faq-page"
         }
     }
 }

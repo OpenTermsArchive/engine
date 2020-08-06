@@ -2,16 +2,16 @@
     "name": "Google",
     "documents": {
         "privacy": {
-            "location": "https://policies.google.com/privacy?hl=en-US",
-            "contentSelector": "div[role=article]",
-            "filters": [
+            "fetch": "https://policies.google.com/privacy?hl=en-US",
+            "select": "div[role=article]",
+            "filter": [
                 "removeUTMfromUrls"
             ]
         },
         "tos": {
-            "location": "https://policies.google.com/terms?hl=en-US",
-            "contentSelector": "div[role=article]",
-            "filters": [
+            "fetch": "https://policies.google.com/terms?hl=en-US",
+            "select": "div[role=article]",
+            "filter": [
                 "removeUTMfromUrls"
             ]
         }
