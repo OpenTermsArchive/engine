@@ -31,7 +31,7 @@
         "removeScripts"
       ]
     },
-    "lawEnforcementPolicy": {
+    "lawEnforcementGuidelines": {
       "location": "https://help.twitter.com/en/rules-and-policies/twitter-law-enforcement-support",
       "contentSelector": ".twtr-grid__yang > div:nth-child(1)",
       "filters": [

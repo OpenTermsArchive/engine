@@ -15,6 +15,10 @@ export const TYPES = {
     name: 'Developer Policy',
     fileName: 'developer_policy'
   },
+  communityGuidelines: {
+    name: 'Community Guidelines',
+    fileName: 'community_guidelines'
+  },
   brandGuidelines: {
     name: 'Brand Guidelines',
     fileName: 'brand_guidelines'
@@ -35,12 +39,8 @@ export const TYPES = {
     name: 'Copyright Policy',
     fileName: 'copyright_policy'
   },
-  lawEnforcementPolicy: {
-    name: 'Law Enforcement Policy',
-    fileName: 'law_enforcement_policy'
-  },
-  cookiesPolicy: {
-    name: 'Cookies Policy',
-    fileName: 'cookies_policy'
+  lawEnforcementGuidelines: {
+    name: 'Law Enforcement Guidelines',
+    fileName: 'law_enforcement_guidelines'
   }
 };

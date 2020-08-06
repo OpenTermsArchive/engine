@@ -8,6 +8,18 @@
         "privacy": {
             "location": "https://help.instagram.com/519522125107875",
             "contentSelector": "#faq-page"
+        },
+        "communityGuidelines": {
+            "location": "https://help.instagram.com/477434105621119",
+            "contentSelector": "#faq-page"
+        },
+        "lawEnforcementGuidelines": {
+            "location": "https://help.instagram.com/494561080557017",
+            "contentSelector": "#faq-page"
+        },
+        "devPolicy": {
+            "location": "https://help.instagram.com/325135857663734",
+            "contentSelector": "#faq-page"
         }
     }
 }
