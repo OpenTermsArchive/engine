@@ -37,27 +37,76 @@ const schema = {
       type: 'object',
       additionalProperties: false,
       required: [
-        'location',
-        'contentSelector'
+        'fetch',
+        'select'
       ],
       properties: {
-        location: {
+        fetch: {
           type: 'string',
           format: 'uri',
           description: 'The URL where the document can be found'
         },
-        contentSelector: {
-          type: [ 'string', 'object', 'array' ],
-          description: 'The content selector that targets the meaningful part of the document, excluding elements such as headers, footers and navigation'
+        select: {
+          description: 'Selector(s) that targets element to include',
+          oneOf: [
+            { $ref: '#/definitions/cssSelector' },
+            { $ref: '#/definitions/range' },
+            {
+              type: 'array',
+              items: {
+                oneOf: [
+                  { $ref: '#/definitions/cssSelector' },
+                  { $ref: '#/definitions/range' },
+                ]
+              }
+            }
+          ]
         },
-        filters: {
-          type: 'array'
+        filter: {
+          type: 'array',
+          items: {
+            type: 'string',
+            pattern: '^.+$',
+            description: 'Filter function name'
+          }
         },
-        removeElements: {
-          type: [ 'string', 'object', 'array' ],
-          description: 'The content selector that targets element to exclude'
+        remove: {
+          description: 'Selector(s) that targets element to exclude',
+          oneOf: [
+            { $ref: '#/definitions/cssSelector' },
+            { $ref: '#/definitions/range' },
+            {
+              type: 'array',
+              items: {
+                oneOf: [
+                  { $ref: '#/definitions/cssSelector' },
+                  { $ref: '#/definitions/range' },
+                ]
+              }
+            }
+          ]
         }
       }
+    },
+    cssSelector: {
+      type: 'string',
+      pattern: '^.+$',
+      description: 'A CSS selector'
+    },
+    range: {
+      type: 'object',
+      properties: {
+        startBefore: { $ref: '#/definitions/cssSelector' },
+        startAfter: { $ref: '#/definitions/cssSelector' },
+        endBefore: { $ref: '#/definitions/cssSelector' },
+        endAfter: { $ref: '#/definitions/cssSelector' }
+      },
+      oneOf: [
+        { required: [ 'startBefore', 'endBefore' ] },
+        { required: [ 'startBefore', 'endAfter' ] },
+        { required: [ 'startAfter', 'endBefore' ] },
+        { required: [ 'startAfter', 'endAfter' ] },
+      ]
     }
   }
 };
