@@ -14,12 +14,12 @@ export default async function filter(content, { fetch: location, select: extract
   const { document: webPageDOM } = new JSDOM(content).window;
 
   serviceSpecificFilters.forEach(filterName => {
-    filterFunctions[filterName](webPageDOM); // Filters work in place
+    filterFunctions[filterName](webPageDOM); // filters work in place
   });
 
   convertRelativeURLsToAbsolute(webPageDOM, location);
 
-  remove(webPageDOM, deletionSelectors); // work in place
+  remove(webPageDOM, deletionSelectors); // remove function works in place
 
   const domFragment = select(webPageDOM, extractionSelectors);
 
@@ -57,6 +57,7 @@ export function convertRelativeURLsToAbsolute(document, baseURL) {
   });
 }
 
+// Wokrs in place
 function remove(webPageDOM, deletionSelectors) {
   [].concat(deletionSelectors).forEach(selector => {
     if (typeof selector === 'object') {
