@@ -14,37 +14,20 @@ export default async function filter(content, { fetch: location, select: extract
   const { document: webPageDOM } = new JSDOM(content).window;
 
   serviceSpecificFilters.forEach(filterName => {
-    // Filters work in place
-    filterFunctions[filterName](webPageDOM);
+    filterFunctions[filterName](webPageDOM); // Filters work in place
   });
 
   convertRelativeURLsToAbsolute(webPageDOM, location);
 
-  [].concat(deletionSelectors).forEach(elementSelector => {
-    if (typeof elementSelector === 'object') {
-      const rangeSelection = getRangeSelection(webPageDOM, elementSelector);
-      rangeSelection.deleteContents();
-    } else {
-      Array.from(webPageDOM.querySelectorAll(elementSelector)).forEach(node => node.remove());
-    }
-  });
+  remove(webPageDOM, deletionSelectors); // work in place
 
-  const selectedContents = [];
-
-  [].concat(extractionSelectors).forEach(elementSelector => {
-    if (typeof elementSelector === 'object') {
-      const rangeSelection = getRangeSelection(webPageDOM, elementSelector);
-      selectedContents.push(rangeSelection.cloneContents());
-    } else {
-      selectedContents.push(...Array.from(webPageDOM.querySelectorAll(elementSelector)));
-    }
-  });
+  const selectedContents = select(webPageDOM, extractionSelectors);
 
   if (!selectedContents.length) {
     throw new Error(`The provided selector "${extractionSelectors}" has no match in the web page.`);
   }
 
-  return selectedContents.map(domFragment => turndownService.turndown(domFragment)).join('\n');
+  return transform(selectedContents);
 }
 
 function getRangeSelection(document, rangeSelector) {
@@ -72,4 +55,33 @@ export function convertRelativeURLsToAbsolute(document, baseURL) {
   Array.from(document.querySelectorAll(LINKS_TO_CONVERT_SELECTOR)).forEach(link => {
     link.href = url.resolve(baseURL, link.href);
   });
+}
+
+function remove(webPageDOM, deletionSelectors) {
+  [].concat(deletionSelectors).forEach(selector => {
+    if (typeof selector === 'object') {
+      const rangeSelection = getRangeSelection(webPageDOM, selector);
+      rangeSelection.deleteContents();
+    } else {
+      Array.from(webPageDOM.querySelectorAll(selector)).forEach(node => node.remove());
+    }
+  });
+}
+
+function select(webPageDOM, extractionSelectors) {
+  const selectedContents = [];
+  [].concat(extractionSelectors).forEach(selector => {
+    if (typeof selector === 'object') {
+      const rangeSelection = getRangeSelection(webPageDOM, selector);
+      selectedContents.push(rangeSelection.cloneContents());
+    } else {
+      selectedContents.push(...Array.from(webPageDOM.querySelectorAll(selector)));
+    }
+  });
+
+  return selectedContents;
+}
+
+function transform(selectedContents) {
+  return selectedContents.map(domFragment => turndownService.turndown(domFragment)).join('\n');
 }
