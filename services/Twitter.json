@@ -27,7 +27,7 @@
       ],
       "select": ".twtr-grid__yang > div:nth-child(1)"
     },
-    "lawEnforcementPolicy": {
+    "lawEnforcementGuidelines": {
       "fetch": "https://help.twitter.com/en/rules-and-policies/twitter-law-enforcement-support",
       "filter": [
         "removeBanner"
