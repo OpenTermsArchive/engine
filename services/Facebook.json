@@ -23,6 +23,24 @@
         "removeHelpButtons",
         "cleanUrls"
       ]
+    },
+    "cookiesPolicy": {
+      "location": "https://www.facebook.com/policies/cookies",
+      "contentSelector": "._5tkp",
+      "filters": [
+        "removeImgFromCookiesPolicy",
+        "removeReturnToTopButtons",
+        "cleanUrls"
+      ]
+    },
+    "commercialTerms": {
+      "location": "https://www.facebook.com/legal/commercial_terms",
+      "contentSelector": "#content",
+      "filters": [
+        "numberListCorrectly",
+        "removeHelpButtons",
+        "cleanUrls"
+      ]
     }
   }
 }
