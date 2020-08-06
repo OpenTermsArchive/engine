@@ -21,9 +21,9 @@ const SERVICE_DECLARATIONS_PATH = path.resolve(__dirname, '../../', config.get('
 
 describe('Services validation', async () => {
   const serviceId = process.argv.slice(process.argv.indexOf('--serviceId'))[1];
-  const schemaOnly = process.argv.indexOf('--schemaOnly') != -1;
+  const schemaOnly = process.argv.indexOf('--schema-only') != -1;
   const serviceIds = fsApi.readdirSync(SERVICE_DECLARATIONS_PATH).filter(filename => path.extname(filename) === '.json').map(filename => path.basename(filename, '.json'));
-  const servicesToValidate = serviceId ? [serviceId] : serviceIds;
+  const servicesToValidate = serviceId ? [ serviceId ] : serviceIds;
 
   servicesToValidate.forEach(serviceId => {
     let service;
