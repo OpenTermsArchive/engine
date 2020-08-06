@@ -10,45 +10,38 @@ turndownService.use(turndownPluginGithubFlavouredMarkdown.gfm);
 
 export const LINKS_TO_CONVERT_SELECTOR = 'a[href]:not([href^="#"])';
 
-export default async function filter(content, { fetch: location, select: selectElements, remove: removeElements, filter: filterNames}, filterFunctions) {
+export default async function filter(content, { fetch: location, select: extractionSelectors = [], remove: deletionSelectors = [], filter: serviceSpecificFilters = [] }, filterFunctions) {
   const { document: webPageDOM } = new JSDOM(content).window;
 
-  if (filterNames) {
-    filterNames.forEach(filterName => {
-      // Filters work in place
-      filterFunctions[filterName](webPageDOM);
-    });
-  }
+  serviceSpecificFilters.forEach(filterName => {
+    // Filters work in place
+    filterFunctions[filterName](webPageDOM);
+  });
 
   convertRelativeURLsToAbsolute(webPageDOM, location);
 
-  const selectedContent = webPageDOM;
-
-  if (removeElements) {
-    [].concat(removeElements).forEach(elementSelector => {
-      if (typeof elementSelector === 'object') {
-        const rangeSelection = getRangeSelection(selectedContent, elementSelector);
-        rangeSelection.deleteContents();
-      } else {
-        Array.from(webPageDOM.querySelectorAll(elementSelector)).forEach(node => node.remove());
-      }
-    });
-  }
+  [].concat(deletionSelectors).forEach(elementSelector => {
+    if (typeof elementSelector === 'object') {
+      const rangeSelection = getRangeSelection(webPageDOM, elementSelector);
+      rangeSelection.deleteContents();
+    } else {
+      Array.from(webPageDOM.querySelectorAll(elementSelector)).forEach(node => node.remove());
+    }
+  });
 
   const selectedContents = [];
-  if (selectElements) {
-    [].concat(selectElements).forEach(elementSelector => {
-      if (typeof elementSelector === 'object') {
-        const rangeSelection = getRangeSelection(selectedContent, elementSelector);
-        selectedContents.push(rangeSelection.cloneContents());
-      } else {
-        selectedContents.push(...Array.from(webPageDOM.querySelectorAll(elementSelector)));
-      }
-    });
-  }
+
+  [].concat(extractionSelectors).forEach(elementSelector => {
+    if (typeof elementSelector === 'object') {
+      const rangeSelection = getRangeSelection(webPageDOM, elementSelector);
+      selectedContents.push(rangeSelection.cloneContents());
+    } else {
+      selectedContents.push(...Array.from(webPageDOM.querySelectorAll(elementSelector)));
+    }
+  });
 
   if (!selectedContents.length) {
-    throw new Error(`The provided selector "${selectElements}" has no match in the web page.`);
+    throw new Error(`The provided selector "${extractionSelectors}" has no match in the web page.`);
   }
 
   return selectedContents.map(domFragment => turndownService.turndown(domFragment)).join('\n');
