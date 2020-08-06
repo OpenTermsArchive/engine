@@ -2,18 +2,18 @@
   "name": "LibraryThing",
   "documents": {
     "tos": {
-      "location": "https://www.librarything.com/privacy",
-      "contentSelector": ".content > table:nth-child(1) > tbody:nth-child(1) > tr:nth-child(1) > td:nth-child(2)",
-      "filters": [
-        "selectOnlyTOS"
-      ]
+      "fetch": "https://www.librarything.com/privacy",
+      "filter": [
+      "selectOnlyTOS"
+      ],
+      "select": ".content > table:nth-child(1) > tbody:nth-child(1) > tr:nth-child(1) > td:nth-child(2)"
     },
     "privacy": {
-      "location": "https://www.librarything.com/privacy",
-      "contentSelector": ".content > table:nth-child(1) > tbody:nth-child(1) > tr:nth-child(1) > td:nth-child(2)",
-      "filters": [
-        "selectOnlyPrivacyPolicy"
-      ]
+      "fetch": "https://www.librarything.com/privacy",
+      "filter": [
+      "selectOnlyPrivacyPolicy"
+      ],
+      "select": ".content > table:nth-child(1) > tbody:nth-child(1) > tr:nth-child(1) > td:nth-child(2)"
     }
   }
 }

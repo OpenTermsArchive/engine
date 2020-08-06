@@ -1,13 +1,13 @@
 {
-    "name": "Goodreads",
-    "documents": {
-        "tos": {
-            "location": "https://www.goodreads.com/about/terms",
-            "contentSelector": ".guidelines"
-        },
-        "privacy": {
-            "location": "https://www.goodreads.com/about/privacy",
-            "contentSelector": ".guidelines"
-        }
+  "name": "Goodreads",
+  "documents": {
+    "tos": {
+      "fetch": "https://www.goodreads.com/about/terms",
+      "select": ".guidelines"
+    },
+    "privacy": {
+      "fetch": "https://www.goodreads.com/about/privacy",
+      "select": ".guidelines"
     }
+  }
 }

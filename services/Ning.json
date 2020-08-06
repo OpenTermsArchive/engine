@@ -1,13 +1,13 @@
 {
-    "name": "Ning",
-    "documents": {
-        "tos": {
-            "location": "https://www.ning.com/termsofservice/",
-            "contentSelector": ".page__article"
-        },
-        "privacy": {
-            "location": "https://www.ning.com/privacy/",
-            "contentSelector": ".page__article"
-        }
+  "name": "Ning",
+  "documents": {
+    "tos": {
+      "fetch": "https://www.ning.com/termsofservice/",
+      "select": ".page__article"
+    },
+    "privacy": {
+      "fetch": "https://www.ning.com/privacy/",
+      "select": ".page__article"
     }
+  }
 }

@@ -1,21 +1,21 @@
 {
-    "name": "Google Play Store",
-    "documents": {
-        "devPolicy": {
-            "location": "https://play.google.com/intl/ALL_en/about/developer-distribution-agreement.html",
-            "contentSelector": "body > .play-contained"
-        },
-        "tos": {
-            "location": "https://play.google.com/intl/en_US/about/play-terms/index.html",
-            "contentSelector": "body > .play-contained"
-        },
-        "brandGuidelines": {
-            "location": "https://developer.android.com/distribute/marketing-tools/brand-guidelines",
-            "contentSelector": "article.devsite-article-inner"
-        },
-        "reviewGuidelines": {
-            "location": "https://support.google.com/googleplay/android-developer/answer/9904549?hl=en",
-            "contentSelector": "article.page"
-        }
+  "name": "Google Play Store",
+  "documents": {
+    "devPolicy": {
+      "fetch": "https://play.google.com/intl/ALL_en/about/developer-distribution-agreement.html",
+      "select": "body > .play-contained"
+    },
+    "tos": {
+      "fetch": "https://play.google.com/intl/en_US/about/play-terms/index.html",
+      "select": "body > .play-contained"
+    },
+    "brandGuidelines": {
+      "fetch": "https://developer.android.com/distribute/marketing-tools/brand-guidelines",
+      "select": "article.devsite-article-inner"
+    },
+    "reviewGuidelines": {
+      "fetch": "https://support.google.com/googleplay/android-developer/answer/9904549?hl=en",
+      "select": "article.page"
     }
+  }
 }

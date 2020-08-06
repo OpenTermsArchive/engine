@@ -1,19 +1,19 @@
 {
-    "name": "Google",
-    "documents": {
-        "privacy": {
-            "location": "https://policies.google.com/privacy?hl=en-US",
-            "contentSelector": "div[role=article]",
-            "filters": [
-                "removeUTMfromUrls"
-            ]
-        },
-        "tos": {
-            "location": "https://policies.google.com/terms?hl=en-US",
-            "contentSelector": "div[role=article]",
-            "filters": [
-                "removeUTMfromUrls"
-            ]
-        }
+  "name": "Google",
+  "documents": {
+    "privacy": {
+      "fetch": "https://policies.google.com/privacy?hl=en-US",
+      "filter": [
+        "removeUTMfromUrls"
+      ],
+      "select": "div[role=article]"
+    },
+    "tos": {
+      "fetch": "https://policies.google.com/terms?hl=en-US",
+      "filter": [
+        "removeUTMfromUrls"
+      ],
+      "select": "div[role=article]"
     }
+  }
 }

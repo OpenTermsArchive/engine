@@ -2,9 +2,9 @@
   "name": "Facebook Ads",
   "documents": {
     "tos": {
-      "location": "https://www.facebook.com/legal/self_service_ads_terms",
-      "contentSelector": "#content",
-      "filters": [
+      "fetch": "https://www.facebook.com/legal/self_service_ads_terms",
+      "select": "#content",
+      "filter": [
         "removeHelpButtons",
         "cleanUrls"
       ]

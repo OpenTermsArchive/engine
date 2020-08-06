@@ -1,13 +1,13 @@
 {
-    "name": "LinguaLeo",
-    "documents": {
-        "tos": {
-            "location": "https://corp.lingualeo.com/terms-of-use-en/",
-            "contentSelector": "#main"
-        },
-        "privacy": {
-            "location": "https://corp.lingualeo.com/privacy-policy-en/",
-            "contentSelector": "#main"
-        }
+  "name": "LinguaLeo",
+  "documents": {
+    "tos": {
+      "fetch": "https://corp.lingualeo.com/terms-of-use-en/",
+      "select": "#main"
+    },
+    "privacy": {
+      "fetch": "https://corp.lingualeo.com/privacy-policy-en/",
+      "select": "#main"
     }
+  }
 }

@@ -1,9 +1,9 @@
 {
-    "name": "Telegram",
-    "documents": {
-        "privacy": {
-            "location": "https://telegram.org/privacy",
-            "contentSelector": "#dev_page_content_wrap"
-        }
+  "name": "Telegram",
+  "documents": {
+    "privacy": {
+      "fetch": "https://telegram.org/privacy",
+      "select": "#dev_page_content_wrap"
     }
+  }
 }

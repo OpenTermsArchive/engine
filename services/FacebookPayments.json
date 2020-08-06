@@ -2,17 +2,17 @@
   "name": "Facebook Payments",
   "documents": {
     "tos": {
-      "location": "https://www.facebook.com/payments_terms",
-      "contentSelector": "#content",
-      "filters": [
+      "fetch": "https://www.facebook.com/payments_terms",
+      "select": "#content",
+      "filter": [
         "removeHelpButtons",
         "cleanUrls"
       ]
     },
     "devPolicy": {
-      "location": "https://developers.facebook.com/policy/credits",
-      "contentSelector": "._4bl7, ._4bl9",
-      "filters": [
+      "fetch": "https://developers.facebook.com/policy/credits",
+      "select": "._4bl7, ._4bl9",
+      "filter": [
         "cleanUrls",
         "numberListCorrectly",
         "correctTitleIndentation"

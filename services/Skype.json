@@ -1,25 +1,25 @@
 {
-    "name": "Skype",
-    "documents": {
-        "tos": {
-            "location": "https://www.microsoft.com/en-gb/servicesagreement/",
-            "contentSelector": ".pageIntro, .div_content",
-            "filters": [
-                "removeIrrelevantModulesFromTos",
-                "removeNavigationHeaders",
-                "removeModuleIDs",
-                "removeInvisibleText"
-            ]
-        },
-        "privacy": {
-            "location": "https://privacy.microsoft.com/en-gb/privacystatement",
-            "contentSelector": "h1, #psp_last_updated, .header_content .Description, .div_content",
-            "filters": [
-                "removeIrrelevantModulesFromPrivacyPolicy",
-                "removeNavigationHeaders",
-                "removeModuleIDs",
-                "removeInvisibleText"
-            ]
-        }
+  "name": "Skype",
+  "documents": {
+    "tos": {
+      "fetch": "https://www.microsoft.com/en-gb/servicesagreement/",
+      "filter": [
+        "removeIrrelevantModulesFromTos",
+        "removeNavigationHeaders",
+        "removeModuleIDs",
+        "removeInvisibleText"
+      ],
+      "select": ".pageIntro, .div_content"
+    },
+    "privacy": {
+      "fetch": "https://privacy.microsoft.com/en-gb/privacystatement",
+      "filter": [
+        "removeIrrelevantModulesFromPrivacyPolicy",
+        "removeNavigationHeaders",
+        "removeModuleIDs",
+        "removeInvisibleText"
+      ],
+      "select": "h1, #psp_last_updated, .header_content .Description, .div_content"
     }
+  }
 }
