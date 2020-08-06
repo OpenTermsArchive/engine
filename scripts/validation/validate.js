@@ -4,7 +4,6 @@ import path from 'path';
 import Ajv from 'ajv';
 import chai from 'chai';
 import config from 'config';
-import jsdom from 'jsdom';
 import jsonSourceMap from 'json-source-map';
 
 import fetch from '../../src/fetcher/index.js';

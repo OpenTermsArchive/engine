@@ -98,7 +98,7 @@ describe('Filter', () => {
 
     context('With an array of selectors', () => {
       it('filters the given HTML content', async () => {
-        const result = await filter(rawHTML, { fetch: virtualLocation, select: ['h1', '#link2'] });
+        const result = await filter(rawHTML, { fetch: virtualLocation, select: [ 'h1', '#link2' ] });
         expect(result).to.equal('Title\n=====\n\n[link 2](#anchor)');
       });
     });
