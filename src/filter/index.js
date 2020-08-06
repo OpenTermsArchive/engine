@@ -17,8 +17,6 @@ export default async function filter(content, { fetch: location, select: extract
     filterFunctions[filterName](webPageDOM); // filters work in place
   });
 
-  convertRelativeURLsToAbsolute(webPageDOM, location);
-
   remove(webPageDOM, deletionSelectors); // remove function works in place
 
   const domFragment = select(webPageDOM, extractionSelectors);
@@ -27,10 +25,12 @@ export default async function filter(content, { fetch: location, select: extract
     throw new Error(`The provided selector "${extractionSelectors}" has no match in the web page.`);
   }
 
+  convertRelativeURLsToAbsolute(domFragment, location);
+
   return transform(domFragment);
 }
 
-function getRangeSelection(document, rangeSelector) {
+function selectRange(document, rangeSelector) {
   const { startBefore, startAfter, endBefore, endAfter } = rangeSelector;
 
   const selection = document.createRange();
@@ -57,11 +57,11 @@ export function convertRelativeURLsToAbsolute(document, baseURL) {
   });
 }
 
-// Wokrs in place
+// Works in place
 function remove(webPageDOM, deletionSelectors) {
   [].concat(deletionSelectors).forEach(selector => {
     if (typeof selector === 'object') {
-      const rangeSelection = getRangeSelection(webPageDOM, selector);
+      const rangeSelection = selectRange(webPageDOM, selector);
       rangeSelection.deleteContents();
     } else {
       Array.from(webPageDOM.querySelectorAll(selector)).forEach(node => node.remove());
@@ -70,18 +70,18 @@ function remove(webPageDOM, deletionSelectors) {
 }
 
 function select(webPageDOM, extractionSelectors) {
-  const domFragment = webPageDOM.createElement('div');
+  const result = webPageDOM.createDocumentFragment();
 
   [].concat(extractionSelectors).forEach(selector => {
     if (typeof selector === 'object') {
-      const rangeSelection = getRangeSelection(webPageDOM, selector);
-      domFragment.appendChild(rangeSelection.cloneContents());
+      const rangeSelection = selectRange(webPageDOM, selector);
+      result.appendChild(rangeSelection.cloneContents());
     } else {
-      webPageDOM.querySelectorAll(selector).forEach(element => domFragment.appendChild(element));
+      webPageDOM.querySelectorAll(selector).forEach(element => result.appendChild(element));
     }
   });
 
-  return domFragment;
+  return result;
 }
 
 function transform(domFragment) {

@@ -11,10 +11,10 @@ In the folder `services`, create a JSON file with the name of the service you wa
   "name": "<the public name of the service>",
   "documents": {
     "<document type>": {
-      "fetch": "<an array or service specific filter function name>",
-      "filter": "<a selector or an array of selector that targets the meaningful parts of the document, excluding elements such as headers, footers and navigation>",
-      "remove": "<a selector or an array of selector that targets the noise parts of the document that has to be removed. Useful to remove parts that are inside the selected parts>",
-      "select": "<a selector or an array of selector that targets the meaningful parts of the document, excluding elements such as headers, footers and navigation>",
+      "fetch": "<the URL where the document can be found>",
+      "filter": "<an array of service specific filter function name>",
+      "remove": "<a CSS selector, a range selector or an array of selectors that target the noise parts of the document that has to be removed. Useful to remove parts that are inside the selected parts>",
+      "select": "<a CSS selector, a range selector or an array of selectors that target the meaningful parts of the document, excluding elements such as headers, footers and navigation>",
     }
   }
 }
@@ -46,12 +46,12 @@ Learn more about [usual noises](https://github.com/ambanum/CGUs/wiki/Usual-noise
 
 ### Selectors
 
-A selector allows to target a part of the document. It can be of two types, a **css selector** or a **range selector**.
+A selector allows to target a part of the document. It can be of two types, a [**css selector**](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors) or a **range selector**.
 
-A range selector is defined with a _start_ and an _end_ css selector. It is also necessary to define if the range starts before or after the element targeted by the _start_ css selector and to defined if it ends
-before or after the element targeted by the _end_ css selector. To do that, four keys are available to properly describe a range selector `startBefore`, `startAfter`, `endBefore` and `endAfter`.
+A range selector is defined with a _start_ and an _end_ css selector. It is also necessary to define if the range starts before or after the element targeted by the _start_ css selector and to define if it ends
+before or after the element targeted by the _end_ css selector. To do that, four keys are available to properly describe a range selector: `startBefore`, `startAfter`, `endBefore` and `endAfter`.
 
-Thus, a range selector look like this:
+Thus, a range selector looks like this:
 
 ```json
 {
@@ -84,7 +84,7 @@ npm run validate $service_id
 
 > The service id is the case sensitive name of the service declaration file without the extension. For example, for `Twitter.json`, the service id is `Twitter`.
 
-You can also only validate the schema structure:
+Since this operation fetches documents and could be long, you can also validate the declaration structure only:
 
 ```
 npm run validate:schema $service_id

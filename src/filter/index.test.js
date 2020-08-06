@@ -178,7 +178,7 @@ describe('Filter', () => {
       });
     });
 
-    context('With an array of range selector', () => {
+    context('With an array of range selectors', () => {
       it('filters the given HTML content', async () => {
         const result = await filter(rawHTML, { fetch: virtualLocation,
           select: [{
@@ -192,7 +192,7 @@ describe('Filter', () => {
       });
     });
 
-    context('With an array of mixed string selectors and range selector', () => {
+    context('With an array of mixed string selectors and range selectors', () => {
       it('filters the given HTML content', async () => {
         const result = await filter(rawHTML, { fetch: virtualLocation,
           select: [ 'h1', {
