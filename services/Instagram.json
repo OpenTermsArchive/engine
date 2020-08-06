@@ -1,13 +1,26 @@
 {
-  "name": "Instagram",
-  "documents": {
-    "tos": {
-      "fetch": "https://help.instagram.com/581066165581870",
-      "select": "#faq-page"
-    },
-    "privacy": {
-      "fetch": "https://help.instagram.com/519522125107875",
-      "select": "#faq-page"
+    "name": "Instagram",
+    "documents": {
+        "tos": {
+            "fetch": "https://help.instagram.com/581066165581870",
+            "select": "#faq-page"
+        },
+        "privacy": {
+            "fetch": "https://help.instagram.com/519522125107875",
+            "select": "#faq-page"
+        },
+        "communityGuidelines": {
+            "fetch": "https://help.instagram.com/477434105621119",
+            "select": "#faq-page"
+        },
+        "lawEnforcementGuidelines": {
+            "fetch": "https://help.instagram.com/494561080557017",
+            "select": "#faq-page"
+        },
+        "devPolicy": {
+            "fetch": "https://help.instagram.com/325135857663734",
+            "select": "#faq-page"
+        }
     }
   }
 }
