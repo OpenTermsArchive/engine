@@ -14,8 +14,8 @@ const expected = {
     name: 'Service A',
     documents: {
       tos: {
-        location: 'https://www.servicea.example/tos',
-        contentSelector: 'body'
+        fetch: 'https://www.servicea.example/tos',
+        select: 'body'
       }
     }
   },
@@ -23,8 +23,8 @@ const expected = {
     name: 'Service B',
     documents: {
       tos: {
-        location: 'https://www.serviceb.example/tos',
-        contentSelector: 'body'
+        fetch: 'https://www.serviceb.example/tos',
+        select: 'body'
       }
     }
   }
