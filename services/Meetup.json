@@ -3,19 +3,19 @@
     "documents": {
         "tos": {
             "fetch": "https://help.meetup.com/hc/en-us/articles/360027447252",
-            "select": ".article",
             "remove": [
                 "footer",
                 ".article-subscribe"
-            ]
+            ],
+            "select": ".article"
         },
         "privacy": {
             "fetch": "https://help.meetup.com/hc/en-us/articles/360044422391",
-            "select": ".article",
             "remove": [
                 "footer",
                 ".article-subscribe"
-            ]
+            ],
+            "select": ".article"
         }
     }
 }

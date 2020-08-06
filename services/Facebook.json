@@ -3,44 +3,44 @@
   "documents": {
     "tos": {
       "fetch": "https://www.facebook.com/legal/terms/plain_text_terms",
-      "select": ".fb_content",
       "filter": [
         "cleanUrls"
-      ]
+      ],
+      "select": ".fb_content"
     },
     "privacy": {
       "fetch": "https://www.facebook.com/about/privacy",
-      "select": "._5tkp",
       "filter": [
         "removeReturnToTopButtons",
         "cleanUrls"
-      ]
+      ],
+      "select": "._5tkp"
     },
     "devPolicy": {
       "fetch": "https://developers.facebook.com/policy",
-      "select": "._4bl9",
       "filter": [
         "removeHelpButtons",
         "cleanUrls"
-      ]
+      ],
+      "select": "._4bl9"
     },
     "cookiesPolicy": {
-      "location": "https://www.facebook.com/policies/cookies",
-      "contentSelector": "._5tkp",
-      "filters": [
+      "fetch": "https://www.facebook.com/policies/cookies",
+      "filter": [
         "removeImgFromCookiesPolicy",
         "removeReturnToTopButtons",
         "cleanUrls"
-      ]
+      ],
+      "select": "._5tkp"
     },
     "commercialTerms": {
-      "location": "https://www.facebook.com/legal/commercial_terms",
-      "contentSelector": "#content",
-      "filters": [
+      "fetch": "https://www.facebook.com/legal/commercial_terms",
+      "filter": [
         "numberListCorrectly",
         "removeHelpButtons",
         "cleanUrls"
-      ]
+      ],
+      "select": "#content"
     }
   }
 }

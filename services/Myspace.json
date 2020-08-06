@@ -3,17 +3,13 @@
   "documents": {
     "tos": {
       "fetch": "https://myspace.com/pages/terms",
-      "select": "#nms_legal",
-      "remove": [
-        "ol > *:not(li)"
-      ]
+      "remove": "ol > *:not(li)",
+      "select": "#nms_legal"
     },
     "privacy": {
       "fetch": "https://myspace.com/pages/eeaprivacy",
-      "select": "#nms_legal",
-      "remove": [
-        "ol > *:not(li)"
-      ]
+      "remove": "ol > *:not(li)",
+      "select": "#nms_legal"
     }
   }
 }
