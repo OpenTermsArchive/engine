@@ -138,66 +138,6 @@ describe('Filter', () => {
           expect(result).to.equal('[link 3](http://absolute.url/link)');
         });
       });
-      context('With both "startAfter" and "startBefore" defined', () => {
-        it('throws an error', async () => {
-          try {
-            await filter(rawHTML, virtualLocation, {
-              startBefore: '#link3',
-              startAfter: '#link3',
-              endAfter: '#link3'
-            });
-          } catch (e) {
-            expect(e).to.be.an('error');
-            expect(e.message).to.have.string('startBefore', 'startAfter');
-            return;
-          }
-          expect.fail('No error was thrown');
-        });
-      });
-      context('With both "endAfter" and "endBefore" defined', () => {
-        it('throws an error', async () => {
-          try {
-            await filter(rawHTML, virtualLocation, {
-              endBefore: '#link3',
-              endAfter: '#link3',
-              startAfter: '#link1'
-            });
-          } catch (e) {
-            expect(e).to.be.an('error');
-            expect(e.message).to.have.string('endBefore', 'endAfter');
-            return;
-          }
-          expect.fail('No error was thrown');
-        });
-      });
-      context('With no "endAfter" or "endBefore" defined', () => {
-        it('throws an error', async () => {
-          try {
-            await filter(rawHTML, virtualLocation, {
-              startAfter: '#link1'
-            });
-          } catch (e) {
-            expect(e).to.be.an('error');
-            expect(e.message).to.have.string('start', 'end');
-            return;
-          }
-          expect.fail('No error was thrown');
-        });
-      });
-      context('With no "startAfter" or "startBefore" defined', () => {
-        it('throws an error', async () => {
-          try {
-            await filter(rawHTML, virtualLocation, {
-              endAfter: '#link1'
-            });
-          } catch (e) {
-            expect(e).to.be.an('error');
-            expect(e.message).to.have.string('start', 'end');
-            return;
-          }
-          expect.fail('No error was thrown');
-        });
-      });
       context('With a "start" selector that has no match', () => {
         it('throws an error', async () => {
           try {
@@ -278,6 +218,7 @@ describe('Filter', () => {
           });
           expect(result).to.equal('Title\n=====');
         });
+<<<<<<< HEAD
         context('With both "startAfter" and "startBefore" defined', () => {
           it('throws an error', async () => {
             try {
@@ -338,6 +279,8 @@ describe('Filter', () => {
             expect.fail('No error was thrown');
           });
         });
+=======
+>>>>>>> Remove checks and tests make obsolete by schema validation
         context('With a "start" selector that has no match', () => {
           it('throws an error', async () => {
             try {

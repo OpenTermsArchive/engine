@@ -57,18 +57,6 @@ export default async function filter(content, { fetch: location, select: selectE
 function getRangeSelection(document, rangeSelector) {
   const { startBefore, startAfter, endBefore, endAfter } = rangeSelector;
 
-  if (startBefore && startAfter) {
-    throw new Error(`Content selectors "startBefore" and "startAfter" cannot both be defined. Specify only one in: ${JSON.stringify(rangeSelector)}`);
-  }
-
-  if (endBefore && endAfter) {
-    throw new Error(`Content selectors "endBefore" and "endAfter" cannot both be defined. Specify only one in: ${JSON.stringify(rangeSelector)}`);
-  }
-
-  if (!((startBefore || startAfter) && (endBefore || endAfter))) {
-    throw new Error(`At least one "start" and one "end" should be defined in: ${JSON.stringify(rangeSelector)}`);
-  }
-
   const selection = document.createRange();
   const startNode = document.querySelector(startBefore || startAfter);
   const endNode = document.querySelector(endBefore || endAfter);
