@@ -1,21 +1,21 @@
 {
-    "name": "Meetup",
-    "documents": {
-        "tos": {
-            "fetch": "https://help.meetup.com/hc/en-us/articles/360027447252",
-            "remove": [
-                "footer",
-                ".article-subscribe"
-            ],
-            "select": ".article"
-        },
-        "privacy": {
-            "fetch": "https://help.meetup.com/hc/en-us/articles/360044422391",
-            "remove": [
-                "footer",
-                ".article-subscribe"
-            ],
-            "select": ".article"
-        }
+  "name": "Meetup",
+  "documents": {
+    "tos": {
+      "fetch": "https://help.meetup.com/hc/en-us/articles/360027447252",
+      "remove": [
+        "footer",
+        ".article-subscribe"
+      ],
+      "select": ".article"
+    },
+    "privacy": {
+      "fetch": "https://help.meetup.com/hc/en-us/articles/360044422391",
+      "remove": [
+        "footer",
+        ".article-subscribe"
+      ],
+      "select": ".article"
     }
+  }
 }

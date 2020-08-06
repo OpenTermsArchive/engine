@@ -1,13 +1,13 @@
 {
-    "name": "Yelp",
-    "documents": {
-        "tos": {
-            "fetch": "https://terms.yelp.com/tos/en_gb/20200101_en_gb/",
-            "select": ".article"
-        },
-        "privacy": {
-            "fetch": "https://terms.yelp.com/privacy/en_gb/20200101_en_gb/",
-            "select": ".article"
-        }
+  "name": "Yelp",
+  "documents": {
+    "tos": {
+      "fetch": "https://terms.yelp.com/tos/en_gb/20200101_en_gb/",
+      "select": ".article"
+    },
+    "privacy": {
+      "fetch": "https://terms.yelp.com/privacy/en_gb/20200101_en_gb/",
+      "select": ".article"
     }
+  }
 }

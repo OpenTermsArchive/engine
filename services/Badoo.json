@@ -1,13 +1,13 @@
 {
-    "name": "Badoo",
-    "documents": {
-        "tos": {
-            "fetch": "https://badoo.com/terms/",
-            "select": ".formatted-text"
-        },
-        "privacy": {
-            "fetch": "https://badoo.com/privacy/",
-            "select": ".formatted-text"
-        }
+  "name": "Badoo",
+  "documents": {
+    "tos": {
+      "fetch": "https://badoo.com/terms/",
+      "select": ".formatted-text"
+    },
+    "privacy": {
+      "fetch": "https://badoo.com/privacy/",
+      "select": ".formatted-text"
     }
+  }
 }

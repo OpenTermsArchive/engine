@@ -1,13 +1,13 @@
 {
-    "name": "LastFm",
-    "documents": {
-        "tos": {
-            "fetch": "https://www.last.fm/legal/terms",
-            "select": "div.container:nth-child(3)"
-        },
-        "privacy": {
-            "fetch": "https://privacy.cbs/",
-            "select": ".post-content"
-        }
+  "name": "LastFm",
+  "documents": {
+    "tos": {
+      "fetch": "https://www.last.fm/legal/terms",
+      "select": "div.container:nth-child(3)"
+    },
+    "privacy": {
+      "fetch": "https://privacy.cbs/",
+      "select": ".post-content"
     }
+  }
 }

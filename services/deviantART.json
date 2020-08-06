@@ -1,13 +1,13 @@
 {
-    "name": "deviantART",
-    "documents": {
-        "tos": {
-            "fetch": "https://about.deviantart.com/policy/service/",
-            "select": ".bubbleview"
-        },
-        "privacy": {
-            "fetch": "https://about.deviantart.com/policy/privacy/",
-            "select": ".bubbleview"
-        }
+  "name": "deviantART",
+  "documents": {
+    "tos": {
+      "fetch": "https://about.deviantart.com/policy/service/",
+      "select": ".bubbleview"
+    },
+    "privacy": {
+      "fetch": "https://about.deviantart.com/policy/privacy/",
+      "select": ".bubbleview"
     }
+  }
 }

@@ -1,9 +1,9 @@
 {
-    "name": "LiveJournal",
-    "documents": {
-        "tos": {
-            "fetch": "https://www.livejournal.com/legal/tos-en.bml",
-            "select": ".s-main"
-        }
+  "name": "LiveJournal",
+  "documents": {
+    "tos": {
+      "fetch": "https://www.livejournal.com/legal/tos-en.bml",
+      "select": ".s-main"
     }
+  }
 }
