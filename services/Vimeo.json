@@ -1,13 +1,13 @@
 {
-    "name": "Vimeo",
-    "documents": {
-        "tos": {
-            "location": "https://vimeo.com/terms",
-            "contentSelector": "#legal_doc"
-        },
-        "privacy": {
-            "location": "https://vimeo.com/privacy",
-            "contentSelector": "#legal_doc"
-        }
+  "name": "Vimeo",
+  "documents": {
+    "tos": {
+      "fetch": "https://vimeo.com/terms",
+      "select": "#legal_doc"
+    },
+    "privacy": {
+      "fetch": "https://vimeo.com/privacy",
+      "select": "#legal_doc"
     }
+  }
 }

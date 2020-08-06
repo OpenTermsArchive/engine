@@ -1,13 +1,13 @@
 {
-    "name": "StackOverflow",
-    "documents": {
-        "tos": {
-            "location": "https://stackoverflow.com/legal/terms-of-service",
-            "contentSelector": ".grid--cell9"
-        },
-        "privacy": {
-            "location": "https://stackoverflow.com/legal/privacy-policy",
-            "contentSelector": ".grid--cell9"
-        }
+  "name": "StackOverflow",
+  "documents": {
+    "tos": {
+      "fetch": "https://stackoverflow.com/legal/terms-of-service",
+      "select": ".grid--cell9"
+    },
+    "privacy": {
+      "fetch": "https://stackoverflow.com/legal/privacy-policy",
+      "select": ".grid--cell9"
     }
+  }
 }

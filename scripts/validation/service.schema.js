@@ -1,59 +1,112 @@
 import { TYPES } from '../../src/types.js';
+
 const AVAILABLE_TYPES_NAME = Object.keys(TYPES);
 
 const documentsProperties = () => {
   const result = {};
-  AVAILABLE_TYPES_NAME.forEach((type) => result[type] = { "$ref": "#/definitions/document" });
+  AVAILABLE_TYPES_NAME.forEach(type => result[type] = { $ref: '#/definitions/document' });
   return result;
 };
 
 const schema = {
-  "type": "object",
-  "additionalProperties": false,
-  "title": "Service declaration",
-  "required": [
-    "name",
-    "documents"
+  type: 'object',
+  additionalProperties: false,
+  title: 'Service declaration',
+  required: [
+    'name',
+    'documents'
   ],
-  "properties": {
-    "name": {
-      "type": "string",
-      "title": "Service public name",
-      "examples": [
-        "Facebook"
+  properties: {
+    name: {
+      type: 'string',
+      title: 'Service public name',
+      examples: [
+        'Facebook'
       ]
     },
-    "documents": {
-      "type": "object",
-      "properties": documentsProperties(),
-      "propertyNames": {
-        "enum": AVAILABLE_TYPES_NAME,
+    documents: {
+      type: 'object',
+      properties: documentsProperties(),
+      propertyNames: {
+        enum: AVAILABLE_TYPES_NAME,
       }
     }
   },
-  "definitions": {
-    "document": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": [
-        "location",
-        "contentSelector"
+  definitions: {
+    document: {
+      type: 'object',
+      additionalProperties: false,
+      required: [
+        'fetch',
+        'select'
       ],
-      "properties": {
-        "location": {
-          "type": "string",
-          "format": "uri",
-          "description": "The URL where the document can be found"
+      properties: {
+        fetch: {
+          type: 'string',
+          format: 'uri',
+          description: 'The URL where the document can be found'
         },
-        "contentSelector": {
-          "type": "string",
-          "pattern": "^.+$",
-          "description": "The CSS selector that targets the meaningful part of the document, excluding elements such as headers, footers and navigation"
+        select: {
+          description: 'Selector(s) that targets element to include',
+          oneOf: [
+            { $ref: '#/definitions/cssSelector' },
+            { $ref: '#/definitions/range' },
+            {
+              type: 'array',
+              items: {
+                oneOf: [
+                  { $ref: '#/definitions/cssSelector' },
+                  { $ref: '#/definitions/range' },
+                ]
+              }
+            }
+          ]
         },
-        "filters": {
-          "type": "array"
+        filter: {
+          type: 'array',
+          items: {
+            type: 'string',
+            pattern: '^.+$',
+            description: 'Filter function name'
+          }
+        },
+        remove: {
+          description: 'Selector(s) that targets element to exclude',
+          oneOf: [
+            { $ref: '#/definitions/cssSelector' },
+            { $ref: '#/definitions/range' },
+            {
+              type: 'array',
+              items: {
+                oneOf: [
+                  { $ref: '#/definitions/cssSelector' },
+                  { $ref: '#/definitions/range' },
+                ]
+              }
+            }
+          ]
         }
       }
+    },
+    cssSelector: {
+      type: 'string',
+      pattern: '^.+$',
+      description: 'A CSS selector'
+    },
+    range: {
+      type: 'object',
+      properties: {
+        startBefore: { $ref: '#/definitions/cssSelector' },
+        startAfter: { $ref: '#/definitions/cssSelector' },
+        endBefore: { $ref: '#/definitions/cssSelector' },
+        endAfter: { $ref: '#/definitions/cssSelector' }
+      },
+      oneOf: [
+        { required: [ 'startBefore', 'endBefore' ] },
+        { required: [ 'startBefore', 'endAfter' ] },
+        { required: [ 'startAfter', 'endBefore' ] },
+        { required: [ 'startAfter', 'endAfter' ] },
+      ]
     }
   }
 };

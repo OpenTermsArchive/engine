@@ -1,13 +1,13 @@
 {
-    "name": "Match",
-    "documents": {
-        "tos": {
-            "location": "https://uk.match.com/pages/misc/cge",
-            "contentSelector": "#article_content"
-        },
-        "privacy": {
-            "location": "https://uk.match.com/pages/misc/privacy",
-            "contentSelector": "#article_content"
-        }
+  "name": "Match",
+  "documents": {
+    "tos": {
+      "fetch": "https://uk.match.com/pages/misc/cge",
+      "select": "#article_content"
+    },
+    "privacy": {
+      "fetch": "https://uk.match.com/pages/misc/privacy",
+      "select": "#article_content"
     }
+  }
 }

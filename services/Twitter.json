@@ -2,48 +2,44 @@
   "name": "Twitter",
   "documents": {
     "tos": {
-      "location": "https://twitter.com/tos",
-      "contentSelector": ".p22__item > .cr01-section:nth-child(7), .p23-chapter:nth-child(8)",
-      "filters": [
-        "removeNotDisplayedElements"
-      ]
+      "fetch": "https://twitter.com/tos",
+      "remove": "[style='display: none;']",
+      "select": ".p22__item > .cr01-section:nth-child(7), .p23-chapter:nth-child(8)"
     },
     "privacy": {
-      "location": "https://twitter.com/privacy",
-      "contentSelector": "main",
-      "filters": [
-        "removeNotDisplayedElements"
-      ]
+      "fetch": "https://twitter.com/privacy",
+      "remove": "[style='display: none;']",
+      "select": "main"
     },
     "devAgreement": {
-      "location": "https://developer.twitter.com/developer-terms/agreement",
-      "contentSelector": "main"
+      "fetch": "https://developer.twitter.com/developer-terms/agreement",
+      "select": "main"
     },
     "devPolicy": {
-      "location": "https://developer.twitter.com/developer-terms/policy",
-      "contentSelector": "main"
+      "fetch": "https://developer.twitter.com/developer-terms/policy",
+      "select": "main"
     },
     "copyrightPolicy": {
-      "location": "https://help.twitter.com/en/rules-and-policies/copyright-policy",
-      "contentSelector": ".twtr-grid__yang > div:nth-child(1)",
-      "filters": [
+      "fetch": "https://help.twitter.com/en/rules-and-policies/copyright-policy",
+      "filter": [
         "removeBanner",
         "removeScripts"
-      ]
+      ],
+      "select": ".twtr-grid__yang > div:nth-child(1)"
     },
     "lawEnforcementGuidelines": {
-      "location": "https://help.twitter.com/en/rules-and-policies/twitter-law-enforcement-support",
-      "contentSelector": ".twtr-grid__yang > div:nth-child(1)",
-      "filters": [
+      "fetch": "https://help.twitter.com/en/rules-and-policies/twitter-law-enforcement-support",
+      "filter": [
         "removeBanner"
-      ]
+      ],
+      "select": ".twtr-grid__yang > div:nth-child(1)"
     },
     "cookiesPolicy": {
-      "location": "https://help.twitter.com/en/rules-and-policies/twitter-cookies",
-      "contentSelector": ".twtr-grid__yang > div:nth-child(1)",
-      "filters": [
+      "fetch": "https://help.twitter.com/en/rules-and-policies/twitter-cookies",
+      "filter": [
         "removeBanner"
-      ]
+      ],
+      "select": ".twtr-grid__yang > div:nth-child(1)"
     }
   }
 }

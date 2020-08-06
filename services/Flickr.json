@@ -1,13 +1,13 @@
 {
-    "name": "Flickr",
-    "documents": {
-        "tos": {
-            "location": "https://www.flickr.com/help/terms",
-            "contentSelector": ".help-page-container"
-        },
-        "privacy": {
-            "location": "https://www.flickr.com/help/privacy/",
-            "contentSelector": ".help-page-container"
-        }
+  "name": "Flickr",
+  "documents": {
+    "tos": {
+      "fetch": "https://www.flickr.com/help/terms",
+      "select": ".help-page-container"
+    },
+    "privacy": {
+      "fetch": "https://www.flickr.com/help/privacy/",
+      "select": ".help-page-container"
     }
+  }
 }

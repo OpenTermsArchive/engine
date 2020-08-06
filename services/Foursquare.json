@@ -1,13 +1,13 @@
 {
-    "name": "Foursquare",
-    "documents": {
-        "tos": {
-            "location": "https://foursquare.com/legal/terms",
-            "contentSelector": "#blankPage"
-        },
-        "privacy": {
-            "location": "https://foursquare.com/legal/privacy",
-            "contentSelector": "#blankPage"
-        }
+  "name": "Foursquare",
+  "documents": {
+    "tos": {
+      "fetch": "https://foursquare.com/legal/terms",
+      "select": "#blankPage"
+    },
+    "privacy": {
+      "fetch": "https://foursquare.com/legal/privacy",
+      "select": "#blankPage"
     }
+  }
 }

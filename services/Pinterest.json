@@ -1,13 +1,13 @@
 {
-    "name": "Pinterest",
-    "documents": {
-        "tos": {
-            "location": "https://policy.pinterest.com/en/terms-of-service",
-            "contentSelector": "article"
-        },
-        "privacy": {
-            "location": "https://policy.pinterest.com/en/privacy-policy",
-            "contentSelector": "article"
-        }
+  "name": "Pinterest",
+  "documents": {
+    "tos": {
+      "fetch": "https://policy.pinterest.com/en/terms-of-service",
+      "select": "article"
+    },
+    "privacy": {
+      "fetch": "https://policy.pinterest.com/en/privacy-policy",
+      "select": "article"
     }
+  }
 }

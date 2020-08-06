@@ -1,13 +1,13 @@
 {
-    "name": "AskFM",
-    "documents": {
-        "tos": {
-            "location": "https://about.ask.fm/legal/en/terms.html",
-            "contentSelector": "section.container"
-        },
-        "privacy": {
-            "location": "https://about.ask.fm/legal/en/privacy.html",
-            "contentSelector": "section.container"
-        }
+  "name": "AskFM",
+  "documents": {
+    "tos": {
+      "fetch": "https://about.ask.fm/legal/en/terms.html",
+      "select": "section.container"
+    },
+    "privacy": {
+      "fetch": "https://about.ask.fm/legal/en/privacy.html",
+      "select": "section.container"
     }
+  }
 }
