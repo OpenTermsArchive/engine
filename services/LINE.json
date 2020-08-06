@@ -1,14 +1,14 @@
 {
-    "name": "LINE",
-    "documents": {
-        "tos": {
-            "fetch": "https://terms.line.me/line_terms/?lang=en",
-            "select": ".MdTerms01"
-        },
-        "privacy": {
-            "fetch": "https://terms.line.me/line_rules/?lang=en",
-            "remove": "style",
-            "select": ".MdTerms01 > h1:nth-child(1)"
-        }
+  "name": "LINE",
+  "documents": {
+    "tos": {
+      "fetch": "https://terms.line.me/line_terms/?lang=en",
+      "select": ".MdTerms01"
+    },
+    "privacy": {
+      "fetch": "https://terms.line.me/line_rules/?lang=en",
+      "remove": "style",
+      "select": ".MdTerms01 > h1:nth-child(1)"
     }
+  }
 }

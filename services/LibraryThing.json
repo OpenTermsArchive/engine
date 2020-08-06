@@ -4,14 +4,14 @@
     "tos": {
       "fetch": "https://www.librarything.com/privacy",
       "filter": [
-        "selectOnlyTOS"
+      "selectOnlyTOS"
       ],
       "select": ".content > table:nth-child(1) > tbody:nth-child(1) > tr:nth-child(1) > td:nth-child(2)"
     },
     "privacy": {
       "fetch": "https://www.librarything.com/privacy",
       "filter": [
-        "selectOnlyPrivacyPolicy"
+      "selectOnlyPrivacyPolicy"
       ],
       "select": ".content > table:nth-child(1) > tbody:nth-child(1) > tr:nth-child(1) > td:nth-child(2)"
     }

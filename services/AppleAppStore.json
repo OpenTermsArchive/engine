@@ -1,9 +1,9 @@
 {
-    "name": "Apple App Store",
-    "documents": {
-        "reviewGuidelines": {
-            "fetch": "https://developer.apple.com/app-store/review/guidelines/",
-            "select": "main"
-        }
+  "name": "Apple App Store",
+  "documents": {
+    "reviewGuidelines": {
+      "fetch": "https://developer.apple.com/app-store/review/guidelines/",
+      "select": "main"
     }
+  }
 }

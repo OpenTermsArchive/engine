@@ -1,9 +1,9 @@
 {
-    "name": "Apple",
-    "documents": {
-        "privacy": {
-            "fetch": "https://www.apple.com/legal/privacy/en-ww/",
-            "select": "main"
-        }
+  "name": "Apple",
+  "documents": {
+    "privacy": {
+      "fetch": "https://www.apple.com/legal/privacy/en-ww/",
+      "select": "main"
     }
+  }
 }

@@ -1,13 +1,13 @@
 {
-    "name": "Quora",
-    "documents": {
-        "tos": {
-            "fetch": "https://www.quora.com/about/tos",
-            "select": ".section"
-        },
-        "privacy": {
-            "fetch": "https://www.quora.com/about/privacy",
-            "select": ".section"
-        }
+  "name": "Quora",
+  "documents": {
+    "tos": {
+      "fetch": "https://www.quora.com/about/tos",
+      "select": ".section"
+    },
+    "privacy": {
+      "fetch": "https://www.quora.com/about/privacy",
+      "select": ".section"
     }
+  }
 }

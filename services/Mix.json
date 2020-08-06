@@ -1,13 +1,13 @@
 {
-    "name": "Mix",
-    "documents": {
-        "tos": {
-            "fetch": "https://mix.com/tos",
-            "select": ".TosPage"
-        },
-        "privacy": {
-            "fetch": "https://mix.com/privacy",
-            "select": ".PrivacyPage"
-        }
+  "name": "Mix",
+  "documents": {
+    "tos": {
+      "fetch": "https://mix.com/tos",
+      "select": ".TosPage"
+    },
+    "privacy": {
+      "fetch": "https://mix.com/privacy",
+      "select": ".PrivacyPage"
     }
+  }
 }

@@ -1,13 +1,13 @@
 {
-    "name": "hi5",
-    "documents": {
-        "tos": {
-            "fetch": "http://www.hi5.com/terms_of_service.html",
-            "select": "#terms_of_service"
-        },
-        "privacy": {
-            "fetch": "http://www.hi5.com/terms_of_service.html",
-            "select": "#privacy_policy"
-        }
+  "name": "hi5",
+  "documents": {
+    "tos": {
+      "fetch": "http://www.hi5.com/terms_of_service.html",
+      "select": "#terms_of_service"
+    },
+    "privacy": {
+      "fetch": "http://www.hi5.com/terms_of_service.html",
+      "select": "#privacy_policy"
     }
+  }
 }

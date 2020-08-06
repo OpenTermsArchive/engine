@@ -1,13 +1,13 @@
 {
-    "name": "Tencent",
-    "documents": {
-        "tos": {
-            "fetch": "https://www.tencent.com/en-us/service-agreement.html",
-            "select": ".page-content"
-        },
-        "privacy": {
-            "fetch": "https://www.tencent.com/en-us/privacy-policy.html",
-            "select": ".page-content"
-        }
+  "name": "Tencent",
+  "documents": {
+    "tos": {
+      "fetch": "https://www.tencent.com/en-us/service-agreement.html",
+      "select": ".page-content"
+    },
+    "privacy": {
+      "fetch": "https://www.tencent.com/en-us/privacy-policy.html",
+      "select": ".page-content"
     }
+  }
 }
