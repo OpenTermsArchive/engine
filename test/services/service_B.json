@@ -2,8 +2,8 @@
   "name": "Service B",
   "documents": {
     "tos": {
-      "location": "https://www.serviceb.example/tos",
-      "contentSelector": "body"
+      "fetch": "https://www.serviceb.example/tos",
+      "select": "body"
     }
   }
 }
