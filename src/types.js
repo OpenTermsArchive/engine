@@ -22,5 +22,13 @@ export const TYPES = {
   reviewGuidelines: {
     name: 'Review Guidelines',
     fileName: 'review_guidelines'
+  },
+  cookiesPolicy: {
+    name: 'Cookies Policy',
+    fileName: 'cookies_policy'
+  },
+  commercialTerms: {
+    name: 'Commercial Terms',
+    fileName: 'commercial_terms'
   }
 };
