@@ -91,15 +91,15 @@ describe('Filter', () => {
       context('With multiple selectors in one string', () => {
         it('filters the given HTML content', async () => {
           const result = await filter(rawHTML, { fetch: virtualLocation, select: 'h1, #link2' });
-          expect(result).to.equal('Title\nlink 2');
+          expect(result).to.equal('Title\n=====\n\n[link 2](#anchor)');
         });
       });
     });
 
     context('With an array of selectors', () => {
       it('filters the given HTML content', async () => {
-        const result = await filter(rawHTML, { fetch: virtualLocation, select: [ 'h1', '#link2' ] });
-        expect(result).to.equal('Title\nlink 2');
+        const result = await filter(rawHTML, { fetch: virtualLocation, select: ['h1', '#link2'] });
+        expect(result).to.equal('Title\n=====\n\n[link 2](#anchor)');
       });
     });
 
@@ -188,7 +188,7 @@ describe('Filter', () => {
             startAfter: '#link2',
             endAfter: '#link3'
           }] });
-        expect(result).to.equal('[link 2](#anchor)\n[link 3](http://absolute.url/link)');
+        expect(result).to.equal('[link 2](#anchor)\n\n[link 3](http://absolute.url/link)');
       });
     });
 
@@ -199,7 +199,7 @@ describe('Filter', () => {
             startAfter: '#link2',
             endAfter: '#link3'
           }] });
-        expect(result).to.equal('Title\n[link 3](http://absolute.url/link)');
+        expect(result).to.equal('Title\n=====\n\n[link 3](http://absolute.url/link)');
       });
     });
 

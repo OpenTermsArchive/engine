@@ -21,13 +21,13 @@ export default async function filter(content, { fetch: location, select: extract
 
   remove(webPageDOM, deletionSelectors); // work in place
 
-  const selectedContents = select(webPageDOM, extractionSelectors);
+  const domFragment = select(webPageDOM, extractionSelectors);
 
-  if (!selectedContents.length) {
+  if (!domFragment.children.length) {
     throw new Error(`The provided selector "${extractionSelectors}" has no match in the web page.`);
   }
 
-  return transform(selectedContents);
+  return transform(domFragment);
 }
 
 function getRangeSelection(document, rangeSelector) {
@@ -69,19 +69,20 @@ function remove(webPageDOM, deletionSelectors) {
 }
 
 function select(webPageDOM, extractionSelectors) {
-  const selectedContents = [];
+  const domFragment = webPageDOM.createElement('div');
+
   [].concat(extractionSelectors).forEach(selector => {
     if (typeof selector === 'object') {
       const rangeSelection = getRangeSelection(webPageDOM, selector);
-      selectedContents.push(rangeSelection.cloneContents());
+      domFragment.appendChild(rangeSelection.cloneContents());
     } else {
-      selectedContents.push(...Array.from(webPageDOM.querySelectorAll(selector)));
+      webPageDOM.querySelectorAll(selector).forEach(element => domFragment.appendChild(element));
     }
   });
 
-  return selectedContents;
+  return domFragment;
 }
 
-function transform(selectedContents) {
-  return selectedContents.map(domFragment => turndownService.turndown(domFragment)).join('\n');
+function transform(domFragment) {
+  return turndownService.turndown(domFragment);
 }
