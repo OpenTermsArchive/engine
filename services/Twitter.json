@@ -3,7 +3,7 @@
   "documents": {
     "tos": {
       "location": "https://twitter.com/tos",
-      "contentSelector": "main",
+      "contentSelector": ".p22__item > .cr01-section:nth-child(7), .p23-chapter:nth-child(8)",
       "filters": [
         "removeNotDisplayedElements"
       ]
@@ -22,6 +22,28 @@
     "devPolicy": {
       "location": "https://developer.twitter.com/developer-terms/policy",
       "contentSelector": "main"
+    },
+    "copyrightPolicy": {
+      "location": "https://help.twitter.com/en/rules-and-policies/copyright-policy",
+      "contentSelector": ".twtr-grid__yang > div:nth-child(1)",
+      "filters": [
+        "removeBanner",
+        "removeScripts"
+      ]
+    },
+    "lawEnforcementPolicy": {
+      "location": "https://help.twitter.com/en/rules-and-policies/twitter-law-enforcement-support",
+      "contentSelector": ".twtr-grid__yang > div:nth-child(1)",
+      "filters": [
+        "removeBanner"
+      ]
+    },
+    "cookiesPolicy": {
+      "location": "https://help.twitter.com/en/rules-and-policies/twitter-cookies",
+      "contentSelector": ".twtr-grid__yang > div:nth-child(1)",
+      "filters": [
+        "removeBanner"
+      ]
     }
   }
 }
