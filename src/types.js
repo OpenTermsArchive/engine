@@ -38,5 +38,9 @@ export const TYPES = {
   lawEnforcementPolicy: {
     name: 'Law Enforcement Policy',
     fileName: 'law_enforcement_policy'
+  },
+  cookiesPolicy: {
+    name: 'Cookies Policy',
+    fileName: 'cookies_policy'
   }
 };
