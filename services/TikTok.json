@@ -2,15 +2,15 @@
   "name": "TikTok",
   "documents": {
     "tos": {
-      "location": "https://www.tiktok.com/legal/terms-of-use?lang=en",
-      "contentSelector": {
+      "fetch": "https://www.tiktok.com/legal/terms-of-use?lang=en",
+      "select": {
         "startBefore": "#terms-eea",
         "endBefore": "#terms-in"
       }
     },
     "privacy": {
-      "location": "https://www.tiktok.com/legal/privacy-policy?lang=en",
-      "contentSelector": {
+      "fetch": "https://www.tiktok.com/legal/privacy-policy?lang=en",
+      "select": {
         "startBefore": "#privacy-eea",
         "endBefore": "#privacy-row"
       }

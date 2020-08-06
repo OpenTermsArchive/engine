@@ -2,12 +2,12 @@
     "name": "Discord",
     "documents": {
         "tos": {
-            "location": "https://discord.com/new/terms",
-            "contentSelector": ".document-3OCpS5"
+            "fetch": "https://discord.com/new/terms",
+            "select": ".document-3OCpS5"
         },
         "privacy": {
-            "location": "https://discord.com/new/privacy",
-            "contentSelector": ".document-3OCpS5"
+            "fetch": "https://discord.com/new/privacy",
+            "select": ".document-3OCpS5"
         }
     }
 }

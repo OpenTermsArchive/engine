@@ -2,12 +2,12 @@
     "name": "Pinterest",
     "documents": {
         "tos": {
-            "location": "https://policy.pinterest.com/en/terms-of-service",
-            "contentSelector": "article"
+            "fetch": "https://policy.pinterest.com/en/terms-of-service",
+            "select": "article"
         },
         "privacy": {
-            "location": "https://policy.pinterest.com/en/privacy-policy",
-            "contentSelector": "article"
+            "fetch": "https://policy.pinterest.com/en/privacy-policy",
+            "select": "article"
         }
     }
 }

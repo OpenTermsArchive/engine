@@ -2,12 +2,12 @@
     "name": "WeChat",
     "documents": {
         "tos": {
-            "location": "https://www.wechat.com/en/service_terms.html",
-            "contentSelector": "#agreement"
+            "fetch": "https://www.wechat.com/en/service_terms.html",
+            "select": "#agreement"
         },
         "privacy": {
-            "location": "https://www.wechat.com/en/privacy_policy.html",
-            "contentSelector": "#agreement6"
+            "fetch": "https://www.wechat.com/en/privacy_policy.html",
+            "select": "#agreement6"
         }
     }
 }

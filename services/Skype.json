@@ -2,9 +2,9 @@
     "name": "Skype",
     "documents": {
         "tos": {
-            "location": "https://www.microsoft.com/en-gb/servicesagreement/",
-            "contentSelector": ".pageIntro, .div_content",
-            "filters": [
+            "fetch": "https://www.microsoft.com/en-gb/servicesagreement/",
+            "select": ".pageIntro, .div_content",
+            "filter": [
                 "removeIrrelevantModulesFromTos",
                 "removeNavigationHeaders",
                 "removeModuleIDs",
@@ -12,9 +12,9 @@
             ]
         },
         "privacy": {
-            "location": "https://privacy.microsoft.com/en-gb/privacystatement",
-            "contentSelector": "h1, #psp_last_updated, .header_content .Description, .div_content",
-            "filters": [
+            "fetch": "https://privacy.microsoft.com/en-gb/privacystatement",
+            "select": "h1, #psp_last_updated, .header_content .Description, .div_content",
+            "filter": [
                 "removeIrrelevantModulesFromPrivacyPolicy",
                 "removeNavigationHeaders",
                 "removeModuleIDs",

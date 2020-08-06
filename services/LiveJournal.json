@@ -2,8 +2,8 @@
     "name": "LiveJournal",
     "documents": {
         "tos": {
-            "location": "https://www.livejournal.com/legal/tos-en.bml",
-            "contentSelector": ".s-main"
+            "fetch": "https://www.livejournal.com/legal/tos-en.bml",
+            "select": ".s-main"
         }
     }
 }

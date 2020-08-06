@@ -2,12 +2,12 @@
     "name": "Tagged",
     "documents": {
         "tos": {
-            "location": "http://www.tagged.com/terms_of_service.html",
-            "contentSelector": "#terms_of_service"
+            "fetch": "http://www.tagged.com/terms_of_service.html",
+            "select": "#terms_of_service"
         },
         "privacy": {
-            "location": "http://www.tagged.com/terms_of_service.html",
-            "contentSelector": "#privacy_policy"
+            "fetch": "http://www.tagged.com/terms_of_service.html",
+            "select": "#privacy_policy"
         }
     }
 }

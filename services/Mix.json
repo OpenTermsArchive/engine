@@ -2,12 +2,12 @@
     "name": "Mix",
     "documents": {
         "tos": {
-            "location": "https://mix.com/tos",
-            "contentSelector": ".TosPage"
+            "fetch": "https://mix.com/tos",
+            "select": ".TosPage"
         },
         "privacy": {
-            "location": "https://mix.com/privacy",
-            "contentSelector": ".PrivacyPage"
+            "fetch": "https://mix.com/privacy",
+            "select": ".PrivacyPage"
         }
     }
 }

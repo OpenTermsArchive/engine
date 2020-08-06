@@ -2,12 +2,12 @@
     "name": "Badoo",
     "documents": {
         "tos": {
-            "location": "https://badoo.com/terms/",
-            "contentSelector": ".formatted-text"
+            "fetch": "https://badoo.com/terms/",
+            "select": ".formatted-text"
         },
         "privacy": {
-            "location": "https://badoo.com/privacy/",
-            "contentSelector": ".formatted-text"
+            "fetch": "https://badoo.com/privacy/",
+            "select": ".formatted-text"
         }
     }
 }

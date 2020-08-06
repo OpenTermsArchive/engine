@@ -2,12 +2,12 @@
     "name": "Vimeo",
     "documents": {
         "tos": {
-            "location": "https://vimeo.com/terms",
-            "contentSelector": "#legal_doc"
+            "fetch": "https://vimeo.com/terms",
+            "select": "#legal_doc"
         },
         "privacy": {
-            "location": "https://vimeo.com/privacy",
-            "contentSelector": "#legal_doc"
+            "fetch": "https://vimeo.com/privacy",
+            "select": "#legal_doc"
         }
     }
 }
