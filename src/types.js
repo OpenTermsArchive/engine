@@ -80,7 +80,7 @@ export const TYPES = {
     fileName: 'community_guidelines'
   },
   customerPrivacyPolicy: {
-    name: 'Costomer Privacy Policy',
+    name: 'Customer Privacy Policy',
     fileName: 'costumer_privacy_policy'
   },
   DMCA: {
