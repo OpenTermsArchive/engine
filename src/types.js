@@ -139,7 +139,7 @@ export const TYPES = {
     name: 'Security and Privacy',
     fileName: 'security_and_privacy'
   },
-  vulnerabilityDisclosureProgram: {
+  vulnerabilityDisclosurePolicy: {
     name: 'Vulnerability Disclosure Program',
     fileName: 'vulnerability_disclosure_program'
   },
