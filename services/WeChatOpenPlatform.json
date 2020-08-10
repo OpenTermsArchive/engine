@@ -1,0 +1,20 @@
+{
+    "name": "WeChat Open Platform",
+    "documents": {
+        "tosParent": {
+            "fetch": "https://www.tencent.com/en-us/service-agreement.html",
+            "select": ".page-content"
+        },
+        "devAgreement": {
+            "fetch": "https://open.weixin.qq.com/cgi-bin/frame?t=news/protocol_developer_tmpl",
+            "select": "#en_US_tpl",
+            "filter": [
+                "convertScriptToDiv"
+            ]
+        },
+        "softwareLicenseAgreement": {
+            "fetch": "http://weixin.qq.com/cgi-bin/readtemplate?lang=en&t=weixin_agreement&s=default&cc=CN",
+            "select": ".content_title, .content_body"
+        }
+    }
+}
