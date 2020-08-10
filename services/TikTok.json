@@ -1,40 +1,40 @@
 {
   "name": "TikTok",
   "documents": {
-    "tos": {
+    "Terms of service": {
       "fetch": "https://www.tiktok.com/legal/terms-of-use?lang=en",
       "select": {
         "startBefore": "#terms-eea",
         "endBefore": "#terms-in"
       }
     },
-    "privacy": {
+    "Privacy Policy": {
       "fetch": "https://www.tiktok.com/legal/privacy-policy?lang=en",
       "select": {
         "startBefore": "#privacy-eea",
         "endBefore": "#privacy-row"
       }
     },
-    "communityGuidelines": {
+    "Community Guidelines": {
       "fetch": "https://www.tiktok.com/community-guidelines?lang=en",
       "select": ".base-layout-container"
     },
-    "lawEnforcementGuidelines": {
+    "Law Enforcement Guidelines": {
       "fetch": "https://www.tiktok.com/legal/law-enforcement?lang=en",
       "select": "article"
     },
-    "copyrightPolicy": {
+    "Copyright Policy": {
       "fetch": "https://www.tiktok.com/legal/copyright-policy?lang=en",
       "select": "article"
     },
-    "inAppPurchasesPolicy": {
+    "In-App Purchases Policy": {
       "fetch": "https://www.tiktok.com/legal/virtual-items?lang=en",
       "select": {
         "startBefore": "#virtual-items-eu",
         "endBefore": "#virtual-items-in"
       }
     },
-    "cookiesPolicy": {
+    "Cookies Policy": {
       "fetch": "https://www.tiktok.com/legal/tiktok-website-cookies-policy?lang=en",
       "select": "article"
     }

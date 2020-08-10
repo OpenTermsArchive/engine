@@ -1,11 +1,11 @@
 {
   "name": "Flickr",
   "documents": {
-    "tos": {
+    "Terms of service": {
       "fetch": "https://www.flickr.com/help/terms",
       "select": ".help-page-container"
     },
-    "privacy": {
+    "Privacy Policy": {
       "fetch": "https://www.flickr.com/help/privacy/",
       "select": ".help-page-container"
     }

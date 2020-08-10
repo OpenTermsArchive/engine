@@ -1,11 +1,11 @@
 {
   "name": "WhatsApp",
   "documents": {
-    "tos": {
+    "Terms of service": {
       "fetch": "https://www.whatsapp.com/legal?eea=1",
       "select": "div._-pj:nth-child(3)"
     },
-    "privacy": {
+    "Privacy Policy": {
       "fetch": "https://www.whatsapp.com/legal?eea=1",
       "select": "div._-pj:nth-child(4)"
     }

@@ -1,11 +1,11 @@
 {
   "name": "WeHeartIt",
   "documents": {
-    "tos": {
+    "Terms of service": {
       "fetch": "https://weheartit.com/about/terms-of-service",
       "select": "div.cel:nth-child(2)"
     },
-    "privacy": {
+    "Privacy Policy": {
       "fetch": "https://weheartit.com/about/privacy-policy",
       "select": "div.cel:nth-child(2)"
     }

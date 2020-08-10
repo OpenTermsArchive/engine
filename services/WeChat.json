@@ -1,21 +1,21 @@
 {
-    "name": "WeChat",
-    "documents": {
-        "tos": {
-            "fetch": "https://www.wechat.com/en/service_terms.html",
-            "remove": {
-                "startBefore": "#wechat-terms-of-service-usa-specific-terms-",
-                "endBefore": "#wechat-terms-of-service-european-union-specific-terms-"
-            },
-            "select": "#agreement"
-        },
-        "privacy": {
-            "fetch": "https://www.wechat.com/en/privacy_policy.html",
-            "select": "#agreement6"
-        },
-        "acceptableUsePolicy": {
-            "fetch": "https://www.wechat.com/en/acceptable_use_policy.html",
-            "select": "#agreement"
-        }
+  "name": "WeChat",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://www.wechat.com/en/service_terms.html",
+      "remove": {
+        "startBefore": "#wechat-terms-of-service-usa-specific-terms-",
+        "endBefore": "#wechat-terms-of-service-european-union-specific-terms-"
+      },
+      "select": "#agreement"
+    },
+    "Privacy Policy": {
+      "fetch": "https://www.wechat.com/en/privacy_policy.html",
+      "select": "#agreement6"
+    },
+    "Acceptable Use Policy": {
+      "fetch": "https://www.wechat.com/en/acceptable_use_policy.html",
+      "select": "#agreement"
     }
+  }
 }

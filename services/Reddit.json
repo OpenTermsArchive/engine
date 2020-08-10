@@ -1,12 +1,12 @@
 {
   "name": "Reddit",
   "documents": {
-    "tos": {
+    "Terms of service": {
       "fetch": "https://www.redditinc.com/policies/user-agreement",
       "remove": ".filter-holder",
       "select": "#content"
     },
-    "privacy": {
+    "Privacy Policy": {
       "fetch": "https://www.redditinc.com/policies/privacy-policy",
       "remove": ".filter-holder",
       "select": "#content"

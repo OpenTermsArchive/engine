@@ -1,7 +1,7 @@
 {
   "name": "Telegram",
   "documents": {
-    "privacy": {
+    "Privacy Policy": {
       "fetch": "https://telegram.org/privacy",
       "select": "#dev_page_content_wrap"
     }

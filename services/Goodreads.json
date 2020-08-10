@@ -1,11 +1,11 @@
 {
   "name": "Goodreads",
   "documents": {
-    "tos": {
+    "Terms of service": {
       "fetch": "https://www.goodreads.com/about/terms",
       "select": ".guidelines"
     },
-    "privacy": {
+    "Privacy Policy": {
       "fetch": "https://www.goodreads.com/about/privacy",
       "select": ".guidelines"
     }

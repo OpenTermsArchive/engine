@@ -1,11 +1,11 @@
 {
   "name": "LinguaLeo",
   "documents": {
-    "tos": {
+    "Terms of service": {
       "fetch": "https://corp.lingualeo.com/terms-of-use-en/",
       "select": "#main"
     },
-    "privacy": {
+    "Privacy Policy": {
       "fetch": "https://corp.lingualeo.com/privacy-policy-en/",
       "select": "#main"
     }

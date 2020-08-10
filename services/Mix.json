@@ -1,11 +1,11 @@
 {
   "name": "Mix",
   "documents": {
-    "tos": {
+    "Terms of service": {
       "fetch": "https://mix.com/tos",
       "select": ".TosPage"
     },
-    "privacy": {
+    "Privacy Policy": {
       "fetch": "https://mix.com/privacy",
       "select": ".PrivacyPage"
     }
