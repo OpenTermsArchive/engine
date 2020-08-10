@@ -1,11 +1,11 @@
 {
   "name": "MouthShut",
   "documents": {
-    "tos": {
+    "Terms of service": {
       "fetch": "https://www.mouthshut.com/help/tos.php",
       "select": ".box-module"
     },
-    "privacy": {
+    "Privacy Policy": {
       "fetch": "https://www.mouthshut.com/help/privacy.php",
       "select": ".box-module"
     }

@@ -1,7 +1,7 @@
 {
   "name": "Facebook Payments",
   "documents": {
-    "tos": {
+    "Terms of service": {
       "fetch": "https://www.facebook.com/payments_terms",
       "select": "#content",
       "filter": [
@@ -9,7 +9,7 @@
         "cleanUrls"
       ]
     },
-    "devPolicy": {
+    "Developer Policy": {
       "fetch": "https://developers.facebook.com/policy/credits",
       "select": "._4bl7, ._4bl9",
       "filter": [

@@ -1,14 +1,14 @@
 {
   "name": "Google",
   "documents": {
-    "privacy": {
+    "Privacy Policy": {
       "fetch": "https://policies.google.com/privacy?hl=en-US",
       "filter": [
         "removeUTMfromUrls"
       ],
       "select": "div[role=article]"
     },
-    "tos": {
+    "Terms of service": {
       "fetch": "https://policies.google.com/terms?hl=en-US",
       "filter": [
         "removeUTMfromUrls"

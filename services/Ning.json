@@ -1,11 +1,11 @@
 {
   "name": "Ning",
   "documents": {
-    "tos": {
+    "Terms of service": {
       "fetch": "https://www.ning.com/termsofservice/",
       "select": ".page__article"
     },
-    "privacy": {
+    "Privacy Policy": {
       "fetch": "https://www.ning.com/privacy/",
       "select": ".page__article"
     }

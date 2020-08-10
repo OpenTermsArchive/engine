@@ -1,15 +1,15 @@
 {
   "name": "Myspace",
   "documents": {
-  "tos": {
-    "fetch": "https://myspace.com/pages/terms",
-    "remove": "ol > *:not(li)",
-    "select": "#nms_legal"
-  },
-  "privacy": {
-    "fetch": "https://myspace.com/pages/eeaprivacy",
-    "remove": "ol > *:not(li)",
-    "select": "#nms_legal"
-  }
+    "Terms of service": {
+      "fetch": "https://myspace.com/pages/terms",
+      "remove": "ol > *:not(li)",
+      "select": "#nms_legal"
+    },
+    "Privacy Policy": {
+      "fetch": "https://myspace.com/pages/eeaprivacy",
+      "remove": "ol > *:not(li)",
+      "select": "#nms_legal"
+    }
   }
 }

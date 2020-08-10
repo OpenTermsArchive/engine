@@ -1,23 +1,23 @@
 {
     "name": "Instagram",
     "documents": {
-        "tos": {
+        "Terms of service": {
             "fetch": "https://help.instagram.com/581066165581870",
             "select": "#faq-page"
         },
-        "privacy": {
+        "Privacy Policy": {
             "fetch": "https://help.instagram.com/519522125107875",
             "select": "#faq-page"
         },
-        "communityGuidelines": {
+        "Community Guidelines": {
             "fetch": "https://help.instagram.com/477434105621119",
             "select": "#faq-page"
         },
-        "lawEnforcementGuidelines": {
+        "Law Enforcement Guidelines": {
             "fetch": "https://help.instagram.com/494561080557017",
             "select": "#faq-page"
         },
-        "devPolicy": {
+        "Developer Policy": {
             "fetch": "https://help.instagram.com/325135857663734",
             "select": "#faq-page"
         }

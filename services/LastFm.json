@@ -1,11 +1,11 @@
 {
   "name": "LastFm",
   "documents": {
-    "tos": {
+    "Terms of service": {
       "fetch": "https://www.last.fm/legal/terms",
       "select": "div.container:nth-child(3)"
     },
-    "privacy": {
+    "Privacy Policy": {
       "fetch": "https://privacy.cbs/",
       "select": ".post-content"
     }

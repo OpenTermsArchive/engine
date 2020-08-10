@@ -1,7 +1,7 @@
 {
   "name": "Apple",
   "documents": {
-    "privacy": {
+    "Privacy Policy": {
       "fetch": "https://www.apple.com/legal/privacy/en-ww/",
       "select": "main"
     }

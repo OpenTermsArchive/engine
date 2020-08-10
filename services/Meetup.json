@@ -1,7 +1,7 @@
 {
   "name": "Meetup",
   "documents": {
-    "tos": {
+    "Terms of service": {
       "fetch": "https://help.meetup.com/hc/en-us/articles/360027447252",
       "remove": [
         "footer",
@@ -9,7 +9,7 @@
       ],
       "select": ".article"
     },
-    "privacy": {
+    "Privacy Policy": {
       "fetch": "https://help.meetup.com/hc/en-us/articles/360044422391",
       "remove": [
         "footer",
