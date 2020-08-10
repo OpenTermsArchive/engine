@@ -16,7 +16,7 @@
       ],
       "select": "._5tkp"
     },
-    "Developer Policy": {
+    "Developer Terms": {
       "fetch": "https://developers.facebook.com/policy",
       "filter": [
         "removeHelpButtons",

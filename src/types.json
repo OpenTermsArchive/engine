@@ -20,14 +20,7 @@
       "object": "personal data"
     }
   },
-  "Developer Agreement": {
-    "commitment": {
-      "writer": "service provider",
-      "audience": "developer",
-      "object": "API and Content usage"
-    }
-  },
-  "Developer Policy": {
+  "Developer Terms": {
     "commitment": {
       "writer": "service provider",
       "audience": "developer",

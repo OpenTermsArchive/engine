@@ -17,7 +17,7 @@
             "fetch": "https://help.instagram.com/494561080557017",
             "select": "#faq-page"
         },
-        "Developer Policy": {
+        "Developer Terms": {
             "fetch": "https://help.instagram.com/325135857663734",
             "select": "#faq-page"
         }
