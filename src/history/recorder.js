@@ -3,7 +3,7 @@ import fsApi from 'fs';
 import async from 'async';
 
 import Git from './git.js';
-import { TYPES as DOCUMENT_TYPES } from '../types.js';
+import * as DOCUMENT_TYPES from '../types.json';
 
 const fs = fsApi.promises;
 
@@ -20,7 +20,7 @@ export default class Recorder {
     const filePath = await this.save({ serviceId, documentType, content });
     const isNewFile = await this.git.isNew(filePath);
 
-    let message = `${isNewFile ? 'Start tracking' : 'Update'} ${serviceId} ${DOCUMENT_TYPES[documentType].name}`;
+    let message = `${isNewFile ? 'Start tracking' : 'Update'} ${serviceId} ${DOCUMENT_TYPES.default[documentType].name}`;
 
     if (details) {
       message += `\n\n${details}`;
@@ -42,7 +42,7 @@ export default class Recorder {
       await fs.mkdir(directory, { recursive: true });
     }
 
-    const filePath = `${directory}/${DOCUMENT_TYPES[documentType].fileName}.${this.fileExtension}`;
+    const filePath = `${directory}/${DOCUMENT_TYPES.default[documentType].fileName}.${this.fileExtension}`;
 
     await fs.writeFile(filePath, content);
 

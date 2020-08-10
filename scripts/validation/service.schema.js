@@ -1,6 +1,6 @@
-import { TYPES } from '../../src/types.js';
+import * as TYPES from '../../src/types.json';
 
-const AVAILABLE_TYPES_NAME = Object.keys(TYPES);
+const AVAILABLE_TYPES_NAME = Object.keys(TYPES.default);
 
 const documentsProperties = () => {
   const result = {};

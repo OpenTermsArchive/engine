@@ -10,12 +10,12 @@ import fetch from '../../src/fetcher/index.js';
 import filter from '../../src/filter/index.js';
 import loadServiceDeclarations from '../../src/loader/index.js';
 import serviceSchema from './service.schema.js';
-import { TYPES } from '../../src/types.js';
+import * as TYPES from '../../src/types.json';
 
 const fs = fsApi.promises;
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
 const { expect } = chai;
-const AVAILABLE_TYPE_NAMES = Object.keys(TYPES);
+const AVAILABLE_TYPE_NAMES = Object.keys(TYPES.default);
 const rootPath = path.join(__dirname, '../..');
 const SERVICE_DECLARATIONS_PATH = path.resolve(__dirname, '../../', config.get('serviceDeclarationsPath'));
 
@@ -45,7 +45,7 @@ describe('Services validation', async () => {
 
       if (!schemaOnly) {
         AVAILABLE_TYPE_NAMES.forEach(type => {
-          describe(TYPES[type].name, () => {
+          describe(TYPES.default[type].name, () => {
             before(function () {
               if (!service.documents[type]) {
                 console.log('      (Tests skipped for this document type as it is not declared for this service)');
