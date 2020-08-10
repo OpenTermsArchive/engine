@@ -22,7 +22,28 @@ In the folder `services`, create a JSON file with the name of the service you wa
 
 ### Document type
 
-For the `<document type>` key, you will have to use one of those listed in `/src/types.js` (or create a new one there if it is not already referenced).
+For the `<document type>` key, you will have to use one of those listed in `/src/types.js`.
+Each document type is characterised along three dimensions of the contractual relationship, the `writer` of the contract, the targeted `audience` and the `object` of commitment.
+
+
+Document type declaration look like:
+
+```json
+{
+  …
+  "Privacy Policy": {
+    "commitment": {
+      "writer": "service provider",
+      "audience": "end user",
+      "object": "personal data"
+    }
+  },
+  …
+}
+```
+
+If the document you want to add has no matching referenced document type, you can create a new one but before ensure that there isn't a synonym of the one you are looking for.
+
 You can find examples in the `services` folder.
 
 ### Filters
