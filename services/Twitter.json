@@ -11,12 +11,8 @@
       "remove": "[style='display: none;']",
       "select": "main"
     },
-    "Developer Agreement": {
+    "Developer Terms": {
       "fetch": "https://developer.twitter.com/developer-terms/agreement",
-      "select": "main"
-    },
-    "Developer Policy": {
-      "fetch": "https://developer.twitter.com/developer-terms/policy",
       "select": "main"
     },
     "Copyright Policy": {
