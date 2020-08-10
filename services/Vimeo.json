@@ -1,7 +1,7 @@
 {
   "name": "Vimeo",
   "documents": {
-    "Terms of service": {
+    "Terms of Service": {
       "fetch": "https://vimeo.com/terms",
       "select": "#legal_doc"
     },

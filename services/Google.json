@@ -8,7 +8,7 @@
       ],
       "select": "div[role=article]"
     },
-    "Terms of service": {
+    "Terms of Service": {
       "fetch": "https://policies.google.com/terms?hl=en-US",
       "filter": [
         "removeUTMfromUrls"

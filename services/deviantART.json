@@ -1,7 +1,7 @@
 {
   "name": "deviantART",
   "documents": {
-    "Terms of service": {
+    "Terms of Service": {
       "fetch": "https://about.deviantart.com/policy/service/",
       "select": ".bubbleview"
     },

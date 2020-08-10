@@ -1,7 +1,7 @@
 {
   "name": "Twitch",
   "documents": {
-    "Terms of service": {
+    "Terms of Service": {
       "fetch": "https://www.twitch.tv/p/legal/terms-of-service/",
       "select": ".editable"
     },

@@ -1,7 +1,7 @@
 {
   "name": "LinguaLeo",
   "documents": {
-    "Terms of service": {
+    "Terms of Service": {
       "fetch": "https://corp.lingualeo.com/terms-of-use-en/",
       "select": "#main"
     },

@@ -1,7 +1,7 @@
 {
   "name": "LastFm",
   "documents": {
-    "Terms of service": {
+    "Terms of Service": {
       "fetch": "https://www.last.fm/legal/terms",
       "select": "div.container:nth-child(3)"
     },

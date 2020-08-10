@@ -1,7 +1,7 @@
 {
   "name": "TikTok",
   "documents": {
-    "Terms of service": {
+    "Terms of Service": {
       "fetch": "https://www.tiktok.com/legal/terms-of-use?lang=en",
       "select": {
         "startBefore": "#terms-eea",

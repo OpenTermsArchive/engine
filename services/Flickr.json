@@ -1,7 +1,7 @@
 {
   "name": "Flickr",
   "documents": {
-    "Terms of service": {
+    "Terms of Service": {
       "fetch": "https://www.flickr.com/help/terms",
       "select": ".help-page-container"
     },

@@ -1,7 +1,7 @@
 {
   "name": "Meetup",
   "documents": {
-    "Terms of service": {
+    "Terms of Service": {
       "fetch": "https://help.meetup.com/hc/en-us/articles/360027447252",
       "remove": [
         "footer",

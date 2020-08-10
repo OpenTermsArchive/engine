@@ -1,7 +1,7 @@
 {
   "name": "Tencent",
   "documents": {
-    "Terms of service": {
+    "Terms of Service": {
       "fetch": "https://www.tencent.com/en-us/service-agreement.html",
       "select": ".page-content"
     },

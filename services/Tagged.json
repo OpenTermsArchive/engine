@@ -1,7 +1,7 @@
 {
   "name": "Tagged",
   "documents": {
-    "Terms of service": {
+    "Terms of Service": {
       "fetch": "http://www.tagged.com/terms_of_service.html",
       "select": "#terms_of_service"
     },

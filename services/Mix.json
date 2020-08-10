@@ -1,7 +1,7 @@
 {
   "name": "Mix",
   "documents": {
-    "Terms of service": {
+    "Terms of Service": {
       "fetch": "https://mix.com/tos",
       "select": ".TosPage"
     },
