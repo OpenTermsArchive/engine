@@ -9,7 +9,7 @@ import { publish, recordSnapshot, recordVersion } from './history/index.js';
 import fetch from './fetcher/index.js';
 import filter from './filter/index.js';
 import loadServiceDeclarations from './loader/index.js';
-import { TYPES } from './types.js';
+import * as TYPES from './types.json';
 
 consoleStamp(console);
 
@@ -19,7 +19,7 @@ const SERVICE_DECLARATIONS_PATH = path.resolve(__dirname, '../', config.get('ser
 export default class CGUs extends events.EventEmitter {
   constructor() {
     super();
-    this._types = TYPES;
+    this._types = TYPES.default;
   }
 
   get serviceDeclarations() {
