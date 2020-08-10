@@ -14,6 +14,29 @@
         "startBefore": "#privacy-eea",
         "endBefore": "#privacy-row"
       }
+    },
+    "communityGuidelines": {
+      "fetch": "https://www.tiktok.com/community-guidelines?lang=en",
+      "select": "article"
+    },
+    "lawEnforcementGuidelines": {
+      "fetch": "https://www.tiktok.com/legal/law-enforcement?lang=en",
+      "select": "article"
+    },
+    "copyrightPolicy": {
+      "fetch": "https://www.tiktok.com/legal/copyright-policy?lang=en",
+      "select": "article"
+    },
+    "inAppPurchasesPolicy": {
+      "fetch": "https://www.tiktok.com/legal/virtual-items?lang=en",
+      "select": {
+        "startBefore": "#virtual-items-eu",
+        "endBefore": "#virtual-items-in"
+      }
+    },
+    "cookiesPolicy": {
+      "fetch": "https://www.tiktok.com/legal/tiktok-website-cookies-policy?lang=en",
+      "select": "article"
     }
   }
 }
