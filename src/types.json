@@ -1,62 +1,121 @@
 {
-  "tos": {
-    "name": "Terms of service",
-    "fileName": "terms_of_service"
+  "Terms of service": {
+    "commitment": {
+      "writer": "service provider",
+      "audience": "end user",
+      "object": "service usage"
+    }
   },
-  "tosParent": {
-    "name": "Terms of service of the parent company",
-    "fileName": "tos_parent"
+  "Parent Organization Terms": {
+    "commitment": {
+      "writer": "parent organization",
+      "audience": "end user",
+      "object": "products and services usage"
+    }
   },
-  "privacy": {
-    "name": "Privacy Policy",
-    "fileName": "privacy_policy"
+  "Privacy Policy": {
+    "commitment": {
+      "writer": "service provider",
+      "audience": "end user",
+      "object": "personal data"
+    }
   },
-  "devAgreement": {
-    "name": "Developer Agreement",
-    "fileName": "developer_agreement"
+  "Developer Agreement": {
+    "commitment": {
+      "writer": "service provider",
+      "audience": "developer",
+      "object": "API and Content usage"
+    }
   },
-  "devPolicy": {
-    "name": "Developer Policy",
-    "fileName": "developer_policy"
+  "Developer Policy": {
+    "commitment": {
+      "writer": "service provider",
+      "audience": "developer",
+      "object": "API and Content usage"
+    }
   },
-  "communityGuidelines": {
-    "name": "Community Guidelines",
-    "fileName": "community_guidelines"
+  "Cookies Policy": {
+    "commitment": {
+      "writer": "service provider",
+      "audience": "end user",
+      "object": "cookies"
+    }
   },
-  "brandGuidelines": {
-    "name": "Brand Guidelines",
-    "fileName": "brand_guidelines"
+  "Community Guidelines": {
+    "commitment": {
+      "writer": "service provider",
+      "audience": "end user",
+      "object": "public behavior"
+    }
   },
-  "reviewGuidelines": {
-    "name": "Review Guidelines",
-    "fileName": "review_guidelines"
+  "Acceptable Use Policy": {
+    "commitment": {
+      "writer": "service provider",
+      "audience": "end user",
+      "object": "acceptable usage"
+    }
   },
-  "acceptableUsePolicy": {
-    "name": "Acceptable Use Policy",
-    "fileName": "acceptable_use_policy"
+  "Commercial Terms": {
+    "commitment": {
+      "writer": "service provider",
+      "audience": "commercial intermediaries",
+      "object": "business or commercial usage"
+    }
   },
-  "cookiesPolicy": {
-    "name": "Cookies Policy",
-    "fileName": "cookies_policy"
+  "Copyright Policy": {
+    "commitment": {
+      "writer": "service provider",
+      "audience": "end user",
+      "object": "copyright complaints"
+    }
   },
-  "commercialTerms": {
-    "name": "Commercial Terms",
-    "fileName": "commercial_terms"
+  "Law Enforcement Guidelines": {
+    "commitment": {
+      "writer": "service provider",
+      "audience": "law enforcement authorities",
+      "object": "account records"
+    }
   },
-  "softwareLicenseAgreement": {
-    "name": "Software License Agreement",
-    "fileName": "software_license_agreement"
+  "In-App Purchases Policy": {
+    "commitment": {
+      "writer": "service provider",
+      "audience": "end user",
+      "object": "in-app purchase usage"
+    }
   },
-  "copyrightPolicy": {
-    "name": "Copyright Policy",
-    "fileName": "copyright_policy"
+  "Review Guidelines": {
+    "commitment": {
+      "writer": "service provider",
+      "audience": "developer",
+      "object": "review process"
+    }
   },
-  "lawEnforcementGuidelines": {
-    "name": "Law Enforcement Guidelines",
-    "fileName": "law_enforcement_guidelines"
+  "Brand Guidelines": {
+    "commitment": {
+      "writer": "service provider",
+      "audience": "developer",
+      "object": "brand usage"
+    }
   },
-  "inAppPurchasesPolicy": {
-    "name": "In App Purchases Policy",
-    "fileName": "in_app_purchases_policy"
+  "Controller-Controller Data Protection Terms": {
+    "commitment": {
+      "writer": "service provider",
+      "audience": "end user",
+      "object": "data processing in connection with the Protection Legislation"
+    }
+  },
+  "Data Processing Terms": {
+    "commitment": {
+      "writer": "service provider",
+      "audience": "end user",
+      "object": "data processing in connection with the Protection Legislation"
+    }
+  },
+  "User Consent Policy": {
+    "commitment": {
+      "writer": "service provider",
+      "audience": "end user",
+      "object": "user consent"
+    }
   }
 }

@@ -13,7 +13,7 @@ const expected = {
   service_A: {
     name: 'Service A',
     documents: {
-      tos: {
+      'Terms of service': {
         fetch: 'https://www.servicea.example/tos',
         select: 'body'
       }
@@ -22,7 +22,7 @@ const expected = {
   service_B: {
     name: 'Service B',
     documents: {
-      tos: {
+      'Terms of service': {
         fetch: 'https://www.serviceb.example/tos',
         select: 'body'
       }

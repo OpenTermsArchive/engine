@@ -13,7 +13,7 @@ import CGUs from './src/index.js';
 
     const app = new CGUs();
     await app.init();
-    const notifier = new Notifier(app.serviceDeclarations, app.documentTypes);
+    const notifier = new Notifier(app.serviceDeclarations);
 
     let delayedVersionNotificationsParams = [];
 
