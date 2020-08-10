@@ -1,7 +1,7 @@
 {
   "name": "Foursquare",
   "documents": {
-    "Terms of service": {
+    "Terms of Service": {
       "fetch": "https://foursquare.com/legal/terms",
       "select": "#blankPage"
     },

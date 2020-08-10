@@ -1,7 +1,7 @@
 {
   "name": "WhatsApp",
   "documents": {
-    "Terms of service": {
+    "Terms of Service": {
       "fetch": "https://www.whatsapp.com/legal?eea=1",
       "select": "div._-pj:nth-child(3)"
     },

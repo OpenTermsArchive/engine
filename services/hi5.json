@@ -1,7 +1,7 @@
 {
   "name": "hi5",
   "documents": {
-    "Terms of service": {
+    "Terms of Service": {
       "fetch": "http://www.hi5.com/terms_of_service.html",
       "select": "#terms_of_service"
     },

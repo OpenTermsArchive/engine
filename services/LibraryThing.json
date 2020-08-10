@@ -1,7 +1,7 @@
 {
   "name": "LibraryThing",
   "documents": {
-    "Terms of service": {
+    "Terms of Service": {
       "fetch": "https://www.librarything.com/privacy",
       "filter": [
       "selectOnlyTOS"

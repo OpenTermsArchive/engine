@@ -1,7 +1,7 @@
 {
   "name": "Skype",
   "documents": {
-    "Terms of service": {
+    "Terms of Service": {
       "fetch": "https://www.microsoft.com/en-gb/servicesagreement/",
       "filter": [
         "removeIrrelevantModulesFromTos",

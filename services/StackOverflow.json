@@ -1,7 +1,7 @@
 {
   "name": "StackOverflow",
   "documents": {
-    "Terms of service": {
+    "Terms of Service": {
       "fetch": "https://stackoverflow.com/legal/terms-of-service",
       "select": ".grid--cell9"
     },

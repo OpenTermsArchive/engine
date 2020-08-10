@@ -1,7 +1,7 @@
 {
   "name": "Discord",
   "documents": {
-    "Terms of service": {
+    "Terms of Service": {
       "fetch": "https://discord.com/new/terms",
       "select": ".document-3OCpS5"
     },

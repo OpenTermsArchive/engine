@@ -1,7 +1,7 @@
 {
   "name": "LINE",
   "documents": {
-    "Terms of service": {
+    "Terms of Service": {
       "fetch": "https://terms.line.me/line_terms/?lang=en",
       "select": ".MdTerms01"
     },

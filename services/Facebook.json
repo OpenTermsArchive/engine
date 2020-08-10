@@ -1,7 +1,7 @@
 {
   "name": "Facebook",
   "documents": {
-    "Terms of service": {
+    "Terms of Service": {
       "fetch": "https://www.facebook.com/legal/terms/plain_text_terms",
       "filter": [
         "cleanUrls"

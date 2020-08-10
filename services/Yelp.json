@@ -1,7 +1,7 @@
 {
   "name": "Yelp",
   "documents": {
-    "Terms of service": {
+    "Terms of Service": {
       "fetch": "https://terms.yelp.com/tos/en_gb/20200101_en_gb/",
       "select": ".article"
     },

@@ -1,7 +1,7 @@
 {
   "name": "Twitter",
   "documents": {
-    "Terms of service": {
+    "Terms of Service": {
       "fetch": "https://twitter.com/tos",
       "remove": "[style='display: none;']",
       "select": ".p22__item > .cr01-section:nth-child(7), .p23-chapter:nth-child(8)"

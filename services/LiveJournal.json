@@ -1,7 +1,7 @@
 {
   "name": "LiveJournal",
   "documents": {
-    "Terms of service": {
+    "Terms of Service": {
       "fetch": "https://www.livejournal.com/legal/tos-en.bml",
       "select": ".s-main"
     }

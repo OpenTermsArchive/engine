@@ -1,7 +1,7 @@
 {
   "name": "Goodreads",
   "documents": {
-    "Terms of service": {
+    "Terms of Service": {
       "fetch": "https://www.goodreads.com/about/terms",
       "select": ".guidelines"
     },

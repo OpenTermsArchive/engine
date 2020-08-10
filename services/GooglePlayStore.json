@@ -5,7 +5,7 @@
       "fetch": "https://play.google.com/intl/ALL_en/about/developer-distribution-agreement.html",
       "select": "body > .play-contained"
     },
-    "Terms of service": {
+    "Terms of Service": {
       "fetch": "https://play.google.com/intl/en_US/about/play-terms/index.html",
       "select": "body > .play-contained"
     },
