@@ -5,12 +5,15 @@ import Ajv from 'ajv';
 import chai from 'chai';
 import config from 'config';
 import jsonSourceMap from 'json-source-map';
+import { createRequire } from 'module';
 
 import fetch from '../../src/fetcher/index.js';
 import filter from '../../src/filter/index.js';
 import loadServiceDeclarations from '../../src/loader/index.js';
 import serviceSchema from './service.schema.js';
-import TYPES from '../../src/types.json';
+
+const require = createRequire(import.meta.url);
+const TYPES = require('../../src/types.json');
 
 const fs = fsApi.promises;
 const __dirname = path.dirname(new URL(import.meta.url).pathname);

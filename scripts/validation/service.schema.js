@@ -1,10 +1,15 @@
-import TYPES from '../../src/types.json';
+import { createRequire } from 'module';
+
+const require = createRequire(import.meta.url);
+const TYPES = require('../../src/types.json');
 
 const AVAILABLE_TYPES_NAME = Object.keys(TYPES);
 
 const documentsProperties = () => {
   const result = {};
-  AVAILABLE_TYPES_NAME.forEach(type => result[type] = { $ref: '#/definitions/document' });
+  AVAILABLE_TYPES_NAME.forEach(type => {
+    result[type] = { $ref: '#/definitions/document' };
+  });
   return result;
 };
 
