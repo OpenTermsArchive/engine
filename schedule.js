@@ -30,6 +30,8 @@ import CGUs from './src/index.js';
 
     app.on('documentFetchError', notifier.onDocumentFetchError.bind(notifier));
     app.on('documentUpdateError', notifier.onDocumentUpdateError.bind(notifier));
+    app.on('recordSnapshotError', error => notifier.onApplicationError(error));
+    app.on('recordVersionError', error => notifier.onApplicationError(error));
     app.on('publicationError', error => notifier.onApplicationError(error));
     app.on('applicationError', error => notifier.onApplicationError(error));
 
