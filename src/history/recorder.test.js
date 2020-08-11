@@ -120,4 +120,10 @@ describe('Recorder', () => {
       });
     });
   });
+
+  describe('#_filePath', () => {
+    it('returns the file path for the given service provider’s document type', async () => {
+      expect(subject._filePath(SERVICE_PROVIDER_ID, TYPE)).to.equal(EXPECTED_FILE_PATH);
+    });
+  });
 });
