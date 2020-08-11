@@ -11,10 +11,6 @@
             "filter": [
                 "convertScriptToDiv"
             ]
-        },
-        "softwareLicenseAgreement": {
-            "fetch": "http://weixin.qq.com/cgi-bin/readtemplate?lang=en&t=weixin_agreement&s=default&cc=CN",
-            "select": ".content_title, .content_body"
         }
     }
 }
