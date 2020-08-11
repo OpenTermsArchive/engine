@@ -15,11 +15,14 @@ export default class Recorder {
     this.commitQueue.error(Recorder.commitQueueErrorHandler);
   }
 
-  async record({ serviceId, documentType, content, details }) {
+  async record({ serviceId, documentType, content, details, isRefiltering }) {
     const filePath = await this.save({ serviceId, documentType, content });
     const isNewFile = await this.git.isNew(filePath);
 
-    let message = `${isNewFile ? 'Start tracking' : 'Update'} ${serviceId} ${documentType}`;
+    let prefix = isNewFile ? 'Start tracking' : 'Update';
+    prefix = isRefiltering ? 'Refilter' : prefix;
+
+    let message = `${prefix} ${serviceId} ${documentType}`;
 
     if (details) {
       message += `\n\n${details}`;

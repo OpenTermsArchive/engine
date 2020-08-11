@@ -1,3 +1,4 @@
+import fsApi from 'fs';
 import path from 'path';
 import events from 'events';
 
@@ -12,6 +13,7 @@ import loadServiceDeclarations from './loader/index.js';
 
 consoleStamp(console);
 
+const fs = fsApi.promises;
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
 const SERVICE_DECLARATIONS_PATH = path.resolve(__dirname, '../', config.get('serviceDeclarationsPath'));
 
@@ -60,6 +62,35 @@ export default class CGUs extends events.EventEmitter {
     }
   }
 
+  async refilterAndRecordAll(serviceToTrack) {
+    try {
+      console.log('Refiltering documents…');
+
+      const services = serviceToTrack ? { [serviceToTrack]: this._serviceDeclarations[serviceToTrack] } : this._serviceDeclarations;
+
+      const regenerationPromises = [];
+
+      Object.keys(services).forEach(serviceId => {
+        const { documents, name: serviceName } = this._serviceDeclarations[serviceId];
+        Object.keys(documents).forEach(type => {
+          regenerationPromises.push(this.refilterAndRecord({
+            serviceId,
+            serviceName,
+            document: {
+              type,
+              ...documents[type]
+            }
+          }));
+        });
+      });
+
+      await Promise.all(regenerationPromises);
+    } catch (error) {
+      console.error(`Error when trying to refilter documents: ${error}`);
+      this.emit('applicationError', error);
+    }
+  }
+
   async trackDocumentChanges({ serviceId, serviceName, document: documentDeclaration }) {
     const { type, fetch: location } = documentDeclaration;
     const logPrefix = `[${serviceName}-${type}]`;
@@ -96,6 +127,30 @@ export default class CGUs extends events.EventEmitter {
     }
   }
 
+  async refilterAndRecord({ serviceId, serviceName, document: documentDeclaration }) {
+    const { type } = documentDeclaration;
+    const logPrefix = `[${serviceName}-${this._types[type].name}]`;
+    try {
+      const { id: snapshotId, path: snapshotPath } = await history.getLastSnapshot(serviceId, type);
+
+      if (!snapshotId) {
+        return;
+      }
+
+      const snapshotContent = await fs.readFile(snapshotPath, { encoding: 'utf8' });
+
+      return this.recordRefilter({
+        snapshotContent,
+        snapshotId,
+        serviceId,
+        documentDeclaration,
+        logPrefix,
+      });
+    } catch (error) {
+      console.error(`${logPrefix} RefilterError:`, error.message);
+    }
+  }
+
   async fetch({ location, serviceId, type, logPrefix }) {
     console.log(`${logPrefix} Fetch '${location}'.`);
     try {
@@ -119,6 +174,24 @@ export default class CGUs extends events.EventEmitter {
     } catch (error) {
       console.error(`${logPrefix} RecordSnapshotError:`, error.message);
       this.emit('recordSnapshotError', serviceId, type, error);
+    }
+  }
+
+  async recordRefilter({ snapshotContent, snapshotId, serviceId, documentDeclaration, logPrefix }) {
+    const { type } = documentDeclaration;
+    try {
+      const document = await filter(snapshotContent, documentDeclaration, this._serviceDeclarations[serviceId].filters);
+
+      const { id: versionId, path: documentPath } = await history.recordRefilter(serviceId, type, document, snapshotId);
+      if (versionId) {
+        console.log(`${logPrefix} Recorded version in ${documentPath} with id ${versionId}.`);
+        this.emit('versionRecorded', serviceId, type, versionId);
+      } else {
+        console.log(`${logPrefix} No changes after filtering, did not record version.`);
+      }
+    } catch (error) {
+      console.error(`${logPrefix} RecordVersionError:`, error.message);
+      this.emit('recordVersionError', serviceId, type, error);
     }
   }
 

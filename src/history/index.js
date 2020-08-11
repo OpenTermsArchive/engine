@@ -20,6 +20,14 @@ export async function recordSnapshot(serviceId, documentType, content) {
 }
 
 export async function recordVersion(serviceId, documentType, content, snapshotId) {
+  return _recordVersion({ serviceId, documentType, content, snapshotId });
+}
+
+export async function recordRefilter(serviceId, documentType, content, snapshotId) {
+  return _recordVersion({ serviceId, documentType, content, snapshotId, isRefiltering: true });
+}
+
+async function _recordVersion({ serviceId, documentType, content, snapshotId, isRefiltering }) {
   if (!snapshotId) {
     throw new Error(`A snapshot ID is required to ensure data consistency for ${serviceId}'s ${documentType}`);
   }
@@ -28,7 +36,8 @@ export async function recordVersion(serviceId, documentType, content, snapshotId
     serviceId,
     documentType,
     content,
-    details: `This version was recorded after filtering snapshot ${config.get('history.publish') ? config.get('history.snapshotsBaseUrl') : ''}${snapshotId}`
+    details: `This version was recorded after filtering snapshot ${config.get('history.publish') ? config.get('history.snapshotsBaseUrl') : ''}${snapshotId}`,
+    isRefiltering
   });
 }
 
