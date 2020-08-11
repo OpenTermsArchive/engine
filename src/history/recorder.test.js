@@ -157,4 +157,37 @@ describe('Recorder', () => {
       expect(commits[1].hash).to.include(firstRecordId);
     });
   });
+
+  describe('#getLatestRecord', () => {
+    const PERSIST_FILE_CONTENT = `${FILE_CONTENT}record`;
+    let lastSnapshotId;
+    let lastestRecord;
+
+    before(async () => {
+      await subject.record({
+        serviceId: SERVICE_PROVIDER_ID,
+        documentType: TYPE,
+        content: FILE_CONTENT,
+        isFiltered: false
+      });
+      const { id: recordId } = await subject.record({
+        serviceId: SERVICE_PROVIDER_ID,
+        documentType: TYPE,
+        content: PERSIST_FILE_CONTENT,
+        isFiltered: false
+      });
+      lastSnapshotId = recordId;
+      lastestRecord = await subject.getLatestRecord(SERVICE_PROVIDER_ID, TYPE);
+    });
+
+    after(resetGitRepository);
+
+    it('return the latest record id', async () => {
+      expect(lastestRecord.id).to.include(lastSnapshotId);
+    });
+
+    it('return the latest record path', async () => {
+      expect(lastestRecord.path).to.equal(EXPECTED_FILE_PATH);
+    });
+  });
 });
