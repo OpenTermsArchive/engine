@@ -1,0 +1,21 @@
+{
+  "name": "GoogleAnalytics",
+  "documents": {
+    "dataProcessingTerms": {
+      "fetch": "https://privacy.google.com/businesses/processorterms/",
+      "select": ".ads-controller"
+    },
+    "cookiesPolicy": {
+      "fetch": "https://policies.google.com/technologies/ads",
+      "select": "div[role=article]"
+    },
+    "userConsentPolicy": {
+      "fetch": "https://www.google.com/about/company/user-consent-policy/",
+      "select": ".page-section" 
+    },
+    "controllerControllerDataProtectionTerms": {
+      "fetch": "https://support.google.com/analytics/answer/9012600",
+      "select": ".article-container"
+    }
+  }
+}
