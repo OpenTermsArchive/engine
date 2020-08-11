@@ -126,4 +126,35 @@ describe('Recorder', () => {
       expect(subject._filePath(SERVICE_PROVIDER_ID, TYPE)).to.equal(EXPECTED_FILE_PATH);
     });
   });
+
+  describe('#_getCommits', () => {
+    let firstRecordId;
+    let secondRecordId;
+    before(async () => {
+      let record = await subject.record({
+        serviceId: SERVICE_PROVIDER_ID,
+        documentType: TYPE,
+        content: FILE_CONTENT,
+        isFiltered: false
+      });
+      firstRecordId = record.id;
+      record = await subject.record({
+        serviceId: SERVICE_PROVIDER_ID,
+        documentType: TYPE,
+        content: `${FILE_CONTENT}record`,
+        isFiltered: false
+      });
+      secondRecordId = record.id;
+    });
+
+    after(resetGitRepository);
+
+    it('returns all commits related to the given file path', async () => {
+      const filePath = subject._filePath(SERVICE_PROVIDER_ID, TYPE);
+      const commits = await subject._getCommits(filePath);
+      expect(commits).to.have.length(2);
+      expect(commits[0].hash).to.include(secondRecordId);
+      expect(commits[1].hash).to.include(firstRecordId);
+    });
+  });
 });
