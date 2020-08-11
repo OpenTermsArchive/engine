@@ -102,6 +102,10 @@ export default class CGUs extends events.EventEmitter {
         logPrefix,
       });
 
+      if (!pageContent) {
+        return;
+      }
+
       const snapshotId = await this.recordSnapshot({
         snapshotContent: pageContent,
         content: pageContent,
