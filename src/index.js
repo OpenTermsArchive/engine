@@ -33,7 +33,7 @@ export default class CGUs extends events.EventEmitter {
 
   async trackChanges(serviceToTrack) {
     try {
-      console.log('Start scraping and saving terms of service…');
+      console.log('Start tracking changes…');
 
       const services = serviceToTrack ? { [serviceToTrack]: this._serviceDeclarations[serviceToTrack] } : this._serviceDeclarations;
 
