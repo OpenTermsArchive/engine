@@ -46,7 +46,15 @@ export default class Git {
   }
 
   async log(options) {
-    return this.git.log(options);
+    try {
+      const logSummary = await this.git.log(options);
+      return logSummary.all;
+    } catch (error) {
+      if (!error.message.includes('unknown revision or path not in the working tree')) {
+        throw (error);
+      }
+      return [];
+    }
   }
 
   relativePath(absolutePath) {

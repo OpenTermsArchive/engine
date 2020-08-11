@@ -67,10 +67,13 @@ export default class Recorder {
   async getLatestRecord(serviceId, documentType) {
     const filePath = this._filePath(serviceId, documentType);
     const commits = await this._getCommits(filePath);
-    return {
-      id: commits[0].hash,
-      path: filePath,
-    };
+    const result = { id: null, path: filePath };
+
+    if (commits.length) {
+      result.id = commits[0].hash;
+    }
+
+    return result;
   }
 
   _filePath(serviceId, documentType) {
@@ -78,10 +81,7 @@ export default class Recorder {
   }
 
   async _getCommits(filePath) {
-    const logSummary = await this.git.log({ file: filePath });
-    return logSummary.all;
-  }
-
+    return this.git.log({ file: filePath });
   }
 }
 
