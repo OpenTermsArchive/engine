@@ -17,7 +17,7 @@
     },
     "communityGuidelines": {
       "fetch": "https://www.tiktok.com/community-guidelines?lang=en",
-      "select": "article"
+      "select": ".base-layout-container"
     },
     "lawEnforcementGuidelines": {
       "fetch": "https://www.tiktok.com/legal/law-enforcement?lang=en",
