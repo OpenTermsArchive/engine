@@ -45,6 +45,10 @@ export default class Git {
            || (status.not_added.indexOf(this.relativePath(filepath)) > -1);
   }
 
+  async log(options) {
+    return this.git.log(options);
+  }
+
   relativePath(absolutePath) {
     // Git needs a path relative to the .git directory, not an absolute one
     return path.relative(this.path, absolutePath);
