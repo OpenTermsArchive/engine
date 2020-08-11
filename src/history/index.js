@@ -38,3 +38,7 @@ export async function publish() {
     versionRecorder.publish()
   ]);
 }
+
+export function getLastSnapshot(serviceId, documentType) {
+  return snapshotRecorder.getLatestRecord(serviceId, documentType);
+}
