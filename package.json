@@ -12,6 +12,7 @@
     "start:prod": "NODE_ENV=production node index.js",
     "start:scheduler": "node schedule.js",
     "start:scheduler:prod": "NODE_ENV=production node schedule.js",
+    "refilter": "node refilter.js",
     "setup": "node scripts/setup.js",
     "lint": "./node_modules/eslint/bin/eslint.js ./test/**/*.js ./src/**/*.js ./services/**/*.js",
     "posttest": "npm run lint",
