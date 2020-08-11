@@ -67,6 +67,15 @@ export default class Recorder {
     return this.git.pushChanges();
   }
 
+  async getLatestRecord(serviceId, documentType) {
+    const filePath = this._filePath(serviceId, documentType);
+    const commits = await this._getCommits(filePath);
+    return {
+      id: commits[0].hash,
+      path: filePath,
+    };
+  }
+
   _filePath(serviceId, documentType) {
     return `${this.path}/${serviceId}/${documentType}.${this.fileExtension}`;
   }
