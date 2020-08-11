@@ -3,6 +3,10 @@ export const TYPES = {
     name: 'Terms of service',
     fileName: 'terms_of_service'
   },
+  tosParent: {
+    name: 'Terms of service of the parent company',
+    fileName: 'tos_parent'
+  },
   privacy: {
     name: 'Privacy Policy',
     fileName: 'privacy_policy'
