@@ -6,7 +6,7 @@ import simpleGit from 'simple-git';
 export default class Git {
   constructor(repositoryPath) {
     this.path = repositoryPath;
-    this.git = simpleGit(repositoryPath);
+    this.git = simpleGit(repositoryPath, { maxConcurrentProcesses: 1 });
   }
 
   async init() {

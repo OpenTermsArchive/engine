@@ -1,7 +1,5 @@
 import fsApi from 'fs';
 
-import async from 'async';
-
 import Git from './git.js';
 
 const fs = fsApi.promises;
@@ -11,8 +9,6 @@ export default class Recorder {
     this.path = path;
     this.fileExtension = fileExtension;
     this.git = new Git(this.path);
-    this.commitQueue = async.queue(this._commit.bind(this), 1);
-    this.commitQueue.error(Recorder.commitQueueErrorHandler);
   }
 
   async record({ serviceId, documentType, content, details, isRefiltering }) {
@@ -52,18 +48,16 @@ export default class Recorder {
   }
 
   async commit(filePath, message) {
-    if (!await this.git.hasChanges(filePath)) {
-      return;
+    try {
+      if (!await this.git.hasChanges(filePath)) {
+        return;
+      }
+
+      await this.git.add(filePath);
+      return await this.git.commit(filePath, message);
+    } catch (error) {
+      throw new Error(`Could not commit ${filePath} with message "${message}" due to error: "${error}"`);
     }
-
-    return new Promise((resolve, reject) => {
-      this.commitQueue.push({ filePath, message, resolve, reject });
-    });
-  }
-
-  async _commit({ filePath, message, resolve }) {
-    await this.git.add(filePath);
-    resolve(await this.git.commit(filePath, message));
   }
 
   async publish() {
@@ -88,8 +82,6 @@ export default class Recorder {
     return logSummary.all;
   }
 
-  static commitQueueErrorHandler(error, { filePath, message, reject }) {
-    reject(new Error(`Could not commit ${filePath} with message "${message}" due to error: "${error}"`));
   }
 }
 
