@@ -71,6 +71,11 @@ export default class Recorder {
     return `${this.path}/${serviceId}/${documentType}.${this.fileExtension}`;
   }
 
+  async _getCommits(filePath) {
+    const logSummary = await this.git.log({ file: filePath });
+    return logSummary.all;
+  }
+
   static commitQueueErrorHandler(error, { filePath, message, reject }) {
     reject(new Error(`Could not commit ${filePath} with message "${message}" due to error: "${error}"`));
   }
