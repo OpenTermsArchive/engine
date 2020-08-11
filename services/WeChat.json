@@ -3,6 +3,10 @@
     "documents": {
         "tos": {
             "fetch": "https://www.wechat.com/en/service_terms.html",
+            "remove": [
+                "#wechat-terms-of-service-usa-specific-terms-",
+                "#wechat-terms-of-service-australia-specific-terms-"
+            ],
             "select": "#agreement"
         },
         "privacy": {
