@@ -27,6 +27,10 @@ export const TYPES = {
     name: 'Review Guidelines',
     fileName: 'review_guidelines'
   },
+  acceptableUsePolicy: {
+    name: 'Acceptable Use Policy',
+    fileName: 'acceptable_use_policy'
+  },
   cookiesPolicy: {
     name: 'Cookies Policy',
     fileName: 'cookies_policy'
@@ -35,6 +39,10 @@ export const TYPES = {
     name: 'Commercial Terms',
     fileName: 'commercial_terms'
   },
+  softwareLicenseAgreement: {
+    name: 'Software License Agreement',
+    fileName: 'software_license_agreement'
+  },
   copyrightPolicy: {
     name: 'Copyright Policy',
     fileName: 'copyright_policy'
@@ -42,5 +50,9 @@ export const TYPES = {
   lawEnforcementGuidelines: {
     name: 'Law Enforcement Guidelines',
     fileName: 'law_enforcement_guidelines'
+  },
+  inAppPurchasesPolicy: {
+    name: 'In App Purchases Policy',
+    fileName: 'in_app_purchases_policy'
   }
 };
