@@ -1,0 +1,25 @@
+{
+  "name": "GoogleAdsProcessor",
+  "documents": {
+    "tos": {
+      "fetch": "https://privacy.google.com/businesses/processorterms/",
+      "select": ".ads-controller"
+    },
+    "cookiesPolicy": {
+      "fetch": "https://policies.google.com/technologies/ads",
+      "select": "div[role=article]"
+    },
+    "userConsentPolicy": {
+      "fetch": "https://www.google.com/about/company/user-consent-policy/",
+      "select": ".page-section" 
+    },
+    "servicesList": {
+      "fetch": "https://privacy.google.com/businesses/adsservices/",
+      "select": ".ads-controller",
+      "remove": {
+        "startBefore": "h2:nth-of-type(1)",
+        "endBefore":"h2:nth-of-type(2)"
+      }
+    }
+  }
+}

@@ -58,5 +58,13 @@ export const TYPES = {
   inAppPurchasesPolicy: {
     name: 'In App Purchases Policy',
     fileName: 'in_app_purchases_policy'
+  },
+  userConsentPolicy: {
+    name: 'User Consent Policy',
+    fileName: 'user_consent_policy'
+  },
+  servicesList: {
+    name: 'List of Services',
+    fileName: 'services_list'
   }
 };
