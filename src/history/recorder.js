@@ -41,7 +41,7 @@ export default class Recorder {
       await fs.mkdir(directory, { recursive: true });
     }
 
-    const filePath = `${directory}/${documentType}.${this.fileExtension}`;
+    const filePath = this._filePath(serviceId, documentType);
 
     await fs.writeFile(filePath, content);
 
@@ -65,6 +65,10 @@ export default class Recorder {
 
   async publish() {
     return this.git.pushChanges();
+  }
+
+  _filePath(serviceId, documentType) {
+    return `${this.path}/${serviceId}/${documentType}.${this.fileExtension}`;
   }
 
   static commitQueueErrorHandler(error, { filePath, message, reject }) {
