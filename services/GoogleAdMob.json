@@ -1,0 +1,17 @@
+{
+  "name": "AdMob",
+  "documents": {
+    "controllerControllerDataProtectionTerms": {
+      "fetch": "https://privacy.google.com/businesses/controllerterms/",
+      "select": ".ads-controller"
+    },
+    "cookiesPolicy": {
+      "fetch": "https://policies.google.com/technologies/ads",
+      "select": "div[role=article]"
+    },
+    "userConsentPolicy": {
+      "fetch": "https://www.google.com/about/company/user-consent-policy/",
+      "select": ".page-section" 
+    }
+  }
+}
