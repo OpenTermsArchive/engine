@@ -23,7 +23,7 @@ export default class Git {
 
   async commit(filepath, message) {
     const summary = await this.git.commit(message, this.relativePath(filepath), { '--author': `${config.get('history.author').name} <${config.get('history.author').email}>` });
-    return summary.commit.replace('HEAD ', '');
+    return summary.commit.replace('HEAD ', '').replace('(root-commit) ', '');
   }
 
   async pushChanges() {
