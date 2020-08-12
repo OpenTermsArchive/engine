@@ -121,9 +121,9 @@ describe('Recorder', () => {
     });
   });
 
-  describe('#_filePath', () => {
+  describe('#getPathFor', () => {
     it('returns the file path for the given service provider’s document type', async () => {
-      expect(subject._filePath(SERVICE_PROVIDER_ID, TYPE)).to.equal(EXPECTED_FILE_PATH);
+      expect(subject.getPathFor(SERVICE_PROVIDER_ID, TYPE)).to.equal(EXPECTED_FILE_PATH);
     });
   });
 
@@ -150,7 +150,7 @@ describe('Recorder', () => {
     after(resetGitRepository);
 
     it('returns all commits related to the given file path', async () => {
-      const filePath = subject._filePath(SERVICE_PROVIDER_ID, TYPE);
+      const filePath = subject.getPathFor(SERVICE_PROVIDER_ID, TYPE);
       const commits = await subject._getCommits(filePath);
       expect(commits).to.have.length(2);
       expect(commits[0].hash).to.include(secondRecordId);
