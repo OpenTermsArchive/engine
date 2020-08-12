@@ -9,7 +9,7 @@ import Recorder from './recorder.js';
 const { expect } = chai;
 
 const SERVICE_PROVIDER_ID = 'test_service';
-const TYPE = 'Terms of service';
+const TYPE = 'Terms of Service';
 const FILE_CONTENT = 'ToS fixture data with UTF-8 çhãràčtęrs';
 const EXPECTED_FILE_PATH = `${SNAPSHOTS_PATH}/${SERVICE_PROVIDER_ID}/${TYPE}.html`;
 

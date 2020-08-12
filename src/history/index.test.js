@@ -6,7 +6,7 @@ import { SNAPSHOTS_PATH, VERSIONS_PATH, recordSnapshot, recordVersion } from './
 const { expect } = chai;
 
 const SERVICE_ID = 'test_service';
-const TYPE = 'Terms of service';
+const TYPE = 'Terms of Service';
 
 const SNAPSHOT_FILE_CONTENT = '<html><h1>ToS fixture data with UTF-8 çhãràčtęrs</h1></html>';
 const EXPECTED_SNAPSHOT_FILE_PATH = `${SNAPSHOTS_PATH}/${SERVICE_ID}/${TYPE}.html`;

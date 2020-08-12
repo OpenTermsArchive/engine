@@ -1,7 +1,7 @@
 {
   "name": "Service B",
   "documents": {
-    "Terms of service": {
+    "Terms of Service": {
       "fetch": "https://www.serviceb.example/tos",
       "select": "body"
     }
