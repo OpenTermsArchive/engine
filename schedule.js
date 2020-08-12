@@ -13,7 +13,7 @@ import CGUs from './src/index.js';
 
     const app = new CGUs();
     await app.init();
-    await app.refilterAndRecordAll();
+    await app.refilterAndRecord();
 
     const notifier = new Notifier(app.serviceDeclarations);
 

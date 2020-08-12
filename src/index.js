@@ -62,7 +62,7 @@ export default class CGUs extends events.EventEmitter {
     }
   }
 
-  async refilterAndRecordAll(serviceToTrack) {
+  async refilterAndRecord(serviceToTrack) {
     console.log('Refiltering documents…');
 
     const services = serviceToTrack ? { [serviceToTrack]: this._serviceDeclarations[serviceToTrack] } : this._serviceDeclarations;
@@ -72,7 +72,7 @@ export default class CGUs extends events.EventEmitter {
     Object.keys(services).forEach(serviceId => {
       const { documents, name: serviceName } = this._serviceDeclarations[serviceId];
       Object.keys(documents).forEach(type => {
-        refilterAndRecordDocumentPromises.push(this.refilterAndRecord({
+        refilterAndRecordDocumentPromises.push(this.refilterAndRecordDocument({
           serviceId,
           serviceName,
           document: {
@@ -126,7 +126,7 @@ export default class CGUs extends events.EventEmitter {
     }
   }
 
-  async refilterAndRecord({ serviceId, serviceName, document: documentDeclaration }) {
+  async refilterAndRecordDocument({ serviceId, serviceName, document: documentDeclaration }) {
     const { type } = documentDeclaration;
     const logPrefix = `[${serviceName}-${this._types[type].name}]`;
     const { id: snapshotId, path: snapshotPath } = await history.getLastSnapshot(serviceId, type);
