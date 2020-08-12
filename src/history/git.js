@@ -45,8 +45,9 @@ export default class Git {
            || (status.not_added.indexOf(this.relativePath(filepath)) > -1);
   }
 
-  async log(options) {
+  async log(options = {}) {
     try {
+      options.file = options.file ? this.relativePath(options.file) : options.file;
       const logSummary = await this.git.log(options);
       return logSummary.all;
     } catch (error) {
