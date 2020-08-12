@@ -6,25 +6,11 @@
       "object": "service usage"
     }
   },
-  "Parent Organization Terms": {
-    "commitment": {
-      "writer": "parent organization",
-      "audience": "end user",
-      "object": "products and services usage"
-    }
-  },
   "Privacy Policy": {
     "commitment": {
       "writer": "service provider",
       "audience": "end user",
       "object": "personal data"
-    }
-  },
-  "Developer Terms": {
-    "commitment": {
-      "writer": "service provider",
-      "audience": "developer",
-      "object": "API and Content usage"
     }
   },
   "Cookies Policy": {
@@ -34,11 +20,25 @@
       "object": "cookies"
     }
   },
+  "Parent Organization Terms": {
+    "commitment": {
+      "writer": "parent organization",
+      "audience": "end user",
+      "object": "products and services usage"
+    }
+  },
+  "Developer Terms": {
+    "commitment": {
+      "writer": "service provider",
+      "audience": "developer",
+      "object": "APIs and programmatic access to content"
+    }
+  },
   "Community Guidelines": {
     "commitment": {
       "writer": "service provider",
       "audience": "end user",
-      "object": "public behavior"
+      "object": "public behaviour"
     }
   },
   "Acceptable Use Policy": {
@@ -59,35 +59,35 @@
     "commitment": {
       "writer": "service provider",
       "audience": "end user",
-      "object": "copyright complaints"
+      "object": "copyright complaints (DMCA…)"
     }
   },
   "Law Enforcement Guidelines": {
     "commitment": {
       "writer": "service provider",
       "audience": "law enforcement authorities",
-      "object": "account records"
+      "object": "account records access"
     }
   },
   "In-App Purchases Policy": {
     "commitment": {
       "writer": "service provider",
       "audience": "end user",
-      "object": "in-app purchase usage"
+      "object": "in-app and other virtual goods purchase usage"
     }
   },
   "Review Guidelines": {
     "commitment": {
       "writer": "service provider",
       "audience": "developer",
-      "object": "review process"
+      "object": "review process of provided content"
     }
   },
   "Brand Guidelines": {
     "commitment": {
       "writer": "service provider",
       "audience": "developer",
-      "object": "brand usage"
+      "object": "usage of the service provider’s brand"
     }
   },
   "Data Controller Agreement": {
