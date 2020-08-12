@@ -5,6 +5,8 @@ import Git from '../src/history/git.js';
 import { SNAPSHOTS_PATH, VERSIONS_PATH } from '../src/history/index.js';
 
 const fs = fsApi.promises;
+let _gitVersion;
+let _gitSnapshot;
 
 before(initRepo);
 after(eraseRepo);
@@ -15,10 +17,17 @@ export async function resetGitRepository() {
 }
 
 async function initRepo() {
-  for (const repoPath of [ VERSIONS_PATH, SNAPSHOTS_PATH ]) {
-    const git = new Git(repoPath);
-    await git.init(); // eslint-disable-line no-await-in-loop
-  }
+  _gitVersion = new Git(VERSIONS_PATH);
+  _gitSnapshot = new Git(SNAPSHOTS_PATH);
+  return Promise.all([ _gitVersion.init(), _gitSnapshot.init() ]);
+}
+
+export function gitVersion() {
+  return _gitVersion;
+}
+
+export function gitSnapshot() {
+  return _gitSnapshot;
 }
 
 async function eraseRepo() {

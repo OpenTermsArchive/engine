@@ -2,7 +2,7 @@ import fs from 'fs';
 
 import chai from 'chai';
 
-import { resetGitRepository } from '../../test/helper.js';
+import { resetGitRepository, gitSnapshot } from '../../test/helper.js';
 import { SNAPSHOTS_PATH } from './index.js';
 import Recorder from './recorder.js';
 
@@ -26,7 +26,6 @@ describe('Recorder', () => {
         serviceId: SERVICE_PROVIDER_ID,
         documentType: TYPE,
         content: FILE_CONTENT,
-        isFiltered: false
       }));
 
       after(resetGitRepository);
@@ -49,7 +48,6 @@ describe('Recorder', () => {
           serviceId: NEW_SERVICE_ID,
           documentType: TYPE,
           content: FILE_CONTENT,
-          isFiltered: false
         });
 
         expect(fs.readFileSync(NEW_SERVICE_EXPECTED_FILE_PATH, { encoding: 'utf8' })).to.equal(FILE_CONTENT);
@@ -58,72 +56,98 @@ describe('Recorder', () => {
   });
 
   describe('#commit', () => {
-    const COMMIT_FILE_CONTENT = `${FILE_CONTENT}commit`;
+    const commitMessage = 'Message to check if the commit message is properly saved';
+    let id;
+    let commit;
 
-    before(async () => subject.save({
-      serviceId: SERVICE_PROVIDER_ID,
-      documentType: TYPE,
-      content: COMMIT_FILE_CONTENT,
-      isFiltered: false
-    }));
+    before(async () => {
+      await subject.save({
+        serviceId: SERVICE_PROVIDER_ID,
+        documentType: TYPE,
+        content: FILE_CONTENT,
+      });
+      id = await subject.commit(EXPECTED_FILE_PATH, commitMessage);
+      const commits = await gitSnapshot().log();
+      [commit] = commits;
+    });
 
     after(resetGitRepository);
 
-    it('commits the file for the given service', async () => {
-      const id = await subject.commit(EXPECTED_FILE_PATH, 'message');
-      expect(id).to.not.be.null;
+    it('returns the id of the commit', async () => {
+      expect(commit.hash).to.includes(id);
+    });
+
+    it('properly saves the commit message', async () => {
+      expect(commit.message).to.equal(commitMessage);
     });
   });
 
   describe('#record', () => {
+    const changelog = 'Changelog to save in the commit message';
     let id;
-    let isFirstRecord;
-    const PERSIST_FILE_CONTENT = `${FILE_CONTENT}record`;
+    let path;
+    let commit;
 
     before(async () => {
-      const { id: recordId, isFirstRecord: firstRecord } = await subject.record({
+      const { id: recordId, path: recordFilePath } = await subject.record({
         serviceId: SERVICE_PROVIDER_ID,
         documentType: TYPE,
-        content: PERSIST_FILE_CONTENT,
-        isFiltered: false
+        content: FILE_CONTENT,
+        changelog,
       });
       id = recordId;
-      isFirstRecord = firstRecord;
+      path = recordFilePath;
+      const commits = await gitSnapshot().log();
+      [commit] = commits;
     });
 
     after(resetGitRepository);
 
-    it('creates a file for the given service', () => {
-      expect(fs.readFileSync(EXPECTED_FILE_PATH, { encoding: 'utf8' })).to.equal(PERSIST_FILE_CONTENT);
+    it('creates the file with the proper content', () => {
+      expect(fs.readFileSync(EXPECTED_FILE_PATH, { encoding: 'utf8' })).to.equal(FILE_CONTENT);
     });
 
-    it('commits the file for the given service', () => {
-      expect(id).to.exist;
-      expect(id).to.be.a('string');
+    it('returns the file path', () => {
+      expect(path).to.equal(EXPECTED_FILE_PATH);
     });
 
-    context('when this is the first record', () => {
-      it('returns a boolean to specify this is the first one', () => {
-        expect(isFirstRecord).to.equal(true);
-      });
+    it('returns the commit id', () => {
+      expect(commit.hash).to.include(id);
     });
 
-    context('when this is not the first record', () => {
-      it('returns a boolean to specify this is not the first one', async () => {
-        const recordResult = await subject.record({
-          serviceId: SERVICE_PROVIDER_ID,
-          documentType: TYPE,
-          content: PERSIST_FILE_CONTENT,
-          isFiltered: false
-        });
-        expect(recordResult.isFirstRecord).to.equal(false);
-      });
+    it('saves the changelog in the commit message', () => {
+      expect(commit.message).to.equal(changelog);
     });
   });
 
   describe('#getPathFor', () => {
     it('returns the file path for the given service provider’s document type', async () => {
       expect(subject.getPathFor(SERVICE_PROVIDER_ID, TYPE)).to.equal(EXPECTED_FILE_PATH);
+    });
+  });
+
+  describe('#isTracked', () => {
+    after(resetGitRepository);
+
+    context('when the file does not exists', () => {
+      it('returns false', async () => {
+        expect(await subject.isTracked(SERVICE_PROVIDER_ID, TYPE)).to.be.false;
+      });
+    });
+
+    context('when the file already exists', () => {
+      before(async () => {
+        await subject.record({
+          serviceId: SERVICE_PROVIDER_ID,
+          documentType: TYPE,
+          content: FILE_CONTENT,
+          changelog: 'Start tracking document'
+        });
+      });
+
+      it('returns true', async () => {
+        expect(await subject.isTracked(SERVICE_PROVIDER_ID, TYPE)).to.be.true;
+      });
     });
   });
 
@@ -135,14 +159,12 @@ describe('Recorder', () => {
         serviceId: SERVICE_PROVIDER_ID,
         documentType: TYPE,
         content: FILE_CONTENT,
-        isFiltered: false
       });
       firstRecordId = record.id;
       record = await subject.record({
         serviceId: SERVICE_PROVIDER_ID,
         documentType: TYPE,
         content: `${FILE_CONTENT} (with additional content to trigger a record)`,
-        isFiltered: false
       });
       secondRecordId = record.id;
     });
@@ -167,13 +189,11 @@ describe('Recorder', () => {
         serviceId: SERVICE_PROVIDER_ID,
         documentType: TYPE,
         content: FILE_CONTENT,
-        isFiltered: false
       });
       const { id: recordId } = await subject.record({
         serviceId: SERVICE_PROVIDER_ID,
         documentType: TYPE,
         content: `${FILE_CONTENT} (with additional content to trigger a record)`,
-        isFiltered: false
       });
       lastSnapshotId = recordId;
       lastestRecord = await subject.getLatestRecord(SERVICE_PROVIDER_ID, TYPE);
