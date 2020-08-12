@@ -55,7 +55,7 @@
       "object": "business or commercial usage"
     }
   },
-  "Copyright Policy": {
+  "Copyright Claims Policy": {
     "commitment": {
       "writer": "service provider",
       "audience": "end user",
@@ -90,14 +90,14 @@
       "object": "brand usage"
     }
   },
-  "Controller-Controller Data Protection Terms": {
+  "Data Controller Agreement": {
     "commitment": {
       "writer": "service provider",
       "audience": "end user",
       "object": "data processing in connection with the Protection Legislation"
     }
   },
-  "Data Processing Terms": {
+  "Data Processor Agreement": {
     "commitment": {
       "writer": "service provider",
       "audience": "end user",

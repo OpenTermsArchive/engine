@@ -1,7 +1,7 @@
 {
   "name": "GoogleAnalytics",
   "documents": {
-    "Data Processing Terms": {
+    "Data Processor Agreement": {
       "fetch": "https://privacy.google.com/businesses/processorterms/",
       "select": ".ads-controller"
     },
@@ -13,7 +13,7 @@
       "fetch": "https://www.google.com/about/company/user-consent-policy/",
       "select": ".page-section"
     },
-    "Controller-Controller Data Protection Terms": {
+    "Data Controller Agreement": {
       "fetch": "https://support.google.com/analytics/answer/9012600",
       "select": ".article-container"
     }
