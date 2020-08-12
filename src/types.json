@@ -93,22 +93,22 @@
   "Data Controller Agreement": {
     "commitment": {
       "writer": "service provider",
-      "audience": "end user",
-      "object": "data processing in connection with the Protection Legislation"
+      "audience": "data controllers (in the sense of GDPR)",
+      "object": "end user personal data"
     }
   },
   "Data Processor Agreement": {
     "commitment": {
       "writer": "service provider",
-      "audience": "end user",
-      "object": "data processing in connection with the Protection Legislation"
+      "audience": "data controllers (in the sense of GDPR)",
+      "object": "status of data processor (in the sense of GDPR) for the service provider"
     }
   },
   "User Consent Policy": {
     "commitment": {
       "writer": "service provider",
-      "audience": "end user",
-      "object": "user consent"
+      "audience": "data controllers (in the sense of GDPR)",
+      "object": "user consent collection and storage"
     }
   }
 }
