@@ -11,25 +11,13 @@ export default class Recorder {
     this.git = new Git(this.path);
   }
 
-  async record({ serviceId, documentType, content, details, isRefiltering }) {
+  async record({ serviceId, documentType, content, changelog }) {
     const filePath = await this.save({ serviceId, documentType, content });
-    const isNewFile = await this.git.isNew(filePath);
-
-    let prefix = isNewFile ? 'Start tracking' : 'Update';
-    prefix = isRefiltering ? 'Refilter' : prefix;
-
-    let message = `${prefix} ${serviceId} ${documentType}`;
-
-    if (details) {
-      message += `\n\n${details}`;
-    }
-
-    const sha = await this.commit(filePath, message);
+    const sha = await this.commit(filePath, changelog);
 
     return {
       path: filePath,
       id: sha,
-      isFirstRecord: isNewFile
     };
   }
 
@@ -78,6 +66,17 @@ export default class Recorder {
 
   getPathFor(serviceId, documentType) {
     return `${this.path}/${serviceId}/${documentType}.${this.fileExtension}`;
+  }
+
+  async isTracked(serviceId, documentType) {
+    const filePath = this.getPathFor(serviceId, documentType);
+
+    if (!await fileExists(filePath)) {
+      return false;
+    }
+
+    const isNew = await this.git.isNew(filePath);
+    return !isNew;
   }
 
   async _getCommits(filePath) {
