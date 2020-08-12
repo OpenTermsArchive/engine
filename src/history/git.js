@@ -32,9 +32,11 @@ export default class Git {
 
   async hasChanges(filepath) {
     const status = await this.git.status();
-    return (status.modified.indexOf(this.relativePath(filepath)) > -1)
-           || (status.not_added.indexOf(this.relativePath(filepath)) > -1)
-           || (status.created.indexOf(this.relativePath(filepath)) > -1);
+    const relativePath = this.relativePath(filepath);
+    const escapedRelativePath = filepath.includes(' ') ? `"${relativePath}"` : relativePath;
+    return (status.modified.indexOf(escapedRelativePath) > -1)
+           || (status.not_added.indexOf(relativePath) > -1)
+           || (status.created.indexOf(relativePath) > -1);
   }
 
   async isNew(filepath) {
