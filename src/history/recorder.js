@@ -40,7 +40,7 @@ export default class Recorder {
       await fs.mkdir(directory, { recursive: true });
     }
 
-    const filePath = this._filePath(serviceId, documentType);
+    const filePath = this.getPathFor(serviceId, documentType);
 
     await fs.writeFile(filePath, content);
 
@@ -65,7 +65,7 @@ export default class Recorder {
   }
 
   async getLatestRecord(serviceId, documentType) {
-    const filePath = this._filePath(serviceId, documentType);
+    const filePath = this.getPathFor(serviceId, documentType);
     const commits = await this._getCommits(filePath);
     const result = { id: null, path: filePath };
 
@@ -76,7 +76,7 @@ export default class Recorder {
     return result;
   }
 
-  _filePath(serviceId, documentType) {
+  getPathFor(serviceId, documentType) {
     return `${this.path}/${serviceId}/${documentType}.${this.fileExtension}`;
   }
 
