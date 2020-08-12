@@ -12,11 +12,21 @@ const snapshotRecorder = new Recorder({ path: SNAPSHOTS_PATH, fileExtension: 'ht
 const versionRecorder = new Recorder({ path: VERSIONS_PATH, fileExtension: 'md' });
 
 export async function recordSnapshot(serviceId, documentType, content) {
-  return snapshotRecorder.record({
+  const isFirstRecord = !await snapshotRecorder.isTracked(serviceId, documentType);
+  const prefix = isFirstRecord ? 'Start tracking' : 'Update';
+  const changelog = `${prefix} ${serviceId} ${documentType}`;
+
+  const recordResult = await snapshotRecorder.record({
     serviceId,
     documentType,
-    content
+    content,
+    changelog
   });
+
+  return {
+    ...recordResult,
+    isFirstRecord
+  };
 }
 
 export async function recordVersion(serviceId, documentType, content, snapshotId) {
@@ -32,13 +42,25 @@ async function _recordVersion({ serviceId, documentType, content, snapshotId, is
     throw new Error(`A snapshot ID is required to ensure data consistency for ${serviceId}'s ${documentType}`);
   }
 
-  return versionRecorder.record({
+  const isFirstRecord = !await versionRecorder.isTracked(serviceId, documentType);
+  let prefix = isFirstRecord ? 'Start tracking' : 'Update';
+  prefix = isRefiltering ? 'Refilter' : prefix;
+
+  let changelog = `${prefix} ${serviceId} ${documentType}`;
+
+  changelog += `\n\nThis version was recorded after filtering snapshot ${config.get('history.publish') ? config.get('history.snapshotsBaseUrl') : ''}${snapshotId}`;
+
+  const recordResult = await versionRecorder.record({
     serviceId,
     documentType,
     content,
-    details: `This version was recorded after filtering snapshot ${config.get('history.publish') ? config.get('history.snapshotsBaseUrl') : ''}${snapshotId}`,
-    isRefiltering
+    changelog
   });
+
+  return {
+    ...recordResult,
+    isFirstRecord
+  };
 }
 
 export async function publish() {
