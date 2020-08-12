@@ -182,11 +182,11 @@ describe('Recorder', () => {
 
     after(resetGitRepository);
 
-    it('return the latest record id', async () => {
+    it('returns the latest record id', async () => {
       expect(lastestRecord.id).to.include(lastSnapshotId);
     });
 
-    it('return the latest record path', async () => {
+    it('returns the latest record path', async () => {
       expect(lastestRecord.path).to.equal(EXPECTED_FILE_PATH);
     });
   });
