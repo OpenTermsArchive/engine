@@ -55,7 +55,7 @@ export default class CGUs extends events.EventEmitter {
 
       await Promise.all(documentTrackingPromises);
 
-      this.publish();
+      return this.publish();
     } catch (error) {
       console.error(`Error when trying to track changes: ${error}`);
       this.emit('applicationError', error);
