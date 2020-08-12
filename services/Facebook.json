@@ -1,14 +1,14 @@
 {
   "name": "Facebook",
   "documents": {
-    "tos": {
+    "Terms of Service": {
       "fetch": "https://www.facebook.com/legal/terms/plain_text_terms",
       "filter": [
         "cleanUrls"
       ],
       "select": ".fb_content"
     },
-    "privacy": {
+    "Privacy Policy": {
       "fetch": "https://www.facebook.com/about/privacy",
       "filter": [
         "removeReturnToTopButtons",
@@ -16,7 +16,7 @@
       ],
       "select": "._5tkp"
     },
-    "devPolicy": {
+    "Developer Terms": {
       "fetch": "https://developers.facebook.com/policy",
       "filter": [
         "removeHelpButtons",
@@ -24,7 +24,7 @@
       ],
       "select": "._4bl9"
     },
-    "cookiesPolicy": {
+    "Cookies Policy": {
       "fetch": "https://www.facebook.com/policies/cookies",
       "filter": [
         "removeImgFromCookiesPolicy",
@@ -33,7 +33,7 @@
       ],
       "select": "._5tkp"
     },
-    "commercialTerms": {
+    "Commercial Terms": {
       "fetch": "https://www.facebook.com/legal/commercial_terms",
       "filter": [
         "numberListCorrectly",

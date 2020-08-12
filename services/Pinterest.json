@@ -1,11 +1,11 @@
 {
   "name": "Pinterest",
   "documents": {
-    "tos": {
+    "Terms of Service": {
       "fetch": "https://policy.pinterest.com/en/terms-of-service",
       "select": "article"
     },
-    "privacy": {
+    "Privacy Policy": {
       "fetch": "https://policy.pinterest.com/en/privacy-policy",
       "select": "article"
     }

@@ -1,0 +1,114 @@
+{
+  "Terms of Service": {
+    "commitment": {
+      "writer": "service provider",
+      "audience": "end user",
+      "object": "service usage"
+    }
+  },
+  "Privacy Policy": {
+    "commitment": {
+      "writer": "service provider",
+      "audience": "end user",
+      "object": "personal data"
+    }
+  },
+  "Cookies Policy": {
+    "commitment": {
+      "writer": "service provider",
+      "audience": "end user",
+      "object": "cookies"
+    }
+  },
+  "Parent Organization Terms": {
+    "commitment": {
+      "writer": "parent organization",
+      "audience": "end user",
+      "object": "products and services usage"
+    }
+  },
+  "Developer Terms": {
+    "commitment": {
+      "writer": "service provider",
+      "audience": "developer",
+      "object": "APIs and programmatic access to content"
+    }
+  },
+  "Community Guidelines": {
+    "commitment": {
+      "writer": "service provider",
+      "audience": "end user",
+      "object": "public behaviour"
+    }
+  },
+  "Acceptable Use Policy": {
+    "commitment": {
+      "writer": "service provider",
+      "audience": "end user",
+      "object": "acceptable usage"
+    }
+  },
+  "Commercial Terms": {
+    "commitment": {
+      "writer": "service provider",
+      "audience": "commercial intermediaries",
+      "object": "business or commercial usage"
+    }
+  },
+  "Copyright Claims Policy": {
+    "commitment": {
+      "writer": "service provider",
+      "audience": "end user",
+      "object": "copyright complaints (DMCA…)"
+    }
+  },
+  "Law Enforcement Guidelines": {
+    "commitment": {
+      "writer": "service provider",
+      "audience": "law enforcement authorities",
+      "object": "account records access"
+    }
+  },
+  "In-App Purchases Policy": {
+    "commitment": {
+      "writer": "service provider",
+      "audience": "end user",
+      "object": "in-app and other virtual goods purchase usage"
+    }
+  },
+  "Review Guidelines": {
+    "commitment": {
+      "writer": "service provider",
+      "audience": "developer",
+      "object": "review process of provided content"
+    }
+  },
+  "Brand Guidelines": {
+    "commitment": {
+      "writer": "service provider",
+      "audience": "developer",
+      "object": "usage of the service provider’s brand"
+    }
+  },
+  "Data Controller Agreement": {
+    "commitment": {
+      "writer": "service provider",
+      "audience": "data controllers (in the sense of GDPR)",
+      "object": "end user personal data"
+    }
+  },
+  "Data Processor Agreement": {
+    "commitment": {
+      "writer": "service provider",
+      "audience": "data controllers (in the sense of GDPR)",
+      "object": "status of data processor (in the sense of GDPR) for the service provider"
+    }
+  },
+  "User Consent Policy": {
+    "commitment": {
+      "writer": "service provider",
+      "audience": "data controllers (in the sense of GDPR)",
+      "object": "user consent collection and storage"
+    }
+  }
+}

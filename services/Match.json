@@ -1,11 +1,11 @@
 {
   "name": "Match",
   "documents": {
-    "tos": {
+    "Terms of Service": {
       "fetch": "https://uk.match.com/pages/misc/cge",
       "select": "#article_content"
     },
-    "privacy": {
+    "Privacy Policy": {
       "fetch": "https://uk.match.com/pages/misc/privacy",
       "select": "#article_content"
     }

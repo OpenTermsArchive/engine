@@ -1,7 +1,7 @@
 {
   "name": "Skype",
   "documents": {
-    "tos": {
+    "Terms of Service": {
       "fetch": "https://www.microsoft.com/en-gb/servicesagreement/",
       "filter": [
         "removeIrrelevantModulesFromTos",
@@ -11,7 +11,7 @@
       ],
       "select": ".pageIntro, .div_content"
     },
-    "privacy": {
+    "Privacy Policy": {
       "fetch": "https://privacy.microsoft.com/en-gb/privacystatement",
       "filter": [
         "removeIrrelevantModulesFromPrivacyPolicy",

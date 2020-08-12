@@ -1,11 +1,11 @@
 {
   "name": "Badoo",
   "documents": {
-    "tos": {
+    "Terms of Service": {
       "fetch": "https://badoo.com/terms/",
       "select": ".formatted-text"
     },
-    "privacy": {
+    "Privacy Policy": {
       "fetch": "https://badoo.com/privacy/",
       "select": ".formatted-text"
     }

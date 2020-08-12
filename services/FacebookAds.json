@@ -1,7 +1,7 @@
 {
   "name": "Facebook Ads",
   "documents": {
-    "tos": {
+    "Terms of Service": {
       "fetch": "https://www.facebook.com/legal/self_service_ads_terms",
       "select": "#content",
       "filter": [

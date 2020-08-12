@@ -5,14 +5,13 @@ import chai from 'chai';
 import { resetGitRepository } from '../../test/helper.js';
 import { SNAPSHOTS_PATH } from './index.js';
 import Recorder from './recorder.js';
-import { TYPES } from '../types.js';
 
 const { expect } = chai;
 
 const SERVICE_PROVIDER_ID = 'test_service';
-const TYPE = 'tos';
+const TYPE = 'Terms of service';
 const FILE_CONTENT = 'ToS fixture data with UTF-8 çhãràčtęrs';
-const EXPECTED_FILE_PATH = `${SNAPSHOTS_PATH}/${SERVICE_PROVIDER_ID}/${TYPES[TYPE].fileName}.html`;
+const EXPECTED_FILE_PATH = `${SNAPSHOTS_PATH}/${SERVICE_PROVIDER_ID}/${TYPE}.html`;
 
 describe('Recorder', () => {
   let subject;
@@ -39,7 +38,7 @@ describe('Recorder', () => {
 
     context('when service’s directory does not already exist', () => {
       const NEW_SERVICE_ID = 'test_not_existing_service';
-      const NEW_SERVICE_EXPECTED_FILE_PATH = `${SNAPSHOTS_PATH}/${NEW_SERVICE_ID}/${TYPES[TYPE].fileName}.html`;
+      const NEW_SERVICE_EXPECTED_FILE_PATH = `${SNAPSHOTS_PATH}/${NEW_SERVICE_ID}/${TYPE}.html`;
 
       after(() => {
         fs.unlinkSync(NEW_SERVICE_EXPECTED_FILE_PATH);

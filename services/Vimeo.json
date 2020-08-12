@@ -1,11 +1,11 @@
 {
   "name": "Vimeo",
   "documents": {
-    "tos": {
+    "Terms of Service": {
       "fetch": "https://vimeo.com/terms",
       "select": "#legal_doc"
     },
-    "privacy": {
+    "Privacy Policy": {
       "fetch": "https://vimeo.com/privacy",
       "select": "#legal_doc"
     }
