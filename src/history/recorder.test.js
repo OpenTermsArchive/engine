@@ -141,7 +141,7 @@ describe('Recorder', () => {
       record = await subject.record({
         serviceId: SERVICE_PROVIDER_ID,
         documentType: TYPE,
-        content: `${FILE_CONTENT}record`,
+        content: `${FILE_CONTENT} (with additional content to trigger a record)`,
         isFiltered: false
       });
       secondRecordId = record.id;
@@ -159,7 +159,6 @@ describe('Recorder', () => {
   });
 
   describe('#getLatestRecord', () => {
-    const PERSIST_FILE_CONTENT = `${FILE_CONTENT}record`;
     let lastSnapshotId;
     let lastestRecord;
 
@@ -173,7 +172,7 @@ describe('Recorder', () => {
       const { id: recordId } = await subject.record({
         serviceId: SERVICE_PROVIDER_ID,
         documentType: TYPE,
-        content: PERSIST_FILE_CONTENT,
+        content: `${FILE_CONTENT} (with additional content to trigger a record)`,
         isFiltered: false
       });
       lastSnapshotId = recordId;
