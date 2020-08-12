@@ -63,32 +63,27 @@ export default class CGUs extends events.EventEmitter {
   }
 
   async refilterAndRecordAll(serviceToTrack) {
-    try {
-      console.log('Refiltering documents…');
+    console.log('Refiltering documents…');
 
-      const services = serviceToTrack ? { [serviceToTrack]: this._serviceDeclarations[serviceToTrack] } : this._serviceDeclarations;
+    const services = serviceToTrack ? { [serviceToTrack]: this._serviceDeclarations[serviceToTrack] } : this._serviceDeclarations;
 
-      const regenerationPromises = [];
+    const refilterAndRecordDocumentPromises = [];
 
-      Object.keys(services).forEach(serviceId => {
-        const { documents, name: serviceName } = this._serviceDeclarations[serviceId];
-        Object.keys(documents).forEach(type => {
-          regenerationPromises.push(this.refilterAndRecord({
-            serviceId,
-            serviceName,
-            document: {
-              type,
-              ...documents[type]
-            }
-          }));
-        });
+    Object.keys(services).forEach(serviceId => {
+      const { documents, name: serviceName } = this._serviceDeclarations[serviceId];
+      Object.keys(documents).forEach(type => {
+        refilterAndRecordDocumentPromises.push(this.refilterAndRecord({
+          serviceId,
+          serviceName,
+          document: {
+            type,
+            ...documents[type]
+          }
+        }));
       });
+    });
 
-      await Promise.all(regenerationPromises);
-    } catch (error) {
-      console.error(`Error when trying to refilter documents: ${error}`);
-      this.emit('applicationError', error);
-    }
+    return Promise.all(refilterAndRecordDocumentPromises);
   }
 
   async trackDocumentChanges({ serviceId, serviceName, document: documentDeclaration }) {
@@ -134,25 +129,21 @@ export default class CGUs extends events.EventEmitter {
   async refilterAndRecord({ serviceId, serviceName, document: documentDeclaration }) {
     const { type } = documentDeclaration;
     const logPrefix = `[${serviceName}-${this._types[type].name}]`;
-    try {
-      const { id: snapshotId, path: snapshotPath } = await history.getLastSnapshot(serviceId, type);
+    const { id: snapshotId, path: snapshotPath } = await history.getLastSnapshot(serviceId, type);
 
-      if (!snapshotId) {
-        return;
-      }
-
-      const snapshotContent = await fs.readFile(snapshotPath, { encoding: 'utf8' });
-
-      return this.recordRefilter({
-        snapshotContent,
-        snapshotId,
-        serviceId,
-        documentDeclaration,
-        logPrefix,
-      });
-    } catch (error) {
-      console.error(`${logPrefix} RefilterError:`, error.message);
+    if (!snapshotId) {
+      return;
     }
+
+    const snapshotContent = await fs.readFile(snapshotPath, { encoding: 'utf8' });
+
+    return this.recordRefilter({
+      snapshotContent,
+      snapshotId,
+      serviceId,
+      documentDeclaration,
+      logPrefix,
+    });
   }
 
   async fetch({ location, serviceId, type, logPrefix }) {
@@ -166,57 +157,42 @@ export default class CGUs extends events.EventEmitter {
   }
 
   async recordSnapshot({ content, serviceId, type, logPrefix }) {
-    try {
-      const { id: snapshotId, path: snapshotPath } = await history.recordSnapshot(serviceId, type, content);
+    const { id: snapshotId, path: snapshotPath } = await history.recordSnapshot(serviceId, type, content);
 
-      if (!snapshotId) {
-        return console.log(`${logPrefix} No changes, did not record snapshot.`);
-      }
-
-      console.log(`${logPrefix} Recorded snapshot in ${snapshotPath} with id ${snapshotId}.`);
-      return snapshotId;
-    } catch (error) {
-      console.error(`${logPrefix} RecordSnapshotError:`, error.message);
-      this.emit('recordSnapshotError', serviceId, type, error);
+    if (!snapshotId) {
+      return console.log(`${logPrefix} No changes, did not record snapshot.`);
     }
+
+    console.log(`${logPrefix} Recorded snapshot in ${snapshotPath} with id ${snapshotId}.`);
+    return snapshotId;
   }
 
   async recordRefilter({ snapshotContent, snapshotId, serviceId, documentDeclaration, logPrefix }) {
     const { type } = documentDeclaration;
-    try {
-      const document = await filter(snapshotContent, documentDeclaration, this._serviceDeclarations[serviceId].filters);
+    const document = await filter(snapshotContent, documentDeclaration, this._serviceDeclarations[serviceId].filters);
 
-      const { id: versionId, path: documentPath } = await history.recordRefilter(serviceId, type, document, snapshotId);
-      if (versionId) {
-        console.log(`${logPrefix} Recorded version in ${documentPath} with id ${versionId}.`);
-        this.emit('versionRecorded', serviceId, type, versionId);
-      } else {
-        console.log(`${logPrefix} No changes after filtering, did not record version.`);
-      }
-    } catch (error) {
-      console.error(`${logPrefix} RecordVersionError:`, error.message);
-      this.emit('recordVersionError', serviceId, type, error);
+    const { id: versionId, path: documentPath } = await history.recordRefilter(serviceId, type, document, snapshotId);
+    if (versionId) {
+      console.log(`${logPrefix} Recorded version in ${documentPath} with id ${versionId}.`);
+      this.emit('versionRecorded', serviceId, type, versionId);
+    } else {
+      console.log(`${logPrefix} No changes after filtering, did not record version.`);
     }
   }
 
   async recordVersion({ snapshotContent, snapshotId, serviceId, documentDeclaration, logPrefix }) {
     const { type } = documentDeclaration;
-    try {
-      const document = await filter(snapshotContent, documentDeclaration, this._serviceDeclarations[serviceId].filters);
+    const document = await filter(snapshotContent, documentDeclaration, this._serviceDeclarations[serviceId].filters);
 
-      const { id: versionId, path: documentPath, isFirstRecord } = await history.recordVersion(serviceId, type, document, snapshotId);
-      if (versionId) {
-        const message = isFirstRecord
-          ? `${logPrefix} First version recorded in ${documentPath} with id ${versionId}.`
-          : `${logPrefix} Recorded version in ${documentPath} with id ${versionId}.`;
-        console.log(message);
-        this.emit(isFirstRecord ? 'documentAdded' : 'versionRecorded', serviceId, type, versionId);
-      } else {
-        console.log(`${logPrefix} No changes after filtering, did not record version.`);
-      }
-    } catch (error) {
-      console.error(`${logPrefix} RecordVersionError:`, error.message);
-      this.emit('recordVersionError', serviceId, type, error);
+    const { id: versionId, path: documentPath, isFirstRecord } = await history.recordVersion(serviceId, type, document, snapshotId);
+    if (versionId) {
+      const message = isFirstRecord
+        ? `${logPrefix} First version recorded in ${documentPath} with id ${versionId}.`
+        : `${logPrefix} Recorded version in ${documentPath} with id ${versionId}.`;
+      console.log(message);
+      this.emit(isFirstRecord ? 'documentAdded' : 'versionRecorded', serviceId, type, versionId);
+    } else {
+      console.log(`${logPrefix} No changes after filtering, did not record version.`);
     }
   }
 
@@ -225,13 +201,8 @@ export default class CGUs extends events.EventEmitter {
       return console.log('Publication disabled for this environment.');
     }
 
-    try {
-      await history.publish();
-      console.log('Changes published');
-      this.emit('changesPublished');
-    } catch (error) {
-      console.error(`Error when trying to publish changes: ${error}`);
-      this.emit('publicationError', error);
-    }
+    await history.publish();
+    console.log('Changes published');
+    this.emit('changesPublished');
   }
 }
