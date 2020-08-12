@@ -1,11 +1,11 @@
 {
   "name": "Twitch",
   "documents": {
-    "tos": {
+    "Terms of Service": {
       "fetch": "https://www.twitch.tv/p/legal/terms-of-service/",
       "select": ".editable"
     },
-    "privacy": {
+    "Privacy Policy": {
       "fetch": "https://www.twitch.tv/p/legal/privacy-notice/",
       "select": ".editable"
     }

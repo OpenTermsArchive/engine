@@ -1,11 +1,11 @@
 {
   "name": "Tencent",
   "documents": {
-    "tos": {
+    "Terms of Service": {
       "fetch": "https://www.tencent.com/en-us/service-agreement.html",
       "select": ".page-content"
     },
-    "privacy": {
+    "Privacy Policy": {
       "fetch": "https://www.tencent.com/en-us/privacy-policy.html",
       "select": ".page-content"
     }

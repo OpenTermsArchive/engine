@@ -5,7 +5,7 @@ import sendInBlue from 'sib-api-v3-sdk';
 
 dotenv.config();
 export default class Notifier {
-  constructor(passedServiceProviders, passedDocumentTypes) {
+  constructor(passedServiceProviders) {
     const defaultClient = sendInBlue.ApiClient.instance;
     const authentication = defaultClient.authentications['api-key'];
     authentication.apiKey = process.env.SENDINBLUE_API_KEY;
@@ -14,7 +14,6 @@ export default class Notifier {
     this.contactsInstance = new sendInBlue.ContactsApi();
 
     this.serviceProviders = passedServiceProviders;
-    this.documentTypes = passedDocumentTypes;
   }
 
   async onDocumentFetchError(serviceProviderId, documentTypeId, error) {
@@ -22,7 +21,7 @@ export default class Notifier {
       templateId: config.get('notifier.sendInBlue.updateErrorTemplateId'),
       params: {
         SERVICE_PROVIDER_NAME: this.serviceProviders[serviceProviderId].name,
-        DOCUMENT_TYPE: this.documentTypes[documentTypeId].name,
+        DOCUMENT_TYPE: documentTypeId,
         ERROR_TEXT: `An error occured when trying to scrape the document:
   ${error}`
       },
@@ -36,7 +35,7 @@ export default class Notifier {
       templateId: config.get('notifier.sendInBlue.updateTemplateId'),
       params: {
         SERVICE_PROVIDER_NAME: this.serviceProviders[serviceProviderId].name,
-        DOCUMENT_TYPE: this.documentTypes[documentTypeId].name,
+        DOCUMENT_TYPE: documentTypeId,
         SHA: versionId
       },
     };
@@ -49,7 +48,7 @@ export default class Notifier {
       templateId: config.get('notifier.sendInBlue.updateErrorTemplateId'),
       params: {
         SERVICE_PROVIDER_NAME: this.serviceProviders[serviceProviderId].name,
-        DOCUMENT_TYPE: this.documentTypes[documentTypeId].name,
+        DOCUMENT_TYPE: documentTypeId,
         ERROR_TEXT: `An error occured when trying to update the document:
   ${error}`
       },

@@ -1,11 +1,11 @@
 {
   "name": "Quora",
   "documents": {
-    "tos": {
+    "Terms of Service": {
       "fetch": "https://www.quora.com/about/tos",
       "select": ".section"
     },
-    "privacy": {
+    "Privacy Policy": {
       "fetch": "https://www.quora.com/about/privacy",
       "select": ".section"
     }

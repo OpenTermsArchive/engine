@@ -1,14 +1,14 @@
 {
   "name": "LibraryThing",
   "documents": {
-    "tos": {
+    "Terms of Service": {
       "fetch": "https://www.librarything.com/privacy",
       "filter": [
       "selectOnlyTOS"
       ],
       "select": ".content > table:nth-child(1) > tbody:nth-child(1) > tr:nth-child(1) > td:nth-child(2)"
     },
-    "privacy": {
+    "Privacy Policy": {
       "fetch": "https://www.librarything.com/privacy",
       "filter": [
       "selectOnlyPrivacyPolicy"

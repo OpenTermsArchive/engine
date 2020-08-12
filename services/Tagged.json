@@ -1,11 +1,11 @@
 {
   "name": "Tagged",
   "documents": {
-    "tos": {
+    "Terms of Service": {
       "fetch": "http://www.tagged.com/terms_of_service.html",
       "select": "#terms_of_service"
     },
-    "privacy": {
+    "Privacy Policy": {
       "fetch": "http://www.tagged.com/terms_of_service.html",
       "select": "#privacy_policy"
     }

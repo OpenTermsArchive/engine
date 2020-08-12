@@ -1,11 +1,11 @@
 {
   "name": "StackOverflow",
   "documents": {
-    "tos": {
+    "Terms of Service": {
       "fetch": "https://stackoverflow.com/legal/terms-of-service",
       "select": ".grid--cell9"
     },
-    "privacy": {
+    "Privacy Policy": {
       "fetch": "https://stackoverflow.com/legal/privacy-policy",
       "select": ".grid--cell9"
     }

@@ -9,7 +9,6 @@ import { publish, recordSnapshot, recordVersion } from './history/index.js';
 import fetch from './fetcher/index.js';
 import filter from './filter/index.js';
 import loadServiceDeclarations from './loader/index.js';
-import { TYPES } from './types.js';
 
 consoleStamp(console);
 
@@ -17,17 +16,8 @@ const __dirname = path.dirname(new URL(import.meta.url).pathname);
 const SERVICE_DECLARATIONS_PATH = path.resolve(__dirname, '../', config.get('serviceDeclarationsPath'));
 
 export default class CGUs extends events.EventEmitter {
-  constructor() {
-    super();
-    this._types = TYPES;
-  }
-
   get serviceDeclarations() {
     return this._serviceDeclarations;
-  }
-
-  get documentTypes() {
-    return this._types;
   }
 
   async init() {
@@ -82,7 +72,7 @@ export default class CGUs extends events.EventEmitter {
 
   async trackDocumentChanges({ serviceId, serviceName, document: documentDeclaration }) {
     const { type, fetch: location } = documentDeclaration;
-    const logPrefix = `[${serviceName}-${this._types[type].name}]`;
+    const logPrefix = `[${serviceName}-${type}]`;
     try {
       console.log(`${logPrefix} Fetch '${location}'.`);
       let pageContent;

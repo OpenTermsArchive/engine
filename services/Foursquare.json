@@ -1,11 +1,11 @@
 {
   "name": "Foursquare",
   "documents": {
-    "tos": {
+    "Terms of Service": {
       "fetch": "https://foursquare.com/legal/terms",
       "select": "#blankPage"
     },
-    "privacy": {
+    "Privacy Policy": {
       "fetch": "https://foursquare.com/legal/privacy",
       "select": "#blankPage"
     }

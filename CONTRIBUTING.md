@@ -20,10 +20,43 @@ In the folder `services`, create a JSON file with the name of the service you wa
 }
 ```
 
+You can find examples in the `services` folder.
+
 ### Document type
 
-For the `<document type>` key, you will have to use one of those listed in `/src/types.js` (or create a new one there if it is not already referenced).
-You can find examples in the `services` folder.
+You can find the list of allowed values for the `<document type>` key in [`/src/types.json`](./src/types.json).
+
+The types might not always match the exact name given by the service provider. For example, some providers might call their document “Terms and Conditions” or “Terms of Use” instead of “Terms of Service”. The document type does not have to match the exact name, it only has to match the _commitment_ that is taken.
+
+> This model enables comparing documents across providers as long as they cover similar commitments, notwithstanding their given name.
+
+In order to guide usage and disambiguate synonyms, we characterise each document type along three dimensions of the commitment that is being taken in it:
+
+1. The `writer` of the document;
+2. the targeted `audience`;
+3. the `object` of the commitment.
+
+A document type thus looks like:
+
+```json
+{
+  …
+  "Privacy Policy": {
+    "commitment": {
+      "writer": "service provider",
+      "audience": "end user",
+      "object": "personal data"
+    }
+  },
+  …
+}
+```
+
+#### Defining a new document type
+
+If the document you want to add matches no existing document type, you can create a new one in the same pull request in which you declare the service that would use it.
+
+If you're in doubt, please list the potential synonyms you have considered.
 
 ### Filters
 
