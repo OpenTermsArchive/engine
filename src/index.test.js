@@ -59,7 +59,7 @@ describe('CGUs', () => {
   });
 
   describe('#refilterAndRecord', () => {
-    context('When a service’s filter declaration change', () => {
+    context('When a service’s filter declaration changes', () => {
       let originalSnapshotId;
       let firstVersionId;
       let refilterVersionId;
@@ -102,7 +102,7 @@ describe('CGUs', () => {
         expect(refilterVersionId).to.not.equal(firstVersionId);
       });
 
-      it('refers the snapshot id in the message', async () => {
+      it('mentions the snapshot id in the changelog', async () => {
         expect(refilterVersionMessageBody).to.include(originalSnapshotId);
       });
 

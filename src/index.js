@@ -140,7 +140,7 @@ export default class CGUs extends events.EventEmitter {
       snapshotContent = await fs.readFile(snapshotPath, { encoding: 'utf8' });
     } catch (error) {
       if (error.code === 'ENOENT') {
-        return console.error(`The snapshot file ${snapshotPath} does not exists.`);
+        return console.error(`The snapshot file ${snapshotPath} does not exist.`);
       }
     }
 
