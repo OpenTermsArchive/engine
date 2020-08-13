@@ -42,13 +42,14 @@ async function _recordVersion({ serviceId, documentType, content, snapshotId, is
     throw new Error(`A snapshot ID is required to ensure data consistency for ${serviceId}'s ${documentType}`);
   }
 
+  let prefix = isRefiltering ? 'Refilter' : 'Update';
+
   const isFirstRecord = !await versionRecorder.isTracked(serviceId, documentType);
-  let prefix = isFirstRecord ? 'Start tracking' : 'Update';
-  prefix = isRefiltering ? 'Refilter' : prefix;
+  prefix = isFirstRecord ? 'Start tracking' : prefix;
 
-  let changelog = `${prefix} ${serviceId} ${documentType}`;
+  const changelog = `${prefix} ${serviceId} ${documentType}
 
-  changelog += `\n\nThis version was recorded after filtering snapshot ${config.get('history.publish') ? config.get('history.snapshotsBaseUrl') : ''}${snapshotId}`;
+This version was recorded after filtering snapshot ${config.get('history.publish') ? config.get('history.snapshotsBaseUrl') : ''}${snapshotId}`;
 
   const recordResult = await versionRecorder.record({
     serviceId,
