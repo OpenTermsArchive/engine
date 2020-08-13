@@ -33,7 +33,7 @@ export default class CGUs extends events.EventEmitter {
 
   async trackChanges(serviceToTrack) {
     try {
-      console.log('Start tracking changes…');
+      console.log('\nStart tracking changes…');
 
       const services = serviceToTrack ? { [serviceToTrack]: this._serviceDeclarations[serviceToTrack] } : this._serviceDeclarations;
 
@@ -103,7 +103,7 @@ export default class CGUs extends events.EventEmitter {
   }
 
   async refilterAndRecord(serviceToTrack) {
-    console.log('Refiltering documents… (it could take a while)');
+    console.log('\nRefiltering documents… (it could take a while)');
 
     const services = serviceToTrack ? { [serviceToTrack]: this._serviceDeclarations[serviceToTrack] } : this._serviceDeclarations;
 
