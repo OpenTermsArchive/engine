@@ -43,7 +43,7 @@ describe('History', () => {
     });
 
     it('returns the id of the commit', async () => {
-      expect(commit.hash).to.includes(id);
+      expect(commit.hash).to.include(id);
     });
 
     it('properly saves the commit message', async () => {
@@ -76,7 +76,7 @@ describe('History', () => {
       });
 
       it('returns the id of the commit', async () => {
-        expect(commit.hash).to.includes(id);
+        expect(commit.hash).to.include(id);
       });
 
       it('properly saves the commit message', async () => {
@@ -84,16 +84,17 @@ describe('History', () => {
       });
 
       context('when the content has not changed', () => {
+        let commitsBefore;
         before(async () => {
+          commitsBefore = await gitSnapshot().log();
           const { id: snapshotId, path: snapshotPath } = await recordSnapshot(SERVICE_ID, TYPE, MODIFIED_FILE_CONTENT);
           id = snapshotId;
           path = snapshotPath;
-          const commits = await gitSnapshot().log();
-          [commit] = commits;
         });
 
-        it('does not commit', () => {
-          expect(id).to.be.undefined;
+        it('does not commit', async () => {
+          const commitsAfter = await gitSnapshot().log();
+          expect(commitsAfter).to.deep.equal(commitsBefore);
         });
       });
     });
@@ -133,7 +134,7 @@ describe('History', () => {
     });
 
     it('returns the id of the commit', async () => {
-      expect(commit.hash).to.includes(id);
+      expect(commit.hash).to.include(id);
     });
 
     it('properly saves the commit message', async () => {
@@ -141,7 +142,7 @@ describe('History', () => {
     });
 
     it('properly adds snapshot’s id in the commit body', async () => {
-      expect(commit.body).to.includes(SNAPSHOTS_ID);
+      expect(commit.body).to.include(SNAPSHOTS_ID);
     });
 
     context('when it is not the first record', () => {
@@ -170,7 +171,7 @@ describe('History', () => {
       });
 
       it('returns the id of the commit', async () => {
-        expect(commit.hash).to.includes(id);
+        expect(commit.hash).to.include(id);
       });
 
       it('properly saves the commit message', async () => {
@@ -178,11 +179,13 @@ describe('History', () => {
       });
 
       it('properly adds snapshot’s id in the commit body', async () => {
-        expect(commit.body).to.includes(SNAPSHOTS_ID);
+        expect(commit.body).to.include(SNAPSHOTS_ID);
       });
 
       context('when the content has not changed', () => {
+        let commitsBefore;
         before(async () => {
+          commitsBefore = await gitVersion().log();
           const { id: versionId, path: versionPath } = await recordVersion(SERVICE_ID, TYPE, MODIFIED_FILE_CONTENT, SNAPSHOTS_ID);
           id = versionId;
           path = versionPath;
@@ -190,8 +193,9 @@ describe('History', () => {
           [commit] = commits;
         });
 
-        it('does not commit', () => {
-          expect(id).to.be.undefined;
+        it('does not commit', async () => {
+          const commitsAfter = await gitVersion().log();
+          expect(commitsAfter).to.deep.equal(commitsBefore);
         });
       });
     });
@@ -213,7 +217,7 @@ describe('History', () => {
   describe('#recordRefilter', () => {
     const FILE_CONTENT = 'ToS fixture data with UTF-8 çhãràčtęrs\n------------------';
     const EXPECTED_FILE_PATH = `${VERSIONS_PATH}/${SERVICE_ID}/${TYPE}.md`;
-    const COMMIT_MESSAGE = `Refilter ${SERVICE_ID} ${TYPE}`;
+    const FIRST_RECORD_COMMIT_MESSAGE = `Start tracking ${SERVICE_ID} ${TYPE}`;
     const SNAPSHOTS_ID = 'snapshot short sha';
     let id;
     let commit;
@@ -231,28 +235,30 @@ describe('History', () => {
 
     after(resetGitRepository);
 
-    it('creates the file with the proper content', () => {
-      expect(fs.readFileSync(EXPECTED_FILE_PATH, { encoding: 'utf8' })).to.equal(FILE_CONTENT);
-    });
+    context('when it is the first record', () => {
+      it('creates the file with the proper content', () => {
+        expect(fs.readFileSync(EXPECTED_FILE_PATH, { encoding: 'utf8' })).to.equal(FILE_CONTENT);
+      });
 
-    it('returns the file path', () => {
-      expect(path).to.equal(EXPECTED_FILE_PATH);
-    });
+      it('returns the file path', () => {
+        expect(path).to.equal(EXPECTED_FILE_PATH);
+      });
 
-    it('returns a boolean to know if it is the first record', async () => {
-      expect(isFirstRecord).to.be.true;
-    });
+      it('returns a boolean to know if it is the first record', async () => {
+        expect(isFirstRecord).to.be.true;
+      });
 
-    it('returns the id of the commit', async () => {
-      expect(commit.hash).to.includes(id);
-    });
+      it('returns the id of the commit', async () => {
+        expect(commit.hash).to.include(id);
+      });
 
-    it('properly saves the commit message', async () => {
-      expect(commit.message).to.equal(COMMIT_MESSAGE);
-    });
+      it('properly saves the commit message', async () => {
+        expect(commit.message).to.equal(FIRST_RECORD_COMMIT_MESSAGE);
+      });
 
-    it('properly adds snapshot’s id in the commit body', async () => {
-      expect(commit.body).to.includes(SNAPSHOTS_ID);
+      it('properly adds snapshot’s id in the commit body', async () => {
+        expect(commit.body).to.include(SNAPSHOTS_ID);
+      });
     });
 
     context('when it is not the first record', () => {
@@ -281,7 +287,7 @@ describe('History', () => {
       });
 
       it('returns the id of the commit', async () => {
-        expect(commit.hash).to.includes(id);
+        expect(commit.hash).to.include(id);
       });
 
       it('properly saves the commit message', async () => {
@@ -289,11 +295,14 @@ describe('History', () => {
       });
 
       it('properly adds snapshot’s id in the commit body', async () => {
-        expect(commit.body).to.includes(SNAPSHOTS_ID);
+        expect(commit.body).to.include(SNAPSHOTS_ID);
       });
 
       context('when the content has not changed', () => {
+        let commitsBefore;
+
         before(async () => {
+          commitsBefore = await gitVersion().log();
           const { id: versionId, path: versionPath } = await recordRefilter(SERVICE_ID, TYPE, MODIFIED_FILE_CONTENT, SNAPSHOTS_ID);
           id = versionId;
           path = versionPath;
@@ -301,8 +310,9 @@ describe('History', () => {
           [commit] = commits;
         });
 
-        it('does not commit', () => {
-          expect(id).to.be.undefined;
+        it('does not commit', async () => {
+          const commitsAfter = await gitVersion().log();
+          expect(commitsAfter).to.deep.equal(commitsBefore);
         });
       });
     });

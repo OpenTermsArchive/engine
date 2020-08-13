@@ -74,7 +74,7 @@ describe('Recorder', () => {
     after(resetGitRepository);
 
     it('returns the id of the commit', async () => {
-      expect(commit.hash).to.includes(id);
+      expect(commit.hash).to.include(id);
     });
 
     it('properly saves the commit message', async () => {
@@ -167,6 +167,11 @@ describe('Recorder', () => {
         content: `${FILE_CONTENT} (with additional content to trigger a record)`,
       });
       secondRecordId = record.id;
+      await subject.record({
+        serviceId: 'another service provider id',
+        documentType: TYPE,
+        content: `${FILE_CONTENT} (with another content)`,
+      });
     });
 
     after(resetGitRepository);
