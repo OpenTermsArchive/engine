@@ -62,30 +62,6 @@ export default class CGUs extends events.EventEmitter {
     }
   }
 
-  async refilterAndRecord(serviceToTrack) {
-    console.log('Refiltering documents…');
-
-    const services = serviceToTrack ? { [serviceToTrack]: this._serviceDeclarations[serviceToTrack] } : this._serviceDeclarations;
-
-    const refilterAndRecordDocumentPromises = [];
-
-    Object.keys(services).forEach(serviceId => {
-      const { documents, name: serviceName } = this._serviceDeclarations[serviceId];
-      Object.keys(documents).forEach(type => {
-        refilterAndRecordDocumentPromises.push(this.refilterAndRecordDocument({
-          serviceId,
-          serviceName,
-          document: {
-            type,
-            ...documents[type]
-          }
-        }));
-      });
-    });
-
-    return Promise.all(refilterAndRecordDocumentPromises);
-  }
-
   async trackDocumentChanges({ serviceId, serviceName, document: documentDeclaration }) {
     const { type, fetch: location } = documentDeclaration;
     const logPrefix = `[${serviceName}-${type}]`;
@@ -124,6 +100,30 @@ export default class CGUs extends events.EventEmitter {
       console.error(`${logPrefix} Error:`, error.message);
       this.emit('documentUpdateError', serviceId, type, error);
     }
+  }
+
+  async refilterAndRecord(serviceToTrack) {
+    console.log('Refiltering documents… (it could take a while)');
+
+    const services = serviceToTrack ? { [serviceToTrack]: this._serviceDeclarations[serviceToTrack] } : this._serviceDeclarations;
+
+    const refilterAndRecordDocumentPromises = [];
+
+    Object.keys(services).forEach(serviceId => {
+      const { documents, name: serviceName } = this._serviceDeclarations[serviceId];
+      Object.keys(documents).forEach(type => {
+        refilterAndRecordDocumentPromises.push(this.refilterAndRecordDocument({
+          serviceId,
+          serviceName,
+          document: {
+            type,
+            ...documents[type]
+          }
+        }));
+      });
+    });
+
+    return Promise.all(refilterAndRecordDocumentPromises);
   }
 
   async refilterAndRecordDocument({ serviceId, serviceName, document: documentDeclaration }) {
