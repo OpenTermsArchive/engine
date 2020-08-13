@@ -25,7 +25,7 @@ describe('History', () => {
       path = snapshotPath;
       isFirstRecord = isFirstSnapshotRecord;
       const commits = await gitSnapshot().log();
-      [commit] = commits;
+      [ commit ] = commits;
     });
 
     after(resetGitRepository);
@@ -60,7 +60,7 @@ describe('History', () => {
         path = snapshotPath;
         isFirstRecord = isFirstSnapshotRecord;
         const commits = await gitSnapshot().log();
-        [commit] = commits;
+        [ commit ] = commits;
       });
 
       it('creates the file with the proper content', () => {
@@ -116,7 +116,7 @@ describe('History', () => {
       path = versionPath;
       isFirstRecord = isFirstVersionRecord;
       const commits = await gitVersion().log();
-      [commit] = commits;
+      [ commit ] = commits;
     });
 
     after(resetGitRepository);
@@ -155,7 +155,7 @@ describe('History', () => {
         path = versionPath;
         isFirstRecord = isFirstVersionRecord;
         const commits = await gitVersion().log();
-        [commit] = commits;
+        [ commit ] = commits;
       });
 
       it('creates the file with the proper content', () => {
@@ -190,7 +190,7 @@ describe('History', () => {
           id = versionId;
           path = versionPath;
           const commits = await gitVersion().log();
-          [commit] = commits;
+          [ commit ] = commits;
         });
 
         it('does not commit', async () => {
@@ -230,7 +230,7 @@ describe('History', () => {
       path = versionPath;
       isFirstRecord = isFirstVersionRecord;
       const commits = await gitVersion().log();
-      [commit] = commits;
+      [ commit ] = commits;
     });
 
     after(resetGitRepository);
@@ -271,7 +271,7 @@ describe('History', () => {
         path = versionPath;
         isFirstRecord = isFirstVersionRecord;
         const commits = await gitVersion().log();
-        [commit] = commits;
+        [ commit ] = commits;
       });
 
       it('creates the file with the proper content', () => {
@@ -307,7 +307,7 @@ describe('History', () => {
           id = versionId;
           path = versionPath;
           const commits = await gitVersion().log();
-          [commit] = commits;
+          [ commit ] = commits;
         });
 
         it('does not commit', async () => {

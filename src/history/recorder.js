@@ -54,7 +54,7 @@ export default class Recorder {
 
   async getLatestRecord(serviceId, documentType) {
     const filePath = this.getPathFor(serviceId, documentType);
-    const [latestCommit] = await this._getCommits(filePath);
+    const [ latestCommit ] = await this._getCommits(filePath);
 
     return {
       id: latestCommit && latestCommit.hash,

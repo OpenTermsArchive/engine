@@ -27,7 +27,7 @@ export default class Notifier {
       },
     };
 
-    return this.send([config.get('notifier.sendInBlue.administratorsListId')], sendParams);
+    return this.send([ config.get('notifier.sendInBlue.administratorsListId') ], sendParams);
   }
 
   async onVersionRecorded(serviceProviderId, documentTypeId, versionId) {
@@ -54,7 +54,7 @@ export default class Notifier {
       },
     };
 
-    return this.send([config.get('notifier.sendInBlue.administratorsListId')], sendParams);
+    return this.send([ config.get('notifier.sendInBlue.administratorsListId') ], sendParams);
   }
 
   async onApplicationError(error) {
@@ -66,7 +66,7 @@ export default class Notifier {
       },
     };
 
-    return this.send([config.get('notifier.sendInBlue.administratorsListId')], sendParams);
+    return this.send([ config.get('notifier.sendInBlue.administratorsListId') ], sendParams);
   }
 
   async send(lists, sendParams) {
@@ -76,7 +76,7 @@ export default class Notifier {
 
     contacts = contacts.flat();
 
-    const uniqueContacts = contacts.reduce((acc, current) => (acc.find(contact => contact.id === current.id) ? acc : acc.concat([current])), []);
+    const uniqueContacts = contacts.reduce((acc, current) => (acc.find(contact => contact.id === current.id) ? acc : acc.concat([ current ])), []);
 
     const sendPromises = uniqueContacts.map(contact => this.apiInstance.sendTransacEmail({ ...sendParams, to: [{ email: contact.email }] }));
 
