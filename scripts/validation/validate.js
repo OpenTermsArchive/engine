@@ -1,16 +1,19 @@
+/* eslint-disable prefer-arrow-callback */
+/* eslint-disable func-names */
+
 import fsApi from 'fs';
 import path from 'path';
 
-import Ajv from 'ajv';
+// eslint-disable-next-line import/no-extraneous-dependencies
 import chai from 'chai';
 import config from 'config';
-import jsonSourceMap from 'json-source-map';
 import { createRequire } from 'module';
 
 import fetch from '../../src/fetcher/index.js';
 import filter from '../../src/filter/index.js';
 import loadServiceDeclarations from '../../src/loader/index.js';
 import serviceSchema from './service.schema.js';
+import { assertValid, validateDocument } from './validator.js';
 
 const require = createRequire(import.meta.url);
 const TYPES = require('../../src/types.json');
@@ -49,43 +52,27 @@ describe('Services validation', async () => {
       if (!schemaOnly) {
         AVAILABLE_TYPE_NAMES.forEach(type => {
           describe(type, () => {
-            before(function () {
+            let validationResults;
+            before(async function () {
+              this.timeout(11000); // should be longer than the timeout built into validateDocument
+
               if (!service.documents[type]) {
                 console.log('      (Tests skipped for this document type as it is not declared for this service)');
                 this.skip();
               }
+              validationResults = await validateDocument(service.documents[type]);
             });
 
             it('has fetchable URL', async function () {
-              this.timeout(10000);
-
-              const { fetch: location } = service.documents[type];
-              await fetch(location);
+              expect(validationResults.fetchable).to.be.true;
             });
 
             it('has a selector that matches an element in the web page', async function () {
-              this.timeout(10000);
-
-              const { fetch: location } = service.documents[type];
-              const content = await fetch(location);
-              const filteredContent = await filter(content, service.documents[type], service.filters);
-              expect(filteredContent).to.not.be.empty;
+              expect(validationResults.selectorMatchesAnElement).to.be.true;
             });
 
-            context('When fetched and filtered twice in a row', () => {
-              it('has consistent filtered content', async function () {
-                this.timeout(10000);
-
-                const { fetch: location } = service.documents[type];
-                const filteredContent = [];
-
-                for (let i = 0; i < 2; i++) {
-                  const content = await fetch(location);
-                  filteredContent[i] = await filter(content, service.documents[type], service.filters);
-                }
-
-                expect(filteredContent[0]).to.equal(filteredContent[1]);
-              });
+            it('has consistent filtered content', async function () {
+              expect(validationResults.hasConsistentFilteredContent).to.be.true;
             });
           });
         });
@@ -93,33 +80,3 @@ describe('Services validation', async () => {
     });
   });
 });
-
-const validator = new Ajv({
-  allErrors: true,
-  jsonPointers: true,
-});
-
-function assertValid(schema, subject) {
-  const valid = validator.validate(schema, subject);
-
-  if (!valid) {
-    const errorPointers = new Set();
-    let errorMessage = '';
-    const sourceMap = jsonSourceMap.stringify(subject, null, 2);
-    const jsonLines = sourceMap.json.split('\n');
-    validator.errors.forEach(error => {
-      errorMessage += `\n\n${validator.errorsText([error])}`;
-      const errorPointer = sourceMap.pointers[error.dataPath];
-      if (errorPointer) {
-        errorMessage += `\n> ${jsonLines.slice(errorPointer.value.line, errorPointer.valueEnd.line).join('\n> ')}`;
-        errorPointers.add(errorPointer);
-      } else {
-        errorMessage += ' (in entire file)\n';
-      }
-    });
-
-    errorMessage += `\n\n${errorPointers.size} features have errors in total`;
-
-    throw new Error(errorMessage);
-  }
-}
