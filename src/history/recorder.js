@@ -1,7 +1,5 @@
 import fsApi from 'fs';
 
-import async from 'async';
-
 import Git from './git.js';
 
 const fs = fsApi.promises;
@@ -11,26 +9,15 @@ export default class Recorder {
     this.path = path;
     this.fileExtension = fileExtension;
     this.git = new Git(this.path);
-    this.commitQueue = async.queue(this._commit.bind(this), 1);
-    this.commitQueue.error(Recorder.commitQueueErrorHandler);
   }
 
-  async record({ serviceId, documentType, content, details }) {
+  async record({ serviceId, documentType, content, changelog }) {
     const filePath = await this.save({ serviceId, documentType, content });
-    const isNewFile = await this.git.isNew(filePath);
-
-    let message = `${isNewFile ? 'Start tracking' : 'Update'} ${serviceId} ${documentType}`;
-
-    if (details) {
-      message += `\n\n${details}`;
-    }
-
-    const sha = await this.commit(filePath, message);
+    const sha = await this.commit(filePath, changelog);
 
     return {
       path: filePath,
       id: sha,
-      isFirstRecord: isNewFile
     };
   }
 
@@ -41,7 +28,7 @@ export default class Recorder {
       await fs.mkdir(directory, { recursive: true });
     }
 
-    const filePath = `${directory}/${documentType}.${this.fileExtension}`;
+    const filePath = this.getPathFor(serviceId, documentType);
 
     await fs.writeFile(filePath, content);
 
@@ -49,26 +36,43 @@ export default class Recorder {
   }
 
   async commit(filePath, message) {
-    if (!await this.git.hasChanges(filePath)) {
-      return;
+    try {
+      if (!await this.git.hasChanges(filePath)) {
+        return;
+      }
+
+      await this.git.add(filePath);
+      return await this.git.commit(filePath, message);
+    } catch (error) {
+      throw new Error(`Could not commit ${filePath} with message "${message}" due to error: "${error}"`);
     }
-
-    return new Promise((resolve, reject) => {
-      this.commitQueue.push({ filePath, message, resolve, reject });
-    });
-  }
-
-  async _commit({ filePath, message, resolve }) {
-    await this.git.add(filePath);
-    resolve(await this.git.commit(filePath, message));
   }
 
   async publish() {
     return this.git.pushChanges();
   }
 
-  static commitQueueErrorHandler(error, { filePath, message, reject }) {
-    reject(new Error(`Could not commit ${filePath} with message "${message}" due to error: "${error}"`));
+  async getLatestRecord(serviceId, documentType) {
+    const filePath = this.getPathFor(serviceId, documentType);
+    const [ latestCommit ] = await this._getCommits(filePath);
+
+    return {
+      id: latestCommit && latestCommit.hash,
+      path: filePath
+    };
+  }
+
+  getPathFor(serviceId, documentType) {
+    return `${this.path}/${serviceId}/${documentType}.${this.fileExtension}`;
+  }
+
+  async isTracked(serviceId, documentType) {
+    const filePath = this.getPathFor(serviceId, documentType);
+    return this.git.isTracked(filePath);
+  }
+
+  async _getCommits(filePath) {
+    return this.git.log({ file: filePath });
   }
 }
 

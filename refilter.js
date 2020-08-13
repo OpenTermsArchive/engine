@@ -6,7 +6,6 @@ import CGUs from './src/index.js';
     const app = new CGUs();
     await app.init();
     await app.refilterAndRecord(serviceId);
-    await app.trackChanges(serviceId);
   } catch (error) {
     console.error(error);
   }

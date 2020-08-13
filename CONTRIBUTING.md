@@ -122,3 +122,9 @@ Since this operation fetches documents and could be long, you can also validate 
 ```
 npm run validate:schema $service_id
 ```
+
+If you change filters or selectors and want to refilter documents from snapshots and regenerate versions only:
+
+```
+npm run refilter [$service_id]
+```

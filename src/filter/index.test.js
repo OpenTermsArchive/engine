@@ -83,7 +83,7 @@ describe('Filter', () => {
 
       context('With an additional filter', () => {
         it('filters the given HTML content also with given additional filter', async () => {
-          const result = await filter(rawHTML, { fetch: virtualLocation, select: 'body', filter: ['removeLinks'] }, additionalFilter);
+          const result = await filter(rawHTML, { fetch: virtualLocation, select: 'body', filter: [ 'removeLinks' ] }, additionalFilter);
           expect(result).to.equal(expectedFilteredWithAdditional);
         });
       });
