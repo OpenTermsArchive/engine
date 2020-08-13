@@ -128,7 +128,7 @@ export default class CGUs extends events.EventEmitter {
 
   async refilterAndRecordDocument({ serviceId, serviceName, document: documentDeclaration }) {
     const { type } = documentDeclaration;
-    const logPrefix = `[${serviceName}-${this._types[type].name}]`;
+    const logPrefix = `[${serviceName}-${type}]`;
     const { id: snapshotId, path: snapshotPath } = await history.getLastSnapshot(serviceId, type);
 
     if (!snapshotId) {
