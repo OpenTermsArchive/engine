@@ -73,20 +73,20 @@ describe('CGUs', () => {
         await app.init();
         await app.trackChanges();
 
-        const [originalSnapshotCommit] = await gitSnapshot().log({ file: SERVICE_A_EXPECTED_SNAPSHOT_FILE_PATH });
+        const [ originalSnapshotCommit ] = await gitSnapshot().log({ file: SERVICE_A_EXPECTED_SNAPSHOT_FILE_PATH });
         originalSnapshotId = originalSnapshotCommit.hash;
 
-        const [firstVersionCommit] = await gitVersion().log({ file: SERVICE_A_EXPECTED_VERSION_FILE_PATH });
+        const [ firstVersionCommit ] = await gitVersion().log({ file: SERVICE_A_EXPECTED_VERSION_FILE_PATH });
         firstVersionId = firstVersionCommit.hash;
 
-        const [serviceBVersionCommit] = await gitVersion().log({ file: SERVICE_B_EXPECTED_VERSION_FILE_PATH });
+        const [ serviceBVersionCommit ] = await gitVersion().log({ file: SERVICE_B_EXPECTED_VERSION_FILE_PATH });
         serviceBVersionId = serviceBVersionCommit.hash;
 
         app._serviceDeclarations[SERVICE_A_ID].documents[SERVICE_A_TYPE].select = 'h1';
 
         await app.refilterAndRecord();
 
-        const [refilterVersionCommit] = await gitVersion().log({ file: SERVICE_A_EXPECTED_VERSION_FILE_PATH });
+        const [ refilterVersionCommit ] = await gitVersion().log({ file: SERVICE_A_EXPECTED_VERSION_FILE_PATH });
         refilterVersionId = refilterVersionCommit.hash;
         refilterVersionMessageBody = refilterVersionCommit.body;
       });
@@ -94,7 +94,7 @@ describe('CGUs', () => {
       after(resetGitRepository);
 
       it('refilters the content and saves the file', async () => {
-        const serviceAContent = await fs.readFile(path.resolve(__dirname, SERVICE_A_EXPECTED_VERSION_FILE_PATH), { encoding: 'utf8' })
+        const serviceAContent = await fs.readFile(path.resolve(__dirname, SERVICE_A_EXPECTED_VERSION_FILE_PATH), { encoding: 'utf8' });
         expect(serviceAContent).to.be.equal('Terms of service\n================');
       });
 
@@ -112,7 +112,7 @@ describe('CGUs', () => {
       });
 
       it('does not generate a new id for other services', async () => {
-        const [serviceBCommit] = await gitVersion().log({ file: SERVICE_B_EXPECTED_VERSION_FILE_PATH });
+        const [ serviceBCommit ] = await gitVersion().log({ file: SERVICE_B_EXPECTED_VERSION_FILE_PATH });
         expect(serviceBCommit.hash).to.be.equal(serviceBVersionId);
       });
     });
