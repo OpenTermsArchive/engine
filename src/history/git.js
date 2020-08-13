@@ -58,6 +58,11 @@ export default class Git {
     }
   }
 
+  async isTracked(filepath) {
+    const result = await this.git.raw('ls-files', this.relativePath(filepath));
+    return !!result;
+  }
+
   relativePath(absolutePath) {
     // Git needs a path relative to the .git directory, not an absolute one
     return path.relative(this.path, absolutePath);
