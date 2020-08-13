@@ -64,7 +64,7 @@ describe('CGUs', () => {
       let firstVersionId;
       let refilterVersionId;
       let refilterVersionMessageBody;
-      let serviceBVersionId;
+      let serviceBCommits;
 
       before(async () => {
         nock('https://www.servicea.example').get('/tos').reply(200, SERVICE_A_TOS_SNAPSHOT);
@@ -79,8 +79,7 @@ describe('CGUs', () => {
         const [ firstVersionCommit ] = await gitVersion().log({ file: SERVICE_A_EXPECTED_VERSION_FILE_PATH });
         firstVersionId = firstVersionCommit.hash;
 
-        const [ serviceBVersionCommit ] = await gitVersion().log({ file: SERVICE_B_EXPECTED_VERSION_FILE_PATH });
-        serviceBVersionId = serviceBVersionCommit.hash;
+        serviceBCommits = await gitVersion().log({ file: SERVICE_B_EXPECTED_VERSION_FILE_PATH });
 
         app._serviceDeclarations[SERVICE_A_ID].documents[SERVICE_A_TYPE].select = 'h1';
 
@@ -112,8 +111,8 @@ describe('CGUs', () => {
       });
 
       it('does not generate a new id for other services', async () => {
-        const [ serviceBCommit ] = await gitVersion().log({ file: SERVICE_B_EXPECTED_VERSION_FILE_PATH });
-        expect(serviceBCommit.hash).to.be.equal(serviceBVersionId);
+        const serviceBCommitsAfterRefiltering = await gitVersion().log({ file: SERVICE_B_EXPECTED_VERSION_FILE_PATH });
+        expect(serviceBCommitsAfterRefiltering.map(commit => commit.hash)).to.deep.equal(serviceBCommits.map(commit => commit.hash));
       });
     });
   });
