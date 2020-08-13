@@ -163,6 +163,7 @@ export default class CGUs extends events.EventEmitter {
     }
   }
 
+  /* eslint-disable class-methods-use-this */
   async recordSnapshot({ content, serviceId, type, logPrefix }) {
     const { id: snapshotId, path: snapshotPath } = await history.recordSnapshot(serviceId, type, content);
 
@@ -173,6 +174,7 @@ export default class CGUs extends events.EventEmitter {
     console.log(`${logPrefix} Recorded snapshot in ${snapshotPath} with id ${snapshotId}.`);
     return snapshotId;
   }
+  /* eslint-enable class-methods-use-this */
 
   async recordRefilter({ snapshotContent, snapshotId, serviceId, documentDeclaration, logPrefix }) {
     const { type } = documentDeclaration;
