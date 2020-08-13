@@ -182,7 +182,7 @@ describe('Recorder', () => {
 
   describe('#getLatestRecord', () => {
     let lastSnapshotId;
-    let lastestRecord;
+    let latestRecord;
 
     before(async () => {
       await subject.record({
@@ -196,17 +196,17 @@ describe('Recorder', () => {
         content: `${FILE_CONTENT} (with additional content to trigger a record)`,
       });
       lastSnapshotId = recordId;
-      lastestRecord = await subject.getLatestRecord(SERVICE_PROVIDER_ID, TYPE);
+      latestRecord = await subject.getLatestRecord(SERVICE_PROVIDER_ID, TYPE);
     });
 
     after(resetGitRepository);
 
     it('returns the latest record id', async () => {
-      expect(lastestRecord.id).to.include(lastSnapshotId);
+      expect(latestRecord.id).to.include(lastSnapshotId);
     });
 
     it('returns the latest record path', async () => {
-      expect(lastestRecord.path).to.equal(EXPECTED_FILE_PATH);
+      expect(latestRecord.path).to.equal(EXPECTED_FILE_PATH);
     });
   });
 });
