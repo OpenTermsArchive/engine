@@ -205,7 +205,7 @@ export default class CGUs extends events.EventEmitter {
 
   async publish() {
     if (!config.get('history.publish')) {
-      return console.log('Publication disabled for this environment.');
+      return;
     }
 
     await history.publish();
