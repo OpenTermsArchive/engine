@@ -71,6 +71,6 @@ export async function publish() {
   ]);
 }
 
-export function getLastSnapshot(serviceId, documentType) {
+export function getLatestSnapshot(serviceId, documentType) {
   return snapshotRecorder.getLatestRecord(serviceId, documentType);
 }
