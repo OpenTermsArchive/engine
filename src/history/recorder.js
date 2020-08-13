@@ -68,13 +68,7 @@ export default class Recorder {
 
   async isTracked(serviceId, documentType) {
     const filePath = this.getPathFor(serviceId, documentType);
-
-    if (!await fileExists(filePath)) {
-      return false;
-    }
-
-    const isNew = await this.git.isNew(filePath);
-    return !isNew;
+    return this.git.isTracked(filePath);
   }
 
   async _getCommits(filePath) {
