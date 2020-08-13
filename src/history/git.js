@@ -6,7 +6,7 @@ import simpleGit from 'simple-git';
 export default class Git {
   constructor(repositoryPath) {
     this.path = repositoryPath;
-    this.git = simpleGit(repositoryPath);
+    this.git = simpleGit(repositoryPath, { maxConcurrentProcesses: 1 });
   }
 
   async init() {
@@ -23,7 +23,7 @@ export default class Git {
 
   async commit(filepath, message) {
     const summary = await this.git.commit(message, this.relativePath(filepath), { '--author': `${config.get('history.author').name} <${config.get('history.author').email}>` });
-    return summary.commit.replace('HEAD ', '');
+    return summary.commit.replace('HEAD ', '').replace('(root-commit) ', '');
   }
 
   async pushChanges() {
@@ -43,6 +43,24 @@ export default class Git {
     const status = await this.git.status();
     return (status.created.indexOf(this.relativePath(filepath)) > -1)
            || (status.not_added.indexOf(this.relativePath(filepath)) > -1);
+  }
+
+  async log(options = {}) {
+    try {
+      options.file = options.file && this.relativePath(options.file);
+      const logSummary = await this.git.log(options);
+      return logSummary.all;
+    } catch (error) {
+      if (!error.message.includes('unknown revision or path not in the working tree')) {
+        throw (error);
+      }
+      return [];
+    }
+  }
+
+  async isTracked(filepath) {
+    const result = await this.git.raw('ls-files', this.relativePath(filepath));
+    return !!result;
   }
 
   relativePath(absolutePath) {
