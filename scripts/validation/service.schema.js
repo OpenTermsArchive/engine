@@ -35,6 +35,13 @@ const schema = {
       propertyNames: {
         enum: AVAILABLE_TYPES_NAME,
       }
+    },
+    importedFrom: {
+      type: 'string',
+      title: 'Imported from',
+      examples: [
+        'https://github.com/tosdr/tosback2/blob/5acac7abb5e967cfafd124a5e275f98f6ecd423e/rules/4shared.com.xml'
+      ]
     }
   },
   definitions: {
