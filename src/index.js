@@ -135,7 +135,14 @@ export default class CGUs extends events.EventEmitter {
       return;
     }
 
-    const snapshotContent = await fs.readFile(snapshotPath, { encoding: 'utf8' });
+    let snapshotContent;
+    try {
+      snapshotContent = await fs.readFile(snapshotPath, { encoding: 'utf8' });
+    } catch (error) {
+      if (error.code === 'ENOENT') {
+        return console.error(`The snapshot file ${snapshotPath} does not exists.`);
+      }
+    }
 
     return this.recordRefilter({
       snapshotContent,
