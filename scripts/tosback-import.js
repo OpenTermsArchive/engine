@@ -29,7 +29,7 @@ const SERVICES_PATH = './services/';
 const LOCAL_TOSBACK2_REPO = '../../tosdr/tosback2';
 const TOSBACK2_WEB_ROOT = 'https://github.com/tosdr/tosback2';
 const TOSBACK2_RULES_FOLDER_NAME = 'rules';
-const DEFAULT_POSTGRES_URL = 'postgres://localhost/phoenix_development';
+const POSTGRES_URL = 'postgres://localhost/phoenix_development';
 
 const services = {};
 const documents = {};
@@ -77,15 +77,9 @@ async function processTosback2(importedFrom, imported) {
     imported.sitename.docname = [imported.sitename.docname];
   }
   const serviceName = toPascalCase(imported.sitename.name.split('.')[0]);
-  const documents = {};
-  const promises = imported.sitename.docname.map(async docnameObj => {
-    if (documents.type) {
-      throw new Error('Same type used twice!');
-    }
-    return process(serviceName, docnameObj.name, docnameObj.url.name, docnameObj.url.xpath, importedFrom).catch(e => {
-      console.log('Could not process', serviceName, docnameObj.name, docnameObj.url.name, docnameObj.url.xpath, importedFrom, e.message);
-    });
-  });
+  const promises = imported.sitename.docname.map(async docnameObj => process(serviceName, docnameObj.name, docnameObj.url.name, docnameObj.url.xpath, importedFrom).catch(e => {
+    console.log('Could not process', serviceName, docnameObj.name, docnameObj.url.name, docnameObj.url.xpath, importedFrom, e.message);
+  }));
   return Promise.all(promises);
 }
 
@@ -104,7 +98,7 @@ async function process(serviceName, docName, url, xpath, importedFrom) {
   }
   try {
     const type = toType(docName);
-    if (documents.type) {
+    if (services[fileName].documents[type]) {
       throw new Error('Same type used twice!');
     }
     const docObj = {
@@ -181,8 +175,8 @@ async function readExistingServices() {
 
 async function run() {
   await readExistingServices();
-  // await parseAllGitXml(getLocalRulesFolder());
-  await parseAllPg(DEFAULT_POSTGRES_URL, services);
+  await parseAllGitXml(getLocalRulesFolder());
+  await parseAllPg(POSTGRES_URL, services);
   await saveAllServices();
 }
 run();
