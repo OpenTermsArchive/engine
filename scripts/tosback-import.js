@@ -6,6 +6,21 @@ import parser from 'xml2json';
 import xPathToCss from 'xpath-to-css';
 import simpleGit from 'simple-git';
 import { createRequire } from 'module';
+// eslint-disable-next-line import/no-extraneous-dependencies
+import pg from 'pg';
+
+import fetch from '../src/fetcher/index.js';
+import filter from '../src/filter/index.js';
+
+// FIXME: Somehow Node.js ESM doesn't recognize this export:
+//
+// import { Client } from 'pg';
+// ^^^^^^
+// SyntaxError: The requested module 'pg' does not provide an export named 'Client'
+//
+// But it does work:
+const { Client } = pg;
+
 import { assertValid, validateDocument } from './validation/validator.js';
 import serviceSchema from './validation/service.schema.js';
 
@@ -14,9 +29,11 @@ const TYPES = require('../src/types.json');
 
 const fs = fsApi.promises;
 
+const SERVICES_PATH = './services/';
 const LOCAL_TOSBACK2_REPO = '../../tosdr/tosback2';
 const TOSBACK2_WEB_ROOT = 'https://github.com/tosdr/tosback2';
 const TOSBACK2_RULES_FOLDER_NAME = 'rules';
+const DEFAULT_POSTGRES_URL = 'postgres://localhost/phoenix_development';
 
 function getLocalRulesFolder() {
   return path.join(LOCAL_TOSBACK2_REPO, TOSBACK2_RULES_FOLDER_NAME);
@@ -95,7 +112,7 @@ async function parseTosback2(importedFrom, imported) {
   return declaration;
 }
 
-async function parseAll(folder) {
+async function parseAllGitXml(folder) {
   const git = simpleGit(folder);
   const gitLog = await git.log();
   const commitHash = gitLog.latest.hash;
@@ -120,7 +137,7 @@ async function parseAll(folder) {
     console.log('Got declaration', declaration);
     if (declaration && declaration.name && Object.keys(declaration.documents).length) {
       try {
-        await fs.writeFile(`services/${declaration.name}.json`, JSON.stringify(declaration, null, 2));
+        await fs.writeFile(path.join(servicesPath, `${declaration.name}.json`), JSON.stringify(declaration, null, 2));
       } catch (e) {
         console.error('Error saving service declaration:', e);
       }
@@ -129,4 +146,71 @@ async function parseAll(folder) {
   await Promise.all(promises);
 }
 
-parseAll(getLocalRulesFolder());
+async function process(row, documents) {
+  if (documents[row.url]) {
+    // console.log('exists!', row.url);
+    return;
+  }
+  const fileName = path.join(SERVICES_PATH, `${row.service}.json`);
+  let content;
+  try {
+    content = JSON.parse(await fs.readFile(fileName));
+  } catch (e) {
+    content = {
+      name: row.service,
+      documents: {}
+    };
+  }
+  try {
+    const type = toType(row.name);
+    if (documents.type) {
+      throw new Error('Same type used twice!');
+    }
+    const docObj = {
+      fetch: row.url,
+      select: xPathToCss(row.xpath)
+    };  
+    const valid = await validDocObj(docObj);
+    if (valid) {
+      documents[type] = docObj;
+    }
+  await fs.writeFile(fileName, JSON.stringify(content, null, 2));
+  console.log('Updated', fileName);
+}
+
+async function parseAllPg(connectionString, services) {
+  const client = new Client({
+    connectionString
+  });
+  await client.connect();
+  const res = await client.query('SELECT d.name, d.xpath, d.url, s.url as domains, s.name as service from documents d inner join services s on d.service_id=s.id');
+  await Promise.all(res.rows.map(row => process(row, services)));
+  await client.end();
+}
+
+async function readExistingServices() {
+  const documents = {};
+  const serviceFiles = await fs.readdir(SERVICES_PATH);
+  await Promise.all(serviceFiles.filter(x => x.endsWith('.json')).map(async serviceFile => {
+    const content = JSON.parse(await fs.readFile(path.join(SERVICES_PATH, serviceFile)));
+    Object.keys(content.documents).forEach(x => {
+      const url = content.documents[x].fetch;
+      if (!documents[url]) {
+        documents[url] = [];
+      }
+      documents[url].push({
+        service: content.name,
+        docType: x,
+        select: content.documents[x].select
+      });
+    });
+  }));
+  return documents;
+}
+
+async function run() {
+  const services = await readExistingServices();
+  // await parseAllGitXml(getLocalRulesFolder());
+  await parseAllPg(DEFAULT_POSTGRES_URL, services);
+}
+run();
