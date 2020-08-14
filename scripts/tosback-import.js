@@ -185,4 +185,4 @@ async function run(includeXml, includePsql) {
 }
 
 // Edit this line to run the Tosback / ToS;DR import(s) you want:
-run(true, true);
+run(true, false);
