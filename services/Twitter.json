@@ -30,7 +30,7 @@
       ],
       "select": ".twtr-grid__yang > div:nth-child(1)"
     },
-    "Cookies Policy": {
+    "Trackers Policy": {
       "fetch": "https://help.twitter.com/en/rules-and-policies/twitter-cookies",
       "filter": [
         "removeBanner"
