@@ -32,7 +32,7 @@ const TOSBACK2_RULES_FOLDER_NAME = 'rules';
 const POSTGRES_URL = 'postgres://localhost/phoenix_development';
 
 const services = {};
-const documents = {};
+const urlAlreadyCovered = {};
 
 function getLocalRulesFolder() {
   return path.join(LOCAL_TOSBACK2_REPO, TOSBACK2_RULES_FOLDER_NAME);
@@ -73,8 +73,7 @@ function toType(str) {
 }
 
 async function process(serviceName, docName, url, xpath, importedFrom) {
-  if (documents[url]) {
-    // console.log('exists!', url);
+  if (urlAlreadyCovered[url]) {
     return;
   }
   const fileName = `${serviceName}.json`;
@@ -96,7 +95,7 @@ async function process(serviceName, docName, url, xpath, importedFrom) {
     };
     const validationResult = await validateDocument(docObj, []);
     if (validationResult.ok) {
-      documents[type] = docObj;
+      services[fileName].documents[type] = docObj;
     }
   } catch (e) {
     console.log('error importing row', serviceName, docName, url, xpath, e.message);
@@ -143,13 +142,19 @@ async function parseAllPg(connectionString) {
   await client.end();
 }
 
-async function saveAllServices() {
-  const promises = Object.keys(services).map(async i => {
-    if (Object.keys(services[i].documents).length) {
+async function trySave(i) {
+  if (Object.keys(services[i].documents).length) {
+    try {
       assertValid(serviceSchema, services[i]);
       return fs.writeFile(path.join(SERVICES_PATH, i), `${JSON.stringify(services[i], null, 2)}\n`);
+    } catch (e) {
+      console.error('Could not save', e);
     }
-  });
+  }
+}
+
+async function saveAllServices() {
+  const promises = Object.keys(services).map(trySave);
   await Promise.all(promises);
 }
 
@@ -160,27 +165,32 @@ async function readExistingServices() {
     services[serviceFile] = content;
     Object.keys(content.documents).forEach(x => {
       const url = content.documents[x].fetch;
-      if (!documents[url]) {
-        documents[url] = [];
+      if (!urlAlreadyCovered[url]) {
+        urlAlreadyCovered[url] = [];
       }
-      documents[url].push({
+      urlAlreadyCovered[url].push({
         service: content.name,
         docType: x,
         select: content.documents[x].select
       });
     });
   }));
-  return documents;
+  return urlAlreadyCovered;
 }
 
 async function run(includeXml, includePsql) {
   await readExistingServices();
+  // Save all files once per minute while the script runs:
+  const timer = setInterval(saveAllServices, 60000);
+
   if (includeXml) {
     await parseAllGitXml(getLocalRulesFolder());
   }
   if (includePsql) {
     await parseAllPg(POSTGRES_URL, services);
   }
+  // Save all files once more at the end:
+  clearInterval(timer);
   await saveAllServices();
 }
 
