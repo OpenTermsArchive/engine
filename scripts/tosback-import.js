@@ -8,9 +8,8 @@ import simpleGit from 'simple-git';
 import { createRequire } from 'module';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import pg from 'pg';
-
-import fetch from '../src/fetcher/index.js';
-import filter from '../src/filter/index.js';
+import { assertValid, validateDocument } from './validation/validator.js';
+import serviceSchema from './validation/service.schema.js';
 
 // FIXME: Somehow Node.js ESM doesn't recognize this export:
 //
@@ -20,9 +19,6 @@ import filter from '../src/filter/index.js';
 //
 // But it does work:
 const { Client } = pg;
-
-import { assertValid, validateDocument } from './validation/validator.js';
-import serviceSchema from './validation/service.schema.js';
 
 const require = createRequire(import.meta.url);
 const TYPES = require('../src/types.json');
@@ -34,6 +30,9 @@ const LOCAL_TOSBACK2_REPO = '../../tosdr/tosback2';
 const TOSBACK2_WEB_ROOT = 'https://github.com/tosdr/tosback2';
 const TOSBACK2_RULES_FOLDER_NAME = 'rules';
 const DEFAULT_POSTGRES_URL = 'postgres://localhost/phoenix_development';
+
+const services = {};
+const documents = {};
 
 function getLocalRulesFolder() {
   return path.join(LOCAL_TOSBACK2_REPO, TOSBACK2_RULES_FOLDER_NAME);
@@ -73,43 +72,52 @@ function toType(str) {
   return found;
 }
 
-async function parseTosback2(importedFrom, imported) {
+async function processTosback2(importedFrom, imported) {
   if (!Array.isArray(imported.sitename.docname)) {
     imported.sitename.docname = [imported.sitename.docname];
   }
-  const siteName = toPascalCase(imported.sitename.name.split('.')[0]);
+  const serviceName = toPascalCase(imported.sitename.name.split('.')[0]);
   const documents = {};
   const promises = imported.sitename.docname.map(async docnameObj => {
-    const type = toType(docnameObj.name);
+    if (documents.type) {
+      throw new Error('Same type used twice!');
+    }
+    return process(serviceName, docnameObj.name, docnameObj.url.name, docnameObj.url.xpath, importedFrom).catch(e => {
+      console.log('Could not process', serviceName, docnameObj.name, docnameObj.url.name, docnameObj.url.xpath, importedFrom, e.message);
+    });
+  });
+  return Promise.all(promises);
+}
+
+async function process(serviceName, docName, url, xpath, importedFrom) {
+  if (documents[url]) {
+    // console.log('exists!', url);
+    return;
+  }
+  const fileName = `${serviceName}.json`;
+  if (!services[fileName]) {
+    services[fileName] = {
+      name: serviceName,
+      importedFrom,
+      documents: {}
+    };
+  }
+  try {
+    const type = toType(docName);
     if (documents.type) {
       throw new Error('Same type used twice!');
     }
     const docObj = {
-      fetch: docnameObj.url.name
+      fetch: url,
+      select: xPathToCss(xpath)
     };
-
-    try {
-      docObj.select = xPathToCss(docnameObj.url.xpath);
-    } catch (e) {
-      if (docnameObj.url.xpath) {
-        console.error('XPath-to-CSS failed:', docnameObj.url.xpath);
-      }
-      throw e;
-    }
     const validationResult = await validateDocument(docObj, []);
     if (validationResult.ok) {
       documents[type] = docObj;
     }
-  });
-  // NB: if one doc spec import fails, the whole service spec import fails:
-  await Promise.all(promises);
-  const declaration = {
-    importedFrom,
-    name: siteName,
-    documents
-  };
-  assertValid(serviceSchema, declaration);
-  return declaration;
+  } catch (e) {
+    console.log('error importing row', serviceName, docName, url, xpath);
+  }
 }
 
 async function parseAllGitXml(folder) {
@@ -126,73 +134,36 @@ async function parseAllGitXml(folder) {
       console.error('Error parsing xml', filename, e.message);
       return;
     }
-    console.log('imported', filename, JSON.stringify(imported, null, 2));
-    let declaration;
-    try {
-      declaration = await parseTosback2(getGitHubWebUrl(commitHash, filename), imported);
-    } catch (e) {
-      console.error('Error parsing tosback2 object:', e.message);
-      return;
-    }
-    console.log('Got declaration', declaration);
-    if (declaration && declaration.name && Object.keys(declaration.documents).length) {
-      try {
-        await fs.writeFile(path.join(servicesPath, `${declaration.name}.json`), JSON.stringify(declaration, null, 2));
-      } catch (e) {
-        console.error('Error saving service declaration:', e);
-      }
-    }
+    await processTosback2(getGitHubWebUrl(commitHash, filename), imported);
   });
   await Promise.all(promises);
 }
 
-async function process(row, documents) {
-  if (documents[row.url]) {
-    // console.log('exists!', row.url);
-    return;
-  }
-  const fileName = path.join(SERVICES_PATH, `${row.service}.json`);
-  let content;
-  try {
-    content = JSON.parse(await fs.readFile(fileName));
-  } catch (e) {
-    content = {
-      name: row.service,
-      documents: {}
-    };
-  }
-  try {
-    const type = toType(row.name);
-    if (documents.type) {
-      throw new Error('Same type used twice!');
-    }
-    const docObj = {
-      fetch: row.url,
-      select: xPathToCss(row.xpath)
-    };  
-    const valid = await validDocObj(docObj);
-    if (valid) {
-      documents[type] = docObj;
-    }
-  await fs.writeFile(fileName, JSON.stringify(content, null, 2));
-  console.log('Updated', fileName);
-}
-
-async function parseAllPg(connectionString, services) {
+async function parseAllPg(connectionString) {
   const client = new Client({
     connectionString
   });
   await client.connect();
   const res = await client.query('SELECT d.name, d.xpath, d.url, s.url as domains, s.name as service from documents d inner join services s on d.service_id=s.id');
-  await Promise.all(res.rows.map(row => process(row, services)));
+  await Promise.all(res.rows.map(row => process(row.service, row.name, row.url, row.xpath)));
   await client.end();
 }
 
+async function saveAllServices() {
+  const promises = Object.keys(services).map(async i => {
+    if (Object.keys(services[i].documents).length) {
+      assertValid(serviceSchema, services[i]);
+      return fs.writeFile(path.join(SERVICES_PATH, i), `${JSON.stringify(services[i], null, 2)}\n`);
+    }
+  });
+  await Promise.all(promises);
+}
+
 async function readExistingServices() {
-  const documents = {};
   const serviceFiles = await fs.readdir(SERVICES_PATH);
   await Promise.all(serviceFiles.filter(x => x.endsWith('.json')).map(async serviceFile => {
     const content = JSON.parse(await fs.readFile(path.join(SERVICES_PATH, serviceFile)));
+    services[serviceFile] = content;
     Object.keys(content.documents).forEach(x => {
       const url = content.documents[x].fetch;
       if (!documents[url]) {
@@ -209,8 +180,9 @@ async function readExistingServices() {
 }
 
 async function run() {
-  const services = await readExistingServices();
+  await readExistingServices();
   // await parseAllGitXml(getLocalRulesFolder());
   await parseAllPg(DEFAULT_POSTGRES_URL, services);
+  await saveAllServices();
 }
 run();
