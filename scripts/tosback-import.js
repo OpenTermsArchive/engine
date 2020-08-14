@@ -72,17 +72,6 @@ function toType(str) {
   return found;
 }
 
-async function processTosback2(importedFrom, imported) {
-  if (!Array.isArray(imported.sitename.docname)) {
-    imported.sitename.docname = [imported.sitename.docname];
-  }
-  const serviceName = toPascalCase(imported.sitename.name.split('.')[0]);
-  const promises = imported.sitename.docname.map(async docnameObj => process(serviceName, docnameObj.name, docnameObj.url.name, docnameObj.url.xpath, importedFrom).catch(e => {
-    console.log('Could not process', serviceName, docnameObj.name, docnameObj.url.name, docnameObj.url.xpath, importedFrom, e.message);
-  }));
-  return Promise.all(promises);
-}
-
 async function process(serviceName, docName, url, xpath, importedFrom) {
   if (documents[url]) {
     // console.log('exists!', url);
@@ -103,15 +92,26 @@ async function process(serviceName, docName, url, xpath, importedFrom) {
     }
     const docObj = {
       fetch: url,
-      select: xPathToCss(xpath)
+      select: (xpath ? xPathToCss(xpath) : 'body')
     };
     const validationResult = await validateDocument(docObj, []);
     if (validationResult.ok) {
       documents[type] = docObj;
     }
   } catch (e) {
-    console.log('error importing row', serviceName, docName, url, xpath);
+    console.log('error importing row', serviceName, docName, url, xpath, e.message);
   }
+}
+
+async function processTosback2(importedFrom, imported) {
+  if (!Array.isArray(imported.sitename.docname)) {
+    imported.sitename.docname = [ imported.sitename.docname ];
+  }
+  const serviceName = toPascalCase(imported.sitename.name.split('.')[0]);
+  const promises = imported.sitename.docname.map(async docnameObj => process(serviceName, docnameObj.name, docnameObj.url.name, docnameObj.url.xpath, importedFrom).catch(e => {
+    console.log('Could not process', serviceName, docnameObj.name, docnameObj.url.name, docnameObj.url.xpath, importedFrom, e.message);
+  }));
+  return Promise.all(promises);
 }
 
 async function parseAllGitXml(folder) {
@@ -173,10 +173,16 @@ async function readExistingServices() {
   return documents;
 }
 
-async function run() {
+async function run(includeXml, includePsql) {
   await readExistingServices();
-  await parseAllGitXml(getLocalRulesFolder());
-  await parseAllPg(POSTGRES_URL, services);
+  if (includeXml) {
+    await parseAllGitXml(getLocalRulesFolder());
+  }
+  if (includePsql) {
+    await parseAllPg(POSTGRES_URL, services);
+  }
   await saveAllServices();
 }
-run();
+
+// Edit this line to run the Tosback / ToS;DR import(s) you want:
+run(true, true);
