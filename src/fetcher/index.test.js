@@ -10,16 +10,19 @@ const __dirname = path.dirname(new URL(import.meta.url).pathname);
 const { expect } = chai;
 const facebookTermsHTML = fs.readFileSync(path.resolve(__dirname, '../../test/fixtures/facebook_terms_raw.html'), { encoding: 'utf8' });
 
-nock('https://www.facebook.com', {
-  reqheaders: { 'Accept-Language': 'en' }
-}).get('/terms.php')
-  .reply(200, facebookTermsHTML);
-
-nock('https://not.available.document.com')
-  .get('/')
-  .reply(404);
-
 describe('Fetcher', () => {
+  before(() => {
+    nock('https://www.facebook.com', {
+      reqheaders: { 'Accept-Language': 'en' }
+    }).persist()
+      .get('/terms.php')
+      .reply(200, facebookTermsHTML);
+
+    nock('https://not.available.document.com')
+      .get('/')
+      .reply(404);
+  });
+
   describe('#fetch', () => {
     it('returns the web page content of the given URL', async () => {
       const result = await fetch('https://www.facebook.com/terms.php');
