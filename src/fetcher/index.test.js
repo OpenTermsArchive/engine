@@ -26,6 +26,13 @@ describe('Fetcher', () => {
       expect(result).to.be.equal(facebookTermsHTML);
     });
 
+    context('With returns as blob option', () => {
+      it('returns the blob of the given URL', async () => {
+        const result = await fetch('https://www.facebook.com/terms.php', { returnBlob: true });
+        expect(result.constructor.name).to.equal('Blob');
+      });
+    });
+
     context('when web page is not available', () => {
       it('throws an error', async () => {
         try {
