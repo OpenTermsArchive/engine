@@ -30,6 +30,7 @@ const LOCAL_TOSBACK2_REPO = '../../tosdr/tosback2';
 const TOSBACK2_WEB_ROOT = 'https://github.com/tosdr/tosback2';
 const TOSBACK2_RULES_FOLDER_NAME = 'rules';
 const POSTGRES_URL = 'postgres://localhost/phoenix_development';
+const THREADS = 5;
 
 const services = {};
 const urlAlreadyCovered = {};
@@ -72,21 +73,25 @@ function toType(str) {
   return found;
 }
 
-let running = {};
-let ready = Promise.resolve();
+const queue = [];
+let running = 0;
 
 async function processWhenReady(serviceName, docName, url, xpath, importedFrom) {
-  console.log(serviceName, docName, 'queued', running);
-  await ready;
-  console.log('finished', running);
-  if (Object.keys(running) > 0) {
-    throw new Error('not finished?');
+  console.log(serviceName, docName, 'queued');
+  queue.push(() => process(serviceName, docName, url, xpath, importedFrom));
+  async function next() {
+    console.log(`Next task (${queue.length} tasks left, running ${THREADS} in parallel)`);
+    if (queue.length && running < THREADS) {
+      running++;
+      const thisTask = queue.shift();
+      await thisTask();
+      running--;
+      next();
+    }
   }
-  running[url] = true;
-  ready = process(serviceName, docName, url, xpath, importedFrom);
-  await ready;
-  delete running[url];
+  next();
 }
+
 async function process(serviceName, docName, url, xpath, importedFrom) {
   console.log(serviceName, docName, 'start');
   if (urlAlreadyCovered[url]) {
