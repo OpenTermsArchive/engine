@@ -21,6 +21,7 @@ const { expect } = chai;
 const AVAILABLE_TYPE_NAMES = Object.keys(TYPES);
 const rootPath = path.join(__dirname, '../..');
 const SERVICE_DECLARATIONS_PATH = path.resolve(__dirname, '../../', config.get('serviceDeclarationsPath'));
+const MIN_DOC_LENGTH = 100;
 
 describe('Services validation', async () => {
   const serviceId = process.argv.slice(process.argv.indexOf('--serviceId'))[1];
@@ -53,6 +54,9 @@ describe('Services validation', async () => {
       if (!schemaOnly) {
         AVAILABLE_TYPE_NAMES.forEach(type => {
           describe(type, () => {
+            let content;
+            let filteredContent;
+
             before(function () {
               if (!service.documents[type]) {
                 console.log('      (Tests skipped for this document type as it is not declared for this service)');
@@ -64,31 +68,52 @@ describe('Services validation', async () => {
               this.timeout(10000);
 
               const { fetch: location } = service.documents[type];
-              await fetch(location);
+              content = await fetch(location);
             });
 
             it('has a selector that matches an element in the web page', async function () {
-              this.timeout(10000);
+              if (!content) {
+                console.log('      (Tests skipped as url is not fetchable)');
+                this.skip();
+              }
 
-              const { fetch: location } = service.documents[type];
-              const content = await fetch(location);
-              const filteredContent = await filter(content, service.documents[type], service.filters);
+              filteredContent = await filter(content, service.documents[type], service.filters);
               expect(filteredContent).to.not.be.empty;
+            });
+
+            it(`has a resulting filtered content with at least ${MIN_DOC_LENGTH}`, async function () {
+              if (!content) {
+                console.log('      (Tests skipped as url is not fetchable)');
+                this.skip();
+              }
+
+              if (!filteredContent) {
+                console.log('      (Tests skipped as content cannot be filtered)');
+                this.skip();
+              }
+
+              expect(filteredContent.length).to.be.greaterThan(MIN_DOC_LENGTH);
             });
 
             context('When fetched and filtered twice in a row', () => {
               it('has consistent filtered content', async function () {
+                if (!content) {
+                  console.log('      (Tests skipped as url is not fetchable)');
+                  this.skip();
+                }
+
+                if (!filteredContent) {
+                  console.log('      (Tests skipped as content cannot be filtered)');
+                  this.skip();
+                }
+
                 this.timeout(10000);
 
                 const { fetch: location } = service.documents[type];
-                const filteredContent = [];
+                const secondContent = await fetch(location);
+                const secondFilteredContent = await filter(secondContent, service.documents[type], service.filters);
 
-                for (let i = 0; i < 2; i++) {
-                  const content = await fetch(location);
-                  filteredContent[i] = await filter(content, service.documents[type], service.filters);
-                }
-
-                expect(filteredContent[0]).to.equal(filteredContent[1]);
+                expect(secondFilteredContent).to.equal(filteredContent);
               });
             });
           });
