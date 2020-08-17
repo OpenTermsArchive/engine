@@ -27,12 +27,16 @@ describe('Services validation', async () => {
   const schemaOnly = process.argv.indexOf('--schema-only') != -1;
   const serviceIds = fsApi.readdirSync(SERVICE_DECLARATIONS_PATH).filter(filename => path.extname(filename) === '.json').map(filename => path.basename(filename, '.json'));
   const servicesToValidate = serviceId ? [ serviceId ] : serviceIds;
+  let serviceDeclarations;
+
+  before(async () => {
+    serviceDeclarations = await loadServiceDeclarations(path.join(rootPath, config.get('serviceDeclarationsPath')));
+  });
 
   servicesToValidate.forEach(serviceId => {
     let service;
 
     before(async () => {
-      const serviceDeclarations = await loadServiceDeclarations(path.join(rootPath, config.get('serviceDeclarationsPath')));
       service = serviceDeclarations[serviceId];
 
       if (!service) {
