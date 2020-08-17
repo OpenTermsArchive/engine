@@ -1,0 +1,14 @@
+{
+  "name": "Coursera",
+  "importedFrom": "https://github.com/tosdr/tosback2/blob/940c8d2ffb356473d324a3e0830723f39779de0c/rules/coursera.org.xml",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.coursera.org/about/privacy",
+      "select": "div.coursera-tos"
+    },
+    "Cookies Policy": {
+      "fetch": "https://www.coursera.org/about/cookies",
+      "select": "div.coursera-tos"
+    }
+  }
+}

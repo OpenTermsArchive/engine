@@ -1,0 +1,10 @@
+{
+  "name": "City-data",
+  "importedFrom": "https://github.com/tosdr/tosback2/blob/940c8d2ffb356473d324a3e0830723f39779de0c/rules/city-data.com.xml",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "http://www.city-data.com/terms.html#priv",
+      "select": "body"
+    }
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "name": "Canary",
+  "importedFrom": "https://github.com/tosdr/tosback2/blob/940c8d2ffb356473d324a3e0830723f39779de0c/rules/canary.is.xml",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://canary.is/legal/privacy-policy/",
+      "select": "html > body > div:first-of-type > div > div:nth-of-type(2) > section:first-of-type > div > div:nth-of-type(2) > article"
+    }
+  }
+}

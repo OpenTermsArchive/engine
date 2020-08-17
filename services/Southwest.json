@@ -1,0 +1,10 @@
+{
+  "name": "Southwest",
+  "importedFrom": "https://github.com/tosdr/tosback2/blob/940c8d2ffb356473d324a3e0830723f39779de0c/rules/southwest.com.xml",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "http://www.southwest.com/html/about-southwest/terms-and-conditions/privacy-policy-pol.html?int=GFOOTER-BOTTOM-PRIVACY-POLICY",
+      "select": "div.swa_layout_main_inner"
+    }
+  }
+}

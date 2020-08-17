@@ -1,0 +1,14 @@
+{
+  "name": "Netgear",
+  "importedFrom": "https://github.com/tosdr/tosback2/blob/940c8d2ffb356473d324a3e0830723f39779de0c/rules/netgear.com.xml",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.netgear.com/about/privacy-policy/default.aspx#13",
+      "select": "#wrapper > main > section > div > div > section > article > section > div"
+    },
+    "Terms of Service": {
+      "fetch": "https://www.netgear.com/about/terms-and-conditions/default.aspx",
+      "select": "#wrapper > main > section > div > div > section > article > section"
+    }
+  }
+}

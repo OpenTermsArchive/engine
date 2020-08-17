@@ -9,8 +9,6 @@ import chai from 'chai';
 import config from 'config';
 import { createRequire } from 'module';
 
-import fetch from '../../src/fetcher/index.js';
-import filter from '../../src/filter/index.js';
 import loadServiceDeclarations from '../../src/loader/index.js';
 import serviceSchema from './service.schema.js';
 import { assertValid, validateDocument } from './validator.js';

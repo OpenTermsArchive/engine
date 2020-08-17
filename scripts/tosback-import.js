@@ -72,8 +72,25 @@ function toType(str) {
   return found;
 }
 
+let running = {};
+let ready = Promise.resolve();
+
+async function processWhenReady(serviceName, docName, url, xpath, importedFrom) {
+  console.log(serviceName, docName, 'queued', running);
+  await ready;
+  console.log('finished', running);
+  if (Object.keys(running) > 0) {
+    throw new Error('not finished?');
+  }
+  running[url] = true;
+  ready = process(serviceName, docName, url, xpath, importedFrom);
+  await ready;
+  delete running[url];
+}
 async function process(serviceName, docName, url, xpath, importedFrom) {
+  console.log(serviceName, docName, 'start');
   if (urlAlreadyCovered[url]) {
+    console.log(serviceName, docName, 'skip');
     return;
   }
   const fileName = `${serviceName}.json`;
@@ -97,8 +114,10 @@ async function process(serviceName, docName, url, xpath, importedFrom) {
     if (validationResult.ok) {
       services[fileName].documents[type] = docObj;
     }
+    await trySave(fileName);
+    console.log(serviceName, docName, 'done');
   } catch (e) {
-    console.log('error importing row', serviceName, docName, url, xpath, e.message);
+    console.log(serviceName, docName, 'fail');
   }
 }
 
@@ -107,7 +126,7 @@ async function processTosback2(importedFrom, imported) {
     imported.sitename.docname = [ imported.sitename.docname ];
   }
   const serviceName = toPascalCase(imported.sitename.name.split('.')[0]);
-  const promises = imported.sitename.docname.map(async docnameObj => process(serviceName, docnameObj.name, docnameObj.url.name, docnameObj.url.xpath, importedFrom).catch(e => {
+  const promises = imported.sitename.docname.map(async docnameObj => processWhenReady(serviceName, docnameObj.name, docnameObj.url.name, docnameObj.url.xpath, importedFrom).catch(e => {
     console.log('Could not process', serviceName, docnameObj.name, docnameObj.url.name, docnameObj.url.xpath, importedFrom, e.message);
   }));
   return Promise.all(promises);
@@ -138,24 +157,22 @@ async function parseAllPg(connectionString) {
   });
   await client.connect();
   const res = await client.query('SELECT d.name, d.xpath, d.url, s.url as domains, s.name as service from documents d inner join services s on d.service_id=s.id');
-  await Promise.all(res.rows.map(row => process(row.service, row.name, row.url, row.xpath)));
+  await Promise.all(res.rows.map(row => processWhenReady(row.service, row.name, row.url, row.xpath)));
   await client.end();
 }
 
 async function trySave(i) {
+  console.log('Saving', path.join(SERVICES_PATH, i));
   if (Object.keys(services[i].documents).length) {
     try {
       assertValid(serviceSchema, services[i]);
-      return fs.writeFile(path.join(SERVICES_PATH, i), `${JSON.stringify(services[i], null, 2)}\n`);
+      await fs.writeFile(path.join(SERVICES_PATH, i), `${JSON.stringify(services[i], null, 2)}\n`);
+      // await new Promise(resolve => setTimeout(resolve, 100));
+      console.log('Saved', path.join(SERVICES_PATH, i));
     } catch (e) {
       console.error('Could not save', e);
     }
   }
-}
-
-async function saveAllServices() {
-  const promises = Object.keys(services).map(trySave);
-  await Promise.all(promises);
 }
 
 async function readExistingServices() {
@@ -180,8 +197,6 @@ async function readExistingServices() {
 
 async function run(includeXml, includePsql) {
   await readExistingServices();
-  // Save all files once per minute while the script runs:
-  const timer = setInterval(saveAllServices, 60000);
 
   if (includeXml) {
     await parseAllGitXml(getLocalRulesFolder());
@@ -189,9 +204,6 @@ async function run(includeXml, includePsql) {
   if (includePsql) {
     await parseAllPg(POSTGRES_URL, services);
   }
-  // Save all files once more at the end:
-  clearInterval(timer);
-  await saveAllServices();
 }
 
 // Edit this line to run the Tosback / ToS;DR import(s) you want:

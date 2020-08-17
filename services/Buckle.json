@@ -1,0 +1,10 @@
+{
+  "name": "Buckle",
+  "importedFrom": "https://github.com/tosdr/tosback2/blob/940c8d2ffb356473d324a3e0830723f39779de0c/rules/buckle.com.xml",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "http://www.buckle.com/guest-services/privacy-security/privacy-security",
+      "select": "body"
+    }
+  }
+}

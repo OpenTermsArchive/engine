@@ -7,7 +7,7 @@ import fetch from '../../src/fetcher/index.js';
 import filter from '../../src/filter/index.js';
 
 const MIN_DOC_LENGTH = 100;
-const TIMEOUT = 10000;
+const TIMEOUT = 100000;
 
 const validator = new Ajv({
   allErrors: true,
@@ -60,14 +60,22 @@ const NEGATIVE_RESULT = {
 async function validateDocumentImpl(docObj, filters) {
   const result = { ...NEGATIVE_RESULT };
   const { fetch: location } = docObj;
-  const content = await fetch(location);
+  const content = await fetch(location).catch(() => {
+    throw new Error(`Could not fetch ${location}`);
+  });
   result.fetchable = true;
   const filteredContent = [];
-  filteredContent[0] = await filter(content, docObj, filters);
+  filteredContent[0] = await filter(content, docObj, filters).catch(() => {
+    throw new Error(`Could not filter ${location}`);
+  });;
   result.selectorMatchesAnElement = (filteredContent[0].length > 0);
   result.isLongEnough = isLongEnough(filteredContent[0]);
-  const content2 = await fetch(location);
-  filteredContent[1] = await filter(content2, docObj, filters);
+  const content2 = await fetch(location).catch(() => {
+    throw new Error(`Could not fetch second time ${location}`);
+  });
+  filteredContent[1] = await filter(content2, docObj, filters).catch(() => {
+    throw new Error(`Could not filter second time ${location}`);
+  });
   result.hasConsistentFilteredContent = (filteredContent[0] === filteredContent[1]);
   result.ok = result.fetchable && result.selectorMatchesAnElement && result.hasConsistentFilteredContent && result.isLongEnough;
   return result;
@@ -80,6 +88,6 @@ export async function validateDocument(docObj, filters) {
         resolve(NEGATIVE_RESULT);
       }, TIMEOUT);
     }),
-    validateDocumentImpl(docObj, filters)
+    validateDocumentImpl(docObj, filters).catch(e => console.error(e.message))
   ]);
 }

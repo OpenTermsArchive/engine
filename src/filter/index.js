@@ -12,20 +12,25 @@ export const LINKS_TO_CONVERT_SELECTOR = 'a[href]:not([href^="#"])';
 
 export default async function filter(content, { fetch: location, select: extractionSelectors = [], remove: deletionSelectors = [], filter: serviceSpecificFilters = [] }, filterFunctions) {
   const { document: webPageDOM } = new JSDOM(content).window;
-
+  console.log('filter 1', location);
   serviceSpecificFilters.forEach(filterName => {
     filterFunctions[filterName](webPageDOM); // filters work in place
   });
+  console.log('filter 2', location);
 
   remove(webPageDOM, deletionSelectors); // remove function works in place
+  console.log('filter 3', location);
 
   const domFragment = select(webPageDOM, extractionSelectors);
+  console.log('filter 4', location);
 
   if (!domFragment.children.length) {
     throw new Error(`The provided selector "${extractionSelectors}" has no match in the web page.`);
   }
+  console.log('filter 5', location);
 
   convertRelativeURLsToAbsolute(domFragment, location);
+  console.log('filter 6', location);
 
   return transform(domFragment);
 }
