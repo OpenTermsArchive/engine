@@ -2,11 +2,11 @@
   "name": "AskFM",
   "documents": {
     "Terms of Service": {
-      "fetch": "https://about.ask.fm/legal/en/terms.html",
+      "fetch": "https://ask.fm/docs/terms_of_use/?lang=en",
       "select": "section.container"
     },
     "Privacy Policy": {
-      "fetch": "https://about.ask.fm/legal/en/privacy.html",
+      "fetch": "https://ask.fm/docs/privacy_policy/?lang=en",
       "select": "section.container"
     }
   }

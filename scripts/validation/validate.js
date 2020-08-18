@@ -50,7 +50,7 @@ let serviceDeclarations;
                 let filteredContent;
 
                 it('has fetchable URL', async function () {
-                  this.timeout(10000);
+                  this.timeout(30000);
 
                   const { fetch: location } = service.documents[type];
                   content = await fetch(location);
@@ -92,7 +92,7 @@ let serviceDeclarations;
                       this.skip();
                     }
 
-                    this.timeout(10000);
+                    this.timeout(30000);
 
                     const { fetch: location } = service.documents[type];
                     const secondContent = await fetch(location);
