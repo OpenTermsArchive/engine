@@ -124,8 +124,30 @@ async function parseFile(filename) {
 }
 
 function toPascalCase(str) {
-  const lowerCase = str.toLowerCase();
-  return str[0].toUpperCase() + lowerCase.substring(1);
+  const parts = str.split(' ');
+  const candidate = parts.map(part => {
+    const lowerCase = part.toLowerCase().replace(/[^a-zA-Z0-9]/g, '');
+    return part[0].toUpperCase() + lowerCase.substring(1);
+  }).join('');
+  return {
+    Att: 'ATT',
+    Bbc: 'BBC',
+    Discordapp: 'DiscordApp',
+    Duckduckgo: 'DuckDuckGo',
+    Foxnews: 'FoxNews',
+    Github: 'GitHub',
+    Live: 'MicrosoftLive',
+    Msn: 'MSN',
+    Phpbb: 'phpBB',
+    Plus: 'GooglePlus',
+    Microsoftstore: 'MicrosoftStore',
+    Play: 'GooglePlayStore', // note this is an exception in https://github.com/ambanum/CGUs/issues/106#issue-680943515
+    W3schools: 'W3Schools',
+    Wikimediafoundation: 'WikimediaFoundation',
+    Wordpress: 'WordPress',
+    Xing: 'XING',
+    Youtube: 'YouTube'
+  }[candidate] || candidate;
 }
 
 function toType(str) {
@@ -204,6 +226,10 @@ async function processTosback2(importedFrom, imported) {
     imported.sitename.docname = [ imported.sitename.docname ];
   }
   const serviceName = toPascalCase(imported.sitename.name.split('.')[0]);
+  if (!imported.sitename.docname[0].url.reviewed) {
+    console.log('focusing on crawl_reviewed, skipping the rest');
+    return;
+  }
   const promises = imported.sitename.docname.map(async docnameObj => processWhenReady(serviceName, docnameObj.name, docnameObj.url.name, docnameObj.url.xpath, importedFrom).catch(e => {
     console.log('Could not process', serviceName, docnameObj.name, docnameObj.url.name, docnameObj.url.xpath, importedFrom, e.message);
   }));
@@ -285,4 +311,4 @@ async function run(includeXml, includePsql) {
 }
 
 // Edit this line to run the Tosback / ToS;DR import(s) you want:
-run(false, true);
+run(true, false);
