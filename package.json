@@ -18,8 +18,8 @@
     "posttest": "npm run lint",
     "test": "NODE_ENV=test mocha --file './test/helper.js' --recursive \"./src/**/*.test.js\"",
     "test:debug": "NODE_ENV=test mocha --file './test/helper.js' --recursive \"./src/**/*.test.js\" --inspect-brk --exit",
-    "validate": "NODE_ENV=validation mocha --file './test/helper.js' scripts/validation/validate.js --serviceId",
-    "validate:schema": "NODE_ENV=validation mocha --file './test/helper.js' scripts/validation/validate.js --schema-only --serviceId"
+    "validate": "NODE_ENV=validation mocha --delay --file './test/helper.js' scripts/validation/validate.js --serviceId",
+    "validate:schema": "NODE_ENV=validation mocha --delay --file './test/helper.js' scripts/validation/validate.js --schema-only --serviceId"
   },
   "repository": {
     "type": "git",
