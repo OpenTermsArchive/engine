@@ -2,14 +2,15 @@
   "name": "Google",
   "documents": {
     "Privacy Policy": {
-      "fetch": "https://policies.google.com/privacy?hl=en-US",
+      "fetch": "https://policies.google.com/privacy?hl=en-GB",
       "filter": [
         "removeUTMfromUrls"
       ],
-      "select": "div[role=article]"
+      "select": "div[role=article]",
+      "remove": ".KMMDve, .TL2alc, img[src$='.svg']"
     },
     "Terms of Service": {
-      "fetch": "https://policies.google.com/terms?hl=en-US",
+      "fetch": "https://policies.google.com/terms?hl=en-GB",
       "filter": [
         "removeUTMfromUrls"
       ],
