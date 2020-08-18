@@ -11,8 +11,12 @@ turndownService.use(turndownPluginGithubFlavouredMarkdown.gfm);
 export const LINKS_TO_CONVERT_SELECTOR = 'a[href]:not([href^="#"])';
 
 export default async function filter(content, { fetch: location, select: extractionSelectors = [], remove: deletionSelectors = [], filter: serviceSpecificFilters = [] }, filterFunctions) {
-  const { document: webPageDOM } = new JSDOM(content).window;
-
+  const virtualConsole = new jsdom.VirtualConsole();
+  const jsdomInstance = new JSDOM(content, {
+    url: location,
+    virtualConsole
+  });
+  const { document: webPageDOM } = jsdomInstance.window;
   serviceSpecificFilters.forEach(filterName => {
     filterFunctions[filterName](webPageDOM); // filters work in place
   });

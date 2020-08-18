@@ -110,5 +110,40 @@
       "audience": "data controllers (in the sense of GDPR)",
       "object": "user consent collection and storage"
     }
+  },
+  "Closed Captioning Policy": {
+    "commitment": {
+      "writer": "service provider",
+      "audience": "end user",
+      "object": "closed captioning on streamed content"
+    }
+  },
+  "Seller Warranty": {
+    "commitment": {
+      "writer": "service provider",
+      "audience": "end user",
+      "object": "protection of end users that act as sellers"
+    }
+  },
+  "Single Sign-On Policy": {
+    "commitment": {
+      "writer": "service provider",
+      "audience": "end user",
+      "object": "connecting your account to other services"
+    }
+  },
+  "Vulnerability Disclosure Policy": {
+    "commitment": {
+      "writer": "service provider",
+      "audience": "vulnerability reporter",
+      "object": "how to report a security vulnerability or issue"
+    }
+  },
+  "Legal Information": {
+    "commitment": {
+      "writer": "service provider",
+      "audience": "end user",
+      "object": "all term, conditions, and policies related to the use of the service"
+    }
   }
 }
