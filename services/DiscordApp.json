@@ -1,0 +1,10 @@
+{
+  "name": "DiscordApp",
+  "importedFrom": "https://github.com/tosdr/tosback2/blob/940c8d2ffb356473d324a3e0830723f39779de0c/rules/discordapp.com.xml",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://discordapp.com/terms",
+      "select": "body"
+    }
+  }
+}

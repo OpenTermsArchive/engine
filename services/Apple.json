@@ -4,6 +4,10 @@
     "Privacy Policy": {
       "fetch": "https://www.apple.com/legal/privacy/en-ww/",
       "select": "main"
+    },
+    "Terms of Service": {
+      "fetch": "http://www.apple.com/legal/internet-services/terms/site.html",
+      "select": "main.main"
     }
   }
 }
