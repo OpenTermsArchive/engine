@@ -1,0 +1,10 @@
+{
+  "name": "Youtube",
+  "importedFrom": "https://www.alexa.com/topsites",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.google.com/intl/en/policies/privacy/",
+      "select": "body"
+    }
+  }
+}

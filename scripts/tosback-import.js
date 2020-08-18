@@ -35,7 +35,7 @@ const THREADS = 5;
 const services = {};
 const urlAlreadyCovered = {};
 
-const typesMap = {
+export const typesMap = {
   'API Terms of Use': 'Developer Terms',
   'APIs Terms of Use': 'Developer Terms',
   'Acceptable Use Policy': 'Terms of Service',
@@ -162,7 +162,7 @@ async function processWhenReady(serviceName, docName, url, xpath, importedFrom) 
 }
 
 const pending = {};
-async function process(serviceName, docName, url, xpath, importedFrom) {
+export async function process(serviceName, docName, url, xpath, importedFrom) {
   console.log(serviceName, docName, 'start');
   if (urlAlreadyCovered[url]) {
     console.log(serviceName, docName, 'skip');
@@ -253,7 +253,7 @@ async function trySave(i) {
   }
 }
 
-async function readExistingServices() {
+export async function readExistingServices() {
   const serviceFiles = await fs.readdir(SERVICES_PATH);
   await Promise.all(serviceFiles.filter(x => x.endsWith('.json')).map(async serviceFile => {
     const content = JSON.parse(await fs.readFile(path.join(SERVICES_PATH, serviceFile)));
@@ -285,4 +285,4 @@ async function run(includeXml, includePsql) {
 }
 
 // Edit this line to run the Tosback / ToS;DR import(s) you want:
-run(false, true);
+run(false, false);

@@ -1,0 +1,10 @@
+{
+  "name": "Blogspot",
+  "importedFrom": "https://www.alexa.com/topsites",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://blogspot.com/go/privacy",
+      "select": "body"
+    }
+  }
+}
