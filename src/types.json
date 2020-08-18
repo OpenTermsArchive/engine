@@ -27,6 +27,13 @@
       "object": "products and services usage"
     }
   },
+  "Parent Organization Privacy Policy": {
+    "commitment": {
+      "writer": "parent organization",
+      "audience": "end user",
+      "object": "personal data"
+    }
+  },
   "Developer Terms": {
     "commitment": {
       "writer": "service provider",
@@ -46,6 +53,13 @@
       "writer": "service provider",
       "audience": "end user",
       "object": "acceptable usage"
+    }
+  },
+  "Restricted Use Policy": {
+    "commitment": {
+      "writer": "service provider",
+      "audience": "end user",
+      "object": "restricted usage"
     }
   },
   "Commercial Terms": {
@@ -88,6 +102,13 @@
       "writer": "service provider",
       "audience": "developer",
       "object": "usage of the service provider’s brand"
+    }
+  },
+  "Quality Guidelines": {
+    "commitment": {
+      "writer": "service provider",
+      "audience": "end user",
+      "object": "quality of content produced by means of the service"
     }
   },
   "Data Controller Agreement": {
@@ -144,6 +165,13 @@
       "writer": "service provider",
       "audience": "end user",
       "object": "all term, conditions, and policies related to the use of the service"
+    }
+  },
+  "Program Policies": {
+    "commitment": {
+      "writer": "service provider",
+      "audience": "program users",
+      "object": "program usage"
     }
   }
 }
