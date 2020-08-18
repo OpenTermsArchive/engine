@@ -5,7 +5,7 @@
       "fetch": "https://privacy.google.com/businesses/processorterms/",
       "select": ".ads-controller"
     },
-    "Cookies Policy": {
+    "Trackers Policy": {
       "fetch": "https://policies.google.com/technologies/ads",
       "select": "div[role=article]"
     },
