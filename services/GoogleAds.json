@@ -1,9 +1,9 @@
 {
-  "name": "Google Analytics",
+  "name": "Google Ads",
   "documents": {
     "Terms of Service": {
-      "fetch": "https://marketingplatform.google.com/about/analytics/terms/gb/",
-      "select": ".terms-section"
+      "fetch": "https://payments.google.com/payments/apis-secure/get_legal_document?ldi=31472",
+      "select": "body"
     },
     "Parent Organization Privacy Policy": {
       "fetch": "https://policies.google.com/privacy?hl=en-GB",
@@ -12,6 +12,14 @@
       ],
       "select": "div[role=article]",
       "remove": ".KMMDve, .TL2alc, img[src$='.svg']"
+    },
+    "Program Policies": {
+      "fetch": "https://support.google.com/adspolicy/answer/6008942",
+      "select": ".article-container"
+    },
+    "Data Controller Agreement": {
+      "fetch": "https://privacy.google.com/businesses/controllerterms/",
+      "select": ".ads-controller"
     },
     "Data Processor Agreement": {
       "fetch": "https://privacy.google.com/businesses/processorterms/",
@@ -25,9 +33,10 @@
       "fetch": "https://www.google.com/about/company/user-consent-policy/",
       "select": ".page-section" 
     },
-    "Data Controller Agreement": {
-      "fetch": "https://support.google.com/analytics/answer/9012600",
-      "select": ".article-container"
+    "Developer Terms": {
+      "fetch": "https://developers.google.com/adwords/api/docs/terms",
+      "select": ".devsite-article-body",
+      "remove": "style"
     }
   }
 }
