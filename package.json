@@ -8,11 +8,11 @@
     "node": ">=12.17"
   },
   "scripts": {
-    "start": "node index.js",
-    "start:prod": "NODE_ENV=production node index.js",
-    "start:scheduler": "node schedule.js",
-    "start:scheduler:prod": "NODE_ENV=production node schedule.js",
-    "refilter": "node refilter.js",
+    "start": "node src/index.js",
+    "start:prod": "NODE_ENV=production node src/index.js",
+    "start:scheduler": "node src/schedule.js",
+    "start:scheduler:prod": "NODE_ENV=production node src/schedule.js",
+    "refilter": "node src/refilter.js",
     "setup": "node scripts/setup.js",
     "lint": "./node_modules/eslint/bin/eslint.js ./test/**/*.js ./src/*.js ./src/**/*.js ./services/**/*.js",
     "posttest": "npm run lint",
