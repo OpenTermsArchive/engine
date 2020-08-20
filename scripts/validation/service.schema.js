@@ -49,8 +49,7 @@ const schema = {
       type: 'object',
       additionalProperties: false,
       required: [
-        'fetch',
-        'select'
+        'fetch'
       ],
       properties: {
         fetch: {
