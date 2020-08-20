@@ -21,5 +21,9 @@ export default async function fetch(url) {
 
   const blob = await response.blob();
 
-  return blob.text();
+  if (blob.type.startsWith('text/')) {
+    return blob.text();
+  }
+
+  return blob;
 }
