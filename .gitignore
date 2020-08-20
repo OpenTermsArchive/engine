@@ -5,3 +5,4 @@ node_modules
 vault.key
 data
 yarn.lock
+log/trace.log
