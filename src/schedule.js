@@ -1,7 +1,7 @@
 import schedule from 'node-schedule';
 
-import Notifier from './src/notifier/index.js';
-import CGUs from './src/index.js';
+import CGUs from './app/index.js';
+import Notifier from './notifier/index.js';
 
 (async () => {
   try {

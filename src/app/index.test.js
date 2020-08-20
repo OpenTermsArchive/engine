@@ -5,7 +5,7 @@ import nock from 'nock';
 
 import CGUs from './index.js';
 import { SNAPSHOTS_PATH, VERSIONS_PATH } from './history/index.js';
-import { resetGitRepository, gitVersion, gitSnapshot } from '../test/helper.js';
+import { resetGitRepository, gitVersion, gitSnapshot } from '../../test/helper.js';
 
 const fs = fsApi.promises;
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
@@ -15,15 +15,15 @@ const SERVICE_A_ID = 'service_A';
 const SERVICE_A_TYPE = 'Terms of Service';
 const SERVICE_A_EXPECTED_SNAPSHOT_FILE_PATH = `${SNAPSHOTS_PATH}/${SERVICE_A_ID}/${SERVICE_A_TYPE}.html`;
 const SERVICE_A_EXPECTED_VERSION_FILE_PATH = `${VERSIONS_PATH}/${SERVICE_A_ID}/${SERVICE_A_TYPE}.md`;
-const SERVICE_A_TOS_SNAPSHOT = fsApi.readFileSync(path.resolve(__dirname, '../test/fixtures/service_A_terms_snapshot.html'), { encoding: 'utf8' });
-const SERVICE_A_TOS_VERSION = fsApi.readFileSync(path.resolve(__dirname, '../test/fixtures/service_A_terms.md'), { encoding: 'utf8' });
+const SERVICE_A_TOS_SNAPSHOT = fsApi.readFileSync(path.resolve(__dirname, '../../test/fixtures/service_A_terms_snapshot.html'), { encoding: 'utf8' });
+const SERVICE_A_TOS_VERSION = fsApi.readFileSync(path.resolve(__dirname, '../../test/fixtures/service_A_terms.md'), { encoding: 'utf8' });
 
 const SERVICE_B_ID = 'service_B';
 const SERVICE_B_TYPE = 'Terms of Service';
 const SERVICE_B_EXPECTED_SNAPSHOT_FILE_PATH = `${SNAPSHOTS_PATH}/${SERVICE_B_ID}/${SERVICE_B_TYPE}.html`;
 const SERVICE_B_EXPECTED_VERSION_FILE_PATH = `${VERSIONS_PATH}/${SERVICE_B_ID}/${SERVICE_B_TYPE}.md`;
-const SERVICE_B_TOS_SNAPSHOT = fsApi.readFileSync(path.resolve(__dirname, '../test/fixtures/service_B_terms_snapshot.html'), { encoding: 'utf8' });
-const SERVICE_B_TOS_VERSION = fsApi.readFileSync(path.resolve(__dirname, '../test/fixtures/service_B_terms.md'), { encoding: 'utf8' });
+const SERVICE_B_TOS_SNAPSHOT = fsApi.readFileSync(path.resolve(__dirname, '../../test/fixtures/service_B_terms_snapshot.html'), { encoding: 'utf8' });
+const SERVICE_B_TOS_VERSION = fsApi.readFileSync(path.resolve(__dirname, '../../test/fixtures/service_B_terms.md'), { encoding: 'utf8' });
 
 describe('CGUs', () => {
   describe('#trackChanges', () => {

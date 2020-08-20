@@ -1,11 +1,11 @@
 import fsApi from 'fs';
-const fs = fsApi.promises;
 import path from 'path';
 
 import config from 'config';
 import inquirer from 'inquirer';
 import simpleGit from 'simple-git';
 
+const fs = fsApi.promises;
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
 
 const NEW_HISTORY_MESSAGE = 'Start a new local empty history';

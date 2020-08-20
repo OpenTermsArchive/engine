@@ -2,7 +2,7 @@ import fs from 'fs';
 
 import chai from 'chai';
 
-import { resetGitRepository, gitSnapshot } from '../../test/helper.js';
+import { resetGitRepository, gitSnapshot } from '../../../test/helper.js';
 import { SNAPSHOTS_PATH } from './index.js';
 import Recorder from './recorder.js';
 

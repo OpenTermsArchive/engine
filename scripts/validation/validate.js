@@ -6,9 +6,9 @@ import chai from 'chai';
 import config from 'config';
 import jsonSourceMap from 'json-source-map';
 
-import fetch from '../../src/fetcher/index.js';
-import filter from '../../src/filter/index.js';
-import loadServiceDeclarations from '../../src/loader/index.js';
+import fetch from '../../src/app/fetcher/index.js';
+import filter from '../../src/app/filter/index.js';
+import loadServiceDeclarations from '../../src/app/loader/index.js';
 import serviceSchema from './service.schema.js';
 
 const fs = fsApi.promises;
