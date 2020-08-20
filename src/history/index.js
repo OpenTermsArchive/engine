@@ -12,7 +12,15 @@ const snapshotRecorder = new Recorder({ path: SNAPSHOTS_PATH, fileExtension: 'ht
 const versionRecorder = new Recorder({ path: VERSIONS_PATH, fileExtension: 'md' });
 
 export async function recordSnapshot(serviceId, documentType, content) {
-  const isFirstRecord = !await snapshotRecorder.isTracked(serviceId, documentType);
+  return _recordSnapshot({ serviceId, documentType, content });
+}
+
+export async function recordPDFSnapshot(serviceId, documentType, content) {
+  return _recordSnapshot({ serviceId, documentType, content, fileExtension: 'pdf' });
+}
+
+export async function _recordSnapshot({ serviceId, documentType, content, fileExtension }) {
+  const isFirstRecord = !await snapshotRecorder.isTracked(serviceId, documentType, fileExtension);
   const prefix = isFirstRecord ? 'Start tracking' : 'Update';
   const changelog = `${prefix} ${serviceId} ${documentType}`;
 
@@ -20,7 +28,8 @@ export async function recordSnapshot(serviceId, documentType, content) {
     serviceId,
     documentType,
     content,
-    changelog
+    changelog,
+    fileExtension,
   });
 
   return {
