@@ -1,8 +1,10 @@
 import url from 'url';
 
+import jsdom from 'jsdom';
 import TurndownService from 'turndown';
 import turndownPluginGithubFlavouredMarkdown from 'joplin-turndown-plugin-gfm';
-import jsdom from 'jsdom';
+import mardownPdf from '@accordproject/markdown-pdf';
+import ciceroMark from '@accordproject/markdown-cicero';
 
 const { JSDOM } = jsdom;
 const turndownService = new TurndownService();
@@ -10,7 +12,25 @@ turndownService.use(turndownPluginGithubFlavouredMarkdown.gfm);
 
 export const LINKS_TO_CONVERT_SELECTOR = 'a[href]:not([href^="#"])';
 
-export default async function filter(content, { fetch: location, select: extractionSelectors = [], remove: deletionSelectors = [], filter: serviceSpecificFilters = [] }, filterFunctions) {
+export default async function filter({ content, documentDeclaration, filterFunctions, isPDF }) {
+  if (isPDF) {
+    return filterPDF({ content });
+  }
+
+  return filterHTML({
+    content,
+    documentDeclaration,
+    filterFunctions
+  });
+}
+
+export async function filterHTML({ content, documentDeclaration, filterFunctions }) {
+  const {
+    fetch: location,
+    select: extractionSelectors = [],
+    remove: deletionSelectors = [],
+    filter: serviceSpecificFilters = []
+  } = documentDeclaration;
   const virtualConsole = new jsdom.VirtualConsole();
   const jsdomInstance = new JSDOM(content, {
     url: location,
@@ -32,6 +52,18 @@ export default async function filter(content, { fetch: location, select: extract
   convertRelativeURLsToAbsolute(domFragment, location);
 
   return transform(domFragment);
+}
+
+export async function filterPDF({ content: pdfBuffer }) {
+  const { PdfTransformer } = mardownPdf;
+  const pdfTransformer = new PdfTransformer();
+
+  const { CiceroMarkTransformer } = ciceroMark;
+  const ciceroMarkTransformer = new CiceroMarkTransformer();
+
+  const ciceroMarkdown = await pdfTransformer.toCiceroMark(pdfBuffer);
+
+  return ciceroMarkTransformer.toMarkdown(ciceroMarkdown);
 }
 
 function selectRange(document, rangeSelector) {
