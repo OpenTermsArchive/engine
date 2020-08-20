@@ -20,16 +20,19 @@ const SERVICE_A_TOS_VERSION = fsApi.readFileSync(path.resolve(__dirname, '../tes
 
 const SERVICE_B_ID = 'service_B';
 const SERVICE_B_TYPE = 'Terms of Service';
-const SERVICE_B_EXPECTED_SNAPSHOT_FILE_PATH = `${SNAPSHOTS_PATH}/${SERVICE_B_ID}/${SERVICE_B_TYPE}.html`;
+const SERVICE_B_EXPECTED_SNAPSHOT_FILE_PATH = `${SNAPSHOTS_PATH}/${SERVICE_B_ID}/${SERVICE_B_TYPE}.pdf`;
 const SERVICE_B_EXPECTED_VERSION_FILE_PATH = `${VERSIONS_PATH}/${SERVICE_B_ID}/${SERVICE_B_TYPE}.md`;
-const SERVICE_B_TOS_SNAPSHOT = fsApi.readFileSync(path.resolve(__dirname, '../test/fixtures/service_B_terms_snapshot.html'), { encoding: 'utf8' });
+const SERVICE_B_TOS_SNAPSHOT = fsApi.readFileSync(path.resolve(__dirname, '../test/fixtures/service_B_terms_snapshot.pdf'));
 const SERVICE_B_TOS_VERSION = fsApi.readFileSync(path.resolve(__dirname, '../test/fixtures/service_B_terms.md'), { encoding: 'utf8' });
 
 describe('CGUs', () => {
+  before(async () => {
+    nock('https://www.servicea.example').persist().get('/tos').reply(200, SERVICE_A_TOS_SNAPSHOT, { 'Content-Type': 'text/html' });
+    nock('https://www.serviceb.example').persist().get('/tos').reply(200, SERVICE_B_TOS_SNAPSHOT, { 'Content-Type': 'application/pdf' });
+  });
+
   describe('#trackChanges', () => {
     before(async () => {
-      nock('https://www.servicea.example').get('/tos').reply(200, SERVICE_A_TOS_SNAPSHOT);
-      nock('https://www.serviceb.example').get('/tos').reply(200, SERVICE_B_TOS_SNAPSHOT);
       const app = new CGUs();
       await app.init();
       return app.trackChanges();
@@ -48,8 +51,8 @@ describe('CGUs', () => {
     });
 
     it('records snapshot for service B', async () => {
-      const resultingSnapshotTerms = await fs.readFile(path.resolve(__dirname, SERVICE_B_EXPECTED_SNAPSHOT_FILE_PATH), { encoding: 'utf8' });
-      expect(resultingSnapshotTerms).to.be.equal(SERVICE_B_TOS_SNAPSHOT);
+      const resultingSnapshotTerms = await fs.readFile(path.resolve(__dirname, SERVICE_B_EXPECTED_SNAPSHOT_FILE_PATH));
+      expect(resultingSnapshotTerms.equals(SERVICE_B_TOS_SNAPSHOT)).to.be.true;
     });
 
     it('records version for service B', async () => {
@@ -67,8 +70,6 @@ describe('CGUs', () => {
       let serviceBCommits;
 
       before(async () => {
-        nock('https://www.servicea.example').get('/tos').reply(200, SERVICE_A_TOS_SNAPSHOT);
-        nock('https://www.serviceb.example').get('/tos').reply(200, SERVICE_B_TOS_SNAPSHOT);
         const app = new CGUs();
         await app.init();
         await app.trackChanges();

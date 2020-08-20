@@ -66,7 +66,7 @@ export default class CGUs extends events.EventEmitter {
     const { type, fetch: location } = documentDeclaration;
     const logPrefix = `[${serviceName}-${type}]`;
     try {
-      const pageContent = await this.fetch({
+      let pageContent = await this.fetch({
         location,
         serviceId,
         type,
@@ -77,12 +77,19 @@ export default class CGUs extends events.EventEmitter {
         return;
       }
 
+      let isPDF;
+      if (pageContent.constructor.name == 'Blob' && pageContent.type == 'application/pdf') {
+        isPDF = true;
+        pageContent = Buffer.from(await pageContent.arrayBuffer());
+      }
+
       const snapshotId = await this.recordSnapshot({
         snapshotContent: pageContent,
         content: pageContent,
         serviceId,
         type,
-        logPrefix
+        logPrefix,
+        isPDF
       });
 
       if (!snapshotId) {
@@ -95,6 +102,7 @@ export default class CGUs extends events.EventEmitter {
         serviceId,
         documentDeclaration,
         logPrefix,
+        isPDF
       });
     } catch (error) {
       console.error(`${logPrefix} Error:`, error.message);
@@ -135,9 +143,13 @@ export default class CGUs extends events.EventEmitter {
       return;
     }
 
+    const isPDF = path.extname(snapshotPath) == '.pdf';
+
     let snapshotContent;
     try {
-      snapshotContent = await fs.readFile(snapshotPath, { encoding: 'utf8' });
+      snapshotContent = await fs.readFile(snapshotPath, {
+        encoding: !isPDF && 'utf8' // if PDF we want a buffer not an UTF-8 string
+      });
     } catch (error) {
       if (error.code === 'ENOENT') {
         return console.error(`The snapshot file ${snapshotPath} does not exist.`);
@@ -150,6 +162,7 @@ export default class CGUs extends events.EventEmitter {
       serviceId,
       documentDeclaration,
       logPrefix,
+      isPDF,
     });
   }
 
@@ -164,8 +177,9 @@ export default class CGUs extends events.EventEmitter {
   }
 
   /* eslint-disable class-methods-use-this */
-  async recordSnapshot({ content, serviceId, type, logPrefix }) {
-    const { id: snapshotId, path: snapshotPath } = await history.recordSnapshot(serviceId, type, content);
+  async recordSnapshot({ content, serviceId, type, logPrefix, isPDF }) {
+    const recordFunction = isPDF ? 'recordPDFSnapshot' : 'recordSnapshot';
+    const { id: snapshotId, path: snapshotPath } = await history[recordFunction](serviceId, type, content);
 
     if (!snapshotId) {
       return console.log(`${logPrefix} No changes, did not record snapshot.`);
@@ -176,9 +190,14 @@ export default class CGUs extends events.EventEmitter {
   }
   /* eslint-enable class-methods-use-this */
 
-  async recordRefilter({ snapshotContent, snapshotId, serviceId, documentDeclaration, logPrefix }) {
+  async recordRefilter({ snapshotContent, snapshotId, serviceId, documentDeclaration, logPrefix, isPDF }) {
     const { type } = documentDeclaration;
-    const document = await filter(snapshotContent, documentDeclaration, this._serviceDeclarations[serviceId].filters);
+    const document = await filter({
+      content: snapshotContent,
+      documentDeclaration,
+      filterFunctions: this._serviceDeclarations[serviceId].filters,
+      isPDF
+    });
 
     const { id: versionId, path: documentPath } = await history.recordRefilter(serviceId, type, document, snapshotId);
     if (versionId) {
@@ -189,9 +208,14 @@ export default class CGUs extends events.EventEmitter {
     }
   }
 
-  async recordVersion({ snapshotContent, snapshotId, serviceId, documentDeclaration, logPrefix }) {
+  async recordVersion({ snapshotContent, snapshotId, serviceId, documentDeclaration, logPrefix, isPDF }) {
     const { type } = documentDeclaration;
-    const document = await filter(snapshotContent, documentDeclaration, this._serviceDeclarations[serviceId].filters);
+    const document = await filter({
+      content: snapshotContent,
+      documentDeclaration,
+      filterFunctions: this._serviceDeclarations[serviceId].filters,
+      isPDF
+    });
 
     const { id: versionId, path: documentPath, isFirstRecord } = await history.recordVersion(serviceId, type, document, snapshotId);
     if (versionId) {
