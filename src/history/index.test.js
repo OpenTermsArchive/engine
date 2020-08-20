@@ -1,11 +1,13 @@
-import fs from 'fs';
+import fsApi from 'fs';
 import path from 'path';
+
 import chai from 'chai';
 
 import { resetGitRepository, gitSnapshot, gitVersion } from '../../test/helper.js';
 import { SNAPSHOTS_PATH, VERSIONS_PATH, recordSnapshot, recordPDFSnapshot, recordVersion, recordRefilter } from './index.js';
 
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
+const fs = fsApi.promises;
 const { expect } = chai;
 
 describe('History', () => {
@@ -32,8 +34,8 @@ describe('History', () => {
 
     after(resetGitRepository);
 
-    it('creates the file with the proper content', () => {
-      expect(fs.readFileSync(EXPECTED_FILE_PATH, { encoding: 'utf8' })).to.equal(FILE_CONTENT);
+    it('creates the file with the proper content', async () => {
+      expect(await fs.readFile(EXPECTED_FILE_PATH, { encoding: 'utf8' })).to.equal(FILE_CONTENT);
     });
 
     it('returns the file path', () => {
@@ -65,8 +67,8 @@ describe('History', () => {
         [ commit ] = commits;
       });
 
-      it('creates the file with the proper content', () => {
-        expect(fs.readFileSync(EXPECTED_FILE_PATH, { encoding: 'utf8' })).to.equal(MODIFIED_FILE_CONTENT);
+      it('creates the file with the proper content', async () => {
+        expect(await fs.readFile(EXPECTED_FILE_PATH, { encoding: 'utf8' })).to.equal(MODIFIED_FILE_CONTENT);
       });
 
       it('returns the file path', () => {
@@ -112,7 +114,7 @@ describe('History', () => {
     let isFirstRecord;
 
     before(async () => {
-      expectedPDFContent = fs.readFileSync(path.resolve(__dirname, '../../test/fixtures/terms.pdf'));
+      expectedPDFContent = await fs.readFile(path.resolve(__dirname, '../../test/fixtures/terms.pdf'));
       const { id: snapshotId, path: snapshotPath, isFirstRecord: isFirstSnapshotRecord } = await recordPDFSnapshot(SERVICE_ID, TYPE, expectedPDFContent);
       id = snapshotId;
       filepath = snapshotPath;
@@ -123,8 +125,9 @@ describe('History', () => {
 
     after(resetGitRepository);
 
-    it('creates the file with the proper content', () => {
-      expect(fs.readFileSync(EXPECTED_FILE_PATH).equals(expectedPDFContent)).to.be.true;
+    it('creates the file with the proper content', async () => {
+      const fileContent = await fs.readFile(EXPECTED_FILE_PATH);
+      expect(fileContent.equals(expectedPDFContent)).to.be.true;
     });
 
     it('returns the file path', () => {
@@ -147,7 +150,7 @@ describe('History', () => {
       const UPDATE_COMMIT_MESSAGE = `Update ${SERVICE_ID} ${TYPE}`;
 
       before(async () => {
-        expectedPDFContent = fs.readFileSync(path.resolve(__dirname, '../../test/fixtures/termsModified.pdf'));
+        expectedPDFContent = await fs.readFile(path.resolve(__dirname, '../../test/fixtures/termsModified.pdf'));
         const { id: snapshotId, path: snapshotPath, isFirstRecord: isFirstSnapshotRecord } = await recordPDFSnapshot(SERVICE_ID, TYPE, expectedPDFContent);
         id = snapshotId;
         filepath = snapshotPath;
@@ -156,8 +159,9 @@ describe('History', () => {
         [ commit ] = commits;
       });
 
-      it('creates the file with the proper content', () => {
-        expect(fs.readFileSync(EXPECTED_FILE_PATH).equals(expectedPDFContent)).to.be.true;
+      it('creates the file with the proper content', async () => {
+        const fileContent = await fs.readFile(EXPECTED_FILE_PATH);
+        expect(fileContent.equals(expectedPDFContent)).to.be.true;
       });
 
       it('returns the file path', () => {
@@ -214,8 +218,8 @@ describe('History', () => {
 
     after(resetGitRepository);
 
-    it('creates the file with the proper content', () => {
-      expect(fs.readFileSync(EXPECTED_FILE_PATH, { encoding: 'utf8' })).to.equal(FILE_CONTENT);
+    it('creates the file with the proper content', async () => {
+      expect(await fs.readFile(EXPECTED_FILE_PATH, { encoding: 'utf8' })).to.equal(FILE_CONTENT);
     });
 
     it('returns the file path', () => {
@@ -251,8 +255,8 @@ describe('History', () => {
         [ commit ] = commits;
       });
 
-      it('creates the file with the proper content', () => {
-        expect(fs.readFileSync(EXPECTED_FILE_PATH, { encoding: 'utf8' })).to.equal(MODIFIED_FILE_CONTENT);
+      it('creates the file with the proper content', async () => {
+        expect(await fs.readFile(EXPECTED_FILE_PATH, { encoding: 'utf8' })).to.equal(MODIFIED_FILE_CONTENT);
       });
 
       it('returns the file path', () => {
@@ -329,8 +333,8 @@ describe('History', () => {
     after(resetGitRepository);
 
     context('when it is the first record', () => {
-      it('creates the file with the proper content', () => {
-        expect(fs.readFileSync(EXPECTED_FILE_PATH, { encoding: 'utf8' })).to.equal(FILE_CONTENT);
+      it('creates the file with the proper content', async () => {
+        expect(await fs.readFile(EXPECTED_FILE_PATH, { encoding: 'utf8' })).to.equal(FILE_CONTENT);
       });
 
       it('returns the file path', () => {
@@ -367,8 +371,8 @@ describe('History', () => {
         [ commit ] = commits;
       });
 
-      it('creates the file with the proper content', () => {
-        expect(fs.readFileSync(EXPECTED_FILE_PATH, { encoding: 'utf8' })).to.equal(MODIFIED_FILE_CONTENT);
+      it('creates the file with the proper content', async () => {
+        expect(await fs.readFile(EXPECTED_FILE_PATH, { encoding: 'utf8' })).to.equal(MODIFIED_FILE_CONTENT);
       });
 
       it('returns the file path', () => {
