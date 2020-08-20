@@ -12,6 +12,7 @@ const SERVICE_PROVIDER_ID = 'test_service';
 const TYPE = 'Terms of Service';
 const FILE_CONTENT = 'ToS fixture data with UTF-8 çhãràčtęrs';
 const EXPECTED_FILE_PATH = `${SNAPSHOTS_PATH}/${SERVICE_PROVIDER_ID}/${TYPE}.html`;
+const EXPECTED_PDF_FILE_PATH = EXPECTED_FILE_PATH.replace('html', 'pdf');
 
 describe('Recorder', () => {
   let subject;
@@ -33,15 +34,32 @@ describe('Recorder', () => {
       it('creates a file for the given service', async () => {
         expect(fs.readFileSync(EXPECTED_FILE_PATH, { encoding: 'utf8' })).to.equal(FILE_CONTENT);
       });
+
+      context('With provided extension', () => {
+        let savedFilePath;
+
+        before(async () => {
+          savedFilePath = await subject.save({
+            serviceId: SERVICE_PROVIDER_ID,
+            documentType: TYPE,
+            content: FILE_CONTENT,
+            fileExtension: 'pdf',
+          });
+        });
+
+        after(resetGitRepository);
+
+        it('creates a file for the given service with the given extension', async () => {
+          expect(savedFilePath).to.equal(EXPECTED_PDF_FILE_PATH);
+        });
+      });
     });
 
     context('when service’s directory does not already exist', () => {
       const NEW_SERVICE_ID = 'test_not_existing_service';
       const NEW_SERVICE_EXPECTED_FILE_PATH = `${SNAPSHOTS_PATH}/${NEW_SERVICE_ID}/${TYPE}.html`;
 
-      after(() => {
-        fs.unlinkSync(NEW_SERVICE_EXPECTED_FILE_PATH);
-      });
+      after(resetGitRepository);
 
       it('creates a directory and file for the given service', async () => {
         await subject.save({
@@ -118,11 +136,36 @@ describe('Recorder', () => {
     it('saves the changelog in the commit message', () => {
       expect(commit.message).to.equal(changelog);
     });
+
+    context('With provided extension', () => {
+      before(async () => {
+        const { path: recordFilePath } = await subject.record({
+          serviceId: SERVICE_PROVIDER_ID,
+          documentType: TYPE,
+          content: FILE_CONTENT,
+          changelog,
+          fileExtension: 'pdf',
+        });
+        path = recordFilePath;
+      });
+
+      it('returns the file path with the proper extension', () => {
+        expect(path).to.equal(EXPECTED_PDF_FILE_PATH);
+      });
+    });
   });
 
   describe('#getPathFor', () => {
-    it('returns the file path for the given service provider’s document type', async () => {
-      expect(subject.getPathFor(SERVICE_PROVIDER_ID, TYPE)).to.equal(EXPECTED_FILE_PATH);
+    context('Without provided extension', () => {
+      it('returns the file path with default extension for the given service provider’s document type', async () => {
+        expect(subject.getPathFor(SERVICE_PROVIDER_ID, TYPE)).to.equal(EXPECTED_FILE_PATH);
+      });
+    });
+
+    context('With provided extension', () => {
+      it('returns the file path with given extension for the given service provider’s document type', async () => {
+        expect(subject.getPathFor(SERVICE_PROVIDER_ID, TYPE, 'pdf')).to.equal(EXPECTED_PDF_FILE_PATH);
+      });
     });
   });
 
@@ -186,32 +229,73 @@ describe('Recorder', () => {
   });
 
   describe('#getLatestRecord', () => {
-    let lastSnapshotId;
-    let latestRecord;
+    context('When there are records for given service', () => {
+      let lastSnapshotId;
+      let latestRecord;
 
-    before(async () => {
-      await subject.record({
-        serviceId: SERVICE_PROVIDER_ID,
-        documentType: TYPE,
-        content: FILE_CONTENT,
+      before(async () => {
+        await subject.record({
+          serviceId: SERVICE_PROVIDER_ID,
+          documentType: TYPE,
+          content: FILE_CONTENT,
+        });
+        const { id: recordId } = await subject.record({
+          serviceId: SERVICE_PROVIDER_ID,
+          documentType: TYPE,
+          content: `${FILE_CONTENT} (with additional content to trigger a record)`,
+        });
+        lastSnapshotId = recordId;
+        latestRecord = await subject.getLatestRecord(SERVICE_PROVIDER_ID, TYPE);
       });
-      const { id: recordId } = await subject.record({
-        serviceId: SERVICE_PROVIDER_ID,
-        documentType: TYPE,
-        content: `${FILE_CONTENT} (with additional content to trigger a record)`,
+
+      after(resetGitRepository);
+
+      it('returns the latest record id', async () => {
+        expect(latestRecord.id).to.include(lastSnapshotId);
       });
-      lastSnapshotId = recordId;
-      latestRecord = await subject.getLatestRecord(SERVICE_PROVIDER_ID, TYPE);
+
+      it('returns the latest record path', async () => {
+        expect(latestRecord.path).to.equal(EXPECTED_FILE_PATH);
+      });
+
+      context('With pdf file', () => {
+        before(async () => {
+          const { id: recordId } = await subject.record({
+            serviceId: SERVICE_PROVIDER_ID,
+            documentType: TYPE,
+            content: `${FILE_CONTENT} (with fake pdf file)`,
+            fileExtension: 'pdf'
+          });
+          lastSnapshotId = recordId;
+          latestRecord = await subject.getLatestRecord(SERVICE_PROVIDER_ID, TYPE);
+        });
+
+        after(resetGitRepository);
+
+        it('returns the latest record id', async () => {
+          expect(latestRecord.id).to.include(lastSnapshotId);
+        });
+
+        it('returns the latest record path', async () => {
+          expect(latestRecord.path).to.equal(EXPECTED_PDF_FILE_PATH);
+        });
+      });
     });
 
-    after(resetGitRepository);
+    context('When there are no record for given service', () => {
+      let latestRecord;
 
-    it('returns the latest record id', async () => {
-      expect(latestRecord.id).to.include(lastSnapshotId);
-    });
+      before(async () => {
+        latestRecord = await subject.getLatestRecord(SERVICE_PROVIDER_ID, TYPE);
+      });
 
-    it('returns the latest record path', async () => {
-      expect(latestRecord.path).to.equal(EXPECTED_FILE_PATH);
+      it('returns null for id', async () => {
+        expect(latestRecord.id).to.be.null;
+      });
+
+      it('returns null for path', async () => {
+        expect(latestRecord.path).to.be.null;
+      });
     });
   });
 });
