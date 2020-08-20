@@ -59,6 +59,11 @@ export default class Git {
     }
   }
 
+  async filesInCommit(sha) {
+    const result = await this.git.raw('show', '--name-only', '--pretty=format:', sha);
+    return result.trim().split('\n');
+  }
+
   async isTracked(filepath) {
     const result = await this.git.raw('ls-files', this.relativePath(filepath));
     return !!result;
