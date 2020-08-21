@@ -8,8 +8,13 @@ import simpleGit from 'simple-git';
 import { createRequire } from 'module';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import pg from 'pg';
+// eslint-disable-next-line import/no-extraneous-dependencies
+import pQueue from 'p-queue';
 import { assertValid, validateDocument } from './validation/validator.js';
 import serviceSchema from './validation/service.schema.js';
+
+const PQueue = pQueue.default;
+console.log(PQueue);
 
 // FIXME: Somehow Node.js ESM doesn't recognize this export:
 //
@@ -32,9 +37,13 @@ const TOSBACK2_RULES_FOLDER_NAME = 'rules';
 const TOSBACK2_CRAWLS_FOLDER_NAME = 'crawl_reviewed';
 const POSTGRES_URL = 'postgres://localhost/phoenix_development';
 const THREADS = 5;
+const SNAPSHOTS_PATH = 'data/snapshots/';
 
 const services = {};
 const urlAlreadyCovered = {};
+
+const HTML_PREFIX = '<!DOCTYPE html><html><head></head><body>';
+const HTML_SUFFIX = '</body></html>';
 
 const typesMap = {
   'API Terms of Use': 'Developer Terms',
@@ -105,6 +114,14 @@ const typesMap = {
   'end-user-license-agreement': 'Terms of Service'
 };
 
+function translateSnapshotPath(serviceName, fileName) {
+  const map = {
+    'google.com/Terms of Service.txt': 'Google/Terms of Service.html',
+    'google.com/Privacy Policy.txt': 'Google/Privacy Policy.html'
+  };
+  return map[`${serviceName}/${fileName}`];
+}
+
 function getLocalRulesFolder() {
   return path.join(LOCAL_TOSBACK2_REPO, TOSBACK2_RULES_FOLDER_NAME);
 }
@@ -147,23 +164,31 @@ function toType(str) {
   return found;
 }
 
-const queue = [];
-let running = 0;
+// class TaskQueue {
+//   constructor(threads = 1) {
+//     this.queue = [];
+//     this.running = 0;
+//     this.threads = threads;
+//   }
+
+//   async addTask(task) {
+//     this.queue.push(task);
+//     if (this.queue.length && this.running < this.threads) {
+//       this.running++;
+//       console.log(`Next task (${this.queue.length} tasks left, running ${this.running} in parallel)`);
+//       const thisTask = this.queue.shift();
+//       await thisTask();
+//       this.running--;
+//       return this.run();
+//     }
+//   }
+// }
+
+const queue = new PQueue({ concurrency: THREADS });
 
 async function processWhenReady(serviceName, docName, url, xpath, importedFrom) {
   console.log(serviceName, docName, 'queued');
-  queue.push(() => process(serviceName, docName, url, xpath, importedFrom));
-  async function next() {
-    if (queue.length && running < THREADS) {
-      running++;
-      console.log(`Next task (${queue.length} tasks left, running ${running} in parallel)`);
-      const thisTask = queue.shift();
-      await thisTask();
-      running--;
-      next();
-    }
-  }
-  next();
+  queue.add(() => process(serviceName, docName, url, xpath, importedFrom));
 }
 
 const pending = {};
@@ -222,6 +247,13 @@ function getTosbackGit() {
     maxConcurrentProcesses: 6,
   });
 }
+function getSnapshotGit() {
+  return simpleGit({
+    baseDir: SNAPSHOTS_PATH,
+    binary: 'git',
+    maxConcurrentProcesses: 6,
+  });
+}
 
 async function parseAllGitXml(folder, only) {
   const git = getTosbackGit();
@@ -255,9 +287,12 @@ async function parseAllPg(connectionString) {
   await Promise.all(res.rows.map(row => processWhenReady(row.service, row.name, row.url, row.xpath)));
   await client.end();
 }
-async function importCrawls(folder, only) {
-  const git = getTosbackGit();
 
+async function importCrawls(folder, only) {
+  const tosbackGitSemaphore = new PQueue({ concurrency: 1 });
+  const snapshotGitSemaphore = new PQueue({ concurrency: 1 });
+  const tosbackGit = getTosbackGit();
+  const snapshotGit = getSnapshotGit();
   const domainNames = await fs.readdir(folder);
   const domainPromises = domainNames.map(async domainName => {
     if (only && domainName !== only) {
@@ -269,10 +304,32 @@ async function importCrawls(folder, only) {
     const filePromises = fileNames.map(async fileName => {
       const filePath = path.join(TOSBACK2_CRAWLS_FOLDER_NAME, domainName, fileName);
       console.log('filePath', filePath);
-      // See https://github.com/steveukx/git-js/blob/80741ac/src/git.js#L891
-      const gitLog = await git.log({ file: filePath });
-      const thisFileCommits = gitLog.all.map(line => line.hash);
+      let thisFileCommits;
+      await tosbackGitSemaphore.add(async () => {
+        tosbackGit.checkout('master');
+        // See https://github.com/steveukx/git-js/blob/80741ac/src/git.js#L891
+        const gitLog = await tosbackGit.log({ file: filePath });
+        thisFileCommits = gitLog.all;
+      });
       console.log(fileName, thisFileCommits);
+      const commitPromises = thisFileCommits.map(async commit => {
+        let html;
+        await tosbackGitSemaphore.add(async () => {
+          console.log('tosback git checkout', commit.hash);
+          tosbackGit.checkout(commit.hash);
+          console.log('Reading file', path.join(LOCAL_TOSBACK2_REPO, filePath));
+          const fileTxtAtCommit = await fs.readFile(path.join(LOCAL_TOSBACK2_REPO, filePath));
+          html = HTML_PREFIX + fileTxtAtCommit + HTML_SUFFIX;
+        });
+        await snapshotGitSemaphore.add(async () => {
+          const destPath = path.join(SNAPSHOTS_PATH, translateSnapshotPath(domainName, fileName));
+          console.log('saving', destPath);
+          await fs.writeFile(destPath, html);
+          console.log('committing', destPath, `From tosback2 ${commit.hash}`);
+          await snapshotGit.commit(`From tosback2 ${commit.hash}`, [ '-a', `--date="${commit.date}"` ]);
+        });
+      })
+      return Promise.all(commitPromises);
     });
     return Promise.all(filePromises);
   });
