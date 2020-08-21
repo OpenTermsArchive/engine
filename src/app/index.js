@@ -13,7 +13,7 @@ const fs = fsApi.promises;
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
 const SERVICE_DECLARATIONS_PATH = path.resolve(__dirname, '../../', config.get('serviceDeclarationsPath'));
 
-const AVAILABLE_EVENTS = [
+export const AVAILABLE_EVENTS = [
   'startTrackingChanges',
   'endTrackingChanges',
   'startRefiltering',

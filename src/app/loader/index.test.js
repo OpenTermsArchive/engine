@@ -22,7 +22,7 @@ const expected = {
   service_B: {
     name: 'Service B',
     documents: {
-      'Terms of Service': {
+      'Privacy Policy': {
         fetch: 'https://www.serviceb.example/tos',
         select: 'body'
       }
