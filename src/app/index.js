@@ -28,6 +28,7 @@ const AVAILABLE_EVENTS = [
   'applicationError',
   'documentUpdateError',
   'documentFetchError',
+  'recordRefilterError',
 ];
 
 export default class CGUs extends events.EventEmitter {
@@ -194,15 +195,19 @@ export default class CGUs extends events.EventEmitter {
 
   async recordRefilter({ snapshotContent, snapshotId, serviceId, documentDeclaration }) {
     const { type } = documentDeclaration;
-    const document = await filter(snapshotContent, documentDeclaration, this._serviceDeclarations[serviceId].filters);
+    try {
+      const document = await filter(snapshotContent, documentDeclaration, this._serviceDeclarations[serviceId].filters);
 
-    const { id: versionId, isFirstRecord } = await history.recordRefilter(serviceId, type, document, snapshotId);
+      const { id: versionId, isFirstRecord } = await history.recordRefilter(serviceId, type, document, snapshotId);
 
-    if (!versionId) {
-      return this.emit('noVersionChanges', serviceId, type);
+      if (!versionId) {
+        return this.emit('noVersionChanges', serviceId, type);
+      }
+
+      this.emit(isFirstRecord ? 'firstVersionRecorded' : 'versionRecorded', serviceId, type, versionId);
+    } catch (error) {
+      this.emit('recordRefilterError', serviceId, type, error);
     }
-
-    this.emit(isFirstRecord ? 'firstVersionRecorded' : 'versionRecorded', serviceId, type, versionId);
   }
 
   async recordVersion({ snapshotContent, snapshotId, serviceId, documentDeclaration }) {
