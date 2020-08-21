@@ -1,6 +1,7 @@
 import schedule from 'node-schedule';
 
 import CGUs from './app/index.js';
+import * as logger from './logger/index.js';
 import Notifier from './notifier/index.js';
 
 (async () => {
@@ -13,6 +14,7 @@ import Notifier from './notifier/index.js';
 
     const app = new CGUs();
     await app.init();
+    await app.attach(logger);
     await app.refilterAndRecord();
 
     const notifier = new Notifier(app.serviceDeclarations);

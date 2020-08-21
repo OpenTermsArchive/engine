@@ -61,7 +61,7 @@ export default class CGUs extends events.EventEmitter {
 
   async trackChanges(serviceToTrack) {
     try {
-      console.log('\nStart tracking changes…');
+      this.emit('startTrackingChanges');
 
       const services = serviceToTrack ? { [serviceToTrack]: this._serviceDeclarations[serviceToTrack] } : this._serviceDeclarations;
 
@@ -83,22 +83,21 @@ export default class CGUs extends events.EventEmitter {
 
       await Promise.all(documentTrackingPromises);
 
-      return this.publish();
+      await this.publish();
+      this.emit('endTrackingChanges');
     } catch (error) {
-      console.error(`Error when trying to track changes: ${error}`);
       this.emit('applicationError', error);
     }
   }
 
-  async trackDocumentChanges({ serviceId, serviceName, document: documentDeclaration }) {
+  async trackDocumentChanges({ serviceId, document: documentDeclaration }) {
     const { type, fetch: location } = documentDeclaration;
-    const logPrefix = `[${serviceName}-${type}]`;
+
     try {
       const pageContent = await this.fetch({
         location,
         serviceId,
         type,
-        logPrefix,
       });
 
       if (!pageContent) {
@@ -109,8 +108,7 @@ export default class CGUs extends events.EventEmitter {
         snapshotContent: pageContent,
         content: pageContent,
         serviceId,
-        type,
-        logPrefix
+        type
       });
 
       if (!snapshotId) {
@@ -121,18 +119,15 @@ export default class CGUs extends events.EventEmitter {
         snapshotContent: pageContent,
         snapshotId,
         serviceId,
-        documentDeclaration,
-        logPrefix,
+        documentDeclaration
       });
     } catch (error) {
-      console.error(`${logPrefix} Error:`, error.message);
       this.emit('documentUpdateError', serviceId, type, error);
     }
   }
 
   async refilterAndRecord(serviceToTrack) {
-    console.log('\nRefiltering documents… (it could take a while)');
-
+    this.emit('startRefiltering');
     const services = serviceToTrack ? { [serviceToTrack]: this._serviceDeclarations[serviceToTrack] } : this._serviceDeclarations;
 
     const refilterAndRecordDocumentPromises = [];
@@ -151,7 +146,8 @@ export default class CGUs extends events.EventEmitter {
       });
     });
 
-    return Promise.all(refilterAndRecordDocumentPromises);
+    await Promise.all(refilterAndRecordDocumentPromises);
+    this.emit('endRefiltering');
   }
 
   async refilterAndRecordDocument({ serviceId, serviceName, document: documentDeclaration }) {
@@ -168,7 +164,7 @@ export default class CGUs extends events.EventEmitter {
       snapshotContent = await fs.readFile(snapshotPath, { encoding: 'utf8' });
     } catch (error) {
       if (error.code === 'ENOENT') {
-        return console.error(`The snapshot file ${snapshotPath} does not exist.`);
+        throw new Error(`The snapshot file ${snapshotPath} does not exist.`);
       }
     }
 
@@ -181,56 +177,49 @@ export default class CGUs extends events.EventEmitter {
     });
   }
 
-  async fetch({ location, serviceId, type, logPrefix }) {
-    console.log(`${logPrefix} Fetch '${location}'.`);
+  async fetch({ location, serviceId, type }) {
     try {
       return await fetch(location);
     } catch (error) {
-      console.error(`${logPrefix} Could not fetch location: ${error}`);
       this.emit('documentFetchError', serviceId, type, error);
     }
   }
 
-  /* eslint-disable class-methods-use-this */
-  async recordSnapshot({ content, serviceId, type, logPrefix }) {
-    const { id: snapshotId, path: snapshotPath } = await history.recordSnapshot(serviceId, type, content);
+  async recordSnapshot({ content, serviceId, type }) {
+    const { id: snapshotId, isFirstRecord } = await history.recordSnapshot(serviceId, type, content);
 
     if (!snapshotId) {
-      return console.log(`${logPrefix} No changes, did not record snapshot.`);
+      return this.emit('noSnapshotChanges', serviceId, type);
     }
 
-    console.log(`${logPrefix} Recorded snapshot in ${snapshotPath} with id ${snapshotId}.`);
+    this.emit(isFirstRecord ? 'firstSnapshotRecorded' : 'snapshotRecorded', serviceId, type, snapshotId);
     return snapshotId;
   }
-  /* eslint-enable class-methods-use-this */
 
-  async recordRefilter({ snapshotContent, snapshotId, serviceId, documentDeclaration, logPrefix }) {
+  async recordRefilter({ snapshotContent, snapshotId, serviceId, documentDeclaration }) {
     const { type } = documentDeclaration;
     const document = await filter(snapshotContent, documentDeclaration, this._serviceDeclarations[serviceId].filters);
 
-    const { id: versionId, path: documentPath } = await history.recordRefilter(serviceId, type, document, snapshotId);
-    if (versionId) {
-      console.log(`${logPrefix} Recorded version in ${documentPath} with id ${versionId}.`);
-      this.emit('versionRecorded', serviceId, type, versionId);
-    } else {
-      console.log(`${logPrefix} No changes after filtering, did not record version.`);
+    const { id: versionId, isFirstRecord } = await history.recordRefilter(serviceId, type, document, snapshotId);
+
+    if (!versionId) {
+      return this.emit('noVersionChanges', serviceId, type);
     }
+
+    this.emit(isFirstRecord ? 'firstVersionRecorded' : 'versionRecorded', serviceId, type, versionId);
   }
 
-  async recordVersion({ snapshotContent, snapshotId, serviceId, documentDeclaration, logPrefix }) {
+  async recordVersion({ snapshotContent, snapshotId, serviceId, documentDeclaration }) {
     const { type } = documentDeclaration;
     const document = await filter(snapshotContent, documentDeclaration, this._serviceDeclarations[serviceId].filters);
 
-    const { id: versionId, path: documentPath, isFirstRecord } = await history.recordVersion(serviceId, type, document, snapshotId);
-    if (versionId) {
-      const message = isFirstRecord
-        ? `${logPrefix} First version recorded in ${documentPath} with id ${versionId}.`
-        : `${logPrefix} Recorded version in ${documentPath} with id ${versionId}.`;
-      console.log(message);
-      this.emit(isFirstRecord ? 'documentAdded' : 'versionRecorded', serviceId, type, versionId);
-    } else {
-      console.log(`${logPrefix} No changes after filtering, did not record version.`);
+    const { id: versionId, isFirstRecord } = await history.recordVersion(serviceId, type, document, snapshotId);
+
+    if (!versionId) {
+      return this.emit('noVersionChanges', serviceId, type);
     }
+
+    this.emit(isFirstRecord ? 'firstVersionRecorded' : 'versionRecorded', serviceId, type, versionId);
   }
 
   async publish() {
@@ -239,7 +228,6 @@ export default class CGUs extends events.EventEmitter {
     }
 
     await history.publish();
-    console.log('Changes published');
     this.emit('changesPublished');
   }
 }
