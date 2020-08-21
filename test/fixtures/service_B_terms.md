@@ -1,5 +1,5 @@
-Terms of service
-================
+Terms of service B
+==================
 
 Dapibus quis diam sagittis vitae orci fames fusce porta metus risus, gravida pharetra cras rhoncus nullam tempor purus mattis sit condimentum senectus, a sodales varius in natoque molestie tortor velit quisque. Parturient sit facilisis risus dictumst quisque penatibus donec, mollis ultrices nibh viverra consequat porttitor dignissim laoreet, auctor fermentum himenaeos ut fusce volutpat. Dignissim nulla penatibus lacus at augue sem hendrerit sit, et potenti cum aptent ultricies aliquam habitant, porta lobortis cubilia primis sociis nascetur etiam. Torquent duis facilisis aliquam est purus curae quam sit porta, augue netus laoreet per pharetra volutpat lectus sem commodo, senectus primis arcu suspendisse id vivamus consequat sapien. Litora eros hendrerit commodo eleifend scelerisque risus in fusce porttitor cubilia ultrices porta sed blandit cras condimentum quisque, class accumsan odio enim magna tempus facilisis auctor imperdiet fringilla arcu tristique volutpat faucibus molestie velit. Per quam tristique tortor viverra tempus class varius condimentum, curabitur tellus cras fusce elementum velit cubilia, hendrerit orci vestibulum libero in enim gravida. Eget praesent dictumst lobortis pretium dignissim at viverra tempus fusce potenti, in morbi nascetur purus natoque sagittis phasellus urna sit commodo, ad tortor hendrerit ante mauris venenatis dolor consequat donec.
 
