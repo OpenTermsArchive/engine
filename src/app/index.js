@@ -17,6 +17,23 @@ const fs = fsApi.promises;
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
 const SERVICE_DECLARATIONS_PATH = path.resolve(__dirname, '../../', config.get('serviceDeclarationsPath'));
 
+const AVAILABLE_EVENTS = [
+  'startTrackingChanges',
+  'endTrackingChanges',
+  'startRefiltering',
+  'endRefiltering',
+  'snapshotRecorded',
+  'firstSnapshotRecorded',
+  'noSnapshotChanges',
+  'versionRecorded',
+  'firstVersionRecorded',
+  'noVersionChanges',
+  'changesPublished',
+  'applicationError',
+  'documentUpdateError',
+  'documentFetchError',
+];
+
 export default class CGUs extends events.EventEmitter {
   get serviceDeclarations() {
     return this._serviceDeclarations;
@@ -29,6 +46,17 @@ export default class CGUs extends events.EventEmitter {
     }
 
     return this.initialized;
+  }
+
+  attach(listener) {
+    AVAILABLE_EVENTS.forEach(event => {
+      const handlerName = `on${event[0].toUpperCase()}${event.substr(1)}`;
+
+      if (Object.prototype.hasOwnProperty.call(listener, handlerName)
+      || Object.prototype.hasOwnProperty.call(listener.constructor.prototype, handlerName)) {
+        this.on(event, listener[handlerName].bind(listener));
+      }
+    });
   }
 
   async trackChanges(serviceToTrack) {
