@@ -18,24 +18,7 @@ import Notifier from './notifier/index.js';
     await app.refilterAndRecord();
 
     const notifier = new Notifier(app.serviceDeclarations);
-
-    let delayedVersionNotificationsParams = [];
-
-    app.on('versionRecorded', (serviceId, type, versionId) => {
-      delayedVersionNotificationsParams.push({ serviceId, type, versionId });
-    });
-
-    app.on('changesPublished', () => {
-      delayedVersionNotificationsParams.forEach(({ serviceId, type, versionId }) => {
-        notifier.onVersionRecorded(serviceId, type, versionId);
-      });
-      delayedVersionNotificationsParams = [];
-    });
-
-    app.on('documentFetchError', notifier.onDocumentFetchError.bind(notifier));
-    app.on('documentUpdateError', notifier.onDocumentUpdateError.bind(notifier));
-    app.on('publicationError', error => notifier.onApplicationError(error));
-    app.on('applicationError', error => notifier.onApplicationError(error));
+    await app.attach(notifier);
 
     schedule.scheduleJob(rule, () => {
       app.trackChanges();
