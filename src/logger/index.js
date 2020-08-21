@@ -1,59 +1,84 @@
+import winston from 'winston';
+
+const { combine, timestamp, align, printf, colorize } = winston.format;
+
+const alignedWithColorsAndTime = combine(colorize(),
+  timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
+  align(),
+  printf(({ level, message, timestamp, serviceId, type }) => {
+    let prefix = '';
+    if (serviceId && type) {
+      prefix = `${serviceId} — ${type}`;
+    }
+    return `${timestamp} ${level.padEnd(15)} ${prefix.padEnd(55)} ${message}`;
+  }));
+
+const logger = winston.createLogger({
+  format: alignedWithColorsAndTime,
+  transports: [
+    new winston.transports.Console({
+      handleExceptions: true
+    }),
+  ],
+  exitOnError: false
+});
+
 export function onStartTrackingChanges() {
-  console.log('Start tracking changes…');
+  logger.info({ message: 'Start tracking changes…' });
 }
 
 export function onEndTrackingChanges() {
-  console.log('\n');
+  logger.info({ message: 'Tracking changes done.' });
 }
 
 export function onStartRefiltering() {
-  console.log('Refiltering documents… (it could take a while)');
+  logger.info({ message: 'Refiltering documents… (it could take a while)' });
 }
 
 export function onEndRefiltering() {
-  console.log('\n');
+  logger.info({ message: 'Refiltering done.' });
 }
 
-export function onFirstSnapshotRecorded(serviceId, type, versionId) {
-  console.log(logPrefix(serviceId, type), `Recorded first snapshot with id ${versionId}.`);
+export function onFirstSnapshotRecorded(serviceId, type, snapshotId) {
+  logger.info({ message: `Recorded first snapshot with id ${snapshotId}.`, serviceId, type });
 }
 
 export function onSnapshotRecorded(serviceId, type, snapshotId) {
-  console.log(logPrefix(serviceId, type), `Recorded snapshot with id ${snapshotId}.`);
+  logger.info({ message: `Recorded snapshot with id ${snapshotId}.`, serviceId, type });
 }
 
 export function onNoSnapshotChanges(serviceId, type) {
-  console.log(logPrefix(serviceId, type), 'No changes, did not record snapshot.');
+  logger.info({ message: 'No changes, did not record snapshot.', serviceId, type });
 }
 
 export function onFirstVersionRecorded(serviceId, type, versionId) {
-  console.log(logPrefix(serviceId, type), `Recorded first version with id ${versionId}.`);
+  logger.info({ message: `Recorded first version with id ${versionId}.`, serviceId, type });
 }
 
 export function onVersionRecorded(serviceId, type, versionId) {
-  console.log(logPrefix(serviceId, type), `Recorded version with id ${versionId}.`);
+  logger.info({ message: `Recorded version with id ${versionId}.`, serviceId, type });
 }
 
 export function onNoVersionChanges(serviceId, type) {
-  console.log(logPrefix(serviceId, type), 'No changes after filtering, did not record version.');
+  logger.info({ message: 'No changes after filtering, did not record version.', serviceId, type });
 }
 
 export function onChangesPublished() {
-  console.log('Changes published');
+  logger.info({ message: 'Changes published' });
 }
 
 export function onApplicationError(error) {
-  console.error('ApplicationError', error);
+  logger.error({ message: `ApplicationError: ${error}` });
+}
+
+export function onRecordRefilterError(serviceId, type, error) {
+  logger.error({ message: `Could not refilter: ${error}`, serviceId, type });
 }
 
 export function onDocumentUpdateError(serviceId, type, error) {
-  console.error(logPrefix(serviceId, type), `Could not update document: ${error}`);
+  logger.error({ message: `Could not update document: ${error}`, serviceId, type });
 }
 
 export function onDocumentFetchError(serviceId, type, error) {
-  console.error(logPrefix(serviceId, type), `Could not fetch location: ${error}`);
-}
-
-function logPrefix(serviceId, type) {
-  return `[${serviceId}-${type}]`;
+  logger.error({ message: `Could not fetch document: ${error}`, serviceId, type });
 }

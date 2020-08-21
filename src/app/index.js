@@ -4,14 +4,10 @@ import events from 'events';
 
 import config from 'config';
 
-import consoleStamp from 'console-stamp';
-
 import * as history from './history/index.js';
 import fetch from './fetcher/index.js';
 import filter from './filter/index.js';
 import loadServiceDeclarations from './loader/index.js';
-
-consoleStamp(console);
 
 const fs = fsApi.promises;
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
