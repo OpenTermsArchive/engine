@@ -29,6 +29,7 @@ const SERVICES_PATH = './services/';
 const LOCAL_TOSBACK2_REPO = '../../tosdr/tosback2';
 const TOSBACK2_WEB_ROOT = 'https://github.com/tosdr/tosback2';
 const TOSBACK2_RULES_FOLDER_NAME = 'rules';
+const TOSBACK2_CRAWLS_FOLDER_NAME = 'crawl_reviewed';
 const POSTGRES_URL = 'postgres://localhost/phoenix_development';
 const THREADS = 5;
 
@@ -106,6 +107,10 @@ const typesMap = {
 
 function getLocalRulesFolder() {
   return path.join(LOCAL_TOSBACK2_REPO, TOSBACK2_RULES_FOLDER_NAME);
+}
+
+function getLocalCrawlsFolder() {
+  return path.join(LOCAL_TOSBACK2_REPO, TOSBACK2_CRAWLS_FOLDER_NAME);
 }
 
 function getGitHubWebUrl(commitHash, filename) {
@@ -210,13 +215,25 @@ async function processTosback2(importedFrom, imported) {
   return Promise.all(promises);
 }
 
-async function parseAllGitXml(folder) {
-  const git = simpleGit(folder);
+function getTosbackGit() {
+  return simpleGit({
+    baseDir: LOCAL_TOSBACK2_REPO,
+    binary: 'git',
+    maxConcurrentProcesses: 6,
+  });
+}
+
+async function parseAllGitXml(folder, only) {
+  const git = getTosbackGit();
   const gitLog = await git.log();
   const commitHash = gitLog.latest.hash;
 
   const files = await fs.readdir(folder);
   const promises = files.map(async filename => {
+    if (only && filename !== `${only}.xml`) {
+      // console.log(`Skipping ${filename}, only looking for ${only}.xml.`);
+      return;
+    }
     let imported;
     try {
       imported = JSON.parse(await parseFile(path.join(folder, filename)));
@@ -237,6 +254,29 @@ async function parseAllPg(connectionString) {
   const res = await client.query('SELECT d.name, d.xpath, d.url, s.url as domains, s.name as service from documents d inner join services s on d.service_id=s.id');
   await Promise.all(res.rows.map(row => processWhenReady(row.service, row.name, row.url, row.xpath)));
   await client.end();
+}
+async function importCrawls(folder, only) {
+  const git = getTosbackGit();
+
+  const domainNames = await fs.readdir(folder);
+  const domainPromises = domainNames.map(async domainName => {
+    if (only && domainName !== only) {
+      // console.log(`Skipping ${domainName}, only looking for ${only}.`);
+      return;
+    }
+    console.log('Found!', domainName);
+    const fileNames = await fs.readdir(path.join(folder, domainName));
+    const filePromises = fileNames.map(async fileName => {
+      const filePath = path.join(TOSBACK2_CRAWLS_FOLDER_NAME, domainName, fileName);
+      console.log('filePath', filePath);
+      // See https://github.com/steveukx/git-js/blob/80741ac/src/git.js#L891
+      const gitLog = await git.log({ file: filePath });
+      const thisFileCommits = gitLog.all.map(line => line.hash);
+      console.log(fileName, thisFileCommits);
+    });
+    return Promise.all(filePromises);
+  });
+  await Promise.all(domainPromises);
 }
 
 async function trySave(i) {
@@ -273,16 +313,19 @@ async function readExistingServices() {
   return urlAlreadyCovered;
 }
 
-async function run(includeXml, includePsql) {
+async function run(includeXml, includePsql, includeCrawls, only) {
   await readExistingServices();
 
   if (includeXml) {
-    await parseAllGitXml(getLocalRulesFolder());
+    await parseAllGitXml(getLocalRulesFolder(), only);
   }
   if (includePsql) {
     await parseAllPg(POSTGRES_URL, services);
   }
+  if (includeCrawls) {
+    await importCrawls(getLocalCrawlsFolder(), only);
+  }
 }
 
-// Edit this line to run the Tosback / ToS;DR import(s) you want:
-run(false, true);
+// Edit this line to run the Tosback rules / ToS;DR rules / Tosback crawls import(s) you want:
+run(false, false, true, 'google.com');
