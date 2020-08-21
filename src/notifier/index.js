@@ -14,6 +14,18 @@ export default class Notifier {
     this.contactsInstance = new sendInBlue.ContactsApi();
 
     this.serviceProviders = passedServiceProviders;
+    this.delayedVersionNotificationsParams = [];
+  }
+
+  async onVersionRecorded(serviceId, type, versionId) {
+    this.delayedVersionNotificationsParams.push({ serviceId, type, versionId });
+  }
+
+  async onChangesPublished() {
+    this.delayedVersionNotificationsParams.forEach(({ serviceId, type, versionId }) => {
+      this.notifyVersionRecorded(serviceId, type, versionId);
+    });
+    this.delayedVersionNotificationsParams = [];
   }
 
   async onDocumentFetchError(serviceProviderId, documentTypeId, error) {
@@ -30,7 +42,7 @@ export default class Notifier {
     return this.send([ config.get('notifier.sendInBlue.administratorsListId') ], sendParams);
   }
 
-  async onVersionRecorded(serviceProviderId, documentTypeId, versionId) {
+  async notifyVersionRecorded(serviceProviderId, documentTypeId, versionId) {
     const sendParams = {
       templateId: config.get('notifier.sendInBlue.updateTemplateId'),
       params: {
