@@ -42,8 +42,8 @@ const SNAPSHOTS_PATH = 'data/snapshots/';
 const services = {};
 const urlAlreadyCovered = {};
 
-const HTML_PREFIX = '<!DOCTYPE html><html><head></head><body>';
-const HTML_SUFFIX = '</body></html>';
+const HTML_PREFIX = '<!DOCTYPE html><html><head></head><body>\n';
+const HTML_SUFFIX = '\n</body></html>';
 
 const typesMap = {
   'API Terms of Use': 'Developer Terms',
@@ -293,6 +293,11 @@ async function importCrawls(folder, only) {
   const snapshotGitSemaphore = new PQueue({ concurrency: 1 });
   const tosbackGit = getTosbackGit();
   const snapshotGit = getSnapshotGit();
+  console.log('Tosback2 git checkout master');
+  await tosbackGit.checkout('master');
+  console.log('Tosback2 git pull');
+  await tosbackGit.pull();
+  console.log('Tosback2 gathering domain names');
   const domainNames = await fs.readdir(folder);
   const domainPromises = domainNames.map(async domainName => {
     if (only && domainName !== only) {
@@ -316,7 +321,7 @@ async function importCrawls(folder, only) {
         let html;
         await tosbackGitSemaphore.add(async () => {
           console.log('tosback git checkout', commit.hash);
-          tosbackGit.checkout(commit.hash);
+          await tosbackGit.checkout(commit.hash);
           console.log('Reading file', path.join(LOCAL_TOSBACK2_REPO, filePath));
           const fileTxtAtCommit = await fs.readFile(path.join(LOCAL_TOSBACK2_REPO, filePath));
           html = HTML_PREFIX + fileTxtAtCommit + HTML_SUFFIX;
@@ -334,6 +339,8 @@ async function importCrawls(folder, only) {
     return Promise.all(filePromises);
   });
   await Promise.all(domainPromises);
+  console.log('Setting Tosback2 repo back to master');
+  await tosbackGit.checkout('master');
 }
 
 async function trySave(i) {
