@@ -308,12 +308,12 @@ async function importCrawls(foldersToTry, only) {
         await tosbackGitSemaphore.add(async () => {
           console.log('tosback git checkout', commit.hash);
           await tosbackGit.checkout(commit.hash);
-          console.log('Reading file', path.join(LOCAL_TOSBACK2_REPO, filePath1));
+          console.log('Reading file', path.join(LOCAL_TOSBACK2_REPO, filePath1), commit.hash);
           let fileTxtAtCommit;
           try {
             fileTxtAtCommit = await fs.readFile(path.join(LOCAL_TOSBACK2_REPO, filePath1));
           } catch (e) {
-            console.log('Retrying to load file at', filePath2);
+            console.log('Retrying to load file at', filePath2, commit.hash);
             fileTxtAtCommit = await fs.readFile(path.join(LOCAL_TOSBACK2_REPO, filePath2));
           }
           html = HTML_PREFIX + fileTxtAtCommit + HTML_SUFFIX;
