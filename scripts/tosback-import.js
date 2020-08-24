@@ -31,7 +31,7 @@ const TYPES = require('../src/types.json');
 const fs = fsApi.promises;
 
 const SERVICES_PATH = './services/';
-const LOCAL_TOSBACK2_REPO = '../../tosdr/tosback2';
+const LOCAL_TOSBACK2_REPO = '/Volumes/Workspace/tosback2';
 const TOSBACK2_WEB_ROOT = 'https://github.com/tosdr/tosback2';
 const TOSBACK2_RULES_FOLDER_NAME = 'rules';
 const TOSBACK2_CRAWLS_FOLDER_NAME = 'crawl_reviewed';
@@ -329,6 +329,8 @@ async function importCrawls(folder, only) {
         await snapshotGitSemaphore.add(async () => {
           const destPath = path.join(SNAPSHOTS_PATH, translateSnapshotPath(domainName, fileName));
           console.log('saving', destPath);
+          const containingDir = path.dirname(destPath);
+          await fs.mkdir(containingDir, { recursive: true });
           await fs.writeFile(destPath, html);
           console.log('committing', destPath, `From tosback2 ${commit.hash}`);
           await snapshotGit.commit(`From tosback2 ${commit.hash}`, [ '-a', `--date="${commit.date}"` ]);
@@ -348,7 +350,10 @@ async function trySave(i) {
   if (Object.keys(services[i].documents).length) {
     try {
       assertValid(serviceSchema, services[i]);
-      await fs.writeFile(path.join(SERVICES_PATH, i), `${JSON.stringify(services[i], null, 2)}\n`);
+      const fileName = path.join(SERVICES_PATH, i);
+      const containingDir = path.dirname(fileName);
+      await fs.mkdir(containingDir, { recursive: true });
+      await fs.writeFile(fileName, `${JSON.stringify(services[i], null, 2)}\n`);
       // await new Promise(resolve => setTimeout(resolve, 100));
       console.log('Saved', path.join(SERVICES_PATH, i));
     } catch (e) {
