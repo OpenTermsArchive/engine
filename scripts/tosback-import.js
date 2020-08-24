@@ -34,7 +34,8 @@ const SERVICES_PATH = './services/';
 const LOCAL_TOSBACK2_REPO = '/Volumes/Workspace/tosback2';
 const TOSBACK2_WEB_ROOT = 'https://github.com/tosdr/tosback2';
 const TOSBACK2_RULES_FOLDER_NAME = 'rules';
-const TOSBACK2_CRAWLS_FOLDER_NAME = 'crawl_reviewed';
+const TOSBACK2_CRAWLS_FOLDER_NAME_1 = 'crawl_reviewed';
+const TOSBACK2_CRAWLS_FOLDER_NAME_2 = 'crawl';
 const POSTGRES_URL = 'postgres://localhost/phoenix_development';
 const THREADS = 5;
 const SNAPSHOTS_PATH = 'data/snapshots/';
@@ -126,8 +127,11 @@ function getLocalRulesFolder() {
   return path.join(LOCAL_TOSBACK2_REPO, TOSBACK2_RULES_FOLDER_NAME);
 }
 
-function getLocalCrawlsFolder() {
-  return path.join(LOCAL_TOSBACK2_REPO, TOSBACK2_CRAWLS_FOLDER_NAME);
+function getLocalCrawlsFolders() {
+  return [
+    TOSBACK2_CRAWLS_FOLDER_NAME_1,
+    TOSBACK2_CRAWLS_FOLDER_NAME_2
+  ];
 }
 
 function getGitHubWebUrl(commitHash, filename) {
@@ -163,26 +167,6 @@ function toType(str) {
   }
   return found;
 }
-
-// class TaskQueue {
-//   constructor(threads = 1) {
-//     this.queue = [];
-//     this.running = 0;
-//     this.threads = threads;
-//   }
-
-//   async addTask(task) {
-//     this.queue.push(task);
-//     if (this.queue.length && this.running < this.threads) {
-//       this.running++;
-//       console.log(`Next task (${this.queue.length} tasks left, running ${this.running} in parallel)`);
-//       const thisTask = this.queue.shift();
-//       await thisTask();
-//       this.running--;
-//       return this.run();
-//     }
-//   }
-// }
 
 const queue = new PQueue({ concurrency: THREADS });
 
@@ -288,7 +272,7 @@ async function parseAllPg(connectionString) {
   await client.end();
 }
 
-async function importCrawls(folder, only) {
+async function importCrawls(foldersToTry, only) {
   const tosbackGitSemaphore = new PQueue({ concurrency: 1 });
   const snapshotGitSemaphore = new PQueue({ concurrency: 1 });
   const tosbackGit = getTosbackGit();
@@ -298,23 +282,25 @@ async function importCrawls(folder, only) {
   console.log('Tosback2 git pull');
   await tosbackGit.pull();
   console.log('Tosback2 gathering domain names');
-  const domainNames = await fs.readdir(folder);
+  const domainNames = await fs.readdir(path.join(LOCAL_TOSBACK2_REPO, foldersToTry[0]));
   const domainPromises = domainNames.map(async domainName => {
     if (only && domainName !== only) {
       // console.log(`Skipping ${domainName}, only looking for ${only}.`);
       return;
     }
     console.log('Found!', domainName);
-    const fileNames = await fs.readdir(path.join(folder, domainName));
+    const fileNames = await fs.readdir(path.join(LOCAL_TOSBACK2_REPO, foldersToTry[0], domainName));
     const filePromises = fileNames.map(async fileName => {
-      const filePath = path.join(TOSBACK2_CRAWLS_FOLDER_NAME, domainName, fileName);
-      console.log('filePath', filePath);
+      const filePath1 = path.join(foldersToTry[0], domainName, fileName);
+      const filePath2 = path.join(foldersToTry[1], domainName, fileName);
+      console.log('filePath', filePath1);
       let thisFileCommits;
       await tosbackGitSemaphore.add(async () => {
         tosbackGit.checkout('master');
-        // See https://github.com/steveukx/git-js/blob/80741ac/src/git.js#L891
-        const gitLog = await tosbackGit.log({ file: filePath });
-        thisFileCommits = gitLog.all;
+        // This will set the --follow flag, see:
+        // https://github.com/steveukx/git-js/blob/80741ac/src/git.js#L891
+        const gitLog = await tosbackGit.log({ file: filePath1 });
+        thisFileCommits = gitLog.all.reverse();
       });
       console.log(fileName, thisFileCommits);
       const commitPromises = thisFileCommits.map(async commit => {
@@ -322,8 +308,14 @@ async function importCrawls(folder, only) {
         await tosbackGitSemaphore.add(async () => {
           console.log('tosback git checkout', commit.hash);
           await tosbackGit.checkout(commit.hash);
-          console.log('Reading file', path.join(LOCAL_TOSBACK2_REPO, filePath));
-          const fileTxtAtCommit = await fs.readFile(path.join(LOCAL_TOSBACK2_REPO, filePath));
+          console.log('Reading file', path.join(LOCAL_TOSBACK2_REPO, filePath1));
+          let fileTxtAtCommit;
+          try {
+            fileTxtAtCommit = await fs.readFile(path.join(LOCAL_TOSBACK2_REPO, filePath1));
+          } catch (e) {
+            console.log('Retrying to load file at', filePath2);
+            fileTxtAtCommit = await fs.readFile(path.join(LOCAL_TOSBACK2_REPO, filePath2));
+          }
           html = HTML_PREFIX + fileTxtAtCommit + HTML_SUFFIX;
         });
         await snapshotGitSemaphore.add(async () => {
@@ -333,6 +325,7 @@ async function importCrawls(folder, only) {
           await fs.mkdir(containingDir, { recursive: true });
           await fs.writeFile(destPath, html);
           console.log('committing', destPath, `From tosback2 ${commit.hash}`);
+          await snapshotGit.add('.');
           await snapshotGit.commit(`From tosback2 ${commit.hash}`, [ '-a', `--date="${commit.date}"` ]);
         });
       })
@@ -392,7 +385,7 @@ async function run(includeXml, includePsql, includeCrawls, only) {
     await parseAllPg(POSTGRES_URL, services);
   }
   if (includeCrawls) {
-    await importCrawls(getLocalCrawlsFolder(), only);
+    await importCrawls(getLocalCrawlsFolders(), only);
   }
 }
 
