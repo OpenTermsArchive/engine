@@ -272,6 +272,8 @@ async function parseAllPg(connectionString) {
   await client.end();
 }
 
+const couldNotRead = {};
+
 async function importCrawls(foldersToTry, only) {
   const tosbackGitSemaphore = new PQueue({ concurrency: 1 });
   const snapshotGitSemaphore = new PQueue({ concurrency: 1 });
@@ -314,7 +316,15 @@ async function importCrawls(foldersToTry, only) {
             fileTxtAtCommit = await fs.readFile(path.join(LOCAL_TOSBACK2_REPO, filePath1));
           } catch (e) {
             console.log('Retrying to load file at', filePath2, commit.hash);
-            fileTxtAtCommit = await fs.readFile(path.join(LOCAL_TOSBACK2_REPO, filePath2));
+            try {
+              fileTxtAtCommit = await fs.readFile(path.join(LOCAL_TOSBACK2_REPO, filePath2));
+            } catch (e) {
+              if (!couldNotRead[commit.hash]) {
+                couldNotRead[commit.hash] = [];
+              }
+              couldNotRead[commit.hash].push(filePath1);
+              console.log('Could not load, skipping', couldNotRead);
+            }
           }
           html = HTML_PREFIX + fileTxtAtCommit + HTML_SUFFIX;
         });
