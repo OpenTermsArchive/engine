@@ -12,7 +12,7 @@
     "Brand Guidelines": {
       "fetch": "https://developer.android.com/distribute/marketing-tools/brand-guidelines",
       "filter": [
-        "convertImagesToDataURI"
+        "downloadImages"
       ],
       "select": "article.devsite-article-inner"
     },
