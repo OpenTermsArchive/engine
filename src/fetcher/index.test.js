@@ -31,7 +31,7 @@ describe('Fetcher', () => {
 
     context('With returns as blob option', () => {
       it('returns the blob of the given URL', async () => {
-        const result = await fetch('https://www.facebook.com/terms.php', { returnBlob: true });
+        const result = await fetch('https://www.facebook.com/terms.php', { asRawData: true });
         expect(result.constructor.name).to.equal('Blob');
       });
     });
