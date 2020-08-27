@@ -8,7 +8,7 @@ export async function downloadImages(document, { fetch: baseUrl, select: selecto
 
   return Promise.all(images.map(async ({ src }, index) => {
     if (src.startsWith('data:')) {
-      return Promise.resolve(); // Already a data-URI, skip.
+      return; // Already a data-URI, skip
     }
 
     const imageUrl = new URL(src, baseUrl).href; // Ensure url is absolute
