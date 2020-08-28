@@ -55,14 +55,14 @@ if (args.includes('--schema-only')) {
     Object.keys(service.documents).forEach(async type => {
       console.log('┡┓', type);
 
-      let filteredContent;
+      const document = service.documents[type];
 
       console.log('│┣', 'has a URL that can be fetched');
-      const { fetch: location } = service.documents[type];
+      const { fetch: location } = document;
       const content = await fetch(location);
 
       console.log('│┣', 'has a selector that matches an element in the web page');
-      filteredContent = await filter(content, service.documents[type], service.filters);  // TODO: this is not true, the selector might match but the filters remove everything
+      const filteredContent = await filter(content, document, service.filters);  // TODO: this is not true, the selector might match but the filters remove everything
       expect(filteredContent).to.not.be.empty;
 
       console.log('│┣', `has a resulting filtered content with at least ${MIN_DOC_LENGTH} characters`);
@@ -70,7 +70,7 @@ if (args.includes('--schema-only')) {
 
       console.log('│┗', 'consistently filters content');
       const secondContent = await fetch(location);
-      const secondFilteredContent = await filter(secondContent, service.documents[type], service.filters);
+      const secondFilteredContent = await filter(secondContent, document, service.filters);
       expect(secondFilteredContent).to.equal(filteredContent);
     });
   });
