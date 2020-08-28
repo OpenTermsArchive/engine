@@ -14,107 +14,68 @@ import serviceSchema from './service.schema.js';
 const fs = fsApi.promises;
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
 const { expect } = chai;
-const rootPath = path.join(__dirname, '../..');
+
+
+const serviceDeclarationsPath = path.join(__dirname, '../..', config.get('serviceDeclarationsPath'));
 const MIN_DOC_LENGTH = 100;
 
 
-(async () => {
-  try {
-    const serviceDeclarations = await loadServiceDeclarations(path.join(rootPath, config.get('serviceDeclarationsPath')));
+const args = process.argv.slice(2);
+let schemaOnly = false;
+if (args.includes('--schema-only')) {
+  args.splice(args.indexOf('--schema-only', 1));
+  schemaOnly = true;
+}
 
-    const args = process.argv.slice(2);
-    if (args.includes('--schema-only')) {
-      args.splice(args.indexOf('--schema-only', 1));
-      schemaOnly = true;
+(async () => {
+  const serviceDeclarations = await loadServiceDeclarations(serviceDeclarationsPath);
+
+  const servicesToValidate = args.length ? args : Object.keys(serviceDeclarations);
+
+  servicesToValidate.forEach(serviceId => {
+    if (!serviceDeclarations.hasOwnProperty(serviceId)) {
+      throw new Error(`Could not find any service with id "${serviceId}"`);
+    }
+  });
+
+  servicesToValidate.forEach(async serviceId => {
+    console.log('Validating', serviceId);
+
+    let declaration = await fs.readFile(`${serviceDeclarationsPath}/${serviceId}.json`);
+    declaration = JSON.parse(declaration);
+
+    assertValid(serviceSchema, declaration);
+
+    if (schemaOnly) {
+      return;
     }
 
-    describe('Services validation', async () => {
-      const servicesToValidate = args.length ? args : Object.keys(serviceDeclarations);
+    const service = serviceDeclarations[serviceId];
 
-      servicesToValidate.forEach(serviceId => {
-        const service = serviceDeclarations[serviceId];
+    Object.keys(service.documents).forEach(async type => {
+      console.log('┡┓', type);
 
-        if (!service) {
-          console.error(`There is no service declared with id "${serviceId}"`);
-          process.exit();
-        }
+      let filteredContent;
 
-        describe(serviceId, () => {
-          it('has a valid declaration', async () => {
-            const declaration = JSON.parse(await fs.readFile(path.join(rootPath, config.get('serviceDeclarationsPath'), `${serviceId}.json`)));
-            assertValid(serviceSchema, declaration);
-          });
+      console.log('│┣', 'has a URL that can be fetched');
+      const { fetch: location } = service.documents[type];
+      const content = await fetch(location);
 
-          if (!schemaOnly) {
-            Object.keys(service.documents).forEach(type => {
-              describe(type, () => {
-                let content;
-                let filteredContent;
+      console.log('│┣', 'has a selector that matches an element in the web page');
+      filteredContent = await filter(content, service.documents[type], service.filters);  // TODO: this is not true, the selector might match but the filters remove everything
+      expect(filteredContent).to.not.be.empty;
 
-                it('has fetchable URL', async function () {
-                  this.timeout(30000);
+      console.log('│┣', `has a resulting filtered content with at least ${MIN_DOC_LENGTH} characters`);
+      expect(filteredContent.length).to.be.greaterThan(MIN_DOC_LENGTH);
 
-                  const { fetch: location } = service.documents[type];
-                  content = await fetch(location);
-                });
-
-                it('has a selector that matches an element in the web page', async function () {
-                  if (!content) {
-                    console.log('      (Tests skipped as url is not fetchable)');
-                    this.skip();
-                  }
-
-                  filteredContent = await filter(content, service.documents[type], service.filters);
-                  expect(filteredContent).to.not.be.empty;
-                });
-
-                it(`has a resulting filtered content with at least ${MIN_DOC_LENGTH}`, async function () {
-                  if (!content) {
-                    console.log('      (Tests skipped as url is not fetchable)');
-                    this.skip();
-                  }
-
-                  if (!filteredContent) {
-                    console.log('      (Tests skipped as content cannot be filtered)');
-                    this.skip();
-                  }
-
-                  expect(filteredContent.length).to.be.greaterThan(MIN_DOC_LENGTH);
-                });
-
-                context('When fetched and filtered twice in a row', () => {
-                  it('has consistent filtered content', async function () {
-                    if (!content) {
-                      console.log('      (Tests skipped as url is not fetchable)');
-                      this.skip();
-                    }
-
-                    if (!filteredContent) {
-                      console.log('      (Tests skipped as content cannot be filtered)');
-                      this.skip();
-                    }
-
-                    this.timeout(30000);
-
-                    const { fetch: location } = service.documents[type];
-                    const secondContent = await fetch(location);
-                    const secondFilteredContent = await filter(secondContent, service.documents[type], service.filters);
-
-                    expect(secondFilteredContent).to.equal(filteredContent);
-                  });
-                });
-              });
-            });
-          }
-        });
-      });
+      console.log('│┗', 'consistently filters content');
+      const secondContent = await fetch(location);
+      const secondFilteredContent = await filter(secondContent, service.documents[type], service.filters);
+      expect(secondFilteredContent).to.equal(filteredContent);
     });
-
-    run();
-  } catch (error) {
-    console.error(error);
-  }
+  });
 })();
+
 
 const validator = new Ajv({
   allErrors: true,

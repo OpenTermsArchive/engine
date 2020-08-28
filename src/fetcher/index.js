@@ -3,9 +3,12 @@ import HttpProxyAgent from 'http-proxy-agent';
 import HttpsProxyAgent from 'https-proxy-agent';
 
 const LANGUAGE = 'en';
+const TIMEOUT = 30 * 1000;
 
 export default async function fetch(url) {
-  const options = {};
+  const options = {
+    timeout: TIMEOUT ,
+  };
   if (url.startsWith('https:') && process.env.HTTPS_PROXY) {
     options.agent = new HttpsProxyAgent(process.env.HTTPS_PROXY);
   } else if (url.startsWith('http:') && process.env.HTTP_PROXY) {
