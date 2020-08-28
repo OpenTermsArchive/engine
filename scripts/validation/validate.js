@@ -40,7 +40,7 @@ if (args.includes('--schema-only')) {
 
   console.log('Validating', servicesToValidate.length, 'service declarations…');
 
-  const servicesValidationPromises = servicesToValidate.map(async serviceId => {
+  const serviceValidationPromises = servicesToValidate.map(async serviceId => {
     let declaration = await fs.readFile(`${serviceDeclarationsPath}/${serviceId}.json`);
     declaration = JSON.parse(declaration);
     assertValid(serviceSchema, declaration, serviceId);
@@ -51,7 +51,7 @@ if (args.includes('--schema-only')) {
 
     const service = serviceDeclarations[serviceId];
 
-    const documentsValidationPromises = Object.keys(service.documents).map(async type => {
+    const documentValidationPromises = Object.keys(service.documents).map(async type => {
       const document = service.documents[type];
       const { fetch: location } = document;
 
@@ -78,14 +78,14 @@ if (args.includes('--schema-only')) {
       });
   });
 
-  return Promise.allSettled(servicesValidationPromises)
-    .then(servicesValidationResults => {
+  return Promise.allSettled(serviceValidationPromises)
+    .then(serviceValidationResults => {
       const totals = {
         rejected: 0,
         fulfilled: 0,
       };
 
-      servicesValidationResults.forEach(result => totals[result.status]++);
+      serviceValidationResults.forEach(result => totals[result.status]++);
 
       console.log(totals.fulfilled, 'services are valid');
       if (totals.rejected) {
