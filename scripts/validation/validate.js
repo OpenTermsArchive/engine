@@ -39,11 +39,12 @@ if (args.includes('--schema-only')) {
   });
 
   servicesToValidate.forEach(async serviceId => {
-    console.log('Validating', serviceId);
+    console.log('┣', serviceId);
 
     let declaration = await fs.readFile(`${serviceDeclarationsPath}/${serviceId}.json`);
     declaration = JSON.parse(declaration);
 
+    console.log('│┣', 'has a valid declaration');
     assertValid(serviceSchema, declaration);
 
     if (schemaOnly) {
@@ -53,22 +54,22 @@ if (args.includes('--schema-only')) {
     const service = serviceDeclarations[serviceId];
 
     Object.keys(service.documents).forEach(async type => {
-      console.log('┡┓', type);
+      console.log('│┡┓', type);
 
       const document = service.documents[type];
 
-      console.log('│┣', 'has a URL that can be fetched');
+      console.log('││┣', 'has a URL that can be fetched');
       const { fetch: location } = document;
       const content = await fetch(location);
 
-      console.log('│┣', 'has a selector that matches an element in the web page');
+      console.log('││┣', 'has a selector that matches an element in the web page');
       const filteredContent = await filter(content, document, service.filters);  // TODO: this is not true, the selector might match but the filters remove everything
       expect(filteredContent).to.not.be.empty;
 
-      console.log('│┣', `has a resulting filtered content with at least ${MIN_DOC_LENGTH} characters`);
+      console.log('││┣', `has a resulting filtered content with at least ${MIN_DOC_LENGTH} characters`);
       expect(filteredContent.length).to.be.greaterThan(MIN_DOC_LENGTH);
 
-      console.log('│┗', 'consistently filters content');
+      console.log('││┗', 'consistently filters content');
       const secondContent = await fetch(location);
       const secondFilteredContent = await filter(secondContent, document, service.filters);
       expect(secondFilteredContent).to.equal(filteredContent);
