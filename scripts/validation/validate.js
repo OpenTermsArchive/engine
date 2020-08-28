@@ -62,11 +62,8 @@ if (args.includes('--schema-only')) {
       const { fetch: location } = document;
       const content = await fetch(location);
 
-      console.log('││┣', 'has a selector that matches an element in the web page');
-      const filteredContent = await filter(content, document, service.filters);  // TODO: this is not true, the selector might match but the filters remove everything
-      expect(filteredContent).to.not.be.empty;
-
       console.log('││┣', `has a resulting filtered content with at least ${MIN_DOC_LENGTH} characters`);
+      const filteredContent = await filter(content, document, service.filters);
       expect(filteredContent.length).to.be.greaterThan(MIN_DOC_LENGTH);
 
       console.log('││┗', 'consistently filters content');
