@@ -43,8 +43,7 @@ if (args.includes('--schema-only')) {
   const servicesValidationPromises = servicesToValidate.map(async serviceId => {
     let declaration = await fs.readFile(`${serviceDeclarationsPath}/${serviceId}.json`);
     declaration = JSON.parse(declaration);
-
-    assertValid(serviceSchema, declaration);
+    assertValid(serviceSchema, declaration, serviceId);
 
     if (schemaOnly) {
       return;
@@ -58,22 +57,24 @@ if (args.includes('--schema-only')) {
 
       const content = await fetch(location);
       const filteredContent = await filter(content, document, service.filters);
-      expect(filteredContent.length, 'has an unexpectedly small textual content after filtering').to.be.greaterThan(MIN_DOC_LENGTH);
+      expect(filteredContent.length, `${serviceId} ${type} has an unexpectedly small textual content after filtering`).to.be.greaterThan(MIN_DOC_LENGTH);
 
       const secondContent = await fetch(location);
       const secondFilteredContent = await filter(secondContent, document, service.filters);
-      expect(secondFilteredContent, 'does not consistently filter content').to.equal(filteredContent);
+      expect(secondFilteredContent, `${serviceId} ${type} has inconsistent filtered content`).to.equal(filteredContent);
     });
 
-    return Promise.allSettled(documentsValidationPromises)
-      .then(documentsValidationResults => {
-        const failure = documentsValidationResults.find(result => result.status == 'rejected');
-        if (failure) {
-          console.warn(serviceId, 'fails:', failure.reason.message);
-          throw failure.reason;
-        } else {
-          console.log(serviceId, 'is valid');
+    return Promise.allSettled(documentValidationPromises)
+      .then(documentValidationResults => {
+        const failures = documentValidationResults.filter(result => result.status == 'rejected');
+
+        failures.forEach(failure => console.warn(serviceId, 'fails:', failure.reason.message));
+
+        if (failures.length) {
+          throw failures;
         }
+
+        console.log(serviceId, 'is valid');
       });
   });
 
@@ -100,12 +101,12 @@ const validator = new Ajv({
   jsonPointers: true,
 });
 
-function assertValid(schema, subject) {
+function assertValid(schema, subject, sourceIdentifier) {
   const valid = validator.validate(schema, subject);
 
   if (!valid) {
     const errorPointers = new Set();
-    let errorMessage = '';
+    let errorMessage = sourceIdentifier ? `In ${sourceIdentifier}:` : '';
     const sourceMap = jsonSourceMap.stringify(subject, null, 2);
     const jsonLines = sourceMap.json.split('\n');
     validator.errors.forEach(error => {
