@@ -20,7 +20,7 @@
     "test:debug": "NODE_ENV=test mocha --file './test/helper.js' --recursive \"./src/**/*.test.js\" --inspect-brk --exit",
     "validate": "NODE_ENV=validation mocha --delay --file './test/helper.js' scripts/validation/validate.js --serviceId",
     "validate:schema": "NODE_ENV=validation mocha --delay --file './test/helper.js' scripts/validation/validate.js --schema-only --serviceId",
-    "validate:modified": "NODE_ENV=validation mocha --delay --file './test/helper.js' scripts/validation/validate.js --modified-only"
+    "validate:modified": "npm run validate $(git diff --name-only master 'services/*.json' | xargs basename -s '.json')"
   },
   "repository": {
     "type": "git",
