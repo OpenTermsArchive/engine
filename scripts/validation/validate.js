@@ -38,13 +38,12 @@ if (args.includes('--schema-only')) {
     }
   });
 
-  servicesToValidate.forEach(async serviceId => {
-    console.log('┣', serviceId);
+  console.log('Validating', servicesToValidate.length, 'service declarations…');
 
+  servicesToValidate.forEach(async serviceId => {
     let declaration = await fs.readFile(`${serviceDeclarationsPath}/${serviceId}.json`);
     declaration = JSON.parse(declaration);
 
-    console.log('│┣', 'has a valid declaration');
     assertValid(serviceSchema, declaration);
 
     if (schemaOnly) {
@@ -53,24 +52,30 @@ if (args.includes('--schema-only')) {
 
     const service = serviceDeclarations[serviceId];
 
-    Object.keys(service.documents).forEach(async type => {
-      console.log('│┡┓', type);
-
+    const documentsValidationPromises = Object.keys(service.documents).map(async type => {
       const document = service.documents[type];
-
-      console.log('││┣', 'has a URL that can be fetched');
       const { fetch: location } = document;
+
       const content = await fetch(location);
-
-      console.log('││┣', `has a resulting filtered content with at least ${MIN_DOC_LENGTH} characters`);
       const filteredContent = await filter(content, document, service.filters);
-      expect(filteredContent.length).to.be.greaterThan(MIN_DOC_LENGTH);
+      expect(filteredContent.length, 'has an unexpectedly small textual content after filtering').to.be.greaterThan(MIN_DOC_LENGTH);
 
-      console.log('││┗', 'consistently filters content');
       const secondContent = await fetch(location);
       const secondFilteredContent = await filter(secondContent, document, service.filters);
-      expect(secondFilteredContent).to.equal(filteredContent);
+      expect(secondFilteredContent, 'does not consistently filter content').to.equal(filteredContent);
+
+      return `All tests passed for document ${type}`;
     });
+
+    Promise.allSettled(documentsValidationPromises)
+      .then(documentsValidationResults => {
+        const failure = documentsValidationResults.find(result => result.status == 'rejected');
+        if (failure) {
+          console.warn(serviceId, 'fails:', failure.reason.message);
+        } else {
+          console.log(serviceId, 'is valid');
+        }
+      });
   });
 })();
 
