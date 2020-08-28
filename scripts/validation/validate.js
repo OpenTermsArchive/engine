@@ -40,7 +40,7 @@ if (args.includes('--schema-only')) {
 
   console.log('Validating', servicesToValidate.length, 'service declarations…');
 
-  servicesToValidate.forEach(async serviceId => {
+  const servicesValidationPromises = servicesToValidate.map(async serviceId => {
     let declaration = await fs.readFile(`${serviceDeclarationsPath}/${serviceId}.json`);
     declaration = JSON.parse(declaration);
 
@@ -63,20 +63,35 @@ if (args.includes('--schema-only')) {
       const secondContent = await fetch(location);
       const secondFilteredContent = await filter(secondContent, document, service.filters);
       expect(secondFilteredContent, 'does not consistently filter content').to.equal(filteredContent);
-
-      return `All tests passed for document ${type}`;
     });
 
-    Promise.allSettled(documentsValidationPromises)
+    return Promise.allSettled(documentsValidationPromises)
       .then(documentsValidationResults => {
         const failure = documentsValidationResults.find(result => result.status == 'rejected');
         if (failure) {
           console.warn(serviceId, 'fails:', failure.reason.message);
+          throw failure.reason;
         } else {
           console.log(serviceId, 'is valid');
         }
       });
   });
+
+  return Promise.allSettled(servicesValidationPromises)
+    .then(servicesValidationResults => {
+      const totals = {
+        rejected: 0,
+        fulfilled: 0,
+      };
+
+      servicesValidationResults.forEach(result => totals[result.status]++);
+
+      console.log(totals.fulfilled, 'services are valid');
+      if (totals.rejected) {
+        console.error(totals.rejected, 'services have validation errors');
+        process.exitCode = 1;
+      }
+    });
 })();
 
 
