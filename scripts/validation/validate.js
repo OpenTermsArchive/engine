@@ -17,17 +17,19 @@ const { expect } = chai;
 const rootPath = path.join(__dirname, '../..');
 const MIN_DOC_LENGTH = 100;
 
-let serviceDeclarations;
+
 (async () => {
   try {
-    serviceDeclarations = await loadServiceDeclarations(path.join(rootPath, config.get('serviceDeclarationsPath')));
+    const serviceDeclarations = await loadServiceDeclarations(path.join(rootPath, config.get('serviceDeclarationsPath')));
+
+    const args = process.argv.slice(2);
+    if (args.includes('--schema-only')) {
+      args.splice(args.indexOf('--schema-only', 1));
+      schemaOnly = true;
+    }
 
     describe('Services validation', async () => {
-      const serviceId = process.argv.slice(process.argv.indexOf('--serviceId'))[1];
-      const schemaOnly = process.argv.indexOf('--schema-only') != -1;
-      const serviceIds = Object.keys(serviceDeclarations);
-
-      const servicesToValidate = serviceId ? [ serviceId ] : serviceIds;
+      const servicesToValidate = args.length ? args : Object.keys(serviceDeclarations);
 
       servicesToValidate.forEach(serviceId => {
         const service = serviceDeclarations[serviceId];
