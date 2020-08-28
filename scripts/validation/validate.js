@@ -5,7 +5,6 @@ import Ajv from 'ajv';
 import chai from 'chai';
 import config from 'config';
 import jsonSourceMap from 'json-source-map';
-import simpleGit from 'simple-git';
 
 import fetch from '../../src/fetcher/index.js';
 import filter from '../../src/filter/index.js';
@@ -19,26 +18,16 @@ const rootPath = path.join(__dirname, '../..');
 const MIN_DOC_LENGTH = 100;
 
 let serviceDeclarations;
-let modifiedServices;
 (async () => {
   try {
     serviceDeclarations = await loadServiceDeclarations(path.join(rootPath, config.get('serviceDeclarationsPath')));
-    modifiedServices = await getModifiedServices();
 
     describe('Services validation', async () => {
-      const specifiedServiceId = process.argv.slice(process.argv.indexOf('--serviceId'))[1];
+      const serviceId = process.argv.slice(process.argv.indexOf('--serviceId'))[1];
       const schemaOnly = process.argv.indexOf('--schema-only') != -1;
-      const modifiedOnly = process.argv.indexOf('--modified-only') != -1;
-
       const serviceIds = Object.keys(serviceDeclarations);
 
-      let servicesToValidate = serviceIds;
-      if (modifiedOnly) {
-        servicesToValidate = modifiedServices;
-      }
-      if (specifiedServiceId) {
-        servicesToValidate = [ specifiedServiceId ];
-      }
+      const servicesToValidate = serviceId ? [ serviceId ] : serviceIds;
 
       servicesToValidate.forEach(serviceId => {
         const service = serviceDeclarations[serviceId];
@@ -153,12 +142,4 @@ function assertValid(schema, subject) {
 
     throw new Error(errorMessage);
   }
-}
-
-async function getModifiedServices() {
-  const git = simpleGit(path.resolve(__dirname, '../..'), { maxConcurrentProcesses: 1 });
-  const modifiedFiles = await (await git.diff([ '--name-only', 'master...' ])).split('\n');
-  const modifiedServicePaths = modifiedFiles.filter(filepath => filepath.startsWith('services/') && !filepath.includes('.filters.js'));
-  const modifiedServiceNames = modifiedServicePaths.map(filepath => path.basename(filepath).replace('.json', ''));
-  return modifiedServiceNames;
 }
