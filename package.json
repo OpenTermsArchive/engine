@@ -20,7 +20,7 @@
     "test:debug": "NODE_ENV=test mocha --file './test/helper.js' --recursive \"./src/**/*.test.js\" --inspect-brk --exit",
     "validate": "node scripts/validation/validate.js",
     "validate:schema": "npm run validate -- --schema-only",
-    "validate:modified": "npm run validate $(git diff --name-only master 'services/*.json' | xargs basename -s '.json')"
+    "validate:modified": "git diff --name-only master 'services/*.json' | xargs basename -s '.json' | xargs npm run validate"
   },
   "repository": {
     "type": "git",
