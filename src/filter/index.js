@@ -12,8 +12,8 @@ turndownService.use(turndownPluginGithubFlavouredMarkdown.gfm);
 
 export const LINKS_TO_CONVERT_SELECTOR = 'a[href]:not([href^="#"])';
 
-export default async function filter({ content, documentDeclaration, filterFunctions, isPDF }) {
-  if (isPDF) {
+export default async function filter({ content, mimeType, documentDeclaration, filterFunctions }) {
+  if (mimeType == 'application/pdf') {
     return filterPDF({ content });
   }
 
