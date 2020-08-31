@@ -1,3 +1,7 @@
+/**
+* This module is the boundary beyond which the persistence method (filesystem and git) is abstracted.
+*/
+
 import path from 'path';
 import config from 'config';
 
@@ -11,25 +15,16 @@ export const VERSIONS_PATH = path.resolve(__dirname, '../..', config.get('histor
 const snapshotRecorder = new Recorder({ path: SNAPSHOTS_PATH, fileExtension: 'html' });
 const versionRecorder = new Recorder({ path: VERSIONS_PATH, fileExtension: 'md' });
 
-export async function recordSnapshot(serviceId, documentType, content) {
-  return _recordSnapshot({ serviceId, documentType, content });
-}
-
-export async function recordPDFSnapshot(serviceId, documentType, content) {
-  return _recordSnapshot({ serviceId, documentType, content, fileExtension: 'pdf' });
-}
-
-export async function _recordSnapshot({ serviceId, documentType, content, fileExtension }) {
-  const isFirstRecord = !await snapshotRecorder.isTracked(serviceId, documentType, fileExtension);
+export async function recordSnapshot({ serviceId, documentType, content, mimeType }) {
+  const isFirstRecord = !await snapshotRecorder.isTracked(serviceId, documentType);
   const prefix = isFirstRecord ? 'Start tracking' : 'Update';
   const changelog = `${prefix} ${serviceId} ${documentType}`;
-
   const recordResult = await snapshotRecorder.record({
     serviceId,
     documentType,
     content,
     changelog,
-    fileExtension,
+    mimeType,
   });
 
   return {
@@ -38,11 +33,11 @@ export async function _recordSnapshot({ serviceId, documentType, content, fileEx
   };
 }
 
-export async function recordVersion(serviceId, documentType, content, snapshotId) {
+export async function recordVersion({ serviceId, documentType, content, snapshotId }) {
   return _recordVersion({ serviceId, documentType, content, snapshotId });
 }
 
-export async function recordRefilter(serviceId, documentType, content, snapshotId) {
+export async function recordRefilter({ serviceId, documentType, content, snapshotId }) {
   return _recordVersion({ serviceId, documentType, content, snapshotId, isRefiltering: true });
 }
 
