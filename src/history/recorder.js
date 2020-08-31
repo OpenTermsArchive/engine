@@ -71,7 +71,7 @@ export default class Recorder {
     const [ relativeFilePath, ...otherFilesPaths ] = await this.git.filesInCommit(latestCommit.hash);
 
     if (otherFilesPaths.length) {
-      throw new Error(`The commit ${latestCommit.hash} should only contain one file but contains following files: ${otherFilesPaths}`);
+      throw new Error(`Only one document of type ${documentType} should have been recorded in ${latestCommit.hash}, but these additional ones have also been recorded: ${otherFilesPaths}`);
     }
 
     return {

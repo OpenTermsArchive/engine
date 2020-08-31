@@ -229,7 +229,7 @@ describe('Recorder', () => {
   });
 
   describe('#getLatestRecord', () => {
-    context('When there are records for given service', () => {
+    context('When there are records for the given service', () => {
       let lastSnapshotId;
       let latestRecord;
       const UPDATED_FILE_CONTENT = `${FILE_CONTENT} (with additional content to trigger a record)`;
@@ -293,7 +293,7 @@ describe('Recorder', () => {
       });
     });
 
-    context('When there are no record for given service', () => {
+    context('When there are no records for the given service', () => {
       let latestRecord;
 
       before(async () => {
