@@ -12,6 +12,11 @@ turndownService.use(turndownPluginGithubFlavouredMarkdown.gfm);
 
 export const LINKS_TO_CONVERT_SELECTOR = 'a[href]:not([href^="#"])';
 
+const { PdfTransformer } = mardownPdf;
+const { CiceroMarkTransformer } = ciceroMark;
+const pdfTransformer = new PdfTransformer();
+const ciceroMarkTransformer = new CiceroMarkTransformer();
+
 export default async function filter({ content, mimeType, documentDeclaration, filterFunctions }) {
   if (mimeType == 'application/pdf') {
     return filterPDF({ content });
@@ -55,12 +60,6 @@ export async function filterHTML({ content, documentDeclaration, filterFunctions
 }
 
 export async function filterPDF({ content: pdfBuffer }) {
-  const { PdfTransformer } = mardownPdf;
-  const pdfTransformer = new PdfTransformer();
-
-  const { CiceroMarkTransformer } = ciceroMark;
-  const ciceroMarkTransformer = new CiceroMarkTransformer();
-
   const ciceroMarkdown = await pdfTransformer.toCiceroMark(pdfBuffer);
 
   return ciceroMarkTransformer.toMarkdown(ciceroMarkdown);
