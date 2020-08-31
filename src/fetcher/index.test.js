@@ -21,9 +21,23 @@ describe('Fetcher', () => {
   });
 
   describe('#fetch', () => {
-    it('returns the web page content of the given URL', async () => {
-      const result = await fetch('https://testdomain/terms.html');
-      expect(result).to.be.equal(termsHTML);
+    context('when web page is available', () => {
+      let content;
+      let mimeType;
+
+      before(async () => {
+        const result = await fetch('https://testdomain/terms.html');
+        content = result.content;
+        mimeType = result.mimeType;
+      });
+
+      it('returns the web page content of the given URL', async () => {
+        expect(content).to.be.equal(termsHTML);
+      });
+
+      it('returns the mime type of the given URL', async () => {
+        expect(mimeType).to.be.equal('text/html');
+      });
     });
 
     context('when web page is not available', () => {
@@ -46,7 +60,8 @@ describe('Fetcher', () => {
     });
 
     context('when url targets a PDF file', () => {
-      let result;
+      let content;
+      let mimeType;
       let expectedPDFContent;
 
       before(async () => {
@@ -56,19 +71,21 @@ describe('Fetcher', () => {
           .get('/terms.pdf')
           .reply(200, expectedPDFContent, { 'Content-Type': 'application/pdf' });
 
-        result = await fetch('https://testdomain.com/terms.pdf');
+        const result = await fetch('https://testdomain.com/terms.pdf');
+        content = result.content;
+        mimeType = result.mimeType;
       });
 
-      it('returns a blob', async () => {
-        expect(result.constructor.name).to.equal('Blob');
+      it('returns a buffer for PDF content', async () => {
+        expect(content).to.be.an.instanceOf(Buffer);
       });
 
       it('returns a blob with the file type', async () => {
-        expect(result.type).to.equal('application/pdf');
+        expect(mimeType).to.equal('application/pdf');
       });
 
       it('returns a blob with the file content', async () => {
-        expect(Buffer.from(await result.arrayBuffer()).equals(expectedPDFContent)).to.be.true;
+        expect(content.equals(expectedPDFContent)).to.be.true;
       });
     });
   });
