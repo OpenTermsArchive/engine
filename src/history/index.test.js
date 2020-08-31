@@ -1,12 +1,10 @@
 import fsApi from 'fs';
-import path from 'path';
 
 import chai from 'chai';
 
 import { resetGitRepository, gitSnapshot, gitVersion } from '../../test/helper.js';
-import { SNAPSHOTS_PATH, VERSIONS_PATH, recordSnapshot, recordPDFSnapshot, recordVersion, recordRefilter } from './index.js';
+import { SNAPSHOTS_PATH, VERSIONS_PATH, recordSnapshot, recordVersion, recordRefilter } from './index.js';
 
-const __dirname = path.dirname(new URL(import.meta.url).pathname);
 const fs = fsApi.promises;
 const { expect } = chai;
 
@@ -18,13 +16,23 @@ describe('History', () => {
     const FILE_CONTENT = '<html><h1>ToS fixture data with UTF-8 çhãràčtęrs</h1></html>';
     const EXPECTED_FILE_PATH = `${SNAPSHOTS_PATH}/${SERVICE_ID}/${TYPE}.html`;
     const FIRST_COMMIT_MESSAGE = `Start tracking ${SERVICE_ID} ${TYPE}`;
+    const MIME_TYPE = 'text/html';
     let id;
     let commit;
     let filepath;
     let isFirstRecord;
 
     before(async () => {
-      const { id: snapshotId, path: snapshotPath, isFirstRecord: isFirstSnapshotRecord } = await recordSnapshot(SERVICE_ID, TYPE, FILE_CONTENT);
+      const {
+        id: snapshotId,
+        path: snapshotPath,
+        isFirstRecord: isFirstSnapshotRecord
+      } = await recordSnapshot({
+        serviceId: SERVICE_ID,
+        documentType: TYPE,
+        content: FILE_CONTENT,
+        mimeType: MIME_TYPE
+      });
       id = snapshotId;
       filepath = snapshotPath;
       isFirstRecord = isFirstSnapshotRecord;
@@ -59,7 +67,16 @@ describe('History', () => {
       const UPDATE_COMMIT_MESSAGE = `Update ${SERVICE_ID} ${TYPE}`;
 
       before(async () => {
-        const { id: snapshotId, path: snapshotPath, isFirstRecord: isFirstSnapshotRecord } = await recordSnapshot(SERVICE_ID, TYPE, MODIFIED_FILE_CONTENT);
+        const {
+          id: snapshotId,
+          path: snapshotPath,
+          isFirstRecord: isFirstSnapshotRecord
+        } = await recordSnapshot({
+          serviceId: SERVICE_ID,
+          documentType: TYPE,
+          content: MODIFIED_FILE_CONTENT,
+          mimeType: MIME_TYPE
+        });
         id = snapshotId;
         filepath = snapshotPath;
         isFirstRecord = isFirstSnapshotRecord;
@@ -91,100 +108,15 @@ describe('History', () => {
         let commitsBefore;
         before(async () => {
           commitsBefore = await gitSnapshot().log();
-          const { id: snapshotId, path: snapshotPath } = await recordSnapshot(SERVICE_ID, TYPE, MODIFIED_FILE_CONTENT);
-          id = snapshotId;
-          filepath = snapshotPath;
-        });
-
-        it('does not commit', async () => {
-          const commitsAfter = await gitSnapshot().log();
-          expect(commitsAfter).to.deep.equal(commitsBefore);
-        });
-      });
-    });
-  });
-
-  describe('#recordPDFSnapshot', () => {
-    let expectedPDFContent;
-    const EXPECTED_FILE_PATH = `${SNAPSHOTS_PATH}/${SERVICE_ID}/${TYPE}.pdf`;
-    const FIRST_COMMIT_MESSAGE = `Start tracking ${SERVICE_ID} ${TYPE}`;
-    let id;
-    let commit;
-    let filepath;
-    let isFirstRecord;
-
-    before(async () => {
-      expectedPDFContent = await fs.readFile(path.resolve(__dirname, '../../test/fixtures/terms.pdf'));
-      const { id: snapshotId, path: snapshotPath, isFirstRecord: isFirstSnapshotRecord } = await recordPDFSnapshot(SERVICE_ID, TYPE, expectedPDFContent);
-      id = snapshotId;
-      filepath = snapshotPath;
-      isFirstRecord = isFirstSnapshotRecord;
-      const commits = await gitSnapshot().log();
-      [ commit ] = commits;
-    });
-
-    after(resetGitRepository);
-
-    it('creates the file with the proper content', async () => {
-      const fileContent = await fs.readFile(EXPECTED_FILE_PATH);
-      expect(fileContent.equals(expectedPDFContent)).to.be.true;
-    });
-
-    it('returns the file path', () => {
-      expect(filepath).to.equal(EXPECTED_FILE_PATH);
-    });
-
-    it('returns a boolean to know if it is the first record', async () => {
-      expect(isFirstRecord).to.be.true;
-    });
-
-    it('returns the id of the commit', async () => {
-      expect(commit.hash).to.include(id);
-    });
-
-    it('properly saves the commit message', async () => {
-      expect(commit.message).to.equal(FIRST_COMMIT_MESSAGE);
-    });
-
-    context('when it is not the first record', () => {
-      const UPDATE_COMMIT_MESSAGE = `Update ${SERVICE_ID} ${TYPE}`;
-
-      before(async () => {
-        expectedPDFContent = await fs.readFile(path.resolve(__dirname, '../../test/fixtures/termsModified.pdf'));
-        const { id: snapshotId, path: snapshotPath, isFirstRecord: isFirstSnapshotRecord } = await recordPDFSnapshot(SERVICE_ID, TYPE, expectedPDFContent);
-        id = snapshotId;
-        filepath = snapshotPath;
-        isFirstRecord = isFirstSnapshotRecord;
-        const commits = await gitSnapshot().log();
-        [ commit ] = commits;
-      });
-
-      it('creates the file with the proper content', async () => {
-        const fileContent = await fs.readFile(EXPECTED_FILE_PATH);
-        expect(fileContent.equals(expectedPDFContent)).to.be.true;
-      });
-
-      it('returns the file path', () => {
-        expect(filepath).to.equal(EXPECTED_FILE_PATH);
-      });
-
-      it('returns a boolean to know if it is the first record', async () => {
-        expect(isFirstRecord).to.be.false;
-      });
-
-      it('returns the id of the commit', async () => {
-        expect(commit.hash).to.include(id);
-      });
-
-      it('properly saves the commit message', async () => {
-        expect(commit.message).to.equal(UPDATE_COMMIT_MESSAGE);
-      });
-
-      context('when the content has not changed', () => {
-        let commitsBefore;
-        before(async () => {
-          commitsBefore = await gitSnapshot().log();
-          const { id: snapshotId, path: snapshotPath } = await recordPDFSnapshot(SERVICE_ID, TYPE, expectedPDFContent);
+          const {
+            id: snapshotId,
+            path: snapshotPath,
+          } = await recordSnapshot({
+            serviceId: SERVICE_ID,
+            documentType: TYPE,
+            content: MODIFIED_FILE_CONTENT,
+            mimeType: MIME_TYPE
+          });
           id = snapshotId;
           filepath = snapshotPath;
         });
@@ -201,14 +133,23 @@ describe('History', () => {
     const FILE_CONTENT = '# ToS fixture data with UTF-8 çhãràčtęrs';
     const EXPECTED_FILE_PATH = `${VERSIONS_PATH}/${SERVICE_ID}/${TYPE}.md`;
     const FIRST_COMMIT_MESSAGE = `Start tracking ${SERVICE_ID} ${TYPE}`;
-    const SNAPSHOTS_ID = 'snapshot short sha';
+    const SNAPSHOT_ID = 'snapshot short sha';
     let id;
     let commit;
     let filepath;
     let isFirstRecord;
 
     before(async () => {
-      const { id: versionId, path: versionPath, isFirstRecord: isFirstVersionRecord } = await recordVersion(SERVICE_ID, TYPE, FILE_CONTENT, SNAPSHOTS_ID);
+      const {
+        id: versionId,
+        path: versionPath,
+        isFirstRecord: isFirstVersionRecord
+      } = await recordVersion({
+        serviceId: SERVICE_ID,
+        documentType: TYPE,
+        content: FILE_CONTENT,
+        snapshotId: SNAPSHOT_ID,
+      });
       id = versionId;
       filepath = versionPath;
       isFirstRecord = isFirstVersionRecord;
@@ -239,7 +180,7 @@ describe('History', () => {
     });
 
     it('properly adds snapshot’s id in the commit body', async () => {
-      expect(commit.body).to.include(SNAPSHOTS_ID);
+      expect(commit.body).to.include(SNAPSHOT_ID);
     });
 
     context('when it is not the first record', () => {
@@ -247,7 +188,17 @@ describe('History', () => {
       const UPDATE_COMMIT_MESSAGE = `Update ${SERVICE_ID} ${TYPE}`;
 
       before(async () => {
-        const { id: versionId, path: versionPath, isFirstRecord: isFirstVersionRecord } = await recordVersion(SERVICE_ID, TYPE, MODIFIED_FILE_CONTENT, SNAPSHOTS_ID);
+        const {
+          id: versionId,
+          path: versionPath,
+          isFirstRecord: isFirstVersionRecord
+        } = await recordVersion({
+          serviceId: SERVICE_ID,
+          documentType: TYPE,
+          content: MODIFIED_FILE_CONTENT,
+          snapshotId: SNAPSHOT_ID,
+        });
+
         id = versionId;
         filepath = versionPath;
         isFirstRecord = isFirstVersionRecord;
@@ -276,14 +227,22 @@ describe('History', () => {
       });
 
       it('properly adds snapshot’s id in the commit body', async () => {
-        expect(commit.body).to.include(SNAPSHOTS_ID);
+        expect(commit.body).to.include(SNAPSHOT_ID);
       });
 
       context('when the content has not changed', () => {
         let commitsBefore;
         before(async () => {
           commitsBefore = await gitVersion().log();
-          const { id: versionId, path: versionPath } = await recordVersion(SERVICE_ID, TYPE, MODIFIED_FILE_CONTENT, SNAPSHOTS_ID);
+          const {
+            id: versionId,
+            path: versionPath,
+          } = await recordVersion({
+            serviceId: SERVICE_ID,
+            documentType: TYPE,
+            content: MODIFIED_FILE_CONTENT,
+            snapshotId: SNAPSHOT_ID,
+          });
           id = versionId;
           filepath = versionPath;
           const commits = await gitVersion().log();
@@ -315,14 +274,23 @@ describe('History', () => {
     const FILE_CONTENT = 'ToS fixture data with UTF-8 çhãràčtęrs\n------------------';
     const EXPECTED_FILE_PATH = `${VERSIONS_PATH}/${SERVICE_ID}/${TYPE}.md`;
     const FIRST_RECORD_COMMIT_MESSAGE = `Start tracking ${SERVICE_ID} ${TYPE}`;
-    const SNAPSHOTS_ID = 'snapshot short sha';
+    const SNAPSHOT_ID = 'snapshot short sha';
     let id;
     let commit;
     let filepath;
     let isFirstRecord;
 
     before(async () => {
-      const { id: versionId, path: versionPath, isFirstRecord: isFirstVersionRecord } = await recordRefilter(SERVICE_ID, TYPE, FILE_CONTENT, SNAPSHOTS_ID);
+      const {
+        id: versionId,
+        path: versionPath,
+        isFirstRecord: isFirstVersionRecord
+      } = await recordRefilter({
+        serviceId: SERVICE_ID,
+        documentType: TYPE,
+        content: FILE_CONTENT,
+        snapshotId: SNAPSHOT_ID,
+      });
       id = versionId;
       filepath = versionPath;
       isFirstRecord = isFirstVersionRecord;
@@ -354,7 +322,7 @@ describe('History', () => {
       });
 
       it('properly adds snapshot’s id in the commit body', async () => {
-        expect(commit.body).to.include(SNAPSHOTS_ID);
+        expect(commit.body).to.include(SNAPSHOT_ID);
       });
     });
 
@@ -363,7 +331,16 @@ describe('History', () => {
       const UPDATE_COMMIT_MESSAGE = `Refilter ${SERVICE_ID} ${TYPE}`;
 
       before(async () => {
-        const { id: versionId, path: versionPath, isFirstRecord: isFirstVersionRecord } = await recordRefilter(SERVICE_ID, TYPE, MODIFIED_FILE_CONTENT, SNAPSHOTS_ID);
+        const {
+          id: versionId,
+          path: versionPath,
+          isFirstRecord: isFirstVersionRecord
+        } = await recordRefilter({
+          serviceId: SERVICE_ID,
+          documentType: TYPE,
+          content: MODIFIED_FILE_CONTENT,
+          snapshotId: SNAPSHOT_ID,
+        });
         id = versionId;
         filepath = versionPath;
         isFirstRecord = isFirstVersionRecord;
@@ -392,7 +369,7 @@ describe('History', () => {
       });
 
       it('properly adds snapshot’s id in the commit body', async () => {
-        expect(commit.body).to.include(SNAPSHOTS_ID);
+        expect(commit.body).to.include(SNAPSHOT_ID);
       });
 
       context('when the content has not changed', () => {
@@ -400,7 +377,15 @@ describe('History', () => {
 
         before(async () => {
           commitsBefore = await gitVersion().log();
-          const { id: versionId, path: versionPath } = await recordRefilter(SERVICE_ID, TYPE, MODIFIED_FILE_CONTENT, SNAPSHOTS_ID);
+          const {
+            id: versionId,
+            path: versionPath,
+          } = await recordRefilter({
+            serviceId: SERVICE_ID,
+            documentType: TYPE,
+            content: MODIFIED_FILE_CONTENT,
+            snapshotId: SNAPSHOT_ID,
+          });
           id = versionId;
           filepath = versionPath;
           const commits = await gitVersion().log();
