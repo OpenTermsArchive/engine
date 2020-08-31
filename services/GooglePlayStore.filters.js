@@ -1,4 +1,6 @@
+import mime from 'mime';
 import DataURIParser from 'datauri/parser.js';
+
 import fetch from '../src/fetcher/index.js';
 
 const dataURI = new DataURIParser();
@@ -13,11 +15,10 @@ export async function downloadImages(document, { fetch: baseUrl, select: selecto
 
     const imageUrl = new URL(src, baseUrl).href; // Ensure url is absolute
 
-    const blob = await fetch(imageUrl, { asRawData: true });
+    const { mimeType, content } = await fetch(imageUrl);
 
-    const extension = `.${blob.type.split('/')[1].split('+')[0]}`;
-    const arrayBuffer = await blob.arrayBuffer();
+    const extension = mime.getExtension(mimeType);
 
-    images[index].src = dataURI.format(extension, arrayBuffer).content;
+    images[index].src = dataURI.format(extension, content).content;
   }));
 }
