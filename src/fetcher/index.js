@@ -19,11 +19,10 @@ export default async function fetch(url) {
     throw new Error(`Received HTTP code ${response.status} when trying to fetch '${url}'`);
   }
 
-  const blob = await response.blob();
+  const mimeType = response.headers.get('content-type');
 
-  if (blob.type.startsWith('text/')) {
-    return blob.text();
-  }
-
-  return blob;
+  return {
+    mimeType,
+    content: await (mimeType.startsWith('text/') ? response.text() : response.buffer()),
+  };
 }
