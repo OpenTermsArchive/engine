@@ -71,11 +71,31 @@ Filters take the document as parameter and are:
 
 Filters are loaded automatically from files named after the service they operate on. For example, filters for the Meetup service, which is declared in `services/Meetup.json`, are loaded from `services/Meetup.filters.js`.
 
-Each filter is exposed as a named function export that takes a `document` parameter and behaves like the `document` object in a browser DOM.
+Each filter is exposed as a named function export, which could be `async`, that takes a `document` parameter and behaves like the `document` object in a browser DOM.
 
 > It is actually a [JSDOM](https://github.com/jsdom/jsdom) document instance.
 
+There is also an optional parameter containing the whole document declaration. It can be useful if you need to access the defined document url or selector inside your filter.
+
+For example, you can scope your the selection in your filter by the `selector` defined in the document declaration:
+
+```js
+export function removeImages(document, { select: selector }) {
+  const images = document.querySelectorAll(`${selector} img`);
+  images.forEach(el => el.remove());
+}
+
+```
+
+So the generic function signature is:
+
+```js
+export [async] function filterName(document [, documentDeclaration])
+```
+
 Learn more about [usual noise](https://github.com/ambanum/CGUs/wiki/Usual-noise).
+
+You can find example of filters in [`/services/*.filters.json`](./services) files.
 
 ### Selectors
 
