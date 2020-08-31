@@ -144,7 +144,7 @@ describe('Recorder', () => {
           documentType: TYPE,
           content: FILE_CONTENT,
           changelog,
-          fileExtension: 'pdf',
+          mimeType: 'application/pdf',
         });
         path = recordFilePath;
       });
@@ -232,6 +232,7 @@ describe('Recorder', () => {
     context('When there are records for given service', () => {
       let lastSnapshotId;
       let latestRecord;
+      const UPDATED_FILE_CONTENT = `${FILE_CONTENT} (with additional content to trigger a record)`;
 
       before(async () => {
         await subject.record({
@@ -242,7 +243,7 @@ describe('Recorder', () => {
         const { id: recordId } = await subject.record({
           serviceId: SERVICE_PROVIDER_ID,
           documentType: TYPE,
-          content: `${FILE_CONTENT} (with additional content to trigger a record)`,
+          content: UPDATED_FILE_CONTENT,
         });
         lastSnapshotId = recordId;
         latestRecord = await subject.getLatestRecord(SERVICE_PROVIDER_ID, TYPE);
@@ -254,17 +255,23 @@ describe('Recorder', () => {
         expect(latestRecord.id).to.include(lastSnapshotId);
       });
 
-      it('returns the latest record path', async () => {
-        expect(latestRecord.path).to.equal(EXPECTED_FILE_PATH);
+      it('returns the latest record content', async () => {
+        expect(latestRecord.content.toString('utf8')).to.equal(UPDATED_FILE_CONTENT);
+      });
+
+      it('returns the latest record mime type', async () => {
+        expect(latestRecord.mimeType).to.equal('text/html');
       });
 
       context('With pdf file', () => {
+        const PDF_FILE_CONTENT = `${FILE_CONTENT} (with fake pdf file)`;
+
         before(async () => {
           const { id: recordId } = await subject.record({
             serviceId: SERVICE_PROVIDER_ID,
             documentType: TYPE,
             content: `${FILE_CONTENT} (with fake pdf file)`,
-            fileExtension: 'pdf'
+            mimeType: 'application/pdf'
           });
           lastSnapshotId = recordId;
           latestRecord = await subject.getLatestRecord(SERVICE_PROVIDER_ID, TYPE);
@@ -276,8 +283,12 @@ describe('Recorder', () => {
           expect(latestRecord.id).to.include(lastSnapshotId);
         });
 
-        it('returns the latest record path', async () => {
-          expect(latestRecord.path).to.equal(EXPECTED_PDF_FILE_PATH);
+        it('returns the latest record content', async () => {
+          expect(latestRecord.content.toString('utf8')).to.equal(PDF_FILE_CONTENT);
+        });
+
+        it('returns the latest record mime type', async () => {
+          expect(latestRecord.mimeType).to.equal('application/pdf');
         });
       });
     });
@@ -289,12 +300,16 @@ describe('Recorder', () => {
         latestRecord = await subject.getLatestRecord(SERVICE_PROVIDER_ID, TYPE);
       });
 
-      it('returns null for id', async () => {
-        expect(latestRecord.id).to.be.null;
+      it('returns no id', async () => {
+        expect(latestRecord.id).to.be.undefined;
       });
 
-      it('returns null for path', async () => {
-        expect(latestRecord.path).to.be.null;
+      it('returns no content', async () => {
+        expect(latestRecord.content).to.be.undefined;
+      });
+
+      it('returns no mimeType', async () => {
+        expect(latestRecord.mimeType).to.be.undefined;
       });
     });
   });
