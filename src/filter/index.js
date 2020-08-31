@@ -10,16 +10,30 @@ turndownService.use(turndownPluginGithubFlavouredMarkdown.gfm);
 
 export const LINKS_TO_CONVERT_SELECTOR = 'a[href]:not([href^="#"])';
 
-export default async function filter(content, { fetch: location, select: extractionSelectors = [], remove: deletionSelectors = [], filter: serviceSpecificFilters = [] }, filterFunctions) {
-  const virtualConsole = new jsdom.VirtualConsole();
+export default async function filter(content, documentDeclaration, filterFunctions) {
+  const {
+    fetch: location,
+    select: extractionSelectors = [],
+    remove: deletionSelectors = [],
+    filter: serviceSpecificFilters = [],
+  } = documentDeclaration;
+
   const jsdomInstance = new JSDOM(content, {
     url: location,
-    virtualConsole
+    virtualConsole: new jsdom.VirtualConsole(),
   });
   const { document: webPageDOM } = jsdomInstance.window;
-  serviceSpecificFilters.forEach(filterName => {
-    filterFunctions[filterName](webPageDOM); // filters work in place
-  });
+
+  for (const filterName of serviceSpecificFilters) {
+    const isAsyncFilter = filterFunctions[filterName].constructor.name === 'AsyncFunction';
+
+    // filters work in place
+    if (isAsyncFilter) {
+      await filterFunctions[filterName](webPageDOM, documentDeclaration); // eslint-disable-line no-await-in-loop
+    } else {
+      filterFunctions[filterName](webPageDOM, documentDeclaration);
+    }
+  }
 
   remove(webPageDOM, deletionSelectors); // remove function works in place
 
