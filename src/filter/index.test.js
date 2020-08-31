@@ -116,7 +116,11 @@ describe('Filter', () => {
 
       context('With an additional async filter', () => {
         it('filters the given HTML content also with given additional filter', async () => {
-          const result = await filter(rawHTML, { fetch: virtualLocation, select: 'body', filter: [ 'removeLinksAsync' ] }, additionalFilter);
+          const result = await filterHTML({
+            content: rawHTML,
+            documentDeclaration: { fetch: virtualLocation, select: 'body', filter: [ 'removeLinksAsync' ] },
+            filterFunctions: additionalFilter
+          });
           expect(result).to.equal(expectedFilteredWithAdditional);
         });
       });
