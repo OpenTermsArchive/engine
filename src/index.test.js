@@ -15,22 +15,22 @@ const { expect } = chai;
 describe('CGUs', () => {
   const SERVICE_A_EXPECTED_SNAPSHOT_FILE_PATH = `${SNAPSHOTS_PATH}/service_A/Terms of Service.html`;
   const SERVICE_A_EXPECTED_VERSION_FILE_PATH = `${VERSIONS_PATH}/service_A/Terms of Service.md`;
-  let serviceASnaphostExpectedContent;
+  let serviceASnapshotExpectedContent;
   let serviceAVersionExpectedContent;
 
   const SERVICE_B_EXPECTED_SNAPSHOT_FILE_PATH = `${SNAPSHOTS_PATH}/service_B/Terms of Service.pdf`;
   const SERVICE_B_EXPECTED_VERSION_FILE_PATH = `${VERSIONS_PATH}/service_B/Terms of Service.md`;
-  let serviceBSnaphostExpectedContent;
+  let serviceBSnapshotExpectedContent;
   let serviceBVersionExpectedContent;
 
   before(async () => {
-    serviceASnaphostExpectedContent = await fs.readFile(path.resolve(__dirname, '../test/fixtures/service_A_terms_snapshot.html'), { encoding: 'utf8' });
+    serviceASnapshotExpectedContent = await fs.readFile(path.resolve(__dirname, '../test/fixtures/service_A_terms_snapshot.html'), { encoding: 'utf8' });
     serviceAVersionExpectedContent = await fs.readFile(path.resolve(__dirname, '../test/fixtures/service_A_terms.md'), { encoding: 'utf8' });
     serviceBSnapshotExpectedContent = await fs.readFile(path.resolve(__dirname, '../test/fixtures/terms.pdf'));
     serviceBVersionExpectedContent = await fs.readFile(path.resolve(__dirname, '../test/fixtures/termsFromPDF.md'), { encoding: 'utf8' });
 
-    nock('https://www.servicea.example').persist().get('/tos').reply(200, serviceASnaphostExpectedContent, { 'Content-Type': 'text/html' });
-    nock('https://www.serviceb.example').persist().get('/tos').reply(200, serviceBSnaphostExpectedContent, { 'Content-Type': 'application/pdf' });
+    nock('https://www.servicea.example').persist().get('/tos').reply(200, serviceASnapshotExpectedContent, { 'Content-Type': 'text/html' });
+    nock('https://www.serviceb.example').persist().get('/tos').reply(200, serviceBSnapshotExpectedContent, { 'Content-Type': 'application/pdf' });
   });
 
   describe('#trackChanges', () => {
@@ -44,7 +44,7 @@ describe('CGUs', () => {
 
     it('records snapshot for service A', async () => {
       const resultingSnapshotTerms = await fs.readFile(path.resolve(__dirname, SERVICE_A_EXPECTED_SNAPSHOT_FILE_PATH), { encoding: 'utf8' });
-      expect(resultingSnapshotTerms).to.be.equal(serviceASnaphostExpectedContent);
+      expect(resultingSnapshotTerms).to.be.equal(serviceASnapshotExpectedContent);
     });
 
     it('records version for service A', async () => {
@@ -54,7 +54,7 @@ describe('CGUs', () => {
 
     it('records snapshot for service B', async () => {
       const resultingSnapshotTerms = await fs.readFile(path.resolve(__dirname, SERVICE_B_EXPECTED_SNAPSHOT_FILE_PATH));
-      expect(resultingSnapshotTerms.equals(serviceBSnaphostExpectedContent)).to.be.true;
+      expect(resultingSnapshotTerms.equals(serviceBSnapshotExpectedContent)).to.be.true;
     });
 
     it('records version for service B', async () => {
