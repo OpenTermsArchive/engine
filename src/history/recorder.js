@@ -1,4 +1,11 @@
+/**
+* This file is the boundary beyond which the usage of git is abstracted.
+* Commit SHAs are used as opaque unique IDs.
+*/
+
 import fsApi from 'fs';
+
+import mime from 'mime';
 
 import Git from './git.js';
 
@@ -11,7 +18,8 @@ export default class Recorder {
     this.git = new Git(this.path);
   }
 
-  async record({ serviceId, documentType, content, changelog, fileExtension }) {
+  async record({ serviceId, documentType, content, changelog, mimeType }) {
+    const fileExtension = mime.getExtension(mimeType);
     const filePath = await this.save({ serviceId, documentType, content, fileExtension });
     const sha = await this.commit(filePath, changelog);
 
@@ -57,10 +65,7 @@ export default class Recorder {
     const [ latestCommit ] = await this._getCommits(filePath);
 
     if (!latestCommit) {
-      return {
-        id: null,
-        path: null,
-      };
+      return {};
     }
 
     const [ relativeFilePath, ...otherFilesPaths ] = await this.git.filesInCommit(latestCommit.hash);
@@ -71,7 +76,8 @@ export default class Recorder {
 
     return {
       id: latestCommit.hash,
-      path: `${this.path}/${relativeFilePath}`,
+      content: await fs.readFile(`${this.path}/${relativeFilePath}`),
+      mimeType: mime.getType(relativeFilePath)
     };
   }
 
@@ -79,8 +85,8 @@ export default class Recorder {
     return `${this.path}/${serviceId}/${documentType}.${fileExtension || this.fileExtension}`;
   }
 
-  async isTracked(serviceId, documentType, fileExtension) {
-    const filePath = this.getPathFor(serviceId, documentType, fileExtension);
+  async isTracked(serviceId, documentType) {
+    const filePath = this.getPathFor(serviceId, documentType, '*');
     return this.git.isTracked(filePath);
   }
 
