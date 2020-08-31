@@ -45,6 +45,17 @@ const additionalFilter = {
     links.forEach(link => {
       link.remove();
     });
+  },
+  removeLinksAsync: async function removeLinksAsync(document) {
+    return new Promise(resolve => {
+      setTimeout(() => {
+        const links = document.querySelectorAll('a');
+        links.forEach(link => {
+          link.remove();
+        });
+        resolve();
+      }, 300);
+    });
   }
 };
 
@@ -99,6 +110,13 @@ describe('Filter', () => {
             documentDeclaration: { fetch: virtualLocation, select: 'body', filter: [ 'removeLinks' ] },
             filterFunctions: additionalFilter
           });
+          expect(result).to.equal(expectedFilteredWithAdditional);
+        });
+      });
+
+      context('With an additional async filter', () => {
+        it('filters the given HTML content also with given additional filter', async () => {
+          const result = await filter(rawHTML, { fetch: virtualLocation, select: 'body', filter: [ 'removeLinksAsync' ] }, additionalFilter);
           expect(result).to.equal(expectedFilteredWithAdditional);
         });
       });

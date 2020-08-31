@@ -36,15 +36,23 @@ export async function filterHTML({ content, documentDeclaration, filterFunctions
     remove: deletionSelectors = [],
     filter: serviceSpecificFilters = []
   } = documentDeclaration;
-  const virtualConsole = new jsdom.VirtualConsole();
+
   const jsdomInstance = new JSDOM(content, {
     url: location,
-    virtualConsole
+    virtualConsole: new jsdom.VirtualConsole(),
   });
   const { document: webPageDOM } = jsdomInstance.window;
-  serviceSpecificFilters.forEach(filterName => {
-    filterFunctions[filterName](webPageDOM); // filters work in place
-  });
+
+  for (const filterName of serviceSpecificFilters) {
+    const isAsyncFilter = filterFunctions[filterName].constructor.name === 'AsyncFunction';
+
+    // filters work in place
+    if (isAsyncFilter) {
+      await filterFunctions[filterName](webPageDOM, documentDeclaration); // eslint-disable-line no-await-in-loop
+    } else {
+      filterFunctions[filterName](webPageDOM, documentDeclaration);
+    }
+  }
 
   remove(webPageDOM, deletionSelectors); // remove function works in place
 
