@@ -4,7 +4,7 @@ import HttpsProxyAgent from 'https-proxy-agent';
 
 const LANGUAGE = 'en';
 
-export default async function fetch(url, { asRawData = false } = {}) {
+export default async function fetch(url) {
   const options = {};
   if (url.startsWith('https:') && process.env.HTTPS_PROXY) {
     options.agent = new HttpsProxyAgent(process.env.HTTPS_PROXY);
