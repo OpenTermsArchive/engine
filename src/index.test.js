@@ -26,8 +26,8 @@ describe('CGUs', () => {
   before(async () => {
     serviceASnaphostExpectedContent = await fs.readFile(path.resolve(__dirname, '../test/fixtures/service_A_terms_snapshot.html'), { encoding: 'utf8' });
     serviceAVersionExpectedContent = await fs.readFile(path.resolve(__dirname, '../test/fixtures/service_A_terms.md'), { encoding: 'utf8' });
-    serviceBSnaphostExpectedContent = await fs.readFile(path.resolve(__dirname, '../test/fixtures/service_B_terms_snapshot.pdf'));
-    serviceBVersionExpectedContent = await fs.readFile(path.resolve(__dirname, '../test/fixtures/service_B_terms.md'), { encoding: 'utf8' });
+    serviceBSnapshotExpectedContent = await fs.readFile(path.resolve(__dirname, '../test/fixtures/terms.pdf'));
+    serviceBVersionExpectedContent = await fs.readFile(path.resolve(__dirname, '../test/fixtures/termsFromPDF.md'), { encoding: 'utf8' });
 
     nock('https://www.servicea.example').persist().get('/tos').reply(200, serviceASnaphostExpectedContent, { 'Content-Type': 'text/html' });
     nock('https://www.serviceb.example').persist().get('/tos').reply(200, serviceBSnaphostExpectedContent, { 'Content-Type': 'application/pdf' });
