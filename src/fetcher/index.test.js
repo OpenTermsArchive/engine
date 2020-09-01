@@ -32,11 +32,11 @@ describe('Fetcher', () => {
       });
 
       it('returns the web page content of the given URL', async () => {
-        expect(content).to.be.equal(termsHTML);
+        expect(content).to.equal(termsHTML);
       });
 
       it('returns the mime type of the given URL', async () => {
-        expect(mimeType).to.be.equal('text/html');
+        expect(mimeType).to.equal('text/html');
       });
     });
 
