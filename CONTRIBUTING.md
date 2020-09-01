@@ -77,7 +77,7 @@ Each filter is exposed as a named function export, which could be `async`, that 
 
 There is also an optional parameter containing the whole document declaration. It can be useful if you need to access the defined document url or selector inside your filter.
 
-For example, you can scope your the selection in your filter by the `selector` defined in the document declaration:
+For example, you can scope the selection in your filter with the `selector` defined in the document declaration:
 
 ```js
 export function removeImages(document, { select: selector }) {
@@ -95,7 +95,7 @@ export [async] function filterName(document [, documentDeclaration])
 
 Learn more about [usual noise](https://github.com/ambanum/CGUs/wiki/Usual-noise).
 
-You can find example of filters in [`/services/*.filters.json`](./services) files.
+You can find examples of filters in [`/services/*.filters.json`](./services) files.
 
 ### Selectors
 
