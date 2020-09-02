@@ -1,4 +1,11 @@
+/**
+* This file is the boundary beyond which the usage of git is abstracted.
+* Commit SHAs are used as opaque unique IDs.
+*/
+
 import fsApi from 'fs';
+
+import mime from 'mime';
 
 import Git from './git.js';
 
@@ -11,8 +18,9 @@ export default class Recorder {
     this.git = new Git(this.path);
   }
 
-  async record({ serviceId, documentType, content, changelog }) {
-    const filePath = await this.save({ serviceId, documentType, content });
+  async record({ serviceId, documentType, content, changelog, mimeType }) {
+    const fileExtension = mime.getExtension(mimeType);
+    const filePath = await this.save({ serviceId, documentType, content, fileExtension });
     const sha = await this.commit(filePath, changelog);
 
     return {
@@ -21,14 +29,14 @@ export default class Recorder {
     };
   }
 
-  async save({ serviceId, documentType, content }) {
+  async save({ serviceId, documentType, content, fileExtension }) {
     const directory = `${this.path}/${serviceId}`;
 
     if (!await fileExists(directory)) {
       await fs.mkdir(directory, { recursive: true });
     }
 
-    const filePath = this.getPathFor(serviceId, documentType);
+    const filePath = this.getPathFor(serviceId, documentType, fileExtension);
 
     await fs.writeFile(filePath, content);
 
@@ -53,21 +61,32 @@ export default class Recorder {
   }
 
   async getLatestRecord(serviceId, documentType) {
-    const filePath = this.getPathFor(serviceId, documentType);
+    const filePath = this.getPathFor(serviceId, documentType, '*');
     const [ latestCommit ] = await this._getCommits(filePath);
 
+    if (!latestCommit) {
+      return {};
+    }
+
+    const [ relativeFilePath, ...otherFilesPaths ] = await this.git.filesInCommit(latestCommit.hash);
+
+    if (otherFilesPaths.length) {
+      throw new Error(`Only one document of type ${documentType} should have been recorded in ${latestCommit.hash}, but these additional ones have also been recorded: ${otherFilesPaths}`);
+    }
+
     return {
-      id: latestCommit && latestCommit.hash,
-      path: filePath
+      id: latestCommit.hash,
+      content: await fs.readFile(`${this.path}/${relativeFilePath}`),
+      mimeType: mime.getType(relativeFilePath)
     };
   }
 
-  getPathFor(serviceId, documentType) {
-    return `${this.path}/${serviceId}/${documentType}.${this.fileExtension}`;
+  getPathFor(serviceId, documentType, fileExtension) {
+    return `${this.path}/${serviceId}/${documentType}.${fileExtension || this.fileExtension}`;
   }
 
   async isTracked(serviceId, documentType) {
-    const filePath = this.getPathFor(serviceId, documentType);
+    const filePath = this.getPathFor(serviceId, documentType, '*');
     return this.git.isTracked(filePath);
   }
 

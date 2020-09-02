@@ -51,11 +51,17 @@ export default class Git {
       const logSummary = await this.git.log(options);
       return logSummary.all;
     } catch (error) {
-      if (!error.message.includes('unknown revision or path not in the working tree')) {
+      if (!(error.message.includes('unknown revision or path not in the working tree')
+         || error.message.includes('does not have any commits yet'))) {
         throw (error);
       }
       return [];
     }
+  }
+
+  async filesInCommit(sha) {
+    const result = await this.git.raw('show', '--name-only', '--pretty=format:', sha);
+    return result.trim().split('\n');
   }
 
   async isTracked(filepath) {
