@@ -64,14 +64,20 @@ Some documents will need additional filtering beyond simple element deletion and
 
 These filters are declared as JavaScript functions that modify the downloaded web page through the [DOM API](https://developer.mozilla.org/en-US/docs/Web/API/Document_Object_Model).
 
-Filters take the document as parameter and are:
+Filters take the document and the document declaration as parameters and are:
 
 - **in-place**: they modify the document structure and content directly;
 - **idempotent**: they should return the same document structure and content even if run repeatedly on their own result.
 
 Filters are loaded automatically from files named after the service they operate on. For example, filters for the Meetup service, which is declared in `services/Meetup.json`, are loaded from `services/Meetup.filters.js`.
 
-Each filter is exposed as a named function export, which could be `async`, that takes a `document` parameter and behaves like the `document` object in a browser DOM.
+The generic function signature for a filter is:
+
+```js
+export [async] function filterName(document [, documentDeclaration])
+```
+
+Each filter is exposed as a named function export that takes a `document` parameter and behaves like the `document` object in a browser DOM. These functions can be `async`, but they will still run sequentially.
 
 > It is actually a [JSDOM](https://github.com/jsdom/jsdom) document instance.
 
@@ -87,15 +93,9 @@ export function removeImages(document, { select: selector }) {
 
 ```
 
-So the generic function signature is:
-
-```js
-export [async] function filterName(document [, documentDeclaration])
-```
-
-Learn more about [usual noise](https://github.com/ambanum/CGUs/wiki/Usual-noise).
-
 You can find examples of filters in [`/services/*.filters.json`](./services) files.
+
+You can also learn more about [usual noise](https://github.com/ambanum/CGUs/wiki/Usual-noise).
 
 ### Selectors
 
