@@ -308,7 +308,7 @@ describe('Recorder', () => {
         expect(latestRecord.content).to.be.undefined;
       });
 
-      it('returns no mimeType', async () => {
+      it('returns no mime type', async () => {
         expect(latestRecord.mimeType).to.be.undefined;
       });
     });
