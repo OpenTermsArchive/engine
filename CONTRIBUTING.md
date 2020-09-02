@@ -79,9 +79,9 @@ export [async] function filterName(document [, documentDeclaration])
 
 Each filter is exposed as a named function export that takes a `document` parameter and behaves like the `document` object in a browser DOM. These functions can be `async`, but they will still run sequentially.
 
-> It is actually a [JSDOM](https://github.com/jsdom/jsdom) document instance.
+> The `document` parameter is actually a [JSDOM](https://github.com/jsdom/jsdom) document instance.
 
-There is also an optional parameter containing the whole document declaration. It can be useful if you need to access the defined document url or selector inside your filter.
+The second parameter contains the whole document declaration. It can be useful if you need to access the defined document URL or selector inside your filter.
 
 For example, you can scope the selection in your filter with the `selector` defined in the document declaration:
 
