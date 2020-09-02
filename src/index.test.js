@@ -44,12 +44,12 @@ describe('CGUs', () => {
 
     it('records snapshot for service A', async () => {
       const resultingSnapshotTerms = await fs.readFile(path.resolve(__dirname, SERVICE_A_EXPECTED_SNAPSHOT_FILE_PATH), { encoding: 'utf8' });
-      expect(resultingSnapshotTerms).to.be.equal(serviceASnapshotExpectedContent);
+      expect(resultingSnapshotTerms).to.equal(serviceASnapshotExpectedContent);
     });
 
     it('records version for service A', async () => {
       const resultingTerms = await fs.readFile(path.resolve(__dirname, SERVICE_A_EXPECTED_VERSION_FILE_PATH), { encoding: 'utf8' });
-      expect(resultingTerms).to.be.equal(serviceAVersionExpectedContent);
+      expect(resultingTerms).to.equal(serviceAVersionExpectedContent);
     });
 
     it('records snapshot for service B', async () => {
@@ -59,7 +59,7 @@ describe('CGUs', () => {
 
     it('records version for service B', async () => {
       const resultingTerms = await fs.readFile(path.resolve(__dirname, SERVICE_B_EXPECTED_VERSION_FILE_PATH), { encoding: 'utf8' });
-      expect(resultingTerms).to.be.equal(serviceBVersionExpectedContent);
+      expect(resultingTerms).to.equal(serviceBVersionExpectedContent);
     });
   });
 
@@ -97,7 +97,7 @@ describe('CGUs', () => {
 
       it('refilters the content and saves the file', async () => {
         const serviceAContent = await fs.readFile(path.resolve(__dirname, SERVICE_A_EXPECTED_VERSION_FILE_PATH), { encoding: 'utf8' });
-        expect(serviceAContent).to.be.equal('Terms of service\n================');
+        expect(serviceAContent).to.equal('Terms of service\n================');
       });
 
       it('generates a new version id', async () => {
@@ -110,7 +110,7 @@ describe('CGUs', () => {
 
       it('does not change other services', async () => {
         const serviceBVersion = await fs.readFile(path.resolve(__dirname, SERVICE_B_EXPECTED_VERSION_FILE_PATH), { encoding: 'utf8' });
-        expect(serviceBVersion).to.be.equal(serviceBVersionExpectedContent);
+        expect(serviceBVersion).to.equal(serviceBVersionExpectedContent);
       });
 
       it('does not generate a new id for other services', async () => {
