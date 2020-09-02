@@ -64,35 +64,33 @@ if (args.includes('--schema-only')) {
       expect(secondFilteredContent, `${serviceId} ${type} has inconsistent filtered content`).to.equal(filteredContent);
     });
 
-    return Promise.allSettled(documentValidationPromises)
-      .then(documentValidationResults => {
-        const failures = documentValidationResults.filter(result => result.status == 'rejected');
+    const documentValidationResults = await Promise.allSettled(documentValidationPromises);
 
-        failures.forEach(failure => console.warn(serviceId, 'fails:', failure.reason.message));
+    const failures = documentValidationResults.filter(result => result.status == 'rejected');
+    failures.forEach(failure => console.warn(serviceId, 'fails:', failure.reason.message));
 
-        if (failures.length) {
-          throw failures;
-        }
+    if (failures.length) {
+      throw failures;
+    }
 
-        console.log(serviceId, 'is valid');
-      });
+    console.log(serviceId, 'is valid');
   });
 
-  return Promise.allSettled(serviceValidationPromises)
-    .then(serviceValidationResults => {
-      const totals = {
-        rejected: 0,
-        fulfilled: 0,
-      };
+  const serviceValidationResults = await Promise.allSettled(serviceValidationPromises);
 
-      serviceValidationResults.forEach(result => totals[result.status]++);
+  const totals = {
+    rejected: 0,
+    fulfilled: 0,
+  };
 
-      console.log(totals.fulfilled, 'services are valid');
-      if (totals.rejected) {
-        console.error(totals.rejected, 'services have validation errors');
-        process.exitCode = 1;
-      }
-    });
+  serviceValidationResults.forEach(result => totals[result.status]++);
+
+  console.log(totals.fulfilled, 'services are valid');
+
+  if (totals.rejected) {
+    console.error(totals.rejected, 'services have validation errors');
+    process.exitCode = 1;
+  }
 })();
 
 
