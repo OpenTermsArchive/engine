@@ -1,6 +1,7 @@
-import chai from 'chai';
 import fsApi from 'fs';
 import path from 'path';
+
+import chai from 'chai';
 import nock from 'nock';
 
 import CGUs from './index.js';
@@ -11,25 +12,29 @@ const fs = fsApi.promises;
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
 const { expect } = chai;
 
-const SERVICE_A_ID = 'service_A';
-const SERVICE_A_TYPE = 'Terms of Service';
-const SERVICE_A_EXPECTED_SNAPSHOT_FILE_PATH = `${SNAPSHOTS_PATH}/${SERVICE_A_ID}/${SERVICE_A_TYPE}.html`;
-const SERVICE_A_EXPECTED_VERSION_FILE_PATH = `${VERSIONS_PATH}/${SERVICE_A_ID}/${SERVICE_A_TYPE}.md`;
-const SERVICE_A_TOS_SNAPSHOT = fsApi.readFileSync(path.resolve(__dirname, '../test/fixtures/service_A_terms_snapshot.html'), { encoding: 'utf8' });
-const SERVICE_A_TOS_VERSION = fsApi.readFileSync(path.resolve(__dirname, '../test/fixtures/service_A_terms.md'), { encoding: 'utf8' });
-
-const SERVICE_B_ID = 'service_B';
-const SERVICE_B_TYPE = 'Terms of Service';
-const SERVICE_B_EXPECTED_SNAPSHOT_FILE_PATH = `${SNAPSHOTS_PATH}/${SERVICE_B_ID}/${SERVICE_B_TYPE}.html`;
-const SERVICE_B_EXPECTED_VERSION_FILE_PATH = `${VERSIONS_PATH}/${SERVICE_B_ID}/${SERVICE_B_TYPE}.md`;
-const SERVICE_B_TOS_SNAPSHOT = fsApi.readFileSync(path.resolve(__dirname, '../test/fixtures/service_B_terms_snapshot.html'), { encoding: 'utf8' });
-const SERVICE_B_TOS_VERSION = fsApi.readFileSync(path.resolve(__dirname, '../test/fixtures/service_B_terms.md'), { encoding: 'utf8' });
-
 describe('CGUs', () => {
+  const SERVICE_A_EXPECTED_SNAPSHOT_FILE_PATH = `${SNAPSHOTS_PATH}/service_A/Terms of Service.html`;
+  const SERVICE_A_EXPECTED_VERSION_FILE_PATH = `${VERSIONS_PATH}/service_A/Terms of Service.md`;
+  let serviceASnapshotExpectedContent;
+  let serviceAVersionExpectedContent;
+
+  const SERVICE_B_EXPECTED_SNAPSHOT_FILE_PATH = `${SNAPSHOTS_PATH}/service_B/Terms of Service.pdf`;
+  const SERVICE_B_EXPECTED_VERSION_FILE_PATH = `${VERSIONS_PATH}/service_B/Terms of Service.md`;
+  let serviceBSnapshotExpectedContent;
+  let serviceBVersionExpectedContent;
+
+  before(async () => {
+    serviceASnapshotExpectedContent = await fs.readFile(path.resolve(__dirname, '../test/fixtures/service_A_terms_snapshot.html'), { encoding: 'utf8' });
+    serviceAVersionExpectedContent = await fs.readFile(path.resolve(__dirname, '../test/fixtures/service_A_terms.md'), { encoding: 'utf8' });
+    serviceBSnapshotExpectedContent = await fs.readFile(path.resolve(__dirname, '../test/fixtures/terms.pdf'));
+    serviceBVersionExpectedContent = await fs.readFile(path.resolve(__dirname, '../test/fixtures/termsFromPDF.md'), { encoding: 'utf8' });
+
+    nock('https://www.servicea.example').persist().get('/tos').reply(200, serviceASnapshotExpectedContent, { 'Content-Type': 'text/html' });
+    nock('https://www.serviceb.example').persist().get('/tos').reply(200, serviceBSnapshotExpectedContent, { 'Content-Type': 'application/pdf' });
+  });
+
   describe('#trackChanges', () => {
     before(async () => {
-      nock('https://www.servicea.example').get('/tos').reply(200, SERVICE_A_TOS_SNAPSHOT);
-      nock('https://www.serviceb.example').get('/tos').reply(200, SERVICE_B_TOS_SNAPSHOT);
       const app = new CGUs();
       await app.init();
       return app.trackChanges();
@@ -39,22 +44,22 @@ describe('CGUs', () => {
 
     it('records snapshot for service A', async () => {
       const resultingSnapshotTerms = await fs.readFile(path.resolve(__dirname, SERVICE_A_EXPECTED_SNAPSHOT_FILE_PATH), { encoding: 'utf8' });
-      expect(resultingSnapshotTerms).to.be.equal(SERVICE_A_TOS_SNAPSHOT);
+      expect(resultingSnapshotTerms).to.equal(serviceASnapshotExpectedContent);
     });
 
     it('records version for service A', async () => {
       const resultingTerms = await fs.readFile(path.resolve(__dirname, SERVICE_A_EXPECTED_VERSION_FILE_PATH), { encoding: 'utf8' });
-      expect(resultingTerms).to.be.equal(SERVICE_A_TOS_VERSION);
+      expect(resultingTerms).to.equal(serviceAVersionExpectedContent);
     });
 
     it('records snapshot for service B', async () => {
-      const resultingSnapshotTerms = await fs.readFile(path.resolve(__dirname, SERVICE_B_EXPECTED_SNAPSHOT_FILE_PATH), { encoding: 'utf8' });
-      expect(resultingSnapshotTerms).to.be.equal(SERVICE_B_TOS_SNAPSHOT);
+      const resultingSnapshotTerms = await fs.readFile(path.resolve(__dirname, SERVICE_B_EXPECTED_SNAPSHOT_FILE_PATH));
+      expect(resultingSnapshotTerms.equals(serviceBSnapshotExpectedContent)).to.be.true;
     });
 
     it('records version for service B', async () => {
       const resultingTerms = await fs.readFile(path.resolve(__dirname, SERVICE_B_EXPECTED_VERSION_FILE_PATH), { encoding: 'utf8' });
-      expect(resultingTerms).to.be.equal(SERVICE_B_TOS_VERSION);
+      expect(resultingTerms).to.equal(serviceBVersionExpectedContent);
     });
   });
 
@@ -67,8 +72,6 @@ describe('CGUs', () => {
       let serviceBCommits;
 
       before(async () => {
-        nock('https://www.servicea.example').get('/tos').reply(200, SERVICE_A_TOS_SNAPSHOT);
-        nock('https://www.serviceb.example').get('/tos').reply(200, SERVICE_B_TOS_SNAPSHOT);
         const app = new CGUs();
         await app.init();
         await app.trackChanges();
@@ -81,7 +84,7 @@ describe('CGUs', () => {
 
         serviceBCommits = await gitVersion().log({ file: SERVICE_B_EXPECTED_VERSION_FILE_PATH });
 
-        app._serviceDeclarations[SERVICE_A_ID].documents[SERVICE_A_TYPE].select = 'h1';
+        app._serviceDeclarations.service_A.documents['Terms of Service'].select = 'h1';
 
         await app.refilterAndRecord();
 
@@ -94,7 +97,7 @@ describe('CGUs', () => {
 
       it('refilters the content and saves the file', async () => {
         const serviceAContent = await fs.readFile(path.resolve(__dirname, SERVICE_A_EXPECTED_VERSION_FILE_PATH), { encoding: 'utf8' });
-        expect(serviceAContent).to.be.equal('Terms of service\n================');
+        expect(serviceAContent).to.equal('Terms of service\n================');
       });
 
       it('generates a new version id', async () => {
@@ -107,7 +110,7 @@ describe('CGUs', () => {
 
       it('does not change other services', async () => {
         const serviceBVersion = await fs.readFile(path.resolve(__dirname, SERVICE_B_EXPECTED_VERSION_FILE_PATH), { encoding: 'utf8' });
-        expect(serviceBVersion).to.be.equal(SERVICE_B_TOS_VERSION);
+        expect(serviceBVersion).to.equal(serviceBVersionExpectedContent);
       });
 
       it('does not generate a new id for other services', async () => {

@@ -1,9 +1,11 @@
-import fs from 'fs';
+import fsApi from 'fs';
+
 import chai from 'chai';
 
 import { resetGitRepository, gitSnapshot, gitVersion } from '../../test/helper.js';
 import { SNAPSHOTS_PATH, VERSIONS_PATH, recordSnapshot, recordVersion, recordRefilter } from './index.js';
 
+const fs = fsApi.promises;
 const { expect } = chai;
 
 describe('History', () => {
@@ -14,15 +16,25 @@ describe('History', () => {
     const FILE_CONTENT = '<html><h1>ToS fixture data with UTF-8 çhãràčtęrs</h1></html>';
     const EXPECTED_FILE_PATH = `${SNAPSHOTS_PATH}/${SERVICE_ID}/${TYPE}.html`;
     const FIRST_COMMIT_MESSAGE = `Start tracking ${SERVICE_ID} ${TYPE}`;
+    const MIME_TYPE = 'text/html';
     let id;
     let commit;
-    let path;
+    let filepath;
     let isFirstRecord;
 
     before(async () => {
-      const { id: snapshotId, path: snapshotPath, isFirstRecord: isFirstSnapshotRecord } = await recordSnapshot(SERVICE_ID, TYPE, FILE_CONTENT);
+      const {
+        id: snapshotId,
+        path: snapshotPath,
+        isFirstRecord: isFirstSnapshotRecord
+      } = await recordSnapshot({
+        serviceId: SERVICE_ID,
+        documentType: TYPE,
+        content: FILE_CONTENT,
+        mimeType: MIME_TYPE
+      });
       id = snapshotId;
-      path = snapshotPath;
+      filepath = snapshotPath;
       isFirstRecord = isFirstSnapshotRecord;
       const commits = await gitSnapshot().log();
       [ commit ] = commits;
@@ -30,12 +42,12 @@ describe('History', () => {
 
     after(resetGitRepository);
 
-    it('creates the file with the proper content', () => {
-      expect(fs.readFileSync(EXPECTED_FILE_PATH, { encoding: 'utf8' })).to.equal(FILE_CONTENT);
+    it('creates the file with the proper content', async () => {
+      expect(await fs.readFile(EXPECTED_FILE_PATH, { encoding: 'utf8' })).to.equal(FILE_CONTENT);
     });
 
     it('returns the file path', () => {
-      expect(path).to.equal(EXPECTED_FILE_PATH);
+      expect(filepath).to.equal(EXPECTED_FILE_PATH);
     });
 
     it('returns a boolean to know if it is the first record', async () => {
@@ -55,20 +67,29 @@ describe('History', () => {
       const UPDATE_COMMIT_MESSAGE = `Update ${SERVICE_ID} ${TYPE}`;
 
       before(async () => {
-        const { id: snapshotId, path: snapshotPath, isFirstRecord: isFirstSnapshotRecord } = await recordSnapshot(SERVICE_ID, TYPE, MODIFIED_FILE_CONTENT);
+        const {
+          id: snapshotId,
+          path: snapshotPath,
+          isFirstRecord: isFirstSnapshotRecord
+        } = await recordSnapshot({
+          serviceId: SERVICE_ID,
+          documentType: TYPE,
+          content: MODIFIED_FILE_CONTENT,
+          mimeType: MIME_TYPE
+        });
         id = snapshotId;
-        path = snapshotPath;
+        filepath = snapshotPath;
         isFirstRecord = isFirstSnapshotRecord;
         const commits = await gitSnapshot().log();
         [ commit ] = commits;
       });
 
-      it('creates the file with the proper content', () => {
-        expect(fs.readFileSync(EXPECTED_FILE_PATH, { encoding: 'utf8' })).to.equal(MODIFIED_FILE_CONTENT);
+      it('creates the file with the proper content', async () => {
+        expect(await fs.readFile(EXPECTED_FILE_PATH, { encoding: 'utf8' })).to.equal(MODIFIED_FILE_CONTENT);
       });
 
       it('returns the file path', () => {
-        expect(path).to.equal(EXPECTED_FILE_PATH);
+        expect(filepath).to.equal(EXPECTED_FILE_PATH);
       });
 
       it('returns a boolean to know if it is the first record', async () => {
@@ -87,9 +108,17 @@ describe('History', () => {
         let commitsBefore;
         before(async () => {
           commitsBefore = await gitSnapshot().log();
-          const { id: snapshotId, path: snapshotPath } = await recordSnapshot(SERVICE_ID, TYPE, MODIFIED_FILE_CONTENT);
+          const {
+            id: snapshotId,
+            path: snapshotPath,
+          } = await recordSnapshot({
+            serviceId: SERVICE_ID,
+            documentType: TYPE,
+            content: MODIFIED_FILE_CONTENT,
+            mimeType: MIME_TYPE
+          });
           id = snapshotId;
-          path = snapshotPath;
+          filepath = snapshotPath;
         });
 
         it('does not commit', async () => {
@@ -104,16 +133,25 @@ describe('History', () => {
     const FILE_CONTENT = '# ToS fixture data with UTF-8 çhãràčtęrs';
     const EXPECTED_FILE_PATH = `${VERSIONS_PATH}/${SERVICE_ID}/${TYPE}.md`;
     const FIRST_COMMIT_MESSAGE = `Start tracking ${SERVICE_ID} ${TYPE}`;
-    const SNAPSHOTS_ID = 'snapshot short sha';
+    const SNAPSHOT_ID = 'snapshot short sha';
     let id;
     let commit;
-    let path;
+    let filepath;
     let isFirstRecord;
 
     before(async () => {
-      const { id: versionId, path: versionPath, isFirstRecord: isFirstVersionRecord } = await recordVersion(SERVICE_ID, TYPE, FILE_CONTENT, SNAPSHOTS_ID);
+      const {
+        id: versionId,
+        path: versionPath,
+        isFirstRecord: isFirstVersionRecord
+      } = await recordVersion({
+        serviceId: SERVICE_ID,
+        documentType: TYPE,
+        content: FILE_CONTENT,
+        snapshotId: SNAPSHOT_ID,
+      });
       id = versionId;
-      path = versionPath;
+      filepath = versionPath;
       isFirstRecord = isFirstVersionRecord;
       const commits = await gitVersion().log();
       [ commit ] = commits;
@@ -121,12 +159,12 @@ describe('History', () => {
 
     after(resetGitRepository);
 
-    it('creates the file with the proper content', () => {
-      expect(fs.readFileSync(EXPECTED_FILE_PATH, { encoding: 'utf8' })).to.equal(FILE_CONTENT);
+    it('creates the file with the proper content', async () => {
+      expect(await fs.readFile(EXPECTED_FILE_PATH, { encoding: 'utf8' })).to.equal(FILE_CONTENT);
     });
 
     it('returns the file path', () => {
-      expect(path).to.equal(EXPECTED_FILE_PATH);
+      expect(filepath).to.equal(EXPECTED_FILE_PATH);
     });
 
     it('returns a boolean to know if it is the first record', async () => {
@@ -142,7 +180,7 @@ describe('History', () => {
     });
 
     it('properly adds snapshot’s id in the commit body', async () => {
-      expect(commit.body).to.include(SNAPSHOTS_ID);
+      expect(commit.body).to.include(SNAPSHOT_ID);
     });
 
     context('when it is not the first record', () => {
@@ -150,20 +188,30 @@ describe('History', () => {
       const UPDATE_COMMIT_MESSAGE = `Update ${SERVICE_ID} ${TYPE}`;
 
       before(async () => {
-        const { id: versionId, path: versionPath, isFirstRecord: isFirstVersionRecord } = await recordVersion(SERVICE_ID, TYPE, MODIFIED_FILE_CONTENT, SNAPSHOTS_ID);
+        const {
+          id: versionId,
+          path: versionPath,
+          isFirstRecord: isFirstVersionRecord
+        } = await recordVersion({
+          serviceId: SERVICE_ID,
+          documentType: TYPE,
+          content: MODIFIED_FILE_CONTENT,
+          snapshotId: SNAPSHOT_ID,
+        });
+
         id = versionId;
-        path = versionPath;
+        filepath = versionPath;
         isFirstRecord = isFirstVersionRecord;
         const commits = await gitVersion().log();
         [ commit ] = commits;
       });
 
-      it('creates the file with the proper content', () => {
-        expect(fs.readFileSync(EXPECTED_FILE_PATH, { encoding: 'utf8' })).to.equal(MODIFIED_FILE_CONTENT);
+      it('creates the file with the proper content', async () => {
+        expect(await fs.readFile(EXPECTED_FILE_PATH, { encoding: 'utf8' })).to.equal(MODIFIED_FILE_CONTENT);
       });
 
       it('returns the file path', () => {
-        expect(path).to.equal(EXPECTED_FILE_PATH);
+        expect(filepath).to.equal(EXPECTED_FILE_PATH);
       });
 
       it('returns a boolean to know if it is the first record', async () => {
@@ -179,16 +227,24 @@ describe('History', () => {
       });
 
       it('properly adds snapshot’s id in the commit body', async () => {
-        expect(commit.body).to.include(SNAPSHOTS_ID);
+        expect(commit.body).to.include(SNAPSHOT_ID);
       });
 
       context('when the content has not changed', () => {
         let commitsBefore;
         before(async () => {
           commitsBefore = await gitVersion().log();
-          const { id: versionId, path: versionPath } = await recordVersion(SERVICE_ID, TYPE, MODIFIED_FILE_CONTENT, SNAPSHOTS_ID);
+          const {
+            id: versionId,
+            path: versionPath,
+          } = await recordVersion({
+            serviceId: SERVICE_ID,
+            documentType: TYPE,
+            content: MODIFIED_FILE_CONTENT,
+            snapshotId: SNAPSHOT_ID,
+          });
           id = versionId;
-          path = versionPath;
+          filepath = versionPath;
           const commits = await gitVersion().log();
           [ commit ] = commits;
         });
@@ -218,16 +274,25 @@ describe('History', () => {
     const FILE_CONTENT = 'ToS fixture data with UTF-8 çhãràčtęrs\n------------------';
     const EXPECTED_FILE_PATH = `${VERSIONS_PATH}/${SERVICE_ID}/${TYPE}.md`;
     const FIRST_RECORD_COMMIT_MESSAGE = `Start tracking ${SERVICE_ID} ${TYPE}`;
-    const SNAPSHOTS_ID = 'snapshot short sha';
+    const SNAPSHOT_ID = 'snapshot short sha';
     let id;
     let commit;
-    let path;
+    let filepath;
     let isFirstRecord;
 
     before(async () => {
-      const { id: versionId, path: versionPath, isFirstRecord: isFirstVersionRecord } = await recordRefilter(SERVICE_ID, TYPE, FILE_CONTENT, SNAPSHOTS_ID);
+      const {
+        id: versionId,
+        path: versionPath,
+        isFirstRecord: isFirstVersionRecord
+      } = await recordRefilter({
+        serviceId: SERVICE_ID,
+        documentType: TYPE,
+        content: FILE_CONTENT,
+        snapshotId: SNAPSHOT_ID,
+      });
       id = versionId;
-      path = versionPath;
+      filepath = versionPath;
       isFirstRecord = isFirstVersionRecord;
       const commits = await gitVersion().log();
       [ commit ] = commits;
@@ -236,12 +301,12 @@ describe('History', () => {
     after(resetGitRepository);
 
     context('when it is the first record', () => {
-      it('creates the file with the proper content', () => {
-        expect(fs.readFileSync(EXPECTED_FILE_PATH, { encoding: 'utf8' })).to.equal(FILE_CONTENT);
+      it('creates the file with the proper content', async () => {
+        expect(await fs.readFile(EXPECTED_FILE_PATH, { encoding: 'utf8' })).to.equal(FILE_CONTENT);
       });
 
       it('returns the file path', () => {
-        expect(path).to.equal(EXPECTED_FILE_PATH);
+        expect(filepath).to.equal(EXPECTED_FILE_PATH);
       });
 
       it('returns a boolean to know if it is the first record', async () => {
@@ -257,7 +322,7 @@ describe('History', () => {
       });
 
       it('properly adds snapshot’s id in the commit body', async () => {
-        expect(commit.body).to.include(SNAPSHOTS_ID);
+        expect(commit.body).to.include(SNAPSHOT_ID);
       });
     });
 
@@ -266,20 +331,29 @@ describe('History', () => {
       const UPDATE_COMMIT_MESSAGE = `Refilter ${SERVICE_ID} ${TYPE}`;
 
       before(async () => {
-        const { id: versionId, path: versionPath, isFirstRecord: isFirstVersionRecord } = await recordRefilter(SERVICE_ID, TYPE, MODIFIED_FILE_CONTENT, SNAPSHOTS_ID);
+        const {
+          id: versionId,
+          path: versionPath,
+          isFirstRecord: isFirstVersionRecord
+        } = await recordRefilter({
+          serviceId: SERVICE_ID,
+          documentType: TYPE,
+          content: MODIFIED_FILE_CONTENT,
+          snapshotId: SNAPSHOT_ID,
+        });
         id = versionId;
-        path = versionPath;
+        filepath = versionPath;
         isFirstRecord = isFirstVersionRecord;
         const commits = await gitVersion().log();
         [ commit ] = commits;
       });
 
-      it('creates the file with the proper content', () => {
-        expect(fs.readFileSync(EXPECTED_FILE_PATH, { encoding: 'utf8' })).to.equal(MODIFIED_FILE_CONTENT);
+      it('creates the file with the proper content', async () => {
+        expect(await fs.readFile(EXPECTED_FILE_PATH, { encoding: 'utf8' })).to.equal(MODIFIED_FILE_CONTENT);
       });
 
       it('returns the file path', () => {
-        expect(path).to.equal(EXPECTED_FILE_PATH);
+        expect(filepath).to.equal(EXPECTED_FILE_PATH);
       });
 
       it('returns a boolean to know if it is the first record', async () => {
@@ -295,7 +369,7 @@ describe('History', () => {
       });
 
       it('properly adds snapshot’s id in the commit body', async () => {
-        expect(commit.body).to.include(SNAPSHOTS_ID);
+        expect(commit.body).to.include(SNAPSHOT_ID);
       });
 
       context('when the content has not changed', () => {
@@ -303,9 +377,17 @@ describe('History', () => {
 
         before(async () => {
           commitsBefore = await gitVersion().log();
-          const { id: versionId, path: versionPath } = await recordRefilter(SERVICE_ID, TYPE, MODIFIED_FILE_CONTENT, SNAPSHOTS_ID);
+          const {
+            id: versionId,
+            path: versionPath,
+          } = await recordRefilter({
+            serviceId: SERVICE_ID,
+            documentType: TYPE,
+            content: MODIFIED_FILE_CONTENT,
+            snapshotId: SNAPSHOT_ID,
+          });
           id = versionId;
-          path = versionPath;
+          filepath = versionPath;
           const commits = await gitVersion().log();
           [ commit ] = commits;
         });

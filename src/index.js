@@ -1,4 +1,3 @@
-import fsApi from 'fs';
 import path from 'path';
 import events from 'events';
 
@@ -13,7 +12,6 @@ import loadServiceDeclarations from './loader/index.js';
 
 consoleStamp(console);
 
-const fs = fsApi.promises;
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
 const SERVICE_DECLARATIONS_PATH = path.resolve(__dirname, '../', config.get('serviceDeclarationsPath'));
 
@@ -66,23 +64,23 @@ export default class CGUs extends events.EventEmitter {
     const { type, fetch: location } = documentDeclaration;
     const logPrefix = `[${serviceName}-${type}]`;
     try {
-      const pageContent = await this.fetch({
+      const { mimeType, content } = await this.fetch({
         location,
         serviceId,
         type,
         logPrefix,
       });
 
-      if (!pageContent) {
+      if (!content) {
         return;
       }
 
       const snapshotId = await this.recordSnapshot({
-        snapshotContent: pageContent,
-        content: pageContent,
+        content,
+        mimeType,
         serviceId,
         type,
-        logPrefix
+        logPrefix,
       });
 
       if (!snapshotId) {
@@ -90,14 +88,15 @@ export default class CGUs extends events.EventEmitter {
       }
 
       return this.recordVersion({
-        snapshotContent: pageContent,
+        snapshotContent: content,
+        mimeType,
         snapshotId,
         serviceId,
         documentDeclaration,
         logPrefix,
       });
     } catch (error) {
-      console.error(`${logPrefix} Error:`, error.message);
+      console.error(`${logPrefix} Error:`, error);
       this.emit('documentUpdateError', serviceId, type, error);
     }
   }
@@ -129,23 +128,15 @@ export default class CGUs extends events.EventEmitter {
   async refilterAndRecordDocument({ serviceId, serviceName, document: documentDeclaration }) {
     const { type } = documentDeclaration;
     const logPrefix = `[${serviceName}-${type}]`;
-    const { id: snapshotId, path: snapshotPath } = await history.getLatestSnapshot(serviceId, type);
+    const { id: snapshotId, content: snapshotContent, mimeType } = await history.getLatestSnapshot(serviceId, type);
 
     if (!snapshotId) {
       return;
     }
 
-    let snapshotContent;
-    try {
-      snapshotContent = await fs.readFile(snapshotPath, { encoding: 'utf8' });
-    } catch (error) {
-      if (error.code === 'ENOENT') {
-        return console.error(`The snapshot file ${snapshotPath} does not exist.`);
-      }
-    }
-
     return this.recordRefilter({
       snapshotContent,
+      mimeType,
       snapshotId,
       serviceId,
       documentDeclaration,
@@ -164,8 +155,13 @@ export default class CGUs extends events.EventEmitter {
   }
 
   /* eslint-disable class-methods-use-this */
-  async recordSnapshot({ content, serviceId, type, logPrefix }) {
-    const { id: snapshotId, path: snapshotPath } = await history.recordSnapshot(serviceId, type, content);
+  async recordSnapshot({ content, mimeType, serviceId, type, logPrefix }) {
+    const { id: snapshotId, path: snapshotPath } = await history.recordSnapshot({
+      serviceId,
+      documentType: type,
+      content,
+      mimeType
+    });
 
     if (!snapshotId) {
       return console.log(`${logPrefix} No changes, did not record snapshot.`);
@@ -176,11 +172,22 @@ export default class CGUs extends events.EventEmitter {
   }
   /* eslint-enable class-methods-use-this */
 
-  async recordRefilter({ snapshotContent, snapshotId, serviceId, documentDeclaration, logPrefix }) {
+  async recordRefilter({ snapshotContent, mimeType, snapshotId, serviceId, documentDeclaration, logPrefix }) {
     const { type } = documentDeclaration;
-    const document = await filter(snapshotContent, documentDeclaration, this._serviceDeclarations[serviceId].filters);
+    const document = await filter({
+      content: snapshotContent,
+      mimeType,
+      documentDeclaration,
+      filterFunctions: this._serviceDeclarations[serviceId].filters
+    });
 
-    const { id: versionId, path: documentPath } = await history.recordRefilter(serviceId, type, document, snapshotId);
+    const { id: versionId, path: documentPath } = await history.recordRefilter({
+      serviceId,
+      content: document,
+      documentType: type,
+      snapshotId
+    });
+
     if (versionId) {
       console.log(`${logPrefix} Recorded version in ${documentPath} with id ${versionId}.`);
       this.emit('versionRecorded', serviceId, type, versionId);
@@ -189,11 +196,22 @@ export default class CGUs extends events.EventEmitter {
     }
   }
 
-  async recordVersion({ snapshotContent, snapshotId, serviceId, documentDeclaration, logPrefix }) {
+  async recordVersion({ snapshotContent, mimeType, snapshotId, serviceId, documentDeclaration, logPrefix }) {
     const { type } = documentDeclaration;
-    const document = await filter(snapshotContent, documentDeclaration, this._serviceDeclarations[serviceId].filters);
+    const document = await filter({
+      content: snapshotContent,
+      mimeType,
+      documentDeclaration,
+      filterFunctions: this._serviceDeclarations[serviceId].filters,
+    });
 
-    const { id: versionId, path: documentPath, isFirstRecord } = await history.recordVersion(serviceId, type, document, snapshotId);
+    const { id: versionId, path: documentPath, isFirstRecord } = await history.recordVersion({
+      serviceId,
+      content: document,
+      documentType: type,
+      snapshotId
+    });
+
     if (versionId) {
       const message = isFirstRecord
         ? `${logPrefix} First version recorded in ${documentPath} with id ${versionId}.`

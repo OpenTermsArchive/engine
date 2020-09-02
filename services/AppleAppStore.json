@@ -4,6 +4,9 @@
     "Review Guidelines": {
       "fetch": "https://developer.apple.com/app-store/review/guidelines/",
       "select": "main"
+    },
+    "Developer Terms": {
+      "fetch": "https://developer.apple.com/terms/apple-developer-agreement/Apple-Developer-Agreement-English.pdf"
     }
   }
 }
