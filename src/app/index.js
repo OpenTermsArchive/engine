@@ -12,21 +12,15 @@ const __dirname = path.dirname(new URL(import.meta.url).pathname);
 const SERVICE_DECLARATIONS_PATH = path.resolve(__dirname, '../../', config.get('serviceDeclarationsPath'));
 
 export const AVAILABLE_EVENTS = [
-  'startTrackingChanges',
-  'endTrackingChanges',
-  'startRefiltering',
-  'endRefiltering',
   'snapshotRecorded',
   'firstSnapshotRecorded',
-  'noSnapshotChanges',
+  'snapshotNotChanged',
   'versionRecorded',
   'firstVersionRecorded',
-  'noVersionChanges',
-  'changesPublished',
-  'applicationError',
-  'documentUpdateError',
-  'documentFetchError',
-  'recordRefilterError',
+  'versionNotChanged',
+  'recordsPublished',
+  'documentTrackingError',
+  'refilteringError',
 ];
 
 export default class CGUs extends events.EventEmitter {
@@ -55,45 +49,33 @@ export default class CGUs extends events.EventEmitter {
   }
 
   async trackChanges(serviceToTrack) {
-    try {
-      this.emit('startTrackingChanges');
+    const services = serviceToTrack ? { [serviceToTrack]: this._serviceDeclarations[serviceToTrack] } : this._serviceDeclarations;
 
-      const services = serviceToTrack ? { [serviceToTrack]: this._serviceDeclarations[serviceToTrack] } : this._serviceDeclarations;
+    const documentTrackingPromises = [];
 
-      const documentTrackingPromises = [];
-
-      Object.keys(services).forEach(serviceId => {
-        const { documents, name: serviceName } = this._serviceDeclarations[serviceId];
-        Object.keys(documents).forEach(type => {
-          documentTrackingPromises.push(this.trackDocumentChanges({
-            serviceId,
-            serviceName,
-            document: {
-              type,
-              ...documents[type]
-            }
-          }));
-        });
+    Object.keys(services).forEach(serviceId => {
+      const { documents } = this._serviceDeclarations[serviceId];
+      Object.keys(documents).forEach(type => {
+        documentTrackingPromises.push(this.trackDocumentChanges({
+          serviceId,
+          document: {
+            type,
+            ...documents[type]
+          }
+        }));
       });
+    });
 
-      await Promise.all(documentTrackingPromises);
+    await Promise.all(documentTrackingPromises);
 
-      await this.publish();
-      this.emit('endTrackingChanges');
-    } catch (error) {
-      this.emit('applicationError', error);
-    }
+    await this.publish();
   }
 
   async trackDocumentChanges({ serviceId, document: documentDeclaration }) {
     const { type, fetch: location } = documentDeclaration;
 
     try {
-      const { mimeType, content } = await this.fetch({
-        location,
-        serviceId,
-        type,
-      });
+      const { mimeType, content } = await fetch(location);
 
       if (!content) {
         return;
@@ -118,13 +100,11 @@ export default class CGUs extends events.EventEmitter {
         documentDeclaration
       });
     } catch (error) {
-      console.log(error);
-      this.emit('documentUpdateError', serviceId, type, error);
+      this.emit('documentTrackingError', serviceId, type, error);
     }
   }
 
   async refilterAndRecord(serviceToTrack) {
-    this.emit('startRefiltering');
     const services = serviceToTrack ? { [serviceToTrack]: this._serviceDeclarations[serviceToTrack] } : this._serviceDeclarations;
 
     const refilterAndRecordDocumentPromises = [];
@@ -144,7 +124,6 @@ export default class CGUs extends events.EventEmitter {
     });
 
     await Promise.all(refilterAndRecordDocumentPromises);
-    this.emit('endRefiltering');
   }
 
   async refilterAndRecordDocument({ serviceId, serviceName, document: documentDeclaration }) {
@@ -166,15 +145,7 @@ export default class CGUs extends events.EventEmitter {
         logPrefix,
       });
     } catch (error) {
-      console.error(`${logPrefix} Could not refilter document: ${error}`);
-    }
-  }
-
-  async fetch({ location, serviceId, type }) {
-    try {
-      return await fetch(location);
-    } catch (error) {
-      this.emit('documentFetchError', serviceId, type, error);
+      this.emit('refilteringError', serviceId, type, error);
     }
   }
 
@@ -187,7 +158,7 @@ export default class CGUs extends events.EventEmitter {
     });
 
     if (!snapshotId) {
-      return this.emit('noSnapshotChanges', serviceId, type);
+      return this.emit('snapshotNotChanged', serviceId, type);
     }
 
     this.emit(isFirstRecord ? 'firstSnapshotRecorded' : 'snapshotRecorded', serviceId, type, snapshotId);
@@ -196,29 +167,25 @@ export default class CGUs extends events.EventEmitter {
 
   async recordRefilter({ snapshotContent, mimeType, snapshotId, serviceId, documentDeclaration }) {
     const { type } = documentDeclaration;
-    try {
-      const document = await filter({
-        content: snapshotContent,
-        mimeType,
-        documentDeclaration,
-        filterFunctions: this._serviceDeclarations[serviceId].filters
-      });
+    const document = await filter({
+      content: snapshotContent,
+      mimeType,
+      documentDeclaration,
+      filterFunctions: this._serviceDeclarations[serviceId].filters
+    });
 
-      const { id: versionId, isFirstRecord } = await history.recordRefilter({
-        serviceId,
-        content: document,
-        documentType: type,
-        snapshotId
-      });
+    const { id: versionId, isFirstRecord } = await history.recordRefilter({
+      serviceId,
+      content: document,
+      documentType: type,
+      snapshotId
+    });
 
-      if (!versionId) {
-        return this.emit('noVersionChanges', serviceId, type);
-      }
-
-      this.emit(isFirstRecord ? 'firstVersionRecorded' : 'versionRecorded', serviceId, type, versionId);
-    } catch (error) {
-      this.emit('recordRefilterError', serviceId, type, error);
+    if (!versionId) {
+      return this.emit('versionNotChanged', serviceId, type);
     }
+
+    this.emit(isFirstRecord ? 'firstVersionRecorded' : 'versionRecorded', serviceId, type, versionId);
   }
 
   async recordVersion({ snapshotContent, mimeType, snapshotId, serviceId, documentDeclaration }) {
@@ -238,7 +205,7 @@ export default class CGUs extends events.EventEmitter {
     });
 
     if (!versionId) {
-      return this.emit('noVersionChanges', serviceId, type);
+      return this.emit('versionNotChanged', serviceId, type);
     }
 
     this.emit(isFirstRecord ? 'firstVersionRecorded' : 'versionRecorded', serviceId, type, versionId);
@@ -250,6 +217,6 @@ export default class CGUs extends events.EventEmitter {
     }
 
     await history.publish();
-    this.emit('changesPublished');
+    this.emit('recordsPublished');
   }
 }
