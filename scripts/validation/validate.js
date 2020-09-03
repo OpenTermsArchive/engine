@@ -52,10 +52,10 @@ if (args.includes('--schema-only')) {
     const service = serviceDeclarations[serviceId];
 
     const documentValidationPromises = Object.keys(service.documents).map(async type => {
-      try {
-        const document = service.documents[type];
-        const { fetch: location } = document;
+      const document = service.documents[type];
+      const { fetch: location } = document;
 
+      try {
         const content = await fetch(location);
         const filteredContent = await filter(content, document, service.filters);
         expect(filteredContent.length, 'The textual content after filtering was unexpectedly small.').to.be.greaterThan(MIN_DOC_LENGTH);
@@ -68,6 +68,8 @@ if (args.includes('--schema-only')) {
         failure.documentType = type;
         throw failure;
       }
+
+      console.log(serviceId, 'has valid', type);
     });
 
     const documentValidationResults = await Promise.allSettled(documentValidationPromises);
@@ -79,8 +81,6 @@ if (args.includes('--schema-only')) {
       failures.serviceId = serviceId;
       throw failures;
     }
-
-    console.log(serviceId, 'is valid');
   });
 
   const serviceValidationResults = await Promise.allSettled(serviceValidationPromises);
