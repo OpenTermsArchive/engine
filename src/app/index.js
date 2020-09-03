@@ -109,11 +109,10 @@ export default class CGUs extends events.EventEmitter {
     const refilterAndRecordDocumentPromises = [];
 
     Object.keys(services).forEach(serviceId => {
-      const { documents, name: serviceName } = this._serviceDeclarations[serviceId];
+      const { documents } = this._serviceDeclarations[serviceId];
       Object.keys(documents).forEach(type => {
         refilterAndRecordDocumentPromises.push(this.refilterAndRecordDocument({
           serviceId,
-          serviceName,
           document: {
             type,
             ...documents[type]
@@ -125,9 +124,8 @@ export default class CGUs extends events.EventEmitter {
     await Promise.all(refilterAndRecordDocumentPromises);
   }
 
-  async refilterAndRecordDocument({ serviceId, serviceName, document: documentDeclaration }) {
+  async refilterAndRecordDocument({ serviceId, document: documentDeclaration }) {
     const { type } = documentDeclaration;
-    const logPrefix = `[${serviceName}-${type}]`;
     try {
       const { id: snapshotId, content: snapshotContent, mimeType } = await history.getLatestSnapshot(serviceId, type);
 
@@ -141,7 +139,6 @@ export default class CGUs extends events.EventEmitter {
         snapshotId,
         serviceId,
         documentDeclaration,
-        logPrefix,
       });
     } catch (error) {
       this.emit('refilteringError', serviceId, type, error);
