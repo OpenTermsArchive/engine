@@ -4,10 +4,11 @@ import CGUs from './app/index.js';
 import * as logger from './logger/index.js';
 import Notifier from './notifier/index.js';
 
+const serviceId = process.argv.slice(process.argv.indexOf('--serviceId'))[1];
+const refilterOnly = process.argv.indexOf('--refilter-only') != -1;
+const schedule = process.argv.indexOf('--schedule') != -1;
+
 (async () => {
-  const serviceId = process.argv.slice(process.argv.indexOf('--serviceId'))[1];
-  const refilterOnly = process.argv.indexOf('--refilter-only') != -1;
-  const schedule = process.argv.indexOf('--schedule') != -1;
   const app = new CGUs();
   app.attach(logger);
   await app.init();
