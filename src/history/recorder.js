@@ -81,7 +81,7 @@ export default class Recorder {
     const mimeType = mime.getType(relativeRecordFilePath);
 
     const readFileOptions = {};
-    if (mimeType != 'application/pdf') {
+    if (mimeType.startsWith('text/')) {
       readFileOptions.encoding = 'utf8';
     }
 
