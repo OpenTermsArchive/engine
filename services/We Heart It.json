@@ -1,5 +1,5 @@
 {
-  "name": "WeHeartIt",
+  "name": "We Heart It",
   "documents": {
     "Terms of Service": {
       "fetch": "https://weheartit.com/about/terms-of-service",
