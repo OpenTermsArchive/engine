@@ -128,20 +128,24 @@ export default class CGUs extends events.EventEmitter {
   async refilterAndRecordDocument({ serviceId, serviceName, document: documentDeclaration }) {
     const { type } = documentDeclaration;
     const logPrefix = `[${serviceName}-${type}]`;
-    const { id: snapshotId, content: snapshotContent, mimeType } = await history.getLatestSnapshot(serviceId, type);
+    try {
+      const { id: snapshotId, content: snapshotContent, mimeType } = await history.getLatestSnapshot(serviceId, type);
 
-    if (!snapshotId) {
-      return;
+      if (!snapshotId) {
+        return;
+      }
+
+      return await this.recordRefilter({
+        snapshotContent,
+        mimeType,
+        snapshotId,
+        serviceId,
+        documentDeclaration,
+        logPrefix,
+      });
+    } catch (error) {
+      console.error(`${logPrefix} Could not refilter document: ${error}`);
     }
-
-    return this.recordRefilter({
-      snapshotContent,
-      mimeType,
-      snapshotId,
-      serviceId,
-      documentDeclaration,
-      logPrefix,
-    });
   }
 
   async fetch({ location, serviceId, type, logPrefix }) {
