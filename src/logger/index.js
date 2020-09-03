@@ -58,3 +58,15 @@ export function onRefilteringError(serviceId, type, error) {
 export function onDocumentTrackingError(serviceId, type, error) {
   logger.error({ message: `Could not track document: ${error.stack}`, serviceId, type });
 }
+
+export function info(options) {
+  logger.info(options);
+}
+
+export function error(options) {
+  logger.error(options);
+}
+
+export function warn(options) {
+  logger.warn(options);
+}
