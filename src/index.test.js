@@ -97,7 +97,7 @@ describe('CGUs', () => {
 
       it('refilters the content and saves the file', async () => {
         const serviceAContent = await fs.readFile(path.resolve(__dirname, SERVICE_A_EXPECTED_VERSION_FILE_PATH), { encoding: 'utf8' });
-        expect(serviceAContent).to.equal('Terms of service\n================');
+        expect(serviceAContent).to.equal('Terms of service with UTF-8 \'çhãràčtęrs"\n========================================');
       });
 
       it('generates a new version id', async () => {
