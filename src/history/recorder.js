@@ -76,12 +76,19 @@ export default class Recorder {
       throw new Error(`Only one document of type ${documentType} should have been recorded in ${latestCommit.hash}, but these additional ones have also been recorded: ${filePaths}`);
     }
 
-    const [ recordFilePath ] = filePaths;
+    const [ relativeRecordFilePath ] = filePaths;
+    const recordFilePath = `${this.path}/${relativeRecordFilePath}`;
+    const mimeType = mime.getType(relativeRecordFilePath);
+
+    const readFileOptions = {};
+    if (mimeType != 'application/pdf') {
+      readFileOptions.encoding = 'utf8';
+    }
 
     return {
       id: latestCommit.hash,
-      content: await fs.readFile(`${this.path}/${recordFilePath}`),
-      mimeType: mime.getType(recordFilePath),
+      content: await fs.readFile(recordFilePath, readFileOptions),
+      mimeType,
     };
   }
 
