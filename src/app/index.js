@@ -41,8 +41,7 @@ export default class CGUs extends events.EventEmitter {
     AVAILABLE_EVENTS.forEach(event => {
       const handlerName = `on${event[0].toUpperCase()}${event.substr(1)}`;
 
-      if (Object.prototype.hasOwnProperty.call(listener, handlerName)
-      || Object.prototype.hasOwnProperty.call(listener.constructor.prototype, handlerName)) {
+      if (listener[handlerName]) {
         this.on(event, listener[handlerName].bind(listener));
       }
     });
