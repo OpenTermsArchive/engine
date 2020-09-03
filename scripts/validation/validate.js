@@ -73,7 +73,7 @@ if (args.includes('--schema-only')) {
     const documentValidationResults = await Promise.allSettled(documentValidationPromises);
 
     const failures = documentValidationResults.filter(result => result.status == 'rejected');
-    failures.forEach(failure => console.warn(serviceId, 'fails:', failure.reason.message));
+    failures.forEach(failure => console.warn(failure.reason.serviceId, 'fails on', failure.reason.documentType, ':', failure.reason.message));
 
     if (failures.length) {
       failures.serviceId = serviceId;
