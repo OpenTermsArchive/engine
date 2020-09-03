@@ -41,6 +41,11 @@ if (args.includes('--schema-only')) {
 
   console.log('Validating', servicesToValidate.length, 'service declarations…');
 
+  const documentsTotals = {
+    valid: 0,
+    invalid: 0,
+  };
+
   const serviceValidationPromises = servicesToValidate.map(async serviceId => {
     let declaration = await fs.readFile(`${serviceDeclarationsPath}/${serviceId}.json`);
     declaration = JSON.parse(declaration);
@@ -66,9 +71,11 @@ if (args.includes('--schema-only')) {
         expect(secondFilteredContent, 'Filters give inconsistent results.').to.equal(filteredContent);
       } catch (failure) {
         failure.source = type;
+        documentsTotals.invalid++;
         throw failure;
       }
 
+      documentsTotals.valid++;
       console.log(serviceId, 'has valid', type);
     });
 
@@ -87,7 +94,8 @@ if (args.includes('--schema-only')) {
   const serviceFailures = serviceValidationResults.filter(result => result.status == 'rejected');
 
   console.log();
-  console.log(serviceValidationResults.length - serviceFailures.length, 'services are valid');
+  console.log('Validated', documentsTotals.valid + documentsTotals.invalid, 'documents, out of which', documentsTotals.valid, 'passed and', documentsTotals.invalid, 'failed.');
+  console.log(serviceValidationResults.length - serviceFailures.length, 'services are valid.');
 
   if (serviceFailures.length) {
     console.error(serviceFailures.length, 'services have validation errors. Recap below.\n');
