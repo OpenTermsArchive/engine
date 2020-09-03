@@ -23,7 +23,7 @@ const expected = {
     name: 'Service B',
     documents: {
       'Privacy Policy': {
-        fetch: 'https://www.serviceb.example/tos',
+        fetch: 'https://www.serviceb.example/privacy',
         select: 'body'
       }
     }
