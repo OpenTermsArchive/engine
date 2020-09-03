@@ -34,6 +34,7 @@ if (args.includes('--schema-only')) {
 
   servicesToValidate.forEach(serviceId => {
     if (!serviceDeclarations.hasOwnProperty(serviceId)) {
+      process.exitCode = 1;
       throw new Error(`Could not find any service with id "${serviceId}"`);
     }
   });
@@ -91,7 +92,7 @@ if (args.includes('--schema-only')) {
 
   if (serviceFailures.length) {
     console.error(serviceFailures.length, 'services have validation errors. Recap below.\n');
-    process.exitCode = 1;
+    process.exitCode = 2;
 
     serviceFailures.forEach(serviceFailure => {
       console.warn(serviceFailure.reason.serviceId);
