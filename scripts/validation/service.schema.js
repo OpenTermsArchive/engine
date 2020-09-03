@@ -8,7 +8,12 @@ const AVAILABLE_TYPES_NAME = Object.keys(TYPES);
 const documentsProperties = () => {
   const result = {};
   AVAILABLE_TYPES_NAME.forEach(type => {
-    result[type] = { $ref: '#/definitions/document' };
+    result[type] = {
+      oneOf: [
+        { $ref: '#/definitions/document' },
+        { $ref: '#/definitions/pdfDocument' },
+      ]
+    }
   });
   return result;
 };
@@ -45,12 +50,26 @@ const schema = {
     }
   },
   definitions: {
+    pdfDocument: {
+      type: 'object',
+      additionalProperties: false,
+      required: [
+        'fetch',
+      ],
+      properties: {
+        fetch: {
+          type: 'string',
+          pattern: '^https?://.+\.[pP][dD][fF]$',
+          description: 'The URL where the document can be found'
+        },
+      },
+    },
     document: {
       type: 'object',
       additionalProperties: false,
       required: [
         'fetch',
-        'select'
+        'select',
       ],
       properties: {
         fetch: {
