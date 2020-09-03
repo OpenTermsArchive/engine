@@ -14,25 +14,32 @@ const __dirname = path.dirname(new URL(import.meta.url).pathname);
 chai.use(sinonChai);
 const { expect } = chai;
 
-const SERVICE_A_ID = 'service_A';
-const SERVICE_A_TYPE = 'Terms of Service';
-const SERVICE_A_EXPECTED_SNAPSHOT_FILE_PATH = `${SNAPSHOTS_PATH}/${SERVICE_A_ID}/${SERVICE_A_TYPE}.html`;
-const SERVICE_A_EXPECTED_VERSION_FILE_PATH = `${VERSIONS_PATH}/${SERVICE_A_ID}/${SERVICE_A_TYPE}.md`;
-const SERVICE_A_TOS_SNAPSHOT = fsApi.readFileSync(path.resolve(__dirname, '../../test/fixtures/service_A_terms_snapshot.html'), { encoding: 'utf8' });
-const SERVICE_A_TOS_VERSION = fsApi.readFileSync(path.resolve(__dirname, '../../test/fixtures/service_A_terms.md'), { encoding: 'utf8' });
-
-const SERVICE_B_ID = 'service_B';
-const SERVICE_B_TYPE = 'Privacy Policy';
-const SERVICE_B_EXPECTED_SNAPSHOT_FILE_PATH = `${SNAPSHOTS_PATH}/${SERVICE_B_ID}/${SERVICE_B_TYPE}.html`;
-const SERVICE_B_EXPECTED_VERSION_FILE_PATH = `${VERSIONS_PATH}/${SERVICE_B_ID}/${SERVICE_B_TYPE}.md`;
-const SERVICE_B_TOS_SNAPSHOT = fsApi.readFileSync(path.resolve(__dirname, '../../test/fixtures/service_B_terms_snapshot.html'), { encoding: 'utf8' });
-const SERVICE_B_TOS_VERSION = fsApi.readFileSync(path.resolve(__dirname, '../../test/fixtures/service_B_terms.md'), { encoding: 'utf8' });
-
 describe('CGUs', () => {
+  const SERVICE_A_ID = 'service_A';
+  const SERVICE_A_TYPE = 'Terms of Service';
+  const SERVICE_A_EXPECTED_SNAPSHOT_FILE_PATH = `${SNAPSHOTS_PATH}/${SERVICE_A_ID}/${SERVICE_A_TYPE}.html`;
+  const SERVICE_A_EXPECTED_VERSION_FILE_PATH = `${VERSIONS_PATH}/${SERVICE_A_ID}/${SERVICE_A_TYPE}.md`;
+  let serviceASnapshotExpectedContent;
+  let serviceAVersionExpectedContent;
+
+  const SERVICE_B_ID = 'service_B';
+  const SERVICE_B_TYPE = 'Privacy Policy';
+  const SERVICE_B_EXPECTED_SNAPSHOT_FILE_PATH = `${SNAPSHOTS_PATH}/${SERVICE_B_ID}/${SERVICE_B_TYPE}.pdf`;
+  const SERVICE_B_EXPECTED_VERSION_FILE_PATH = `${VERSIONS_PATH}/${SERVICE_B_ID}/${SERVICE_B_TYPE}.md`;
+  let serviceBSnapshotExpectedContent;
+  let serviceBVersionExpectedContent;
+
+  before(async () => {
+    serviceASnapshotExpectedContent = await fs.readFile(path.resolve(__dirname, '../../test/fixtures/service_A_terms_snapshot.html'), { encoding: 'utf8' });
+    serviceAVersionExpectedContent = await fs.readFile(path.resolve(__dirname, '../../test/fixtures/service_A_terms.md'), { encoding: 'utf8' });
+    serviceBSnapshotExpectedContent = await fs.readFile(path.resolve(__dirname, '../../test/fixtures/terms.pdf'));
+    serviceBVersionExpectedContent = await fs.readFile(path.resolve(__dirname, '../../test/fixtures/termsFromPDF.md'), { encoding: 'utf8' });
+  });
+
   describe('#trackChanges', () => {
     before(async () => {
-      nock('https://www.servicea.example').get('/tos').reply(200, SERVICE_A_TOS_SNAPSHOT);
-      nock('https://www.serviceb.example').get('/tos').reply(200, SERVICE_B_TOS_SNAPSHOT);
+      nock('https://www.servicea.example').get('/tos').reply(200, serviceASnapshotExpectedContent, { 'Content-Type': 'text/html' });
+      nock('https://www.serviceb.example').get('/tos').reply(200, serviceBSnapshotExpectedContent, { 'Content-Type': 'application/pdf' });
       const app = new CGUs();
       await app.init();
       return app.trackChanges();
@@ -42,22 +49,22 @@ describe('CGUs', () => {
 
     it('records snapshot for service A', async () => {
       const resultingSnapshotTerms = await fs.readFile(path.resolve(__dirname, SERVICE_A_EXPECTED_SNAPSHOT_FILE_PATH), { encoding: 'utf8' });
-      expect(resultingSnapshotTerms).to.be.equal(SERVICE_A_TOS_SNAPSHOT);
+      expect(resultingSnapshotTerms).to.equal(serviceASnapshotExpectedContent);
     });
 
     it('records version for service A', async () => {
       const resultingTerms = await fs.readFile(path.resolve(__dirname, SERVICE_A_EXPECTED_VERSION_FILE_PATH), { encoding: 'utf8' });
-      expect(resultingTerms).to.be.equal(SERVICE_A_TOS_VERSION);
+      expect(resultingTerms).to.equal(serviceAVersionExpectedContent);
     });
 
     it('records snapshot for service B', async () => {
-      const resultingSnapshotTerms = await fs.readFile(path.resolve(__dirname, SERVICE_B_EXPECTED_SNAPSHOT_FILE_PATH), { encoding: 'utf8' });
-      expect(resultingSnapshotTerms).to.be.equal(SERVICE_B_TOS_SNAPSHOT);
+      const resultingSnapshotTerms = await fs.readFile(path.resolve(__dirname, SERVICE_B_EXPECTED_SNAPSHOT_FILE_PATH));
+      expect(resultingSnapshotTerms.equals(serviceBSnapshotExpectedContent)).to.be.true;
     });
 
     it('records version for service B', async () => {
       const resultingTerms = await fs.readFile(path.resolve(__dirname, SERVICE_B_EXPECTED_VERSION_FILE_PATH), { encoding: 'utf8' });
-      expect(resultingTerms).to.be.equal(SERVICE_B_TOS_VERSION);
+      expect(resultingTerms).to.equal(serviceBVersionExpectedContent);
     });
   });
 
@@ -70,8 +77,8 @@ describe('CGUs', () => {
       let serviceBCommits;
 
       before(async () => {
-        nock('https://www.servicea.example').get('/tos').reply(200, SERVICE_A_TOS_SNAPSHOT);
-        nock('https://www.serviceb.example').get('/tos').reply(200, SERVICE_B_TOS_SNAPSHOT);
+        nock('https://www.servicea.example').get('/tos').reply(200, serviceASnapshotExpectedContent, { 'Content-Type': 'text/html' });
+        nock('https://www.serviceb.example').get('/tos').reply(200, serviceBSnapshotExpectedContent, { 'Content-Type': 'application/pdf' });
         const app = new CGUs();
         await app.init();
         await app.trackChanges();
@@ -97,7 +104,7 @@ describe('CGUs', () => {
 
       it('refilters the content and saves the file', async () => {
         const serviceAContent = await fs.readFile(path.resolve(__dirname, SERVICE_A_EXPECTED_VERSION_FILE_PATH), { encoding: 'utf8' });
-        expect(serviceAContent).to.be.equal('Terms of service A\n==================');
+        expect(serviceAContent).to.equal('Terms of service with UTF-8 \'çhãràčtęrs"\n========================================');
       });
 
       it('generates a new version id', async () => {
@@ -110,7 +117,7 @@ describe('CGUs', () => {
 
       it('does not change other services', async () => {
         const serviceBVersion = await fs.readFile(path.resolve(__dirname, SERVICE_B_EXPECTED_VERSION_FILE_PATH), { encoding: 'utf8' });
-        expect(serviceBVersion).to.be.equal(SERVICE_B_TOS_VERSION);
+        expect(serviceBVersion).to.equal(serviceBVersionExpectedContent);
       });
 
       it('does not generate a new id for other services', async () => {
@@ -249,7 +256,7 @@ describe('CGUs', () => {
 
     describe('#recordVersion', () => {
       context('When it is the first record', () => {
-        before(async () => app.recordVersion({ snapshotContent: SERVICE_A_TOS_SNAPSHOT, snapshotId: 'sha', serviceId: SERVICE_A_ID, documentDeclaration: documentADeclaration }));
+        before(async () => app.recordVersion({ snapshotContent: serviceASnapshotExpectedContent, snapshotId: 'sha', serviceId: SERVICE_A_ID, documentDeclaration: documentADeclaration }));
 
         after(() => {
           resetSpiesHistory();
@@ -281,9 +288,9 @@ describe('CGUs', () => {
       context('When it is not the first record', () => {
         context('When there are changes', () => {
           before(async () => {
-            await app.recordVersion({ snapshotContent: SERVICE_A_TOS_SNAPSHOT, snapshotId: 'sha', serviceId: SERVICE_A_ID, documentDeclaration: documentADeclaration });
+            await app.recordVersion({ snapshotContent: serviceASnapshotExpectedContent, snapshotId: 'sha', serviceId: SERVICE_A_ID, documentDeclaration: documentADeclaration });
             resetSpiesHistory();
-            await app.recordVersion({ snapshotContent: SERVICE_B_TOS_SNAPSHOT, snapshotId: 'sha', serviceId: SERVICE_A_ID, documentDeclaration: documentADeclaration });
+            await app.recordVersion({ snapshotContent: serviceBSnapshotExpectedContent, snapshotId: 'sha', serviceId: SERVICE_A_ID, documentDeclaration: documentADeclaration });
           });
 
           after(() => {
@@ -315,9 +322,9 @@ describe('CGUs', () => {
 
         context('When there are no changes', () => {
           before(async () => {
-            await app.recordVersion({ snapshotContent: SERVICE_A_TOS_SNAPSHOT, snapshotId: 'sha', serviceId: SERVICE_A_ID, documentDeclaration: documentADeclaration });
+            await app.recordVersion({ snapshotContent: serviceASnapshotExpectedContent, snapshotId: 'sha', serviceId: SERVICE_A_ID, documentDeclaration: documentADeclaration });
             resetSpiesHistory();
-            await app.recordVersion({ snapshotContent: SERVICE_A_TOS_SNAPSHOT, snapshotId: 'sha', serviceId: SERVICE_A_ID, documentDeclaration: documentADeclaration });
+            await app.recordVersion({ snapshotContent: serviceASnapshotExpectedContent, snapshotId: 'sha', serviceId: SERVICE_A_ID, documentDeclaration: documentADeclaration });
           });
 
           after(() => {
@@ -351,7 +358,7 @@ describe('CGUs', () => {
 
     describe('#recordRefilter', () => {
       context('When it is the first record', () => {
-        before(async () => app.recordRefilter({ snapshotContent: SERVICE_A_TOS_SNAPSHOT, snapshotId: 'sha', serviceId: SERVICE_A_ID, documentDeclaration: documentADeclaration }));
+        before(async () => app.recordRefilter({ snapshotContent: serviceASnapshotExpectedContent, snapshotId: 'sha', serviceId: SERVICE_A_ID, documentDeclaration: documentADeclaration }));
 
         after(() => {
           resetSpiesHistory();
@@ -383,9 +390,9 @@ describe('CGUs', () => {
       context('When it is not the first record', () => {
         context('When there are changes', () => {
           before(async () => {
-            await app.recordRefilter({ snapshotContent: SERVICE_A_TOS_SNAPSHOT, snapshotId: 'sha', serviceId: SERVICE_A_ID, documentDeclaration: documentADeclaration });
+            await app.recordRefilter({ snapshotContent: serviceASnapshotExpectedContent, snapshotId: 'sha', serviceId: SERVICE_A_ID, documentDeclaration: documentADeclaration });
             resetSpiesHistory();
-            await app.recordRefilter({ snapshotContent: SERVICE_B_TOS_SNAPSHOT, snapshotId: 'sha', serviceId: SERVICE_A_ID, documentDeclaration: documentADeclaration });
+            await app.recordRefilter({ snapshotContent: serviceBSnapshotExpectedContent, snapshotId: 'sha', serviceId: SERVICE_A_ID, documentDeclaration: documentADeclaration });
           });
 
           after(() => {
@@ -417,9 +424,9 @@ describe('CGUs', () => {
 
         context('When there are no changes', () => {
           before(async () => {
-            await app.recordRefilter({ snapshotContent: SERVICE_A_TOS_SNAPSHOT, snapshotId: 'sha', serviceId: SERVICE_A_ID, documentDeclaration: documentADeclaration });
+            await app.recordRefilter({ snapshotContent: serviceASnapshotExpectedContent, snapshotId: 'sha', serviceId: SERVICE_A_ID, documentDeclaration: documentADeclaration });
             resetSpiesHistory();
-            await app.recordRefilter({ snapshotContent: SERVICE_A_TOS_SNAPSHOT, snapshotId: 'sha', serviceId: SERVICE_A_ID, documentDeclaration: documentADeclaration });
+            await app.recordRefilter({ snapshotContent: serviceASnapshotExpectedContent, snapshotId: 'sha', serviceId: SERVICE_A_ID, documentDeclaration: documentADeclaration });
           });
 
           after(() => {
@@ -459,7 +466,7 @@ describe('CGUs', () => {
 
       context('When everything is ok', () => {
         before(async () => {
-          nock('https://www.servicea.example').get('/tos').reply(200, SERVICE_A_TOS_SNAPSHOT);
+          nock('https://www.servicea.example').get('/tos').reply(200, serviceASnapshotExpectedContent, { 'Content-Type': 'text/html' });
 
           const { fetch: location } = app.serviceDeclarations[SERVICE_A_ID].documents[SERVICE_A_TYPE];
 
@@ -486,11 +493,11 @@ describe('CGUs', () => {
       });
 
       context('When url cannot be fetched', () => {
-        before(async () => {
-          const { fetch: location } = app.serviceDeclarations[SERVICE_A_ID].documents[SERVICE_A_TYPE];
-
-          return app.fetch({ location, serviceId: SERVICE_A_ID, type: SERVICE_A_TYPE });
-        });
+        before(async () => app.fetch({
+          location: 'https://not.available.example',
+          serviceId: SERVICE_A_ID,
+          type: SERVICE_A_TYPE
+        }));
 
         it('emits "documentFetchError" event', async () => {
           expect(spies.onDocumentFetchError).to.have.been.calledWith(SERVICE_A_ID, SERVICE_A_TYPE);
@@ -517,8 +524,8 @@ describe('CGUs', () => {
 
     context('When tracking changes on new services', () => {
       before(async () => {
-        nock('https://www.servicea.example').get('/tos').reply(200, SERVICE_A_TOS_SNAPSHOT);
-        nock('https://www.serviceb.example').get('/tos').reply(200, SERVICE_B_TOS_SNAPSHOT);
+        nock('https://www.servicea.example').get('/tos').reply(200, serviceASnapshotExpectedContent, { 'Content-Type': 'text/html' });
+        nock('https://www.serviceb.example').get('/tos').reply(200, serviceBSnapshotExpectedContent, { 'Content-Type': 'application/pdf' });
 
         return app.trackChanges();
       });
@@ -566,13 +573,13 @@ describe('CGUs', () => {
     context('When tracking changes on already tracked services', () => {
       context('When services did not change', () => {
         before(async () => {
-          nock('https://www.servicea.example').get('/tos').reply(200, SERVICE_A_TOS_SNAPSHOT);
-          nock('https://www.serviceb.example').get('/tos').reply(200, SERVICE_B_TOS_SNAPSHOT);
+          nock('https://www.servicea.example').get('/tos').reply(200, serviceASnapshotExpectedContent, { 'Content-Type': 'text/html' });
+          nock('https://www.serviceb.example').get('/tos').reply(200, serviceBSnapshotExpectedContent, { 'Content-Type': 'application/pdf' });
 
           await app.trackChanges();
 
-          nock('https://www.servicea.example').get('/tos').reply(200, SERVICE_A_TOS_SNAPSHOT);
-          nock('https://www.serviceb.example').get('/tos').reply(200, SERVICE_B_TOS_SNAPSHOT);
+          nock('https://www.servicea.example').get('/tos').reply(200, serviceASnapshotExpectedContent, { 'Content-Type': 'text/html' });
+          nock('https://www.serviceb.example').get('/tos').reply(200, serviceBSnapshotExpectedContent, { 'Content-Type': 'application/pdf' });
 
           resetSpiesHistory();
           return app.trackChanges();
@@ -620,16 +627,16 @@ describe('CGUs', () => {
 
       context('When a service changed', () => {
         before(async () => {
-          nock('https://www.servicea.example').get('/tos').reply(200, SERVICE_A_TOS_SNAPSHOT);
-          nock('https://www.serviceb.example').get('/tos').reply(200, SERVICE_B_TOS_SNAPSHOT);
+          nock('https://www.servicea.example').get('/tos').reply(200, serviceASnapshotExpectedContent, { 'Content-Type': 'text/html' });
+          nock('https://www.serviceb.example').get('/tos').reply(200, serviceBSnapshotExpectedContent, { 'Content-Type': 'application/pdf' });
 
           await app.trackChanges();
 
-          nock('https://www.servicea.example').get('/tos').reply(200, SERVICE_B_TOS_SNAPSHOT);
-          nock('https://www.serviceb.example').get('/tos').reply(200, SERVICE_B_TOS_SNAPSHOT);
+          nock('https://www.servicea.example').get('/tos').reply(200, serviceBSnapshotExpectedContent, { 'Content-Type': 'text/html' });
+          nock('https://www.serviceb.example').get('/tos').reply(200, serviceBSnapshotExpectedContent, { 'Content-Type': 'application/pdf' });
 
           resetSpiesHistory();
-          return app.trackChanges();
+          await app.trackChanges();
         });
 
         after(() => {

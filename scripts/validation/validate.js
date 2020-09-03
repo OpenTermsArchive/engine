@@ -48,12 +48,18 @@ let serviceDeclarations;
               describe(type, () => {
                 let content;
                 let filteredContent;
+                let isPDF;
 
                 it('has fetchable URL', async function () {
                   this.timeout(30000);
 
                   const { fetch: location } = service.documents[type];
                   content = await fetch(location);
+
+                  if (content.constructor.name == 'Blob' && content.type == 'application/pdf') {
+                    isPDF = true;
+                    content = Buffer.from(await content.arrayBuffer());
+                  }
                 });
 
                 it('has a selector that matches an element in the web page', async function () {
@@ -62,7 +68,13 @@ let serviceDeclarations;
                     this.skip();
                   }
 
-                  filteredContent = await filter(content, service.documents[type], service.filters);
+                  filteredContent = await filter({
+                    content,
+                    documentDeclaration: service.documents[type],
+                    filterFunctions: service.filters,
+                    isPDF
+                  });
+
                   expect(filteredContent).to.not.be.empty;
                 });
 
@@ -95,8 +107,18 @@ let serviceDeclarations;
                     this.timeout(30000);
 
                     const { fetch: location } = service.documents[type];
-                    const secondContent = await fetch(location);
-                    const secondFilteredContent = await filter(secondContent, service.documents[type], service.filters);
+                    let secondContent = await fetch(location);
+
+                    if (secondContent.constructor.name == 'Blob' && secondContent.type == 'application/pdf') {
+                      secondContent = Buffer.from(await secondContent.arrayBuffer());
+                    }
+
+                    const secondFilteredContent = await filter({
+                      content: secondContent,
+                      documentDeclaration: service.documents[type],
+                      filterFunctions: service.filters,
+                      isPDF
+                    });
 
                     expect(secondFilteredContent).to.equal(filteredContent);
                   });
