@@ -91,7 +91,7 @@ export default class CGUs extends events.EventEmitter {
         return;
       }
 
-      return this.recordVersion({
+      await this.recordVersion({
         snapshotContent: content,
         mimeType,
         snapshotId,
