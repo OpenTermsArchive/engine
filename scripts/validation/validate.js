@@ -52,16 +52,22 @@ if (args.includes('--schema-only')) {
     const service = serviceDeclarations[serviceId];
 
     const documentValidationPromises = Object.keys(service.documents).map(async type => {
-      const document = service.documents[type];
-      const { fetch: location } = document;
+      try {
+        const document = service.documents[type];
+        const { fetch: location } = document;
 
-      const content = await fetch(location);
-      const filteredContent = await filter(content, document, service.filters);
-      expect(filteredContent.length, `${serviceId} ${type} has an unexpectedly small textual content after filtering`).to.be.greaterThan(MIN_DOC_LENGTH);
+        const content = await fetch(location);
+        const filteredContent = await filter(content, document, service.filters);
+        expect(filteredContent.length, 'The textual content after filtering was unexpectedly small.').to.be.greaterThan(MIN_DOC_LENGTH);
 
-      const secondContent = await fetch(location);
-      const secondFilteredContent = await filter(secondContent, document, service.filters);
-      expect(secondFilteredContent, `${serviceId} ${type} has inconsistent filtered content`).to.equal(filteredContent);
+        const secondContent = await fetch(location);
+        const secondFilteredContent = await filter(secondContent, document, service.filters);
+        expect(secondFilteredContent, 'Filters give inconsistent results.').to.equal(filteredContent);
+      } catch (failure) {
+        failure.serviceId = serviceId;
+        failure.documentType = type;
+        throw failure;
+      }
     });
 
     const documentValidationResults = await Promise.allSettled(documentValidationPromises);
@@ -70,6 +76,7 @@ if (args.includes('--schema-only')) {
     failures.forEach(failure => console.warn(serviceId, 'fails:', failure.reason.message));
 
     if (failures.length) {
+      failures.serviceId = serviceId;
       throw failures;
     }
 
@@ -77,19 +84,19 @@ if (args.includes('--schema-only')) {
   });
 
   const serviceValidationResults = await Promise.allSettled(serviceValidationPromises);
+  const serviceFailures = serviceValidationResults.filter(result => result.status == 'rejected');
 
-  const totals = {
-    rejected: 0,
-    fulfilled: 0,
-  };
+  console.log();
+  console.log(serviceValidationResults.length - serviceFailures.length, 'services are valid');
 
-  serviceValidationResults.forEach(result => totals[result.status]++);
-
-  console.log(totals.fulfilled, 'services are valid');
-
-  if (totals.rejected) {
-    console.error(totals.rejected, 'services have validation errors');
+  if (serviceFailures.length) {
+    console.error(serviceFailures.length, 'services have validation errors. Recap below.\n');
     process.exitCode = 1;
+
+    serviceFailures.forEach(serviceFailure => {
+      console.warn(serviceFailure.reason.serviceId);
+      serviceFailure.reason.forEach(documentFailure => console.warn(' ', documentFailure.reason.documentType, '\n   ', documentFailure.reason.message));
+    });
   }
 })();
 
