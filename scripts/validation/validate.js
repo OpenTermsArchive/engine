@@ -65,8 +65,7 @@ if (args.includes('--schema-only')) {
         const secondFilteredContent = await filter(secondContent, document, service.filters);
         expect(secondFilteredContent, 'Filters give inconsistent results.').to.equal(filteredContent);
       } catch (failure) {
-        failure.serviceId = serviceId;
-        failure.documentType = type;
+        failure.source = type;
         throw failure;
       }
 
@@ -76,10 +75,10 @@ if (args.includes('--schema-only')) {
     const documentValidationResults = await Promise.allSettled(documentValidationPromises);
 
     const failures = documentValidationResults.filter(result => result.status == 'rejected');
-    failures.forEach(failure => console.warn(failure.reason.serviceId, 'fails on', failure.reason.documentType, ':', failure.reason.message));
+    failures.forEach(failure => console.warn(serviceId, 'fails on', failure.reason.source, ':', failure.reason.message));
 
     if (failures.length) {
-      failures.serviceId = serviceId;
+      failures.source = serviceId;
       throw failures;
     }
   });
@@ -95,8 +94,13 @@ if (args.includes('--schema-only')) {
     process.exitCode = 2;
 
     serviceFailures.forEach(serviceFailure => {
-      console.warn(serviceFailure.reason.serviceId);
-      serviceFailure.reason.forEach(documentFailure => console.warn(' ', documentFailure.reason.documentType, '\n   ', documentFailure.reason.message));
+      console.warn(serviceFailure.reason.source);
+
+      if (Array.isArray(serviceFailure.reason)) {
+        serviceFailure.reason.forEach(documentFailure => console.warn(' ', documentFailure.reason.source, '\n   ', documentFailure.reason.message));
+      } else {
+        console.warn('  Service declaration is malformed', serviceFailure.reason.message);
+      }
     });
   }
 })();
@@ -111,23 +115,25 @@ function assertValid(schema, subject, sourceIdentifier) {
   const valid = validator.validate(schema, subject);
 
   if (!valid) {
+    const result = new Error();
+    result.source = sourceIdentifier;
+
     const errorPointers = new Set();
-    let errorMessage = sourceIdentifier ? `In ${sourceIdentifier}:` : '';
     const sourceMap = jsonSourceMap.stringify(subject, null, 2);
     const jsonLines = sourceMap.json.split('\n');
+
     validator.errors.forEach(error => {
-      errorMessage += `\n\n${validator.errorsText([error])}`;
+      result.message += `\n\n${validator.errorsText([error])}`;
       const errorPointer = sourceMap.pointers[error.dataPath];
       if (errorPointer) {
-        errorMessage += `\n> ${jsonLines.slice(errorPointer.value.line, errorPointer.valueEnd.line).join('\n> ')}`;
+        result.message += `\n> ${jsonLines.slice(errorPointer.value.line, errorPointer.valueEnd.line).join('\n> ')}`;
         errorPointers.add(errorPointer);
       } else {
-        errorMessage += ' (in entire file)\n';
+        result.message += ' (in entire file)\n';
       }
     });
 
-    errorMessage += `\n\n${errorPointers.size} features have errors in total`;
-
-    throw new Error(errorMessage);
+    result.message += `\n\n${errorPointers.size} features have errors in total`;
+    throw result;
   }
 }
