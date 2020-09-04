@@ -21,25 +21,11 @@ export default class Notifier {
     this.delayedVersionNotificationsParams.push({ serviceId, type, versionId });
   }
 
-  async onChangesPublished() {
+  async onRecordsPublished() {
     this.delayedVersionNotificationsParams.forEach(({ serviceId, type, versionId }) => {
       this.notifyVersionRecorded(serviceId, type, versionId);
     });
     this.delayedVersionNotificationsParams = [];
-  }
-
-  async onDocumentFetchError(serviceProviderId, documentTypeId, error) {
-    const sendParams = {
-      templateId: config.get('notifier.sendInBlue.updateErrorTemplateId'),
-      params: {
-        SERVICE_PROVIDER_NAME: this.serviceProviders[serviceProviderId].name,
-        DOCUMENT_TYPE: documentTypeId,
-        ERROR_TEXT: `An error occured when trying to scrape the document:
-  ${error}`
-      },
-    };
-
-    return this.send([ config.get('notifier.sendInBlue.administratorsListId') ], sendParams);
   }
 
   async notifyVersionRecorded(serviceProviderId, documentTypeId, versionId) {
@@ -53,32 +39,6 @@ export default class Notifier {
     };
 
     return this.send([ config.get('notifier.sendInBlue.administratorsListId'), config.get('notifier.sendInBlue.updatesListId') ], sendParams);
-  }
-
-  async onDocumentUpdateError(serviceProviderId, documentTypeId, error) {
-    const sendParams = {
-      templateId: config.get('notifier.sendInBlue.updateErrorTemplateId'),
-      params: {
-        SERVICE_PROVIDER_NAME: this.serviceProviders[serviceProviderId].name,
-        DOCUMENT_TYPE: documentTypeId,
-        ERROR_TEXT: `An error occured when trying to update the document:
-  ${error}`
-      },
-    };
-
-    return this.send([ config.get('notifier.sendInBlue.administratorsListId') ], sendParams);
-  }
-
-  async onApplicationError(error) {
-    const sendParams = {
-      templateId: config.get('notifier.sendInBlue.applicationErrorTemplateId'),
-      params: {
-        ERROR_TEXT: `An error occured:
-  ${error}`
-      },
-    };
-
-    return this.send([ config.get('notifier.sendInBlue.administratorsListId') ], sendParams);
   }
 
   async send(lists, sendParams) {
