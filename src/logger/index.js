@@ -1,5 +1,10 @@
 import winston from 'winston';
+import 'winston-mail';
 
+import config from 'config';
+import dotenv from 'dotenv';
+
+dotenv.config();
 const { combine, timestamp, printf, colorize } = winston.format;
 
 const alignedWithColorsAndTime = combine(colorize(),
@@ -12,14 +17,30 @@ const alignedWithColorsAndTime = combine(colorize(),
     return `${timestamp} ${level.padEnd(15)} ${prefix.padEnd(55)} ${message}`;
   }));
 
+const consoleTransport = new winston.transports.Console();
+
+const transports = [ consoleTransport ];
+
+if (config.get('logger.sendMailOnError')) {
+  const mailErrorTransport = new winston.transports.Mail({
+    level: 'error',
+    to: config.get('logger.sendMailOnError.to'),
+    from: config.get('logger.sendMailOnError.from'),
+    subject: 'CGUs - Error Report',
+    host: process.env.SMTP_HOST,
+    username: process.env.SMTP_USERNAME,
+    password: process.env.SMTP_PASSWORD,
+    ssl: true,
+    formatter: args => args[Object.getOwnPropertySymbols(args)[1]]
+  });
+
+  transports.push(mailErrorTransport);
+}
+
 const logger = winston.createLogger({
   format: alignedWithColorsAndTime,
-  transports: [
-    new winston.transports.Console({
-      handleExceptions: true
-    }),
-  ],
-  exitOnError: false
+  transports,
+  rejectionHandlers: transports,
 });
 
 export function onFirstSnapshotRecorded(serviceId, type, snapshotId) {

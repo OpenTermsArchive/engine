@@ -3,5 +3,11 @@
     "snapshotsPath": "../cgus-snapshots",
     "versionsPath": "../cgus-versions",
     "publish": true
+  },
+  "logger": {
+    "sendMailOnError": {
+      "to": "nicolas.dupont@beta.gouv.fr",
+      "from": "admin.ambassadeur-numerique@diplomatie.gouv.fr"
+    }
   }
 }

@@ -12,6 +12,9 @@
       "email": "ambnum.bot@disinfo.quaidorsay.fr"
     }
   },
+  "logger": {
+    "sendMailOnError": false
+  },
   "notifier": {
     "sendInBlue": {
       "administratorsListId": 9,

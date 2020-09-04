@@ -64,6 +64,7 @@
     "sib-api-v3-sdk": "^7.2.3",
     "simple-git": "^2.17.0",
     "turndown": "^6.0.0",
-    "winston": "^3.3.3"
+    "winston": "^3.3.3",
+    "winston-mail": "^2.0.0"
   }
 }
