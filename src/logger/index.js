@@ -1,10 +1,9 @@
 import winston from 'winston';
 
-const { combine, timestamp, align, printf, colorize } = winston.format;
+const { combine, timestamp, printf, colorize } = winston.format;
 
 const alignedWithColorsAndTime = combine(colorize(),
   timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
-  align(),
   printf(({ level, message, timestamp, serviceId, type }) => {
     let prefix = '';
     if (serviceId && type) {
