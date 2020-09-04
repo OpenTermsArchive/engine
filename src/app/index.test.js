@@ -39,7 +39,7 @@ describe('CGUs', () => {
   describe('#trackChanges', () => {
     before(async () => {
       nock('https://www.servicea.example').get('/tos').reply(200, serviceASnapshotExpectedContent, { 'Content-Type': 'text/html' });
-      nock('https://www.serviceb.example').get('/tos').reply(200, serviceBSnapshotExpectedContent, { 'Content-Type': 'application/pdf' });
+      nock('https://www.serviceb.example').get('/privacy').reply(200, serviceBSnapshotExpectedContent, { 'Content-Type': 'application/pdf' });
       const app = new CGUs();
       await app.init();
       return app.trackChanges();
@@ -78,7 +78,7 @@ describe('CGUs', () => {
 
       before(async () => {
         nock('https://www.servicea.example').get('/tos').reply(200, serviceASnapshotExpectedContent, { 'Content-Type': 'text/html' });
-        nock('https://www.serviceb.example').get('/tos').reply(200, serviceBSnapshotExpectedContent, { 'Content-Type': 'application/pdf' });
+        nock('https://www.serviceb.example').get('/privacy').reply(200, serviceBSnapshotExpectedContent, { 'Content-Type': 'application/pdf' });
         const app = new CGUs();
         await app.init();
         await app.trackChanges();
@@ -136,6 +136,15 @@ describe('CGUs', () => {
       Object.keys(spies).forEach(spyName => spies[spyName].resetHistory());
     }
 
+    function emitsOnly(eventNames) {
+      AVAILABLE_EVENTS.filter(el => eventNames.indexOf(el) < 0).forEach(event => {
+        const handlerName = `on${event[0].toUpperCase()}${event.substr(1)}`;
+        it(`emits no "${event}" event`, () => {
+          expect(spies[handlerName]).to.have.not.been.called;
+        });
+      });
+    }
+
     before(async () => {
       app = new CGUs();
       await app.init();
@@ -161,26 +170,11 @@ describe('CGUs', () => {
           return resetGitRepository();
         });
 
-        it('emits "onFirstSnapshotRecorded" event', async () => {
+        it('emits "firstSnapshotRecorded" event', async () => {
           expect(spies.onFirstSnapshotRecorded).to.have.been.calledWith(SERVICE_A_ID, SERVICE_A_TYPE);
         });
 
-        it('emits no other events', async () => {
-          expect(spies.onStartTrackingChanges).to.have.not.been.called;
-          expect(spies.onEndTrackingChanges).to.have.not.been.called;
-          expect(spies.onStartRefiltering).to.have.not.been.called;
-          expect(spies.onEndRefiltering).to.have.not.been.called;
-          expect(spies.onSnapshotRecorded).to.have.not.been.called;
-          expect(spies.onNoSnapshotChanges).to.have.not.been.called;
-          expect(spies.onFirstVersionRecorded).to.have.not.been.called;
-          expect(spies.onVersionRecorded).to.have.not.been.called;
-          expect(spies.onNoVersionChanges).to.have.not.been.called;
-          expect(spies.onChangesPublished).to.have.not.been.called;
-          expect(spies.onApplicationError).to.have.not.been.called;
-          expect(spies.onRecordRefilterError).to.have.not.been.called;
-          expect(spies.onDocumentUpdateError).to.have.not.been.called;
-          expect(spies.onDocumentFetchError).to.have.not.been.called;
-        });
+        emitsOnly([ 'firstSnapshotRecorded' ]);
       });
 
       context('When it is not the first record', () => {
@@ -196,26 +190,11 @@ describe('CGUs', () => {
             return resetGitRepository();
           });
 
-          it('emits "onSnapshotRecorded" event', async () => {
+          it('emits "snapshotRecorded" event', async () => {
             expect(spies.onSnapshotRecorded).to.have.been.calledWith(SERVICE_A_ID, SERVICE_A_TYPE);
           });
 
-          it('emits no other events', async () => {
-            expect(spies.onStartTrackingChanges).to.have.not.been.called;
-            expect(spies.onEndTrackingChanges).to.have.not.been.called;
-            expect(spies.onStartRefiltering).to.have.not.been.called;
-            expect(spies.onEndRefiltering).to.have.not.been.called;
-            expect(spies.onFirstSnapshotRecorded).to.have.not.been.called;
-            expect(spies.onNoSnapshotChanges).to.have.not.been.called;
-            expect(spies.onFirstVersionRecorded).to.have.not.been.called;
-            expect(spies.onVersionRecorded).to.have.not.been.called;
-            expect(spies.onNoVersionChanges).to.have.not.been.called;
-            expect(spies.onChangesPublished).to.have.not.been.called;
-            expect(spies.onApplicationError).to.have.not.been.called;
-            expect(spies.onRecordRefilterError).to.have.not.been.called;
-            expect(spies.onDocumentUpdateError).to.have.not.been.called;
-            expect(spies.onDocumentFetchError).to.have.not.been.called;
-          });
+          emitsOnly([ 'snapshotRecorded' ]);
         });
 
         context('When there are no changes', () => {
@@ -230,26 +209,11 @@ describe('CGUs', () => {
             return resetGitRepository();
           });
 
-          it('emits "onNoSnapshotChanges" event', async () => {
-            expect(spies.onNoSnapshotChanges).to.have.been.calledWith(SERVICE_A_ID, SERVICE_A_TYPE);
+          it('emits "snapshotNotChanged" event', async () => {
+            expect(spies.onSnapshotNotChanged).to.have.been.calledWith(SERVICE_A_ID, SERVICE_A_TYPE);
           });
 
-          it('emits no other events', async () => {
-            expect(spies.onStartTrackingChanges).to.have.not.been.called;
-            expect(spies.onEndTrackingChanges).to.have.not.been.called;
-            expect(spies.onStartRefiltering).to.have.not.been.called;
-            expect(spies.onEndRefiltering).to.have.not.been.called;
-            expect(spies.onFirstSnapshotRecorded).to.have.not.been.called;
-            expect(spies.onSnapshotRecorded).to.have.not.been.called;
-            expect(spies.onFirstVersionRecorded).to.have.not.been.called;
-            expect(spies.onVersionRecorded).to.have.not.been.called;
-            expect(spies.onNoVersionChanges).to.have.not.been.called;
-            expect(spies.onChangesPublished).to.have.not.been.called;
-            expect(spies.onApplicationError).to.have.not.been.called;
-            expect(spies.onRecordRefilterError).to.have.not.been.called;
-            expect(spies.onDocumentUpdateError).to.have.not.been.called;
-            expect(spies.onDocumentFetchError).to.have.not.been.called;
-          });
+          emitsOnly([ 'snapshotNotChanged' ]);
         });
       });
     });
@@ -263,26 +227,11 @@ describe('CGUs', () => {
           return resetGitRepository();
         });
 
-        it('emits "onFirstVersionRecorded" event', async () => {
+        it('emits "firstVersionRecorded" event', async () => {
           expect(spies.onFirstVersionRecorded).to.have.been.calledWith(SERVICE_A_ID, SERVICE_A_TYPE);
         });
 
-        it('emits no other events', async () => {
-          expect(spies.onStartTrackingChanges).to.have.not.been.called;
-          expect(spies.onEndTrackingChanges).to.have.not.been.called;
-          expect(spies.onStartRefiltering).to.have.not.been.called;
-          expect(spies.onEndRefiltering).to.have.not.been.called;
-          expect(spies.onSnapshotRecorded).to.have.not.been.called;
-          expect(spies.onNoSnapshotChanges).to.have.not.been.called;
-          expect(spies.onFirstSnapshotRecorded).to.have.not.been.called;
-          expect(spies.onVersionRecorded).to.have.not.been.called;
-          expect(spies.onNoVersionChanges).to.have.not.been.called;
-          expect(spies.onChangesPublished).to.have.not.been.called;
-          expect(spies.onApplicationError).to.have.not.been.called;
-          expect(spies.onRecordRefilterError).to.have.not.been.called;
-          expect(spies.onDocumentUpdateError).to.have.not.been.called;
-          expect(spies.onDocumentFetchError).to.have.not.been.called;
-        });
+        emitsOnly([ 'firstVersionRecorded' ]);
       });
 
       context('When it is not the first record', () => {
@@ -298,26 +247,11 @@ describe('CGUs', () => {
             return resetGitRepository();
           });
 
-          it('emits "onVersionRecorded" event', async () => {
+          it('emits "versionRecorded" event', async () => {
             expect(spies.onVersionRecorded).to.have.been.calledWith(SERVICE_A_ID, SERVICE_A_TYPE);
           });
 
-          it('emits no other events', async () => {
-            expect(spies.onStartTrackingChanges).to.have.not.been.called;
-            expect(spies.onEndTrackingChanges).to.have.not.been.called;
-            expect(spies.onStartRefiltering).to.have.not.been.called;
-            expect(spies.onEndRefiltering).to.have.not.been.called;
-            expect(spies.onFirstSnapshotRecorded).to.have.not.been.called;
-            expect(spies.onNoSnapshotChanges).to.have.not.been.called;
-            expect(spies.onFirstVersionRecorded).to.have.not.been.called;
-            expect(spies.onSnapshotRecorded).to.have.not.been.called;
-            expect(spies.onNoVersionChanges).to.have.not.been.called;
-            expect(spies.onChangesPublished).to.have.not.been.called;
-            expect(spies.onApplicationError).to.have.not.been.called;
-            expect(spies.onRecordRefilterError).to.have.not.been.called;
-            expect(spies.onDocumentUpdateError).to.have.not.been.called;
-            expect(spies.onDocumentFetchError).to.have.not.been.called;
-          });
+          emitsOnly([ 'versionRecorded' ]);
         });
 
         context('When there are no changes', () => {
@@ -332,26 +266,11 @@ describe('CGUs', () => {
             return resetGitRepository();
           });
 
-          it('emits "onNoVersionChanges" event', async () => {
-            expect(spies.onNoVersionChanges).to.have.been.calledWith(SERVICE_A_ID, SERVICE_A_TYPE);
+          it('emits "versionNotChanged" event', async () => {
+            expect(spies.onVersionNotChanged).to.have.been.calledWith(SERVICE_A_ID, SERVICE_A_TYPE);
           });
 
-          it('emits no other events', async () => {
-            expect(spies.onStartTrackingChanges).to.have.not.been.called;
-            expect(spies.onEndTrackingChanges).to.have.not.been.called;
-            expect(spies.onStartRefiltering).to.have.not.been.called;
-            expect(spies.onEndRefiltering).to.have.not.been.called;
-            expect(spies.onFirstSnapshotRecorded).to.have.not.been.called;
-            expect(spies.onSnapshotRecorded).to.have.not.been.called;
-            expect(spies.onFirstVersionRecorded).to.have.not.been.called;
-            expect(spies.onVersionRecorded).to.have.not.been.called;
-            expect(spies.onNoSnapshotChanges).to.have.not.been.called;
-            expect(spies.onChangesPublished).to.have.not.been.called;
-            expect(spies.onApplicationError).to.have.not.been.called;
-            expect(spies.onRecordRefilterError).to.have.not.been.called;
-            expect(spies.onDocumentUpdateError).to.have.not.been.called;
-            expect(spies.onDocumentFetchError).to.have.not.been.called;
-          });
+          emitsOnly([ 'versionNotChanged' ]);
         });
       });
     });
@@ -365,26 +284,11 @@ describe('CGUs', () => {
           return resetGitRepository();
         });
 
-        it('emits "onFirstVersionRecorded" event', async () => {
+        it('emits "firstVersionRecorded" event', async () => {
           expect(spies.onFirstVersionRecorded).to.have.been.calledWith(SERVICE_A_ID, SERVICE_A_TYPE);
         });
 
-        it('emits no other events', async () => {
-          expect(spies.onStartTrackingChanges).to.have.not.been.called;
-          expect(spies.onEndTrackingChanges).to.have.not.been.called;
-          expect(spies.onStartRefiltering).to.have.not.been.called;
-          expect(spies.onEndRefiltering).to.have.not.been.called;
-          expect(spies.onSnapshotRecorded).to.have.not.been.called;
-          expect(spies.onNoSnapshotChanges).to.have.not.been.called;
-          expect(spies.onFirstSnapshotRecorded).to.have.not.been.called;
-          expect(spies.onVersionRecorded).to.have.not.been.called;
-          expect(spies.onNoVersionChanges).to.have.not.been.called;
-          expect(spies.onChangesPublished).to.have.not.been.called;
-          expect(spies.onApplicationError).to.have.not.been.called;
-          expect(spies.onRecordRefilterError).to.have.not.been.called;
-          expect(spies.onDocumentUpdateError).to.have.not.been.called;
-          expect(spies.onDocumentFetchError).to.have.not.been.called;
-        });
+        emitsOnly([ 'firstVersionRecorded' ]);
       });
 
       context('When it is not the first record', () => {
@@ -400,26 +304,11 @@ describe('CGUs', () => {
             return resetGitRepository();
           });
 
-          it('emits "onVersionRecorded" event', async () => {
+          it('emits "versionRecorded" event', async () => {
             expect(spies.onVersionRecorded).to.have.been.calledWith(SERVICE_A_ID, SERVICE_A_TYPE);
           });
 
-          it('emits no other events', async () => {
-            expect(spies.onStartTrackingChanges).to.have.not.been.called;
-            expect(spies.onEndTrackingChanges).to.have.not.been.called;
-            expect(spies.onStartRefiltering).to.have.not.been.called;
-            expect(spies.onEndRefiltering).to.have.not.been.called;
-            expect(spies.onFirstSnapshotRecorded).to.have.not.been.called;
-            expect(spies.onNoSnapshotChanges).to.have.not.been.called;
-            expect(spies.onFirstVersionRecorded).to.have.not.been.called;
-            expect(spies.onSnapshotRecorded).to.have.not.been.called;
-            expect(spies.onNoVersionChanges).to.have.not.been.called;
-            expect(spies.onChangesPublished).to.have.not.been.called;
-            expect(spies.onApplicationError).to.have.not.been.called;
-            expect(spies.onRecordRefilterError).to.have.not.been.called;
-            expect(spies.onDocumentUpdateError).to.have.not.been.called;
-            expect(spies.onDocumentFetchError).to.have.not.been.called;
-          });
+          emitsOnly([ 'versionRecorded' ]);
         });
 
         context('When there are no changes', () => {
@@ -434,90 +323,11 @@ describe('CGUs', () => {
             return resetGitRepository();
           });
 
-          it('emits "onNoVersionChanges" event', async () => {
-            expect(spies.onNoVersionChanges).to.have.been.calledWith(SERVICE_A_ID, SERVICE_A_TYPE);
+          it('emits "versionNotChanged" event', async () => {
+            expect(spies.onVersionNotChanged).to.have.been.calledWith(SERVICE_A_ID, SERVICE_A_TYPE);
           });
 
-          it('emits no other events', async () => {
-            expect(spies.onStartTrackingChanges).to.have.not.been.called;
-            expect(spies.onEndTrackingChanges).to.have.not.been.called;
-            expect(spies.onStartRefiltering).to.have.not.been.called;
-            expect(spies.onEndRefiltering).to.have.not.been.called;
-            expect(spies.onFirstSnapshotRecorded).to.have.not.been.called;
-            expect(spies.onSnapshotRecorded).to.have.not.been.called;
-            expect(spies.onFirstVersionRecorded).to.have.not.been.called;
-            expect(spies.onVersionRecorded).to.have.not.been.called;
-            expect(spies.onNoSnapshotChanges).to.have.not.been.called;
-            expect(spies.onChangesPublished).to.have.not.been.called;
-            expect(spies.onApplicationError).to.have.not.been.called;
-            expect(spies.onRecordRefilterError).to.have.not.been.called;
-            expect(spies.onDocumentUpdateError).to.have.not.been.called;
-            expect(spies.onDocumentFetchError).to.have.not.been.called;
-          });
-        });
-      });
-    });
-
-    describe('#fetch', () => {
-      after(() => {
-        resetSpiesHistory();
-        return resetGitRepository();
-      });
-
-      context('When everything is ok', () => {
-        before(async () => {
-          nock('https://www.servicea.example').get('/tos').reply(200, serviceASnapshotExpectedContent, { 'Content-Type': 'text/html' });
-
-          const { fetch: location } = app.serviceDeclarations[SERVICE_A_ID].documents[SERVICE_A_TYPE];
-
-          return app.fetch({ location, serviceId: SERVICE_A_ID, type: SERVICE_A_TYPE });
-        });
-
-        it('emits no events', async () => {
-          expect(spies.onStartTrackingChanges).to.have.not.been.called;
-          expect(spies.onEndTrackingChanges).to.have.not.been.called;
-          expect(spies.onStartRefiltering).to.have.not.been.called;
-          expect(spies.onEndRefiltering).to.have.not.been.called;
-          expect(spies.onFirstSnapshotRecorded).to.have.not.been.called;
-          expect(spies.onSnapshotRecorded).to.have.not.been.called;
-          expect(spies.onNoSnapshotChanges).to.have.not.been.called;
-          expect(spies.onFirstVersionRecorded).to.have.not.been.called;
-          expect(spies.onVersionRecorded).to.have.not.been.called;
-          expect(spies.onNoVersionChanges).to.have.not.been.called;
-          expect(spies.onChangesPublished).to.have.not.been.called;
-          expect(spies.onApplicationError).to.have.not.been.called;
-          expect(spies.onRecordRefilterError).to.have.not.been.called;
-          expect(spies.onDocumentUpdateError).to.have.not.been.called;
-          expect(spies.onDocumentFetchError).to.have.not.been.called;
-        });
-      });
-
-      context('When url cannot be fetched', () => {
-        before(async () => app.fetch({
-          location: 'https://not.available.example',
-          serviceId: SERVICE_A_ID,
-          type: SERVICE_A_TYPE
-        }));
-
-        it('emits "documentFetchError" event', async () => {
-          expect(spies.onDocumentFetchError).to.have.been.calledWith(SERVICE_A_ID, SERVICE_A_TYPE);
-        });
-
-        it('emits no others events', async () => {
-          expect(spies.onStartTrackingChanges).to.have.not.been.called;
-          expect(spies.onEndTrackingChanges).to.have.not.been.called;
-          expect(spies.onStartRefiltering).to.have.not.been.called;
-          expect(spies.onEndRefiltering).to.have.not.been.called;
-          expect(spies.onFirstSnapshotRecorded).to.have.not.been.called;
-          expect(spies.onSnapshotRecorded).to.have.not.been.called;
-          expect(spies.onNoSnapshotChanges).to.have.not.been.called;
-          expect(spies.onFirstVersionRecorded).to.have.not.been.called;
-          expect(spies.onVersionRecorded).to.have.not.been.called;
-          expect(spies.onNoVersionChanges).to.have.not.been.called;
-          expect(spies.onChangesPublished).to.have.not.been.called;
-          expect(spies.onApplicationError).to.have.not.been.called;
-          expect(spies.onRecordRefilterError).to.have.not.been.called;
-          expect(spies.onDocumentUpdateError).to.have.not.been.called;
+          emitsOnly([ 'versionNotChanged' ]);
         });
       });
     });
@@ -525,7 +335,7 @@ describe('CGUs', () => {
     context('When tracking changes on new services', () => {
       before(async () => {
         nock('https://www.servicea.example').get('/tos').reply(200, serviceASnapshotExpectedContent, { 'Content-Type': 'text/html' });
-        nock('https://www.serviceb.example').get('/tos').reply(200, serviceBSnapshotExpectedContent, { 'Content-Type': 'application/pdf' });
+        nock('https://www.serviceb.example').get('/privacy').reply(200, serviceBSnapshotExpectedContent, { 'Content-Type': 'application/pdf' });
 
         return app.trackChanges();
       });
@@ -535,51 +345,31 @@ describe('CGUs', () => {
         return resetGitRepository();
       });
 
-      it('emits a "startTrackingChanges" event', async () => {
-        expect(spies.onStartTrackingChanges).to.have.been.calledOnce;
-      });
-
-      it('emits "onFirstSnapshotRecorded" events', async () => {
+      it('emits "firstSnapshotRecorded" events', async () => {
         expect(spies.onFirstSnapshotRecorded).to.have.been.calledTwice;
       });
 
-      it('emits "onFirstVersionRecorded" events', async () => {
+      it('emits "firstVersionRecorded" events', async () => {
         expect(spies.onFirstVersionRecorded).to.have.been.calledTwice;
       });
 
-      it('emits "onFirstVersionRecorded" events after "onFirstSnapshotRecorded" events', async () => {
+      it('emits "firstVersionRecorded" events after "firstSnapshotRecorded" events', async () => {
         expect(spies.onFirstVersionRecorded).to.have.been.calledAfter(spies.onFirstSnapshotRecorded);
       });
 
-      it('emits a "endTrackingChanges" event after "startTrackingChanges"', async () => {
-        expect(spies.onEndTrackingChanges).to.have.been.calledAfter(spies.onStartTrackingChanges);
-      });
-
-      it('emits no other events', async () => {
-        expect(spies.onStartRefiltering).to.have.not.been.called;
-        expect(spies.onEndRefiltering).to.have.not.been.called;
-        expect(spies.onSnapshotRecorded).to.have.not.been.called;
-        expect(spies.onNoSnapshotChanges).to.have.not.been.called;
-        expect(spies.onVersionRecorded).to.have.not.been.called;
-        expect(spies.onNoVersionChanges).to.have.not.been.called;
-        expect(spies.onChangesPublished).to.have.not.been.called;
-        expect(spies.onApplicationError).to.have.not.been.called;
-        expect(spies.onRecordRefilterError).to.have.not.been.called;
-        expect(spies.onDocumentUpdateError).to.have.not.been.called;
-        expect(spies.onDocumentFetchError).to.have.not.been.called;
-      });
+      emitsOnly([ 'firstSnapshotRecorded', 'onFirstSnapshotRecorded', 'firstVersionRecorded' ]);
     });
 
     context('When tracking changes on already tracked services', () => {
       context('When services did not change', () => {
         before(async () => {
           nock('https://www.servicea.example').get('/tos').reply(200, serviceASnapshotExpectedContent, { 'Content-Type': 'text/html' });
-          nock('https://www.serviceb.example').get('/tos').reply(200, serviceBSnapshotExpectedContent, { 'Content-Type': 'application/pdf' });
+          nock('https://www.serviceb.example').get('/privacy').reply(200, serviceBSnapshotExpectedContent, { 'Content-Type': 'application/pdf' });
 
           await app.trackChanges();
 
           nock('https://www.servicea.example').get('/tos').reply(200, serviceASnapshotExpectedContent, { 'Content-Type': 'text/html' });
-          nock('https://www.serviceb.example').get('/tos').reply(200, serviceBSnapshotExpectedContent, { 'Content-Type': 'application/pdf' });
+          nock('https://www.serviceb.example').get('/privacy').reply(200, serviceBSnapshotExpectedContent, { 'Content-Type': 'application/pdf' });
 
           resetSpiesHistory();
           return app.trackChanges();
@@ -590,50 +380,30 @@ describe('CGUs', () => {
           return resetGitRepository();
         });
 
-        it('emits a "startTrackingChanges" event', async () => {
-          expect(spies.onStartTrackingChanges).to.have.been.calledOnce;
+        it('emits "snapshotNotChanged" events', async () => {
+          expect(spies.onSnapshotNotChanged).to.have.been.calledTwice;
         });
 
-        it('emits "onNoSnapshotChanges" events', async () => {
-          expect(spies.onNoSnapshotChanges).to.have.been.calledTwice;
+        it('emits "versionNotChanged" events', async () => {
+          expect(spies.onVersionNotChanged).to.have.been.calledTwice;
         });
 
-        it('emits "onNoVersionChanges" events', async () => {
-          expect(spies.onNoVersionChanges).to.have.been.calledTwice;
+        it('emits "versionNotChanged" events after "snapshotRecorded" events', async () => {
+          expect(spies.onVersionNotChanged).to.have.been.calledAfter(spies.onSnapshotNotChanged);
         });
 
-        it('emits "onNoVersionChanges" events after "onSnapshotRecorded" events', async () => {
-          expect(spies.onNoVersionChanges).to.have.been.calledAfter(spies.onNoSnapshotChanges);
-        });
-
-        it('emits a "endTrackingChanges" event after "startTrackingChanges"', async () => {
-          expect(spies.onEndTrackingChanges).to.have.been.calledAfter(spies.onStartTrackingChanges);
-        });
-
-        it('emits no other events', async () => {
-          expect(spies.onStartRefiltering).to.have.not.been.called;
-          expect(spies.onEndRefiltering).to.have.not.been.called;
-          expect(spies.onSnapshotRecorded).to.have.not.been.called;
-          expect(spies.onFirstSnapshotRecorded).to.have.not.been.called;
-          expect(spies.onVersionRecorded).to.have.not.been.called;
-          expect(spies.onFirstVersionRecorded).to.have.not.been.called;
-          expect(spies.onChangesPublished).to.have.not.been.called;
-          expect(spies.onApplicationError).to.have.not.been.called;
-          expect(spies.onRecordRefilterError).to.have.not.been.called;
-          expect(spies.onDocumentUpdateError).to.have.not.been.called;
-          expect(spies.onDocumentFetchError).to.have.not.been.called;
-        });
+        emitsOnly([ 'snapshotNotChanged', 'versionNotChanged', 'snapshotRecorded' ]);
       });
 
       context('When a service changed', () => {
         before(async () => {
           nock('https://www.servicea.example').get('/tos').reply(200, serviceASnapshotExpectedContent, { 'Content-Type': 'text/html' });
-          nock('https://www.serviceb.example').get('/tos').reply(200, serviceBSnapshotExpectedContent, { 'Content-Type': 'application/pdf' });
+          nock('https://www.serviceb.example').get('/privacy').reply(200, serviceBSnapshotExpectedContent, { 'Content-Type': 'application/pdf' });
 
           await app.trackChanges();
 
           nock('https://www.servicea.example').get('/tos').reply(200, serviceBSnapshotExpectedContent, { 'Content-Type': 'text/html' });
-          nock('https://www.serviceb.example').get('/tos').reply(200, serviceBSnapshotExpectedContent, { 'Content-Type': 'application/pdf' });
+          nock('https://www.serviceb.example').get('/privacy').reply(200, serviceBSnapshotExpectedContent, { 'Content-Type': 'application/pdf' });
 
           resetSpiesHistory();
           await app.trackChanges();
@@ -644,45 +414,27 @@ describe('CGUs', () => {
           return resetGitRepository();
         });
 
-        it('emits a "startTrackingChanges" event', async () => {
-          expect(spies.onStartTrackingChanges).to.have.been.calledOnce;
+        it('emits "snapshotNotChanged" events', async () => {
+          expect(spies.onSnapshotNotChanged).to.have.been.calledOnceWith(SERVICE_B_ID, SERVICE_B_TYPE);
         });
 
-        it('emits "onNoSnapshotChanges" events', async () => {
-          expect(spies.onNoSnapshotChanges).to.have.been.calledOnceWith(SERVICE_B_ID, SERVICE_B_TYPE);
-        });
-
-        it('emits "onSnapshotRecorded" event for service which changed', async () => {
+        it('emits "snapshotRecorded" event for service which changed', async () => {
           expect(spies.onSnapshotRecorded).to.have.been.calledOnceWith(SERVICE_A_ID, SERVICE_A_TYPE);
         });
 
-        it('emits "onNoVersionChanges" events', async () => {
-          expect(spies.onNoVersionChanges).to.have.been.calledOnceWith(SERVICE_B_ID, SERVICE_B_TYPE);
+        it('emits "versionNotChanged" events', async () => {
+          expect(spies.onVersionNotChanged).to.have.been.calledOnceWith(SERVICE_B_ID, SERVICE_B_TYPE);
         });
 
-        it('emits "onVersionRecorded" event for service which changed', async () => {
+        it('emits "versionRecorded" event for service which changed', async () => {
           expect(spies.onVersionRecorded).to.have.been.calledOnceWith(SERVICE_A_ID, SERVICE_A_TYPE);
         });
 
-        it('emits "onSnapshotRecorded" events after "onVersionRecorded" events', async () => {
+        it('emits "snapshotRecorded" events after "versionRecorded" events', async () => {
           expect(spies.onVersionRecorded).to.have.been.calledAfter(spies.onSnapshotRecorded);
         });
 
-        it('emits a "endTrackingChanges" event after "startTrackingChanges"', async () => {
-          expect(spies.onEndTrackingChanges).to.have.been.calledAfter(spies.onStartTrackingChanges);
-        });
-
-        it('emits no other events', async () => {
-          expect(spies.onStartRefiltering).to.have.not.been.called;
-          expect(spies.onEndRefiltering).to.have.not.been.called;
-          expect(spies.onFirstSnapshotRecorded).to.have.not.been.called;
-          expect(spies.onFirstVersionRecorded).to.have.not.been.called;
-          expect(spies.onChangesPublished).to.have.not.been.called;
-          expect(spies.onApplicationError).to.have.not.been.called;
-          expect(spies.onRecordRefilterError).to.have.not.been.called;
-          expect(spies.onDocumentUpdateError).to.have.not.been.called;
-          expect(spies.onDocumentFetchError).to.have.not.been.called;
-        });
+        emitsOnly([ 'snapshotNotChanged', 'snapshotRecorded', 'versionNotChanged', 'versionRecorded' ]);
       });
     });
   });
