@@ -172,8 +172,12 @@ function assertValid(schema, subject) {
 
 async function getModifiedServices() {
   const git = simpleGit(path.resolve(__dirname, '../..'), { maxConcurrentProcesses: 1 });
-  const modifiedFiles = await (await git.diff([ '--name-only', 'master...' ])).split('\n');
-  const modifiedServicePaths = modifiedFiles.filter(filepath => filepath.startsWith('services/') && !filepath.includes('.filters.js'));
-  const modifiedServiceNames = modifiedServicePaths.map(filepath => path.basename(filepath).replace('.json', ''));
-  return modifiedServiceNames;
+  const modifiedFilesPathString = await git.diff([ '--name-only', 'master...', 'services/*.json' ]);
+
+  if (!modifiedFilesPathString) {
+    return;
+  }
+
+  const modifiedFilesPathArray = modifiedFilesPathString.trim().split('\n');
+  return modifiedFilesPathArray.map(filePath => path.basename(filePath, '.json'));
 }
