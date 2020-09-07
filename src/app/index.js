@@ -112,19 +112,28 @@ export default class CGUs extends events.EventEmitter {
   async refilterAndRecord(serviceToTrack) {
     const services = serviceToTrack ? { [serviceToTrack]: this._serviceDeclarations[serviceToTrack] } : this._serviceDeclarations;
 
-    const refilterAndRecordDocumentPromises = [];
+    let refilterAndRecordDocumentPromises = [];
 
     Object.keys(services).forEach(serviceId => {
       const { documents } = this._serviceDeclarations[serviceId];
-      Object.keys(documents).forEach(type => {
-        refilterAndRecordDocumentPromises.push(this.refilterAndRecordDocument({
-          serviceId,
-          document: {
-            type,
-            ...documents[type]
+      const documentsPromises = Object.keys(documents).map(async type => {
+        try {
+          await this.refilterAndRecordDocument({
+            serviceId,
+            document: {
+              type,
+              ...documents[type]
+            }
+          });
+        } catch (error) {
+          if (error.type == 'inaccessibleContentError') {
+            return this.emit(AVAILABLE_EVENTS.inaccessibleContentError, serviceId, type, error);
           }
-        }));
+          throw error;
+        }
       });
+
+      refilterAndRecordDocumentPromises = refilterAndRecordDocumentPromises.concat(documentsPromises);
     });
 
     await Promise.all(refilterAndRecordDocumentPromises);
