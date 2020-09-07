@@ -66,18 +66,15 @@ if (args.includes('--modified-only')) {
               describe(type, () => {
                 let content;
                 let filteredContent;
-                let isPDF;
+                let mimeType;
 
                 it('has fetchable URL', async function () {
                   this.timeout(30000);
 
                   const { fetch: location } = service.documents[type];
-                  content = await fetch(location);
-
-                  if (content.constructor.name == 'Blob' && content.type == 'application/pdf') {
-                    isPDF = true;
-                    content = Buffer.from(await content.arrayBuffer());
-                  }
+                  const { content: tmpContent, mimeType: tmpMimeType } = await fetch(location);
+                  content = tmpContent;
+                  mimeType = tmpMimeType;
                 });
 
                 it('has a selector that matches an element in the web page', async function () {
@@ -90,7 +87,7 @@ if (args.includes('--modified-only')) {
                     content,
                     documentDeclaration: service.documents[type],
                     filterFunctions: service.filters,
-                    isPDF
+                    mimeType,
                   });
 
                   expect(filteredContent).to.not.be.empty;
@@ -125,17 +122,13 @@ if (args.includes('--modified-only')) {
                     this.timeout(30000);
 
                     const { fetch: location } = service.documents[type];
-                    let secondContent = await fetch(location);
-
-                    if (secondContent.constructor.name == 'Blob' && secondContent.type == 'application/pdf') {
-                      secondContent = Buffer.from(await secondContent.arrayBuffer());
-                    }
+                    const { content: secondContent, mimeType: secondMimetype} = await fetch(location);
 
                     const secondFilteredContent = await filter({
                       content: secondContent,
                       documentDeclaration: service.documents[type],
                       filterFunctions: service.filters,
-                      isPDF
+                      mimeType: secondMimetype
                     });
 
                     expect(secondFilteredContent).to.equal(filteredContent);
