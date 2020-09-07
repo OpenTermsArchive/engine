@@ -127,59 +127,119 @@ describe('CGUs', () => {
 
   describe('#refilterAndRecord', () => {
     context('When a service’s filter declaration changes', () => {
-      let originalSnapshotId;
-      let firstVersionId;
-      let refilterVersionId;
-      let refilterVersionMessageBody;
-      let serviceBCommits;
+      context('When everything works fine', () => {
+        let originalSnapshotId;
+        let firstVersionId;
+        let refilterVersionId;
+        let refilterVersionMessageBody;
+        let serviceBCommits;
 
-      before(async () => {
-        nock('https://www.servicea.example').get('/tos').reply(200, serviceASnapshotExpectedContent, { 'Content-Type': 'text/html' });
-        nock('https://www.serviceb.example').get('/privacy').reply(200, serviceBSnapshotExpectedContent, { 'Content-Type': 'application/pdf' });
-        const app = new CGUs();
-        await app.init();
-        await app.trackChanges();
+        before(async () => {
+          nock('https://www.servicea.example').get('/tos').reply(200, serviceASnapshotExpectedContent, { 'Content-Type': 'text/html' });
+          nock('https://www.serviceb.example').get('/privacy').reply(200, serviceBSnapshotExpectedContent, { 'Content-Type': 'application/pdf' });
+          const app = new CGUs();
+          await app.init();
+          await app.trackChanges();
 
-        const [ originalSnapshotCommit ] = await gitSnapshot().log({ file: SERVICE_A_EXPECTED_SNAPSHOT_FILE_PATH });
-        originalSnapshotId = originalSnapshotCommit.hash;
+          const [ originalSnapshotCommit ] = await gitSnapshot().log({ file: SERVICE_A_EXPECTED_SNAPSHOT_FILE_PATH });
+          originalSnapshotId = originalSnapshotCommit.hash;
 
-        const [ firstVersionCommit ] = await gitVersion().log({ file: SERVICE_A_EXPECTED_VERSION_FILE_PATH });
-        firstVersionId = firstVersionCommit.hash;
+          const [ firstVersionCommit ] = await gitVersion().log({ file: SERVICE_A_EXPECTED_VERSION_FILE_PATH });
+          firstVersionId = firstVersionCommit.hash;
 
-        serviceBCommits = await gitVersion().log({ file: SERVICE_B_EXPECTED_VERSION_FILE_PATH });
+          serviceBCommits = await gitVersion().log({ file: SERVICE_B_EXPECTED_VERSION_FILE_PATH });
 
-        app.serviceDeclarations[SERVICE_A_ID].documents[SERVICE_A_TYPE].select = 'h1';
+          app.serviceDeclarations[SERVICE_A_ID].documents[SERVICE_A_TYPE].select = 'h1';
 
-        await app.refilterAndRecord();
+          await app.refilterAndRecord();
 
-        const [ refilterVersionCommit ] = await gitVersion().log({ file: SERVICE_A_EXPECTED_VERSION_FILE_PATH });
-        refilterVersionId = refilterVersionCommit.hash;
-        refilterVersionMessageBody = refilterVersionCommit.body;
+          const [ refilterVersionCommit ] = await gitVersion().log({ file: SERVICE_A_EXPECTED_VERSION_FILE_PATH });
+          refilterVersionId = refilterVersionCommit.hash;
+          refilterVersionMessageBody = refilterVersionCommit.body;
+        });
+
+        after(resetGitRepository);
+
+        it('refilters the changed service', async () => {
+          const serviceAContent = await fs.readFile(path.resolve(__dirname, SERVICE_A_EXPECTED_VERSION_FILE_PATH), { encoding: 'utf8' });
+          expect(serviceAContent).to.equal('Terms of service with UTF-8 \'çhãràčtęrs"\n========================================');
+        });
+
+        it('generates a new version id', async () => {
+          expect(refilterVersionId).to.not.equal(firstVersionId);
+        });
+
+        it('mentions the snapshot id in the changelog', async () => {
+          expect(refilterVersionMessageBody).to.include(originalSnapshotId);
+        });
+
+        it('does not change other services', async () => {
+          const serviceBVersion = await fs.readFile(path.resolve(__dirname, SERVICE_B_EXPECTED_VERSION_FILE_PATH), { encoding: 'utf8' });
+          expect(serviceBVersion).to.equal(serviceBVersionExpectedContent);
+        });
+
+        it('does not generate a new id for other services', async () => {
+          const serviceBCommitsAfterRefiltering = await gitVersion().log({ file: SERVICE_B_EXPECTED_VERSION_FILE_PATH });
+          expect(serviceBCommitsAfterRefiltering.map(commit => commit.hash)).to.deep.equal(serviceBCommits.map(commit => commit.hash));
+        });
       });
 
-      after(resetGitRepository);
+      context('When there is an expected error', () => {
+        let inaccessibleContentErrorSpy;
+        let versionNotChangedSpy;
+        before(async () => {
+          nock('https://www.servicea.example').get('/tos').reply(200, serviceASnapshotExpectedContent, { 'Content-Type': 'text/html' });
+          nock('https://www.serviceb.example').get('/privacy').reply(200, serviceBSnapshotExpectedContent, { 'Content-Type': 'application/pdf' });
+          const app = new CGUs();
+          await app.init();
+          await app.trackChanges();
 
-      it('refilters the content and saves the file', async () => {
-        const serviceAContent = await fs.readFile(path.resolve(__dirname, SERVICE_A_EXPECTED_VERSION_FILE_PATH), { encoding: 'utf8' });
-        expect(serviceAContent).to.equal('Terms of service with UTF-8 \'çhãràčtęrs"\n========================================');
+          app.serviceDeclarations[SERVICE_A_ID].documents[SERVICE_A_TYPE].select = 'inexistant-selector';
+          inaccessibleContentErrorSpy = sinon.spy();
+          versionNotChangedSpy = sinon.spy();
+          app.on('inaccessibleContentError', inaccessibleContentErrorSpy);
+          app.on('versionNotChanged', versionNotChangedSpy);
+          await app.refilterAndRecord();
+        });
+
+        after(resetGitRepository);
+
+        it('does not refilter the service on error', async () => {
+          expect(inaccessibleContentErrorSpy).to.have.been.calledWith(SERVICE_A_ID, SERVICE_A_TYPE);
+        });
+
+        it('still refilters other services', async () => {
+          expect(versionNotChangedSpy).to.have.been.calledWith(SERVICE_B_ID, SERVICE_B_TYPE);
+        });
       });
 
-      it('generates a new version id', async () => {
-        expect(refilterVersionId).to.not.equal(firstVersionId);
-      });
+      context('When there is an unexpected error', () => {
+        let error;
+        before(async () => {
+          try {
+            nock('https://www.servicea.example').get('/tos').reply(200, serviceASnapshotExpectedContent, { 'Content-Type': 'text/html' });
+            nock('https://www.serviceb.example').get('/privacy').reply(200, serviceBSnapshotExpectedContent, { 'Content-Type': 'application/pdf' });
+            const app = new CGUs();
+            await app.init();
+            await app.trackChanges();
+            sinon.stub(app, 'refilterAndRecordDocument').throws('UnexpectedError');
+            await app.refilterAndRecord();
+          } catch (e) {
+            error = e;
+            return;
+          }
+          expect.fail('No error was thrown');
+        });
 
-      it('mentions the snapshot id in the changelog', async () => {
-        expect(refilterVersionMessageBody).to.include(originalSnapshotId);
-      });
+        after(resetGitRepository);
 
-      it('does not change other services', async () => {
-        const serviceBVersion = await fs.readFile(path.resolve(__dirname, SERVICE_B_EXPECTED_VERSION_FILE_PATH), { encoding: 'utf8' });
-        expect(serviceBVersion).to.equal(serviceBVersionExpectedContent);
-      });
+        it('throws an error', async () => {
+          expect(error).to.be.an('error');
+        });
 
-      it('does not generate a new id for other services', async () => {
-        const serviceBCommitsAfterRefiltering = await gitVersion().log({ file: SERVICE_B_EXPECTED_VERSION_FILE_PATH });
-        expect(serviceBCommitsAfterRefiltering.map(commit => commit.hash)).to.deep.equal(serviceBCommits.map(commit => commit.hash));
+        it('throws an unknown error', async () => {
+          expect(error.type).to.be.undefined;
+        });
       });
     });
   });
