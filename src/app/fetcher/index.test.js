@@ -5,6 +5,7 @@ import chai from 'chai';
 import nock from 'nock';
 
 import fetch from './index.js';
+import { ERROR_TYPES } from '../errors.js';
 
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
 const { expect } = chai;
@@ -47,11 +48,12 @@ describe('Fetcher', () => {
           .reply(404);
       });
 
-      it('throws an error', async () => {
+      it(`throws an "${ERROR_TYPES.inaccessibleContent.id}" error`, async () => {
         try {
           await fetch('https://not.available.example');
         } catch (e) {
           expect(e).to.be.an('error');
+          expect(e.type).to.equal(ERROR_TYPES.inaccessibleContent.id);
           expect(e.message).to.contain('404');
           return;
         }
