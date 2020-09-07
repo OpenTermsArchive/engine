@@ -37,34 +37,91 @@ describe('CGUs', () => {
   });
 
   describe('#trackChanges', () => {
+    let app;
     before(async () => {
       nock('https://www.servicea.example').get('/tos').reply(200, serviceASnapshotExpectedContent, { 'Content-Type': 'text/html' });
       nock('https://www.serviceb.example').get('/privacy').reply(200, serviceBSnapshotExpectedContent, { 'Content-Type': 'application/pdf' });
-      const app = new CGUs();
+      app = new CGUs();
       await app.init();
-      return app.trackChanges();
     });
 
-    after(resetGitRepository);
+    context('When everything works fine', () => {
+      before(async () => app.trackChanges());
 
-    it('records snapshot for service A', async () => {
-      const resultingSnapshotTerms = await fs.readFile(path.resolve(__dirname, SERVICE_A_EXPECTED_SNAPSHOT_FILE_PATH), { encoding: 'utf8' });
-      expect(resultingSnapshotTerms).to.equal(serviceASnapshotExpectedContent);
+      after(resetGitRepository);
+
+      it('records no snapshot for service A', async () => {
+        const resultingSnapshotTerms = await fs.readFile(path.resolve(__dirname, SERVICE_A_EXPECTED_SNAPSHOT_FILE_PATH), { encoding: 'utf8' });
+        expect(resultingSnapshotTerms).to.equal(serviceASnapshotExpectedContent);
+      });
+
+      it('records no version for service A', async () => {
+        const resultingTerms = await fs.readFile(path.resolve(__dirname, SERVICE_A_EXPECTED_VERSION_FILE_PATH), { encoding: 'utf8' });
+        expect(resultingTerms).to.equal(serviceAVersionExpectedContent);
+      });
+
+      it('records snapshot for service B', async () => {
+        const resultingSnapshotTerms = await fs.readFile(path.resolve(__dirname, SERVICE_B_EXPECTED_SNAPSHOT_FILE_PATH));
+        expect(resultingSnapshotTerms.equals(serviceBSnapshotExpectedContent)).to.be.true;
+      });
+
+      it('records version for service B', async () => {
+        const resultingTerms = await fs.readFile(path.resolve(__dirname, SERVICE_B_EXPECTED_VERSION_FILE_PATH), { encoding: 'utf8' });
+        expect(resultingTerms).to.equal(serviceBVersionExpectedContent);
+      });
     });
 
-    it('records version for service A', async () => {
-      const resultingTerms = await fs.readFile(path.resolve(__dirname, SERVICE_A_EXPECTED_VERSION_FILE_PATH), { encoding: 'utf8' });
-      expect(resultingTerms).to.equal(serviceAVersionExpectedContent);
+    context('When there is an expected error', () => {
+      before(async () => {
+        // as there is no more HTTP request mocks for service A, it should throw an `ENOTFOUND` error which is consiedred as an expected error in our workflow
+        nock.cleanAll();
+        nock('https://www.serviceb.example').get('/privacy').reply(200, serviceBSnapshotExpectedContent, { 'Content-Type': 'application/pdf' });
+        await app.trackChanges();
+      });
+
+      after(resetGitRepository);
+
+      it('records no snapshot for service A', async () => {
+        expect(fsApi.existsSync(path.resolve(__dirname, SERVICE_A_EXPECTED_SNAPSHOT_FILE_PATH))).to.be.false;
+      });
+
+      it('records no version for service A', async () => {
+        expect(fsApi.existsSync(path.resolve(__dirname, SERVICE_A_EXPECTED_VERSION_FILE_PATH))).to.be.false;
+      });
+
+      it('still records snapshot for service B', async () => {
+        const resultingSnapshotTerms = await fs.readFile(path.resolve(__dirname, SERVICE_B_EXPECTED_SNAPSHOT_FILE_PATH));
+        expect(resultingSnapshotTerms.equals(serviceBSnapshotExpectedContent)).to.be.true;
+      });
+
+      it('still records version for service B', async () => {
+        const resultingTerms = await fs.readFile(path.resolve(__dirname, SERVICE_B_EXPECTED_VERSION_FILE_PATH), { encoding: 'utf8' });
+        expect(resultingTerms).to.equal(serviceBVersionExpectedContent);
+      });
     });
 
-    it('records snapshot for service B', async () => {
-      const resultingSnapshotTerms = await fs.readFile(path.resolve(__dirname, SERVICE_B_EXPECTED_SNAPSHOT_FILE_PATH));
-      expect(resultingSnapshotTerms.equals(serviceBSnapshotExpectedContent)).to.be.true;
-    });
+    context('When there is an unexpected error', () => {
+      let error;
+      before(async () => {
+        try {
+          sinon.stub(app, 'trackDocumentChanges').throws('UnexpectedError');
+          await app.trackChanges();
+        } catch (e) {
+          error = e;
+          return;
+        }
+        expect.fail('No error was thrown');
+      });
 
-    it('records version for service B', async () => {
-      const resultingTerms = await fs.readFile(path.resolve(__dirname, SERVICE_B_EXPECTED_VERSION_FILE_PATH), { encoding: 'utf8' });
-      expect(resultingTerms).to.equal(serviceBVersionExpectedContent);
+      after(resetGitRepository);
+
+      it('throws an error', async () => {
+        expect(error).to.be.an('error');
+      });
+
+      it('throws an unknown error', async () => {
+        expect(error.type).to.be.undefined;
+      });
     });
   });
 
