@@ -50,19 +50,28 @@ export default class CGUs extends events.EventEmitter {
   async trackChanges(serviceToTrack) {
     const services = serviceToTrack ? { [serviceToTrack]: this._serviceDeclarations[serviceToTrack] } : this._serviceDeclarations;
 
-    const documentTrackingPromises = [];
+    let documentTrackingPromises = [];
 
     Object.keys(services).forEach(serviceId => {
       const { documents } = this._serviceDeclarations[serviceId];
-      Object.keys(documents).forEach(type => {
-        documentTrackingPromises.push(this.trackDocumentChanges({
-          serviceId,
-          document: {
-            type,
-            ...documents[type]
+      const serviceDocumentsPromises = Object.keys(documents).map(async type => {
+        try {
+          await this.trackDocumentChanges({
+            serviceId,
+            document: {
+              type,
+              ...documents[type]
+            }
+          });
+        } catch (error) {
+          if (error.type == 'inaccessibleContentError') {
+            return this.emit('inaccessibleContentError', serviceId, type, error);
           }
-        }));
+          throw error;
+        }
       });
+
+      documentTrackingPromises = documentTrackingPromises.concat(serviceDocumentsPromises);
     });
 
     await Promise.all(documentTrackingPromises);
@@ -73,34 +82,30 @@ export default class CGUs extends events.EventEmitter {
   async trackDocumentChanges({ serviceId, document: documentDeclaration }) {
     const { type, fetch: location } = documentDeclaration;
 
-    try {
-      const { mimeType, content } = await fetch(location);
+    const { mimeType, content } = await fetch(location);
 
-      if (!content) {
-        return;
-      }
-
-      const snapshotId = await this.recordSnapshot({
-        content,
-        mimeType,
-        serviceId,
-        type
-      });
-
-      if (!snapshotId) {
-        return;
-      }
-
-      await this.recordVersion({
-        snapshotContent: content,
-        mimeType,
-        snapshotId,
-        serviceId,
-        documentDeclaration
-      });
-    } catch (error) {
-      this.emit('documentTrackingError', serviceId, type, error);
+    if (!content) {
+      return;
     }
+
+    const snapshotId = await this.recordSnapshot({
+      content,
+      mimeType,
+      serviceId,
+      type
+    });
+
+    if (!snapshotId) {
+      return;
+    }
+
+    await this.recordVersion({
+      snapshotContent: content,
+      mimeType,
+      snapshotId,
+      serviceId,
+      documentDeclaration
+    });
   }
 
   async refilterAndRecord(serviceToTrack) {
@@ -126,23 +131,20 @@ export default class CGUs extends events.EventEmitter {
 
   async refilterAndRecordDocument({ serviceId, document: documentDeclaration }) {
     const { type } = documentDeclaration;
-    try {
-      const { id: snapshotId, content: snapshotContent, mimeType } = await history.getLatestSnapshot(serviceId, type);
 
-      if (!snapshotId) {
-        return;
-      }
+    const { id: snapshotId, content: snapshotContent, mimeType } = await history.getLatestSnapshot(serviceId, type);
 
-      return await this.recordRefilter({
-        snapshotContent,
-        mimeType,
-        snapshotId,
-        serviceId,
-        documentDeclaration,
-      });
-    } catch (error) {
-      this.emit('refilteringError', serviceId, type, error);
+    if (!snapshotId) {
+      return;
     }
+
+    return this.recordRefilter({
+      snapshotContent,
+      mimeType,
+      snapshotId,
+      serviceId,
+      documentDeclaration,
+    });
   }
 
   async recordSnapshot({ content, mimeType, serviceId, type }) {

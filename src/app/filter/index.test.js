@@ -5,6 +5,7 @@ import chai from 'chai';
 import jsdom from 'jsdom';
 
 import { filterHTML, filterPDF, convertRelativeURLsToAbsolute } from './index.js';
+import { ERROR_TYPES } from '../errors.js';
 
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
 const fs = fsApi.promises;
@@ -88,7 +89,7 @@ describe('Filter', () => {
       });
 
       context('With no match for the given selector', () => {
-        it('throws an error', async () => {
+        it(`throws an "${ERROR_TYPES.inaccessibleContent.id}" error`, async () => {
           try {
             await filterHTML({
               content: rawHTML,
@@ -96,6 +97,7 @@ describe('Filter', () => {
             });
           } catch (e) {
             expect(e).to.be.an('error');
+            expect(e.type).to.equal(ERROR_TYPES.inaccessibleContent.id);
             expect(e.message).to.have.string('provided selector', 'has no match');
             return;
           }
@@ -208,7 +210,7 @@ describe('Filter', () => {
         });
       });
       context('With a "start" selector that has no match', () => {
-        it('throws an error', async () => {
+        it(`throws an "${ERROR_TYPES.inaccessibleContent.id}" error`, async () => {
           try {
             await filterHTML({
               content: rawHTML,
@@ -222,6 +224,7 @@ describe('Filter', () => {
             });
           } catch (e) {
             expect(e).to.be.an('error');
+            expect(e.type).to.equal(ERROR_TYPES.inaccessibleContent.id);
             expect(e.message).to.have.string('"start" selector has no match');
             return;
           }
@@ -229,7 +232,7 @@ describe('Filter', () => {
         });
       });
       context('With an "end" selector that has no match', () => {
-        it('throws an error', async () => {
+        it(`throws an "${ERROR_TYPES.inaccessibleContent.id}" error`, async () => {
           try {
             await filterHTML({
               content: rawHTML,
@@ -243,6 +246,7 @@ describe('Filter', () => {
             });
           } catch (e) {
             expect(e).to.be.an('error');
+            expect(e.type).to.equal(ERROR_TYPES.inaccessibleContent.id);
             expect(e.message).to.have.string('"end" selector has no match');
             return;
           }
@@ -333,7 +337,7 @@ describe('Filter', () => {
           expect(result).to.equal('Title\n=====');
         });
         context('With a "start" selector that has no match', () => {
-          it('throws an error', async () => {
+          it(`throws an "${ERROR_TYPES.inaccessibleContent.id}" error`, async () => {
             try {
               await filterHTML({
                 content: rawHTML,
@@ -348,6 +352,7 @@ describe('Filter', () => {
               });
             } catch (e) {
               expect(e).to.be.an('error');
+              expect(e.type).to.equal(ERROR_TYPES.inaccessibleContent.id);
               expect(e.message).to.have.string('"start" selector has no match');
               return;
             }
@@ -355,7 +360,7 @@ describe('Filter', () => {
           });
         });
         context('With an "end" selector that has no match', () => {
-          it('throws an error', async () => {
+          it(`throws an "${ERROR_TYPES.inaccessibleContent.id}" error`, async () => {
             try {
               await filterHTML({
                 content: rawHTML,
@@ -370,6 +375,7 @@ describe('Filter', () => {
               });
             } catch (e) {
               expect(e).to.be.an('error');
+              expect(e.type).to.equal(ERROR_TYPES.inaccessibleContent.id);
               expect(e.message).to.have.string('"end" selector has no match');
               return;
             }
