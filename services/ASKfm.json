@@ -1,5 +1,5 @@
 {
-  "name": "AskFM",
+  "name": "ASKfm",
   "documents": {
     "Terms of Service": {
       "fetch": "https://ask.fm/docs/terms_of_use/?lang=en",

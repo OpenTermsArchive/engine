@@ -1,9 +1,0 @@
-{
-  "name": "Apple App Store",
-  "documents": {
-    "Review Guidelines": {
-      "fetch": "https://developer.apple.com/app-store/review/guidelines/",
-      "select": "main"
-    }
-  }
-}

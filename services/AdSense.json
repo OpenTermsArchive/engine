@@ -1,5 +1,5 @@
 {
-  "name": "Google AdSense",
+  "name": "AdSense",
   "documents": {
     "Terms of Service": {
       "fetch": "https://www.google.com/adsense/tc/2018/UnitedKingdom.html",
