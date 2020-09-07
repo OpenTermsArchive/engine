@@ -11,17 +11,17 @@ import loadServiceDeclarations from './loader/index.js';
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
 const SERVICE_DECLARATIONS_PATH = path.resolve(__dirname, '../../', config.get('serviceDeclarationsPath'));
 
-export const AVAILABLE_EVENTS = [
-  'snapshotRecorded',
-  'firstSnapshotRecorded',
-  'snapshotNotChanged',
-  'versionRecorded',
-  'firstVersionRecorded',
-  'versionNotChanged',
-  'recordsPublished',
-  'documentTrackingError',
-  'refilteringError',
-];
+export const AVAILABLE_EVENTS = {
+  snapshotRecorded: 'snapshotRecorded',
+  firstSnapshotRecorded: 'firstSnapshotRecorded',
+  snapshotNotChanged: 'snapshotNotChanged',
+  versionRecorded: 'versionRecorded',
+  firstVersionRecorded: 'firstVersionRecorded',
+  versionNotChanged: 'versionNotChanged',
+  recordsPublished: 'recordsPublished',
+  inaccessibleContentError: 'inaccessibleContentError',
+  refilteringError: 'refilteringError',
+};
 
 export default class CGUs extends events.EventEmitter {
   get serviceDeclarations() {
@@ -38,7 +38,8 @@ export default class CGUs extends events.EventEmitter {
   }
 
   attach(listener) {
-    AVAILABLE_EVENTS.forEach(event => {
+    Object.keys(AVAILABLE_EVENTS).forEach(eventId => {
+      const event = AVAILABLE_EVENTS[eventId];
       const handlerName = `on${event[0].toUpperCase()}${event.substr(1)}`;
 
       if (listener[handlerName]) {
@@ -54,7 +55,7 @@ export default class CGUs extends events.EventEmitter {
 
     Object.keys(services).forEach(serviceId => {
       const { documents } = this._serviceDeclarations[serviceId];
-      const serviceDocumentsPromises = Object.keys(documents).map(async type => {
+      const documentsPromises = Object.keys(documents).map(async type => {
         try {
           await this.trackDocumentChanges({
             serviceId,
@@ -65,13 +66,13 @@ export default class CGUs extends events.EventEmitter {
           });
         } catch (error) {
           if (error.type == 'inaccessibleContentError') {
-            return this.emit('inaccessibleContentError', serviceId, type, error);
+            return this.emit(AVAILABLE_EVENTS.inaccessibleContentError, serviceId, type, error);
           }
           throw error;
         }
       });
 
-      documentTrackingPromises = documentTrackingPromises.concat(serviceDocumentsPromises);
+      documentTrackingPromises = documentTrackingPromises.concat(documentsPromises);
     });
 
     await Promise.all(documentTrackingPromises);
@@ -156,10 +157,10 @@ export default class CGUs extends events.EventEmitter {
     });
 
     if (!snapshotId) {
-      return this.emit('snapshotNotChanged', serviceId, type);
+      return this.emit(AVAILABLE_EVENTS.snapshotNotChanged, serviceId, type);
     }
 
-    this.emit(isFirstRecord ? 'firstSnapshotRecorded' : 'snapshotRecorded', serviceId, type, snapshotId);
+    this.emit(isFirstRecord ? AVAILABLE_EVENTS.firstSnapshotRecorded : AVAILABLE_EVENTS.snapshotRecorded, serviceId, type, snapshotId);
     return snapshotId;
   }
 
@@ -180,10 +181,10 @@ export default class CGUs extends events.EventEmitter {
     });
 
     if (!versionId) {
-      return this.emit('versionNotChanged', serviceId, type);
+      return this.emit(AVAILABLE_EVENTS.versionNotChanged, serviceId, type);
     }
 
-    this.emit(isFirstRecord ? 'firstVersionRecorded' : 'versionRecorded', serviceId, type, versionId);
+    this.emit(isFirstRecord ? AVAILABLE_EVENTS.firstVersionRecorded : AVAILABLE_EVENTS.versionRecorded, serviceId, type, versionId);
   }
 
   async recordVersion({ snapshotContent, mimeType, snapshotId, serviceId, documentDeclaration }) {
@@ -203,10 +204,10 @@ export default class CGUs extends events.EventEmitter {
     });
 
     if (!versionId) {
-      return this.emit('versionNotChanged', serviceId, type);
+      return this.emit(AVAILABLE_EVENTS.versionNotChanged, serviceId, type);
     }
 
-    this.emit(isFirstRecord ? 'firstVersionRecorded' : 'versionRecorded', serviceId, type, versionId);
+    this.emit(isFirstRecord ? AVAILABLE_EVENTS.firstVersionRecorded : AVAILABLE_EVENTS.versionRecorded, serviceId, type, versionId);
   }
 
   async publish() {
@@ -215,6 +216,6 @@ export default class CGUs extends events.EventEmitter {
     }
 
     await history.publish();
-    this.emit('recordsPublished');
+    this.emit(AVAILABLE_EVENTS.recordsPublished);
   }
 }
