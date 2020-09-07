@@ -137,7 +137,8 @@ describe('CGUs', () => {
     }
 
     function emitsOnly(eventNames) {
-      AVAILABLE_EVENTS.filter(el => eventNames.indexOf(el) < 0).forEach(event => {
+      Object.keys(AVAILABLE_EVENTS).filter(el => eventNames.indexOf(el) < 0).forEach(eventId => {
+        const event = AVAILABLE_EVENTS[eventId];
         const handlerName = `on${event[0].toUpperCase()}${event.substr(1)}`;
         it(`emits no "${event}" event`, () => {
           expect(spies[handlerName]).to.have.not.been.called;
@@ -149,7 +150,8 @@ describe('CGUs', () => {
       app = new CGUs();
       await app.init();
 
-      AVAILABLE_EVENTS.forEach(event => {
+      Object.keys(AVAILABLE_EVENTS).forEach(eventId => {
+        const event = AVAILABLE_EVENTS[eventId];
         const handlerName = `on${event[0].toUpperCase()}${event.substr(1)}`;
         spies[handlerName] = sinon.spy();
         app.on(event, spies[handlerName]);
