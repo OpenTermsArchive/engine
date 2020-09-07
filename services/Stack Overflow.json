@@ -1,5 +1,5 @@
 {
-  "name": "StackOverflow",
+  "name": "Stack Overflow",
   "documents": {
     "Terms of Service": {
       "fetch": "https://stackoverflow.com/legal/terms-of-service",

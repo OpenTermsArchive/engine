@@ -4,6 +4,9 @@
     "Privacy Policy": {
       "fetch": "https://www.apple.com/legal/privacy/en-ww/",
       "select": "main"
+    },
+    "Human Rights Policy": {
+      "fetch": "https://investor.apple.com/files/doc_downloads/gov_docs/Apple-Human-Rights-Policy.pdf"
     }
   }
 }
