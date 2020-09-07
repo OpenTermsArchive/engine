@@ -1,5 +1,5 @@
 {
-  "name": "Google Play Store",
+  "name": "Google Play",
   "documents": {
     "Developer Terms": {
       "fetch": "https://play.google.com/intl/ALL_en/about/developer-distribution-agreement.html",

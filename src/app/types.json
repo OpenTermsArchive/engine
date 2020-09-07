@@ -83,6 +83,13 @@
       "object": "account records access"
     }
   },
+  "Human Rights Policy": {
+    "commitment": {
+      "writer": "service provider",
+      "audience": "shareholders",
+      "object": "human rights"
+    }
+  },
   "In-App Purchases Policy": {
     "commitment": {
       "writer": "service provider",

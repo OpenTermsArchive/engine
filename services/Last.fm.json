@@ -1,5 +1,5 @@
 {
-  "name": "LastFm",
+  "name": "Last.fm",
   "documents": {
     "Terms of Service": {
       "fetch": "https://www.last.fm/legal/terms",
