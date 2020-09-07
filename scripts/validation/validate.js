@@ -51,8 +51,8 @@ if (args.includes('--modified-only')) {
         const service = serviceDeclarations[serviceId];
 
         if (!service) {
-          console.error(`There is no service declared with id "${serviceId}"`);
-          process.exit();
+          process.exitCode = 1;
+          throw new Error(`Could not find any service with id "${serviceId}"`);
         }
 
         describe(serviceId, () => {
