@@ -166,7 +166,7 @@ function assertValid(schema, subject) {
 }
 
 async function getModifiedServices() {
-  const git = simpleGit(path.resolve(__dirname, '../..'), { maxConcurrentProcesses: 1 });
+  const git = simpleGit(rootPath, { maxConcurrentProcesses: 1 });
   const modifiedFilesPathString = await git.diff([ '--name-only', 'master', 'services/*.json' ]);
 
   const modifiedFilesPathArray = modifiedFilesPathString.trim().split('\n');
