@@ -167,8 +167,17 @@ function assertValid(schema, subject) {
 
 async function getModifiedServices() {
   const git = simpleGit(rootPath, { maxConcurrentProcesses: 1 });
-  const modifiedFilesPathString = await git.diff([ '--name-only', 'master', 'services/*.json' ]);
+  const committedFiles = await git.diff([ '--name-only', 'master...', 'services/*.json' ]);
+  const status = await git.status();
+  const modifiedFiles = [
+    ...status.not_added, // Files created but not already in staged area
+    ...status.modified, // Files modified
+    ...status.created, // Files created and in the staged area
+    ...status.renamed.map(({ to }) => to), // Files renamed
+    ...committedFiles.trim().split('\n') // Files committed
+  ];
 
-  const modifiedFilesPathArray = modifiedFilesPathString.trim().split('\n');
-  return modifiedFilesPathArray.map(filePath => path.basename(filePath, '.json')).filter(fileName => fileName);
+  return modifiedFiles
+    .filter(fileName => fileName.match(/services.*\.json/))
+    .map(filePath => path.basename(filePath, '.json'));
 }
