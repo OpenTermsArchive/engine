@@ -104,13 +104,13 @@ let serviceDeclarations;
                     this.timeout(30000);
 
                     const { fetch: location } = service.documents[type];
-                    const { content: secondContent, mimeType: secondMimetype} = await fetch(location);
+                    const document = await fetch(location);
 
                     const secondFilteredContent = await filter({
-                      content: secondContent,
+                      content: document.content,
                       documentDeclaration: service.documents[type],
                       filterFunctions: service.filters,
-                      mimeType: secondMimetype
+                      mimeType: document.mimeType
                     });
 
                     expect(secondFilteredContent).to.equal(filteredContent);
