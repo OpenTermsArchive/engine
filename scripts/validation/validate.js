@@ -20,31 +20,19 @@ const MIN_DOC_LENGTH = 100;
 
 let args = process.argv.slice(6);
 
-let schemaOnly = false;
-if (args.includes('--schema-only')) {
-  args.splice(args.indexOf('--schema-only'), 1);
-  schemaOnly = true;
-}
-
-let modifiedOnly = false;
-if (args.includes('--modified-only')) {
-  args.splice(args.indexOf('--modified-only'), 1);
-  modifiedOnly = true;
-}
+const schemaOnly = args.includes('--schema-only');
+const modifiedOnly = args.includes('--modified-only');
+let servicesToValidate = args.filter(arg => !arg.startsWith('--'));
 
 (async () => {
   try {
     const serviceDeclarations = await loadServiceDeclarations(path.join(rootPath, config.get('serviceDeclarationsPath')));
 
     if (modifiedOnly) {
-      args = await getModifiedServices();
-      if (!args) {
-        console.log('No services modified');
-        return;
-      }
+      servicesToValidate = await getModifiedServices();
+    } else if (!servicesToValidate.length) {
+      servicesToValidate = Object.keys(serviceDeclarations);
     }
-
-    const servicesToValidate = args.length ? args : Object.keys(serviceDeclarations);
 
     describe('Services validation', async () => {
       servicesToValidate.forEach(serviceId => {
@@ -179,12 +167,8 @@ function assertValid(schema, subject) {
 
 async function getModifiedServices() {
   const git = simpleGit(path.resolve(__dirname, '../..'), { maxConcurrentProcesses: 1 });
-  const modifiedFilesPathString = await git.diff([ '--name-only', 'master...', 'services/*.json' ]);
-
-  if (!modifiedFilesPathString) {
-    return;
-  }
+  const modifiedFilesPathString = await git.diff([ '--name-only', 'master', 'services/*.json' ]);
 
   const modifiedFilesPathArray = modifiedFilesPathString.trim().split('\n');
-  return modifiedFilesPathArray.map(filePath => path.basename(filePath, '.json'));
+  return modifiedFilesPathArray.map(filePath => path.basename(filePath, '.json')).filter(fileName => fileName);
 }
