@@ -18,7 +18,7 @@ const { expect } = chai;
 const rootPath = path.join(__dirname, '../..');
 const MIN_DOC_LENGTH = 100;
 
-let args = process.argv.slice(6);
+const args = process.argv.slice(6);
 
 const schemaOnly = args.includes('--schema-only');
 const modifiedOnly = args.includes('--modified-only');
@@ -149,7 +149,7 @@ function assertValid(schema, subject) {
     const sourceMap = jsonSourceMap.stringify(subject, null, 2);
     const jsonLines = sourceMap.json.split('\n');
     validator.errors.forEach(error => {
-      errorMessage += `\n\n${validator.errorsText([error])}`;
+      errorMessage += `\n\n${validator.errorsText([ error ])}`;
       const errorPointer = sourceMap.pointers[error.dataPath];
       if (errorPointer) {
         errorMessage += `\n> ${jsonLines.slice(errorPointer.value.line, errorPointer.valueEnd.line).join('\n> ')}`;
