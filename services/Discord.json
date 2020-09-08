@@ -2,11 +2,11 @@
   "name": "Discord",
   "documents": {
     "Terms of Service": {
-      "fetch": "https://discord.com/new/terms",
+      "fetch": "https://discord.com/terms",
       "select": ".document-3OCpS5"
     },
     "Privacy Policy": {
-      "fetch": "https://discord.com/new/privacy",
+      "fetch": "https://discord.com/privacy",
       "select": ".document-3OCpS5"
     }
   }
