@@ -23,4 +23,5 @@ jobs:
         git config --global user.name 'AmbNum Bot'
         git config --global user.email 'ambnum.bot@disinfo.quaidorsay.fr'
     - run: npm run validate:schema
+    - run: npm run validate:modified
     - run: npm test
