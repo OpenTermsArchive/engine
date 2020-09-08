@@ -54,9 +54,9 @@ let serviceDeclarations;
                   this.timeout(30000);
 
                   const { fetch: location } = service.documents[type];
-                  const { content: tmpContent, mimeType: tmpMimeType } = await fetch(location);
-                  content = tmpContent;
-                  mimeType = tmpMimeType;
+                  const document = await fetch(location);
+                  content = document.content;
+                  mimeType = document.mimeType;
                 });
 
                 it('has a selector that matches an element in the web page', async function () {
