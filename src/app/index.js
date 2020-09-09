@@ -50,40 +50,7 @@ export default class CGUs extends events.EventEmitter {
   }
 
   async trackChanges(servicesSubset) {
-    let services = this._serviceDeclarations;
-
-    if (servicesSubset) {
-      services = servicesSubset.reduce((accumulator, service) => {
-        accumulator[service] = this._serviceDeclarations[service];
-        return accumulator;
-      }, {});
-    }
-
-    let documentTrackingPromises = [];
-
-    Object.keys(services).forEach(serviceId => {
-      const { documents } = this._serviceDeclarations[serviceId];
-      const documentsPromises = Object.keys(documents).map(async type => {
-        try {
-          await this.trackDocumentChanges({
-            serviceId,
-            document: {
-              type,
-              ...documents[type]
-            }
-          });
-        } catch (error) {
-          if (error instanceof InaccessibleContentError) {
-            return this.emit(AVAILABLE_EVENTS.inaccessibleContentError, serviceId, type, error);
-          }
-          throw error;
-        }
-      });
-
-      documentTrackingPromises = documentTrackingPromises.concat(documentsPromises);
-    });
-
-    await Promise.all(documentTrackingPromises);
+    await this.forEachDocumentOfServices(servicesSubset, serviceDocument => this.trackDocumentChanges(serviceDocument));
 
     await this.publish();
   }
@@ -118,40 +85,7 @@ export default class CGUs extends events.EventEmitter {
   }
 
   async refilterAndRecord(servicesSubset) {
-    let services = this._serviceDeclarations;
-
-    if (servicesSubset) {
-      services = servicesSubset.reduce((accumulator, service) => {
-        accumulator[service] = this._serviceDeclarations[service];
-        return accumulator;
-      }, {});
-    }
-
-    let refilterAndRecordDocumentPromises = [];
-
-    Object.keys(services).forEach(serviceId => {
-      const { documents } = this._serviceDeclarations[serviceId];
-      const documentsPromises = Object.keys(documents).map(async type => {
-        try {
-          await this.refilterAndRecordDocument({
-            serviceId,
-            document: {
-              type,
-              ...documents[type]
-            }
-          });
-        } catch (error) {
-          if (error instanceof InaccessibleContentError) {
-            return this.emit(AVAILABLE_EVENTS.inaccessibleContentError, serviceId, type, error);
-          }
-          throw error;
-        }
-      });
-
-      refilterAndRecordDocumentPromises = refilterAndRecordDocumentPromises.concat(documentsPromises);
-    });
-
-    await Promise.all(refilterAndRecordDocumentPromises);
+    return this.forEachDocumentOfServices(servicesSubset, serviceDocument => this.refilterAndRecordDocument(serviceDocument));
   }
 
   async refilterAndRecordDocument({ serviceId, document: documentDeclaration }) {
@@ -170,6 +104,43 @@ export default class CGUs extends events.EventEmitter {
       serviceId,
       documentDeclaration,
     });
+  }
+
+  async forEachDocumentOfServices(servicesSubset = [], callback) {
+    let services = this._serviceDeclarations;
+
+    if (servicesSubset.length) {
+      services = servicesSubset.reduce((accumulator, service) => {
+        accumulator[service] = this._serviceDeclarations[service];
+        return accumulator;
+      }, {});
+    }
+
+    let documentPromises = [];
+
+    Object.keys(services).forEach(serviceId => {
+      const { documents } = this._serviceDeclarations[serviceId];
+      const documentsPromises = Object.keys(documents).map(async type => {
+        try {
+          await callback({
+            serviceId,
+            document: {
+              type,
+              ...documents[type]
+            }
+          });
+        } catch (error) {
+          if (error instanceof InaccessibleContentError) {
+            return this.emit(AVAILABLE_EVENTS.inaccessibleContentError, serviceId, type, error);
+          }
+          throw error;
+        }
+      });
+
+      documentPromises = documentPromises.concat(documentsPromises);
+    });
+
+    await Promise.all(documentPromises);
   }
 
   async recordSnapshot({ content, mimeType, serviceId, type }) {
