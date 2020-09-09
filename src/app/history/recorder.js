@@ -62,23 +62,14 @@ export default class Recorder {
 
   async getLatestRecord(serviceId, documentType) {
     const filePathGlob = this.getPathFor(serviceId, documentType, '*');
-    const [ latestCommit ] = await this._getCommits(filePathGlob);
+    const { commit, filePath } = await this.git.lastCommitAndFilePathMatchingGlob(filePathGlob);
 
-    if (!latestCommit) {
+    if (!commit || !filePath) {
       return {};
     }
 
-    let filePaths = await this.git.filesInCommit(latestCommit.hash);
-    const relativeFilePathWithoutExtension = filePathGlob.replace(`${this.path}/`, '').replace('*', '');
-    filePaths = filePaths.filter(filePath => filePath.includes(relativeFilePathWithoutExtension));
-
-    if (filePaths.length > 1) {
-      throw new Error(`Only one document of type ${documentType} should have been recorded in ${latestCommit.hash}, but these additional ones have also been recorded: ${filePaths}`);
-    }
-
-    const [ relativeRecordFilePath ] = filePaths;
-    const recordFilePath = `${this.path}/${relativeRecordFilePath}`;
-    const mimeType = mime.getType(relativeRecordFilePath);
+    const recordFilePath = `${this.path}/${filePath}`;
+    const mimeType = mime.getType(filePath);
 
     const readFileOptions = {};
     if (mimeType.startsWith('text/')) {
@@ -86,7 +77,7 @@ export default class Recorder {
     }
 
     return {
-      id: latestCommit.hash,
+      id: commit.hash,
       content: await fs.readFile(recordFilePath, readFileOptions),
       mimeType,
     };

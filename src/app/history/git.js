@@ -69,6 +69,25 @@ export default class Git {
     return !!result;
   }
 
+  async lastCommitAndFilePathMatchingGlob(glob) {
+    const [ latestCommit ] = await this.log([ '-n', '1', '--stat=4096', glob ]);
+
+    if (!latestCommit) {
+      return {};
+    }
+
+    const filePaths = latestCommit.diff.files.map(file => file.file);
+
+    if (filePaths.length > 1) {
+      throw new Error(`Only one document should have been recorded in ${latestCommit.hash}, but all these documens have been recorded: ${filePaths}`);
+    }
+
+    return {
+      commit: latestCommit,
+      filePath: filePaths[0],
+    };
+  }
+
   relativePath(absolutePath) {
     // Git needs a path relative to the .git directory, not an absolute one
     return path.relative(this.path, absolutePath);
