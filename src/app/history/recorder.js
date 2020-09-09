@@ -91,10 +91,6 @@ export default class Recorder {
     const filePath = this.getPathFor(serviceId, documentType, '*');
     return this.git.isTracked(filePath);
   }
-
-  async _getCommits(filePath) {
-    return this.git.log({ file: filePath });
-  }
 }
 
 async function fileExists(filePath) {

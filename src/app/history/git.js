@@ -17,10 +17,6 @@ export default class Git {
     return this.git.add(this.relativePath(filepath));
   }
 
-  async status() {
-    return this.git.status();
-  }
-
   async commit(filepath, message) {
     const summary = await this.git.commit(message, this.relativePath(filepath), { '--author': `${config.get('history.author').name} <${config.get('history.author').email}>` });
     return summary.commit.replace('HEAD ', '').replace('(root-commit) ', '');
@@ -39,12 +35,6 @@ export default class Git {
            || (status.created.indexOf(relativePath) > -1);
   }
 
-  async isNew(filepath) {
-    const status = await this.git.status();
-    return (status.created.indexOf(this.relativePath(filepath)) > -1)
-           || (status.not_added.indexOf(this.relativePath(filepath)) > -1);
-  }
-
   async log(options = {}) {
     try {
       options.file = options.file && this.relativePath(options.file);
@@ -57,11 +47,6 @@ export default class Git {
       }
       return [];
     }
-  }
-
-  async filesInCommit(sha) {
-    const result = await this.git.raw('show', '--name-only', '--pretty=format:', sha);
-    return result.trim().split('\n');
   }
 
   async isTracked(filepath) {
