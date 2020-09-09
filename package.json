@@ -35,6 +35,7 @@
   "devDependencies": {
     "ajv": "^6.12.3",
     "chai": "^4.2.0",
+    "chai-as-promised": "^7.1.1",
     "eslint": "^7.5.0",
     "eslint-config-airbnb-base": "^14.2.0",
     "eslint-plugin-chai-friendly": "^0.6.0",

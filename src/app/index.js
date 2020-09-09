@@ -7,6 +7,7 @@ import * as history from './history/index.js';
 import fetch from './fetcher/index.js';
 import filter from './filter/index.js';
 import loadServiceDeclarations from './loader/index.js';
+import { InaccessibleContentError } from './errors.js';
 
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
 const SERVICE_DECLARATIONS_PATH = path.resolve(__dirname, '../../', config.get('serviceDeclarationsPath'));
@@ -65,7 +66,7 @@ export default class CGUs extends events.EventEmitter {
             }
           });
         } catch (error) {
-          if (error.type == 'inaccessibleContentError') {
+          if (error instanceof InaccessibleContentError) {
             return this.emit(AVAILABLE_EVENTS.inaccessibleContentError, serviceId, type, error);
           }
           throw error;
@@ -126,7 +127,7 @@ export default class CGUs extends events.EventEmitter {
             }
           });
         } catch (error) {
-          if (error.type == 'inaccessibleContentError') {
+          if (error instanceof InaccessibleContentError) {
             return this.emit(AVAILABLE_EVENTS.inaccessibleContentError, serviceId, type, error);
           }
           throw error;

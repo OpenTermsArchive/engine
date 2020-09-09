@@ -1,6 +1,5 @@
-export const ERROR_TYPES = {
-  inaccessibleContent: {
-    id: 'inaccessibleContentError',
-    description: 'The document content cannot be accessed and selected',
+export class InaccessibleContentError extends Error {
+  constructor(message) {
+    super(`The document cannot be accessed or its content can not be selected: ${message}`);
   }
-};
+}

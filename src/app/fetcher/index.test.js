@@ -2,13 +2,15 @@ import fs from 'fs';
 import path from 'path';
 
 import chai from 'chai';
+import chaiAsPromised from 'chai-as-promised';
 import nock from 'nock';
 
 import fetch from './index.js';
-import { ERROR_TYPES } from '../errors.js';
+import { InaccessibleContentError } from '../errors.js';
 
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
 const { expect } = chai;
+chai.use(chaiAsPromised);
 
 describe('Fetcher', () => {
   let termsHTML;
@@ -48,16 +50,8 @@ describe('Fetcher', () => {
           .reply(404);
       });
 
-      it(`throws an "${ERROR_TYPES.inaccessibleContent.id}" error`, async () => {
-        try {
-          await fetch('https://not.available.example');
-        } catch (e) {
-          expect(e).to.be.an('error');
-          expect(e.type).to.equal(ERROR_TYPES.inaccessibleContent.id);
-          expect(e.message).to.contain('404');
-          return;
-        }
-        expect.fail('No error was thrown');
+      it('throws an InaccessibleContentError error', async () => {
+        await expect(fetch('https://not.available.example')).to.be.rejectedWith(InaccessibleContentError, /404/);
       });
     });
 

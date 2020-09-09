@@ -5,7 +5,7 @@ import chai from 'chai';
 import jsdom from 'jsdom';
 
 import { filterHTML, filterPDF, convertRelativeURLsToAbsolute } from './index.js';
-import { ERROR_TYPES } from '../errors.js';
+import { InaccessibleContentError } from '../errors.js';
 
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
 const fs = fsApi.promises;
@@ -89,19 +89,11 @@ describe('Filter', () => {
       });
 
       context('With no match for the given selector', () => {
-        it(`throws an "${ERROR_TYPES.inaccessibleContent.id}" error`, async () => {
-          try {
-            await filterHTML({
-              content: rawHTML,
-              documentDeclaration: { fetch: virtualLocation, select: '#thisAnchorDoesNotExist' }
-            });
-          } catch (e) {
-            expect(e).to.be.an('error');
-            expect(e.type).to.equal(ERROR_TYPES.inaccessibleContent.id);
-            expect(e.message).to.have.string('provided selector', 'has no match');
-            return;
-          }
-          expect.fail('No error was thrown');
+        it('throws an InaccessibleContentError error', async () => {
+          await expect(filterHTML({
+            content: rawHTML,
+            documentDeclaration: { fetch: virtualLocation, select: '#thisAnchorDoesNotExist' }
+          })).to.be.rejectedWith(InaccessibleContentError, /provided selector "#thisAnchorDoesNotExist" has no match/);
         });
       });
 
@@ -210,47 +202,31 @@ describe('Filter', () => {
         });
       });
       context('With a "start" selector that has no match', () => {
-        it(`throws an "${ERROR_TYPES.inaccessibleContent.id}" error`, async () => {
-          try {
-            await filterHTML({
-              content: rawHTML,
-              documentDeclaration: {
-                fetch: virtualLocation,
-                select: {
-                  startAfter: '#paragraph1',
-                  endAfter: '#link2'
-                }
+        it('throws an InaccessibleContentError error', async () => {
+          await expect(filterHTML({
+            content: rawHTML,
+            documentDeclaration: {
+              fetch: virtualLocation,
+              select: {
+                startAfter: '#paragraph1',
+                endAfter: '#link2'
               }
-            });
-          } catch (e) {
-            expect(e).to.be.an('error');
-            expect(e.type).to.equal(ERROR_TYPES.inaccessibleContent.id);
-            expect(e.message).to.have.string('"start" selector has no match');
-            return;
-          }
-          expect.fail('No error was thrown');
+            }
+          })).to.be.rejectedWith(InaccessibleContentError, /"start" selector has no match/);
         });
       });
       context('With an "end" selector that has no match', () => {
-        it(`throws an "${ERROR_TYPES.inaccessibleContent.id}" error`, async () => {
-          try {
-            await filterHTML({
-              content: rawHTML,
-              documentDeclaration: {
-                fetch: virtualLocation,
-                select: {
-                  startAfter: '#link2',
-                  endAfter: '#paragraph1'
-                }
+        it('throws an InaccessibleContentError error', async () => {
+          await expect(filterHTML({
+            content: rawHTML,
+            documentDeclaration: {
+              fetch: virtualLocation,
+              select: {
+                startAfter: '#link2',
+                endAfter: '#paragraph1'
               }
-            });
-          } catch (e) {
-            expect(e).to.be.an('error');
-            expect(e.type).to.equal(ERROR_TYPES.inaccessibleContent.id);
-            expect(e.message).to.have.string('"end" selector has no match');
-            return;
-          }
-          expect.fail('No error was thrown');
+            }
+          })).to.be.rejectedWith(InaccessibleContentError, /"end" selector has no match/);
         });
       });
     });
@@ -337,49 +313,33 @@ describe('Filter', () => {
           expect(result).to.equal('Title\n=====');
         });
         context('With a "start" selector that has no match', () => {
-          it(`throws an "${ERROR_TYPES.inaccessibleContent.id}" error`, async () => {
-            try {
-              await filterHTML({
-                content: rawHTML,
-                documentDeclaration: {
-                  fetch: virtualLocation,
-                  select: 'body',
-                  remove: {
-                    startAfter: '#paragraph1',
-                    endAfter: '#link2'
-                  }
+          it('throws an InaccessibleContentError error', async () => {
+            await expect(filterHTML({
+              content: rawHTML,
+              documentDeclaration: {
+                fetch: virtualLocation,
+                select: 'body',
+                remove: {
+                  startAfter: '#paragraph1',
+                  endAfter: '#link2'
                 }
-              });
-            } catch (e) {
-              expect(e).to.be.an('error');
-              expect(e.type).to.equal(ERROR_TYPES.inaccessibleContent.id);
-              expect(e.message).to.have.string('"start" selector has no match');
-              return;
-            }
-            expect.fail('No error was thrown');
+              }
+            })).to.be.rejectedWith(InaccessibleContentError, /"start" selector has no match/);
           });
         });
         context('With an "end" selector that has no match', () => {
-          it(`throws an "${ERROR_TYPES.inaccessibleContent.id}" error`, async () => {
-            try {
-              await filterHTML({
-                content: rawHTML,
-                documentDeclaration: {
-                  fetch: virtualLocation,
-                  select: 'body',
-                  remove: {
-                    startAfter: '#link2',
-                    endAfter: '#paragraph1'
-                  }
+          it('throws an InaccessibleContentError error', async () => {
+            await expect(filterHTML({
+              content: rawHTML,
+              documentDeclaration: {
+                fetch: virtualLocation,
+                select: 'body',
+                remove: {
+                  startAfter: '#link2',
+                  endAfter: '#paragraph1'
                 }
-              });
-            } catch (e) {
-              expect(e).to.be.an('error');
-              expect(e.type).to.equal(ERROR_TYPES.inaccessibleContent.id);
-              expect(e.message).to.have.string('"end" selector has no match');
-              return;
-            }
-            expect.fail('No error was thrown');
+              }
+            })).to.be.rejectedWith(InaccessibleContentError, /"end" selector has no match/);
           });
         });
       });
