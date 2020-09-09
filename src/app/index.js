@@ -12,17 +12,16 @@ import { InaccessibleContentError } from './errors.js';
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
 const SERVICE_DECLARATIONS_PATH = path.resolve(__dirname, '../../', config.get('serviceDeclarationsPath'));
 
-export const AVAILABLE_EVENTS = {
-  snapshotRecorded: 'snapshotRecorded',
-  firstSnapshotRecorded: 'firstSnapshotRecorded',
-  snapshotNotChanged: 'snapshotNotChanged',
-  versionRecorded: 'versionRecorded',
-  firstVersionRecorded: 'firstVersionRecorded',
-  versionNotChanged: 'versionNotChanged',
-  recordsPublished: 'recordsPublished',
-  inaccessibleContentError: 'inaccessibleContentError',
-  refilteringError: 'refilteringError',
-};
+export const AVAILABLE_EVENTS = [
+  'snapshotRecorded',
+  'firstSnapshotRecorded',
+  'snapshotNotChanged',
+  'versionRecorded',
+  'firstVersionRecorded',
+  'versionNotChanged',
+  'recordsPublished',
+  'inaccessibleContentError',
+];
 
 export default class CGUs extends events.EventEmitter {
   get serviceDeclarations() {
@@ -39,8 +38,7 @@ export default class CGUs extends events.EventEmitter {
   }
 
   attach(listener) {
-    Object.keys(AVAILABLE_EVENTS).forEach(eventId => {
-      const event = AVAILABLE_EVENTS[eventId];
+    AVAILABLE_EVENTS.forEach(event => {
       const handlerName = `on${event[0].toUpperCase()}${event.substr(1)}`;
 
       if (listener[handlerName]) {
@@ -131,7 +129,7 @@ export default class CGUs extends events.EventEmitter {
           });
         } catch (error) {
           if (error instanceof InaccessibleContentError) {
-            return this.emit(AVAILABLE_EVENTS.inaccessibleContentError, serviceId, type, error);
+            return this.emit('inaccessibleContentError', serviceId, type, error);
           }
           throw error;
         }
@@ -152,10 +150,10 @@ export default class CGUs extends events.EventEmitter {
     });
 
     if (!snapshotId) {
-      return this.emit(AVAILABLE_EVENTS.snapshotNotChanged, serviceId, type);
+      return this.emit('snapshotNotChanged', serviceId, type);
     }
 
-    this.emit(isFirstRecord ? AVAILABLE_EVENTS.firstSnapshotRecorded : AVAILABLE_EVENTS.snapshotRecorded, serviceId, type, snapshotId);
+    this.emit(isFirstRecord ? 'firstSnapshotRecorded' : 'snapshotRecorded', serviceId, type, snapshotId);
     return snapshotId;
   }
 
@@ -176,10 +174,10 @@ export default class CGUs extends events.EventEmitter {
     });
 
     if (!versionId) {
-      return this.emit(AVAILABLE_EVENTS.versionNotChanged, serviceId, type);
+      return this.emit('versionNotChanged', serviceId, type);
     }
 
-    this.emit(isFirstRecord ? AVAILABLE_EVENTS.firstVersionRecorded : AVAILABLE_EVENTS.versionRecorded, serviceId, type, versionId);
+    this.emit(isFirstRecord ? 'firstVersionRecorded' : 'versionRecorded', serviceId, type, versionId);
   }
 
   async recordVersion({ snapshotContent, mimeType, snapshotId, serviceId, documentDeclaration }) {
@@ -199,10 +197,10 @@ export default class CGUs extends events.EventEmitter {
     });
 
     if (!versionId) {
-      return this.emit(AVAILABLE_EVENTS.versionNotChanged, serviceId, type);
+      return this.emit('versionNotChanged', serviceId, type);
     }
 
-    this.emit(isFirstRecord ? AVAILABLE_EVENTS.firstVersionRecorded : AVAILABLE_EVENTS.versionRecorded, serviceId, type, versionId);
+    this.emit(isFirstRecord ? 'firstVersionRecorded' : 'versionRecorded', serviceId, type, versionId);
   }
 
   async publish() {
@@ -211,6 +209,6 @@ export default class CGUs extends events.EventEmitter {
     }
 
     await history.publish();
-    this.emit(AVAILABLE_EVENTS.recordsPublished);
+    this.emit('recordsPublished');
   }
 }
