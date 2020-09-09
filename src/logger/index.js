@@ -31,7 +31,7 @@ if (config.get('logger.sendMailOnError')) {
     username: process.env.SMTP_USERNAME,
     password: process.env.SMTP_PASSWORD,
     ssl: true,
-    formatter: args => args[Object.getOwnPropertySymbols(args)[1]]
+    formatter: args => args[Object.getOwnPropertySymbols(args)[1]] // Returns the full error message, the same visible in the console. It is referenced in the argument object with a Symbol of which we do not have the reference but we know it is the second one.
   });
 
   transports.push(mailErrorTransport);
