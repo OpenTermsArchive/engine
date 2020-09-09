@@ -5,6 +5,7 @@ import Ajv from 'ajv';
 import chai from 'chai';
 import config from 'config';
 import jsonSourceMap from 'json-source-map';
+import simpleGit from 'simple-git';
 
 import fetch from '../../src/app/fetcher/index.js';
 import filter from '../../src/app/filter/index.js';
@@ -17,24 +18,29 @@ const { expect } = chai;
 const rootPath = path.join(__dirname, '../..');
 const MIN_DOC_LENGTH = 100;
 
-let serviceDeclarations;
+const args = process.argv.slice(6);
+
+const schemaOnly = args.includes('--schema-only');
+const modifiedOnly = args.includes('--modified-only');
+let servicesToValidate = args.filter(arg => !arg.startsWith('--'));
+
 (async () => {
   try {
-    serviceDeclarations = await loadServiceDeclarations(path.join(rootPath, config.get('serviceDeclarationsPath')));
+    const serviceDeclarations = await loadServiceDeclarations(path.join(rootPath, config.get('serviceDeclarationsPath')));
+
+    if (modifiedOnly) {
+      servicesToValidate = await getModifiedServices();
+    } else if (!servicesToValidate.length) {
+      servicesToValidate = Object.keys(serviceDeclarations);
+    }
 
     describe('Services validation', async () => {
-      const serviceId = process.argv.slice(process.argv.indexOf('--serviceId'))[1];
-      const schemaOnly = process.argv.indexOf('--schema-only') != -1;
-      const serviceIds = Object.keys(serviceDeclarations);
-
-      const servicesToValidate = serviceId ? [ serviceId ] : serviceIds;
-
       servicesToValidate.forEach(serviceId => {
         const service = serviceDeclarations[serviceId];
 
         if (!service) {
-          console.error(`There is no service declared with id "${serviceId}"`);
-          process.exit();
+          process.exitCode = 1;
+          throw new Error(`Could not find any service with id "${serviceId}"`);
         }
 
         describe(serviceId, () => {
@@ -54,9 +60,9 @@ let serviceDeclarations;
                   this.timeout(30000);
 
                   const { fetch: location } = service.documents[type];
-                  const { content: tmpContent, mimeType: tmpMimeType } = await fetch(location);
-                  content = tmpContent;
-                  mimeType = tmpMimeType;
+                  const document = await fetch(location);
+                  content = document.content;
+                  mimeType = document.mimeType;
                 });
 
                 it('has a selector that matches an element in the web page', async function () {
@@ -104,13 +110,13 @@ let serviceDeclarations;
                     this.timeout(30000);
 
                     const { fetch: location } = service.documents[type];
-                    const { content: secondContent, mimeType: secondMimetype} = await fetch(location);
+                    const document = await fetch(location);
 
                     const secondFilteredContent = await filter({
-                      content: secondContent,
+                      content: document.content,
                       documentDeclaration: service.documents[type],
                       filterFunctions: service.filters,
-                      mimeType: secondMimetype
+                      mimeType: document.mimeType
                     });
 
                     expect(secondFilteredContent).to.equal(filteredContent);
@@ -143,7 +149,7 @@ function assertValid(schema, subject) {
     const sourceMap = jsonSourceMap.stringify(subject, null, 2);
     const jsonLines = sourceMap.json.split('\n');
     validator.errors.forEach(error => {
-      errorMessage += `\n\n${validator.errorsText([error])}`;
+      errorMessage += `\n\n${validator.errorsText([ error ])}`;
       const errorPointer = sourceMap.pointers[error.dataPath];
       if (errorPointer) {
         errorMessage += `\n> ${jsonLines.slice(errorPointer.value.line, errorPointer.valueEnd.line).join('\n> ')}`;
@@ -157,4 +163,21 @@ function assertValid(schema, subject) {
 
     throw new Error(errorMessage);
   }
+}
+
+async function getModifiedServices() {
+  const git = simpleGit(rootPath, { maxConcurrentProcesses: 1 });
+  const committedFiles = await git.diff([ '--name-only', 'master...', 'services/*.json' ]);
+  const status = await git.status();
+  const modifiedFiles = [
+    ...status.not_added, // Files created but not already in staged area
+    ...status.modified, // Files modified
+    ...status.created, // Files created and in the staged area
+    ...status.renamed.map(({ to }) => to), // Files renamed
+    ...committedFiles.trim().split('\n') // Files committed
+  ];
+
+  return modifiedFiles
+    .filter(fileName => fileName.match(/services.*\.json/))
+    .map(filePath => path.basename(filePath, '.json'));
 }

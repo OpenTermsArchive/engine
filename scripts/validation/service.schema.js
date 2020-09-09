@@ -13,7 +13,7 @@ const documentsProperties = () => {
         { $ref: '#/definitions/document' },
         { $ref: '#/definitions/pdfDocument' },
       ]
-    }
+    };
   });
   return result;
 };
