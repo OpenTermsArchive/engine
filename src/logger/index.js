@@ -26,7 +26,7 @@ if (config.get('logger.sendMailOnError')) {
     level: 'error',
     to: config.get('logger.sendMailOnError.to'),
     from: config.get('logger.sendMailOnError.from'),
-    subject: 'CGUs - Error Report',
+    subject: '[CGUs] Error Report',
     host: process.env.SMTP_HOST,
     username: process.env.SMTP_USERNAME,
     password: process.env.SMTP_PASSWORD,
