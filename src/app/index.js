@@ -49,8 +49,15 @@ export default class CGUs extends events.EventEmitter {
     });
   }
 
-  async trackChanges(serviceToTrack) {
-    const services = serviceToTrack ? { [serviceToTrack]: this._serviceDeclarations[serviceToTrack] } : this._serviceDeclarations;
+  async trackChanges(servicesSubset) {
+    let services = this._serviceDeclarations;
+
+    if (servicesSubset) {
+      services = servicesSubset.reduce((accumulator, service) => {
+        accumulator[service] = this._serviceDeclarations[service];
+        return accumulator;
+      }, {});
+    }
 
     let documentTrackingPromises = [];
 
@@ -110,8 +117,15 @@ export default class CGUs extends events.EventEmitter {
     });
   }
 
-  async refilterAndRecord(serviceToTrack) {
-    const services = serviceToTrack ? { [serviceToTrack]: this._serviceDeclarations[serviceToTrack] } : this._serviceDeclarations;
+  async refilterAndRecord(servicesSubset) {
+    let services = this._serviceDeclarations;
+
+    if (servicesSubset) {
+      services = servicesSubset.reduce((accumulator, service) => {
+        accumulator[service] = this._serviceDeclarations[service];
+        return accumulator;
+      }, {});
+    }
 
     let refilterAndRecordDocumentPromises = [];
 
