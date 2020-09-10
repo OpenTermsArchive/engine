@@ -20,7 +20,7 @@ export const AVAILABLE_EVENTS = [
   'firstVersionRecorded',
   'versionNotChanged',
   'recordsPublished',
-  'inaccessibleContentError',
+  'inaccessibleContent',
 ];
 
 export default class CGUs extends events.EventEmitter {
@@ -135,7 +135,7 @@ export default class CGUs extends events.EventEmitter {
           });
         } catch (error) {
           if (error instanceof InaccessibleContentError) {
-            return this.emit('inaccessibleContentError', serviceId, type, error);
+            return this.emit('inaccessibleContent', serviceId, type, error);
           }
           throw error;
         }

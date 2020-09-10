@@ -185,7 +185,7 @@ describe('CGUs', () => {
       });
 
       context('When there is an expected error', () => {
-        let inaccessibleContentErrorSpy;
+        let inaccessibleContentSpy;
         let versionNotChangedSpy;
         before(async () => {
           nock('https://www.servicea.example').get('/tos').reply(200, serviceASnapshotExpectedContent, { 'Content-Type': 'text/html' });
@@ -195,9 +195,9 @@ describe('CGUs', () => {
           await app.trackChanges();
 
           app.serviceDeclarations[SERVICE_A_ID].documents[SERVICE_A_TYPE].select = 'inexistant-selector';
-          inaccessibleContentErrorSpy = sinon.spy();
+          inaccessibleContentSpy = sinon.spy();
           versionNotChangedSpy = sinon.spy();
-          app.on('inaccessibleContentError', inaccessibleContentErrorSpy);
+          app.on('inaccessibleContent', inaccessibleContentSpy);
           app.on('versionNotChanged', versionNotChangedSpy);
           await app.refilterAndRecord();
         });
@@ -205,7 +205,7 @@ describe('CGUs', () => {
         after(resetGitRepository);
 
         it('does not refilter the service on error', async () => {
-          expect(inaccessibleContentErrorSpy).to.have.been.calledWith(SERVICE_A_ID, SERVICE_A_TYPE);
+          expect(inaccessibleContentSpy).to.have.been.calledWith(SERVICE_A_ID, SERVICE_A_TYPE);
         });
 
         it('still refilters other services', async () => {
