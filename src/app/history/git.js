@@ -64,7 +64,7 @@ export default class Git {
     const filePaths = latestCommit.diff.files.map(file => file.file);
 
     if (filePaths.length > 1) {
-      throw new Error(`Only one document should have been recorded in ${latestCommit.hash}, but all these documens have been recorded: ${filePaths}`);
+      throw new Error(`Only one document should have been recorded in ${latestCommit.hash}, but all these documents were recorded: ${filePaths}`);
     }
 
     return {
