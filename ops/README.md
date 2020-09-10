@@ -54,6 +54,14 @@ For example, you can update `CGUs` by running:
 ansible-playbook ops/app.yml --tags update
 ```
 
+### Logs
+
+You can get logs by connecting to the target machine over SSH and obtaining logs from the process manager:
+
+```
+ssh user@machine forever logs cgus
+```
+
 ### Troubleshooting
 
 If you have the following error:
