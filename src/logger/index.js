@@ -71,8 +71,8 @@ export function onRecordsPublished() {
   logger.info({ message: 'Records published.' });
 }
 
-export function onInaccessibleContentError(serviceId, type, error) {
-  logger.error({ message: `Could not track document: ${error.stack}`, serviceId, type });
+export function onInaccessibleContent(serviceId, type, error) {
+  logger.warn({ message: `Content inacessible: ${error.stack}`, serviceId, type });
 }
 
 export function info(options) {
