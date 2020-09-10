@@ -1,7 +1,7 @@
 import scheduler from 'node-schedule';
 
 import CGUs from './app/index.js';
-import * as logger from './logger/index.js';
+import logger from './logger/index.js';
 import Notifier from './notifier/index.js';
 
 const args = process.argv.slice(2);
