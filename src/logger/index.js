@@ -22,7 +22,7 @@ const consoleTransport = new winston.transports.Console();
 const transports = [ consoleTransport ];
 
 if (config.get('logger.sendMailOnError')) {
-  const mailErrorTransport = new winston.transports.Mail({
+  transports.push(new winston.transports.Mail({
     level: 'error',
     to: config.get('logger.sendMailOnError.to'),
     from: config.get('logger.sendMailOnError.from'),
@@ -32,9 +32,7 @@ if (config.get('logger.sendMailOnError')) {
     password: process.env.SMTP_PASSWORD,
     ssl: true,
     formatter: args => args[Object.getOwnPropertySymbols(args)[1]] // Returns the full error message, the same visible in the console. It is referenced in the argument object with a Symbol of which we do not have the reference but we know it is the second one.
-  });
-
-  transports.push(mailErrorTransport);
+  }));
 }
 
 const logger = winston.createLogger({
