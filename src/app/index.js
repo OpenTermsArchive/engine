@@ -45,8 +45,8 @@ export default class CGUs extends events.EventEmitter {
     });
   }
 
-  async trackChanges(servicesSubset) {
-    await this.forEachDocumentOfServices(servicesSubset, serviceDocument => this.trackDocumentChanges(serviceDocument));
+  async trackChanges(servicesIds) {
+    await this._forEachDocumentOf(servicesIds || Object.keys(this._serviceDeclarations), document => this.trackDocumentChanges(document));
 
     await this.publish();
   }
@@ -80,8 +80,8 @@ export default class CGUs extends events.EventEmitter {
     });
   }
 
-  async refilterAndRecord(servicesSubset) {
-    return this.forEachDocumentOfServices(servicesSubset, serviceDocument => this.refilterAndRecordDocument(serviceDocument));
+  async refilterAndRecord(servicesIds) {
+    return this._forEachDocumentOf(servicesIds || Object.keys(this._serviceDeclarations), document => this.refilterAndRecordDocument(document));
   }
 
   async refilterAndRecordDocument({ serviceId, document: documentDeclaration }) {
@@ -102,27 +102,10 @@ export default class CGUs extends events.EventEmitter {
     });
   }
 
-  async forEachDocumentOfServices(servicesSubset = [], callback) {
-    let services = this._serviceDeclarations;
-
-    if (servicesSubset.length) {
-      services = servicesSubset.reduce((accumulator, service) => {
-        accumulator[service] = this._serviceDeclarations[service];
-        return accumulator;
-      }, {});
-    }
-
-    let documentPromises = [];
-
-    Object.keys(services).forEach(serviceId => {
-      const serviceDeclaration = this._serviceDeclarations[serviceId];
-
-      if (!serviceDeclaration) {
-        throw new Error(`The service "${serviceId}" does not exist in services declarations.`);
-      }
-
-      const { documents } = serviceDeclaration;
-      const documentsPromises = Object.keys(documents).map(async type => {
+  async _forEachDocumentOf(servicesIds = [], callback) {
+    const documentPromises = servicesIds.flatMap(serviceId => {
+      const { documents } = this._serviceDeclarations[serviceId];
+      return Object.keys(documents).map(async type => {
         try {
           await callback({
             serviceId,
@@ -138,8 +121,6 @@ export default class CGUs extends events.EventEmitter {
           throw error;
         }
       });
-
-      documentPromises = documentPromises.concat(documentsPromises);
     });
 
     await Promise.all(documentPromises);
