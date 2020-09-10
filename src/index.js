@@ -14,16 +14,14 @@ let serviceIds = args.filter(arg => !arg.startsWith('--'));
   app.attach(logger);
   await app.init();
 
-  if (serviceIds.length) {
-    serviceIds = serviceIds.filter(serviceId => {
-      const isServiceDeclared = app.serviceDeclarations[serviceId];
-      if (!isServiceDeclared) {
-        logger.warn(`Service ${serviceId} does not exist and will be ignored.`);
-      }
+  serviceIds = serviceIds.filter(serviceId => {
+    const isServiceDeclared = app.serviceDeclarations[serviceId];
+    if (!isServiceDeclared) {
+      logger.warn(`Service ${serviceId} does not exist and will be ignored.`);
+    }
 
-      return isServiceDeclared;
-    });
-  }
+    return isServiceDeclared;
+  });
 
   serviceIds = serviceIds.length ? serviceIds : app.serviceIds;
 
