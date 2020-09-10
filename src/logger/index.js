@@ -71,10 +71,6 @@ export function onRecordsPublished() {
   logger.info({ message: 'Records published.' });
 }
 
-export function onRefilteringError(serviceId, type, error) {
-  logger.error({ message: `Could not refilter document: ${error.stack}`, serviceId, type });
-}
-
 export function onInaccessibleContentError(serviceId, type, error) {
   logger.error({ message: `Could not track document: ${error.stack}`, serviceId, type });
 }
