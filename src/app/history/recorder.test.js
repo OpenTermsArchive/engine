@@ -194,40 +194,6 @@ describe('Recorder', () => {
     });
   });
 
-  describe('#_getCommits', () => {
-    let firstRecordId;
-    let secondRecordId;
-    before(async () => {
-      let record = await subject.record({
-        serviceId: SERVICE_PROVIDER_ID,
-        documentType: TYPE,
-        content: FILE_CONTENT,
-      });
-      firstRecordId = record.id;
-      record = await subject.record({
-        serviceId: SERVICE_PROVIDER_ID,
-        documentType: TYPE,
-        content: `${FILE_CONTENT} (with additional content to trigger a record)`,
-      });
-      secondRecordId = record.id;
-      await subject.record({
-        serviceId: 'another service provider id',
-        documentType: TYPE,
-        content: `${FILE_CONTENT} (with another content)`,
-      });
-    });
-
-    after(resetGitRepository);
-
-    it('returns all commits related to the given file path', async () => {
-      const filePath = subject.getPathFor(SERVICE_PROVIDER_ID, TYPE);
-      const commits = await subject._getCommits(filePath);
-      expect(commits).to.have.length(2);
-      expect(commits[0].hash).to.include(secondRecordId);
-      expect(commits[1].hash).to.include(firstRecordId);
-    });
-  });
-
   describe('#getLatestRecord', () => {
     context('When there are records for the given service', () => {
       let lastSnapshotId;
