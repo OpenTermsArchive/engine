@@ -28,6 +28,10 @@ export default class CGUs extends events.EventEmitter {
     return this._serviceDeclarations;
   }
 
+  get serviceIds() {
+    return Object.keys(this._serviceDeclarations);
+  }
+
   async init() {
     if (!this._serviceDeclarations) {
       this._serviceDeclarations = await loadServiceDeclarations(SERVICE_DECLARATIONS_PATH);
@@ -46,7 +50,7 @@ export default class CGUs extends events.EventEmitter {
   }
 
   async trackChanges(servicesIds) {
-    await this._forEachDocumentOf(servicesIds || Object.keys(this._serviceDeclarations), document => this.trackDocumentChanges(document));
+    await this._forEachDocumentOf(servicesIds, document => this.trackDocumentChanges(document));
 
     await this.publish();
   }
@@ -81,7 +85,7 @@ export default class CGUs extends events.EventEmitter {
   }
 
   async refilterAndRecord(servicesIds) {
-    return this._forEachDocumentOf(servicesIds || Object.keys(this._serviceDeclarations), document => this.refilterAndRecordDocument(document));
+    return this._forEachDocumentOf(servicesIds, document => this.refilterAndRecordDocument(document));
   }
 
   async refilterAndRecordDocument({ serviceId, document: documentDeclaration }) {

@@ -46,7 +46,7 @@ describe('CGUs', () => {
     });
 
     context('When everything works fine', () => {
-      before(async () => app.trackChanges());
+      before(async () => app.trackChanges(app.serviceIds));
 
       after(resetGitRepository);
 
@@ -76,7 +76,7 @@ describe('CGUs', () => {
         // as there is no more HTTP request mocks for service A, it should throw an `ENOTFOUND` error which is consiedred as an expected error in our workflow
         nock.cleanAll();
         nock('https://www.serviceb.example').get('/privacy').reply(200, serviceBSnapshotExpectedContent, { 'Content-Type': 'application/pdf' });
-        await app.trackChanges();
+        await app.trackChanges(app.serviceIds);
       });
 
       after(resetGitRepository);
@@ -105,7 +105,7 @@ describe('CGUs', () => {
       before(async () => {
         try {
           sinon.stub(app, 'trackDocumentChanges').throws('UnexpectedError');
-          await app.trackChanges();
+          await app.trackChanges(app.serviceIds);
         } catch (e) {
           error = e;
           return;
@@ -139,7 +139,7 @@ describe('CGUs', () => {
           nock('https://www.serviceb.example').get('/privacy').reply(200, serviceBSnapshotExpectedContent, { 'Content-Type': 'application/pdf' });
           const app = new CGUs();
           await app.init();
-          await app.trackChanges();
+          await app.trackChanges(app.serviceIds);
 
           const [ originalSnapshotCommit ] = await gitSnapshot().log({ file: SERVICE_A_EXPECTED_SNAPSHOT_FILE_PATH });
           originalSnapshotId = originalSnapshotCommit.hash;
@@ -151,7 +151,7 @@ describe('CGUs', () => {
 
           app.serviceDeclarations[SERVICE_A_ID].documents[SERVICE_A_TYPE].select = 'h1';
 
-          await app.refilterAndRecord();
+          await app.refilterAndRecord(app.serviceIds);
 
           const [ refilterVersionCommit ] = await gitVersion().log({ file: SERVICE_A_EXPECTED_VERSION_FILE_PATH });
           refilterVersionId = refilterVersionCommit.hash;
@@ -192,14 +192,14 @@ describe('CGUs', () => {
           nock('https://www.serviceb.example').get('/privacy').reply(200, serviceBSnapshotExpectedContent, { 'Content-Type': 'application/pdf' });
           const app = new CGUs();
           await app.init();
-          await app.trackChanges();
+          await app.trackChanges(app.serviceIds);
 
           app.serviceDeclarations[SERVICE_A_ID].documents[SERVICE_A_TYPE].select = 'inexistant-selector';
           inaccessibleContentSpy = sinon.spy();
           versionNotChangedSpy = sinon.spy();
           app.on('inaccessibleContent', inaccessibleContentSpy);
           app.on('versionNotChanged', versionNotChangedSpy);
-          await app.refilterAndRecord();
+          await app.refilterAndRecord(app.serviceIds);
         });
 
         after(resetGitRepository);
@@ -221,9 +221,9 @@ describe('CGUs', () => {
             nock('https://www.serviceb.example').get('/privacy').reply(200, serviceBSnapshotExpectedContent, { 'Content-Type': 'application/pdf' });
             const app = new CGUs();
             await app.init();
-            await app.trackChanges();
+            await app.trackChanges(app.serviceIds);
             sinon.stub(app, 'refilterAndRecordDocument').throws('UnexpectedError');
-            await app.refilterAndRecord();
+            await app.refilterAndRecord(app.serviceIds);
           } catch (e) {
             error = e;
             return;
@@ -454,7 +454,7 @@ describe('CGUs', () => {
         nock('https://www.servicea.example').get('/tos').reply(200, serviceASnapshotExpectedContent, { 'Content-Type': 'text/html' });
         nock('https://www.serviceb.example').get('/privacy').reply(200, serviceBSnapshotExpectedContent, { 'Content-Type': 'application/pdf' });
 
-        return app.trackChanges();
+        return app.trackChanges(app.serviceIds);
       });
 
       after(() => {
@@ -483,13 +483,13 @@ describe('CGUs', () => {
           nock('https://www.servicea.example').get('/tos').reply(200, serviceASnapshotExpectedContent, { 'Content-Type': 'text/html' });
           nock('https://www.serviceb.example').get('/privacy').reply(200, serviceBSnapshotExpectedContent, { 'Content-Type': 'application/pdf' });
 
-          await app.trackChanges();
+          await app.trackChanges(app.serviceIds);
 
           nock('https://www.servicea.example').get('/tos').reply(200, serviceASnapshotExpectedContent, { 'Content-Type': 'text/html' });
           nock('https://www.serviceb.example').get('/privacy').reply(200, serviceBSnapshotExpectedContent, { 'Content-Type': 'application/pdf' });
 
           resetSpiesHistory();
-          return app.trackChanges();
+          return app.trackChanges(app.serviceIds);
         });
 
         after(() => {
@@ -517,13 +517,13 @@ describe('CGUs', () => {
           nock('https://www.servicea.example').get('/tos').reply(200, serviceASnapshotExpectedContent, { 'Content-Type': 'text/html' });
           nock('https://www.serviceb.example').get('/privacy').reply(200, serviceBSnapshotExpectedContent, { 'Content-Type': 'application/pdf' });
 
-          await app.trackChanges();
+          await app.trackChanges(app.serviceIds);
 
           nock('https://www.servicea.example').get('/tos').reply(200, serviceBSnapshotExpectedContent, { 'Content-Type': 'text/html' });
           nock('https://www.serviceb.example').get('/privacy').reply(200, serviceBSnapshotExpectedContent, { 'Content-Type': 'application/pdf' });
 
           resetSpiesHistory();
-          await app.trackChanges();
+          await app.trackChanges(app.serviceIds);
         });
 
         after(() => {
