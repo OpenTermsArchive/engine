@@ -14,7 +14,19 @@ let serviceIds = args.filter(arg => !arg.startsWith('--'));
   app.attach(logger);
   await app.init();
 
+  if (serviceIds.length) {
+    serviceIds = serviceIds.filter(serviceId => {
+      const isServiceDeclared = app.serviceDeclarations[serviceId];
+      if (!isServiceDeclared) {
+        logger.warn(`Service ${serviceId} does not exist and will be ignored.`);
+      }
+
+      return isServiceDeclared;
+    });
+  }
+
   serviceIds = serviceIds.length ? serviceIds : app.serviceIds;
+
   const numberOfDocuments = serviceIds.reduce((acc, serviceId) => acc + Object.keys(app.serviceDeclarations[serviceId].documents).length, 0);
 
   logger.info(`Refiltering ${numberOfDocuments} documents from ${serviceIds.length} services…`);
