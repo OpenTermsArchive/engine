@@ -53,6 +53,7 @@
   "dependencies": {
     "@accordproject/markdown-cicero": "^0.12.4",
     "@accordproject/markdown-pdf": "^0.12.4",
+    "async": "^3.2.0",
     "config": "^3.3.1",
     "datauri": "^3.0.0",
     "dotenv": "^8.2.0",

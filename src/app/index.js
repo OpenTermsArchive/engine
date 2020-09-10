@@ -2,6 +2,7 @@ import path from 'path';
 import events from 'events';
 
 import config from 'config';
+import async from 'async';
 
 import * as history from './history/index.js';
 import fetch from './fetcher/index.js';
@@ -21,6 +22,7 @@ export const AVAILABLE_EVENTS = [
   'versionNotChanged',
   'recordsPublished',
   'inaccessibleContent',
+  'error'
 ];
 
 export default class CGUs extends events.EventEmitter {
@@ -31,9 +33,23 @@ export default class CGUs extends events.EventEmitter {
   async init() {
     if (!this.initialized) {
       this._serviceDeclarations = await loadServiceDeclarations(SERVICE_DECLARATIONS_PATH);
+
+      this.trackDocumentChangesQueue = async.queue(async ({ serviceDocument }) => this.trackDocumentChanges(serviceDocument), 10);
+      this.refilterDocumentsQueue = async.queue(async ({ serviceDocument }) => this.refilterAndRecordDocument(serviceDocument), 10);
+
+      const queueErrorHandler = (error, { serviceDocument }) => {
+        const { serviceId, document: { type } } = serviceDocument;
+        if (error instanceof InaccessibleContentError) {
+          return this.emit('inaccessibleContent', serviceId, type, error);
+        }
+        this.emit('error', error, serviceId, type);
+      };
+
+      this.trackDocumentChangesQueue.error(queueErrorHandler);
+      this.refilterDocumentsQueue.error(queueErrorHandler);
+
       this.initialized = Promise.resolve();
     }
-
     return this.initialized;
   }
 
@@ -48,8 +64,9 @@ export default class CGUs extends events.EventEmitter {
   }
 
   async trackChanges(servicesSubset) {
-    await this.forEachDocumentOfServices(servicesSubset, serviceDocument => this.trackDocumentChanges(serviceDocument));
+    this.forEachDocumentOfServices(servicesSubset, serviceDocument => this.trackDocumentChangesQueue.push({ serviceDocument }));
 
+    await this.trackDocumentChangesQueue.drain();
     await this.publish();
   }
 
@@ -73,7 +90,7 @@ export default class CGUs extends events.EventEmitter {
       return;
     }
 
-    await this.recordVersion({
+    return this.recordVersion({
       snapshotContent: content,
       mimeType,
       snapshotId,
@@ -83,7 +100,10 @@ export default class CGUs extends events.EventEmitter {
   }
 
   async refilterAndRecord(servicesSubset) {
-    return this.forEachDocumentOfServices(servicesSubset, serviceDocument => this.refilterAndRecordDocument(serviceDocument));
+    this.forEachDocumentOfServices(servicesSubset, serviceDocument => this.refilterDocumentsQueue.push({ serviceDocument }));
+
+    await this.refilterDocumentsQueue.drain();
+    await this.publish();
   }
 
   async refilterAndRecordDocument({ serviceId, document: documentDeclaration }) {
@@ -104,7 +124,7 @@ export default class CGUs extends events.EventEmitter {
     });
   }
 
-  async forEachDocumentOfServices(servicesSubset = [], callback) {
+  forEachDocumentOfServices(servicesSubset = [], callback) {
     let services = this._serviceDeclarations;
 
     if (servicesSubset.length) {
@@ -114,31 +134,18 @@ export default class CGUs extends events.EventEmitter {
       }, {});
     }
 
-    let documentPromises = [];
-
     Object.keys(services).forEach(serviceId => {
       const { documents } = this._serviceDeclarations[serviceId];
-      const documentsPromises = Object.keys(documents).map(async type => {
-        try {
-          await callback({
-            serviceId,
-            document: {
-              type,
-              ...documents[type]
-            }
-          });
-        } catch (error) {
-          if (error instanceof InaccessibleContentError) {
-            return this.emit('inaccessibleContent', serviceId, type, error);
+      Object.keys(documents).forEach(type => {
+        callback({
+          serviceId,
+          document: {
+            type,
+            ...documents[type]
           }
-          throw error;
-        }
+        });
       });
-
-      documentPromises = documentPromises.concat(documentsPromises);
     });
-
-    await Promise.all(documentPromises);
   }
 
   async recordSnapshot({ content, mimeType, serviceId, type }) {
