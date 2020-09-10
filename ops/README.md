@@ -18,7 +18,7 @@ To test the changes without impacting the production server, a Vagrantfile is pr
 ## Usage
 
 To avoid making changes on the production server by mistake, by default all commands will only affect the Vagrant development virtual machine (VM). Note that the VM needs to be started before with `vagrant up`.\
-To execute commands on the production server you should specify it by adding the option `-i ops/inventories/production.yml` to the following commands:
+To execute commands on the production server you should specify it by adding the option `--inventory ops/inventories/production.yml` to the following commands:
 
 - To setup a full [(phoenix)](https://martinfowler.com/bliki/PhoenixServer.html) server:
 ```
@@ -42,7 +42,7 @@ Some useful options can be used to:
 
 ### Tags
 
-Some tags are available to refine what will happen, use them with `-t`:
+Some tags are available to refine what will happen, use them with `--tags`:
  - `setup`: to only setup system dependencies required by the app (cloning repo, installing app dependencies, all config files, and so on…)
  - `start`: to start the app
  - `stop`: to stop the app
@@ -51,7 +51,7 @@ Some tags are available to refine what will happen, use them with `-t`:
 
 For example, you can update `CGUs` by running:
 ```
-ansible-playbook ops/app.yml -t update
+ansible-playbook ops/app.yml --tags update
 ```
 
 ### Troubleshooting
