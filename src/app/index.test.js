@@ -101,26 +101,14 @@ describe('CGUs', () => {
     });
 
     context('When there is an unexpected error', () => {
-      let error;
-      before(async () => {
-        try {
-          sinon.stub(app, 'trackDocumentChanges').throws('UnexpectedError');
-          await app.trackChanges();
-        } catch (e) {
-          error = e;
-          return;
-        }
-        expect.fail('No error was thrown');
-      });
-
       after(resetGitRepository);
 
-      it('throws an error', async () => {
-        expect(error).to.be.an('error');
-      });
-
-      it('throws an unknown error', async () => {
-        expect(error.type).to.be.undefined;
+      it('emits an error', async () => {
+        sinon.stub(app, 'trackDocumentChanges').throws('UnexpectedError');
+        app.on('error', error => {
+          expect(error).to.be.an('error');
+        });
+        await app.trackChanges();
       });
     });
   });
@@ -214,31 +202,20 @@ describe('CGUs', () => {
       });
 
       context('When there is an unexpected error', () => {
-        let error;
-        before(async () => {
-          try {
-            nock('https://www.servicea.example').get('/tos').reply(200, serviceASnapshotExpectedContent, { 'Content-Type': 'text/html' });
-            nock('https://www.serviceb.example').get('/privacy').reply(200, serviceBSnapshotExpectedContent, { 'Content-Type': 'application/pdf' });
-            const app = new CGUs();
-            await app.init();
-            await app.trackChanges();
-            sinon.stub(app, 'refilterAndRecordDocument').throws('UnexpectedError');
-            await app.refilterAndRecord();
-          } catch (e) {
-            error = e;
-            return;
-          }
-          expect.fail('No error was thrown');
-        });
-
         after(resetGitRepository);
 
-        it('throws an error', async () => {
-          expect(error).to.be.an('error');
-        });
+        it('emits an error', async () => {
+          nock('https://www.servicea.example').get('/tos').reply(200, serviceASnapshotExpectedContent, { 'Content-Type': 'text/html' });
+          nock('https://www.serviceb.example').get('/privacy').reply(200, serviceBSnapshotExpectedContent, { 'Content-Type': 'application/pdf' });
+          const app = new CGUs();
+          app.on('error', error => {
+            expect(error).to.be.an('error');
+          });
+          await app.init();
+          await app.trackChanges();
 
-        it('throws an unknown error', async () => {
-          expect(error.type).to.be.undefined;
+          sinon.stub(app, 'refilterAndRecordDocument').throws('UnexpectedError');
+          await app.refilterAndRecord();
         });
       });
     });

@@ -75,6 +75,10 @@ export function onInaccessibleContent(serviceId, type, error) {
   logger.warn({ message: `Content inacessible: ${error.stack}`, serviceId, type });
 }
 
+export function onError(error, serviceId, type) {
+  logger.error({ message: `${error.stack}`, serviceId, type });
+}
+
 export function info(options) {
   logger.info(options);
 }
