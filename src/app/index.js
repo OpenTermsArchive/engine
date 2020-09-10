@@ -29,12 +29,10 @@ export default class CGUs extends events.EventEmitter {
   }
 
   async init() {
-    if (!this.initialized) {
+    if (!this._serviceDeclarations) {
       this._serviceDeclarations = await loadServiceDeclarations(SERVICE_DECLARATIONS_PATH);
-      this.initialized = Promise.resolve();
     }
-
-    return this.initialized;
+    return this._serviceDeclarations;
   }
 
   attach(listener) {
