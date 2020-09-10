@@ -117,7 +117,13 @@ export default class CGUs extends events.EventEmitter {
     let documentPromises = [];
 
     Object.keys(services).forEach(serviceId => {
-      const { documents } = this._serviceDeclarations[serviceId];
+      const serviceDeclaration = this._serviceDeclarations[serviceId];
+
+      if (!serviceDeclaration) {
+        throw new Error(`The service "${serviceId}" does not exist in services declarations.`);
+      }
+
+      const { documents } = serviceDeclaration;
       const documentsPromises = Object.keys(documents).map(async type => {
         try {
           await callback({
