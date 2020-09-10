@@ -5,7 +5,7 @@ import chai from 'chai';
 import loadServiceDeclarations from './index.js';
 
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
-const SERVICE_DECLARATIONS_PATH = path.resolve(__dirname, '../..', config.get('serviceDeclarationsPath'));
+const SERVICE_DECLARATIONS_PATH = path.resolve(__dirname, '../../..', config.get('serviceDeclarationsPath'));
 
 const { expect } = chai;
 
@@ -22,8 +22,8 @@ const expected = {
   service_B: {
     name: 'Service B',
     documents: {
-      'Terms of Service': {
-        fetch: 'https://www.serviceb.example/tos',
+      'Privacy Policy': {
+        fetch: 'https://www.serviceb.example/privacy',
         select: 'body'
       }
     }

@@ -2,7 +2,7 @@ import fsApi from 'fs';
 
 import chai from 'chai';
 
-import { resetGitRepository, gitSnapshot, gitVersion } from '../../test/helper.js';
+import { resetGitRepository, gitSnapshot, gitVersion } from '../../../test/helper.js';
 import { SNAPSHOTS_PATH, VERSIONS_PATH, recordSnapshot, recordVersion, recordRefilter } from './index.js';
 
 const fs = fsApi.promises;

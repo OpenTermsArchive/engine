@@ -1,7 +1,7 @@
 import { createRequire } from 'module';
 
 const require = createRequire(import.meta.url);
-const TYPES = require('../../src/types.json');
+const TYPES = require('../../src/app/types.json');
 
 const AVAILABLE_TYPES_NAME = Object.keys(TYPES);
 

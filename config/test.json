@@ -6,7 +6,11 @@
   },
   "notifier": {
     "sendInBlue": {
-      "listFolderId": 184
+      "administratorsListId": 194,
+      "updatesListId": 195,
+      "updateTemplateId": 21,
+      "updateErrorTemplateId": 22,
+      "applicationErrorTemplateId": 24
     }
   }
 }

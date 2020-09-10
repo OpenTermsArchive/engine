@@ -6,6 +6,8 @@ import turndownPluginGithubFlavouredMarkdown from 'joplin-turndown-plugin-gfm';
 import mardownPdf from '@accordproject/markdown-pdf';
 import ciceroMark from '@accordproject/markdown-cicero';
 
+import { InaccessibleContentError } from '../errors.js';
+
 const { JSDOM } = jsdom;
 const turndownService = new TurndownService();
 turndownService.use(turndownPluginGithubFlavouredMarkdown.gfm);
@@ -59,7 +61,7 @@ export async function filterHTML({ content, documentDeclaration, filterFunctions
   const domFragment = select(webPageDOM, extractionSelectors);
 
   if (!domFragment.children.length) {
-    throw new Error(`The provided selector "${extractionSelectors}" has no match in the web page.`);
+    throw new InaccessibleContentError(`The provided selector "${extractionSelectors}" has no match in the web page.`);
   }
 
   convertRelativeURLsToAbsolute(domFragment, location);
@@ -81,11 +83,11 @@ function selectRange(document, rangeSelector) {
   const endNode = document.querySelector(endBefore || endAfter);
 
   if (!startNode) {
-    throw new Error(`The "start" selector has no match in document in: ${JSON.stringify(rangeSelector)}`);
+    throw new InaccessibleContentError(`The "start" selector has no match in document in: ${JSON.stringify(rangeSelector)}`);
   }
 
   if (!endNode) {
-    throw new Error(`The "end" selector has no match in document in: ${JSON.stringify(rangeSelector)}`);
+    throw new InaccessibleContentError(`The "end" selector has no match in document in: ${JSON.stringify(rangeSelector)}`);
   }
 
   selection[startBefore ? 'setStartBefore' : 'setStartAfter'](startNode);

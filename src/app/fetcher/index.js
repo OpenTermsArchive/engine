@@ -2,6 +2,8 @@ import nodeFetch from 'node-fetch';
 import HttpProxyAgent from 'http-proxy-agent';
 import HttpsProxyAgent from 'https-proxy-agent';
 
+import { InaccessibleContentError } from '../errors.js';
+
 const LANGUAGE = 'en';
 
 export default async function fetch(url) {
@@ -13,10 +15,18 @@ export default async function fetch(url) {
   }
   options.headers = { 'Accept-Language': LANGUAGE };
 
-  const response = await nodeFetch(url, options);
+  let response;
+  try {
+    response = await nodeFetch(url, options);
+  } catch (error) {
+    if (error.code == 'ENOTFOUND' || error.code == 'ETIMEDOUT') {
+      throw new InaccessibleContentError(error.message);
+    }
+    throw error;
+  }
 
   if (!response.ok) {
-    throw new Error(`Received HTTP code ${response.status} when trying to fetch '${url}'`);
+    throw new InaccessibleContentError(`Received HTTP code ${response.status} when trying to fetch '${url}'`);
   }
 
   const mimeType = response.headers.get('content-type');

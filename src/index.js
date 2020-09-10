@@ -1,239 +1,46 @@
-import path from 'path';
-import events from 'events';
+import scheduler from 'node-schedule';
 
-import config from 'config';
+import CGUs from './app/index.js';
+import logger from './logger/index.js';
+import Notifier from './notifier/index.js';
 
-import consoleStamp from 'console-stamp';
+const args = process.argv.slice(2);
+const refilterOnly = args.includes('--refilter-only');
+const schedule = args.includes('--schedule');
+let serviceIds = args.filter(arg => !arg.startsWith('--'));
 
-import * as history from './history/index.js';
-import fetch from './fetcher/index.js';
-import filter from './filter/index.js';
-import loadServiceDeclarations from './loader/index.js';
+(async () => {
+  const app = new CGUs();
+  app.attach(logger);
+  await app.init();
 
-consoleStamp(console);
+  serviceIds = serviceIds.length ? serviceIds : app.serviceIds;
+  const numberOfDocuments = serviceIds.reduce((acc, serviceId) => acc + Object.keys(app.serviceDeclarations[serviceId].documents).length, 0);
 
-const __dirname = path.dirname(new URL(import.meta.url).pathname);
-const SERVICE_DECLARATIONS_PATH = path.resolve(__dirname, '../', config.get('serviceDeclarationsPath'));
+  logger.info(`Refiltering ${numberOfDocuments} documents from ${serviceIds.length} services…`);
+  await app.refilterAndRecord(serviceIds);
+  logger.info(`Refiltered ${numberOfDocuments} documents from ${serviceIds.length} services.\n`);
 
-export default class CGUs extends events.EventEmitter {
-  get serviceDeclarations() {
-    return this._serviceDeclarations;
+  if (refilterOnly) {
+    return;
   }
 
-  async init() {
-    if (!this.initialized) {
-      this._serviceDeclarations = await loadServiceDeclarations(SERVICE_DECLARATIONS_PATH);
-      this.initialized = Promise.resolve();
-    }
-
-    return this.initialized;
+  if (!schedule) {
+    logger.info(`Start tracking changes of ${numberOfDocuments} documents from ${serviceIds.length} services…`);
+    await app.trackChanges(serviceIds);
+    return logger.info(`Tracked changes of ${numberOfDocuments} documents from ${serviceIds.length} services.`);
   }
 
-  async trackChanges(serviceToTrack) {
-    try {
-      console.log('\nStart tracking changes…');
+  const rule = new scheduler.RecurrenceRule();
+  rule.minute = 30; // at minute 30 past every hour.
 
-      const services = serviceToTrack ? { [serviceToTrack]: this._serviceDeclarations[serviceToTrack] } : this._serviceDeclarations;
+  app.attach(new Notifier(app.serviceDeclarations));
 
-      const documentTrackingPromises = [];
-
-      Object.keys(services).forEach(serviceId => {
-        const { documents, name: serviceName } = this._serviceDeclarations[serviceId];
-        Object.keys(documents).forEach(type => {
-          documentTrackingPromises.push(this.trackDocumentChanges({
-            serviceId,
-            serviceName,
-            document: {
-              type,
-              ...documents[type]
-            }
-          }));
-        });
-      });
-
-      await Promise.all(documentTrackingPromises);
-
-      return this.publish();
-    } catch (error) {
-      console.error(`Error when trying to track changes: ${error}`);
-      this.emit('applicationError', error);
-    }
-  }
-
-  async trackDocumentChanges({ serviceId, serviceName, document: documentDeclaration }) {
-    const { type, fetch: location } = documentDeclaration;
-    const logPrefix = `[${serviceName}-${type}]`;
-    try {
-      const { mimeType, content } = await this.fetch({
-        location,
-        serviceId,
-        type,
-        logPrefix,
-      });
-
-      if (!content) {
-        return;
-      }
-
-      const snapshotId = await this.recordSnapshot({
-        content,
-        mimeType,
-        serviceId,
-        type,
-        logPrefix,
-      });
-
-      if (!snapshotId) {
-        return;
-      }
-
-      return this.recordVersion({
-        snapshotContent: content,
-        mimeType,
-        snapshotId,
-        serviceId,
-        documentDeclaration,
-        logPrefix,
-      });
-    } catch (error) {
-      console.error(`${logPrefix} Error:`, error);
-      this.emit('documentUpdateError', serviceId, type, error);
-    }
-  }
-
-  async refilterAndRecord(serviceToTrack) {
-    console.log('\nRefiltering documents… (it could take a while)');
-
-    const services = serviceToTrack ? { [serviceToTrack]: this._serviceDeclarations[serviceToTrack] } : this._serviceDeclarations;
-
-    const refilterAndRecordDocumentPromises = [];
-
-    Object.keys(services).forEach(serviceId => {
-      const { documents, name: serviceName } = this._serviceDeclarations[serviceId];
-      Object.keys(documents).forEach(type => {
-        refilterAndRecordDocumentPromises.push(this.refilterAndRecordDocument({
-          serviceId,
-          serviceName,
-          document: {
-            type,
-            ...documents[type]
-          }
-        }));
-      });
-    });
-
-    return Promise.all(refilterAndRecordDocumentPromises);
-  }
-
-  async refilterAndRecordDocument({ serviceId, serviceName, document: documentDeclaration }) {
-    const { type } = documentDeclaration;
-    const logPrefix = `[${serviceName}-${type}]`;
-    try {
-      const { id: snapshotId, content: snapshotContent, mimeType } = await history.getLatestSnapshot(serviceId, type);
-
-      if (!snapshotId) {
-        return;
-      }
-
-      return await this.recordRefilter({
-        snapshotContent,
-        mimeType,
-        snapshotId,
-        serviceId,
-        documentDeclaration,
-        logPrefix,
-      });
-    } catch (error) {
-      console.error(`${logPrefix} Could not refilter document: ${error}`);
-    }
-  }
-
-  async fetch({ location, serviceId, type, logPrefix }) {
-    console.log(`${logPrefix} Fetch '${location}'.`);
-    try {
-      return await fetch(location);
-    } catch (error) {
-      console.error(`${logPrefix} Could not fetch location: ${error}`);
-      this.emit('documentFetchError', serviceId, type, error);
-    }
-  }
-
-  /* eslint-disable class-methods-use-this */
-  async recordSnapshot({ content, mimeType, serviceId, type, logPrefix }) {
-    const { id: snapshotId, path: snapshotPath } = await history.recordSnapshot({
-      serviceId,
-      documentType: type,
-      content,
-      mimeType
-    });
-
-    if (!snapshotId) {
-      return console.log(`${logPrefix} No changes, did not record snapshot.`);
-    }
-
-    console.log(`${logPrefix} Recorded snapshot in ${snapshotPath} with id ${snapshotId}.`);
-    return snapshotId;
-  }
-  /* eslint-enable class-methods-use-this */
-
-  async recordRefilter({ snapshotContent, mimeType, snapshotId, serviceId, documentDeclaration, logPrefix }) {
-    const { type } = documentDeclaration;
-    const document = await filter({
-      content: snapshotContent,
-      mimeType,
-      documentDeclaration,
-      filterFunctions: this._serviceDeclarations[serviceId].filters
-    });
-
-    const { id: versionId, path: documentPath } = await history.recordRefilter({
-      serviceId,
-      content: document,
-      documentType: type,
-      snapshotId
-    });
-
-    if (versionId) {
-      console.log(`${logPrefix} Recorded version in ${documentPath} with id ${versionId}.`);
-      this.emit('versionRecorded', serviceId, type, versionId);
-    } else {
-      console.log(`${logPrefix} No changes after filtering, did not record version.`);
-    }
-  }
-
-  async recordVersion({ snapshotContent, mimeType, snapshotId, serviceId, documentDeclaration, logPrefix }) {
-    const { type } = documentDeclaration;
-    const document = await filter({
-      content: snapshotContent,
-      mimeType,
-      documentDeclaration,
-      filterFunctions: this._serviceDeclarations[serviceId].filters,
-    });
-
-    const { id: versionId, path: documentPath, isFirstRecord } = await history.recordVersion({
-      serviceId,
-      content: document,
-      documentType: type,
-      snapshotId
-    });
-
-    if (versionId) {
-      const message = isFirstRecord
-        ? `${logPrefix} First version recorded in ${documentPath} with id ${versionId}.`
-        : `${logPrefix} Recorded version in ${documentPath} with id ${versionId}.`;
-      console.log(message);
-      this.emit(isFirstRecord ? 'documentAdded' : 'versionRecorded', serviceId, type, versionId);
-    } else {
-      console.log(`${logPrefix} No changes after filtering, did not record version.`);
-    }
-  }
-
-  async publish() {
-    if (!config.get('history.publish')) {
-      return;
-    }
-
-    await history.publish();
-    console.log('Changes published');
-    this.emit('changesPublished');
-  }
-}
+  logger.info('The scheduler is running…');
+  logger.info(`Documents will be tracked at minute ${rule.minute} past every hour.`);
+  scheduler.scheduleJob(rule, async () => {
+    logger.info(`Start tracking changes of ${numberOfDocuments} documents from ${serviceIds.length} services…`);
+    await app.trackChanges(serviceIds);
+    logger.info(`Tracked changes of ${numberOfDocuments} documents from ${serviceIds.length} services.`);
+  });
+})();

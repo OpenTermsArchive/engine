@@ -24,7 +24,7 @@ You can find examples in the `services` folder.
 
 ### Document type
 
-You can find the list of allowed values for the `<document type>` key in [`/src/types.json`](./src/types.json).
+You can find the list of allowed values for the `<document type>` key in [`/src/app/types.json`](./src/app/types.json).
 
 The types might not always match the exact name given by the service provider. For example, some providers might call their document “Terms and Conditions” or “Terms of Use” instead of “Terms of Service”. The document type does not have to match the exact name, it only has to match the _commitment_ that is taken.
 
