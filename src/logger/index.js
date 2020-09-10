@@ -41,46 +41,36 @@ const logger = winston.createLogger({
   rejectionHandlers: transports,
 });
 
-export function onFirstSnapshotRecorded(serviceId, type, snapshotId) {
+logger.onFirstSnapshotRecorded = (serviceId, type, snapshotId) => {
   logger.info({ message: `Recorded first snapshot with id ${snapshotId}.`, serviceId, type });
-}
+};
 
-export function onSnapshotRecorded(serviceId, type, snapshotId) {
+logger.onSnapshotRecorded = (serviceId, type, snapshotId) => {
   logger.info({ message: `Recorded snapshot with id ${snapshotId}.`, serviceId, type });
-}
+};
 
-export function onSnapshotNotChanged(serviceId, type) {
+logger.onSnapshotNotChanged = (serviceId, type) => {
   logger.info({ message: 'No changes, did not record snapshot.', serviceId, type });
-}
+};
 
-export function onFirstVersionRecorded(serviceId, type, versionId) {
+logger.onFirstVersionRecorded = (serviceId, type, versionId) => {
   logger.info({ message: `Recorded first version with id ${versionId}.`, serviceId, type });
-}
+};
 
-export function onVersionRecorded(serviceId, type, versionId) {
+logger.onVersionRecorded = (serviceId, type, versionId) => {
   logger.info({ message: `Recorded version with id ${versionId}.`, serviceId, type });
-}
+};
 
-export function onVersionNotChanged(serviceId, type) {
+logger.onVersionNotChanged = (serviceId, type) => {
   logger.info({ message: 'No changes after filtering, did not record version.', serviceId, type });
-}
+};
 
-export function onRecordsPublished() {
+logger.onRecordsPublished = () => {
   logger.info({ message: 'Records published.' });
-}
+};
 
-export function onInaccessibleContent(serviceId, type, error) {
+logger.onInaccessibleContent = (serviceId, type, error) => {
   logger.warn({ message: `Content inacessible: ${error.message}`, serviceId, type });
-}
+};
 
-export function info(options) {
-  logger.info(options);
-}
-
-export function error(options) {
-  logger.error(options);
-}
-
-export function warn(options) {
-  logger.warn(options);
-}
+export default logger;
