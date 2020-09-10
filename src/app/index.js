@@ -97,12 +97,13 @@ export default class CGUs extends events.EventEmitter {
       return;
     }
 
-    return this.recordRefilter({
+    return this.recordVersion({
       snapshotContent,
       mimeType,
       snapshotId,
       serviceId,
       documentDeclaration,
+      isRefiltering: true
     });
   }
 
@@ -146,30 +147,7 @@ export default class CGUs extends events.EventEmitter {
     return snapshotId;
   }
 
-  async recordRefilter({ snapshotContent, mimeType, snapshotId, serviceId, documentDeclaration }) {
-    const { type } = documentDeclaration;
-    const document = await filter({
-      content: snapshotContent,
-      mimeType,
-      documentDeclaration,
-      filterFunctions: this._serviceDeclarations[serviceId].filters
-    });
-
-    const { id: versionId, isFirstRecord } = await history.recordRefilter({
-      serviceId,
-      content: document,
-      documentType: type,
-      snapshotId
-    });
-
-    if (!versionId) {
-      return this.emit('versionNotChanged', serviceId, type);
-    }
-
-    this.emit(isFirstRecord ? 'firstVersionRecorded' : 'versionRecorded', serviceId, type, versionId);
-  }
-
-  async recordVersion({ snapshotContent, mimeType, snapshotId, serviceId, documentDeclaration }) {
+  async recordVersion({ snapshotContent, mimeType, snapshotId, serviceId, documentDeclaration, isRefiltering }) {
     const { type } = documentDeclaration;
     const document = await filter({
       content: snapshotContent,
@@ -178,7 +156,9 @@ export default class CGUs extends events.EventEmitter {
       filterFunctions: this._serviceDeclarations[serviceId].filters,
     });
 
-    const { id: versionId, isFirstRecord } = await history.recordVersion({
+    const recordFunction = !isRefiltering ? 'recordVersion' : 'recordRefilter';
+
+    const { id: versionId, isFirstRecord } = await history[recordFunction]({
       serviceId,
       content: document,
       documentType: type,

@@ -392,63 +392,6 @@ describe('CGUs', () => {
       });
     });
 
-    describe('#recordRefilter', () => {
-      context('When it is the first record', () => {
-        before(async () => app.recordRefilter({ snapshotContent: serviceASnapshotExpectedContent, snapshotId: 'sha', serviceId: SERVICE_A_ID, documentDeclaration: documentADeclaration }));
-
-        after(() => {
-          resetSpiesHistory();
-          return resetGitRepository();
-        });
-
-        it('emits "firstVersionRecorded" event', async () => {
-          expect(spies.onFirstVersionRecorded).to.have.been.calledWith(SERVICE_A_ID, SERVICE_A_TYPE);
-        });
-
-        emitsOnly([ 'firstVersionRecorded' ]);
-      });
-
-      context('When it is not the first record', () => {
-        context('When there are changes', () => {
-          before(async () => {
-            await app.recordRefilter({ snapshotContent: serviceASnapshotExpectedContent, snapshotId: 'sha', serviceId: SERVICE_A_ID, documentDeclaration: documentADeclaration });
-            resetSpiesHistory();
-            await app.recordRefilter({ snapshotContent: serviceBSnapshotExpectedContent, snapshotId: 'sha', serviceId: SERVICE_A_ID, documentDeclaration: documentADeclaration });
-          });
-
-          after(() => {
-            resetSpiesHistory();
-            return resetGitRepository();
-          });
-
-          it('emits "versionRecorded" event', async () => {
-            expect(spies.onVersionRecorded).to.have.been.calledWith(SERVICE_A_ID, SERVICE_A_TYPE);
-          });
-
-          emitsOnly([ 'versionRecorded' ]);
-        });
-
-        context('When there are no changes', () => {
-          before(async () => {
-            await app.recordRefilter({ snapshotContent: serviceASnapshotExpectedContent, snapshotId: 'sha', serviceId: SERVICE_A_ID, documentDeclaration: documentADeclaration });
-            resetSpiesHistory();
-            await app.recordRefilter({ snapshotContent: serviceASnapshotExpectedContent, snapshotId: 'sha', serviceId: SERVICE_A_ID, documentDeclaration: documentADeclaration });
-          });
-
-          after(() => {
-            resetSpiesHistory();
-            return resetGitRepository();
-          });
-
-          it('emits "versionNotChanged" event', async () => {
-            expect(spies.onVersionNotChanged).to.have.been.calledWith(SERVICE_A_ID, SERVICE_A_TYPE);
-          });
-
-          emitsOnly([ 'versionNotChanged' ]);
-        });
-      });
-    });
-
     context('When tracking changes on new services', () => {
       before(async () => {
         nock('https://www.servicea.example').get('/tos').reply(200, serviceASnapshotExpectedContent, { 'Content-Type': 'text/html' });
