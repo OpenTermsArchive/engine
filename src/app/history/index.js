@@ -9,8 +9,8 @@ import Recorder from './recorder.js';
 
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
 
-export const SNAPSHOTS_PATH = path.resolve(__dirname, '../..', config.get('history.snapshotsPath'));
-export const VERSIONS_PATH = path.resolve(__dirname, '../..', config.get('history.versionsPath'));
+export const SNAPSHOTS_PATH = path.resolve(__dirname, '../../..', config.get('history.snapshotsPath'));
+export const VERSIONS_PATH = path.resolve(__dirname, '../../..', config.get('history.versionsPath'));
 
 const snapshotRecorder = new Recorder({ path: SNAPSHOTS_PATH, fileExtension: 'html' });
 const versionRecorder = new Recorder({ path: VERSIONS_PATH, fileExtension: 'md' });

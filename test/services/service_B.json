@@ -1,8 +1,8 @@
 {
   "name": "Service B",
   "documents": {
-    "Terms of Service": {
-      "fetch": "https://www.serviceb.example/tos",
+    "Privacy Policy": {
+      "fetch": "https://www.serviceb.example/privacy",
       "select": "body"
     }
   }
