@@ -85,6 +85,8 @@ npm run setup
 
 ### Configuring
 
+#### Configuration file
+
 The default configuration can be read and changed in `config/default.json`:
 
 ```json
@@ -110,6 +112,48 @@ The default configuration can be read and changed in `config/default.json`:
   }
 }
 ```
+
+An example of a production configuration file can be found in `config/production.json`. It includes the extra configuration for:
+
+* A logging mechanism, to be notified upon error (this requires a valid SMTP configuration, see environment variables below):
+
+```json
+{
+  "logger": {
+    "sendMailOnError": {
+      "to": "recipient@example.com",
+      "from": "cgu-bot@example.com"
+    }
+  }
+}
+```
+
+* Public URLs to the snapshots and versions repositories, used to automate the initial database setup (`publicSnapshotsRepository` and `publicVersionsRepository` which are used by `npm setup`) and for the links in notifications (`snapshotsBaseUrl`):
+
+```json
+{
+  "history": {
+    "publicSnapshotsRepository": "https://github.com/ambanum/CGUs-snapshots.git",
+    "publicVersionsRepository": "https://github.com/ambanum/CGUs-versions.git",
+    "snapshotsBaseUrl": "https://github.com/ambanum/CGUs-snapshots/commit/"
+  }
+}
+```
+
+#### Environment variables
+
+These environment variables can be provided in a `.env` file at the root of the repository. See `.env.example` for an example of such a file.
+
+In order to be notified for errors, a valid SMTP configuration should be provided through the following environment variables:
+
+* `SMTP_HOST` for the SMTP hostname
+* `SMTP_USERNAME` / `SMTP_PASSWORD` for the credentials
+
+
+If your infrastructure requires using an outgoing HTTP/HTTPS proxy to access Internet, you can provide it through the `HTTP_PROXY` and `HTTPS_PROXY` environment variable.
+
+In order to use the default SendInBlue-based notification mechanism, a valid API key should be provided through the `SENDINBLUE_API_KEY` environment variable.
+
 
 ### Running
 
