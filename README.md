@@ -115,7 +115,7 @@ The default configuration can be read and changed in `config/default.json`:
 
 An example of a production configuration file can be found in `config/production.json`. It includes the extra configuration for:
 
-* A logging mechanism, to be notified upon error (this requires a valid SMTP configuration, see environment variables below):
+* A logging mechanism, to be notified upon error (this requires a valid SMTP configuration, see [environment variables](#environment-variables) below):
 
 ```json
 {
@@ -152,7 +152,7 @@ In order to be notified for errors, a valid SMTP configuration should be provide
 
 If your infrastructure requires using an outgoing HTTP/HTTPS proxy to access Internet, you can provide it through the `HTTP_PROXY` and `HTTPS_PROXY` environment variable.
 
-In order to use the default SendInBlue-based notification mechanism, a valid API key should be provided through the `SENDINBLUE_API_KEY` environment variable.
+In order to use the default [SendInBlue](https://www.sendinblue.com)-based notification mechanism, a valid API key should be provided through the `SENDINBLUE_API_KEY` environment variable.
 
 
 ### Running
