@@ -4,6 +4,7 @@
 */
 
 import fsApi from 'fs';
+import path from 'path';
 
 import mime from 'mime';
 
@@ -30,13 +31,12 @@ export default class Recorder {
   }
 
   async save({ serviceId, documentType, content, fileExtension }) {
-    const directory = `${this.path}/${serviceId}`;
+    const filePath = this.getPathFor(serviceId, documentType, fileExtension);
 
+    const directory = path.dirname(filePath);
     if (!await fileExists(directory)) {
       await fs.mkdir(directory, { recursive: true });
     }
-
-    const filePath = this.getPathFor(serviceId, documentType, fileExtension);
 
     await fs.writeFile(filePath, content);
 
@@ -84,6 +84,9 @@ export default class Recorder {
   }
 
   getPathFor(serviceId, documentType, fileExtension) {
+    if (serviceId === null) {
+      return `${this.path}/${documentType}.${fileExtension || this.fileExtension}`;
+    }
     return `${this.path}/${serviceId}/${documentType}.${fileExtension || this.fileExtension}`;
   }
 

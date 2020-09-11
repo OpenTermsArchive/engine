@@ -1,8 +1,9 @@
+import config from 'config';
 import scheduler from 'node-schedule';
 
 import CGUs from './app/index.js';
 import logger from './logger/index.js';
-import Notifier from './notifier/index.js';
+import notifiers from './notifier/index.js';
 
 const args = process.argv.slice(2);
 const refilterOnly = args.includes('--refilter-only');
@@ -44,7 +45,9 @@ let serviceIds = args.filter(arg => !arg.startsWith('--'));
   const rule = new scheduler.RecurrenceRule();
   rule.minute = 30; // at minute 30 past every hour.
 
-  app.attach(new Notifier(app.serviceDeclarations));
+  config.get('notifier.enabled').forEach(notifier => {
+    app.attach(new notifiers[notifier](app.serviceDeclarations));
+  });
 
   logger.info('The scheduler is running…');
   logger.info(`Documents will be tracked at minute ${rule.minute} past every hour.`);

@@ -102,6 +102,7 @@ The default configuration can be read and changed in `config/default.json`:
     }
   },
   "notifier": {
+    "enabled": ["A JSON list of notifiers to enable among all available notifiers (see src/notifier folder)"],
     "sendInBlue": {
       "administratorsListId": "SendInBlue contacts list ID of administrators",
       "updatesListId": "SendInBlue contacts list ID of persons to notify on document updates",
@@ -128,14 +129,15 @@ An example of a production configuration file can be found in `config/production
 }
 ```
 
-* Public URLs to the snapshots and versions repositories, used to automate the initial database setup (`publicSnapshotsRepository` and `publicVersionsRepository` which are used by `npm setup`) and for the links in notifications (`snapshotsBaseUrl`):
+* Public URLs to the snapshots and versions repositories, used to automate the initial database setup (`publicSnapshotsRepository` and `publicVersionsRepository` which are used by `npm setup`) and for the links in notifications (`snapshotsBaseUrl` and `versionsBaseUrl`):
 
 ```json
 {
   "history": {
     "publicSnapshotsRepository": "https://github.com/ambanum/CGUs-snapshots.git",
     "publicVersionsRepository": "https://github.com/ambanum/CGUs-versions.git",
-    "snapshotsBaseUrl": "https://github.com/ambanum/CGUs-snapshots/commit/"
+    "snapshotsBaseUrl": "https://github.com/ambanum/CGUs-snapshots/commit/",
+    "versionsBaseUrl": "https://github.com/ambanum/CGUs-versions/commit/"
   }
 }
 ```
