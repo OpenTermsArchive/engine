@@ -1,4 +1,4 @@
-export function moveAppPrivacyPolicyIntoGlobalPrivacyPolicy(document, declaration) {
+export function moveAppPrivacyPolicyIntoGlobalPrivacyPolicy(document) {
   const startOfAppPrivacyPolicy = Array.from(document.querySelectorAll('h3')).filter(title => title.textContent === 'Mobile Apps (Android and iOS)')[0];
   const endOfToS = document.querySelector('[name=coppa] ~ h2');
 
