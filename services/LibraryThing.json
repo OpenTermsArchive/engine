@@ -4,16 +4,22 @@
     "Terms of Service": {
       "fetch": "https://www.librarything.com/privacy",
       "filter": [
-      "selectOnlyTOS"
+        "moveAppPrivacyPolicyIntoGlobalPrivacyPolicy"
       ],
-      "select": ".content > table:nth-child(1) > tbody:nth-child(1) > tr:nth-child(1) > td:nth-child(2)"
+      "select": {
+        "startAfter": "[name=terms]",
+        "endBefore": "[name=coppa] ~ h2"
+      }
     },
     "Privacy Policy": {
       "fetch": "https://www.librarything.com/privacy",
       "filter": [
-      "selectOnlyPrivacyPolicy"
+        "moveAppPrivacyPolicyIntoGlobalPrivacyPolicy"
       ],
-      "select": ".content > table:nth-child(1) > tbody:nth-child(1) > tr:nth-child(1) > td:nth-child(2)"
+      "select": {
+        "startBefore": "[name=\"#privacy\"] ~ h2",
+        "endBefore": "[name=\"#privacy\"] ~ h2 ~ h2"
+      }
     }
   }
 }
