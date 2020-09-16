@@ -20,6 +20,13 @@
         "startBefore": "[name=\"#privacy\"] ~ h2",
         "endBefore": "[name=\"#privacy\"] ~ h2 ~ h2"
       }
+    },
+    "Community Guidelines": {
+      "fetch": "https://www.librarything.com/privacy",
+      "select": {
+        "startBefore": "[name=\"#privacy\"] ~ h2 ~ h2",
+        "endBefore": "[name=terms]"
+      }
     }
   }
 }
