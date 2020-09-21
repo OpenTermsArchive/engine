@@ -45,10 +45,6 @@ export default class Recorder {
 
   async commit(filePath, message) {
     try {
-      if (!await this.git.hasChanges(filePath)) {
-        return;
-      }
-
       await this.git.add(filePath);
       return await this.git.commit(filePath, message);
     } catch (error) {

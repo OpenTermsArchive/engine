@@ -26,15 +26,6 @@ export default class Git {
     return this.git.push('origin', 'master');
   }
 
-  async hasChanges(filepath) {
-    const status = await this.git.status();
-    const relativePath = this.relativePath(filepath);
-    const escapedRelativePath = filepath.includes(' ') ? `"${relativePath}"` : relativePath;
-    return (status.modified.indexOf(escapedRelativePath) > -1)
-           || (status.not_added.indexOf(relativePath) > -1)
-           || (status.created.indexOf(relativePath) > -1);
-  }
-
   async log(options = {}) {
     try {
       options.file = options.file && this.relativePath(options.file);
