@@ -47,6 +47,8 @@ export default class CGUs extends events.EventEmitter {
           return this.emit('inaccessibleContent', error, serviceId, type);
         }
         this.emit('error', error, serviceId, type);
+        this.trackDocumentChangesQueue.kill();
+        this.refilterDocumentsQueue.kill();
       };
 
       this.trackDocumentChangesQueue.error(queueErrorHandler);
