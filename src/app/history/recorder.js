@@ -62,7 +62,7 @@ export default class Recorder {
 
   async getLatestRecord(serviceId, documentType) {
     const filePathGlob = this.getPathFor(serviceId, documentType, '*');
-    const { commit, filePath } = await this.git.lastCommitAndFilePathMatchingGlob(filePathGlob);
+    const { commit, filePath } = await this.git.findUnique(filePathGlob);
 
     if (!commit || !filePath) {
       return {};
