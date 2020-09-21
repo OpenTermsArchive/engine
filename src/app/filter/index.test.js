@@ -93,7 +93,7 @@ describe('Filter', () => {
           await expect(filterHTML({
             content: rawHTML,
             documentDeclaration: { fetch: virtualLocation, select: '#thisAnchorDoesNotExist' }
-          })).to.be.rejectedWith(InaccessibleContentError, /provided selector "#thisAnchorDoesNotExist" has no match/);
+          })).to.be.rejectedWith(InaccessibleContentError, /#thisAnchorDoesNotExist/);
         });
       });
 

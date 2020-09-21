@@ -54,7 +54,7 @@ export default class Git {
     return !!result;
   }
 
-  async lastCommitAndFilePathMatchingGlob(glob) {
+  async findUnique(glob) {
     const [ latestCommit ] = await this.log([ '-n', '1', '--stat=4096', glob ]);
 
     if (!latestCommit) {
@@ -64,7 +64,7 @@ export default class Git {
     const filePaths = latestCommit.diff.files.map(file => file.file);
 
     if (filePaths.length > 1) {
-      throw new Error(`Only one document should have been recorded in ${latestCommit.hash}, but all these documens have been recorded: ${filePaths}`);
+      throw new Error(`Only one document should have been recorded in ${latestCommit.hash}, but all these documents were recorded: ${filePaths}`);
     }
 
     return {

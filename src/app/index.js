@@ -30,8 +30,12 @@ export default class CGUs extends events.EventEmitter {
     return this._serviceDeclarations;
   }
 
+  get serviceIds() {
+    return Object.keys(this._serviceDeclarations);
+  }
+
   async init() {
-    if (!this.initialized) {
+    if (!this._serviceDeclarations) {
       this._serviceDeclarations = await loadServiceDeclarations(SERVICE_DECLARATIONS_PATH);
 
       this.trackDocumentChangesQueue = async.queue(async ({ serviceDocument }) => this.trackDocumentChanges(serviceDocument), 10);
@@ -40,7 +44,7 @@ export default class CGUs extends events.EventEmitter {
       const queueErrorHandler = (error, { serviceDocument }) => {
         const { serviceId, document: { type } } = serviceDocument;
         if (error instanceof InaccessibleContentError) {
-          return this.emit('inaccessibleContent', serviceId, type, error);
+          return this.emit('inaccessibleContent', error, serviceId, type);
         }
         this.emit('error', error, serviceId, type);
       };
@@ -63,8 +67,8 @@ export default class CGUs extends events.EventEmitter {
     });
   }
 
-  async trackChanges(servicesSubset) {
-    this.forEachDocumentOfServices(servicesSubset, serviceDocument => this.trackDocumentChangesQueue.push({ serviceDocument }));
+  async trackChanges(servicesIds) {
+    this._forEachDocumentOf(servicesIds, serviceDocument => this.trackDocumentChangesQueue.push({ serviceDocument }));
 
     await this.trackDocumentChangesQueue.drain();
     await this.publish();
@@ -99,8 +103,8 @@ export default class CGUs extends events.EventEmitter {
     });
   }
 
-  async refilterAndRecord(servicesSubset) {
-    this.forEachDocumentOfServices(servicesSubset, serviceDocument => this.refilterDocumentsQueue.push({ serviceDocument }));
+  async refilterAndRecord(servicesIds) {
+    this._forEachDocumentOf(servicesIds, serviceDocument => this.refilterDocumentsQueue.push({ serviceDocument }));
 
     await this.refilterDocumentsQueue.drain();
     await this.publish();
@@ -115,26 +119,18 @@ export default class CGUs extends events.EventEmitter {
       return;
     }
 
-    return this.recordRefilter({
+    return this.recordVersion({
       snapshotContent,
       mimeType,
       snapshotId,
       serviceId,
       documentDeclaration,
+      isRefiltering: true
     });
   }
 
-  forEachDocumentOfServices(servicesSubset = [], callback) {
-    let services = this._serviceDeclarations;
-
-    if (servicesSubset.length) {
-      services = servicesSubset.reduce((accumulator, service) => {
-        accumulator[service] = this._serviceDeclarations[service];
-        return accumulator;
-      }, {});
-    }
-
-    Object.keys(services).forEach(serviceId => {
+  async _forEachDocumentOf(servicesIds = [], callback) {
+    servicesIds.forEach(serviceId => {
       const { documents } = this._serviceDeclarations[serviceId];
       Object.keys(documents).forEach(type => {
         callback({
@@ -164,30 +160,7 @@ export default class CGUs extends events.EventEmitter {
     return snapshotId;
   }
 
-  async recordRefilter({ snapshotContent, mimeType, snapshotId, serviceId, documentDeclaration }) {
-    const { type } = documentDeclaration;
-    const document = await filter({
-      content: snapshotContent,
-      mimeType,
-      documentDeclaration,
-      filterFunctions: this._serviceDeclarations[serviceId].filters
-    });
-
-    const { id: versionId, isFirstRecord } = await history.recordRefilter({
-      serviceId,
-      content: document,
-      documentType: type,
-      snapshotId
-    });
-
-    if (!versionId) {
-      return this.emit('versionNotChanged', serviceId, type);
-    }
-
-    this.emit(isFirstRecord ? 'firstVersionRecorded' : 'versionRecorded', serviceId, type, versionId);
-  }
-
-  async recordVersion({ snapshotContent, mimeType, snapshotId, serviceId, documentDeclaration }) {
+  async recordVersion({ snapshotContent, mimeType, snapshotId, serviceId, documentDeclaration, isRefiltering }) {
     const { type } = documentDeclaration;
     const document = await filter({
       content: snapshotContent,
@@ -196,7 +169,9 @@ export default class CGUs extends events.EventEmitter {
       filterFunctions: this._serviceDeclarations[serviceId].filters,
     });
 
-    const { id: versionId, isFirstRecord } = await history.recordVersion({
+    const recordFunction = !isRefiltering ? 'recordVersion' : 'recordRefilter';
+
+    const { id: versionId, isFirstRecord } = await history[recordFunction]({
       serviceId,
       content: document,
       documentType: type,
