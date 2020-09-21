@@ -14,7 +14,17 @@
       "filter": [
         "removeUTMfromUrls"
       ],
-      "select": "div[role=article]"
+      "select": "div[role=article]",
+      "remove": [
+        {
+          "startBefore": "a[data-name='country-version']",
+          "endBefore": "#whats-covered"
+        },
+        {
+          "startBefore": "#footnote-country-version",
+          "endBefore": "#footnote-disclaimer"
+        }
+      ]
     }
   }
 }
