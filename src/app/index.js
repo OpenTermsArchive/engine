@@ -37,8 +37,6 @@ export default class CGUs extends events.EventEmitter {
 
   async init() {
     if (!this._serviceDeclarations) {
-      this._serviceDeclarations = await loadServiceDeclarations(SERVICE_DECLARATIONS_PATH);
-
       this.trackDocumentChangesQueue = async.queue(async ({ serviceDocument }) => this.trackDocumentChanges(serviceDocument), NUMBER_OF_WORKERS);
       this.refilterDocumentsQueue = async.queue(async ({ serviceDocument }) => this.refilterAndRecordDocument(serviceDocument), NUMBER_OF_WORKERS);
 
@@ -53,9 +51,10 @@ export default class CGUs extends events.EventEmitter {
       this.trackDocumentChangesQueue.error(queueErrorHandler);
       this.refilterDocumentsQueue.error(queueErrorHandler);
 
-      this.initialized = Promise.resolve();
+      this._serviceDeclarations = await loadServiceDeclarations(SERVICE_DECLARATIONS_PATH);
     }
-    return this.initialized;
+
+    return this._serviceDeclarations;
   }
 
   attach(listener) {
