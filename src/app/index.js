@@ -12,7 +12,8 @@ import { InaccessibleContentError } from './errors.js';
 
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
 const SERVICE_DECLARATIONS_PATH = path.resolve(__dirname, '../../', config.get('serviceDeclarationsPath'));
-const NUMBER_OF_WORKERS = 20;
+const NUMBER_OF_TRACK_DOCUMENT_WORKERS = 20;
+const NUMBER_OF_REFILTER_WORKERS = 1;
 
 export const AVAILABLE_EVENTS = [
   'snapshotRecorded',
@@ -37,8 +38,8 @@ export default class CGUs extends events.EventEmitter {
 
   async init() {
     if (!this._serviceDeclarations) {
-      this.trackDocumentChangesQueue = async.queue(async ({ serviceDocument }) => this.trackDocumentChanges(serviceDocument), NUMBER_OF_WORKERS);
-      this.refilterDocumentsQueue = async.queue(async ({ serviceDocument }) => this.refilterAndRecordDocument(serviceDocument), NUMBER_OF_WORKERS);
+      this.trackDocumentChangesQueue = async.queue(async ({ serviceDocument }) => this.trackDocumentChanges(serviceDocument), NUMBER_OF_TRACK_DOCUMENT_WORKERS);
+      this.refilterDocumentsQueue = async.queue(async ({ serviceDocument }) => this.refilterAndRecordDocument(serviceDocument), NUMBER_OF_REFILTER_WORKERS);
 
       const queueErrorHandler = (error, { serviceDocument }) => {
         const { serviceId, document: { type } } = serviceDocument;
