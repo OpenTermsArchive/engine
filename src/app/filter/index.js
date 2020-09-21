@@ -46,7 +46,11 @@ export async function filterHTML({ content, documentDeclaration, filterFunctions
   const { document: webPageDOM } = jsdomInstance.window;
 
   for (const filterName of serviceSpecificFilters) {
-    await filterFunctions[filterName](webPageDOM, documentDeclaration); // eslint-disable-line no-await-in-loop
+    try {
+      await filterFunctions[filterName](webPageDOM, documentDeclaration); // eslint-disable-line no-await-in-loop
+    } catch (error) {
+      throw new InaccessibleContentError(`The filter function ${filterName} failed: ${error}`);
+    }
   }
 
   remove(webPageDOM, deletionSelectors); // remove function works in place
