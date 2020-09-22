@@ -41,7 +41,7 @@ if (config.get('logger.sendMailOnError')) {
   transports.push(new winston.transports.Mail({
     ...mailerOptions,
     level: 'warn',
-    subject: '[CGUs] Warning Report',
+    subject: '[CGUs] Inaccessible content',
   }));
 }
 
