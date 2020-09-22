@@ -46,13 +46,10 @@ export async function filterHTML({ content, documentDeclaration, filterFunctions
   const { document: webPageDOM } = jsdomInstance.window;
 
   for (const filterName of serviceSpecificFilters) {
-    const isAsyncFilter = filterFunctions[filterName].constructor.name === 'AsyncFunction';
-
-    // filters work in place
-    if (isAsyncFilter) {
+    try {
       await filterFunctions[filterName](webPageDOM, documentDeclaration); // eslint-disable-line no-await-in-loop
-    } else {
-      filterFunctions[filterName](webPageDOM, documentDeclaration);
+    } catch (error) {
+      throw new InaccessibleContentError(`The filter function ${filterName} failed: ${error}`);
     }
   }
 
