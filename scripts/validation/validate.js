@@ -167,7 +167,7 @@ function assertValid(schema, subject) {
 
 async function getModifiedServices() {
   const git = simpleGit(rootPath, { maxConcurrentProcesses: 1 });
-  const committedFiles = await git.diff([ '--name-only', 'master...', 'services/*.json' ]);
+  const committedFiles = await git.diff([ '--name-only', 'master...HEAD', '--', 'services/*.json' ]);
   const status = await git.status();
   const modifiedFiles = [
     ...status.not_added, // Files created but not already in staged area
