@@ -132,6 +132,7 @@ let servicesToValidate = args.filter(arg => !arg.startsWith('--'));
     run();
   } catch (error) {
     console.error(error);
+    process.exit(1);
   }
 })();
 
