@@ -12,7 +12,8 @@
     "Terms of Service": {
       "fetch": "https://policies.google.com/terms?hl=en-GB",
       "filter": [
-        "removeUTMfromUrls"
+        "removeUTMfromUrls",
+        "removeCountryVersion"
       ],
       "select": "div[role=article]"
     }

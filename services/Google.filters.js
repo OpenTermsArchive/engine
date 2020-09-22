@@ -6,17 +6,20 @@ export function removeUTMfromUrls(document) {
 }
 
 export function removeCountryVersion(document) {
-  // Remove "country version" link at top of the page
-  document.querySelector('a[data-name="country-version"]').parentNode.remove();
-
-  // Remove all the "country version" section in the CGUs
+  const countryVersionLink = document.querySelector('a[data-name="country-version"]');
   const countryVersionTitle = document.querySelector('#footnote-country-version');
   const disclaimerTitle = document.querySelector('#footnote-disclaimer');
 
-  let node = countryVersionTitle;
-  while (node !== disclaimerTitle.previousSibling) {
-    const next = node.nextSibling;
-    node.remove();
-    node = next;
+  if (countryVersionLink) {
+    // Remove "country version" link at top of the page
+    countryVersionLink.parentNode.remove();
+  }
+
+  if (countryVersionTitle && disclaimerTitle) {
+    // Remove all the "country version" section in the CGUs
+    const countryVersionSectionContent = document.createRange();
+    countryVersionSectionContent.setStartBefore(countryVersionTitle);
+    countryVersionSectionContent.setEndBefore(disclaimerTitle);
+    countryVersionSectionContent.deleteContents();
   }
 }
