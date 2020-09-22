@@ -20,7 +20,7 @@ export function cleanUrls(document) {
   const links = document.querySelectorAll('[href*="https://l.facebook.com/l.php?"],[href*="http://l.facebook.com/l.php?"]');
 
   links.forEach(link => {
-    link.href = link.href.replace(/&h=\S*/, '');
+    link.href = decodeURIComponent(link.href.replace(/&h=\S*/, '').replace(/(\S*)\?u=(\S*)/, '$2'));
   });
 }
 
