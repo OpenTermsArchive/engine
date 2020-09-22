@@ -16,10 +16,16 @@ export function removeCountryVersion(document) {
   }
 
   if (countryVersionTitle && disclaimerTitle) {
-    // Remove all the "country version" section in the CGUs
     const countryVersionSectionContent = document.createRange();
     countryVersionSectionContent.setStartBefore(countryVersionTitle);
     countryVersionSectionContent.setEndBefore(disclaimerTitle);
+
+    // Avoid removing too much content
+    if (countryVersionSectionContent.cloneContents().querySelectorAll('h3').length > 1) {
+      throw new Error('Country version selection seems to be too large.');
+    }
+
+    // Remove all the "country version" section in the CGUs
     countryVersionSectionContent.deleteContents();
   }
 }
