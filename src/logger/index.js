@@ -22,16 +22,26 @@ const consoleTransport = new winston.transports.Console();
 const transports = [ consoleTransport ];
 
 if (config.get('logger.sendMailOnError')) {
-  transports.push(new winston.transports.Mail({
-    level: 'error',
+  const mailerOptions = {
     to: config.get('logger.sendMailOnError.to'),
     from: config.get('logger.sendMailOnError.from'),
-    subject: '[CGUs] Error Report',
     host: process.env.SMTP_HOST,
     username: process.env.SMTP_USERNAME,
     password: process.env.SMTP_PASSWORD,
     ssl: true,
     formatter: args => args[Object.getOwnPropertySymbols(args)[1]] // Returns the full error message, the same visible in the console. It is referenced in the argument object with a Symbol of which we do not have the reference but we know it is the second one.
+  };
+
+  transports.push(new winston.transports.Mail({
+    ...mailerOptions,
+    level: 'error',
+    subject: '[CGUs] Error Report',
+  }));
+
+  transports.push(new winston.transports.Mail({
+    ...mailerOptions,
+    level: 'warn',
+    subject: '[CGUs] Inaccessible content',
   }));
 }
 
