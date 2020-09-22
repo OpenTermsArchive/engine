@@ -6,7 +6,7 @@
   },
   "logger": {
     "sendMailOnError": {
-      "to": "matti.schneider@beta.gouv.fr",
+      "to": "nicolas.dupont@beta.gouv.fr",
       "from": "admin.ambassadeur-numerique@diplomatie.gouv.fr"
     }
   }
