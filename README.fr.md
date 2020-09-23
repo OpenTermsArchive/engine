@@ -41,8 +41,35 @@ Cliquez sur une modification pour voir en quoi elle consiste (par exemple [celle
 
 Vous pouvez vous abonner pour recevoir un courriel lorsqu'un document est modifié en [remplissant ce formulaire](https://59692a77.sibforms.com/serve/MUIEAKuTv3y67e27PkjAiw7UkHCn0qVrcD188cQb-ofHVBGpvdUWQ6EraZ5AIb6vJqz3L8LDvYhEzPb2SE6eGWP35zXrpwEFVJCpGuER9DKPBUrifKScpF_ENMqwE_OiOZ3FdCV2ra-TXQNxB2sTEL13Zj8HU7U0vbbeF7TnbFiW8gGbcOa5liqmMvw_rghnEB2htMQRCk6A3eyj).
 
-**Attention, ce service est en version bêta et vous risquez de recevoir de nombreuses notifications !** Vous pourrez vous désabonner en répondant à n'importe quel courriel reçu.
+**Attention, ce service est en version bêta et vous risquez de recevoir de nombreuses notifications !** Vous pourrez vous désabonner en répondant à n'importe quel courriel reçu.
 
+Il est également possible d'être notifié pour un service ou un document spécifique en s'abonnant à un des flux RSS disponibles.
+
+_Un flux RSS est une ressource accessible en ligne qui contient des informations sur les derniers contenus publiés par un site web comme par exemple leur date de publication et l'adresse pour les consulter sur le site.
+Lorsque cette ressource est mise à jour, votre lecteur de flux vous prévient automatiquement vous pouvez aller voir la mise à jour._
+
+### Flux RSS disponibles
+
+| Est mis à jour pour | URL |
+|--|--|
+| l'ensemble des services et documents | `https://github.com/ambanum/CGUs-versions/commits.atom` |
+|l'ensemble des documents d'un service| `https://github.com/ambanum/CGUs-versions/commits/master/$serviceId.atom.` Remplacer __$serviceId__ par l'identifiant du service. |
+| un document spécifique d'un service | `https://github.com/ambanum/CGUs-versions/commits/master/$serviceId/$documentType.md.atom` Remplacer __$serviceId__ par l'idantifiant du service et __$documentType__ par le type du document.<br> Par exemple pour le document `Privacy Policy` de `Google`, l'adresse est `https://github.com/ambanum/CGUs-versions/commits/master/Google/Privacy%20Policy.md.atom` |
+
+Par exemple :
+- Pour recevoir toutes les mises à jour des documents de `Facebook`, l'URL est `https://github.com/ambanum/CGUs-versions/commits/master/Facebook.atom`
+
+- Pour recevoir toutes les mises à jour des `Privacy Policy` de `Google`, l'URL est `https://github.com/ambanum/CGUs-versions/commits/master/Google/Privacy Policy.md.atom`
+
+#### Recevoir les mise à jour de flux RSS par courriel
+
+Il est possible de recevoir les mise à jour de flux RSS par courriel en utilisant un service externe comme [feedrabbit](https://feedrabbit.com/).
+
+#### Exemples de lecteurs de flux RSS
+- Sur OS X : [Reeder](https://reederapp.com/)
+- Sur Linux : [Akregator](https://kde.org/applications/en/akregator) ou [FeedReader](https://jangernert.github.io/FeedReader/)
+- Sur Windows : [Omea](https://www.jetbrains.com/omea/reader/)
+- Web et applications mobile : [Inoreader](https://www.inoreader.com/) ou [Feedly](https://feedly.com/)
 
 ## Contribuer
 
