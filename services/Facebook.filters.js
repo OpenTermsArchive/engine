@@ -27,6 +27,8 @@ export function cleanUrls(document) {
 export function numberListCorrectly(document) {
   document.querySelectorAll('ol')
     .forEach(listToClean => Array.from(listToClean.children)
-      .filter(element => element.tagName !== 'LI')
+      .filter(element => element.tagName !== 'LI' && element.tagName !== 'OL')
       .map(element => element.remove()));
+
+  Array.from(document.querySelectorAll('ol > ol')).map(element => element.previousSibling.appendChild(element));
 }
