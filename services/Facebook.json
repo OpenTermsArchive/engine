@@ -41,6 +41,14 @@
         "cleanUrls"
       ],
       "select": "#content"
+    },
+    "Data Controller Agreement": {
+      "fetch": "https://www.facebook.com/legal/EU_data_transfer_addendum",
+      "filter": [
+        "numberListCorrectly",
+        "cleanUrls"
+      ],
+      "select": "#content"
     }
   }
 }
