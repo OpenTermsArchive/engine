@@ -33,6 +33,5 @@ jobs:
     - run: npm run validate:modified
     - run: npm test
     - run: pip install --upgrade setuptools
-    - run: pip uninstall ansible
-    - run: pip install ansible
+    - run: pip install ansible==2.9.11
     - run: ansible-playbook ops/site.yml -i ops/inventories/production.yml
