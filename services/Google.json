@@ -7,7 +7,7 @@
         "removeUTMfromUrls"
       ],
       "select": "div[role=article]",
-      "remove": ".KMMDve, .TL2alc, img[src$='.svg']"
+      "remove": ".KMMDve, .TL2alc, img[src$='.svg'], img[src^='data:image/svg+xml']"
     },
     "Terms of Service": {
       "fetch": "https://policies.google.com/terms?hl=en-GB",
@@ -15,7 +15,8 @@
         "removeUTMfromUrls",
         "removeCountryVersion"
       ],
-      "select": "div[role=article]"
+      "select": "div[role=article]",
+      "remove": "img[src$='.svg'], img[src^='data:image/svg+xml']"
     }
   }
 }
