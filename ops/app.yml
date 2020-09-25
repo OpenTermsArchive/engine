@@ -3,6 +3,4 @@
   hosts: all
 
   roles:
-    - cgus-versions
-    - cgus-snapshots
     - cgus

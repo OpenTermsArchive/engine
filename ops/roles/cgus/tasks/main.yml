@@ -34,6 +34,44 @@
     - stop
     - update
 
+- name: Remove previous CGUs-versions data directory
+  file:
+    path: "/home/{{ ansible_user }}/{{ versions_directory }}"
+    state: absent
+  tags:
+    - setup
+    - update
+
+- name: Remove previous CGUs-snapshots data directory
+  file:
+    path: "/home/{{ ansible_user }}/{{ snapshots_directory }}"
+    state: absent
+  tags:
+    - setup
+    - update
+
+- name: Clone CGUs-versions repository
+  git:
+    repo: "{{ repo_versions }}"
+    dest: "/home/{{ ansible_user }}/{{ versions_directory }}"
+    accept_hostkey: yes
+    key_file: "/home/{{ ansible_user }}/.ssh/cgus-bot-key"
+  register: git_clone_app_finished
+  tags:
+    - setup
+    - update
+
+- name: Clone CGUs-snapshot repository
+  git:
+    repo: "{{ repo_snapshots }}"
+    dest: "/home/{{ ansible_user }}/{{ snapshots_directory }}"
+    accept_hostkey: yes
+    key_file: "/home/{{ ansible_user }}/.ssh/cgus-bot-key"
+  register: git_clone_app_finished
+  tags:
+    - setup
+    - update
+
 - name: Start CGUs
   command:
     cmd: forever start -m 10 -a --uid "{{ app }}" -c "npm run start:scheduler:prod" ./
