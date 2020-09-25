@@ -45,7 +45,7 @@ Vous pouvez vous abonner pour recevoir un courriel lorsqu'un document est modifi
 
 Il est également possible d'être notifié pour le suivi d'un service et/ou un document spécifique en s'abonnant à un des flux RSS disponibles.
 
-_Un flux RSS est une ressource accessible en ligne qui contient des informations sur les derniers contenus publiés par un site web comme par exemple leur date de publication et l'adresse pour les consulter.
+_Un flux RSS est une ressource accessible en ligne qui contient des informations sur les derniers contenus publiés par un site web comme leur date de publication et l'adresse pour les consulter.
 Lorsque cette ressource est mise à jour, votre lecteur de flux vous notifie automatiquement et vous pouvez ainsi consulter la mise à jour._
 
 ### Flux RSS disponibles
