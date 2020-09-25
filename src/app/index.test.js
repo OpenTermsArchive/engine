@@ -99,19 +99,6 @@ describe('CGUs', () => {
         expect(resultingTerms).to.equal(serviceBVersionExpectedContent);
       });
     });
-
-    context('When there is an unexpected error', () => {
-      after(resetGitRepository);
-
-      it('emits an error', done => {
-        sinon.stub(app, 'trackDocumentChanges').throws('UnexpectedError');
-        app.on('error', error => {
-          expect(error).to.be.an('error');
-          done();
-        });
-        app.trackChanges(app.serviceIds);
-      });
-    });
   });
 
   describe('#refilterAndRecord', () => {
@@ -199,27 +186,6 @@ describe('CGUs', () => {
 
         it('still refilters other services', async () => {
           expect(versionNotChangedSpy).to.have.been.calledWith(SERVICE_B_ID, SERVICE_B_TYPE);
-        });
-      });
-
-      context('When there is an unexpected error', () => {
-        let app;
-        before(async () => {
-          nock('https://www.servicea.example').get('/tos').reply(200, serviceASnapshotExpectedContent, { 'Content-Type': 'text/html' });
-          nock('https://www.serviceb.example').get('/privacy').reply(200, serviceBSnapshotExpectedContent, { 'Content-Type': 'application/pdf' });
-          app = new CGUs();
-          await app.init();
-          await app.trackChanges(app.serviceIds);
-        });
-        after(resetGitRepository);
-
-        it('emits an error', done => {
-          app.on('error', error => {
-            expect(error).to.be.an('error');
-            done();
-          });
-          sinon.stub(app, 'refilterAndRecordDocument').throws('UnexpectedError');
-          app.refilterAndRecord(app.serviceIds);
         });
       });
     });
