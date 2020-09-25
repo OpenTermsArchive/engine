@@ -38,28 +38,31 @@ export default class CGUs extends events.EventEmitter {
 
   async init() {
     if (!this._serviceDeclarations) {
-      this.trackDocumentChangesQueue = async.queue(async document => this.trackDocumentChanges(document),
-        MAX_PARALLEL_DOCUMENTS_TRACKS);
-      this.refilterDocumentsQueue = async.queue(async document => this.refilterAndRecordDocument(document),
-        MAX_PARALLEL_REFILTERS);
-
-      const queueErrorHandler = (error, { serviceId, type }) => {
-        if (error instanceof InaccessibleContentError) {
-          return this.emit('inaccessibleContent', error, serviceId, type);
-        }
-
-        this.emit('error', error, serviceId, type);
-
-        throw error;
-      };
-
-      this.trackDocumentChangesQueue.error(queueErrorHandler);
-      this.refilterDocumentsQueue.error(queueErrorHandler);
-
+      this.initQueues();
       this._serviceDeclarations = await loadServiceDeclarations(SERVICE_DECLARATIONS_PATH);
     }
 
     return this._serviceDeclarations;
+  }
+
+  initQueues() {
+    this.trackDocumentChangesQueue = async.queue(async document => this.trackDocumentChanges(document),
+      MAX_PARALLEL_DOCUMENTS_TRACKS);
+    this.refilterDocumentsQueue = async.queue(async document => this.refilterAndRecordDocument(document),
+      MAX_PARALLEL_REFILTERS);
+
+    const queueErrorHandler = (error, { serviceId, type }) => {
+      if (error instanceof InaccessibleContentError) {
+        return this.emit('inaccessibleContent', error, serviceId, type);
+      }
+
+      this.emit('error', error, serviceId, type);
+
+      throw error;
+    };
+
+    this.trackDocumentChangesQueue.error(queueErrorHandler);
+    this.refilterDocumentsQueue.error(queueErrorHandler);
   }
 
   attach(listener) {
