@@ -43,10 +43,10 @@ Vous pouvez vous abonner pour recevoir un courriel lorsqu'un document est modifi
 
 **Attention, ce service est en version bêta et vous risquez de recevoir de nombreuses notifications !** Vous pourrez vous désabonner en répondant à n'importe quel courriel reçu.
 
-Il est également possible d'être notifié pour un service ou un document spécifique en s'abonnant à un des flux RSS disponibles.
+Il est également possible d'être notifié pour le suivi d'un service et/ou un document spécifique en s'abonnant à un des flux RSS disponibles.
 
-_Un flux RSS est une ressource accessible en ligne qui contient des informations sur les derniers contenus publiés par un site web comme par exemple leur date de publication et l'adresse pour les consulter sur le site.
-Lorsque cette ressource est mise à jour, votre lecteur de flux vous prévient automatiquement et vous pouvez aller voir la mise à jour._
+_Un flux RSS est une ressource accessible en ligne qui contient des informations sur les derniers contenus publiés par un site web comme par exemple leur date de publication et l'adresse pour les consulter.
+Lorsque cette ressource est mise à jour, votre lecteur de flux vous notifie automatiquement et vous pouvez ainsi consulter la mise à jour._
 
 ### Flux RSS disponibles
 
@@ -63,7 +63,7 @@ Par exemple :
 
 #### Recevoir les mise à jour de flux RSS par courriel
 
-Il est possible de recevoir les mise à jour de flux RSS par courriel en utilisant un service externe comme [feedrabbit](https://feedrabbit.com/).
+Il est possible de recevoir les mises à jour de flux RSS par courriel en utilisant un service externe comme [feedrabbit](https://feedrabbit.com/).
 
 #### Exemples de lecteurs de flux RSS
 - Sur OS X : [Reeder](https://reederapp.com/)
