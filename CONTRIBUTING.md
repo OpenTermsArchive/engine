@@ -4,7 +4,7 @@ First off, thanks for taking the time to contribute! 🎉👍
 
 ## Declaring a new service
 
-In the folder `services`, create a JSON file with the name of the service you want to add, with the following structure:
+Once you chose the [service name](#service-name) and the [service ID](#service-id), in the folder `services`, create a JSON file with the ID of the service you want to add, with the following structure:
 
 ```json
 {
@@ -20,7 +20,58 @@ In the folder `services`, create a JSON file with the name of the service you wa
 }
 ```
 
-You can find examples in the `services` folder.
+You can find examples in the [`services` folder](./services).
+
+### Service name
+
+The **service name** is presented to end users. It should reflect as closely as possible the official service name, so that it can be identified easily. This name is currently exposed as the `name` property in the service declaration.
+
+- The service name should be the one used by the service itself, no matter the alphabet.
+  - _Example: `туту.ру`_.
+
+- Service name can be prefixed by the provider name when self-references are ambiguous, separated by a space. For example, Facebook refers to their Self-serve Ads service simply as “Ads”, which cannot be used in a shared database. Thus the service is called “Facebook Ads”.
+  - _Example: `Ads` (by Facebook) → `Facebook Ads`_.
+  - _Example: `Analytics` (by Google) → `Google Analytics`_.
+  - _Example: `Firebase` (by Google) → `Firebase`_.
+  - _Example: `App Store` (by Apple) → `App Store`_.
+
+[See Practical guidelines to find the service name](https://github.com/ambanum/CGUs/wiki/Practical-guidelines#practical-guidelines-to-find-the-service-name).
+
+### Service ID
+
+The **service ID** is used internally and exposed for analysis. It should be easy to handle with scripts and other tools.
+In addition to the following constraints, see also the [practical guidelines to derive the ID from the service name](https://github.com/ambanum/CGUs/wiki/Practical-guidelines#practical-guidelines-to-derive-the-id-from-the-service-name).
+
+- Non-ASCII characters are not supported, at least as long as the database is Git and the filesystem, in order to minimise risk. Service IDs are derived from the service name through normalization into ASCII.
+  - _Example: `туту.ру` → `tutu.ru`_.
+  - _Example: `historielærer.dk` → `historielaerer.dk`_.
+  - _Example: `RTÉ` → `RTE`_.
+- Punctuation is supported, except characters that have meaning at filesystem level (`:`, `/`, `\`). These are replaced with a dash (`-`).
+  - _Example: `Yahoo!` → `Yahoo!`_.
+  - _Example: `Last.fm` → `Last.fm`_.
+  - _Example: `re:start` → `re-start`_.
+  - _Example: `we://` → `we---`_.
+- Capitals are supported. Casing is expected to reflect the official service name casing.
+  - _Example: `hi5` → `hi5`_.
+  - _Example: `DeviantArt` → `DeviantArt`_.
+  - _Example: `LINE` → `LINE`_.
+- Spaces are supported. Spaces are expected to reflect the official service name spacing.
+  - _Example: `App Store` → `App Store`_.
+  - _Example: `DeviantArt` → `DeviantArt`_.
+- Like the service name, the service ID can be prefixed by the provider name when self-references are ambiguous, separated by a space. For example, Facebook refers to their Self-serve Ads service simply as “Ads”, which cannot be used in a shared database. Thus the service is called “Facebook Ads”.
+  - _Example: `Ads` (by Facebook) → `Facebook Ads`_.
+  - _Example: `Analytics` (by Google) → `Google Analytics`_.
+  - _Example: `Firebase` (by Google) → `Firebase`_.
+  - _Example: `App Store` (by Apple) → `App Store`_.
+
+#### Combined examples
+
+- `C'est qui le patron ?!`
+- `Google Play`
+- `Last.fm`
+- `DeviantArt`
+- `hi5`
+- `Pepper&Carrot`
 
 ### Document type
 
@@ -57,6 +108,8 @@ A document type thus looks like:
 If the document you want to add matches no existing document type, you can create a new one in the same pull request in which you declare the service that would use it.
 
 If you're in doubt, please list the potential synonyms you have considered.
+
+Note that the desire to multiply documents types is probably a symptom that needs to be broken down into several services, see [practical guidelines for more information](https://github.com/ambanum/CGUs/wiki/Practical-guidelines#provider-prefixing).
 
 ### Filters
 
@@ -129,13 +182,13 @@ For now, when multiple versions coexist, terms are only tracked in their English
 
 ## Test your declaration
 
-Test the declaration by running the following command with the service id:
+Test the declaration by running the following command with the service ID:
 
 ```
 npm run validate $service_id
 ```
 
-> The service id is the case sensitive name of the service declaration file without the extension. For example, for `Twitter.json`, the service id is `Twitter`.
+> The service ID is the case sensitive name of the service declaration file without the extension. For example, for `Twitter.json`, the service ID is `Twitter`.
 
 Since this operation fetches documents and could be long, you can also validate the declaration structure only:
 
