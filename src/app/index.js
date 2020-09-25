@@ -38,11 +38,13 @@ export default class CGUs extends events.EventEmitter {
 
   async init() {
     if (!this._serviceDeclarations) {
-      this.trackDocumentChangesQueue = async.queue(async ({ serviceDocument }) => this.trackDocumentChanges(serviceDocument), MAX_PARALLEL_DOCUMENTS_TRACKS);
-      this.refilterDocumentsQueue = async.queue(async ({ serviceDocument }) => this.refilterAndRecordDocument(serviceDocument), MAX_PARALLEL_REFILTERS);
+      this.trackDocumentChangesQueue = async.queue(async document => this.trackDocumentChanges(document),
+        MAX_PARALLEL_DOCUMENTS_TRACKS);
+      this.refilterDocumentsQueue = async.queue(async document => this.refilterAndRecordDocument(document),
+        MAX_PARALLEL_REFILTERS);
 
-      const queueErrorHandler = (error, { serviceDocument }) => {
-        const { serviceId, document: { type } } = serviceDocument;
+      const queueErrorHandler = (error, document) => {
+        const { serviceId, document: { type } } = document;
         if (error instanceof InaccessibleContentError) {
           return this.emit('inaccessibleContent', error, serviceId, type);
         }
@@ -71,14 +73,14 @@ export default class CGUs extends events.EventEmitter {
   }
 
   async trackChanges(servicesIds) {
-    this._forEachDocumentOf(servicesIds, serviceDocument => this.trackDocumentChangesQueue.push({ serviceDocument }));
+    this._forEachDocumentOf(servicesIds, document => this.trackDocumentChangesQueue.push(document));
 
     await this.trackDocumentChangesQueue.drain();
     await this.publish();
   }
 
-  async trackDocumentChanges({ serviceId, document: documentDeclaration }) {
-    const { type, fetch: location } = documentDeclaration;
+  async trackDocumentChanges(documentDeclaration) {
+    const { type, serviceId, fetch: location } = documentDeclaration;
 
     const { mimeType, content } = await fetch(location);
 
@@ -107,14 +109,14 @@ export default class CGUs extends events.EventEmitter {
   }
 
   async refilterAndRecord(servicesIds) {
-    this._forEachDocumentOf(servicesIds, serviceDocument => this.refilterDocumentsQueue.push({ serviceDocument }));
+    this._forEachDocumentOf(servicesIds, document => this.refilterDocumentsQueue.push(document));
 
     await this.refilterDocumentsQueue.drain();
     await this.publish();
   }
 
-  async refilterAndRecordDocument({ serviceId, document: documentDeclaration }) {
-    const { type } = documentDeclaration;
+  async refilterAndRecordDocument(documentDeclaration) {
+    const { type, serviceId } = documentDeclaration;
 
     const { id: snapshotId, content: snapshotContent, mimeType } = await history.getLatestSnapshot(serviceId, type);
 
@@ -138,10 +140,8 @@ export default class CGUs extends events.EventEmitter {
       Object.keys(documents).forEach(type => {
         callback({
           serviceId,
-          document: {
-            type,
-            ...documents[type]
-          }
+          type,
+          ...documents[type]
         });
       });
     });
