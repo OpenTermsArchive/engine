@@ -54,6 +54,7 @@
   git:
     repo: "{{ repo_versions }}"
     dest: "/home/{{ ansible_user }}/{{ versions_directory }}"
+    depth: 1
     accept_hostkey: yes
     key_file: "/home/{{ ansible_user }}/.ssh/cgus-bot-key"
   register: git_clone_app_finished
@@ -65,6 +66,7 @@
   git:
     repo: "{{ repo_snapshots }}"
     dest: "/home/{{ ansible_user }}/{{ snapshots_directory }}"
+    depth: 1
     accept_hostkey: yes
     key_file: "/home/{{ ansible_user }}/.ssh/cgus-bot-key"
   register: git_clone_app_finished
