@@ -44,7 +44,7 @@ export default class CGUs extends events.EventEmitter {
         MAX_PARALLEL_REFILTERS);
 
       const queueErrorHandler = (error, document) => {
-        const { serviceId, document: { type } } = document;
+        const { serviceId, type } = document;
         if (error instanceof InaccessibleContentError) {
           return this.emit('inaccessibleContent', error, serviceId, type);
         }
