@@ -46,7 +46,7 @@ Vous pouvez vous abonner pour recevoir un courriel lorsqu'un document est modifi
 Il est également possible d'être notifié pour un service ou un document spécifique en s'abonnant à un des flux RSS disponibles.
 
 _Un flux RSS est une ressource accessible en ligne qui contient des informations sur les derniers contenus publiés par un site web comme par exemple leur date de publication et l'adresse pour les consulter sur le site.
-Lorsque cette ressource est mise à jour, votre lecteur de flux vous prévient automatiquement vous pouvez aller voir la mise à jour._
+Lorsque cette ressource est mise à jour, votre lecteur de flux vous prévient automatiquement et vous pouvez aller voir la mise à jour._
 
 ### Flux RSS disponibles
 
@@ -54,7 +54,7 @@ Lorsque cette ressource est mise à jour, votre lecteur de flux vous prévient a
 |--|--|
 | l'ensemble des services et documents | `https://github.com/ambanum/CGUs-versions/commits.atom` |
 |l'ensemble des documents d'un service| `https://github.com/ambanum/CGUs-versions/commits/master/$serviceId.atom.` Remplacer __$serviceId__ par l'identifiant du service. |
-| un document spécifique d'un service | `https://github.com/ambanum/CGUs-versions/commits/master/$serviceId/$documentType.md.atom` Remplacer __$serviceId__ par l'idantifiant du service et __$documentType__ par le type du document.<br> Par exemple pour le document `Privacy Policy` de `Google`, l'adresse est `https://github.com/ambanum/CGUs-versions/commits/master/Google/Privacy%20Policy.md.atom` |
+| un document spécifique d'un service | `https://github.com/ambanum/CGUs-versions/commits/master/$serviceId/$documentType.md.atom` Remplacer __$serviceId__ par l'identifiant du service et __$documentType__ par le type du document |
 
 Par exemple :
 - Pour recevoir toutes les mises à jour des documents de `Facebook`, l'URL est `https://github.com/ambanum/CGUs-versions/commits/master/Facebook.atom`
