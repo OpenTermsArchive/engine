@@ -43,14 +43,14 @@ export default class CGUs extends events.EventEmitter {
       this.refilterDocumentsQueue = async.queue(async document => this.refilterAndRecordDocument(document),
         MAX_PARALLEL_REFILTERS);
 
-      const queueErrorHandler = (error, document) => {
-        const { serviceId, type } = document;
+      const queueErrorHandler = (error, { serviceId, type }) => {
         if (error instanceof InaccessibleContentError) {
           return this.emit('inaccessibleContent', error, serviceId, type);
         }
+
         this.emit('error', error, serviceId, type);
-        this.trackDocumentChangesQueue.kill();
-        this.refilterDocumentsQueue.kill();
+
+        throw error;
       };
 
       this.trackDocumentChangesQueue.error(queueErrorHandler);
