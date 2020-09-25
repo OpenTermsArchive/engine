@@ -17,8 +17,9 @@ const __dirname = path.dirname(new URL(import.meta.url).pathname);
 const { expect } = chai;
 const rootPath = path.join(__dirname, '../..');
 const MIN_DOC_LENGTH = 100;
+const filePathRelativeToRoot = new URL(import.meta.url).pathname.replace(`${rootPath}/`, '');
 
-const args = process.argv.slice(6);
+const args = process.argv.slice(process.argv.indexOf(filePathRelativeToRoot) + 1); // Keep only args that are after the script filename
 
 const schemaOnly = args.includes('--schema-only');
 const modifiedOnly = args.includes('--modified-only');
