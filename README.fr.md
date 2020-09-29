@@ -65,11 +65,6 @@ Par exemple :
 
 Il est possible de recevoir les mises à jour de flux RSS par courriel en utilisant un service externe comme [feedrabbit](https://feedrabbit.com/).
 
-#### Exemples de lecteurs de flux RSS
-- Sur OS X : [Reeder](https://reederapp.com/)
-- Sur Linux : [Akregator](https://kde.org/applications/en/akregator) ou [FeedReader](https://jangernert.github.io/FeedReader/)
-- Sur Windows : [Omea](https://www.jetbrains.com/omea/reader/)
-- Web et applications mobile : [Inoreader](https://www.inoreader.com/) ou [Feedly](https://feedly.com/)
 
 ## Contribuer
 
