@@ -45,32 +45,39 @@ Click on a change to see what it consists of (for example [this one](https://git
 
 ## Be notified
 
-You can subscribe to receive an email when a document is updated by [filling the form available here](https://59692a77.sibforms.com/serve/MUIEAKuTv3y67e27PkjAiw7UkHCn0qVrcD188cQb-ofHVBGpvdUWQ6EraZ5AIb6vJqz3L8LDvYhEzPb2SE6eGWP35zXrpwEFVJCpGuER9DKPBUrifKScpF_ENMqwE_OiOZ3FdCV2ra-TXQNxB2sTEL13Zj8HU7U0vbbeF7TnbFiW8gGbcOa5liqmMvw_rghnEB2htMQRCk6A3eyj).
+### By email
 
-**Beware, this is an early beta and you are likely to receive a large amount of notifications!** You can unsubscribe by replying to any email you will get.
+You can [subscribe](https://59692a77.sibforms.com/serve/MUIEAKuTv3y67e27PkjAiw7UkHCn0qVrcD188cQb-ofHVBGpvdUWQ6EraZ5AIb6vJqz3L8LDvYhEzPb2SE6eGWP35zXrpwEFVJCpGuER9DKPBUrifKScpF_ENMqwE_OiOZ3FdCV2ra-TXQNxB2sTEL13Zj8HU7U0vbbeF7TnbFiW8gGbcOa5liqmMvw_rghnEB2htMQRCk6A3eyj) to receive an email whenever a document is updated in the database.
 
-It is also possible to be notified for tan update of a service and/or a specific document by subscribing to one of the available RSS feeds.
+**Beware, this service is in beta and you are likely to receive a large amount of notifications!** You can unsubscribe by replying to any email you will receive.
 
-_An RSS feed is an online resource that contains information about the latest content published by a website, such as the date of publication and the address to view it.
-When this resource is updated, your feed reader automatically notifies you and you can view the update._
+To receive updates of specific services or documents by email, you can use [RSS](#by-rss) notification instructions and set up a third party service such as [FeedRabbit](https://feedrabbit.com/) to send you an email whenever there is a change.
 
-### RSS feeds available
+### By RSS
 
-| Is updated for | URL |
-|--|--|
+You can receive notification for a specific service or document by subscribing to RSS feeds.
+
+> An RSS feed is a type of web page that contains information about the latest content published by a website, such as the date of publication and the address where you can view it. When this resource is updated, a feed reader app automatically notifies you and you can see the update.
+
+To find out the address of the RSS feed you want to subscribe to:
+
+1. [Navigate](#exploring-the-versions-history) to the page with the history of changes you are interested in. _In the WhatsApp example above, this would be [this page](https://github.com/ambanum/CGUs-versions/commits/master/WhatsApp/Privacy%20Policy.md)._
+2. Copy the address of that page from your browser’s address bar. _In the WhatsApp example, this would be `https://github.com/ambanum/CGUs-versions/commits/master/WhatsApp/Privacy%20Policy.md`._
+3. Append `.atom` at the end of this address. _In the WhatsApp example, this would become `https://github.com/ambanum/CGUs-versions/commits/master/WhatsApp/Privacy%20Policy.md.atom`._
+4. Subscribe your RSS feed reader to the resulting address.
+
+#### Recap of available RSS feeds
+
+| Updated for | URL |
+|-------------|--|
 | all services and documents | `https://github.com/ambanum/CGUs-versions/commits.atom` |
-| all the documents of a service | Replace __$serviceId__ with the service ID:<br>`https://github.com/ambanum/CGUs-versions/commits/master/$serviceId.atom.` |
-| un document spécifique d'un service | Replace __$serviceId__ with the service ID and __$documentType__ with the document type:<br>`https://github.com/ambanum/CGUs-versions/commits/master/$serviceId/$documentType.md.atom` |
+| all the documents of a service | Replace `$serviceId` with the service ID:<br>`https://github.com/ambanum/CGUs-versions/commits/master/$serviceId.atom.` |
+| un document spécifique d'un service | Replace `$serviceId` with the service ID and `$documentType` with the document type:<br>`https://github.com/ambanum/CGUs-versions/commits/master/$serviceId/$documentType.md.atom` |
 
 For example:
-- To receive all updates of `Facebook` documents, the URL is `https://github.com/ambanum/CGUs-versions/commits/master/Facebook.atom`
 
-- To receive all updates of the `Privacy Policy` from `Google`, the URL is `https://github.com/ambanum/CGUs-versions/commits/master/Google/Privacy Policy.md.atom`
-
-#### Receive RSS feed updates by email
-
-It is possible to receive RSS feed updates by email using an external service such as [feedrabbit](https://feedrabbit.com/).
-
+- To receive all updates of `Facebook` documents, the URL is `https://github.com/ambanum/CGUs-versions/commits/master/Facebook.atom`.
+- To receive all updates of the `Privacy Policy` from `Google`, the URL is `https://github.com/ambanum/CGUs-versions/commits/master/Google/Privacy%20Policy.md.atom`.
 
 
 ## Analysing the snapshots history
