@@ -3,6 +3,8 @@ import config from 'config';
 
 import simpleGit from 'simple-git';
 
+process.env.LC_ALL = 'en_GB'; // Ensure git messages will be in English as some errors are handled by analysing the message content
+
 export default class Git {
   constructor(repositoryPath) {
     this.path = repositoryPath;
@@ -24,15 +26,6 @@ export default class Git {
 
   async pushChanges() {
     return this.git.push('origin', 'master');
-  }
-
-  async hasChanges(filepath) {
-    const status = await this.git.status();
-    const relativePath = this.relativePath(filepath);
-    const escapedRelativePath = filepath.includes(' ') ? `"${relativePath}"` : relativePath;
-    return (status.modified.indexOf(escapedRelativePath) > -1)
-           || (status.not_added.indexOf(relativePath) > -1)
-           || (status.created.indexOf(relativePath) > -1);
   }
 
   async log(options = {}) {

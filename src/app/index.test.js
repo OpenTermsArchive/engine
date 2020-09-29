@@ -99,30 +99,6 @@ describe('CGUs', () => {
         expect(resultingTerms).to.equal(serviceBVersionExpectedContent);
       });
     });
-
-    context('When there is an unexpected error', () => {
-      let error;
-      before(async () => {
-        try {
-          sinon.stub(app, 'trackDocumentChanges').throws('UnexpectedError');
-          await app.trackChanges(app.serviceIds);
-        } catch (e) {
-          error = e;
-          return;
-        }
-        expect.fail('No error was thrown');
-      });
-
-      after(resetGitRepository);
-
-      it('throws an error', async () => {
-        expect(error).to.be.an('error');
-      });
-
-      it('throws an unknown error', async () => {
-        expect(error.type).to.be.undefined;
-      });
-    });
   });
 
   describe('#refilterAndRecord', () => {
@@ -204,41 +180,12 @@ describe('CGUs', () => {
 
         after(resetGitRepository);
 
-        it('does not refilter the service on error', async () => {
-          expect(inaccessibleContentSpy).to.have.been.calledWith(SERVICE_A_ID, SERVICE_A_TYPE);
+        it('emits an inaccessibleContent event when an error happens during refiltering', async () => {
+          expect(inaccessibleContentSpy).to.have.been.called;
         });
 
         it('still refilters other services', async () => {
           expect(versionNotChangedSpy).to.have.been.calledWith(SERVICE_B_ID, SERVICE_B_TYPE);
-        });
-      });
-
-      context('When there is an unexpected error', () => {
-        let error;
-        before(async () => {
-          try {
-            nock('https://www.servicea.example').get('/tos').reply(200, serviceASnapshotExpectedContent, { 'Content-Type': 'text/html' });
-            nock('https://www.serviceb.example').get('/privacy').reply(200, serviceBSnapshotExpectedContent, { 'Content-Type': 'application/pdf' });
-            const app = new CGUs();
-            await app.init();
-            await app.trackChanges(app.serviceIds);
-            sinon.stub(app, 'refilterAndRecordDocument').throws('UnexpectedError');
-            await app.refilterAndRecord(app.serviceIds);
-          } catch (e) {
-            error = e;
-            return;
-          }
-          expect.fail('No error was thrown');
-        });
-
-        after(resetGitRepository);
-
-        it('throws an error', async () => {
-          expect(error).to.be.an('error');
-        });
-
-        it('throws an unknown error', async () => {
-          expect(error.type).to.be.undefined;
         });
       });
     });
