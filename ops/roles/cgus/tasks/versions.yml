@@ -1,0 +1,44 @@
+- name: Remove index.lock in CGUs-versions
+  file:
+    path: "/home/{{ ansible_user }}/{{ versions_directory }}/.git/index.lock"
+    state: absent
+
+- name: Create backup tag for CGUs-versions
+  command:
+    cmd: git tag {{ ansible_date_time.iso8601_basic_short }}
+    chdir: "/home/{{ ansible_user }}/{{ versions_directory }}"
+  tags:
+    - restart
+    - start
+    - update
+
+- name: Clone or update CGUs-versions repository
+  git:
+    repo: "{{ repo_versions }}"
+    dest: "/home/{{ ansible_user }}/{{ versions_directory }}"
+    depth: 1
+    force: yes
+    accept_hostkey: yes
+    key_file: "/home/{{ ansible_user }}/.ssh/cgus-bot-key"
+  register: git_clone_app_finished
+  tags:
+    - setup
+    - update
+
+- name: Reset CGUs-versions on origin master
+  command:
+    cmd: git reset --hard origin/{{ versions_deployed_branch }}
+    chdir: "/home/{{ ansible_user }}/{{ versions_directory }}"
+  tags:
+    - restart
+    - start
+    - update
+
+- name: Cleanup tags for CGUs-versions (keep the last 20)
+  shell: git tag -l | sort -r | tail -n +21 | xargs -n 1 -i% git tag -d %
+  args:
+    chdir: "/home/{{ ansible_user }}/{{ versions_directory }}"
+  tags:
+    - restart
+    - start
+    - update

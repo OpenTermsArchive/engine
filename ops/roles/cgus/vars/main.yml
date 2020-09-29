@@ -2,6 +2,8 @@ repo: https://github.com/ambanum/CGUs.git
 repo_versions: git@github.com:ambanum/CGUs-versions.git
 repo_snapshots: git@github.com:ambanum/CGUs-snapshots.git
 versions_directory: cgus-versions
+versions_deployed_branch: master
 snapshots_directory: cgus-snapshots
+snapshots_deployed_branch: master
 app: cgus
 app_port: 3000
