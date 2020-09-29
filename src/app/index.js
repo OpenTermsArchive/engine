@@ -2,6 +2,7 @@ import path from 'path';
 import events from 'events';
 
 import config from 'config';
+import async from 'async';
 
 import * as history from './history/index.js';
 import fetch from './fetcher/index.js';
@@ -11,6 +12,8 @@ import { InaccessibleContentError } from './errors.js';
 
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
 const SERVICE_DECLARATIONS_PATH = path.resolve(__dirname, '../../', config.get('serviceDeclarationsPath'));
+const MAX_PARALLEL_DOCUMENTS_TRACKS = 20;
+const MAX_PARALLEL_REFILTERS = 20;
 
 export const AVAILABLE_EVENTS = [
   'snapshotRecorded',
@@ -21,6 +24,7 @@ export const AVAILABLE_EVENTS = [
   'versionNotChanged',
   'recordsPublished',
   'inaccessibleContent',
+  'error'
 ];
 
 export default class CGUs extends events.EventEmitter {
@@ -34,9 +38,31 @@ export default class CGUs extends events.EventEmitter {
 
   async init() {
     if (!this._serviceDeclarations) {
+      this.initQueues();
       this._serviceDeclarations = await loadServiceDeclarations(SERVICE_DECLARATIONS_PATH);
     }
+
     return this._serviceDeclarations;
+  }
+
+  initQueues() {
+    this.trackDocumentChangesQueue = async.queue(async document => this.trackDocumentChanges(document),
+      MAX_PARALLEL_DOCUMENTS_TRACKS);
+    this.refilterDocumentsQueue = async.queue(async document => this.refilterAndRecordDocument(document),
+      MAX_PARALLEL_REFILTERS);
+
+    const queueErrorHandler = (error, { serviceId, type }) => {
+      if (error instanceof InaccessibleContentError) {
+        return this.emit('inaccessibleContent', error, serviceId, type);
+      }
+
+      this.emit('error', error, serviceId, type);
+
+      throw error;
+    };
+
+    this.trackDocumentChangesQueue.error(queueErrorHandler);
+    this.refilterDocumentsQueue.error(queueErrorHandler);
   }
 
   attach(listener) {
@@ -50,13 +76,14 @@ export default class CGUs extends events.EventEmitter {
   }
 
   async trackChanges(servicesIds) {
-    await this._forEachDocumentOf(servicesIds, document => this.trackDocumentChanges(document));
+    this._forEachDocumentOf(servicesIds, document => this.trackDocumentChangesQueue.push(document));
 
+    await this.trackDocumentChangesQueue.drain();
     await this.publish();
   }
 
-  async trackDocumentChanges({ serviceId, document: documentDeclaration }) {
-    const { type, fetch: location } = documentDeclaration;
+  async trackDocumentChanges(documentDeclaration) {
+    const { type, serviceId, fetch: location } = documentDeclaration;
 
     const { mimeType, content } = await fetch(location);
 
@@ -75,7 +102,7 @@ export default class CGUs extends events.EventEmitter {
       return;
     }
 
-    await this.recordVersion({
+    return this.recordVersion({
       snapshotContent: content,
       mimeType,
       snapshotId,
@@ -85,11 +112,14 @@ export default class CGUs extends events.EventEmitter {
   }
 
   async refilterAndRecord(servicesIds) {
-    return this._forEachDocumentOf(servicesIds, document => this.refilterAndRecordDocument(document));
+    this._forEachDocumentOf(servicesIds, document => this.refilterDocumentsQueue.push(document));
+
+    await this.refilterDocumentsQueue.drain();
+    await this.publish();
   }
 
-  async refilterAndRecordDocument({ serviceId, document: documentDeclaration }) {
-    const { type } = documentDeclaration;
+  async refilterAndRecordDocument(documentDeclaration) {
+    const { type, serviceId } = documentDeclaration;
 
     const { id: snapshotId, content: snapshotContent, mimeType } = await history.getLatestSnapshot(serviceId, type);
 
@@ -108,27 +138,16 @@ export default class CGUs extends events.EventEmitter {
   }
 
   async _forEachDocumentOf(servicesIds = [], callback) {
-    const documentPromises = servicesIds.flatMap(serviceId => {
+    servicesIds.forEach(serviceId => {
       const { documents } = this._serviceDeclarations[serviceId];
-      return Object.keys(documents).map(async type => {
-        try {
-          await callback({
-            serviceId,
-            document: {
-              type,
-              ...documents[type]
-            }
-          });
-        } catch (error) {
-          if (error instanceof InaccessibleContentError) {
-            return this.emit('inaccessibleContent', serviceId, type, error);
-          }
-          throw error;
-        }
+      Object.keys(documents).forEach(type => {
+        callback({
+          serviceId,
+          type,
+          ...documents[type]
+        });
       });
     });
-
-    await Promise.all(documentPromises);
   }
 
   async recordSnapshot({ content, mimeType, serviceId, type }) {
