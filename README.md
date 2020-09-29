@@ -49,6 +49,34 @@ You can subscribe to receive an email when a document is updated by [filling the
 
 **Beware, this is an early beta and you are likely to receive a large amount of notifications!** You can unsubscribe by replying to any email you will get.
 
+It is also possible to be notified for tan update of a service and/or a specific document by subscribing to one of the available RSS feeds.
+
+_An RSS feed is an online resource that contains information about the latest content published by a website, such as the date of publication and the address to view it.
+When this resource is updated, your feed reader automatically notifies you and you can view the update._
+
+### RSS feeds available
+
+| Is updated for | URL |
+|--|--|
+| all services and documents | `https://github.com/ambanum/CGUs-versions/commits.atom` |
+| all the documents of a service | Replace __$serviceId__ with the service ID:<br>`https://github.com/ambanum/CGUs-versions/commits/master/$serviceId.atom.` |
+| un document spécifique d'un service | Replace __$serviceId__ with the service ID and __$documentType__ with the document type:<br>`https://github.com/ambanum/CGUs-versions/commits/master/$serviceId/$documentType.md.atom` |
+
+For example:
+- To receive all updates of `Facebook` documents, the URL is `https://github.com/ambanum/CGUs-versions/commits/master/Facebook.atom`
+
+- To receive all updates of the `Privacy Policy` from `Google`, the URL is `https://github.com/ambanum/CGUs-versions/commits/master/Google/Privacy Policy.md.atom`
+
+#### Receive RSS feed updates by email
+
+It is possible to receive RSS feed updates by email using an external service such as [feedrabbit](https://feedrabbit.com/).
+
+#### Examples of RSS feed readers
+- On OS X: [Reeder](https://reederapp.com/)
+- On Linux: [Akregator](https://kde.org/applications/en/akregator) or [FeedReader](https://jangernert.github.io/FeedReader/)
+- On Windows: [Omea](https://www.jetbrains.com/omea/reader/)
+- Web et mobile applications: [Inoreader](https://www.inoreader.com/) or [Feedly](https://feedly.com/)
+
 
 ## Analysing the snapshots history
 
