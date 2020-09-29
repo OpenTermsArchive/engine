@@ -56,6 +56,8 @@ A document type thus looks like:
 
 If the document you want to add matches no existing document type, you can create a new one in the same pull request in which you declare the service that would use it.
 
+> Please note that we do not want [service-specific types](https://github.com/ambanum/CGUs/pull/89) such as “Twitter Privacy Policy”. Document types should be generic, even if only one service uses them at a given time. Otherwise, duplication occurs and [important efforts](https://github.com/ambanum/CGUs/pull/88) have to be deployed to deduplicate. The triptych form “writer / audience / object” is precisely used to avoid this sort of duplication.
+
 If you're in doubt, please list the potential synonyms you have considered.
 
 ### Filters
