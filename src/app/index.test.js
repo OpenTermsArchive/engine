@@ -180,7 +180,7 @@ describe('CGUs', () => {
 
         after(resetGitRepository);
 
-        it('does not refilter the service on error', async () => {
+        it('emits an inaccessibleContent event when an error happens during refiltering', async () => {
           expect(inaccessibleContentSpy).to.have.been.called;
         });
 
