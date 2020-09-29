@@ -71,11 +71,6 @@ For example:
 
 It is possible to receive RSS feed updates by email using an external service such as [feedrabbit](https://feedrabbit.com/).
 
-#### Examples of RSS feed readers
-- On OS X: [Reeder](https://reederapp.com/)
-- On Linux: [Akregator](https://kde.org/applications/en/akregator) or [FeedReader](https://jangernert.github.io/FeedReader/)
-- On Windows: [Omea](https://www.jetbrains.com/omea/reader/)
-- Web et mobile applications: [Inoreader](https://www.inoreader.com/) or [Feedly](https://feedly.com/)
 
 
 ## Analysing the snapshots history
