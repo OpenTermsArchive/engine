@@ -1,8 +1,8 @@
-repo: https://github.com/ambanum/CGUs.git
-repo_versions: git@github.com:ambanum/CGUs-versions.git
-repo_snapshots: git@github.com:ambanum/CGUs-snapshots.git
+repository: https://github.com/ambanum/CGUs.git
+versions_repository: git@github.com:ambanum/CGUs-versions.git
 versions_directory: cgus-versions
 versions_deployed_branch: master
+snapshots_repository: git@github.com:ambanum/CGUs-snapshots.git
 snapshots_directory: cgus-snapshots
 snapshots_deployed_branch: master
 app: cgus
