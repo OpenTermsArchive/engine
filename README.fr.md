@@ -53,8 +53,8 @@ Lorsque cette ressource est mise à jour, votre lecteur de flux vous notifie aut
 | Est mis à jour pour | URL |
 |--|--|
 | l'ensemble des services et documents | `https://github.com/ambanum/CGUs-versions/commits.atom` |
-|l'ensemble des documents d'un service| `https://github.com/ambanum/CGUs-versions/commits/master/$serviceId.atom.` Remplacer __$serviceId__ par l'identifiant du service. |
-| un document spécifique d'un service | `https://github.com/ambanum/CGUs-versions/commits/master/$serviceId/$documentType.md.atom` Remplacer __$serviceId__ par l'identifiant du service et __$documentType__ par le type du document |
+|l'ensemble des documents d'un service| Remplacer __$serviceId__ par l'identifiant du service :<br>`https://github.com/ambanum/CGUs-versions/commits/master/$serviceId.atom.` |
+| un document spécifique d'un service | Remplacer __$serviceId__ par l'identifiant du service et __$documentType__ par le type du document :<br>`https://github.com/ambanum/CGUs-versions/commits/master/$serviceId/$documentType.md.atom` |
 
 Par exemple :
 - Pour recevoir toutes les mises à jour des documents de `Facebook`, l'URL est `https://github.com/ambanum/CGUs-versions/commits/master/Facebook.atom`
