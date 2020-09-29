@@ -15,6 +15,10 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+        ref: ${{ github.event.pull_request.head.sha }}
+    - run: git checkout HEAD
     - name: Use Node.js
       uses: actions/setup-node@v1
       with:
@@ -30,8 +34,7 @@ jobs:
         git config --global user.name 'AmbNum Bot'
         git config --global user.email 'ambnum.bot@disinfo.quaidorsay.fr'
     - run: npm run validate:schema
-    - run: npm run validate:modified
     - run: npm test
     - run: pip install --upgrade setuptools
-    - run: pip install ansible
+    - run: pip install ansible==2.9.11
     - run: ansible-playbook ops/site.yml -i ops/inventories/production.yml

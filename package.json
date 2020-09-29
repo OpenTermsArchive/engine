@@ -18,7 +18,7 @@
     "posttest": "npm run lint",
     "test": "NODE_ENV=test mocha --file './test/helper.js' --recursive \"./src/**/*.test.js\"",
     "test:debug": "NODE_ENV=test mocha --file './test/helper.js' --recursive \"./src/**/*.test.js\" --inspect-brk --exit",
-    "validate": "NODE_ENV=validation mocha --delay --file './test/helper.js' scripts/validation/validate.js",
+    "validate": "NODE_ENV=validation node --unhandled-rejections=strict ./node_modules/.bin/mocha --delay --file './test/helper.js' scripts/validation/validate.js",
     "validate:schema": "npm run validate -- --schema-only",
     "validate:modified": "npm run validate -- --modified-only"
   },
@@ -44,11 +44,8 @@
     "json-source-map": "^0.6.1",
     "mocha": "^7.2.0",
     "nock": "^12.0.3",
-    "pg": "^8.3.0",
     "sinon": "^9.0.3",
-    "sinon-chai": "^3.5.0",
-    "xml2json": "^0.12.0",
-    "xpath-to-css": "^1.0.5"
+    "sinon-chai": "^3.5.0"
   },
   "dependencies": {
     "@accordproject/markdown-cicero": "^0.12.4",
