@@ -22,9 +22,9 @@ _Note: Actuellement, nous ne suivons que les **conditions** rédigées en anglai
 
 À partir de la **page d'accueil du dépôt** [CGUs-versions](https://github.com/ambanum/CGUs-versions), ouvrez le dossier du **service de votre choix** (prenons par exemple [WhatsApp](https://github.com/ambanum/CGUs-versions/tree/master/WhatsApp)).
 
-L'**ensemble des documents suivis** pour ce service s'affichent, cliquez ensuite sur **celui dont vous souhaitez suivre l'historique** (par exemple la [politique d'utilisation des données de WhatsApp](https://github.com/ambanum/CGUs-versions/blob/master/WhatsApp/privacy_policy.md)). Le document s'affiche alors dans sa **dernière version** (il est actualisé toutes les heures).
+L'**ensemble des documents suivis** pour ce service s'affichent, cliquez ensuite sur **celui dont vous souhaitez suivre l'historique** (par exemple la [politique d'utilisation des données de WhatsApp](https://github.com/ambanum/CGUs-versions/blob/master/WhatsApp/Privacy%20Policy.md)). Le document s'affiche alors dans sa **dernière version** (il est actualisé toutes les heures).
 
-Pour afficher l'**historique des modifications** subies par ce document, cliquez sur **History** en haut à droite du document (pour l'exemple précédent nous arrivons [ici](https://github.com/ambanum/CGUs-versions/commits/master/WhatsApp/privacy_policy.md)). Les **modifications** sont affichées **par dates**, de la plus récente à la plus ancienne.
+Pour afficher l'**historique des modifications** subies par ce document, cliquez sur **History** en haut à droite du document (pour l'exemple précédent nous arrivons [ici](https://github.com/ambanum/CGUs-versions/commits/master/WhatsApp/Privacy%20Policy.md)). Les **modifications** sont affichées **par dates**, de la plus récente à la plus ancienne.
 
 Cliquez sur une modification pour voir en quoi elle consiste (par exemple [celle-ci](https://github.com/ambanum/CGUs-versions/commit/58a1d2ae4187a3260ac58f3f3c7dcd3aeacaebcd)). Vous disposez de **deux types d'affichage**, sélectionnables à partir des icônes dans la barre grisée qui chapeaute le document.
 
