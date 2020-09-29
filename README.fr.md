@@ -39,31 +39,41 @@ Cliquez sur une modification pour voir en quoi elle consiste (par exemple [celle
 
 ## Recevoir des notifications
 
-Vous pouvez vous abonner pour recevoir un courriel lorsqu'un document est modifié en [remplissant ce formulaire](https://59692a77.sibforms.com/serve/MUIEAKuTv3y67e27PkjAiw7UkHCn0qVrcD188cQb-ofHVBGpvdUWQ6EraZ5AIb6vJqz3L8LDvYhEzPb2SE6eGWP35zXrpwEFVJCpGuER9DKPBUrifKScpF_ENMqwE_OiOZ3FdCV2ra-TXQNxB2sTEL13Zj8HU7U0vbbeF7TnbFiW8gGbcOa5liqmMvw_rghnEB2htMQRCk6A3eyj).
+### Par courriel
+
+Vous pouvez [vous abonner](https://59692a77.sibforms.com/serve/MUIEAKuTv3y67e27PkjAiw7UkHCn0qVrcD188cQb-ofHVBGpvdUWQ6EraZ5AIb6vJqz3L8LDvYhEzPb2SE6eGWP35zXrpwEFVJCpGuER9DKPBUrifKScpF_ENMqwE_OiOZ3FdCV2ra-TXQNxB2sTEL13Zj8HU7U0vbbeF7TnbFiW8gGbcOa5liqmMvw_rghnEB2htMQRCk6A3eyj) pour recevoir un courriel à chaque modification d'un document dans l'ensemble de la base.
 
 **Attention, ce service est en version bêta et vous risquez de recevoir de nombreuses notifications !** Vous pourrez vous désabonner en répondant à n'importe quel courriel reçu.
 
-Il est également possible d'être notifié pour le suivi d'un service et/ou un document spécifique en s'abonnant à un des flux RSS disponibles.
+#### Recevoir les mises à jour de services ou documents spécifiques
 
-_Un flux RSS est une ressource accessible en ligne qui contient des informations sur les derniers contenus publiés par un site web comme leur date de publication et l'adresse pour les consulter.
-Lorsque cette ressource est mise à jour, votre lecteur de flux vous notifie automatiquement et vous pouvez ainsi consulter la mise à jour._
+Pour recevoir les mises à jour de services ou documents spécifiques par courriel, vous pouvez utiliser les instructions de notification [par RSS](#par-rss) et mettre en place un service tiers comme [FeedRabbit](https://feedrabbit.com/) pour vous envoyer un courriel à chaque changement.
 
-### Flux RSS disponibles
+### Par RSS
 
-| Est mis à jour pour | URL |
-|--|--|
+Vous pouvez recevoir une notification pour un service ou un document spécifique en vous abonnant à des flux RSS.
+
+> Un flux RSS est un type de page accessible en ligne qui contient des informations sur les derniers contenus publiés par un site web comme leur date de publication et l'adresse pour les consulter. Lorsque cette ressource est mise à jour, une application de type lecteur de flux vous notifie automatiquement et vous pouvez ainsi consulter la mise à jour.
+
+Pour obtenir l'adresse du flux RSS auquel vous abonner :
+
+1. [Naviguez](#naviguer-dans-lhistorique-des-versions) jusqu’à la page qui présente l’historique des modifications qui vous intéressent. _Dans l'exemple de WhatsApp donné plus haut, il s’agit de [cette page](https://github.com/ambanum/CGUs-versions/commits/master/WhatsApp/Privacy%20Policy.md)._
+2. Copiez l’adresse de cette page depuis la barre d’adresse de votre navigateur. _Dans l’exemple de WhatsApp, il s’agit de `https://github.com/ambanum/CGUs-versions/commits/master/WhatsApp/Privacy%20Policy.md`._
+3. Ajoutez `.atom` à la fin de cette adresse. _Dans l’exemple de WhatsApp, cela donnerait `https://github.com/ambanum/CGUs-versions/commits/master/WhatsApp/Privacy%20Policy.md.atom`._
+4. Abonnez votre lecteur de flux RSS à l’adresse résultante.
+
+#### Récapitulatif des flux RSS disponibles
+
+| Mis à jour pour | URL |
+|-----------------|-----|
 | l'ensemble des services et documents | `https://github.com/ambanum/CGUs-versions/commits.atom` |
-|l'ensemble des documents d'un service| Remplacer __$serviceId__ par l'identifiant du service :<br>`https://github.com/ambanum/CGUs-versions/commits/master/$serviceId.atom.` |
-| un document spécifique d'un service | Remplacer __$serviceId__ par l'identifiant du service et __$documentType__ par le type du document :<br>`https://github.com/ambanum/CGUs-versions/commits/master/$serviceId/$documentType.md.atom` |
+| l'ensemble des documents d'un service | Remplacer `$serviceId` par l'identifiant du service :<br>`https://github.com/ambanum/CGUs-versions/commits/master/$serviceId.atom` |
+| un document spécifique d'un service | Remplacer `$serviceId` par l'identifiant du service et `$documentType` par le type du document :<br>`https://github.com/ambanum/CGUs-versions/commits/master/$serviceId/$documentType.md.atom` |
 
-Par exemple :
-- Pour recevoir toutes les mises à jour des documents de `Facebook`, l'URL est `https://github.com/ambanum/CGUs-versions/commits/master/Facebook.atom`
+Par exemple :
 
-- Pour recevoir toutes les mises à jour des `Privacy Policy` de `Google`, l'URL est `https://github.com/ambanum/CGUs-versions/commits/master/Google/Privacy Policy.md.atom`
-
-#### Recevoir les mise à jour de flux RSS par courriel
-
-Il est possible de recevoir les mises à jour de flux RSS par courriel en utilisant un service externe comme [feedrabbit](https://feedrabbit.com/).
+- Pour recevoir toutes les mises à jour des documents de `Facebook`, abonnez-vous à `https://github.com/ambanum/CGUs-versions/commits/master/Facebook.atom`.
+- Pour recevoir toutes les mises à jour des `Privacy Policy` de `Google`, abonnez-vous à `https://github.com/ambanum/CGUs-versions/commits/master/Google/Privacy%20Policy.md.atom`.
 
 
 ## Contribuer
