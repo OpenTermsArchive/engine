@@ -42,7 +42,7 @@
       ],
       "select": "#content"
     },
-    "Data Controller Agreement": {
+    "Data Processor Agreement": {
       "fetch": "https://www.facebook.com/legal/EU_data_transfer_addendum",
       "filter": [
         "numberListCorrectly",
