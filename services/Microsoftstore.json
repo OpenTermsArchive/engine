@@ -1,0 +1,14 @@
+{
+  "name": "Microsoftstore",
+  "importedFrom": "https://github.com/tosdr/tosback2/blob/7ee395d723c33430cdcbf7fbd22bd06bba2a900e/rules/microsoftstore.com.xml",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://privacy.microsoft.com/en-us/privacystatement",
+      "select": "div[style=\"background-color:white\"] > div"
+    },
+    "Terms of Service": {
+      "fetch": "https://www.microsoft.com/en-us/store/b/terms-of-sale",
+      "select": "section#mainArea"
+    }
+  }
+}

@@ -8,6 +8,10 @@
     "Privacy Policy": {
       "fetch": "https://www.flickr.com/help/privacy/",
       "select": ".help-page-container"
+    },
+    "Community Guidelines": {
+      "fetch": "http://www.flickr.com/help/guidelines/",
+      "select": "div#content"
     }
   }
 }

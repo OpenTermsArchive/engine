@@ -1,0 +1,14 @@
+{
+  "name": "Couchsurfing",
+  "importedFrom": "https://github.com/tosdr/tosback2/blob/7ee395d723c33430cdcbf7fbd22bd06bba2a900e/rules/couchsurfing.org.xml",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "http://about.couchsurfing.com/privacy-policy/",
+      "select": "section#privacy-policy"
+    },
+    "Terms of Service": {
+      "fetch": "http://about.couchsurfing.com/terms-of-use/",
+      "select": "section#tos"
+    }
+  }
+}

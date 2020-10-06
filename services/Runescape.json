@@ -1,0 +1,14 @@
+{
+  "name": "Runescape",
+  "importedFrom": "https://github.com/tosdr/tosback2/blob/7ee395d723c33430cdcbf7fbd22bd06bba2a900e/rules/runescape.com.xml",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.jagex.com/en-GB/terms/privacy",
+      "select": "div.c-copy-block__content"
+    },
+    "Terms of Service": {
+      "fetch": "https://www.jagex.com/en-GB/terms",
+      "select": "div.c-copy-block__content"
+    }
+  }
+}

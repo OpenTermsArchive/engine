@@ -1,0 +1,14 @@
+{
+  "name": "Xfinity",
+  "importedFrom": "https://github.com/tosdr/tosback2/blob/7ee395d723c33430cdcbf7fbd22bd06bba2a900e/rules/xfinity.com.xml",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://www.xfinity.com/Corporate/Customers/Policies/HighSpeedInternetAUP",
+      "select": "div.x-flex__col-xs-12.x-flex__col-lg-9"
+    },
+    "Privacy Policy": {
+      "fetch": "https://www.xfinity.com/corporate/legal/privacyStatement",
+      "select": "section#details"
+    }
+  }
+}

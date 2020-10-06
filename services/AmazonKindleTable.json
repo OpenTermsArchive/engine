@@ -1,0 +1,10 @@
+{
+  "name": "AmazonKindleTable",
+  "importedFrom": "https://github.com/tosdr/tosback2/blob/7ee395d723c33430cdcbf7fbd22bd06bba2a900e/rules/amazon.com.xml",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://www.amazon.com/gp/help/customer/display.html?nodeId=200699130",
+      "select": "div.help-content"
+    }
+  }
+}

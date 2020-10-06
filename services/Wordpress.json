@@ -1,0 +1,10 @@
+{
+  "name": "Wordpress",
+  "importedFrom": "https://github.com/tosdr/tosback2/blob/7ee395d723c33430cdcbf7fbd22bd06bba2a900e/rules/wordpress.com.xml",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "http://en.wordpress.com/tos/",
+      "select": "div.pagebody"
+    }
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "name": "Habbo",
+  "importedFrom": "https://github.com/tosdr/tosback2/blob/7ee395d723c33430cdcbf7fbd22bd06bba2a900e/rules/habbo.com.xml",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://help.habbo.com/hc/en-us/articles/221644748",
+      "select": "div.content-body.article-body"
+    },
+    "Terms of Service": {
+      "fetch": "https://help.habbo.com/hc/en-us/articles/221644728",
+      "select": "div.content-body.article-body"
+    }
+  }
+}
