@@ -1,4 +1,5 @@
 {
+  "serviceDeclarationsPath": "./services",
   "history": {
     "snapshotsPath": "../cgus-snapshots",
     "versionsPath": "../cgus-versions",
