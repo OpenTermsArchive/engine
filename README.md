@@ -117,7 +117,7 @@ npm run setup
 
 #### Configuration file
 
-The default configuration can be read and changed in `config/default.json`:
+The default configuration can be read and changed in `config/default.json`.
 
 ```json
 {
@@ -142,6 +142,8 @@ The default configuration can be read and changed in `config/default.json`:
   }
 }
 ```
+
+The default configuration is merged with (and overridden by) environment-specific configuration that can be specified at startup with the [`NODE_ENV` environment variable](#node-env).
 
 An example of a production configuration file can be found in `config/production.json`. It includes the extra configuration for:
 
@@ -174,15 +176,24 @@ An example of a production configuration file can be found in `config/production
 
 These environment variables can be provided in a `.env` file at the root of the repository. See `.env.example` for an example of such a file.
 
-In order to be notified for errors, a valid SMTP configuration should be provided through the following environment variables:
+##### `SMTP_HOST` and `SMTP_USERNAME`
 
-* `SMTP_HOST` for the SMTP hostname
-* `SMTP_USERNAME` / `SMTP_PASSWORD` for the credentials
+In order to be notified for errors over email, a valid SMTP configuration should be provided through the following environment variables:
 
+* `SMTP_HOST` for the SMTP server hostname.
+* `SMTP_USERNAME` / `SMTP_PASSWORD` for the credentials.
+
+##### `HTTP_PROXY` and `HTTPS_PROXY`
 
 If your infrastructure requires using an outgoing HTTP/HTTPS proxy to access Internet, you can provide it through the `HTTP_PROXY` and `HTTPS_PROXY` environment variable.
 
+##### `SENDINBLUE_API_KEY`
+
 In order to use the default [SendInBlue](https://www.sendinblue.com)-based notification mechanism, a valid API key should be provided through the `SENDINBLUE_API_KEY` environment variable.
+
+##### `NODE_ENV`
+
+The `NODE_ENV` environment variable loads additional [configuration files](#configuration-file).
 
 
 ### Running
