@@ -1,0 +1,14 @@
+{
+  "name": "Cloudant",
+  "importedFrom": "https://github.com/tosdr/tosback2/blob/7ee395d723c33430cdcbf7fbd22bd06bba2a900e/rules/cloudant.com.xml",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.ibm.com/privacy/us/en/",
+      "select": "div#ibm-content-main"
+    },
+    "Terms of Service": {
+      "fetch": "https://www.ibm.com/legal/us/en/",
+      "select": "div#ibm-content-main"
+    }
+  }
+}

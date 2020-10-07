@@ -1,0 +1,14 @@
+{
+  "name": "Live",
+  "importedFrom": "https://github.com/tosdr/tosback2/blob/7ee395d723c33430cdcbf7fbd22bd06bba2a900e/rules/live.com.xml",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://www.microsoft.com/en-us/servicesagreement/",
+      "select": "div.row-fluid.grid-container.mscom-grid-container"
+    },
+    "Privacy Policy": {
+      "fetch": "https://privacy.microsoft.com/en-us/PrivacyStatement",
+      "select": "div[style=\"background-color:white\"]"
+    }
+  }
+}

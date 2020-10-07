@@ -1,0 +1,14 @@
+{
+  "name": "Phpbb",
+  "importedFrom": "https://github.com/tosdr/tosback2/blob/7ee395d723c33430cdcbf7fbd22bd06bba2a900e/rules/phpbb.com.xml",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.phpbb.com/community/ucp.php?mode=privacy",
+      "select": "div.content"
+    },
+    "Terms of Service": {
+      "fetch": "https://www.phpbb.com/community/ucp.php?mode=terms",
+      "select": "div.content"
+    }
+  }
+}

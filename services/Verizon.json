@@ -1,0 +1,10 @@
+{
+  "name": "Verizon",
+  "importedFrom": "https://github.com/tosdr/tosback2/blob/7ee395d723c33430cdcbf7fbd22bd06bba2a900e/rules/verizon.com.xml",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://www.verizonwireless.com/legal/notices/customer-agreement/",
+      "select": "div[data-ck=\"LEGAL_DISCLAIMER_CUSTOMER_AGREEMENT\"]"
+    }
+  }
+}

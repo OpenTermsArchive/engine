@@ -1,0 +1,10 @@
+{
+  "name": "Att",
+  "importedFrom": "https://github.com/tosdr/tosback2/blob/7ee395d723c33430cdcbf7fbd22bd06bba2a900e/rules/att.com.xml",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://www.att.com/legal/terms.aup.html",
+      "select": "div#termsofservices"
+    }
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "name": "Packagetrackr",
+  "importedFrom": "https://github.com/tosdr/tosback2/blob/7ee395d723c33430cdcbf7fbd22bd06bba2a900e/rules/packagetrackr.com.xml",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.packagetrackr.com/privacy",
+      "select": "div#content"
+    },
+    "Terms of Service": {
+      "fetch": "https://www.packagetrackr.com/tos",
+      "select": "div#content"
+    }
+  }
+}

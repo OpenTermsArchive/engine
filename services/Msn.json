@@ -1,0 +1,10 @@
+{
+  "name": "Msn",
+  "importedFrom": "https://github.com/tosdr/tosback2/blob/7ee395d723c33430cdcbf7fbd22bd06bba2a900e/rules/msn.com.xml",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://privacy.microsoft.com/en-us/PrivacyStatement",
+      "select": "div[style=\"background-color:white\"]"
+    }
+  }
+}

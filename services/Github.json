@@ -1,0 +1,14 @@
+{
+  "name": "Github",
+  "importedFrom": "https://github.com/tosdr/tosback2/blob/7ee395d723c33430cdcbf7fbd22bd06bba2a900e/rules/github.com.xml",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://help.github.com/en/articles/github-privacy-statement",
+      "select": "main"
+    },
+    "Terms of Service": {
+      "fetch": "https://help.github.com/en/articles/github-terms-of-service",
+      "select": "main"
+    }
+  }
+}

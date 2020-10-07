@@ -1,0 +1,14 @@
+{
+  "name": "Xing",
+  "importedFrom": "https://github.com/tosdr/tosback2/blob/7ee395d723c33430cdcbf7fbd22bd06bba2a900e/rules/xing.com.xml",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://privacy.xing.com/en/privacy-policy/printable-version",
+      "select": "div.data-protection-long-version-content"
+    },
+    "Terms of Service": {
+      "fetch": "http://www.xing.com/terms",
+      "select": "div#maincontent > div > div.foundation-col-12"
+    }
+  }
+}

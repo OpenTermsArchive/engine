@@ -1,0 +1,10 @@
+{
+  "name": "Researchgate",
+  "importedFrom": "https://github.com/tosdr/tosback2/blob/7ee395d723c33430cdcbf7fbd22bd06bba2a900e/rules/researchgate.net.xml",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.researchgate.net/privacy-policy",
+      "select": "div.privacy-policy"
+    }
+  }
+}
