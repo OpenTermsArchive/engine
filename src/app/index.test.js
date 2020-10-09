@@ -4,13 +4,14 @@ import path from 'path';
 import nock from 'nock';
 import sinon from 'sinon';
 import sinonChai from 'sinon-chai';
+import { fileURLToPath } from 'url';
 
 import CGUs, { AVAILABLE_EVENTS } from './index.js';
 import { SNAPSHOTS_PATH, VERSIONS_PATH } from './history/index.js';
 import { resetGitRepository, gitVersion, gitSnapshot } from '../../test/helper.js';
 
 const fs = fsApi.promises;
-const __dirname = path.dirname(new URL(import.meta.url).pathname);
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 chai.use(sinonChai);
 const { expect } = chai;
 

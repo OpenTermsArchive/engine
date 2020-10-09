@@ -3,8 +3,9 @@ import config from 'config';
 import chai from 'chai';
 
 import loadServiceDeclarations from './index.js';
+import { fileURLToPath } from 'url';
 
-const __dirname = path.dirname(new URL(import.meta.url).pathname);
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const SERVICE_DECLARATIONS_PATH = path.resolve(__dirname, '../../..', config.get('serviceDeclarationsPath'));
 
 const { expect } = chai;

@@ -7,8 +7,9 @@ import nock from 'nock';
 
 import fetch from './index.js';
 import { InaccessibleContentError } from '../errors.js';
+import { fileURLToPath } from 'url';
 
-const __dirname = path.dirname(new URL(import.meta.url).pathname);
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const { expect } = chai;
 chai.use(chaiAsPromised);
 
