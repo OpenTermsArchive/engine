@@ -1,12 +1,13 @@
 import fsApi from 'fs';
 import path from 'path';
+import { fileURLToPath } from 'url';
 
 import config from 'config';
 import inquirer from 'inquirer';
 import simpleGit from 'simple-git';
 
 const fs = fsApi.promises;
-const __dirname = path.dirname(new URL(import.meta.url).pathname);
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const NEW_HISTORY_MESSAGE = 'Start a new local empty history';
 const DOWNLOAD_HISTORY_MESSAGE = `Download the entire history of terms of services from ${config.get('history.publicSnapshotsRepository')} and ${config.get('history.publicVersionsRepository')}`;
