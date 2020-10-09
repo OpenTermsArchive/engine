@@ -6,8 +6,9 @@ import jsdom from 'jsdom';
 
 import { filterHTML, filterPDF, convertRelativeURLsToAbsolute } from './index.js';
 import { InaccessibleContentError } from '../errors.js';
+import { fileURLToPath } from 'url';
 
-const __dirname = path.dirname(new URL(import.meta.url).pathname);
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const fs = fsApi.promises;
 const { JSDOM } = jsdom;
 const { expect } = chai;
