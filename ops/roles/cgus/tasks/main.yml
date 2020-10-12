@@ -39,14 +39,12 @@
     name: CGUS-Snapshots
     repository: "{{ snapshots_repository }}"
     directory: "{{ snapshots_directory }}"
-    branch: "{{ snapshots_deployed_branch }}"
 
 - include_tasks: database.yml
   vars:
     name: CGUS-Versions
     repository: "{{ versions_repository }}"
     directory: "{{ versions_directory }}"
-    branch: "{{ versions_deployed_branch }}"
 
 - name: Start CGUs
   command:
