@@ -1,0 +1,9 @@
+{
+    "name": "Amazon",
+    "documents": {
+        "Terms of Service": {
+            "fetch": "https://www.amazon.fr/gp/help/customer/display.html/ref=hp_left_v4_sib?ie=UTF8&nodeId=201909000",
+            "select": "div.help-content"
+        }
+    }
+}
