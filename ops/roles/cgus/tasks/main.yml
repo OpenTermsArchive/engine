@@ -54,7 +54,6 @@
     chdir: "/home/{{ ansible_user }}/{{ app }}"
   environment:
     NODE_ENV: production
-    PORT: "{{ app_port }}"
   tags:
     - restart
     - start
