@@ -16,14 +16,6 @@
         "Acceptable Use Policy": {
             "fetch": "https://www.amazon.com/gp/help/customer/display.html?ie=UTF8&nodeId=GFUSWPZP368LFFA9",
             "select": "div.help-content"
-        },
-        "Brand Guidelines": {
-            "fetch": "https://www.amazon.com/gp/help/customer/display.html?ie=UTF8&nodeId=GUKKCM63WPRVL86G",
-            "select": "div.help-content"
-        },
-        "Vulnerability Disclosure Policy": {
-            "fetch": "https://www.amazon.com/gp/help/customer/display.html/ref=hp_bc_nav?ie=UTF8&nodeId=202101440",
-            "select": "div.help-content"
         }
     }
 }
