@@ -3,16 +3,12 @@
     "documents": {
         "Terms of Service": {
             "fetch": "https://www.booking.com/content/terms.fr.html",
-            "filter": [
-              "removePrintButton"  
-            ],
+            "remove": "a.print-button",
             "select": "div.static_content"
         },
         "Privacy Policy": {
             "fetch": "https://www.booking.com/content/privacy.fr.html",
-            "filter": [
-              "removePrintButton"  
-            ],
+            "remove": "a.print-button",
             "select": "div.static_content"
         }
     }
