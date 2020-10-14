@@ -1,0 +1,10 @@
+{
+  "name": "Harpersbazaar",
+  "importedFrom": "https://github.com/tosdr/tosback2/blob/885c6c80303209c8041e7620897c856c3081461d/rules/harpersbazaar.com.xml",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "http://policy.hearstmags.com.edgesuite.net/privacy.js",
+      "select": "body"
+    }
+  }
+}

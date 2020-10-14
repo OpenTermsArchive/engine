@@ -1,0 +1,10 @@
+{
+  "name": "Care2",
+  "importedFrom": "https://github.com/tosdr/tosback2/blob/885c6c80303209c8041e7620897c856c3081461d/rules/care2.com.xml",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "http://www.care2.com/help/general/privacy.html",
+      "select": "div#care2_main_container"
+    }
+  }
+}

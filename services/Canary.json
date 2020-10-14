@@ -1,0 +1,18 @@
+{
+  "name": "Canary",
+  "importedFrom": "https://github.com/tosdr/tosback2/blob/885c6c80303209c8041e7620897c856c3081461d/rules/canary.is.xml",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://canary.is/legal/eula/",
+      "select": "html > body > div:first-of-type > div > div:nth-of-type(2) > section:first-of-type > div > div:nth-of-type(2) > article"
+    },
+    "Privacy Policy": {
+      "fetch": "https://canary.is/legal/privacy-policy/",
+      "select": "html > body > div:first-of-type > div > div:nth-of-type(2) > section:first-of-type > div > div:nth-of-type(2) > article"
+    },
+    "Vulnerability Disclosure Policy": {
+      "fetch": "https://canary.is/security/",
+      "select": "#security-details > div"
+    }
+  }
+}

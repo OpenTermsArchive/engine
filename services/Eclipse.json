@@ -1,0 +1,10 @@
+{
+  "name": "Eclipse",
+  "importedFrom": "https://github.com/tosdr/tosback2/blob/885c6c80303209c8041e7620897c856c3081461d/rules/eclipse.org.xml",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "http://www.eclipse.org/legal/termsofuse.php",
+      "select": "div#midcolumn"
+    }
+  }
+}
