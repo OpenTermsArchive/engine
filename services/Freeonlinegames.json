@@ -1,0 +1,10 @@
+{
+  "name": "Freeonlinegames",
+  "importedFrom": "https://github.com/tosdr/tosback2/blob/885c6c80303209c8041e7620897c856c3081461d/rules/freeonlinegames.com.xml",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "http://freeonlinegames.com/privacy/",
+      "select": "body"
+    }
+  }
+}

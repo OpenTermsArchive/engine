@@ -1,0 +1,14 @@
+{
+  "name": "Fanpop",
+  "importedFrom": "https://github.com/tosdr/tosback2/blob/885c6c80303209c8041e7620897c856c3081461d/rules/fanpop.com.xml",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "http://www.fanpop.com/privacy",
+      "select": "div#mainCol"
+    },
+    "Terms of Service": {
+      "fetch": "http://www.fanpop.com/terms",
+      "select": "div#mainCol"
+    }
+  }
+}

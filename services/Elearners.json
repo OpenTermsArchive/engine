@@ -1,0 +1,10 @@
+{
+  "name": "Elearners",
+  "importedFrom": "https://github.com/tosdr/tosback2/blob/885c6c80303209c8041e7620897c856c3081461d/rules/elearners.com.xml",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "http://www.elearners.com/help/privacy.asp",
+      "select": "body"
+    }
+  }
+}

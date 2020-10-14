@@ -1,0 +1,10 @@
+{
+  "name": "Globalresearch",
+  "importedFrom": "https://github.com/tosdr/tosback2/blob/885c6c80303209c8041e7620897c856c3081461d/rules/globalresearch.ca.xml",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "http://www.globalresearch.ca/privacy-policy",
+      "select": "div#post-5302098"
+    }
+  }
+}

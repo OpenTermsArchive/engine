@@ -1,0 +1,10 @@
+{
+  "name": "Dishnetwork",
+  "importedFrom": "https://github.com/tosdr/tosback2/blob/885c6c80303209c8041e7620897c856c3081461d/rules/dishnetwork.com.xml",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "http://www.dishnetwork.com/downloads/legal/PrivacyStatement.pdf",
+      "select": "body"
+    }
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "name": "Feed43",
+  "importedFrom": "https://github.com/tosdr/tosback2/blob/885c6c80303209c8041e7620897c856c3081461d/rules/feed43.com.xml",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "http://feed43.com/tos.html",
+      "select": "div.main.tos"
+    }
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "name": "Advanceautoparts",
+  "importedFrom": "https://github.com/tosdr/tosback2/blob/885c6c80303209c8041e7620897c856c3081461d/rules/advanceautoparts.com.xml",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "http://shop.advanceautoparts.com/webapp/wcs/stores/servlet/content_privacypolicy",
+      "select": "body"
+    },
+    "Terms of Service": {
+      "fetch": "http://shop.advanceautoparts.com/webapp/wcs/stores/servlet/content_termscond",
+      "select": "body"
+    }
+  }
+}
