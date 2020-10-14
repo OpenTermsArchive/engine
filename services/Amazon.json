@@ -2,7 +2,27 @@
     "name": "Amazon",
     "documents": {
         "Terms of Service": {
-            "fetch": "https://www.amazon.fr/gp/help/customer/display.html/ref=hp_left_v4_sib?ie=UTF8&nodeId=201909000",
+            "fetch": "https://www.amazon.com/gp/help/customer/display.html/ref=hp_left_v4_sib?ie=UTF8&nodeId=201909000",
+            "select": "div.help-content"
+        },
+        "Privacy Policy": {
+            "fetch": "https://www.amazon.com/gp/help/customer/display.html/ref=hp_left_v4_sib?ie=UTF8&nodeId=GX7NJQ4ZB8MHFRNJ",
+            "select": "div.help-content"
+        },
+        "Commercial Terms": {
+            "fetch": "https://www.amazon.com/gp/help/customer/display.html?nodeId=202119380",
+            "select": "div.help-content"
+        },
+        "Acceptable Use Policy": {
+            "fetch": "https://www.amazon.com/gp/help/customer/display.html?ie=UTF8&nodeId=GFUSWPZP368LFFA9",
+            "select": "div.help-content"
+        },
+        "Brand Guidelines": {
+            "fetch": "https://www.amazon.com/gp/help/customer/display.html?ie=UTF8&nodeId=GUKKCM63WPRVL86G",
+            "select": "div.help-content"
+        },
+        "Vulnerability Disclosure Policy": {
+            "fetch": "https://www.amazon.com/gp/help/customer/display.html/ref=hp_bc_nav?ie=UTF8&nodeId=202101440",
             "select": "div.help-content"
         }
     }

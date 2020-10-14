@@ -2,13 +2,13 @@
     "name": "Booking",
     "documents": {
         "Terms of Service": {
-            "fetch": "https://www.booking.com/content/terms.fr.html",
-            "remove": "a.print-button",
+            "fetch": "https://www.booking.com/content/terms.en-gb.html",
+            "remove": "a.print-button, .print-button + p",
             "select": "div.static_content"
         },
         "Privacy Policy": {
-            "fetch": "https://www.booking.com/content/privacy.fr.html",
-            "remove": "a.print-button",
+            "fetch": "https://www.booking.com/content/privacy.en-gb.html",
+            "remove": "a.print-button, .print-button + p",
             "select": "div.static_content"
         }
     }
