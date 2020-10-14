@@ -2,15 +2,15 @@
     "name": "Airbnb",
     "documents": {
         "Privacy Policy": {
-            "fetch": "https://www.airbnb.fr/terms/privacy_policy",
+            "fetch": "https://www.airbnb.co.uk/terms/privacy_policy",
             "select": "div.col-sm-12"
         },
         "Terms of Service": {
-            "fetch": "https://www.airbnb.fr/terms",
+            "fetch": "https://www.airbnb.co.uk/terms",
             "select": "div.col-sm-12"
         },
         "Trackers Policy": {
-            "fetch": "https://www.airbnb.fr/terms/cookie_policy",
+            "fetch": "https://www.airbnb.co.uk/terms/cookie_policy",
             "select": "div.col-sm-12"
         }
     }
