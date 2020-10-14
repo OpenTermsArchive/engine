@@ -9,6 +9,7 @@
   },
   "scripts": {
     "start": "node src/index.js",
+    "start:modified": "node src/index.js -- --modified-only",
     "start:prod": "cross-env NODE_ENV=production node src/index.js",
     "start:scheduler": "node src/index.js --schedule",
     "start:scheduler:prod": "cross-env NODE_ENV=production node src/index.js --schedule",

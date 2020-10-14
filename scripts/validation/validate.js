@@ -5,9 +5,9 @@ import Ajv from 'ajv';
 import chai from 'chai';
 import config from 'config';
 import jsonSourceMap from 'json-source-map';
-import simpleGit from 'simple-git';
 import { fileURLToPath } from 'url';
 
+import { getModifiedServices } from '../../src/utils/index.js';
 import fetch from '../../src/app/fetcher/index.js';
 import filter from '../../src/app/filter/index.js';
 import loadServiceDeclarations from '../../src/app/loader/index.js';
@@ -161,21 +161,4 @@ function assertValid(schema, subject) {
 
     throw new Error(errorMessage);
   }
-}
-
-async function getModifiedServices() {
-  const git = simpleGit(rootPath, { maxConcurrentProcesses: 1 });
-  const committedFiles = await git.diff([ '--name-only', 'master...HEAD', '--', 'services/*.json' ]);
-  const status = await git.status();
-  const modifiedFiles = [
-    ...status.not_added, // Files created but not already in staged area
-    ...status.modified, // Files modified
-    ...status.created, // Files created and in the staged area
-    ...status.renamed.map(({ to }) => to), // Files renamed
-    ...committedFiles.trim().split('\n') // Files committed
-  ];
-
-  return modifiedFiles
-    .filter(fileName => fileName.match(/services.*\.json/))
-    .map(filePath => path.basename(filePath, '.json'));
 }
