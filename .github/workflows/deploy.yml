@@ -4,9 +4,6 @@ on:
   push:
     branches: [ master ]
 
-env:
-  ANSIBLE_VAULT_PASSWORD: ${{ secrets.ANSIBLE_VAULT_PASSWORD }}
-
 jobs:
   deploy:
 
@@ -23,7 +20,7 @@ jobs:
       with:
         key: ${{ secrets.SSH_KEY }}
         known_hosts: ${{ secrets.KNOWN_HOSTS }}
-    - run: echo "$ANSIBLE_VAULT_PASSWORD" > vault.key
+    - run: echo "${{ secrets.ANSIBLE_VAULT_PASSWORD }}" > vault.key
     - run: |
         git config --global user.name 'AmbNum Bot'
         git config --global user.email 'ambnum.bot@disinfo.quaidorsay.fr'
