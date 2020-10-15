@@ -14,7 +14,7 @@
     "start:scheduler:prod": "NODE_ENV=production node src/index.js --schedule",
     "refilter": "node src/index.js --refilter-only",
     "setup": "node scripts/setup.js",
-    "lint": "./node_modules/eslint/bin/eslint.js ./test/**/*.js ./src/*.js ./src/**/*.js ./services/**/*.js",
+    "lint": "./node_modules/eslint/bin/eslint.js test src services",
     "posttest": "npm run lint",
     "test": "NODE_ENV=test mocha --file './test/helper.js' --recursive \"./src/**/*.test.js\"",
     "test:debug": "NODE_ENV=test mocha --file './test/helper.js' --recursive \"./src/**/*.test.js\" --inspect-brk --exit",
