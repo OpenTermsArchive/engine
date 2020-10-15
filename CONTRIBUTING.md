@@ -224,6 +224,8 @@ A document type thus looks like:
 }
 ```
 
+Please note that we do not want [service-specific types](https://github.com/ambanum/CGUs/pull/89) such as “Twitter Privacy Policy”. Document types should be generic, even if only one service uses them at a given time. Otherwise, duplication occurs and [important efforts](https://github.com/ambanum/CGUs/pull/88) have to be deployed to deduplicate. The triptych form “writer / audience / object” is precisely used to avoid this sort of duplication.
+
 ## Testing your declaration
 
 You can test the declaration by running the following command:
