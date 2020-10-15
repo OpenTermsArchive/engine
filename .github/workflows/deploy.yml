@@ -1,12 +1,8 @@
-name: Test & Deploy
+name: Deploy
 
 on:
   push:
     branches: [ master ]
-
-env:
-  SENDINBLUE_API_KEY: ${{ secrets.SENDINBLUE_API_KEY }}
-  ANSIBLE_VAULT_PASSWORD: ${{ secrets.ANSIBLE_VAULT_PASSWORD }}
 
 jobs:
   deploy:
@@ -19,22 +15,15 @@ jobs:
         fetch-depth: 0
         ref: ${{ github.event.pull_request.head.sha }}
     - run: git checkout HEAD
-    - name: Use Node.js
-      uses: actions/setup-node@v1
-      with:
-        node-version: '12.17'
     - name: Install SSH key
       uses: shimataro/ssh-key-action@v2
       with:
         key: ${{ secrets.SSH_KEY }}
         known_hosts: ${{ secrets.KNOWN_HOSTS }}
-    - run: echo "$ANSIBLE_VAULT_PASSWORD" > vault.key
-    - run: npm ci
+    - run: echo "${{ secrets.ANSIBLE_VAULT_PASSWORD }}" > vault.key
     - run: |
         git config --global user.name 'AmbNum Bot'
         git config --global user.email 'ambnum.bot@disinfo.quaidorsay.fr'
-    - run: npm run validate:schema
-    - run: npm test
     - run: pip install --upgrade setuptools
     - run: pip install ansible==2.9.11
     - run: ansible-playbook ops/site.yml -i ops/inventories/production.yml
