@@ -5,7 +5,13 @@ on: [ push, pull_request ]
 jobs:
   test:
 
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        operating_system:
+        - ubuntu-latest
+        - windows-2019
+
+    runs-on: ${{ matrix.operating_system }}
 
     steps:
     - uses: actions/checkout@v2
