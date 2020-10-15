@@ -1,11 +1,6 @@
 name: Test
 
-on:
-  pull_request:
-    branches: [ master ]
-
-env:
-  SENDINBLUE_API_KEY: ${{ secrets.SENDINBLUE_API_KEY }}
+on: [ push, pull_request ]
 
 jobs:
   test:
@@ -14,6 +9,11 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+        ref: ${{ github.event.pull_request.head.sha }}
+    - run: git checkout HEAD
+    - run: git fetch origin master:master
     - name: Use Node.js
       uses: actions/setup-node@v1
       with:

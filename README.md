@@ -29,9 +29,9 @@ We offer a public database of versions recorded each time there is a change in t
 
 From the **repository homepage** [CGUs-versions](https://github.com/ambanum/CGUs-versions), open the folder of the **service of your choice** (e.g. [WhatsApp](https://github.com/ambanum/CGUs-versions/tree/master/WhatsApp)).
 
-You will see the **set of documents tracked** for that service, now click **on the document of your choice** (e.g. [WhatsApp's Privacy Policy](https://github.com/ambanum/CGUs-versions/blob/master/WhatsApp/privacy_policy.md)). The **latest version** (updated hourly) will be displayed.
+You will see the **set of documents tracked** for that service, now click **on the document of your choice** (e.g. [WhatsApp's Privacy Policy](https://github.com/ambanum/CGUs-versions/blob/master/WhatsApp/Privacy%20Policy.md)). The **latest version** (updated hourly) will be displayed.
 
-To view the **history of changes** made to this document, click on **History** at the top right of the document (for our previous [example](https://github.com/ambanum/CGUs-versions/commits/master/WhatsApp/privacy_policy.md)). The **changes** are ordered **by date**, with the latest first.
+To view the **history of changes** made to this document, click on **History** at the top right of the document (for our previous [example](https://github.com/ambanum/CGUs-versions/commits/master/WhatsApp/Privacy%20Policy.md)). The **changes** are ordered **by date**, with the latest first.
 
 Click on a change to see what it consists of (for example [this one](https://github.com/ambanum/CGUs-versions/commit/58a1d2ae4187a3260ac58f3f3c7dcd3aeacaebcd)). There are **two types of display** you can choose from the icons in the gray bar above the document.
 
@@ -45,9 +45,39 @@ Click on a change to see what it consists of (for example [this one](https://git
 
 ## Be notified
 
-You can subscribe to receive an email when a document is updated by [filling the form available here](https://59692a77.sibforms.com/serve/MUIEAKuTv3y67e27PkjAiw7UkHCn0qVrcD188cQb-ofHVBGpvdUWQ6EraZ5AIb6vJqz3L8LDvYhEzPb2SE6eGWP35zXrpwEFVJCpGuER9DKPBUrifKScpF_ENMqwE_OiOZ3FdCV2ra-TXQNxB2sTEL13Zj8HU7U0vbbeF7TnbFiW8gGbcOa5liqmMvw_rghnEB2htMQRCk6A3eyj).
+### By email
 
-**Beware, this is an early beta and you are likely to receive a large amount of notifications!** You can unsubscribe by replying to any email you will get.
+You can [subscribe](https://59692a77.sibforms.com/serve/MUIEAKuTv3y67e27PkjAiw7UkHCn0qVrcD188cQb-ofHVBGpvdUWQ6EraZ5AIb6vJqz3L8LDvYhEzPb2SE6eGWP35zXrpwEFVJCpGuER9DKPBUrifKScpF_ENMqwE_OiOZ3FdCV2ra-TXQNxB2sTEL13Zj8HU7U0vbbeF7TnbFiW8gGbcOa5liqmMvw_rghnEB2htMQRCk6A3eyj) to receive an email whenever a document is updated in the database.
+
+**Beware, this service is in beta and you are likely to receive a large amount of notifications!** You can unsubscribe by replying to any email you will receive.
+
+To receive updates of specific services or documents by email, you can use [RSS](#by-rss) notification instructions and set up a third party service such as [FeedRabbit](https://feedrabbit.com/) to send you an email whenever there is a change.
+
+### By RSS
+
+You can receive notification for a specific service or document by subscribing to RSS feeds.
+
+> An RSS feed is a type of web page that contains information about the latest content published by a website, such as the date of publication and the address where you can view it. When this resource is updated, a feed reader app automatically notifies you and you can see the update.
+
+To find out the address of the RSS feed you want to subscribe to:
+
+1. [Navigate](#exploring-the-versions-history) to the page with the history of changes you are interested in. _In the WhatsApp example above, this would be [this page](https://github.com/ambanum/CGUs-versions/commits/master/WhatsApp/Privacy%20Policy.md)._
+2. Copy the address of that page from your browser’s address bar. _In the WhatsApp example, this would be `https://github.com/ambanum/CGUs-versions/commits/master/WhatsApp/Privacy%20Policy.md`._
+3. Append `.atom` at the end of this address. _In the WhatsApp example, this would become `https://github.com/ambanum/CGUs-versions/commits/master/WhatsApp/Privacy%20Policy.md.atom`._
+4. Subscribe your RSS feed reader to the resulting address.
+
+#### Recap of available RSS feeds
+
+| Updated for | URL |
+|-------------|--|
+| all services and documents | `https://github.com/ambanum/CGUs-versions/commits.atom` |
+| all the documents of a service | Replace `$serviceId` with the service ID:<br>`https://github.com/ambanum/CGUs-versions/commits/master/$serviceId.atom.` |
+| un document spécifique d'un service | Replace `$serviceId` with the service ID and `$documentType` with the document type:<br>`https://github.com/ambanum/CGUs-versions/commits/master/$serviceId/$documentType.md.atom` |
+
+For example:
+
+- To receive all updates of `Facebook` documents, the URL is `https://github.com/ambanum/CGUs-versions/commits/master/Facebook.atom`.
+- To receive all updates of the `Privacy Policy` from `Google`, the URL is `https://github.com/ambanum/CGUs-versions/commits/master/Google/Privacy%20Policy.md.atom`.
 
 
 ## Analysing the snapshots history
@@ -87,7 +117,7 @@ npm run setup
 
 #### Configuration file
 
-The default configuration can be read and changed in `config/default.json`:
+The default configuration can be read and changed in `config/default.json`.
 
 ```json
 {
@@ -105,13 +135,13 @@ The default configuration can be read and changed in `config/default.json`:
     "sendInBlue": {
       "administratorsListId": "SendInBlue contacts list ID of administrators",
       "updatesListId": "SendInBlue contacts list ID of persons to notify on document updates",
-      "updateTemplateId": "SendInBlue email template ID used for updates notifications",
-      "updateErrorTemplateId": "SendInBlue email template ID used for updates error notifications",
-      "applicationErrorTemplateId": "SendInBlue email template ID used for application error notifications"
+      "updateTemplateId": "SendInBlue email template ID used for updates notifications"
     }
   }
 }
 ```
+
+The default configuration is merged with (and overridden by) environment-specific configuration that can be specified at startup with the [`NODE_ENV` environment variable](#node-env).
 
 An example of a production configuration file can be found in `config/production.json`. It includes the extra configuration for:
 
@@ -144,15 +174,24 @@ An example of a production configuration file can be found in `config/production
 
 These environment variables can be provided in a `.env` file at the root of the repository. See `.env.example` for an example of such a file.
 
-In order to be notified for errors, a valid SMTP configuration should be provided through the following environment variables:
+##### `SMTP_HOST` and `SMTP_USERNAME`
 
-* `SMTP_HOST` for the SMTP hostname
-* `SMTP_USERNAME` / `SMTP_PASSWORD` for the credentials
+In order to be notified for errors over email, a valid SMTP configuration should be provided through the following environment variables:
 
+* `SMTP_HOST` for the SMTP server hostname.
+* `SMTP_USERNAME` / `SMTP_PASSWORD` for the credentials.
+
+##### `HTTP_PROXY` and `HTTPS_PROXY`
 
 If your infrastructure requires using an outgoing HTTP/HTTPS proxy to access Internet, you can provide it through the `HTTP_PROXY` and `HTTPS_PROXY` environment variable.
 
+##### `SENDINBLUE_API_KEY`
+
 In order to use the default [SendInBlue](https://www.sendinblue.com)-based notification mechanism, a valid API key should be provided through the `SENDINBLUE_API_KEY` environment variable.
+
+##### `NODE_ENV`
+
+The `NODE_ENV` environment variable loads additional [configuration files](#configuration-file).
 
 
 ### Running
