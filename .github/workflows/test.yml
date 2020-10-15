@@ -9,11 +9,6 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-      with:
-        fetch-depth: 0
-        ref: ${{ github.event.pull_request.head.sha }}
-    - run: git checkout HEAD
-    - run: git fetch origin master:master
     - name: Use Node.js
       uses: actions/setup-node@v1
       with:
@@ -23,5 +18,4 @@ jobs:
         git config --global user.name 'AmbNum Bot'
         git config --global user.email 'ambnum.bot@disinfo.quaidorsay.fr'
     - run: npm run validate:schema
-    - run: npm run validate:modified
     - run: npm test

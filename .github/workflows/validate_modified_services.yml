@@ -1,0 +1,26 @@
+name: Validate modified services
+
+on:
+  push:
+    branches-ignore:
+      - master  # by definition, there are no modified services on the master branch
+  pull_request:
+
+jobs:
+  test:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+        ref: ${{ github.event.pull_request.head.sha }}
+    - run: git checkout HEAD
+    - run: git fetch origin master:master
+    - name: Use Node.js
+      uses: actions/setup-node@v1
+      with:
+        node-version: '12.17'
+    - run: npm ci
+    - run: npm run validate:modified
