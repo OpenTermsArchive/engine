@@ -2,9 +2,6 @@ name: Test
 
 on: [ push, pull_request ]
 
-env:
-  SENDINBLUE_API_KEY: ${{ secrets.SENDINBLUE_API_KEY }}
-
 jobs:
   test:
 
