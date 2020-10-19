@@ -1,6 +1,6 @@
 import fsApi from 'fs';
 import path from 'path';
-import {pathToFileURL} from 'url';
+import { pathToFileURL } from 'url';
 
 const fs = fsApi.promises;
 
