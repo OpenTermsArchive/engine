@@ -4,10 +4,10 @@ import path from 'path';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import nock from 'nock';
+import { fileURLToPath } from 'url';
 
 import fetch from './index.js';
 import { InaccessibleContentError } from '../errors.js';
-import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const { expect } = chai;

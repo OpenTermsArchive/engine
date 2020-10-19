@@ -6,6 +6,7 @@ import chai from 'chai';
 import config from 'config';
 import jsonSourceMap from 'json-source-map';
 import simpleGit from 'simple-git';
+import { fileURLToPath } from 'url';
 
 import fetch from '../../src/app/fetcher/index.js';
 import filter from '../../src/app/filter/index.js';
@@ -13,11 +14,11 @@ import loadServiceDeclarations from '../../src/app/loader/index.js';
 import serviceSchema from './service.schema.js';
 
 const fs = fsApi.promises;
-const __dirname = path.dirname(new URL(import.meta.url).pathname);
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const { expect } = chai;
 const rootPath = path.join(__dirname, '../..');
 const MIN_DOC_LENGTH = 100;
-const filePathRelativeToRoot = new URL(import.meta.url).pathname.replace(`${rootPath}/`, '');
+const filePathRelativeToRoot = path.relative(rootPath, fileURLToPath(import.meta.url)).split(path.sep).join('/');//Convert possible Windows path to posit version from args
 
 const args = process.argv.slice(process.argv.indexOf(filePathRelativeToRoot) + 1); // Keep only args that are after the script filename
 
