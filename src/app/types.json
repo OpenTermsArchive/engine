@@ -52,14 +52,14 @@
     "commitment": {
       "writer": "service provider",
       "audience": "end user",
-      "object": "acceptable usage"
+      "object": "acceptable and unacceptable usage"
     }
   },
   "Restricted Use Policy": {
     "commitment": {
       "writer": "service provider",
       "audience": "end user",
-      "object": "restricted usage"
+      "object": "restrictions on specific usage"
     }
   },
   "Commercial Terms": {
