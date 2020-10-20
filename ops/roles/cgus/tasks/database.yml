@@ -1,4 +1,4 @@
-- name: Get information about {{ name }}
+- name: Define if {{ name }} base data has been obtained from the public instance
   git:
     repo: "{{ repository }}"
     dest: "/home/{{ ansible_user }}/{{ directory }}"
@@ -12,7 +12,7 @@
     - start
     - update
 
-- name: Remove index.lock in {{ name }}
+- name: Remove existing locks in {{ name }}
   file:
     path: "/home/{{ ansible_user }}/{{ directory }}/.git/index.lock"
     state: absent
@@ -22,7 +22,7 @@
     - start
     - update
 
-- name: Clone {{ name }}
+- name: Obtain {{ name }} initial data from the public instance
   git:
     repo: "{{ repository }}"
     dest: "/home/{{ ansible_user }}/{{ directory }}"
@@ -33,7 +33,7 @@
   tags:
     - setup
 
-- name: Update {{ name }}
+- name: Get latest data from public instance of {{ name }}
   command:
     cmd: git pull
     chdir: "/home/{{ ansible_user }}/{{ directory }}"
@@ -43,7 +43,7 @@
     - start
     - update
 
-- name: Reset {{ name }} on HEAD
+- name: Drop all uncommitted changes on {{ name }}
   command:
     cmd: git reset --hard HEAD
     chdir: "/home/{{ ansible_user }}/{{ directory }}"
