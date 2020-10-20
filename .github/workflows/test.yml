@@ -13,14 +13,16 @@ jobs:
     runs-on: ${{ matrix.operating_system }}
 
     steps:
-    - uses: actions/checkout@v2
-    - name: Use Node.js
-      uses: actions/setup-node@v1
-      with:
-        node-version: 12.x
-    - run: npm ci
-    - run: |
-        git config --global user.name 'AmbNum Bot'
-        git config --global user.email 'ambnum.bot@disinfo.quaidorsay.fr'
-    - run: npm run validate:schema
-    - run: npm test
+      - run: |
+         git config --global user.name 'AmbNum Bot'
+         git config --global user.email 'ambnum.bot@disinfo.quaidorsay.fr'
+         git config --global core.autocrlf false
+      - uses: actions/checkout@v2
+      - name: Use Node.js
+        uses: actions/setup-node@v1
+        with: 
+          node-version: 12.x
+      - run: npm ci
+      - run: npm run validate:schema
+      - run: npm test
+      
