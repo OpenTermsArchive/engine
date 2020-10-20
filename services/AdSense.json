@@ -5,11 +5,6 @@
       "fetch": "https://www.google.com/adsense/tc/2018/UnitedKingdom.html",
       "select": "body"
     },
-    "Program Policies": {
-      "fetch": "https://support.google.com/adsense/answer/48182",
-      "select": ".article-container",
-      "remove": ".action-button, .zippy"
-    },
     "Parent Organization Privacy Policy": {
       "fetch": "https://policies.google.com/privacy?hl=en-GB",
       "filter": [
