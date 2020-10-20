@@ -6,7 +6,7 @@
     update: no
     accept_hostkey: yes
     key_file: "/home/{{ ansible_user }}/.ssh/cgus-bot-key"
-  register: git_dir
+  register: existing_repository  # the `return` property of the return value can tell us if the repository has been cloned already or not, see <https://docs.ansible.com/ansible/latest/collections/ansible/builtin/git_module.html#return-values>
   tags:
     - restart
     - start
@@ -16,7 +16,7 @@
   file:
     path: "/home/{{ ansible_user }}/{{ directory }}/.git/index.lock"
     state: absent
-  when: git_dir.before is defined and git_dir.before
+  when: existing_repository.before is defined and existing_repository.before  # if existing_repository.before is not null, then the repository already is not new
   tags:
     - restart
     - start
@@ -29,7 +29,7 @@
     depth: 1
     accept_hostkey: yes
     key_file: "/home/{{ ansible_user }}/.ssh/cgus-bot-key"
-  when: git_dir.before is defined and not git_dir.before
+  when: existing_repository.before is defined and not existing_repository.before  # if existing_repository.before is null, then the repository already is new
   tags:
     - setup
 
@@ -37,7 +37,7 @@
   command:
     cmd: git pull origin master:master
     chdir: "/home/{{ ansible_user }}/{{ directory }}"
-  when: git_dir.before is defined and git_dir.before
+  when: existing_repository.before is defined and existing_repository.before  # if existing_repository.before is not null, then the repository already is not new
   tags:
     - restart
     - start
@@ -47,7 +47,7 @@
   command:
     cmd: git checkout master
     chdir: "/home/{{ ansible_user }}/{{ directory }}"
-  when: git_dir.before is defined and git_dir.before
+  when: existing_repository.before is defined and existing_repository.before  # if existing_repository.before is not null, then the repository already is not new
   tags:
     - restart
     - start
