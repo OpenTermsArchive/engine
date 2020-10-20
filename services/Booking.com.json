@@ -1,5 +1,5 @@
 {
-    "name": "Booking",
+    "name": "Booking.com",
     "documents": {
         "Terms of Service": {
             "fetch": "https://www.booking.com/content/terms.en-gb.html",
