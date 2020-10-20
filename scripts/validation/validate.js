@@ -18,7 +18,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const { expect } = chai;
 const rootPath = path.join(__dirname, '../..');
 const MIN_DOC_LENGTH = 100;
-const filePathRelativeToRoot = path.relative(rootPath, fileURLToPath(import.meta.url)).split(path.sep).join('/');//Convert possible Windows path to posit version from args
+const filePathRelativeToRoot = path.relative(rootPath, fileURLToPath(import.meta.url)).split(path.sep).join('/'); // Convert possible Windows path to POSIX version from args
 
 const args = process.argv.slice(process.argv.indexOf(filePathRelativeToRoot) + 1); // Keep only args that are after the script filename
 
