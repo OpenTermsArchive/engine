@@ -6,7 +6,7 @@
       "select": "article.devsite-article",
       "remove": ".devsite-article-meta, .devsite-thumb-rating"
     },
-    "Privacy Policy": {
+    "Developer Terms": {
       "fetch": "https://developers.google.com/terms/api-services-user-data-policy",
       "select": "article.devsite-article",
       "remove": ".devsite-article-meta, .devsite-thumb-rating"
