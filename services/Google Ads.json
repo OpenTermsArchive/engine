@@ -13,7 +13,7 @@
       "select": "div[role=article]",
       "remove": ".KMMDve, .TL2alc, img[src$='.svg']"
     },
-    "Program Policies": {
+    "Acceptable Use Policy": {
       "fetch": "https://support.google.com/adspolicy/answer/6008942",
       "select": ".article-container"
     },
