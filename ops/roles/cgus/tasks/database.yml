@@ -35,7 +35,17 @@
 
 - name: Get latest data from public instance of {{ name }}
   command:
-    cmd: git pull
+    cmd: git pull origin master:master
+    chdir: "/home/{{ ansible_user }}/{{ directory }}"
+  when: git_dir.before is defined and git_dir.before
+  tags:
+    - restart
+    - start
+    - update
+
+- name: Ensure {{ name }} is on the main branch
+  command:
+    cmd: git checkout master
     chdir: "/home/{{ ansible_user }}/{{ directory }}"
   when: git_dir.before is defined and git_dir.before
   tags:
