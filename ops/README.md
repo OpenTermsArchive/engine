@@ -30,6 +30,8 @@ ansible-playbook ops/site.yml
 ansible-playbook ops/infra.yml
 ```
 
+Setting up the production infrastructure for publishing on the shared versions repository entails decrypting a private key managed with [Ansible Vault](https://docs.ansible.com/ansible/latest/user_guide/vault.html). It is decrypted with a password that we keep safe. You do not need to decrypt this specific private key on your own production server.
+
 - To setup `CGUs` app only:
 ```
 ansible-playbook ops/app.yml

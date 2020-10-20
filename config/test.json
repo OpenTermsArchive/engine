@@ -8,9 +8,7 @@
     "sendInBlue": {
       "administratorsListId": 194,
       "updatesListId": 195,
-      "updateTemplateId": 21,
-      "updateErrorTemplateId": 22,
-      "applicationErrorTemplateId": 24
+      "updateTemplateId": 21
     }
   }
 }
