@@ -12,16 +12,6 @@
     - start
     - update
 
-- name: Remove existing locks in {{ name }}
-  file:
-    path: "/home/{{ ansible_user }}/{{ directory }}/.git/index.lock"
-    state: absent
-  when: existing_repository.before is defined and existing_repository.before  # if existing_repository.before is not null, then the repository already is not new
-  tags:
-    - restart
-    - start
-    - update
-
 - name: Obtain {{ name }} initial data from the public instance
   git:
     repo: "{{ repository }}"
@@ -33,11 +23,19 @@
   tags:
     - setup
 
+- name: Remove existing locks in {{ name }}
+  file:
+    path: "/home/{{ ansible_user }}/{{ directory }}/.git/index.lock"
+    state: absent
+  tags:
+    - restart
+    - start
+    - update
+
 - name: Get latest data from public instance of {{ name }}
   command:
     cmd: git pull origin master:master
     chdir: "/home/{{ ansible_user }}/{{ directory }}"
-  when: existing_repository.before is defined and existing_repository.before  # if existing_repository.before is not null, then the repository already is not new
   tags:
     - restart
     - start
@@ -47,7 +45,6 @@
   command:
     cmd: git checkout master
     chdir: "/home/{{ ansible_user }}/{{ directory }}"
-  when: existing_repository.before is defined and existing_repository.before  # if existing_repository.before is not null, then the repository already is not new
   tags:
     - restart
     - start
