@@ -18,7 +18,7 @@
     "posttest": "npm run lint",
     "test": "cross-env NODE_ENV=test mocha --file './test/helper.js' --recursive \"./src/**/*.test.js\"",
     "test:debug": "cross-env NODE_ENV=test mocha --file './test/helper.js' --recursive \"./src/**/*.test.js\" --inspect-brk --exit",
-    "validate": "cross-env NODE_ENV=validation node --unhandled-rejections=strict node_modules/mocha/bin/_mocha --delay --file './test/helper.js' scripts/validation/validate.js",
+    "validate": "cross-env NODE_ENV=validation npx --node-arg=--unhandled-rejections=strict node_modules/.bin/mocha --delay --file './test/helper.js' scripts/validation/validate.js",
     "validate:schema": "npm run validate -- --schema-only",
     "validate:modified": "npm run validate -- --modified-only"
   },

@@ -25,4 +25,4 @@ jobs:
       - run: npm ci
       - run: npm run validate:schema
       - run: npm test
-      
+
