@@ -90,7 +90,7 @@ The only mandatory keys are `fetch` and `select` (except for PDF files, for whic
 
 This property should simply contain the URL at which the document you want to track can be downloaded. HTML and PDF files are supported.
 
-When multiple versions coexist, terms are only tracked in their English version and for the European (EEA) jurisdiction.
+When multiple versions coexist, **terms are only tracked in their English version and for the European (EEA) jurisdiction**.
 
 > We intend to expand coverage, but we focus for the moment on this subset of documents to fine-tune the system.
 
