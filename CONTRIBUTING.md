@@ -228,16 +228,18 @@ Please note that we do not want [service-specific types](https://github.com/amba
 
 ## Testing your declaration
 
-You can test the declaration by running the following command:
+You can test the declarations you created or changed by running the following command:
 
 ```
-npm run validate $service_id
+npm run validate:modified
 ```
+
+> You can also validate any arbitrary service with `npm run validate $service_id [, $service_id …]`.
 
 Since this operation fetches documents and could be long, you can also validate the declaration structure only:
 
 ```
-npm run validate:schema $service_id
+npm run validate:schema [$service_id [, $service_id …]]
 ```
 
 If you change filters or selectors and want to refilter documents from snapshots and regenerate versions only:
