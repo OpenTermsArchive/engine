@@ -135,9 +135,7 @@ The default configuration can be read and changed in `config/default.json`.
     "sendInBlue": {
       "administratorsListId": "SendInBlue contacts list ID of administrators",
       "updatesListId": "SendInBlue contacts list ID of persons to notify on document updates",
-      "updateTemplateId": "SendInBlue email template ID used for updates notifications",
-      "updateErrorTemplateId": "SendInBlue email template ID used for updates error notifications",
-      "applicationErrorTemplateId": "SendInBlue email template ID used for application error notifications"
+      "updateTemplateId": "SendInBlue email template ID used for updates notifications"
     }
   }
 }
