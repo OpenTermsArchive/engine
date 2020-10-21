@@ -116,6 +116,10 @@ const schema = {
               }
             }
           ]
+        },
+        executeClientScripts: {
+            type: 'boolean',
+            description: 'Optional boolean to use a puppeteer based fetcher, capable of gathering terms from websites using scripts to render content',
         }
       }
     },
