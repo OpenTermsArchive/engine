@@ -86,7 +86,7 @@ export default class CGUs extends events.EventEmitter {
   async trackDocumentChanges(documentDeclaration) {
     const { type, serviceId, fetch: location } = documentDeclaration;
 
-    const { mimeType, content } = await fetch(location);
+    const { mimeType, content } = documentDeclaration.executeClientScripts ? await fetch(location, documentDeclaration.executeClientScripts, documentDeclaration.select) : await fetch(location);
 
     if (!content) {
       return;

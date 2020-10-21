@@ -61,7 +61,9 @@ let servicesToValidate = args.filter(arg => !arg.startsWith('--'));
                 this.timeout(30000);
 
                 const { fetch: location } = service.documents[type];
-                const document = await fetch(location);
+                const { select: selector } = service.documents[type];
+                const { executeClientScripts: executeClientScripts } = service.documents[type];
+                const document = executeClientScripts ? await fetch(location, executeClientScripts, selector) : await fetch(location);
                 content = document.content;
                 mimeType = document.mimeType;
               });
@@ -71,6 +73,7 @@ let servicesToValidate = args.filter(arg => !arg.startsWith('--'));
                   console.log('      (Tests skipped as url is not fetchable)');
                   this.skip();
                 }
+                this.timeout(30000);
 
                 filteredContent = await filter({
                   content,
@@ -111,7 +114,9 @@ let servicesToValidate = args.filter(arg => !arg.startsWith('--'));
                   this.timeout(30000);
 
                   const { fetch: location } = service.documents[type];
-                  const document = await fetch(location);
+                  const { select: selector } = service.documents[type];
+                  const { executeClientScripts: executeClientScripts } = service.documents[type];
+                  const document = executeClientScripts ? await fetch(location, executeClientScripts, selector) : await fetch(location);
 
                   const secondFilteredContent = await filter({
                     content: document.content,
