@@ -1,0 +1,69 @@
+- name: Define if {{ name }} base data has been obtained from the public instance
+  git:
+    repo: "{{ repository }}"
+    dest: "/home/{{ ansible_user }}/{{ directory }}"
+    clone: no
+    update: no
+    accept_hostkey: yes
+    key_file: "/home/{{ ansible_user }}/.ssh/cgus-bot-key"
+  register: existing_repository  # the `return` property of the return value can tell us if the repository has been cloned already or not, see <https://docs.ansible.com/ansible/latest/collections/ansible/builtin/git_module.html#return-values>
+  tags:
+    - restart
+    - start
+    - update
+
+- name: Obtain {{ name }} initial data from the public instance
+  git:
+    repo: "{{ repository }}"
+    dest: "/home/{{ ansible_user }}/{{ directory }}"
+    depth: 1
+    accept_hostkey: yes
+    key_file: "/home/{{ ansible_user }}/.ssh/cgus-bot-key"
+  when: existing_repository.before is defined and not existing_repository.before  # if existing_repository.before is null, then the repository already is new
+  tags:
+    - setup
+
+- name: Remove existing locks in {{ name }}
+  file:
+    path: "/home/{{ ansible_user }}/{{ directory }}/.git/index.lock"
+    state: absent
+  tags:
+    - restart
+    - start
+    - update
+
+- name: Get latest data from public instance of {{ name }}
+  command:
+    cmd: git pull origin master
+    chdir: "/home/{{ ansible_user }}/{{ directory }}"
+  tags:
+    - restart
+    - start
+    - update
+
+- name: Ensure {{ name }} is on the main branch
+  command:
+    cmd: git checkout master
+    chdir: "/home/{{ ansible_user }}/{{ directory }}"
+  tags:
+    - restart
+    - start
+    - update
+
+- name: Drop all uncommitted changes on {{ name }}
+  command:
+    cmd: git reset --hard HEAD
+    chdir: "/home/{{ ansible_user }}/{{ directory }}"
+  tags:
+    - restart
+    - start
+    - update
+
+- name: Remove all leftover files in {{ name }}
+  command:
+    cmd: git clean --force
+    chdir: "/home/{{ ansible_user }}/{{ directory }}"
+  tags:
+    - restart
+    - start
+    - update
