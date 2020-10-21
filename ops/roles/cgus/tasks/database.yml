@@ -34,7 +34,7 @@
 
 - name: Get latest data from public instance of {{ name }}
   command:
-    cmd: git pull origin master:master
+    cmd: git pull origin master
     chdir: "/home/{{ ansible_user }}/{{ directory }}"
   tags:
     - restart
