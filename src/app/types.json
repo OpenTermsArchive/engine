@@ -3,14 +3,14 @@
     "commitment": {
       "writer": "service provider",
       "audience": "end user",
-      "object": "service usage"
+      "object": "end user’s service usage"
     }
   },
   "Privacy Policy": {
     "commitment": {
       "writer": "service provider",
       "audience": "end user",
-      "object": "personal data"
+      "object": "end user’s personal data"
     }
   },
   "Trackers Policy": {

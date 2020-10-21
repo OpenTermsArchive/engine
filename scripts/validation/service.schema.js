@@ -59,7 +59,7 @@ const schema = {
       properties: {
         fetch: {
           type: 'string',
-          pattern: '^https?://.+\.[pP][dD][fF]$',
+          pattern: '^https?://.+\.[pP][dD][fF](\\?.+)?$',
           description: 'The URL where the document can be found'
         },
       },

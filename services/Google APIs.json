@@ -1,0 +1,15 @@
+{
+  "name": "Google APIs",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://developers.google.com/terms",
+      "select": "article.devsite-article",
+      "remove": ".devsite-article-meta, .devsite-thumb-rating"
+    },
+    "Developer Terms": {
+      "fetch": "https://developers.google.com/terms/api-services-user-data-policy",
+      "select": "article.devsite-article",
+      "remove": ".devsite-article-meta, .devsite-thumb-rating"
+    }
+  }
+}
