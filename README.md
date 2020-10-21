@@ -96,6 +96,8 @@ See [CONTRIBUTING](CONTRIBUTING.md).
 
 ### Installing
 
+> ** Windows Support ** This module can run locally on Windows systems. 
+
 This module is built with [Node](https://nodejs.org/en/). You will need to [install Node](https://nodejs.org/en/download/) to run it.
 
 Clone the repository and install dependencies:
