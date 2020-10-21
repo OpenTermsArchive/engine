@@ -19,7 +19,8 @@ The service name is exposed to end users. It should reflect as closely as possib
   - _Example: `hi5`_.
   - _Example: `LINE`_.
   - _Example: `App Store`_.
-  - _Example: `туту.ру`_.
+  - _Example: `туту.ру` (Cyrillic)_.
+  - _Example: `抖音短视频` (Simplified Chinese characters)_.
 - Domain name extensions (TLDs) are allowed when they are part of the official service name.
   - _Example: `Booking.com`_.
   - _Example: `historielærer.dk`_.
@@ -39,6 +40,7 @@ The service ID is exposed to developers. It should be easy to handle with script
   - _Example: `RTÉ` → `RTE`_.
   - _Example: `historielærer.dk` → `historielaerer.dk`_.
   - _Example: `туту.ру` → `tutu.ru`_.
+  - _Example: `抖音短视频` → `Douyin`_.
 - Punctuation is supported, except characters that have meaning at filesystem level (`:`, `/`, `\`). These are replaced with a dash (`-`).
   - _Example: `Booking.com` → `Booking.com`_.
   - _Example: `Yahoo!` → `Yahoo!`_.
