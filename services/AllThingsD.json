@@ -1,0 +1,10 @@
+{
+  "name": "AllThingsD",
+  "importedFrom": "https://github.com/tosdr/tosback2/blob/f762cd4bbb2571272985fed009201a23300ba9b2/rules/allthingsd.com.xml",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "http://allthingsd.com/privacy/",
+      "select": "div.privacyPolicyContent"
+    }
+  }
+}

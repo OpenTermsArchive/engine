@@ -1,0 +1,10 @@
+{
+  "name": "Dlink",
+  "importedFrom": "https://github.com/tosdr/tosback2/blob/f762cd4bbb2571272985fed009201a23300ba9b2/rules/dlink.com.xml",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://www.dlink.com/en/terms-of-use",
+      "select": "html > body > div > div:nth-of-type(2) > section:nth-of-type(2) > div > section > div > div > div:nth-of-type(2) > div"
+    }
+  }
+}

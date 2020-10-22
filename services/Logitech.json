@@ -1,0 +1,10 @@
+{
+  "name": "Logitech",
+  "importedFrom": "https://github.com/tosdr/tosback2/blob/f762cd4bbb2571272985fed009201a23300ba9b2/rules/logitech.com.xml",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://www.logitech.com/en-us/articles/terms-of-service-logi-circle",
+      "select": "html > body > div:first-of-type > main > div > div > div > div > div"
+    }
+  }
+}

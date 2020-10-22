@@ -1,0 +1,10 @@
+{
+  "name": "Forums",
+  "importedFrom": "https://github.com/tosdr/tosback2/blob/f762cd4bbb2571272985fed009201a23300ba9b2/rules/forums.informe.com.xml",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "http://forums.informe.com/TermsOfService.html",
+      "select": "div#content"
+    }
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "name": "Wordfeud",
+  "importedFrom": "https://github.com/tosdr/tosback2/blob/f762cd4bbb2571272985fed009201a23300ba9b2/rules/wordfeud.com.xml",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "http://wordfeud.com/privacy/",
+      "select": "body"
+    },
+    "Terms of Service": {
+      "fetch": "http://wordfeud.com/tos/",
+      "select": "body"
+    }
+  }
+}

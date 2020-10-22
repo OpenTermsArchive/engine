@@ -1,0 +1,10 @@
+{
+  "name": "Godlikeproductions",
+  "importedFrom": "https://github.com/tosdr/tosback2/blob/f762cd4bbb2571272985fed009201a23300ba9b2/rules/godlikeproductions.com.xml",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "http://www.godlikeproductions.com/privacy",
+      "select": "div#rightpanel_inner"
+    }
+  }
+}

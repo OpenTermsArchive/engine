@@ -1,0 +1,14 @@
+{
+  "name": "Nationalgeographic",
+  "importedFrom": "https://github.com/tosdr/tosback2/blob/f762cd4bbb2571272985fed009201a23300ba9b2/rules/nationalgeographic.com.xml",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "http://www.nationalgeographic.com/community/privacy_complete.html",
+      "select": "div"
+    },
+    "Terms of Service": {
+      "fetch": "http://www.nationalgeographic.com/community/terms/",
+      "select": "div"
+    }
+  }
+}

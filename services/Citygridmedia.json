@@ -1,0 +1,10 @@
+{
+  "name": "Citygridmedia",
+  "importedFrom": "https://github.com/tosdr/tosback2/blob/f762cd4bbb2571272985fed009201a23300ba9b2/rules/citygridmedia.com.xml",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "http://www.citygridmedia.com/privacy_policy.html",
+      "select": "body"
+    }
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "name": "Sparkpeople",
+  "importedFrom": "https://github.com/tosdr/tosback2/blob/f762cd4bbb2571272985fed009201a23300ba9b2/rules/sparkpeople.com.xml",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "http://www.sparkpeople.com/resource/motivation_articles.asp?id=922",
+      "select": "td.article_font_fix"
+    }
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "name": "Npr",
+  "importedFrom": "https://github.com/tosdr/tosback2/blob/f762cd4bbb2571272985fed009201a23300ba9b2/rules/npr.org.xml",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "http://www.npr.org/about/privacypolicy.html",
+      "select": "body"
+    }
+  }
+}

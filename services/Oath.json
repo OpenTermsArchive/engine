@@ -1,0 +1,14 @@
+{
+  "name": "Oath",
+  "importedFrom": "https://github.com/tosdr/tosback2/blob/f762cd4bbb2571272985fed009201a23300ba9b2/rules/oath.com.xml",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://policies.oath.com/us/en/oath/privacy/index.html",
+      "select": "main"
+    },
+    "Vulnerability Disclosure Policy": {
+      "fetch": "https://policies.oath.com/us/en/oath/privacy/topics/security/index.html",
+      "select": "main"
+    }
+  }
+}

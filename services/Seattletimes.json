@@ -1,0 +1,10 @@
+{
+  "name": "Seattletimes",
+  "importedFrom": "https://github.com/tosdr/tosback2/blob/f762cd4bbb2571272985fed009201a23300ba9b2/rules/seattletimes.nwsource.com.xml",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "http://www.seattletimescompany.com/notices/notice2.html",
+      "select": "div#dashboard"
+    }
+  }
+}

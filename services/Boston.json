@@ -1,0 +1,10 @@
+{
+  "name": "Boston",
+  "importedFrom": "https://github.com/tosdr/tosback2/blob/f762cd4bbb2571272985fed009201a23300ba9b2/rules/boston.com.xml",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "http://www.boston.com/help/privacy_policy/?p1=Foot_ContactBostonCom_PrivacyPolicy",
+      "select": "div#Col1"
+    }
+  }
+}

@@ -8,6 +8,10 @@
     "Privacy Policy": {
       "fetch": "https://about.deviantart.com/policy/privacy/",
       "select": ".bubbleview"
+    },
+    "Community Guidelines": {
+      "fetch": "http://about.deviantart.com/policy/etiquette/",
+      "select": "div#policy-etiquette"
     }
   }
 }

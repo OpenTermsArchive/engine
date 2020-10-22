@@ -1,0 +1,14 @@
+{
+  "name": "Amazon",
+  "importedFrom": "https://github.com/tosdr/tosback2/blob/f762cd4bbb2571272985fed009201a23300ba9b2/rules/amazon.co.uk.xml",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.amazon.com/gp/help/customer/display.html?nodeId=468496",
+      "select": "div.help-content"
+    },
+    "Terms of Service": {
+      "fetch": "https://www.amazon.com/gp/help/customer/display.html?nodeId=508088",
+      "select": "div.help-content"
+    }
+  }
+}
