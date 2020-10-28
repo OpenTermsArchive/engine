@@ -91,12 +91,11 @@ We provide a database of snapshots recorded each time there is a change in the t
 
 See [CONTRIBUTING](CONTRIBUTING.md).
 
-
 ## Using locally
 
-### Installing
+> **Windows Support**: This module can run locally on Windows systems.
 
-> ** Windows Support ** This module can run locally on Windows systems. 
+### Installing
 
 This module is built with [Node](https://nodejs.org/en/). You will need to [install Node](https://nodejs.org/en/download/) to run it.
 
