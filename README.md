@@ -91,8 +91,9 @@ We provide a database of snapshots recorded each time there is a change in the t
 
 See [CONTRIBUTING](CONTRIBUTING.md).
 
-
 ## Using locally
+
+> **Windows Support**: This module can run locally on Windows systems.
 
 ### Installing
 

@@ -1,5 +1,6 @@
 import path from 'path';
 import events from 'events';
+import { fileURLToPath } from 'url';
 
 import config from 'config';
 import async from 'async';
@@ -10,7 +11,7 @@ import filter from './filter/index.js';
 import loadServiceDeclarations from './loader/index.js';
 import { InaccessibleContentError } from './errors.js';
 
-const __dirname = path.dirname(new URL(import.meta.url).pathname);
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const SERVICE_DECLARATIONS_PATH = path.resolve(__dirname, '../../', config.get('serviceDeclarationsPath'));
 const MAX_PARALLEL_DOCUMENTS_TRACKS = 20;
 const MAX_PARALLEL_REFILTERS = 20;
