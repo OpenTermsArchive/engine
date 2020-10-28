@@ -4,10 +4,11 @@
 
 import path from 'path';
 import config from 'config';
+import { fileURLToPath } from 'url';
 
 import Recorder from './recorder.js';
 
-const __dirname = path.dirname(new URL(import.meta.url).pathname);
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export const SNAPSHOTS_PATH = path.resolve(__dirname, '../../..', config.get('history.snapshotsPath'));
 export const VERSIONS_PATH = path.resolve(__dirname, '../../..', config.get('history.versionsPath'));

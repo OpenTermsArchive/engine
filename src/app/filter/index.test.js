@@ -3,11 +3,12 @@ import path from 'path';
 
 import chai from 'chai';
 import jsdom from 'jsdom';
+import { fileURLToPath } from 'url';
 
 import { filterHTML, filterPDF, convertRelativeURLsToAbsolute } from './index.js';
 import { InaccessibleContentError } from '../errors.js';
 
-const __dirname = path.dirname(new URL(import.meta.url).pathname);
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const fs = fsApi.promises;
 const { JSDOM } = jsdom;
 const { expect } = chai;
