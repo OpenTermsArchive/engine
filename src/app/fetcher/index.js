@@ -1,10 +1,10 @@
-import nodeFetch from './nodeFetch.js';
-import puppeteerFetch from './puppeteerFetch.js';
+import serverFetch from './serverFetch/index.js';
+import clientFetch from './clientFetch/index.js';
 
-export default async function fetch(url, executeClientScripts, selector) {
+export default async function fetch({ url, executeClientScripts, cssSelectors }) {
   if (executeClientScripts) {
-    return puppeteerFetch(url, selector);
+    return clientFetch(url, cssSelectors);
   }
 
-  return nodeFetch(url);
+  return serverFetch(url);
 }

@@ -4,6 +4,9 @@
     "snapshotsPath": "./test/data/snapshots",
     "versionsPath": "./test/data/versions"
   },
+  "fetcher": {
+    "waitForElementsTimeout": 1000
+  },
   "notifier": {
     "sendInBlue": {
       "administratorsListId": 194,

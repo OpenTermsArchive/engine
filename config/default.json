@@ -12,6 +12,9 @@
       "email": "ambnum.bot@disinfo.quaidorsay.fr"
     }
   },
+  "fetcher": {
+    "waitForElementsTimeout": 10000
+  },
   "logger": {
     "sendMailOnError": false
   },

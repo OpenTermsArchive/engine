@@ -7,13 +7,13 @@ import nock from 'nock';
 import { fileURLToPath } from 'url';
 
 import fetch from './index.js';
-import { InaccessibleContentError } from '../errors.js';
+import { InaccessibleContentError } from '../../errors.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const { expect } = chai;
 chai.use(chaiAsPromised);
 
-describe('Fetcher', () => {
+describe('ServerFetch', () => {
   let termsHTML;
 
   before(() => {
@@ -62,7 +62,7 @@ describe('Fetcher', () => {
       let expectedPDFContent;
 
       before(async () => {
-        expectedPDFContent = fs.readFileSync(path.resolve(__dirname, '../../../test/fixtures/terms.pdf'));
+        expectedPDFContent = fs.readFileSync(path.resolve(__dirname, '../../../../test/fixtures/terms.pdf'));
 
         nock('https://domain.example.com', { reqheaders: { 'Accept-Language': 'en' } })
           .get('/terms.pdf')
