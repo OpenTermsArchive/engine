@@ -10,6 +10,7 @@ import fetch from './fetcher/index.js';
 import filter from './filter/index.js';
 import loadServiceDeclarations from './loader/index.js';
 import { InaccessibleContentError } from './errors.js';
+import { extractCssSelectorsFromDocumentDeclaration } from './utils/index.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const SERVICE_DECLARATIONS_PATH = path.resolve(__dirname, '../../', config.get('serviceDeclarationsPath'));
@@ -84,9 +85,13 @@ export default class CGUs extends events.EventEmitter {
   }
 
   async trackDocumentChanges(documentDeclaration) {
-    const { type, serviceId, fetch: location } = documentDeclaration;
+    const { type, serviceId, fetch: location, executeClientScripts } = documentDeclaration;
 
-    const { mimeType, content } = documentDeclaration.executeClientScripts ? await fetch(location, documentDeclaration.executeClientScripts, documentDeclaration.select) : await fetch(location);
+    const { mimeType, content } = await fetch({
+      url: location,
+      executeClientScripts,
+      cssSelectors: extractCssSelectorsFromDocumentDeclaration(documentDeclaration)
+    });
 
     if (!content) {
       return;
