@@ -2,7 +2,7 @@ import nodeFetch from 'node-fetch';
 import HttpProxyAgent from 'http-proxy-agent';
 import HttpsProxyAgent from 'https-proxy-agent';
 
-import { InaccessibleContentError } from '../errors.js';
+import { InaccessibleContentError } from '../../errors.js';
 
 const LANGUAGE = 'en';
 
@@ -28,6 +28,7 @@ export default async function fetch(url) {
   if (!response.ok) {
     throw new InaccessibleContentError(`Received HTTP code ${response.status} when trying to fetch '${url}'`);
   }
+
   const mimeType = response.headers.get('content-type');
 
   return {
