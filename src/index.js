@@ -3,16 +3,23 @@ import scheduler from 'node-schedule';
 import CGUs from './app/index.js';
 import logger from './logger/index.js';
 import Notifier from './notifier/index.js';
+import { getModifiedServices } from './utils/index.js';
 
 const args = process.argv.slice(2);
+const modifiedOnly = args.includes('--modified-only');
 const refilterOnly = args.includes('--refilter-only');
 const schedule = args.includes('--schedule');
-let serviceIds = args.filter(arg => !arg.startsWith('--'));
 
 (async () => {
   const app = new CGUs();
   app.attach(logger);
   await app.init();
+
+  let serviceIds = args.filter(arg => !arg.startsWith('--'));
+
+  if (modifiedOnly) {
+    serviceIds = await getModifiedServices();
+  }
 
   serviceIds = serviceIds.filter(serviceId => {
     const isServiceDeclared = app.serviceDeclarations[serviceId];
@@ -22,6 +29,11 @@ let serviceIds = args.filter(arg => !arg.startsWith('--'));
 
     return isServiceDeclared;
   });
+
+  if (modifiedOnly && !serviceIds.length) {
+    logger.warn('No services have been modified');
+    return;
+  }
 
   serviceIds = serviceIds.length ? serviceIds : app.serviceIds;
 
