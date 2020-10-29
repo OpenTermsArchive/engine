@@ -76,6 +76,7 @@ Documents are declared in a service declaration file, under the `documents` prop
   "documents": {
     "<document type>": {
       "fetch": "<the URL where the document can be found>",
+      "executeClientScripts": "<a boolean which allow client scripts to be executed before accessing the content>",
       "filter": "<an array of service specific filter function names>",
       "remove": "<a CSS selector, a range selector or an array of selectors that target the noise parts of the document that has to be removed. Useful to remove parts that are inside the selected parts>",
       "select": "<a CSS selector, a range selector or an array of selectors that target the meaningful parts of the document, excluding elements such as headers, footers and navigation>",
@@ -95,6 +96,12 @@ This property should simply contain the URL at which the document you want to tr
 When multiple versions coexist, **terms are only tracked in their English version and for the European (EEA) jurisdiction**.
 
 > We intend to expand coverage, but we focus for the moment on this subset of documents to fine-tune the system.
+
+### `executeClientScripts`
+
+This boolean property, when set to `true` executes client script before trying to get document content by browsing to the URL with an headless browser. It's set to `false` by default. It is useful when the content of the document is loaded or modified dynamically on the browser side by client scripts.
+
+**:warning: Browsing with an headless browser is expensive and time consuming, use only when necessary.**
 
 ### `select`
 
