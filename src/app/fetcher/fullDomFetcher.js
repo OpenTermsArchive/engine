@@ -1,7 +1,7 @@
 import puppeteer from 'puppeteer';
 import config from 'config';
 
-import { InaccessibleContentError } from '../../errors.js';
+import { InaccessibleContentError } from '../errors.js';
 
 export default async function fetch(url, cssSelectors) {
   let response;
