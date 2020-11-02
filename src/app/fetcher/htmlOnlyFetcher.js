@@ -2,12 +2,13 @@ import nodeFetch from 'node-fetch';
 import HttpProxyAgent from 'http-proxy-agent';
 import HttpsProxyAgent from 'https-proxy-agent';
 
-import { InaccessibleContentError } from '../../errors.js';
+import { InaccessibleContentError } from '../errors.js';
 
 const LANGUAGE = 'en';
 
 export default async function fetch(url) {
   const options = {};
+
   if (url.startsWith('https:') && process.env.HTTPS_PROXY) {
     options.agent = new HttpsProxyAgent(process.env.HTTPS_PROXY);
   } else if (url.startsWith('http:') && process.env.HTTP_PROXY) {

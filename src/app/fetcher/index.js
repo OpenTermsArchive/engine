@@ -1,10 +1,10 @@
-import serverFetch from './serverFetch/index.js';
-import clientFetch from './clientFetch/index.js';
+import fetchHtmlOnly from './htmlOnlyFetcher.js';
+import fetchFullDom from './fullDomFetcher.js';
 
 export default async function fetch({ url, executeClientScripts, cssSelectors }) {
   if (executeClientScripts) {
-    return clientFetch(url, cssSelectors);
+    return fetchFullDom(url, cssSelectors);
   }
 
-  return serverFetch(url);
+  return fetchHtmlOnly(url);
 }

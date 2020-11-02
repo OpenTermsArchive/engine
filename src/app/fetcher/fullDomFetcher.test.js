@@ -2,15 +2,15 @@ import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import http from 'http';
 
-import fetch from './index.js';
-import { InaccessibleContentError } from '../../errors.js';
+import fetch from './fullDomFetcher.js';
+import { InaccessibleContentError } from '../errors.js';
 
 const { expect } = chai;
 chai.use(chaiAsPromised);
 
 const SERVER_PORT = 8976;
 
-describe('Client Fetch', function () {
+describe('FullDomFetcher', function () {
   this.timeout(10000);
 
   let termsHTML;
