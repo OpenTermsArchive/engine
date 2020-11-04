@@ -41,3 +41,14 @@
     owner: "{{ ansible_user }}"
     group: "{{ ansible_user }}"
     mode: 0644
+
+- name: Install Chromium
+  apt:
+    pkg:
+    - chromium
+    update_cache: yes
+    state: latest
+
+  # See https://github.com/puppeteer/puppeteer/blob/main/docs/troubleshooting.md#recommended-enable-user-namespace-cloning
+- name: Enable user namespace cloning to allow running Chromium in a sandbox
+  command: sysctl -w kernel.unprivileged_userns_clone=1
