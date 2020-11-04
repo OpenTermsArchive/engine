@@ -7,7 +7,7 @@ import config from 'config';
 import jsonSourceMap from 'json-source-map';
 import { fileURLToPath } from 'url';
 
-import { getModifiedServices } from '../../src/utils/index.js';
+import Services from '../../src/app/services/index.js';
 import fetch from '../../src/app/fetcher/index.js';
 import filter from '../../src/app/filter/index.js';
 import loadServiceDeclarations from '../../src/app/loader/index.js';
@@ -31,7 +31,7 @@ let servicesToValidate = args.filter(arg => !arg.startsWith('--'));
   const serviceDeclarations = await loadServiceDeclarations(path.join(rootPath, config.get('serviceDeclarationsPath')));
 
   if (modifiedOnly) {
-    servicesToValidate = await getModifiedServices();
+    servicesToValidate = await Services.getIdsOfModified();
   } else if (!servicesToValidate.length) {
     servicesToValidate = Object.keys(serviceDeclarations);
   }
