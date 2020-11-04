@@ -1,7 +1,7 @@
 import mime from 'mime';
 import DataURIParser from 'datauri/parser.js';
 
-import fetch from '../src/app/fetcher/index.js';
+import fetch from '../src/app/fetcher/htmlOnlyFetcher.js';
 
 const dataURI = new DataURIParser();
 
