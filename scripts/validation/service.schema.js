@@ -116,6 +116,10 @@ const schema = {
               }
             }
           ]
+        },
+        executeClientScripts: {
+          type: 'boolean',
+          description: 'Execute client-side JavaScript loaded by the document before accessing the content, in case the DOM modifications are needed to access the content.',
         }
       }
     },
