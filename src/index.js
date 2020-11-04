@@ -3,7 +3,7 @@ import scheduler from 'node-schedule';
 import CGUs from './app/index.js';
 import logger from './logger/index.js';
 import Notifier from './notifier/index.js';
-import { getModifiedServices } from './utils/index.js';
+import Services from './app/services/index.js';
 
 const args = process.argv.slice(2);
 const modifiedOnly = args.includes('--modified-only');
@@ -18,7 +18,7 @@ const schedule = args.includes('--schedule');
   let serviceIds = args.filter(arg => !arg.startsWith('--'));
 
   if (modifiedOnly) {
-    serviceIds = await getModifiedServices();
+    serviceIds = await Services.getIdsOfModified();
   }
 
   serviceIds = serviceIds.filter(serviceId => {
