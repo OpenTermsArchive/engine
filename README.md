@@ -132,6 +132,9 @@ The default configuration can be read and changed in `config/default.json`.
       "email": "Email to which changes in tracked documents will be credited"
     }
   },
+  "fetcher": {
+    "waitForElementsTimeout": "Maximum time (in milliseconds) to wait for elements to be present in the page when fetching document in a headless browser",
+  },
   "notifier": {
     "sendInBlue": {
       "administratorsListId": "SendInBlue contacts list ID of administrators",

@@ -118,8 +118,8 @@ const schema = {
           ]
         },
         executeClientScripts: {
-            type: 'boolean',
-            description: 'Optional boolean to use a puppeteer based fetcher, capable of gathering terms from websites using scripts to render content',
+          type: 'boolean',
+          description: 'Execute client-side JavaScript loaded by the document before accessing the content, in case the DOM modifications are needed to access the content.',
         }
       }
     },
