@@ -12,6 +12,7 @@ import fetch from '../../src/app/fetcher/index.js';
 import filter from '../../src/app/filter/index.js';
 import loadServiceDeclarations from '../../src/app/loader/index.js';
 import serviceSchema from './service.schema.js';
+import { extractCssSelectorsFromDocumentDeclaration } from '../../src/app/utils/index.js';
 
 const fs = fsApi.promises;
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -60,8 +61,12 @@ let servicesToValidate = args.filter(arg => !arg.startsWith('--'));
               it('has fetchable URL', async function () {
                 this.timeout(30000);
 
-                const { fetch: location } = service.documents[type];
-                const document = await fetch(location);
+                const { fetch: location, executeClientScripts } = service.documents[type];
+                const document = await fetch({
+                  url: location,
+                  executeClientScripts,
+                  cssSelectors: extractCssSelectorsFromDocumentDeclaration(service.documents[type])
+                });
                 content = document.content;
                 mimeType = document.mimeType;
               });
@@ -71,6 +76,7 @@ let servicesToValidate = args.filter(arg => !arg.startsWith('--'));
                   console.log('      (Tests skipped as url is not fetchable)');
                   this.skip();
                 }
+                this.timeout(30000);
 
                 filteredContent = await filter({
                   content,
@@ -110,8 +116,12 @@ let servicesToValidate = args.filter(arg => !arg.startsWith('--'));
 
                   this.timeout(30000);
 
-                  const { fetch: location } = service.documents[type];
-                  const document = await fetch(location);
+                  const { fetch: location, executeClientScripts } = service.documents[type];
+                  const document = await fetch({
+                    url: location,
+                    executeClientScripts,
+                    cssSelectors: extractCssSelectorsFromDocumentDeclaration(service.documents[type])
+                  });
 
                   const secondFilteredContent = await filter({
                     content: document.content,

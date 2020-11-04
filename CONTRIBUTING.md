@@ -75,10 +75,11 @@ Documents are declared in a service declaration file, under the `documents` prop
   …
   "documents": {
     "<document type>": {
-      "fetch": "<the URL where the document can be found>",
-      "filter": "<an array of service specific filter function names>",
-      "remove": "<a CSS selector, a range selector or an array of selectors that target the noise parts of the document that has to be removed. Useful to remove parts that are inside the selected parts>",
-      "select": "<a CSS selector, a range selector or an array of selectors that target the meaningful parts of the document, excluding elements such as headers, footers and navigation>",
+      "fetch": "The URL where the document can be found",
+      "executeClientScripts": "A boolean to execute client-side JavaScript loaded by the document before accessing the content, in case the DOM modifications are needed to access the content; defaults to false (fetch HTML only)",
+      "filter": "An array of service specific filter function names",
+      "remove": "A CSS selector, a range selector or an array of selectors that target the noise parts of the document that has to be removed. Useful to remove parts that are inside the selected parts",
+      "select": "A CSS selector, a range selector or an array of selectors that target the meaningful parts of the document, excluding elements such as headers, footers and navigation",
     }
   }
   …
@@ -95,6 +96,13 @@ This property should simply contain the URL at which the document you want to tr
 When multiple versions coexist, **terms are only tracked in their English version and for the European (EEA) jurisdiction**.
 
 > We intend to expand coverage, but we focus for the moment on this subset of documents to fine-tune the system.
+
+### `executeClientScripts`
+
+In some cases, the content of the document is only loaded (or is modified dynamically) by client scripts.
+When set to `true`, this boolean property loads the page in a headless browser to load all assets and execute client scripts before trying to get document content.
+
+Since the performance cost of this approach is high, it is set to `false` by default, relying on the HTML content only.
 
 ### `select`
 

@@ -6,14 +6,14 @@ import chaiAsPromised from 'chai-as-promised';
 import nock from 'nock';
 import { fileURLToPath } from 'url';
 
-import fetch from './index.js';
+import fetch from './htmlOnlyFetcher.js';
 import { InaccessibleContentError } from '../errors.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const { expect } = chai;
 chai.use(chaiAsPromised);
 
-describe('Fetcher', () => {
+describe('HtmlOnlyFetcher', () => {
   let termsHTML;
 
   before(() => {
