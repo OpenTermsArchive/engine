@@ -1,9 +1,9 @@
 export function extractCssSelectorsFromDocumentDeclaration(documentDeclaration) {
-  const { select, remove } = documentDeclaration;
+  const { contentSelectors, noiseSelectors } = documentDeclaration;
 
   const result = [
-    ...extractCssSelectorsFromDocumentProperty(select),
-    ...extractCssSelectorsFromDocumentProperty(remove),
+    ...extractCssSelectorsFromDocumentProperty(contentSelectors),
+    ...extractCssSelectorsFromDocumentProperty(noiseSelectors),
   ];
 
   return result.filter(selector => selector);

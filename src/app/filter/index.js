@@ -19,25 +19,25 @@ const { CiceroMarkTransformer } = ciceroMark;
 const pdfTransformer = new PdfTransformer();
 const ciceroMarkTransformer = new CiceroMarkTransformer();
 
-export default async function filter({ content, mimeType, documentDeclaration, filterFunctions }) {
+export default async function filter({ content, mimeType, document, filterFunctions }) {
   if (mimeType == 'application/pdf') {
     return filterPDF({ content });
   }
 
   return filterHTML({
     content,
-    documentDeclaration,
+    document,
     filterFunctions
   });
 }
 
-export async function filterHTML({ content, documentDeclaration, filterFunctions }) {
+export async function filterHTML({ content, document }) {
   const {
-    fetch: location,
-    select: extractionSelectors = [],
-    remove: deletionSelectors = [],
-    filter: serviceSpecificFilters = []
-  } = documentDeclaration;
+    location,
+    contentSelectors = [],
+    noiseSelectors = [],
+    filters: serviceSpecificFilters = []
+  } = document;
 
   const jsdomInstance = new JSDOM(content, {
     url: location,
@@ -45,20 +45,21 @@ export async function filterHTML({ content, documentDeclaration, filterFunctions
   });
   const { document: webPageDOM } = jsdomInstance.window;
 
-  for (const filterName of serviceSpecificFilters) {
+  for (const filterFunction of serviceSpecificFilters) {
     try {
-      await filterFunctions[filterName](webPageDOM, documentDeclaration); // eslint-disable-line no-await-in-loop
+      // TODO PASS LES properties du doc UN PAR UN
+      await filterFunction(webPageDOM, document); // eslint-disable-line no-await-in-loop
     } catch (error) {
-      throw new InaccessibleContentError(`The filter function ${filterName} failed: ${error}`);
+      throw new InaccessibleContentError(`The filter function ${filterFunction} failed: ${error}`);
     }
   }
 
-  remove(webPageDOM, deletionSelectors); // remove function works in place
+  remove(webPageDOM, noiseSelectors); // remove function works in place
 
-  const domFragment = select(webPageDOM, extractionSelectors);
+  const domFragment = select(webPageDOM, contentSelectors);
 
   if (!domFragment.children.length) {
-    throw new InaccessibleContentError(`The provided selector "${extractionSelectors}" has no match in the web page.`);
+    throw new InaccessibleContentError(`The provided selector "${contentSelectors}" has no match in the web page.`);
   }
 
   convertRelativeURLsToAbsolute(domFragment, location);
@@ -102,8 +103,8 @@ export function convertRelativeURLsToAbsolute(document, baseURL) {
 }
 
 // Works in place
-function remove(webPageDOM, deletionSelectors) {
-  [].concat(deletionSelectors).forEach(selector => {
+function remove(webPageDOM, noiseSelectors) {
+  [].concat(noiseSelectors).forEach(selector => {
     if (typeof selector === 'object') {
       const rangeSelection = selectRange(webPageDOM, selector);
       rangeSelection.deleteContents();
@@ -113,10 +114,10 @@ function remove(webPageDOM, deletionSelectors) {
   });
 }
 
-function select(webPageDOM, extractionSelectors) {
+function select(webPageDOM, contentSelectors) {
   const result = webPageDOM.createDocumentFragment();
 
-  [].concat(extractionSelectors).forEach(selector => {
+  [].concat(contentSelectors).forEach(selector => {
     if (typeof selector === 'object') {
       const rangeSelection = selectRange(webPageDOM, selector);
       result.appendChild(rangeSelection.cloneContents());

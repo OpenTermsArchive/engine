@@ -1,6 +1,4 @@
-import path from 'path';
 import events from 'events';
-import { fileURLToPath } from 'url';
 
 import config from 'config';
 import async from 'async';
@@ -8,12 +6,10 @@ import async from 'async';
 import * as history from './history/index.js';
 import fetch from './fetcher/index.js';
 import filter from './filter/index.js';
-import loadServiceDeclarations from './loader/index.js';
+import Services from './services/index.js';
 import { InaccessibleContentError } from './errors.js';
 import { extractCssSelectorsFromDocumentDeclaration } from './utils/index.js';
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const SERVICE_DECLARATIONS_PATH = path.resolve(__dirname, '../../', config.get('serviceDeclarationsPath'));
 const MAX_PARALLEL_DOCUMENTS_TRACKS = 20;
 const MAX_PARALLEL_REFILTERS = 20;
 
@@ -41,7 +37,7 @@ export default class CGUs extends events.EventEmitter {
   async init() {
     if (!this._serviceDeclarations) {
       this.initQueues();
-      this._serviceDeclarations = await loadServiceDeclarations(SERVICE_DECLARATIONS_PATH);
+      this._serviceDeclarations = await Services.load();
     }
 
     return this._serviceDeclarations;
@@ -84,13 +80,13 @@ export default class CGUs extends events.EventEmitter {
     await this.publish();
   }
 
-  async trackDocumentChanges(documentDeclaration) {
-    const { type, serviceId, fetch: location, executeClientScripts } = documentDeclaration;
+  async trackDocumentChanges(document) {
+    const { location, executeClientScripts } = document;
 
     const { mimeType, content } = await fetch({
       url: location,
       executeClientScripts,
-      cssSelectors: extractCssSelectorsFromDocumentDeclaration(documentDeclaration)
+      cssSelectors: extractCssSelectorsFromDocumentDeclaration(document)
     });
 
     if (!content) {
@@ -100,8 +96,7 @@ export default class CGUs extends events.EventEmitter {
     const snapshotId = await this.recordSnapshot({
       content,
       mimeType,
-      serviceId,
-      type
+      document,
     });
 
     if (!snapshotId) {
@@ -112,8 +107,7 @@ export default class CGUs extends events.EventEmitter {
       snapshotContent: content,
       mimeType,
       snapshotId,
-      serviceId,
-      documentDeclaration
+      document
     });
   }
 
@@ -124,8 +118,8 @@ export default class CGUs extends events.EventEmitter {
     await this.publish();
   }
 
-  async refilterAndRecordDocument(documentDeclaration) {
-    const { type, serviceId } = documentDeclaration;
+  async refilterAndRecordDocument(document) {
+    const { type, serviceId } = document;
 
     const { id: snapshotId, content: snapshotContent, mimeType } = await history.getLatestSnapshot(serviceId, type);
 
@@ -137,8 +131,7 @@ export default class CGUs extends events.EventEmitter {
       snapshotContent,
       mimeType,
       snapshotId,
-      serviceId,
-      documentDeclaration,
+      document,
       isRefiltering: true
     });
   }
@@ -147,54 +140,49 @@ export default class CGUs extends events.EventEmitter {
     servicesIds.forEach(serviceId => {
       const { documents } = this._serviceDeclarations[serviceId];
       Object.keys(documents).forEach(type => {
-        callback({
-          serviceId,
-          type,
-          ...documents[type]
-        });
+        callback(documents[type].latest);
       });
     });
   }
 
-  async recordSnapshot({ content, mimeType, serviceId, type }) {
+  async recordSnapshot({ content, mimeType, document: { service, type } }) {
     const { id: snapshotId, isFirstRecord } = await history.recordSnapshot({
-      serviceId,
+      serviceId: service.id,
       documentType: type,
       content,
       mimeType
     });
 
     if (!snapshotId) {
-      return this.emit('snapshotNotChanged', serviceId, type);
+      return this.emit('snapshotNotChanged', service.id, type);
     }
 
-    this.emit(isFirstRecord ? 'firstSnapshotRecorded' : 'snapshotRecorded', serviceId, type, snapshotId);
+    this.emit(isFirstRecord ? 'firstSnapshotRecorded' : 'snapshotRecorded', service.id, type, snapshotId);
     return snapshotId;
   }
 
-  async recordVersion({ snapshotContent, mimeType, snapshotId, serviceId, documentDeclaration, isRefiltering }) {
-    const { type } = documentDeclaration;
-    const document = await filter({
+  async recordVersion({ snapshotContent, mimeType, snapshotId, document, isRefiltering }) {
+    const { service, type } = document;
+    const content = await filter({
       content: snapshotContent,
       mimeType,
-      documentDeclaration,
-      filterFunctions: this._serviceDeclarations[serviceId].filters,
+      document
     });
 
     const recordFunction = !isRefiltering ? 'recordVersion' : 'recordRefilter';
 
     const { id: versionId, isFirstRecord } = await history[recordFunction]({
-      serviceId,
-      content: document,
+      serviceId: service.id,
+      content,
       documentType: type,
       snapshotId
     });
 
     if (!versionId) {
-      return this.emit('versionNotChanged', serviceId, type);
+      return this.emit('versionNotChanged', service.id, type);
     }
 
-    this.emit(isFirstRecord ? 'firstVersionRecorded' : 'versionRecorded', serviceId, type, versionId);
+    this.emit(isFirstRecord ? 'firstVersionRecorded' : 'versionRecorded', service.id, type, versionId);
   }
 
   async publish() {

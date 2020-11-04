@@ -10,7 +10,6 @@ import { fileURLToPath } from 'url';
 import Services from '../../src/app/services/index.js';
 import fetch from '../../src/app/fetcher/index.js';
 import filter from '../../src/app/filter/index.js';
-import loadServiceDeclarations from '../../src/app/loader/index.js';
 import serviceSchema from './service.schema.js';
 import { extractCssSelectorsFromDocumentDeclaration } from '../../src/app/utils/index.js';
 
@@ -28,7 +27,7 @@ const modifiedOnly = args.includes('--modified-only');
 let servicesToValidate = args.filter(arg => !arg.startsWith('--'));
 
 (async () => {
-  const serviceDeclarations = await loadServiceDeclarations(path.join(rootPath, config.get('serviceDeclarationsPath')));
+  const serviceDeclarations = await Services.load();
 
   if (modifiedOnly) {
     servicesToValidate = await Services.getIdsOfModified();
@@ -61,11 +60,11 @@ let servicesToValidate = args.filter(arg => !arg.startsWith('--'));
               it('has fetchable URL', async function () {
                 this.timeout(30000);
 
-                const { fetch: location, executeClientScripts } = service.documents[type];
+                const { location, executeClientScripts } = service.documents[type].latest;
                 const document = await fetch({
                   url: location,
                   executeClientScripts,
-                  cssSelectors: extractCssSelectorsFromDocumentDeclaration(service.documents[type])
+                  cssSelectors: extractCssSelectorsFromDocumentDeclaration(service.documents[type].latest)
                 });
                 content = document.content;
                 mimeType = document.mimeType;
@@ -80,7 +79,7 @@ let servicesToValidate = args.filter(arg => !arg.startsWith('--'));
 
                 filteredContent = await filter({
                   content,
-                  documentDeclaration: service.documents[type],
+                  document: service.documents[type].latest,
                   filterFunctions: service.filters,
                   mimeType,
                 });
@@ -116,16 +115,16 @@ let servicesToValidate = args.filter(arg => !arg.startsWith('--'));
 
                   this.timeout(30000);
 
-                  const { fetch: location, executeClientScripts } = service.documents[type];
+                  const { location, executeClientScripts } = service.documents[type].latest;
                   const document = await fetch({
                     url: location,
                     executeClientScripts,
-                    cssSelectors: extractCssSelectorsFromDocumentDeclaration(service.documents[type])
+                    cssSelectors: extractCssSelectorsFromDocumentDeclaration(service.documents[type].latest)
                   });
 
                   const secondFilteredContent = await filter({
                     content: document.content,
-                    documentDeclaration: service.documents[type],
+                    document: service.documents[type].latest,
                     filterFunctions: service.filters,
                     mimeType: document.mimeType
                   });

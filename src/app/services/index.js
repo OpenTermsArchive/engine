@@ -1,7 +1,70 @@
+import fsApi from 'fs';
 import path from 'path';
+import { pathToFileURL, fileURLToPath } from 'url';
+
+import config from 'config';
 import simpleGit from 'simple-git';
 
+import Document from './document.js';
+
+const fs = fsApi.promises;
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const SERVICE_DECLARATIONS_PATH = path.resolve(__dirname, '../../..', config.get('serviceDeclarationsPath'));
+
 export default class Services {
+  static async load() {
+    const services = {};
+    const fileNames = await fs.readdir(SERVICE_DECLARATIONS_PATH);
+    const serviceFileNames = fileNames.filter(fileName => path.extname(fileName) == '.json' && !fileName.includes('.history.json'));
+
+    for (const fileName of serviceFileNames) {
+      const serviceDeclaration = JSON.parse(await fs.readFile(path.join(SERVICE_DECLARATIONS_PATH, fileName))); // eslint-disable-line no-await-in-loop
+
+      const service = {
+        id: path.basename(fileName, '.json'),
+        name: serviceDeclaration.name,
+        documents: {}
+      };
+
+      services[service.id] = service;
+
+      for (const documentType of Object.keys(serviceDeclaration.documents)) {
+        const {
+          filter: filterNames,
+          fetch: location,
+          select: contentSelectors,
+          remove: noiseSelectors
+        } = serviceDeclaration.documents[documentType];
+
+        let filters;
+        if (filterNames) {
+          const filterFilePath = fileName.replace('.json', '.filters.js');
+          const serviceFilters = await import(pathToFileURL(path.join(SERVICE_DECLARATIONS_PATH, filterFilePath))); // eslint-disable-line no-await-in-loop
+          filters = filterNames.map(filterName => serviceFilters[filterName]);
+        }
+
+        const document = new Document({
+          service: {
+            id: service.id,
+            name: service.name
+          },
+          type: documentType,
+          location,
+          contentSelectors,
+          noiseSelectors,
+          filters,
+        });
+
+        services[service.id].documents[documentType] = {
+          latest: document,
+          history: [ document ]
+        };
+      }
+    }
+
+    return services;
+  }
+
   static async getIdsOfModified() {
     const __dirname = path.dirname(new URL(import.meta.url).pathname);
     const rootPath = path.join(__dirname, '../../../');
