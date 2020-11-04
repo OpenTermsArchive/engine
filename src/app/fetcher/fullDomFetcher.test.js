@@ -10,7 +10,7 @@ chai.use(chaiAsPromised);
 
 const SERVER_PORT = 8976;
 
-describe('FullDomFetcher', function () {
+describe('FullDomFetcher', function () { // eslint-disable-line func-names
   this.timeout(10000);
 
   let termsHTML;
