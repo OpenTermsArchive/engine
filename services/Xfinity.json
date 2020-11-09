@@ -3,12 +3,21 @@
   "importedFrom": "https://github.com/tosdr/tosback2/blob/f762cd4bbb2571272985fed009201a23300ba9b2/rules/xfinity.com.xml",
   "documents": {
     "Terms of Service": {
-      "fetch": "https://www.xfinity.com/Corporate/Customers/Policies/HighSpeedInternetAUP",
-      "select": "div.x-flex__col-xs-12.x-flex__col-lg-9"
+      "fetch": "http://my.xfinity.com/terms/web/",
+      "select": {
+        "startAfter": ".archivelink",
+        "endAfter": "#legal"
+      }
     },
     "Privacy Policy": {
-      "fetch": "https://www.xfinity.com/Corporate/Customers/Policies/CustomerPrivacy",
-      "select": "main[role=\"main\"]"
+      "fetch": "https://www.xfinity.com/privacy/policy",
+      "select": ".hero__content .x-display3, .privacy-copy__container",
+      "remove": "#pdf--language"
+    },
+    "Acceptable Use Policy": {
+      "fetch": "https://www.xfinity.com/Corporate/Customers/Policies/HighSpeedInternetAUP",
+      "select": ".x-section",
+      "remove": ".x-section > .x-content:first-child a"
     }
   }
 }
