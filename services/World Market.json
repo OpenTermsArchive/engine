@@ -1,10 +1,10 @@
 {
-  "name": "Worldmarket",
+  "name": "World Market",
   "importedFrom": "https://github.com/tosdr/tosback2/blob/f762cd4bbb2571272985fed009201a23300ba9b2/rules/worldmarket.com.xml",
   "documents": {
     "Privacy Policy": {
-      "fetch": "http://www.worldmarket.com/category/customer-service/privacy-and-security.do",
-      "select": "div.helpdesk"
+      "fetch": "https://www.worldmarket.com/category/customer-service/privacy-and-security.do",
+      "select": "#privacy"
     }
   }
 }
