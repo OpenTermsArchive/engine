@@ -1,0 +1,10 @@
+{
+  "name": "Bing",
+  "importedFrom": "https://github.com/tosdr/tosback2/blob/f762cd4bbb2571272985fed009201a23300ba9b2/rules/bing.com.xml",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "http://www.microsoft.com/privacystatement/en-us/bing/default.aspx",
+      "select": "div.div_content"
+    }
+  }
+}

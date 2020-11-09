@@ -1,0 +1,18 @@
+{
+  "name": "Gitlab",
+  "importedFrom": "https://github.com/tosdr/tosback2/blob/f762cd4bbb2571272985fed009201a23300ba9b2/rules/gitlab.com.xml",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://about.gitlab.com/privacy/",
+      "select": "div.container.txt-lefty"
+    },
+    "Vulnerability Disclosure Policy": {
+      "fetch": "https://about.gitlab.com/security/",
+      "select": "div.wrapper"
+    },
+    "Terms of Service": {
+      "fetch": "https://about.gitlab.com/terms/",
+      "select": "div.col-sm-9.col-md-9"
+    }
+  }
+}

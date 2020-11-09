@@ -1,0 +1,10 @@
+{
+  "name": "Ubuntu",
+  "importedFrom": "https://github.com/tosdr/tosback2/blob/f762cd4bbb2571272985fed009201a23300ba9b2/rules/ubuntu.com.xml",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "http://www.ubuntu.com/legal",
+      "select": "div#main-content"
+    }
+  }
+}
