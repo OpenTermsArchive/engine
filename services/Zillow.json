@@ -3,8 +3,8 @@
   "importedFrom": "https://github.com/tosdr/tosback2/blob/f762cd4bbb2571272985fed009201a23300ba9b2/rules/zillow.com.xml",
   "documents": {
     "Privacy Policy": {
-      "fetch": "http://www.zillow.com/corp/Privacy.htm",
-      "select": "body"
+      "fetch": "https://www.zillowgroup.com/zg-privacy-policy/",
+      "select": ".site-main"
     }
   }
 }
