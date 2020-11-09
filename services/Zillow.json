@@ -1,0 +1,14 @@
+{
+  "name": "Zillow",
+  "importedFrom": "https://github.com/tosdr/tosback2/blob/f762cd4bbb2571272985fed009201a23300ba9b2/rules/zillow.com.xml",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://www.zillowgroup.com/terms-of-use/",
+      "select": ".site-main"
+    },
+    "Privacy Policy": {
+      "fetch": "https://www.zillowgroup.com/zg-privacy-policy/",
+      "select": ".site-main"
+    }
+  }
+}

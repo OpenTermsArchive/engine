@@ -1,0 +1,11 @@
+{
+  "name": "Xfinity Residential Services",
+  "importedFrom": "https://github.com/tosdr/tosback2/blob/f762cd4bbb2571272985fed009201a23300ba9b2/rules/xfinity.com.xml",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://www.xfinity.com/Corporate/Customers/Policies/SubscriberAgreement",
+      "select": ".x-section",
+      "remove": ".x-section > .x-content:first-child a"
+    }
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "name": "iCloud",
+  "importedFrom": "https://github.com/tosdr/tosback2/blob/f762cd4bbb2571272985fed009201a23300ba9b2/rules/apple.com.xml",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://www.apple.com/legal/internet-services/icloud/en/terms.html",
+      "select": "main.main"
+    }
+  }
+}

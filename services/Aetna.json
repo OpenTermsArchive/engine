@@ -1,0 +1,14 @@
+{
+  "name": "Aetna",
+  "importedFrom": "https://github.com/tosdr/tosback2/blob/f762cd4bbb2571272985fed009201a23300ba9b2/rules/aetna.com.xml",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.aetna.com/legal-notices/privacy/web-privacy.html",
+      "select": [
+        ".responsivegrid .body__copy",
+        ".component.container",
+        ".bodytext + .accordion + .text"
+      ]
+    }
+  }
+}
