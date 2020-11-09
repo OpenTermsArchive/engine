@@ -1,0 +1,10 @@
+{
+  "name": "123 Greetings",
+  "importedFrom": "https://github.com/tosdr/tosback2/blob/f762cd4bbb2571272985fed009201a23300ba9b2/rules/123greetings.com.xml",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "http://info.123greetings.com/company/privacy_policy.html",
+      "select": "body"
+    }
+  }
+}
