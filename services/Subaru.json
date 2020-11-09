@@ -1,0 +1,10 @@
+{
+  "name": "Subaru",
+  "importedFrom": "https://github.com/tosdr/tosback2/blob/f762cd4bbb2571272985fed009201a23300ba9b2/rules/subaru.com.xml",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "http://www.subaru.com/company/privacy.html",
+      "select": "body"
+    }
+  }
+}

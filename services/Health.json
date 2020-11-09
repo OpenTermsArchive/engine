@@ -1,0 +1,10 @@
+{
+  "name": "Health",
+  "importedFrom": "https://github.com/tosdr/tosback2/blob/f762cd4bbb2571272985fed009201a23300ba9b2/rules/health.com.xml",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://subscription.timeinc.com/storefront/privacy/health/generic_privacy_new.html?dnp-source=E",
+      "select": "body"
+    }
+  }
+}

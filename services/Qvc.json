@@ -1,0 +1,10 @@
+{
+  "name": "Qvc",
+  "importedFrom": "https://github.com/tosdr/tosback2/blob/f762cd4bbb2571272985fed009201a23300ba9b2/rules/qvc.com.xml",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "http://www.qvc.com/FAQ+Privacy.content.html",
+      "select": "div#divFaqs"
+    }
+  }
+}

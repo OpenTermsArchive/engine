@@ -1,0 +1,14 @@
+{
+  "name": "Synology",
+  "importedFrom": "https://github.com/tosdr/tosback2/blob/f762cd4bbb2571272985fed009201a23300ba9b2/rules/synology.com.xml",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.synology.com/en-us/company/legal/privacy",
+      "select": "#legal > div > div > div:nth-of-type(2)"
+    },
+    "Terms of Service": {
+      "fetch": "https://www.synology.com/en-us/company/legal/terms_conditions_account",
+      "select": "#legal > div > div > div:nth-of-type(2)"
+    }
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "name": "Blip",
+  "importedFrom": "https://github.com/tosdr/tosback2/blob/f762cd4bbb2571272985fed009201a23300ba9b2/rules/blip.fm.xml",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "http://blip.fm/corp/privacy",
+      "select": "body"
+    }
+  }
+}

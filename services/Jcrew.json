@@ -1,0 +1,10 @@
+{
+  "name": "Jcrew",
+  "importedFrom": "https://github.com/tosdr/tosback2/blob/f762cd4bbb2571272985fed009201a23300ba9b2/rules/jcrew.com.xml",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "http://www.jcrew.com/footer/privacy.jsp",
+      "select": "td.helpContents"
+    }
+  }
+}

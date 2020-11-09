@@ -1,0 +1,10 @@
+{
+  "name": "Pogo",
+  "importedFrom": "https://github.com/tosdr/tosback2/blob/f762cd4bbb2571272985fed009201a23300ba9b2/rules/pogo.com.xml",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "http://tos.ea.com/legalapp/WEBPRIVACY/US/en/PC/?pageSection=footer_privacy",
+      "select": "body"
+    }
+  }
+}

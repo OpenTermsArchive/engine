@@ -1,0 +1,10 @@
+{
+  "name": "Realtor",
+  "importedFrom": "https://github.com/tosdr/tosback2/blob/f762cd4bbb2571272985fed009201a23300ba9b2/rules/realtor.com.xml",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "http://www.move.com/company/privacy.aspx",
+      "select": "body"
+    }
+  }
+}

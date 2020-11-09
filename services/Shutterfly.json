@@ -1,0 +1,14 @@
+{
+  "name": "Shutterfly",
+  "importedFrom": "https://github.com/tosdr/tosback2/blob/f762cd4bbb2571272985fed009201a23300ba9b2/rules/shutterfly.com.xml",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "http://www.shutterfly.com/help/privacy.jsp",
+      "select": "body"
+    },
+    "Terms of Service": {
+      "fetch": "http://www.shutterfly.com/help/terms.jsp",
+      "select": "body"
+    }
+  }
+}

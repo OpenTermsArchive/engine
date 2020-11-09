@@ -1,0 +1,10 @@
+{
+  "name": "Imvu",
+  "importedFrom": "https://github.com/tosdr/tosback2/blob/f762cd4bbb2571272985fed009201a23300ba9b2/rules/imvu.com.xml",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "http://www.imvu.com/catalog/web_info.php?section=Info&topic=privacy",
+      "select": "body"
+    }
+  }
+}

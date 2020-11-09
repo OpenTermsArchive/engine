@@ -1,0 +1,10 @@
+{
+  "name": "Home",
+  "importedFrom": "https://github.com/tosdr/tosback2/blob/f762cd4bbb2571272985fed009201a23300ba9b2/rules/home.mywebsearch.com.xml",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "http://home.mywebsearch.com/resources/html/privacy.html",
+      "select": "body"
+    }
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "name": "Steampowered",
+  "importedFrom": "https://github.com/tosdr/tosback2/blob/f762cd4bbb2571272985fed009201a23300ba9b2/rules/steampowered.com.xml",
+  "documents": {
+    "Legal Information": {
+      "fetch": "https://store.steampowered.com/legal/",
+      "select": "div#main_content"
+    },
+    "Privacy Policy": {
+      "fetch": "https://store.steampowered.com/privacy_agreement/",
+      "select": "div#newsColumn"
+    }
+  }
+}

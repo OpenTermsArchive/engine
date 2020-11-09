@@ -1,0 +1,14 @@
+{
+  "name": "Mega",
+  "importedFrom": "https://github.com/tosdr/tosback2/blob/f762cd4bbb2571272985fed009201a23300ba9b2/rules/mega.co.nz.xml",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "http://g.static.mega.co.nz/pages/privacy.html",
+      "select": "body"
+    },
+    "Terms of Service": {
+      "fetch": "http://g.static.mega.co.nz/pages/terms.html",
+      "select": "body"
+    }
+  }
+}

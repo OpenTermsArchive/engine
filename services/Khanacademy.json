@@ -1,0 +1,10 @@
+{
+  "name": "Khanacademy",
+  "importedFrom": "https://github.com/tosdr/tosback2/blob/f762cd4bbb2571272985fed009201a23300ba9b2/rules/khanacademy.org.xml",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "http://www.khanacademy.org/about/privacy-policy",
+      "select": "article#privacy-policy"
+    }
+  }
+}

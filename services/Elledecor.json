@@ -1,0 +1,10 @@
+{
+  "name": "Elledecor",
+  "importedFrom": "https://github.com/tosdr/tosback2/blob/f762cd4bbb2571272985fed009201a23300ba9b2/rules/elledecor.com.xml",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "http://services.hearstmags.com/media/cm/hfmus/your_privacy_rights.html",
+      "select": "body"
+    }
+  }
+}
