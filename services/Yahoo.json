@@ -3,12 +3,12 @@
   "importedFrom": "https://github.com/tosdr/tosback2/blob/f762cd4bbb2571272985fed009201a23300ba9b2/rules/yahoo.de.xml",
   "documents": {
     "Privacy Policy": {
-      "fetch": "http://info.yahoo.com/privacy/fr/yahoo/",
-      "select": "body"
+      "fetch": "https://policies.yahoo.com/ie/en/yahoo/privacy/index.htm?redirect=no",
+      "select": ".l-content-well-content"
     },
     "Terms of Service": {
-      "fetch": "https://policies.oath.com/us/en/oath/terms/otos/index.html",
-      "select": "main#site-main"
+      "fetch": "https://policies.yahoo.com/ie/en/yahoo/terms/utos/index.htm?redirect=no",
+      "select": ".l-content-well-content"
     }
   }
 }
