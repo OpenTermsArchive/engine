@@ -1,0 +1,10 @@
+{
+  "name": "Nytimes",
+  "importedFrom": "https://github.com/tosdr/tosback2/blob/f762cd4bbb2571272985fed009201a23300ba9b2/rules/nytimes.com.xml",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "http://www.nytimes.com/content/help/rights/privacy/policy/privacy-policy.html",
+      "select": "body"
+    }
+  }
+}

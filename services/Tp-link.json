@@ -1,0 +1,14 @@
+{
+  "name": "Tp-link",
+  "importedFrom": "https://github.com/tosdr/tosback2/blob/f762cd4bbb2571272985fed009201a23300ba9b2/rules/tp-link.com.xml",
+  "documents": {
+    "Vulnerability Disclosure Policy": {
+      "fetch": "https://www.tp-link.com/us/press/security-advisory/",
+      "select": "body"
+    },
+    "Terms of Service": {
+      "fetch": "https://www.tp-link.com/us/press/security-advisory/",
+      "select": "#security > div"
+    }
+  }
+}

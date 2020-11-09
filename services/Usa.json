@@ -1,0 +1,10 @@
+{
+  "name": "Usa",
+  "importedFrom": "https://github.com/tosdr/tosback2/blob/f762cd4bbb2571272985fed009201a23300ba9b2/rules/usa.autodesk.com.xml",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "http://www.usa.gov/About/Privacy-Security.shtml",
+      "select": "body"
+    }
+  }
+}

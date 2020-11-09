@@ -1,0 +1,14 @@
+{
+  "name": "Blogger",
+  "importedFrom": "https://github.com/tosdr/tosback2/blob/f762cd4bbb2571272985fed009201a23300ba9b2/rules/blogger.com.xml",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://policies.google.com/privacy",
+      "select": "div[role=\"article\"]"
+    },
+    "Terms of Service": {
+      "fetch": "https://policies.google.com/terms",
+      "select": "div[role=\"article\"]"
+    }
+  }
+}
