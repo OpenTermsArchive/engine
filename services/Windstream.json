@@ -5,6 +5,10 @@
     "Terms of Service": {
       "fetch": "https://www.windstream.com/about/legal/Terms-and-Conditions",
       "select": ".support-container"
+    },
+    "Privacy Policy": {
+      "fetch": "https://www.windstream.com/about/legal/Privacy-Policy",
+      "select": ".support-container"
     }
   }
 }
