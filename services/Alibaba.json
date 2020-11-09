@@ -4,15 +4,15 @@
   "documents": {
     "Privacy Policy": {
       "fetch": "https://rule.alibaba.com/rule/detail/2034.htm",
-      "select": "[class*=\"mod-main-content\"] div.detail"
+      "select": ".answer"
     },
     "Copyright Claims Policy": {
       "fetch": "https://rule.alibaba.com/rule/detail/6391.htm",
-      "select": "[class*=\"mod-main-content\"] div.detail"
+      "select": ".answer"
     },
     "Terms of Service": {
       "fetch": "https://rule.alibaba.com/rule/detail/2041.htm",
-      "select": "[class*=\"mod-main-content\"] div.detail"
+      "select": ".answer"
     }
   }
 }
