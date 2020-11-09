@@ -1,0 +1,27 @@
+{
+  "name": "Alibaba.com",
+  "importedFrom": "https://github.com/tosdr/tosback2/blob/f762cd4bbb2571272985fed009201a23300ba9b2/rules/alibaba.com.xml",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://rule.alibaba.com/rule/detail/2034.htm",
+      "select": [
+        ".prompt",
+        ".answer"
+      ]
+    },
+    "Copyright Claims Policy": {
+      "fetch": "https://rule.alibaba.com/rule/detail/6391.htm",
+      "select": [
+        ".prompt",
+        ".answer"
+      ]
+    },
+    "Terms of Service": {
+      "fetch": "https://rule.alibaba.com/rule/detail/2041.htm",
+      "select": [
+        ".prompt",
+        ".answer"
+      ]
+    }
+  }
+}

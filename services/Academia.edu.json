@@ -1,0 +1,14 @@
+{
+  "name": "Academia.edu",
+  "importedFrom": "https://github.com/tosdr/tosback2/blob/f762cd4bbb2571272985fed009201a23300ba9b2/rules/academia.edu.xml",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.academia.edu/privacy",
+      "select": "div.static-page-padded-content.no-reset"
+    },
+    "Terms of Service": {
+      "fetch": "https://www.academia.edu/terms",
+      "select": "div.static-page-padded-content.no-reset"
+    }
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "name": "Wix",
+  "importedFrom": "https://github.com/tosdr/tosback2/blob/f762cd4bbb2571272985fed009201a23300ba9b2/rules/wix.com.xml",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://www.wix.com/about/terms-of-use",
+      "select": "#ContainermainPage"
+    },
+    "Privacy Policy": {
+      "fetch": "http://www.wix.com/about/privacy",
+      "select": "#ContainermainPage"
+    }
+  }
+}

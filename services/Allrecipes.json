@@ -1,0 +1,14 @@
+{
+  "name": "Allrecipes",
+  "importedFrom": "https://github.com/tosdr/tosback2/blob/f762cd4bbb2571272985fed009201a23300ba9b2/rules/allrecipes.com.xml",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://www.meredith.com/legal/terms",
+      "select": ".content-block"
+    },
+    "Privacy Policy": {
+      "fetch": "https://www.meredith.com/nmg/privacy",
+      "select": ".WordSection1"
+    }
+  }
+}
