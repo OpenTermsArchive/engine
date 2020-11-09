@@ -5,6 +5,10 @@
     "Terms of Service": {
       "fetch": "https://www.meredith.com/legal/terms",
       "select": ".content-block"
+    },
+    "Privacy Policy": {
+      "fetch": "https://www.meredith.com/nmg/privacy",
+      "select": ".WordSection1"
     }
   }
 }
