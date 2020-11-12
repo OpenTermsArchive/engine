@@ -53,9 +53,7 @@ export async function load() {
         filters,
       });
 
-      services[service.id].documents[documentType] = {
-        latest: document
-      };
+      services[service.id].addDocument(document);
     }
   }
 
@@ -69,8 +67,6 @@ export async function loadWithHistory() {
     const { declaration, filters } = await loadServiceHistoryFiles(serviceId); // eslint-disable-line no-await-in-loop
 
     for (const documentType of Object.keys(declaration)) {
-      services[serviceId].documents[documentType].history = [];
-
       const documenTypeDeclarationEntries = declaration[documentType];
 
       const filterNames = [ ...new Set(documenTypeDeclarationEntries.flatMap(declaration => declaration.filter)) ].filter(el => el);
@@ -95,7 +91,7 @@ export async function loadWithHistory() {
           });
         }
 
-        const document = new Document({
+        services[serviceId].addDocument(new Document({
           service: services[serviceId],
           type: documentType,
           location: declarationForThisDate.fetch,
@@ -103,9 +99,7 @@ export async function loadWithHistory() {
           noiseSelectors: declarationForThisDate.remove,
           filters: actualFilters,
           validUntil: date,
-        });
-
-        services[serviceId].documents[documentType].history.push(document);
+        }));
       });
     }
   }
@@ -137,7 +131,7 @@ function sortHistory(history = {}) {
 
 async function loadServiceHistoryFiles(serviceId) {
   const serviceFileName = path.join(SERVICE_DECLARATIONS_PATH, `${serviceId}.json`);
-  const service = JSON.parse(await fs.readFile(serviceFileName));
+  const serviceDeclaration = JSON.parse(await fs.readFile(serviceFileName));
 
   const serviceHistoryFileName = path.join(SERVICE_DECLARATIONS_PATH, `${serviceId}.history.json`);
   const serviceFiltersFileName = path.join(SERVICE_DECLARATIONS_PATH, `${serviceId}.filters.js`);
@@ -151,10 +145,10 @@ async function loadServiceHistoryFiles(serviceId) {
     serviceHistory = JSON.parse(await fs.readFile(serviceHistoryFileName));
   }
 
-  Object.keys(service.documents).forEach(documentType => {
+  Object.keys(serviceDeclaration.documents).forEach(documentType => {
     serviceHistory[documentType] = serviceHistory[documentType] || [];
-    service.documents[documentType].validUntil = FUTUR_DATE;
-    serviceHistory[documentType].push(service.documents[documentType]);
+    serviceDeclaration.documents[documentType].validUntil = FUTUR_DATE;
+    serviceHistory[documentType].push(serviceDeclaration.documents[documentType]);
   });
 
   sortHistory(serviceHistory);

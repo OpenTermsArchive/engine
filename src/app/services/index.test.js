@@ -89,12 +89,12 @@ describe('Services', () => {
 });
 
 async function validateServiceWithoutHistory(actual, expected) {
-  for (const documentType of Object.keys(actual.documents)) {
-    const { history: actualHistory } = actual.documents[documentType].latest;
+  for (const documentType of actual.getDocumentTypes()) {
+    const { history: actualHistory } = actual.getDocument(documentType);
     expect(actualHistory).to.be.undefined;
 
-    const { filters: actualFilters } = actual.documents[documentType].latest;
-    const { filters: expectedFilters } = expected.documents[documentType].latest;
+    const { filters: actualFilters } = actual.getDocument(documentType);
+    const { filters: expectedFilters } = expected.getDocument(documentType);
 
     if (expectedFilters) {
       for (let indexFilter = 0; indexFilter < actualFilters.length; indexFilter++) {
@@ -109,9 +109,9 @@ async function validateServiceWithoutHistory(actual, expected) {
 async function validateServiceWithHistory(actual, expected) {
   expect(actual).excludingEvery('filters').to.deep.equal(expected);
 
-  for (const documentType of Object.keys(actual.documents)) {
-    const { history: actualHistory } = actual.documents[documentType];
-    const { history: expectedHistory } = expected.documents[documentType];
+  for (const documentType of actual.getDocumentTypes()) {
+    const { _history: actualHistory } = actual._documents[documentType];
+    const { _history: expectedHistory } = expected._documents[documentType];
 
     for (let indexHistory = 0; indexHistory < actualHistory.length; indexHistory++) {
       if (expectedHistory[indexHistory].filters) {

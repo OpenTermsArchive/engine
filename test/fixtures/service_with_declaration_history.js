@@ -65,10 +65,10 @@ const history = [
   })
 ];
 
-service.documents = {
+service._documents = {
   'Terms of Service': {
-    latest,
-    history,
+    _latest: latest,
+    _history: history,
   }
 };
 
