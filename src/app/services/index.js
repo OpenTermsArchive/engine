@@ -12,6 +12,7 @@ const fs = fsApi.promises;
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const SERVICE_DECLARATIONS_PATH = path.resolve(__dirname, '../../..', config.get('serviceDeclarationsPath'));
 
+export const FUTUR_DATE = new Date('2100-01-01T00:00:00.000Z').toISOString();
 
 export async function load() {
   const services = {};
@@ -61,46 +62,129 @@ export async function load() {
   return services;
 }
 
+export async function loadWithHistory() {
+  const services = await load();
 
-      services[service.id] = service;
+  for (const serviceId of Object.keys(services)) {
+    const { declaration, filters } = await loadServiceHistoryFiles(serviceId); // eslint-disable-line no-await-in-loop
 
-      for (const documentType of Object.keys(serviceDeclaration.documents)) {
-        const {
-          filter: filterNames,
-          fetch: location,
-          select: contentSelectors,
-          remove: noiseSelectors
-        } = serviceDeclaration.documents[documentType];
+    for (const documentType of Object.keys(declaration)) {
+      services[serviceId].documents[documentType].history = [];
 
-        let filters;
-        if (filterNames) {
-          const filterFilePath = fileName.replace('.json', '.filters.js');
-          const serviceFilters = await import(pathToFileURL(path.join(SERVICE_DECLARATIONS_PATH, filterFilePath))); // eslint-disable-line no-await-in-loop
-          filters = filterNames.map(filterName => serviceFilters[filterName]);
+      const documenTypeDeclarationEntries = declaration[documentType];
+
+      const filterNames = [ ...new Set(documenTypeDeclarationEntries.flatMap(declaration => declaration.filter)) ].filter(el => el);
+
+      const allHistoryDates = extractHistoryDates({
+        documenTypeDeclarationEntries,
+        filters,
+        filterNames
+      });
+
+      allHistoryDates.forEach(date => {
+        const declarationForThisDate = documenTypeDeclarationEntries.find(entry => new Date(date) <= new Date(entry.validUntil));
+
+        const { filter: declarationForThisDateFilterNames } = declarationForThisDate;
+
+        let actualFilters;
+        if (declarationForThisDateFilterNames) {
+          actualFilters = declarationForThisDateFilterNames.map(filterName => {
+            const validFilterForThisDate = filters[filterName].find(entry => new Date(date) <= new Date(entry.validUntil));
+
+            return validFilterForThisDate.fn;
+          });
         }
 
         const document = new Document({
-          service: {
-            id: service.id,
-            name: service.name
-          },
+          service: services[serviceId],
           type: documentType,
-          location,
-          contentSelectors,
-          noiseSelectors,
-          filters,
+          location: declarationForThisDate.fetch,
+          contentSelectors: declarationForThisDate.select,
+          noiseSelectors: declarationForThisDate.remove,
+          filters: actualFilters,
+          validUntil: date,
         });
 
-        services[service.id].documents[documentType] = {
-          latest: document,
-          history: [ document ]
-        };
-      }
+        services[serviceId].documents[documentType].history.push(document);
+      });
     }
-
-    return services;
   }
 
+  return services;
+}
+
+function extractHistoryDates({ filters, filterNames, documenTypeDeclarationEntries }) {
+  const allHistoryDates = [];
+
+  Object.keys(filters).forEach(filterName => {
+    if (filterNames.includes(filterName)) {
+      filters[filterName].forEach(({ validUntil }) => allHistoryDates.push(validUntil));
+    }
+  });
+
+  documenTypeDeclarationEntries.forEach(({ validUntil }) => allHistoryDates.push(validUntil));
+
+  const sortedDates = allHistoryDates.sort((a, b) => new Date(a) - new Date(b));
+  const uniqSortedDates = [ ...new Set(sortedDates) ];
+  return uniqSortedDates;
+}
+
+function sortHistory(history = {}) {
+  Object.keys(history).forEach(entry => {
+    history[entry].sort((a, b) => new Date(a.validUntil) - new Date(b.validUntil));
+  });
+}
+
+async function loadServiceHistoryFiles(serviceId) {
+  const serviceFileName = path.join(SERVICE_DECLARATIONS_PATH, `${serviceId}.json`);
+  const service = JSON.parse(await fs.readFile(serviceFileName));
+
+  const serviceHistoryFileName = path.join(SERVICE_DECLARATIONS_PATH, `${serviceId}.history.json`);
+  const serviceFiltersFileName = path.join(SERVICE_DECLARATIONS_PATH, `${serviceId}.filters.js`);
+  const serviceFiltersHistoryFileName = path.join(SERVICE_DECLARATIONS_PATH, `${serviceId}.filters.history.js`);
+
+  let serviceHistory = {};
+  const serviceFiltersHistory = {};
+  let serviceFiltersHistoryModule;
+
+  if (await fileExists(serviceHistoryFileName)) {
+    serviceHistory = JSON.parse(await fs.readFile(serviceHistoryFileName));
+  }
+
+  Object.keys(service.documents).forEach(documentType => {
+    serviceHistory[documentType] = serviceHistory[documentType] || [];
+    service.documents[documentType].validUntil = FUTUR_DATE;
+    serviceHistory[documentType].push(service.documents[documentType]);
+  });
+
+  sortHistory(serviceHistory);
+
+  if (await fileExists(serviceFiltersHistoryFileName)) {
+    serviceFiltersHistoryModule = await import(pathToFileURL(serviceFiltersHistoryFileName));
+    Object.keys(serviceFiltersHistoryModule).forEach(filterName => {
+      serviceFiltersHistory[filterName] = serviceFiltersHistoryModule[filterName];
+    });
+  }
+
+  if (await fileExists(serviceFiltersFileName)) {
+    const serviceFilters = await import(pathToFileURL(serviceFiltersFileName));
+
+    Object.keys(serviceFilters).forEach(filterName => {
+      serviceFiltersHistory[filterName] = serviceFiltersHistory[filterName] || [];
+      serviceFiltersHistory[filterName].push({
+        validUntil: FUTUR_DATE,
+        fn: serviceFilters[filterName]
+      });
+    });
+  }
+
+  sortHistory(serviceFiltersHistory);
+
+  return {
+    declaration: serviceHistory || {},
+    filters: serviceFiltersHistory || {},
+  };
+}
 
 export async function getIdsOfModified() {
   const __dirname = path.dirname(new URL(import.meta.url).pathname);
