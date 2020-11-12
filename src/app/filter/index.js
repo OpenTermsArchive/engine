@@ -19,15 +19,14 @@ const { CiceroMarkTransformer } = ciceroMark;
 const pdfTransformer = new PdfTransformer();
 const ciceroMarkTransformer = new CiceroMarkTransformer();
 
-export default async function filter({ content, mimeType, document, filterFunctions }) {
+export default async function filter({ content, mimeType, document }) {
   if (mimeType == 'application/pdf') {
     return filterPDF({ content });
   }
 
   return filterHTML({
     content,
-    document,
-    filterFunctions
+    document
   });
 }
 

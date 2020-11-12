@@ -7,6 +7,7 @@ import { fileURLToPath } from 'url';
 
 import { filterHTML, filterPDF, convertRelativeURLsToAbsolute } from './index.js';
 import { InaccessibleContentError } from '../errors.js';
+import Document from '../services/document.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const fs = fsApi.promises;
@@ -84,7 +85,7 @@ describe('Filter', () => {
       it('filters the given HTML content', async () => {
         const result = await filterHTML({
           content: rawHTML,
-          documentDeclaration: { fetch: virtualLocation, select: 'body' }
+          document: new Document({ location: virtualLocation, contentSelectors: 'body' })
         });
         expect(result).to.equal(expectedFiltered);
       });
@@ -93,7 +94,7 @@ describe('Filter', () => {
         it('throws an InaccessibleContentError error', async () => {
           await expect(filterHTML({
             content: rawHTML,
-            documentDeclaration: { fetch: virtualLocation, select: '#thisAnchorDoesNotExist' }
+            document: new Document({ location: virtualLocation, contentSelectors: '#thisAnchorDoesNotExist' })
           })).to.be.rejectedWith(InaccessibleContentError, /#thisAnchorDoesNotExist/);
         });
       });
@@ -102,8 +103,7 @@ describe('Filter', () => {
         it('filters the given HTML content also with given additional filter', async () => {
           const result = await filterHTML({
             content: rawHTML,
-            documentDeclaration: { fetch: virtualLocation, select: 'body', filter: [ 'removeLinks' ] },
-            filterFunctions: additionalFilter
+            document: new Document({ location: virtualLocation, contentSelectors: 'body', filters: [ additionalFilter.removeLinks ] })
           });
           expect(result).to.equal(expectedFilteredWithAdditional);
         });
@@ -113,8 +113,7 @@ describe('Filter', () => {
         it('filters the given HTML content also with given additional filter', async () => {
           const result = await filterHTML({
             content: rawHTML,
-            documentDeclaration: { fetch: virtualLocation, select: 'body', filter: [ 'removeLinksAsync' ] },
-            filterFunctions: additionalFilter
+            document: new Document({ location: virtualLocation, contentSelectors: 'body', filters: [ additionalFilter.removeLinksAsync ] })
           });
           expect(result).to.equal(expectedFilteredWithAdditional);
         });
@@ -124,7 +123,7 @@ describe('Filter', () => {
         it('filters the given HTML content', async () => {
           const result = await filterHTML({
             content: rawHTML,
-            documentDeclaration: { fetch: virtualLocation, select: 'h1, #link2' }
+            document: new Document({ location: virtualLocation, contentSelectors: 'h1, #link2' })
           });
           expect(result).to.equal('Title\n=====\n\n[link 2](#anchor)');
         });
@@ -135,7 +134,7 @@ describe('Filter', () => {
       it('filters the given HTML content', async () => {
         const result = await filterHTML({
           content: rawHTML,
-          documentDeclaration: { fetch: virtualLocation, select: [ 'h1', '#link2' ] }
+          document: new Document({ location: virtualLocation, contentSelectors: [ 'h1', '#link2' ] })
         });
         expect(result).to.equal('Title\n=====\n\n[link 2](#anchor)');
       });
@@ -146,13 +145,13 @@ describe('Filter', () => {
         it('filters the given HTML content', async () => {
           const result = await filterHTML({
             content: rawHTML,
-            documentDeclaration: {
-              fetch: virtualLocation,
-              select: {
+            document: new Document({
+              location: virtualLocation,
+              contentSelectors: {
                 startBefore: '#link1',
                 endBefore: '#link2'
               }
-            }
+            })
           });
           expect(result).to.equal('[link 1](https://exemple.com/relative/link)');
         });
@@ -161,13 +160,13 @@ describe('Filter', () => {
         it('filters the given HTML content', async () => {
           const result = await filterHTML({
             content: rawHTML,
-            documentDeclaration: {
-              fetch: virtualLocation,
-              select: {
+            document: new Document({
+              location: virtualLocation,
+              contentSelectors: {
                 startBefore: '#link2',
                 endAfter: '#link2'
               }
-            }
+            })
           });
           expect(result).to.equal('[link 2](#anchor)');
         });
@@ -176,13 +175,13 @@ describe('Filter', () => {
         it('filters the given HTML content', async () => {
           const result = await filterHTML({
             content: rawHTML,
-            documentDeclaration: {
-              fetch: virtualLocation,
-              select: {
+            document: new Document({
+              location: virtualLocation,
+              contentSelectors: {
                 startAfter: '#link1',
                 endBefore: '#link3'
               }
-            }
+            })
           });
           expect(result).to.equal('[link 2](#anchor)');
         });
@@ -191,13 +190,13 @@ describe('Filter', () => {
         it('filters the given HTML content', async () => {
           const result = await filterHTML({
             content: rawHTML,
-            documentDeclaration: {
-              fetch: virtualLocation,
-              select: {
+            document: new Document({
+              location: virtualLocation,
+              contentSelectors: {
                 startAfter: '#link2',
                 endAfter: '#link3'
               }
-            }
+            })
           });
           expect(result).to.equal('[link 3](http://absolute.url/link)');
         });
@@ -206,13 +205,13 @@ describe('Filter', () => {
         it('throws an InaccessibleContentError error', async () => {
           await expect(filterHTML({
             content: rawHTML,
-            documentDeclaration: {
-              fetch: virtualLocation,
-              select: {
+            document: new Document({
+              location: virtualLocation,
+              contentSelectors: {
                 startAfter: '#paragraph1',
                 endAfter: '#link2'
               }
-            }
+            })
           })).to.be.rejectedWith(InaccessibleContentError, /"start" selector has no match/);
         });
       });
@@ -220,13 +219,13 @@ describe('Filter', () => {
         it('throws an InaccessibleContentError error', async () => {
           await expect(filterHTML({
             content: rawHTML,
-            documentDeclaration: {
-              fetch: virtualLocation,
-              select: {
+            document: new Document({
+              location: virtualLocation,
+              contentSelectors: {
                 startAfter: '#link2',
                 endAfter: '#paragraph1'
               }
-            }
+            })
           })).to.be.rejectedWith(InaccessibleContentError, /"end" selector has no match/);
         });
       });
@@ -236,16 +235,16 @@ describe('Filter', () => {
       it('filters the given HTML content', async () => {
         const result = await filterHTML({
           content: rawHTML,
-          documentDeclaration: {
-            fetch: virtualLocation,
-            select: [{
+          document: new Document({
+            location: virtualLocation,
+            contentSelectors: [{
               startAfter: '#link1',
               endAfter: '#link2'
             }, {
               startAfter: '#link2',
               endAfter: '#link3'
             }]
-          }
+          })
         });
         expect(result).to.equal('[link 2](#anchor)\n\n[link 3](http://absolute.url/link)');
       });
@@ -255,13 +254,13 @@ describe('Filter', () => {
       it('filters the given HTML content', async () => {
         const result = await filterHTML({
           content: rawHTML,
-          documentDeclaration: {
-            fetch: virtualLocation,
-            select: [ 'h1', {
+          document: new Document({
+            location: virtualLocation,
+            contentSelectors: [ 'h1', {
               startAfter: '#link2',
               endAfter: '#link3'
             }]
-          }
+          })
         });
         expect(result).to.equal('Title\n=====\n\n[link 3](http://absolute.url/link)');
       });
@@ -272,11 +271,11 @@ describe('Filter', () => {
         it('removes the specified elements', async () => {
           const result = await filterHTML({
             content: rawHTML,
-            documentDeclaration: {
-              fetch: virtualLocation,
-              select: 'body',
-              remove: 'h1'
-            }
+            document: new Document({
+              location: virtualLocation,
+              contentSelectors: 'body',
+              noiseSelectors: 'h1'
+            })
           });
           expect(result).to.equal('[link 1](https://exemple.com/relative/link)\n\n[link 2](#anchor)\n\n[link 3](http://absolute.url/link)');
         });
@@ -286,13 +285,13 @@ describe('Filter', () => {
         it('removes the specified elements', async () => {
           const result = await filterHTML({
             content: rawHTML,
-            documentDeclaration: {
-              fetch: virtualLocation,
-              select: 'body',
-              remove: [
+            document: new Document({
+              location: virtualLocation,
+              contentSelectors: 'body',
+              noiseSelectors: [
                 'h1', '#link3'
               ]
-            }
+            })
           });
           expect(result).to.equal('[link 1](https://exemple.com/relative/link)\n\n[link 2](#anchor)');
         });
@@ -302,14 +301,14 @@ describe('Filter', () => {
         it('removes the specified elements', async () => {
           const result = await filterHTML({
             content: rawHTML,
-            documentDeclaration: {
-              fetch: virtualLocation,
-              select: 'body',
-              remove: {
+            document: new Document({
+              location: virtualLocation,
+              contentSelectors: 'body',
+              noiseSelectors: {
                 startBefore: '#link1',
                 endAfter: '#link3'
               }
-            }
+            })
           });
           expect(result).to.equal('Title\n=====');
         });
@@ -317,14 +316,14 @@ describe('Filter', () => {
           it('throws an InaccessibleContentError error', async () => {
             await expect(filterHTML({
               content: rawHTML,
-              documentDeclaration: {
-                fetch: virtualLocation,
-                select: 'body',
-                remove: {
+              document: new Document({
+                location: virtualLocation,
+                contentSelectors: 'body',
+                noiseSelectors: {
                   startAfter: '#paragraph1',
                   endAfter: '#link2'
                 }
-              }
+              })
             })).to.be.rejectedWith(InaccessibleContentError, /"start" selector has no match/);
           });
         });
@@ -332,14 +331,14 @@ describe('Filter', () => {
           it('throws an InaccessibleContentError error', async () => {
             await expect(filterHTML({
               content: rawHTML,
-              documentDeclaration: {
-                fetch: virtualLocation,
-                select: 'body',
-                remove: {
+              document: new Document({
+                location: virtualLocation,
+                contentSelectors: 'body',
+                noiseSelectors: {
                   startAfter: '#link2',
                   endAfter: '#paragraph1'
                 }
-              }
+              })
             })).to.be.rejectedWith(InaccessibleContentError, /"end" selector has no match/);
           });
         });
@@ -348,10 +347,10 @@ describe('Filter', () => {
         it('removes all the selections', async () => {
           const result = await filterHTML({
             content: rawHTML,
-            documentDeclaration: {
-              fetch: virtualLocation,
-              select: 'body',
-              remove: [
+            document: new Document({
+              location: virtualLocation,
+              contentSelectors: 'body',
+              noiseSelectors: [
                 {
                   startBefore: 'h1',
                   endBefore: '#link1'
@@ -361,7 +360,7 @@ describe('Filter', () => {
                   endAfter: '#link3'
                 }
               ]
-            }
+            })
           });
           expect(result).to.equal('[link 1](https://exemple.com/relative/link)\n\n[link 2](#anchor)');
         });
@@ -371,17 +370,17 @@ describe('Filter', () => {
         it('removes all the selections', async () => {
           const result = await filterHTML({
             content: rawHTML,
-            documentDeclaration: {
-              fetch: virtualLocation,
-              select: 'body',
-              remove: [
+            document: new Document({
+              location: virtualLocation,
+              contentSelectors: 'body',
+              noiseSelectors: [
                 'h1',
                 {
                   startBefore: '#link3',
                   endAfter: '#link3'
                 }
               ]
-            }
+            })
           });
           expect(result).to.equal('[link 1](https://exemple.com/relative/link)\n\n[link 2](#anchor)');
         });

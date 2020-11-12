@@ -10,7 +10,7 @@ describe('Utils', () => {
       context('With string selector', () => {
         it('extracts selectors', async () => {
           const result = extractCssSelectorsFromDocumentDeclaration({
-            select: 'body'
+            contentSelectors: 'body'
           });
 
           expect(result).to.deep.equal([ 'body' ]);
@@ -20,7 +20,7 @@ describe('Utils', () => {
       context('With range selector', () => {
         it('extracts selectors', async () => {
           const result = extractCssSelectorsFromDocumentDeclaration({
-            select: {
+            contentSelectors: {
               startBefore: '#startBefore',
               endBefore: '#endBefore'
             }
@@ -33,7 +33,7 @@ describe('Utils', () => {
       context('With an array of mixed selectors', () => {
         it('extracts selectors', async () => {
           const result = extractCssSelectorsFromDocumentDeclaration({
-            select: [
+            contentSelectors: [
               {
                 startBefore: '#startBefore',
                 endBefore: '#endBefore'
@@ -51,7 +51,7 @@ describe('Utils', () => {
       context('With string selector', () => {
         it('extracts selectors', async () => {
           const result = extractCssSelectorsFromDocumentDeclaration({
-            remove: 'body'
+            noiseSelectors: 'body'
           });
 
           expect(result).to.deep.equal([ 'body' ]);
@@ -61,7 +61,7 @@ describe('Utils', () => {
       context('With range selector', () => {
         it('extracts selectors', async () => {
           const result = extractCssSelectorsFromDocumentDeclaration({
-            remove: {
+            noiseSelectors: {
               startBefore: '#startBefore',
               endBefore: '#endBefore'
             }
@@ -74,7 +74,7 @@ describe('Utils', () => {
       context('With an array of mixed selectors', () => {
         it('extracts selectors', async () => {
           const result = extractCssSelectorsFromDocumentDeclaration({
-            remove: [
+            noiseSelectors: [
               {
                 startBefore: '#startBefore',
                 endBefore: '#endBefore'
@@ -92,8 +92,8 @@ describe('Utils', () => {
       context('With string selector', () => {
         it('extracts selectors', async () => {
           const result = extractCssSelectorsFromDocumentDeclaration({
-            select: 'body',
-            remove: 'h1'
+            contentSelectors: 'body',
+            noiseSelectors: 'h1'
           });
 
           expect(result).to.deep.equal([ 'body', 'h1' ]);
@@ -103,11 +103,11 @@ describe('Utils', () => {
       context('With range selector', () => {
         it('extracts selectors', async () => {
           const result = extractCssSelectorsFromDocumentDeclaration({
-            select: {
+            contentSelectors: {
               startBefore: '#startBefore',
               endBefore: '#endBefore'
             },
-            remove: {
+            noiseSelectors: {
               startBefore: '#startBefore',
               endBefore: '#endBefore'
             }
@@ -120,14 +120,14 @@ describe('Utils', () => {
       context('With an array of mixed selectors', () => {
         it('extracts selectors', async () => {
           const result = extractCssSelectorsFromDocumentDeclaration({
-            select: [
+            contentSelectors: [
               {
                 startBefore: '#startBefore',
                 endBefore: '#endBefore'
               },
               'body'
             ],
-            remove: [
+            noiseSelectors: [
               {
                 startBefore: '#startBefore',
                 endBefore: '#endBefore'

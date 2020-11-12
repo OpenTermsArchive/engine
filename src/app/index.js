@@ -6,7 +6,7 @@ import async from 'async';
 import * as history from './history/index.js';
 import fetch from './fetcher/index.js';
 import filter from './filter/index.js';
-import Services from './services/index.js';
+import * as services from './services/index.js';
 import { InaccessibleContentError } from './errors.js';
 import { extractCssSelectorsFromDocumentDeclaration } from './utils/index.js';
 
@@ -27,20 +27,20 @@ export const AVAILABLE_EVENTS = [
 
 export default class CGUs extends events.EventEmitter {
   get serviceDeclarations() {
-    return this._serviceDeclarations;
+    return this.services;
   }
 
   get serviceIds() {
-    return Object.keys(this._serviceDeclarations);
+    return Object.keys(this.services);
   }
 
   async init() {
-    if (!this._serviceDeclarations) {
+    if (!this.services) {
       this.initQueues();
-      this._serviceDeclarations = await Services.load();
+      this.services = await services.load();
     }
 
-    return this._serviceDeclarations;
+    return this.services;
   }
 
   initQueues() {
@@ -49,12 +49,12 @@ export default class CGUs extends events.EventEmitter {
     this.refilterDocumentsQueue = async.queue(async document => this.refilterAndRecordDocument(document),
       MAX_PARALLEL_REFILTERS);
 
-    const queueErrorHandler = (error, { serviceId, type }) => {
+    const queueErrorHandler = (error, { service, type }) => {
       if (error instanceof InaccessibleContentError) {
-        return this.emit('inaccessibleContent', error, serviceId, type);
+        return this.emit('inaccessibleContent', error, service.id, type);
       }
 
-      this.emit('error', error, serviceId, type);
+      this.emit('error', error, service.id, type);
 
       throw error;
     };
@@ -119,9 +119,9 @@ export default class CGUs extends events.EventEmitter {
   }
 
   async refilterAndRecordDocument(document) {
-    const { type, serviceId } = document;
+    const { type, service } = document;
 
-    const { id: snapshotId, content: snapshotContent, mimeType } = await history.getLatestSnapshot(serviceId, type);
+    const { id: snapshotId, content: snapshotContent, mimeType } = await history.getLatestSnapshot(service.id, type);
 
     if (!snapshotId) {
       return;
@@ -138,9 +138,8 @@ export default class CGUs extends events.EventEmitter {
 
   async _forEachDocumentOf(servicesIds = [], callback) {
     servicesIds.forEach(serviceId => {
-      const { documents } = this._serviceDeclarations[serviceId];
-      Object.keys(documents).forEach(type => {
-        callback(documents[type].latest);
+      this.services[serviceId].getDocumentTypes().forEach(documentType => {
+        callback(this.services[serviceId].getDocument(documentType));
       });
     });
   }
