@@ -7,7 +7,7 @@ import { fileURLToPath } from 'url';
 
 import { filterHTML, filterPDF, convertRelativeURLsToAbsolute } from './index.js';
 import { InaccessibleContentError } from '../errors.js';
-import Document from '../services/document.js';
+import DocumentDeclaration from '../services/documentDeclaration.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const fs = fsApi.promises;
@@ -85,7 +85,7 @@ describe('Filter', () => {
       it('filters the given HTML content', async () => {
         const result = await filterHTML({
           content: rawHTML,
-          document: new Document({ location: virtualLocation, contentSelectors: 'body' })
+          document: new DocumentDeclaration({ location: virtualLocation, contentSelectors: 'body' })
         });
         expect(result).to.equal(expectedFiltered);
       });
@@ -94,7 +94,7 @@ describe('Filter', () => {
         it('throws an InaccessibleContentError error', async () => {
           await expect(filterHTML({
             content: rawHTML,
-            document: new Document({ location: virtualLocation, contentSelectors: '#thisAnchorDoesNotExist' })
+            document: new DocumentDeclaration({ location: virtualLocation, contentSelectors: '#thisAnchorDoesNotExist' })
           })).to.be.rejectedWith(InaccessibleContentError, /#thisAnchorDoesNotExist/);
         });
       });
@@ -103,7 +103,7 @@ describe('Filter', () => {
         it('filters the given HTML content also with given additional filter', async () => {
           const result = await filterHTML({
             content: rawHTML,
-            document: new Document({ location: virtualLocation, contentSelectors: 'body', filters: [ additionalFilter.removeLinks ] })
+            document: new DocumentDeclaration({ location: virtualLocation, contentSelectors: 'body', filters: [ additionalFilter.removeLinks ] })
           });
           expect(result).to.equal(expectedFilteredWithAdditional);
         });
@@ -113,7 +113,7 @@ describe('Filter', () => {
         it('filters the given HTML content also with given additional filter', async () => {
           const result = await filterHTML({
             content: rawHTML,
-            document: new Document({ location: virtualLocation, contentSelectors: 'body', filters: [ additionalFilter.removeLinksAsync ] })
+            document: new DocumentDeclaration({ location: virtualLocation, contentSelectors: 'body', filters: [ additionalFilter.removeLinksAsync ] })
           });
           expect(result).to.equal(expectedFilteredWithAdditional);
         });
@@ -123,7 +123,7 @@ describe('Filter', () => {
         it('filters the given HTML content', async () => {
           const result = await filterHTML({
             content: rawHTML,
-            document: new Document({ location: virtualLocation, contentSelectors: 'h1, #link2' })
+            document: new DocumentDeclaration({ location: virtualLocation, contentSelectors: 'h1, #link2' })
           });
           expect(result).to.equal('Title\n=====\n\n[link 2](#anchor)');
         });
@@ -134,7 +134,7 @@ describe('Filter', () => {
       it('filters the given HTML content', async () => {
         const result = await filterHTML({
           content: rawHTML,
-          document: new Document({ location: virtualLocation, contentSelectors: [ 'h1', '#link2' ] })
+          document: new DocumentDeclaration({ location: virtualLocation, contentSelectors: [ 'h1', '#link2' ] })
         });
         expect(result).to.equal('Title\n=====\n\n[link 2](#anchor)');
       });
@@ -145,7 +145,7 @@ describe('Filter', () => {
         it('filters the given HTML content', async () => {
           const result = await filterHTML({
             content: rawHTML,
-            document: new Document({
+            document: new DocumentDeclaration({
               location: virtualLocation,
               contentSelectors: {
                 startBefore: '#link1',
@@ -160,7 +160,7 @@ describe('Filter', () => {
         it('filters the given HTML content', async () => {
           const result = await filterHTML({
             content: rawHTML,
-            document: new Document({
+            document: new DocumentDeclaration({
               location: virtualLocation,
               contentSelectors: {
                 startBefore: '#link2',
@@ -175,7 +175,7 @@ describe('Filter', () => {
         it('filters the given HTML content', async () => {
           const result = await filterHTML({
             content: rawHTML,
-            document: new Document({
+            document: new DocumentDeclaration({
               location: virtualLocation,
               contentSelectors: {
                 startAfter: '#link1',
@@ -190,7 +190,7 @@ describe('Filter', () => {
         it('filters the given HTML content', async () => {
           const result = await filterHTML({
             content: rawHTML,
-            document: new Document({
+            document: new DocumentDeclaration({
               location: virtualLocation,
               contentSelectors: {
                 startAfter: '#link2',
@@ -205,7 +205,7 @@ describe('Filter', () => {
         it('throws an InaccessibleContentError error', async () => {
           await expect(filterHTML({
             content: rawHTML,
-            document: new Document({
+            document: new DocumentDeclaration({
               location: virtualLocation,
               contentSelectors: {
                 startAfter: '#paragraph1',
@@ -219,7 +219,7 @@ describe('Filter', () => {
         it('throws an InaccessibleContentError error', async () => {
           await expect(filterHTML({
             content: rawHTML,
-            document: new Document({
+            document: new DocumentDeclaration({
               location: virtualLocation,
               contentSelectors: {
                 startAfter: '#link2',
@@ -235,7 +235,7 @@ describe('Filter', () => {
       it('filters the given HTML content', async () => {
         const result = await filterHTML({
           content: rawHTML,
-          document: new Document({
+          document: new DocumentDeclaration({
             location: virtualLocation,
             contentSelectors: [{
               startAfter: '#link1',
@@ -254,7 +254,7 @@ describe('Filter', () => {
       it('filters the given HTML content', async () => {
         const result = await filterHTML({
           content: rawHTML,
-          document: new Document({
+          document: new DocumentDeclaration({
             location: virtualLocation,
             contentSelectors: [ 'h1', {
               startAfter: '#link2',
@@ -271,7 +271,7 @@ describe('Filter', () => {
         it('removes the specified elements', async () => {
           const result = await filterHTML({
             content: rawHTML,
-            document: new Document({
+            document: new DocumentDeclaration({
               location: virtualLocation,
               contentSelectors: 'body',
               noiseSelectors: 'h1'
@@ -285,7 +285,7 @@ describe('Filter', () => {
         it('removes the specified elements', async () => {
           const result = await filterHTML({
             content: rawHTML,
-            document: new Document({
+            document: new DocumentDeclaration({
               location: virtualLocation,
               contentSelectors: 'body',
               noiseSelectors: [
@@ -301,7 +301,7 @@ describe('Filter', () => {
         it('removes the specified elements', async () => {
           const result = await filterHTML({
             content: rawHTML,
-            document: new Document({
+            document: new DocumentDeclaration({
               location: virtualLocation,
               contentSelectors: 'body',
               noiseSelectors: {
@@ -316,7 +316,7 @@ describe('Filter', () => {
           it('throws an InaccessibleContentError error', async () => {
             await expect(filterHTML({
               content: rawHTML,
-              document: new Document({
+              document: new DocumentDeclaration({
                 location: virtualLocation,
                 contentSelectors: 'body',
                 noiseSelectors: {
@@ -331,7 +331,7 @@ describe('Filter', () => {
           it('throws an InaccessibleContentError error', async () => {
             await expect(filterHTML({
               content: rawHTML,
-              document: new Document({
+              document: new DocumentDeclaration({
                 location: virtualLocation,
                 contentSelectors: 'body',
                 noiseSelectors: {
@@ -347,7 +347,7 @@ describe('Filter', () => {
         it('removes all the selections', async () => {
           const result = await filterHTML({
             content: rawHTML,
-            document: new Document({
+            document: new DocumentDeclaration({
               location: virtualLocation,
               contentSelectors: 'body',
               noiseSelectors: [
@@ -370,7 +370,7 @@ describe('Filter', () => {
         it('removes all the selections', async () => {
           const result = await filterHTML({
             content: rawHTML,
-            document: new Document({
+            document: new DocumentDeclaration({
               location: virtualLocation,
               contentSelectors: 'body',
               noiseSelectors: [

@@ -5,7 +5,7 @@ import { pathToFileURL, fileURLToPath } from 'url';
 import config from 'config';
 import simpleGit from 'simple-git';
 
-import Document from './document.js';
+import DocumentDeclaration from './documentDeclaration.js';
 import Service from './service.js';
 
 const fs = fsApi.promises;
@@ -44,7 +44,7 @@ export async function load() {
         filters = filterNames.map(filterName => serviceFilters[filterName]);
       }
 
-      const document = new Document({
+      const document = new DocumentDeclaration({
         service,
         type: documentType,
         location,
@@ -91,7 +91,7 @@ export async function loadWithHistory() {
           });
         }
 
-        services[serviceId].addDocument(new Document({
+        services[serviceId].addDocument(new DocumentDeclaration({
           service: services[serviceId],
           type: documentType,
           location: declarationForThisDate.fetch,

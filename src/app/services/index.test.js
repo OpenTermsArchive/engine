@@ -28,22 +28,22 @@ describe('Services', () => {
       await validateServiceWithoutHistory(result.service_B, expectedServices.service_B);
     });
     context('when a service has no history', async () => {
-      it('properly loads the service', async () => {
+      it('loads the service', async () => {
         await validateServiceWithoutHistory(result.service_without_history, expectedServices.service_without_history);
       });
     });
     context('when a service has only delcarations history', async () => {
-      it('properly loads the service', async () => {
+      it('loads the service', async () => {
         await validateServiceWithoutHistory(result.service_with_declaration_history, expectedServices.service_with_declaration_history);
       });
     });
     context('when a service has only filters history', async () => {
-      it('properly loads the service', async () => {
+      it('loads the service', async () => {
         await validateServiceWithoutHistory(result.service_with_filters_history, expectedServices.service_with_filters_history);
       });
     });
     context('when a service has both filters and delcarations histories', async () => {
-      it('properly loads the service', async () => {
+      it('loads the service', async () => {
         await validateServiceWithoutHistory(result.service_with_history, expectedServices.service_with_history);
       });
     });
@@ -66,22 +66,22 @@ describe('Services', () => {
       await validateServiceWithHistory(result.service_B, expectedServices.service_B);
     });
     context('when a service has no history', async () => {
-      it('properly loads the service with its history', async () => {
+      it('loads the service with its history', async () => {
         await validateServiceWithHistory(result.service_without_history, expectedServices.service_without_history);
       });
     });
     context('when a service has only delcarations history', async () => {
-      it('properly loads the service with its history', async () => {
+      it('loads the service with its history', async () => {
         await validateServiceWithHistory(result.service_with_declaration_history, expectedServices.service_with_declaration_history);
       });
     });
     context('when a service has only filters history', async () => {
-      it('properly loads the service with its history', async () => {
+      it('loads the service with its history', async () => {
         await validateServiceWithHistory(result.service_with_filters_history, expectedServices.service_with_filters_history);
       });
     });
     context('when a service has both filters and delcarations histories', async () => {
-      it('properly loads the service with its history', async () => {
+      it('loads the service with its history', async () => {
         await validateServiceWithHistory(result.service_with_history, expectedServices.service_with_history);
       });
     });
@@ -89,8 +89,10 @@ describe('Services', () => {
 });
 
 async function validateServiceWithoutHistory(actual, expected) {
+  expect(actual).excludingEvery([ 'filters', '_history' ]).to.deep.equal(expected);
+
   for (const documentType of actual.getDocumentTypes()) {
-    const { history: actualHistory } = actual.getDocument(documentType);
+    const { _history: actualHistory } = actual.getDocument(documentType);
     expect(actualHistory).to.be.undefined;
 
     const { filters: actualFilters } = actual.getDocument(documentType);

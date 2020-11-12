@@ -1,5 +1,5 @@
 import Service from '../../src/app/services/service.js';
-import Document from '../../src/app/services/document.js';
+import DocumentDeclaration from '../../src/app/services/documentDeclaration.js';
 import { FUTUR_DATE } from '../../src/app/services/index.js';
 
 const service = new Service({
@@ -7,7 +7,7 @@ const service = new Service({
   name: 'Service A',
 });
 
-const latest = new Document({
+const latest = new DocumentDeclaration({
   service,
   type: 'Terms of Service',
   location: 'https://www.servicea.example/tos',
@@ -21,7 +21,7 @@ service._documents = {
   'Terms of Service': {
     _latest: latest,
     _history: [
-      new Document({
+      new DocumentDeclaration({
         ...latest,
         validUntil: FUTUR_DATE
       })
