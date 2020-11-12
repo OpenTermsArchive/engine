@@ -17,10 +17,10 @@ const latest = new Document({
   validUntil: null
 });
 
-service.documents = {
+service._documents = {
   'Privacy Policy': {
-    latest,
-    history: [
+    _latest: latest,
+    _history: [
       new Document({
         ...latest,
         validUntil: FUTUR_DATE

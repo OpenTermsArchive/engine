@@ -128,7 +128,7 @@ describe('CGUs', () => {
 
           serviceBCommits = await gitVersion().log({ file: SERVICE_B_EXPECTED_VERSION_FILE_PATH });
 
-          app.serviceDeclarations[SERVICE_A_ID].documents[SERVICE_A_TYPE].latest.contentSelectors = 'h1';
+          app.serviceDeclarations[SERVICE_A_ID].getDocument(SERVICE_A_TYPE).contentSelectors = 'h1';
 
           await app.refilterAndRecord([ 'service_A', 'service_B' ]);
 
@@ -173,7 +173,7 @@ describe('CGUs', () => {
           await app.init();
           await app.trackChanges(serviceIds);
 
-          app.serviceDeclarations[SERVICE_A_ID].documents[SERVICE_A_TYPE].latest.contentSelectors = 'inexistant-selector';
+          app.serviceDeclarations[SERVICE_A_ID].getDocument(SERVICE_A_TYPE).contentSelectors = 'inexistant-selector';
           inaccessibleContentSpy = sinon.spy();
           versionNotChangedSpy = sinon.spy();
           app.on('inaccessibleContent', inaccessibleContentSpy);
@@ -222,7 +222,7 @@ describe('CGUs', () => {
         app.on(event, spies[handlerName]);
       });
 
-      documentADeclaration = app.serviceDeclarations[SERVICE_A_ID].documents[SERVICE_A_TYPE].latest;
+      documentADeclaration = app.serviceDeclarations[SERVICE_A_ID].getDocument(SERVICE_A_TYPE);
     });
 
     describe('#recordSnapshot', () => {
