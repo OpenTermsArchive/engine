@@ -15,6 +15,12 @@ export default class Git {
     return this.git.init();
   }
 
+  async initUser() {
+    return this.git
+      .addConfig('user.name', config.get('history.author').name)
+      .addConfig('user.email', config.get('history.author').email);
+  }
+
   async add(filepath) {
     return this.git.add(this.relativePath(filepath));
   }
