@@ -15,11 +15,7 @@ export default class Service {
       return currentlyValidDocumentDeclaration;
     }
 
-    if (!_history) {
-      throw new Error('History not loaded. Use "loadWithHistory".');
-    }
-
-    return _history.find(entry => new Date(date) <= new Date(entry.validUntil)) || currentlyValidDocumentDeclaration;
+    return (_history && _history.find(entry => new Date(date) <= new Date(entry.validUntil))) || currentlyValidDocumentDeclaration;
   }
 
   getDocumentTypes() {
@@ -28,8 +24,12 @@ export default class Service {
 
   addDocumentDeclaration(document) {
     if (!document.service) {
+      document.service = this;
+    }
+
+    this._documents[document.type] = this._documents[document.type] || {};
+
     if (!document.validUntil) {
-      this._documents[document.type] = this._documents[document.type] || {};
       this._documents[document.type]._latest = document;
       return;
     }
