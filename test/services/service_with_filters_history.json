@@ -1,0 +1,10 @@
+{
+  "name": "Service with filters history",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://www.service-with-filters-history.example/terms",
+      "select": "main",
+      "filter": [ "removeSharesButton", "removePrintButton" ]
+    }
+  }
+}
