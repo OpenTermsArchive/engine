@@ -1,5 +1,5 @@
 import Service from '../../src/app/services/service.js';
-import Document from '../../src/app/services/document.js';
+import DocumentDeclaration from '../../src/app/services/documentDeclaration.js';
 import { FUTUR_DATE } from '../../src/app/services/index.js';
 
 const service = new Service({
@@ -16,7 +16,7 @@ const filters = [
   }
 ];
 
-const latest = new Document({
+const latest = new DocumentDeclaration({
   service,
   type: 'Terms of Service',
   location: 'https://www.service-wihout-history.example/tos',
@@ -27,7 +27,7 @@ const latest = new Document({
 });
 
 const history = [
-  new Document({
+  new DocumentDeclaration({
     service,
     type: 'Terms of Service',
     location: 'https://www.service-wihout-history.example/tos',

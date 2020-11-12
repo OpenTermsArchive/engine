@@ -1,4 +1,4 @@
-export default class Document {
+export default class DocumentDeclaration {
   constructor({ service, type, location, contentSelectors, noiseSelectors, filters, validUntil = null }) {
     this.service = service;
     this.type = type;

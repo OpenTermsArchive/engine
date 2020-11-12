@@ -1,5 +1,5 @@
 import Service from '../../src/app/services/service.js';
-import Document from '../../src/app/services/document.js';
+import DocumentDeclaration from '../../src/app/services/documentDeclaration.js';
 import { FUTUR_DATE } from '../../src/app/services/index.js';
 
 const service = new Service({
@@ -16,7 +16,7 @@ const filters = [
   }
 ];
 
-const latest = new Document({
+const latest = new DocumentDeclaration({
   service,
   type: 'Terms of Service',
   location: 'https://www.service-with-declaration-history.example/terms',
@@ -27,7 +27,7 @@ const latest = new Document({
 });
 
 const history = [
-  new Document({
+  new DocumentDeclaration({
     service,
     type: 'Terms of Service',
     location: 'https://www.service-with-declaration-history.example/tos',
@@ -36,7 +36,7 @@ const history = [
     filters: undefined,
     validUntil: '2020-08-22T21:30:21.000Z'
   }),
-  new Document({
+  new DocumentDeclaration({
     service,
     type: 'Terms of Service',
     location: 'https://www.service-with-declaration-history.example/tos',
@@ -47,7 +47,7 @@ const history = [
     } ],
     validUntil: '2020-09-30T21:30:21.000Z'
   }),
-  new Document({
+  new DocumentDeclaration({
     service,
     type: 'Terms of Service',
     location: 'https://www.service-with-declaration-history.example/terms',
