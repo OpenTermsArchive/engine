@@ -16,7 +16,7 @@ export const VERSIONS_PATH = path.resolve(__dirname, '../../..', config.get('his
 const snapshotRecorder = new Recorder({ path: SNAPSHOTS_PATH, fileExtension: 'html' });
 const versionRecorder = new Recorder({ path: VERSIONS_PATH, fileExtension: 'md' });
 
-export async function recordSnapshot({ serviceId, documentType, content, mimeType }) {
+export async function recordSnapshot({ serviceId, documentType, content, mimeType, authorDate }) {
   const isFirstRecord = !await snapshotRecorder.isTracked(serviceId, documentType);
   const prefix = isFirstRecord ? 'Start tracking' : 'Update';
   const changelog = `${prefix} ${serviceId} ${documentType}`;
@@ -26,6 +26,7 @@ export async function recordSnapshot({ serviceId, documentType, content, mimeTyp
     content,
     changelog,
     mimeType,
+    authorDate,
   });
 
   return {
