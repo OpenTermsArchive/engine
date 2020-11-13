@@ -226,6 +226,22 @@ npm start $service_id
 
 See [Ops Readme](ops/README.md).
 
+### Exporting a dataset
+
+_NB: For now, this tool assumes that this repo and the `CGUs-versions` repo are cloned side-by-side._
+
+Export data to a folder named `gcus-dataset` (default):
+
+```
+npm run export
+```
+
+Export data to any folder (path is relative to the root of this repo)
+
+```
+npm run export -- --folder-name=/target/dir
+```
+
 - - -
 
 ## License
