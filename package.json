@@ -8,6 +8,7 @@
     "node": ">=12.17"
   },
   "scripts": {
+    "export": "node scripts/export/makedataset.js",
     "start": "node --max-http-header-size=16384 src/index.js",
     "start:modified": "node --max-http-header-size=16384 src/index.js -- --modified-only",
     "start:prod": "cross-env NODE_ENV=production node --max-http-header-size=16384  src/index.js",

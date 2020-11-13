@@ -1,10 +1,11 @@
-import Git from '../../src/app/history/git.js';
 import fs from 'fs';
 import fse from 'fs-extra';
-import path from 'path';
 import mime from 'mime';
+import path from 'path';
 
-const git = new Git("/Users/vincentviers/pro/betagouv/ambanum/CGUs-versions");
+import Git from '../../src/app/history/git.js';
+
+const git = new Git("../CGUs-versions"); //TODO: make this a CLI argument?
 
 const serviceMap = {
     "AskFM": "ASKfm",
@@ -47,17 +48,27 @@ const doctypeMap = {
   "user_consent_policy": "User Consent Policy"
 };
 
+const arg = process.argv.filter(el => el.startsWith("--folder-name"))
+
+var exportTarget = "cgus-dataset";
+if (arg.length === 1) {
+    exportTarget = arg[0].split("=")[1];
+}
+console.log(`Exporting dataset to ${exportTarget}`)
+
 async function getCommits() {
     return git.log([ '--stat=4096' ])
 }
 
 function extractLogInfos(commit) {
+    // parse a LogInfo object
     const { hash, date, message, diff } = commit;
     const {files: filesChanged} = diff;
     return { hash, date, message, filesChanged }
 }
 
 function makeFilename(target, filepath, date) {
+    // given a target folder and a file path, create target dataset structure
     const splitted = filepath.split("/")
     var service = splitted.slice(-2)[0]
     var document_type = splitted.slice(-1)[0].replace(/\.[^/.]+$/, "")
@@ -86,6 +97,7 @@ function makeFilename(target, filepath, date) {
 }
 
 function isValidCommit(commitMessage) {
+    // util function used for filtering CGUs commits
     const [firstVerb] = commitMessage.split(" ")
     return ["Update", "Start", "Refilter"].includes(firstVerb)
 }
@@ -137,7 +149,7 @@ async function main() {
 
         if (commitInfo.filesChanged.length > 1) {
             console.warn("More than one file has been changed in this commit.")
-            // TODO: handle this case (although it should rarely happen)
+            // TODO: handle this case (although it should never happen)
             continue
         }
 
@@ -149,7 +161,7 @@ async function main() {
     git.checkout("master")
 
     // copy temp dir to final destination
-    const final_path = path.join(process.env.PWD, "cgus-dataset")
+    const final_path = path.join(process.env.PWD, exportTarget)
     fse.copy("/tmp/CGUs-extract/", final_path, function (err) {
         if (err) {
           console.error(err);
@@ -162,7 +174,3 @@ async function main() {
 (async function() {
     await main();
 }())
-
-
-//Google/terms_of_service.md
-//Google/Terms of Service.md
