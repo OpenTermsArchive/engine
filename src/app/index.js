@@ -43,9 +43,9 @@ export default class CGUs extends events.EventEmitter {
   }
 
   initQueues() {
-    this.trackDocumentChangesQueue = async.queue(async document => this.trackDocumentChanges(document),
+    this.trackDocumentChangesQueue = async.queue(async documentDeclaration => this.trackDocumentChanges(documentDeclaration),
       MAX_PARALLEL_DOCUMENTS_TRACKS);
-    this.refilterDocumentsQueue = async.queue(async document => this.refilterAndRecordDocument(document),
+    this.refilterDocumentsQueue = async.queue(async documentDeclaration => this.refilterAndRecordDocument(documentDeclaration),
       MAX_PARALLEL_REFILTERS);
 
     const queueErrorHandler = (error, { service, type }) => {
@@ -73,19 +73,19 @@ export default class CGUs extends events.EventEmitter {
   }
 
   async trackChanges(servicesIds) {
-    this._forEachDocumentOf(servicesIds, document => this.trackDocumentChangesQueue.push(document));
+    this._forEachDocumentOf(servicesIds, documentDeclaration => this.trackDocumentChangesQueue.push(documentDeclaration));
 
     await this.trackDocumentChangesQueue.drain();
     await this.publish();
   }
 
-  async trackDocumentChanges(document) {
-    const { location, executeClientScripts } = document;
+  async trackDocumentChanges(documentDeclaration) {
+    const { location, executeClientScripts } = documentDeclaration;
 
     const { mimeType, content } = await fetch({
       url: location,
       executeClientScripts,
-      cssSelectors: document.getCssSelectors(),
+      cssSelectors: documentDeclaration.getCssSelectors(),
     });
 
     if (!content) {
@@ -95,7 +95,7 @@ export default class CGUs extends events.EventEmitter {
     const snapshotId = await this.recordSnapshot({
       content,
       mimeType,
-      document,
+      documentDeclaration,
     });
 
     if (!snapshotId) {
@@ -106,19 +106,19 @@ export default class CGUs extends events.EventEmitter {
       snapshotContent: content,
       mimeType,
       snapshotId,
-      document
+      documentDeclaration
     });
   }
 
   async refilterAndRecord(servicesIds) {
-    this._forEachDocumentOf(servicesIds, document => this.refilterDocumentsQueue.push(document));
+    this._forEachDocumentOf(servicesIds, documentDeclaration => this.refilterDocumentsQueue.push(documentDeclaration));
 
     await this.refilterDocumentsQueue.drain();
     await this.publish();
   }
 
-  async refilterAndRecordDocument(document) {
-    const { type, service } = document;
+  async refilterAndRecordDocument(documentDeclaration) {
+    const { type, service } = documentDeclaration;
 
     const { id: snapshotId, content: snapshotContent, mimeType } = await history.getLatestSnapshot(service.id, type);
 
@@ -130,7 +130,7 @@ export default class CGUs extends events.EventEmitter {
       snapshotContent,
       mimeType,
       snapshotId,
-      document,
+      documentDeclaration,
       isRefiltering: true
     });
   }
@@ -143,7 +143,7 @@ export default class CGUs extends events.EventEmitter {
     });
   }
 
-  async recordSnapshot({ content, mimeType, document: { service, type } }) {
+  async recordSnapshot({ content, mimeType, documentDeclaration: { service, type } }) {
     const { id: snapshotId, isFirstRecord } = await history.recordSnapshot({
       serviceId: service.id,
       documentType: type,
@@ -159,12 +159,12 @@ export default class CGUs extends events.EventEmitter {
     return snapshotId;
   }
 
-  async recordVersion({ snapshotContent, mimeType, snapshotId, document, isRefiltering }) {
-    const { service, type } = document;
+  async recordVersion({ snapshotContent, mimeType, snapshotId, documentDeclaration, isRefiltering }) {
+    const { service, type } = documentDeclaration;
     const content = await filter({
       content: snapshotContent,
       mimeType,
-      document
+      documentDeclaration
     });
 
     const recordFunction = !isRefiltering ? 'recordVersion' : 'recordRefilter';

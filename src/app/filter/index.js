@@ -19,24 +19,24 @@ const { CiceroMarkTransformer } = ciceroMark;
 const pdfTransformer = new PdfTransformer();
 const ciceroMarkTransformer = new CiceroMarkTransformer();
 
-export default async function filter({ content, mimeType, document }) {
+export default async function filter({ content, mimeType, documentDeclaration }) {
   if (mimeType == 'application/pdf') {
     return filterPDF({ content });
   }
 
   return filterHTML({
     content,
-    document
+    documentDeclaration
   });
 }
 
-export async function filterHTML({ content, document }) {
+export async function filterHTML({ content, documentDeclaration }) {
   const {
     location,
     contentSelectors = [],
     noiseSelectors = [],
     filters: serviceSpecificFilters = []
-  } = document;
+  } = documentDeclaration;
 
   const jsdomInstance = new JSDOM(content, {
     url: location,
@@ -46,8 +46,12 @@ export async function filterHTML({ content, document }) {
 
   for (const filterFunction of serviceSpecificFilters) {
     try {
-      // TODO PASS LES properties du doc UN PAR UN
-      await filterFunction(webPageDOM, document); // eslint-disable-line no-await-in-loop
+      await filterFunction(webPageDOM, { // eslint-disable-line no-await-in-loop
+        fetch: location,
+        select: contentSelectors,
+        remove: noiseSelectors,
+        filter: serviceSpecificFilters.map(fn => fn.name)
+      });
     } catch (error) {
       throw new InaccessibleContentError(`The filter function ${filterFunction} failed: ${error}`);
     }
