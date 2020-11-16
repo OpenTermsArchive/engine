@@ -38,4 +38,8 @@ export default class Service {
     this._documents[document.type]._history.push(document);
     this._documents[document.type]._history.sort((a, b) => new Date(a.validUntil) - new Date(b.validUntil));
   }
+
+  getNumberOfDocuments() {
+    return this.getDocumentTypes().length;
+  }
 }
