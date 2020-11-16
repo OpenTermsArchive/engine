@@ -112,16 +112,23 @@ async function validateServiceWithHistory(actual, expected) {
   expect(actual).excludingEvery('filters').to.deep.equal(expected);
 
   for (const documentType of actual.getDocumentTypes()) {
-    const { _history: actualHistory } = actual._documents[documentType];
     const { _history: expectedHistory } = expected._documents[documentType];
+    const expectedHistoryDates = expectedHistory && expectedHistory.map(entry => entry.validUntil);
 
-    for (let indexHistory = 0; indexHistory < actualHistory.length; indexHistory++) {
-      if (expectedHistory[indexHistory].filters) {
-        for (let indexFilter = 0; indexFilter < actualHistory[indexHistory].filters.length; indexFilter++) {
-          expect(await actualHistory[indexHistory].filters[indexFilter]()).equal(await expectedHistory[indexHistory].filters[indexFilter]()); // eslint-disable-line no-await-in-loop
+    if (expectedHistoryDates) {
+      for (const date of expectedHistoryDates) {
+        const expectedDocument = expected.getDocument(documentType, date);
+        const actualDocument = actual.getDocument(documentType, date);
+
+        if (expectedDocument.filters) {
+          expect(actualDocument.filters.length).to.equal(expectedDocument.filters.length);
+
+          for (let indexFilter = 0; indexFilter < expectedDocument.filters.length; indexFilter++) {
+            expect(await actualDocument.filters[indexFilter]()).equal(await expectedDocument.filters[indexFilter]()); // eslint-disable-line no-await-in-loop
+          }
+        } else {
+          expect(actualDocument.filters).to.be.undefined;
         }
-      } else {
-        expect(actualHistory[indexHistory].filters).to.be.undefined;
       }
     }
   }

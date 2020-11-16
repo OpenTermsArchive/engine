@@ -1,6 +1,5 @@
 import Service from '../../src/app/services/service.js';
 import DocumentDeclaration from '../../src/app/services/documentDeclaration.js';
-import { FUTUR_DATE } from '../../src/app/services/index.js';
 
 const service = new Service({
   id: 'service_B',
@@ -20,12 +19,6 @@ const latest = new DocumentDeclaration({
 service._documents = {
   'Privacy Policy': {
     _latest: latest,
-    _history: [
-      new DocumentDeclaration({
-        ...latest,
-        validUntil: FUTUR_DATE
-      })
-    ]
   }
 };
 

@@ -1,6 +1,5 @@
 import Service from '../../src/app/services/service.js';
 import DocumentDeclaration from '../../src/app/services/documentDeclaration.js';
-import { FUTUR_DATE } from '../../src/app/services/index.js';
 
 const service = new Service({
   id: 'service_with_declaration_history',
@@ -47,22 +46,6 @@ const history = [
     } ],
     validUntil: '2020-09-30T21:30:21.000Z'
   }),
-  new DocumentDeclaration({
-    service,
-    type: 'Terms of Service',
-    location: 'https://www.service-with-declaration-history.example/terms',
-    contentSelectors: 'main',
-    noiseSelectors: undefined,
-    filters: [
-      async function removeSharesButton() {
-        return 'last-removeSharesButton';
-      },
-      async function removePrintButton() {
-        return 'last-removePrintButton';
-      }
-    ],
-    validUntil: FUTUR_DATE
-  })
 ];
 
 service._documents = {
