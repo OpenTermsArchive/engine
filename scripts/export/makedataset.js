@@ -13,7 +13,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const CGUS_VERSIONS_PATH = path.resolve(__dirname, '../..', config.get('history.versionsPath'));
 const TEMP_WORK_FOLDER = path.resolve(__dirname, '../..', 'tmp/');
 
-const git = new Git(CGUS_VERSIONS_PATH); // TODO: make this a CLI argument?
+const git = new Git(CGUS_VERSIONS_PATH);
 
 const serviceMap = {
   AskFM: 'ASKfm',
@@ -121,16 +121,7 @@ async function makeData(commitInfo) {
     console.log(`created ${pathCreated} as it did not exist.`);
   }
 
-  // file options for reading data
-
-  // read data from one place and write it to temp location
-  // const data = await fs.readFile(filePath, readFileOptions);
-
   await fs.copyFile(filePath, targetFilePath);
-//   if (data) {
-//     // console.log(`Read data from ${filePath}`);
-//     await fs.writeFile(targetFilePath, data);
-//   }
 }
 
 async function main() {
