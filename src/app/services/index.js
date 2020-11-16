@@ -12,8 +12,6 @@ const fs = fsApi.promises;
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const SERVICE_DECLARATIONS_PATH = path.resolve(__dirname, '../../..', config.get('serviceDeclarationsPath'));
 
-export const FUTUR_DATE = new Date('2100-01-01T00:00:00.000Z').toISOString();
-
 export async function load() {
   const services = {};
   const fileNames = await fs.readdir(SERVICE_DECLARATIONS_PATH);
@@ -77,15 +75,17 @@ export async function loadWithHistory() {
         filterNames
       });
 
-      allHistoryDates.forEach(date => {
-        const declarationForThisDate = documenTypeDeclarationEntries.find(entry => new Date(date) <= new Date(entry.validUntil));
+      const currentlyValidDocumentDeclaration = documenTypeDeclarationEntries.find(entry => !entry.validUntil);
 
+      allHistoryDates.forEach(date => {
+        const declarationForThisDate = documenTypeDeclarationEntries.find(entry => new Date(date) <= new Date(entry.validUntil)) || currentlyValidDocumentDeclaration;
         const { filter: declarationForThisDateFilterNames } = declarationForThisDate;
 
         let actualFilters;
         if (declarationForThisDateFilterNames) {
           actualFilters = declarationForThisDateFilterNames.map(filterName => {
-            const validFilterForThisDate = filters[filterName].find(entry => new Date(date) <= new Date(entry.validUntil));
+            const currentlyValidFilters = filters[filterName].find(entry => !entry.validUntil);
+            const validFilterForThisDate = filters[filterName].find(entry => new Date(date) <= new Date(entry.validUntil)) || currentlyValidFilters;
 
             return validFilterForThisDate.fn;
           });
@@ -147,7 +147,6 @@ async function loadServiceHistoryFiles(serviceId) {
 
   Object.keys(serviceDeclaration.documents).forEach(documentType => {
     serviceHistory[documentType] = serviceHistory[documentType] || [];
-    serviceDeclaration.documents[documentType].validUntil = FUTUR_DATE;
     serviceHistory[documentType].push(serviceDeclaration.documents[documentType]);
   });
 
@@ -165,10 +164,7 @@ async function loadServiceHistoryFiles(serviceId) {
 
     Object.keys(serviceFilters).forEach(filterName => {
       serviceFiltersHistory[filterName] = serviceFiltersHistory[filterName] || [];
-      serviceFiltersHistory[filterName].push({
-        validUntil: FUTUR_DATE,
-        fn: serviceFilters[filterName]
-      });
+      serviceFiltersHistory[filterName].push({ fn: serviceFilters[filterName] });
     });
   }
 

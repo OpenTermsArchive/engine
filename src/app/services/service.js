@@ -6,11 +6,12 @@ export default class Service {
   }
 
   getDocument(documentType, date) {
+    const { _latest: currentlyValidDocumentDeclaration, _history } = this._documents[documentType];
     if (!date) {
-      return this._documents[documentType]._latest;
+      return currentlyValidDocumentDeclaration;
     }
 
-    return this._documents[documentType]._history.find(entry => new Date(date) <= new Date(entry.validUntil));
+    return _history.find(entry => new Date(date) <= new Date(entry.validUntil)) || currentlyValidDocumentDeclaration;
   }
 
   getDocumentTypes() {
@@ -19,9 +20,8 @@ export default class Service {
 
   addDocument(document) {
     if (!document.validUntil) {
-      this._documents[document.type] = {
-        _latest: document
-      };
+      this._documents[document.type] = this._documents[document.type] || {};
+      this._documents[document.type]._latest = document;
       return;
     }
 
