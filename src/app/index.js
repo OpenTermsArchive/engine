@@ -8,7 +8,6 @@ import fetch from './fetcher/index.js';
 import filter from './filter/index.js';
 import * as services from './services/index.js';
 import { InaccessibleContentError } from './errors.js';
-import { extractCssSelectorsFromDocumentDeclaration } from './utils/index.js';
 
 const MAX_PARALLEL_DOCUMENTS_TRACKS = 20;
 const MAX_PARALLEL_REFILTERS = 20;
@@ -86,7 +85,7 @@ export default class CGUs extends events.EventEmitter {
     const { mimeType, content } = await fetch({
       url: location,
       executeClientScripts,
-      cssSelectors: extractCssSelectorsFromDocumentDeclaration(document)
+      cssSelectors: document.getCssSelectors(),
     });
 
     if (!content) {
