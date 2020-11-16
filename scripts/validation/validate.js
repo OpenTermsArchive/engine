@@ -50,7 +50,7 @@ let servicesToValidate = args.filter(arg => !arg.startsWith('--'));
         });
 
         if (!schemaOnly) {
-          Object.keys(service.documents).forEach(type => {
+          service.getDocumentTypes().forEach(type => {
             describe(type, () => {
               let content;
               let filteredContent;
@@ -78,7 +78,7 @@ let servicesToValidate = args.filter(arg => !arg.startsWith('--'));
 
                 filteredContent = await filter({
                   content,
-                  document: service.getDocumentDeclaration(type),
+                  documentDeclaration: service.getDocumentDeclaration(type),
                   filterFunctions: service.filters,
                   mimeType,
                 });
@@ -123,7 +123,7 @@ let servicesToValidate = args.filter(arg => !arg.startsWith('--'));
 
                   const secondFilteredContent = await filter({
                     content: document.content,
-                    document: service.getDocumentDeclaration(type),
+                    documentDeclaration: service.getDocumentDeclaration(type),
                     filterFunctions: service.filters,
                     mimeType: document.mimeType
                   });

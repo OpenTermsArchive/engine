@@ -227,7 +227,7 @@ describe('CGUs', () => {
 
     describe('#recordSnapshot', () => {
       context('When it is the first record', () => {
-        before(async () => app.recordSnapshot({ content: 'document content', document: documentADeclaration }));
+        before(async () => app.recordSnapshot({ content: 'document content', documentDeclaration: documentADeclaration }));
 
         after(() => {
           resetSpiesHistory();
@@ -244,9 +244,9 @@ describe('CGUs', () => {
       context('When it is not the first record', () => {
         context('When there are changes', () => {
           before(async () => {
-            await app.recordSnapshot({ content: 'document content', document: documentADeclaration });
+            await app.recordSnapshot({ content: 'document content', documentDeclaration: documentADeclaration });
             resetSpiesHistory();
-            await app.recordSnapshot({ content: 'document content modified', document: documentADeclaration });
+            await app.recordSnapshot({ content: 'document content modified', documentDeclaration: documentADeclaration });
           });
 
           after(() => {
@@ -263,9 +263,9 @@ describe('CGUs', () => {
 
         context('When there are no changes', () => {
           before(async () => {
-            await app.recordSnapshot({ content: 'document content', document: documentADeclaration });
+            await app.recordSnapshot({ content: 'document content', documentDeclaration: documentADeclaration });
             resetSpiesHistory();
-            await app.recordSnapshot({ content: 'document content', document: documentADeclaration });
+            await app.recordSnapshot({ content: 'document content', documentDeclaration: documentADeclaration });
           });
 
           after(() => {
@@ -284,7 +284,7 @@ describe('CGUs', () => {
 
     describe('#recordVersion', () => {
       context('When it is the first record', () => {
-        before(async () => app.recordVersion({ snapshotContent: serviceASnapshotExpectedContent, snapshotId: 'sha', document: documentADeclaration }));
+        before(async () => app.recordVersion({ snapshotContent: serviceASnapshotExpectedContent, snapshotId: 'sha', documentDeclaration: documentADeclaration }));
 
         after(() => {
           resetSpiesHistory();
@@ -301,9 +301,9 @@ describe('CGUs', () => {
       context('When it is not the first record', () => {
         context('When there are changes', () => {
           before(async () => {
-            await app.recordVersion({ snapshotContent: serviceASnapshotExpectedContent, snapshotId: 'sha', document: documentADeclaration });
+            await app.recordVersion({ snapshotContent: serviceASnapshotExpectedContent, snapshotId: 'sha', documentDeclaration: documentADeclaration });
             resetSpiesHistory();
-            await app.recordVersion({ snapshotContent: serviceBSnapshotExpectedContent, snapshotId: 'sha', document: documentADeclaration });
+            await app.recordVersion({ snapshotContent: serviceBSnapshotExpectedContent, snapshotId: 'sha', documentDeclaration: documentADeclaration });
           });
 
           after(() => {
@@ -320,9 +320,9 @@ describe('CGUs', () => {
 
         context('When there are no changes', () => {
           before(async () => {
-            await app.recordVersion({ snapshotContent: serviceASnapshotExpectedContent, snapshotId: 'sha', document: documentADeclaration });
+            await app.recordVersion({ snapshotContent: serviceASnapshotExpectedContent, snapshotId: 'sha', documentDeclaration: documentADeclaration });
             resetSpiesHistory();
-            await app.recordVersion({ snapshotContent: serviceASnapshotExpectedContent, snapshotId: 'sha', document: documentADeclaration });
+            await app.recordVersion({ snapshotContent: serviceASnapshotExpectedContent, snapshotId: 'sha', documentDeclaration: documentADeclaration });
           });
 
           after(() => {
