@@ -228,7 +228,7 @@ See [Ops Readme](ops/README.md).
 
 ### Exporting a dataset
 
-_NB: For now, this tool assumes that this repo and the `CGUs-versions` repo are cloned side-by-side._
+_NB: The content of a versions repo `CGUs-versions` must be in `./data/versions`._
 
 Export data to a folder named `gcus-dataset` (default):
 
