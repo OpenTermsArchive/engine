@@ -37,7 +37,7 @@ const schedule = args.includes('--schedule');
 
   serviceIds = serviceIds.length ? serviceIds : app.serviceIds;
 
-  const numberOfDocuments = serviceIds.reduce((acc, serviceId) => acc + Object.keys(app.serviceDeclarations[serviceId].documents).length, 0);
+  const numberOfDocuments = serviceIds.reduce((acc, serviceId) => acc + app.serviceDeclarations[serviceId].getNumberOfDocuments(), 0);
 
   logger.info(`Refiltering ${numberOfDocuments} documents from ${serviceIds.length} services…`);
   await app.refilterAndRecord(serviceIds);
