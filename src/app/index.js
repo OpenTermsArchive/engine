@@ -139,7 +139,7 @@ export default class CGUs extends events.EventEmitter {
   async _forEachDocumentOf(servicesIds = [], callback) {
     servicesIds.forEach(serviceId => {
       this.services[serviceId].getDocumentTypes().forEach(documentType => {
-        callback(this.services[serviceId].getDocument(documentType));
+        callback(this.services[serviceId].getDocumentDeclaration(documentType));
       });
     });
   }

@@ -5,7 +5,7 @@ export default class Service {
     this._documents = {};
   }
 
-  getDocument(documentType, date) {
+  getDocumentDeclaration(documentType, date) {
     if (!this._documents[documentType]) {
       return null;
     }
@@ -26,7 +26,8 @@ export default class Service {
     return Object.keys(this._documents);
   }
 
-  addDocument(document) {
+  addDocumentDeclaration(document) {
+    if (!document.service) {
     if (!document.validUntil) {
       this._documents[document.type] = this._documents[document.type] || {};
       this._documents[document.type]._latest = document;
