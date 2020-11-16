@@ -60,11 +60,11 @@ let servicesToValidate = args.filter(arg => !arg.startsWith('--'));
               it('has fetchable URL', async function () {
                 this.timeout(30000);
 
-                const { location, executeClientScripts } = service.getDocument(type);
+                const { location, executeClientScripts } = service.getDocumentDeclaration(type);
                 const document = await fetch({
                   url: location,
                   executeClientScripts,
-                  cssSelectors: extractCssSelectorsFromDocumentDeclaration(service.getDocument(type))
+                  cssSelectors: extractCssSelectorsFromDocumentDeclaration(service.getDocumentDeclaration(type))
                 });
                 content = document.content;
                 mimeType = document.mimeType;
@@ -79,7 +79,7 @@ let servicesToValidate = args.filter(arg => !arg.startsWith('--'));
 
                 filteredContent = await filter({
                   content,
-                  document: service.getDocument(type),
+                  document: service.getDocumentDeclaration(type),
                   filterFunctions: service.filters,
                   mimeType,
                 });
@@ -115,16 +115,16 @@ let servicesToValidate = args.filter(arg => !arg.startsWith('--'));
 
                   this.timeout(30000);
 
-                  const { location, executeClientScripts } = service.getDocument(type);
+                  const { location, executeClientScripts } = service.getDocumentDeclaration(type);
                   const document = await fetch({
                     url: location,
                     executeClientScripts,
-                    cssSelectors: extractCssSelectorsFromDocumentDeclaration(service.getDocument(type))
+                    cssSelectors: extractCssSelectorsFromDocumentDeclaration(service.getDocumentDeclaration(type))
                   });
 
                   const secondFilteredContent = await filter({
                     content: document.content,
-                    document: service.getDocument(type),
+                    document: service.getDocumentDeclaration(type),
                     filterFunctions: service.filters,
                     mimeType: document.mimeType
                   });

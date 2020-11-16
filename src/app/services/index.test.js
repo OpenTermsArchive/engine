@@ -20,21 +20,21 @@ describe('Services', () => {
       /* eslint-disable no-loop-func */
       for (const documentType of expected.getDocumentTypes()) {
         it('has no history', () => {
-          const { _history: actualHistory } = result[serviceId].getDocument(documentType);
+          const { _history: actualHistory } = result[serviceId].getDocumentDeclaration(documentType);
           expect(actualHistory).to.be.undefined;
         });
 
-        const { filters: expectedFilters } = expected.getDocument(documentType);
+        const { filters: expectedFilters } = expected.getDocumentDeclaration(documentType);
         if (expectedFilters) {
           for (let indexFilter = 0; indexFilter < expectedFilters.length; indexFilter++) {
             it(`has the proper "${expectedFilters[indexFilter].name}" filter function`, async () => {
-              const { filters: actualFilters } = result[serviceId].getDocument(documentType);
+              const { filters: actualFilters } = result[serviceId].getDocumentDeclaration(documentType);
               expect(await actualFilters[indexFilter]()).equal(await expectedFilters[indexFilter]()); // eslint-disable-line no-await-in-loop
             });
           }
         } else {
           it('has no filters', () => {
-            const { filters: actualFilters } = result[serviceId].getDocument(documentType);
+            const { filters: actualFilters } = result[serviceId].getDocumentDeclaration(documentType);
             expect(actualFilters).to.be.undefined;
           });
         }
@@ -91,22 +91,22 @@ describe('Services', () => {
           if (expectedHistoryDates) {
             for (const date of expectedHistoryDates) {
               context(`for "${date}" history entry`, () => {
-                const expectedDocument = expected.getDocument(documentType, date);
+                const expectedDocument = expected.getDocumentDeclaration(documentType, date);
                 if (expectedDocument.filters) {
                   it('has the proper number of filter functions', async () => {
-                    const actualDocument = result[serviceId].getDocument(documentType, date);
+                    const actualDocument = result[serviceId].getDocumentDeclaration(documentType, date);
                     expect(actualDocument.filters.length).to.equal(expectedDocument.filters.length);
                   });
 
                   for (let indexFilter = 0; indexFilter < expectedDocument.filters.length; indexFilter++) {
                     it(`has the proper "${expectedDocument.filters[indexFilter].name}" filter function`, async () => {
-                      const actualDocument = result[serviceId].getDocument(documentType, date);
+                      const actualDocument = result[serviceId].getDocumentDeclaration(documentType, date);
                       expect(await actualDocument.filters[indexFilter]()).equal(await expectedDocument.filters[indexFilter]()); // eslint-disable-line no-await-in-loop
                     });
                   }
                 } else {
                   it('has no filters', () => {
-                    const actualDocument = result[serviceId].getDocument(documentType, date);
+                    const actualDocument = result[serviceId].getDocumentDeclaration(documentType, date);
                     expect(actualDocument.filters).to.be.undefined;
                   });
                 }
@@ -117,22 +117,22 @@ describe('Services', () => {
               const { _history } = result[serviceId]._documents[documentType];
               expect(_history).to.be.undefined;
             });
-            const expectedDocument = expected.getDocument(documentType);
+            const expectedDocument = expected.getDocumentDeclaration(documentType);
             if (expectedDocument.filters) {
               it('has the proper number of filter functions', async () => {
-                const actualDocument = result[serviceId].getDocument(documentType);
+                const actualDocument = result[serviceId].getDocumentDeclaration(documentType);
                 expect(actualDocument.filters.length).to.equal(expectedDocument.filters.length);
               });
 
               for (let indexFilter = 0; indexFilter < expectedDocument.filters.length; indexFilter++) {
                 it(`has the proper "${expectedDocument.filters[indexFilter].name}" filter function`, async () => {
-                  const actualDocument = result[serviceId].getDocument(documentType);
+                  const actualDocument = result[serviceId].getDocumentDeclaration(documentType);
                   expect(await actualDocument.filters[indexFilter]()).equal(await expectedDocument.filters[indexFilter]()); // eslint-disable-line no-await-in-loop
                 });
               }
             } else {
               it('has no filters', () => {
-                const actualDocument = result[serviceId].getDocument(documentType);
+                const actualDocument = result[serviceId].getDocumentDeclaration(documentType);
                 expect(actualDocument.filters).to.be.undefined;
               });
             }

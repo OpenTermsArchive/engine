@@ -51,7 +51,7 @@ export async function load() {
         filters,
       });
 
-      services[service.id].addDocument(document);
+      services[service.id].addDocumentDeclaration(document);
     }
   }
 
@@ -91,7 +91,7 @@ export async function loadWithHistory() {
           });
         }
 
-        services[serviceId].addDocument(new DocumentDeclaration({
+        services[serviceId].addDocumentDeclaration(new DocumentDeclaration({
           service: services[serviceId],
           type: documentType,
           location: declarationForThisDate.fetch,
