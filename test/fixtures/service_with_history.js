@@ -140,6 +140,17 @@ service._documents = {
   'Terms of Service': {
     _latest: latest,
     _history: history,
+  },
+  'Privacy Policy': {
+    _latest: new DocumentDeclaration({
+      service,
+      type: 'Privacy Policy',
+      location: 'https://www.service-with-history.example/privacy',
+      contentSelectors: 'body',
+      noiseSelectors: undefined,
+      filters: undefined,
+      validUntil: null
+    }),
   }
 };
 

@@ -6,9 +6,17 @@ export default class Service {
   }
 
   getDocument(documentType, date) {
+    if (!this._documents[documentType]) {
+      return null;
+    }
+
     const { _latest: currentlyValidDocumentDeclaration, _history } = this._documents[documentType];
     if (!date) {
       return currentlyValidDocumentDeclaration;
+    }
+
+    if (!_history) {
+      throw new Error('History not loaded. Use "loadWithHistory".');
     }
 
     return _history.find(entry => new Date(date) <= new Date(entry.validUntil)) || currentlyValidDocumentDeclaration;

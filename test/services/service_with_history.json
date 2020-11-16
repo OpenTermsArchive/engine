@@ -5,6 +5,10 @@
       "fetch": "https://www.service-with-history.example/terms",
       "select": "main",
       "filter": [ "removeSharesButton", "removePrintButton" ]
+    },
+    "Privacy Policy": {
+      "fetch": "https://www.service-with-history.example/privacy",
+      "select": "body"
     }
   }
 }
