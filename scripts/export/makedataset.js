@@ -11,6 +11,7 @@ const fs = fsApi.promises;
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const CGUS_VERSIONS_PATH = path.resolve(__dirname, '../..', config.get('history.versionsPath'));
+const TEMP_WORK_FOLDER = path.resolve(__dirname, '../..', 'tmp/');
 
 const git = new Git(CGUS_VERSIONS_PATH); // TODO: make this a CLI argument?
 
@@ -112,7 +113,7 @@ async function makeData(commitInfo) {
   // compute target Folder and File Names
   const [ file ] = commitInfo.filesChanged;
   const filePath = path.join(git.path, file.file);
-  const targetFilePath = makeFilename('/tmp/CGUs-extract', filePath, commitInfo.date);
+  const targetFilePath = makeFilename(TEMP_WORK_FOLDER, filePath, commitInfo.date);
 
   // create target (temp) folder if needed
   const pathCreated = await fs.mkdir(path.dirname(targetFilePath), { recursive: true });
@@ -150,7 +151,8 @@ async function main() {
   // copy temp dir to final destination
   const finalPath = path.resolve(__dirname, '../..', exportTarget);
 
-  await fse.copy('/tmp/CGUs-extract/', finalPath);
+  await fse.copy(TEMP_WORK_FOLDER, finalPath);
+  await fs.rmdir(TEMP_WORK_FOLDER, { recursive: true });
   console.log(`Dataset is in ${finalPath}`);
 }
 
