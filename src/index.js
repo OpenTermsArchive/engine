@@ -47,10 +47,12 @@ const schedule = args.includes('--schedule');
     return;
   }
 
+  logger.info(`Start tracking changes of ${numberOfDocuments} documents from ${serviceIds.length} services…`);
+  await app.trackChanges(serviceIds);
+  logger.info(`Tracked changes of ${numberOfDocuments} documents from ${serviceIds.length} services.`);
+
   if (!schedule) {
-    logger.info(`Start tracking changes of ${numberOfDocuments} documents from ${serviceIds.length} services…`);
-    await app.trackChanges(serviceIds);
-    return logger.info(`Tracked changes of ${numberOfDocuments} documents from ${serviceIds.length} services.`);
+    return;
   }
 
   const rule = new scheduler.RecurrenceRule();
