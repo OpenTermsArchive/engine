@@ -1,73 +1,51 @@
-import dotenv from 'dotenv';
-import config from 'config';
+import * as mysql from 'mysql';
 
-import sendInBlue from 'sib-api-v3-sdk';
-
-dotenv.config();
 export default class Notifier {
-  constructor(passedServiceProviders) {
-    const defaultClient = sendInBlue.ApiClient.instance;
-    const authentication = defaultClient.authentications['api-key'];
-    authentication.apiKey = process.env.SENDINBLUE_API_KEY;
+  connection;
+  connected;
+  constructor() {
+    this.connection = mysql.createConnection({
+      host     : process.env.MYSQL_HOST,
+      user     : process.env.MYSQL_USER,
+      password : process.env.MYSQL_PASSWORD,
+      database : process.env.MYSQL_DATABASE
+    });
+    this.connected = false;
+  }
 
-    this.apiInstance = new sendInBlue.SMTPApi();
-    this.contactsInstance = new sendInBlue.ContactsApi();
-
-    this.serviceProviders = passedServiceProviders;
-    this.delayedVersionNotificationsParams = [];
+  async doConnect() {
+    return new Promise((resolve, reject) => {
+      connection.connect((err) => {
+        if (err) {
+          console.log("mysql connect fail", err)
+          reject(err);
+        } else {
+          console.log('connected as id ' + connection.threadId);
+          resolve();
+        }
+      });
+    });
   }
 
   async onVersionRecorded(serviceId, type, versionId) {
-    this.delayedVersionNotificationsParams.push({ serviceId, type, versionId });
-  }
-
-  async onRecordsPublished() {
-    this.delayedVersionNotificationsParams.forEach(({ serviceId, type, versionId }) => {
-      this.notifyVersionRecorded(serviceId, type, versionId);
-    });
-    this.delayedVersionNotificationsParams = [];
-  }
-
-  async notifyVersionRecorded(serviceProviderId, documentTypeId, versionId) {
-    const sendParams = {
-      templateId: config.get('notifier.sendInBlue.updateTemplateId'),
-      params: {
-        SERVICE_PROVIDER_NAME: this.serviceProviders[serviceProviderId].name,
-        DOCUMENT_TYPE: documentTypeId,
-        SHA: versionId
-      },
-    };
-
-    return this.send([ config.get('notifier.sendInBlue.administratorsListId'), config.get('notifier.sendInBlue.updatesListId') ], sendParams);
-  }
-
-  async send(lists, sendParams) {
-    const promises = lists.map(listId => this.getListContacts(listId));
-
-    let contacts = await Promise.all(promises);
-
-    contacts = contacts.flat();
-
-    const uniqueContacts = contacts.reduce((acc, current) => (acc.find(contact => contact.id === current.id) ? acc : acc.concat([ current ])), []);
-
-    const sendPromises = uniqueContacts.map(contact => this.apiInstance.sendTransacEmail({ ...sendParams, to: [{ email: contact.email }] }));
-
-    return Promise.all(sendPromises);
-  }
-
-  async getListContacts(listId) {
-    const list = await this.contactsInstance.getList(listId);
-
-    return this.getAllPaginatedEntries('getContactsFromList', listId, 'contacts', [], list.totalSubscribers);
-  }
-
-  async getAllPaginatedEntries(functionName, resourceIdParameter, resultKey, accumulator, count, offset = 0, paginationSize = 50) {
-    if (accumulator.length >= count) {
-      return accumulator;
+    if (!this.connected) {
+      await this.doConnect();
+      this.connected = true;
     }
-
-    const result = await this.contactsInstance[functionName](resourceIdParameter, { limit: paginationSize, offset });
-    accumulator = accumulator.concat(result[resultKey]);
-    return this.getAllPaginatedEntries(functionName, resourceIdParameter, resultKey, accumulator, count, offset + paginationSize, paginationSize);
+    await new Promise((resolve, reject) => {
+      this.connection.query('INSERT INTO notifications (site, name, diff_url) VALUES (?, ?, ?)', [
+        serviceId,
+        type,
+        versionId
+      ], (err, result, fields) => {
+        if (err) {
+          console.log("mysql query fail", err)
+          reject(err);
+        } else {
+          console.log("mysql query success", result, fields);
+          resolve();
+        }
+      });
+    });
   }
 }
