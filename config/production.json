@@ -9,5 +9,11 @@
       "to": "nicolas.dupont@beta.gouv.fr",
       "from": "admin.ambassadeur-numerique@diplomatie.gouv.fr"
     }
+  },
+  "notifier": {
+    "sendInBlue": {
+      "administratorsListId": 9,
+      "updatesListId": 191
+    }
   }
 }
