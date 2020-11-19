@@ -47,6 +47,10 @@ const schedule = args.includes('--schedule');
     return;
   }
 
+  if (process.env.NODE_ENV == 'production') {
+    app.attach(new Notifier(app.serviceDeclarations));
+  }
+
   logger.info(`Start tracking changes of ${numberOfDocuments} documents from ${serviceIds.length} services…`);
   await app.trackChanges(serviceIds);
   logger.info(`Tracked changes of ${numberOfDocuments} documents from ${serviceIds.length} services.`);
@@ -57,8 +61,6 @@ const schedule = args.includes('--schedule');
 
   const rule = new scheduler.RecurrenceRule();
   rule.minute = 30; // at minute 30 past every hour.
-
-  app.attach(new Notifier(app.serviceDeclarations));
 
   logger.info('The scheduler is running…');
   logger.info(`Documents will be tracked at minute ${rule.minute} past every hour.`);
