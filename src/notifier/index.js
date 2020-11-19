@@ -33,7 +33,7 @@ export default class Notifier {
       this.connected = true;
     }
     await new Promise((resolve, reject) => {
-      this.connection.query('INSERT INTO notifications (site, name, diff_url) VALUES (?, ?, ?)', [
+      this.connection.query('INSERT INTO notifications (site, name, created_at, diff_url) VALUES (?, ?, now(), ?)', [
         serviceId,
         type,
         versionId
