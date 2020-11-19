@@ -52,14 +52,14 @@
     "commitment": {
       "writer": "service provider",
       "audience": "end user",
-      "object": "acceptable usage"
+      "object": "acceptable and unacceptable usage"
     }
   },
   "Restricted Use Policy": {
     "commitment": {
       "writer": "service provider",
       "audience": "end user",
-      "object": "restricted usage"
+      "object": "restrictions on specific usage"
     }
   },
   "Commercial Terms": {
@@ -157,7 +157,7 @@
     "commitment": {
       "writer": "service provider",
       "audience": "end user",
-      "object": "connecting your account to other services"
+      "object": "connecting user account to other services"
     }
   },
   "Vulnerability Disclosure Policy": {
@@ -165,20 +165,6 @@
       "writer": "service provider",
       "audience": "vulnerability reporter",
       "object": "how to report a security vulnerability or issue"
-    }
-  },
-  "Legal Information": {
-    "commitment": {
-      "writer": "service provider",
-      "audience": "end user",
-      "object": "all term, conditions, and policies related to the use of the service"
-    }
-  },
-  "Program Policies": {
-    "commitment": {
-      "writer": "service provider",
-      "audience": "program users",
-      "object": "program usage"
     }
   }
 }
