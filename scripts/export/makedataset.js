@@ -87,8 +87,8 @@ function makeFilename(target, filepath, date) { // given a target folder and a f
       documentType = 'Parent Organization Terms';
     }
   }
-
-  return path.join(target, service, documentType, `${date}.md`);
+  const [ safeDateString ] = date.replace('T', '--').replace(/:/g, '-').split('+');
+  return path.join(target, service, documentType, `${safeDateString}.md`);
 }
 
 function isValidCommit(commitMessage) { // util function used for filtering CGUs commits
