@@ -6,13 +6,6 @@
   },
   "fetcher": {
     "waitForElementsTimeout": 1000
-  },
-  "notifier": {
-    "sendInBlue": {
-      "administratorsListId": 194,
-      "updatesListId": 195,
-      "updateTemplateId": 21
-    }
   }
 }
 
