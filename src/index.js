@@ -27,9 +27,13 @@ let serviceIds = args.filter(arg => !arg.startsWith('--'));
 
   const numberOfDocuments = serviceIds.reduce((acc, serviceId) => acc + Object.keys(app.serviceDeclarations[serviceId].documents).length, 0);
 
-  logger.info(`Refiltering ${numberOfDocuments} documents from ${serviceIds.length} services…`);
-  await app.refilterAndRecord(serviceIds);
-  logger.info(`Refiltered ${numberOfDocuments} documents from ${serviceIds.length} services.\n`);
+  if (process.env.SKIP_REFILTER) {
+    logger.info('Skipping refilter');
+  } else {
+    logger.info(`Refiltering ${numberOfDocuments} documents from ${serviceIds.length} services…`);
+    await app.refilterAndRecord(serviceIds);
+    logger.info(`Refiltered ${numberOfDocuments} documents from ${serviceIds.length} services.\n`);
+  }
 
   if (refilterOnly) {
     return;

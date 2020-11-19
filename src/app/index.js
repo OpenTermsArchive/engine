@@ -9,6 +9,7 @@ import fetch from './fetcher/index.js';
 import filter from './filter/index.js';
 import loadServiceDeclarations from './loader/index.js';
 import { InaccessibleContentError } from './errors.js';
+import Notifier from '../notifier/index.js';
 
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
 const SERVICE_DECLARATIONS_PATH = path.resolve(__dirname, '../../', config.get('serviceDeclarationsPath'));
@@ -189,6 +190,16 @@ export default class CGUs extends events.EventEmitter {
     }
 
     this.emit(isFirstRecord ? 'firstVersionRecorded' : 'versionRecorded', serviceId, type, versionId);
+
+    if (!this.notifier) {
+      this.notifier = new Notifier();
+    }
+    await this.notifier.saveToEditTosdrOrg({
+      serviceId,
+      content: document,
+      documentType: type,
+      snapshotId
+    });
   }
 
   async publish() {
