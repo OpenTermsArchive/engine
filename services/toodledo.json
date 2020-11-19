@@ -1,0 +1,13 @@
+{
+  "name": "toodledo",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "http://www.toodledo.com/info/privacy.php",
+      "select": "div#rchunk"
+    },
+    "Terms of Service": {
+      "fetch": "http://www.toodledo.com/info/terms.php",
+      "select": "div#rchunk"
+    }
+  }
+}

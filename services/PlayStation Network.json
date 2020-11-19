@@ -1,0 +1,9 @@
+{
+  "name": "PlayStation Network",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://www.playstation.com/en-us/network/legal/terms-of-service/",
+      "select": "div#main"
+    }
+  }
+}

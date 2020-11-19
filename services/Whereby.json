@@ -1,0 +1,9 @@
+{
+  "name": "Whereby",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://whereby.com/information/tos/privacy-policy/",
+      "select": "body"
+    }
+  }
+}

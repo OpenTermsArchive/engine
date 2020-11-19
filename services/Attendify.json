@@ -1,0 +1,13 @@
+{
+  "name": "Attendify",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://attendify.com/terms_of_service/",
+      "select": "div.sticky-block__content"
+    },
+    "Privacy Policy": {
+      "fetch": "https://attendify.com/privacy_policy/",
+      "select": "div.sticky-block__content"
+    }
+  }
+}

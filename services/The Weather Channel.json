@@ -1,0 +1,13 @@
+{
+  "name": "The Weather Channel",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://weather.com/legal",
+      "select": "html > body > div:first-of-type > div > div > div:nth-of-type(7) > div > div:nth-of-type(2) > div > div > div > div > div > table > tbody > tr > td > table > tbody > tr > td > div > table > tbody > tr > td > div"
+    },
+    "Privacy Policy": {
+      "fetch": "https://weather.com/en-US/twc/privacy-policy",
+      "select": "html > body > div:first-of-type > div > div > div:nth-of-type(7) > div > div:nth-of-type(2) > div > div > div > div > div > div:nth-of-type(2) > div > div:nth-of-type(2)"
+    }
+  }
+}

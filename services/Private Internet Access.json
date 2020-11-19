@@ -1,0 +1,13 @@
+{
+  "name": "Private Internet Access",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.privateinternetaccess.com/pages/privacy-policy/",
+      "select": "html > body > div:nth-of-type(3) > div > div"
+    },
+    "Terms of Service": {
+      "fetch": "https://www.privateinternetaccess.com/pages/terms-of-service/",
+      "select": "html > body > div:nth-of-type(3) > div > div > div"
+    }
+  }
+}

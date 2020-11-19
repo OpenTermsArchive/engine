@@ -1,0 +1,9 @@
+{
+  "name": "Bose",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.bose.com/en_us/legal/privacy_policy.html",
+      "select": "body"
+    }
+  }
+}

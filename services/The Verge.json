@@ -1,0 +1,9 @@
+{
+  "name": "The Verge",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.voxmedia.com/legal/privacy-policy",
+      "select": "body"
+    }
+  }
+}

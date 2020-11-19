@@ -1,0 +1,13 @@
+{
+  "name": "Dummies",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.dummies.com/privacy-policy/",
+      "select": "html > body > section > div"
+    },
+    "Terms of Service": {
+      "fetch": "https://www.dummies.com/terms-of-use/",
+      "select": "html > body > section > div"
+    }
+  }
+}

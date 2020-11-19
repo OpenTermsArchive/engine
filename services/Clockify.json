@@ -1,0 +1,13 @@
+{
+  "name": "Clockify",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://clockify.me/privacy",
+      "select": "html > body > main > div"
+    },
+    "Terms of Service": {
+      "fetch": "https://clockify.me/terms",
+      "select": "html > body > main > div"
+    }
+  }
+}

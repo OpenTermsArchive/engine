@@ -1,0 +1,13 @@
+{
+  "name": "Mailfence",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://mailfence.com/en/privacy.jsp",
+      "select": "body"
+    },
+    "Terms of Service": {
+      "fetch": "https://mailfence.com/en/terms.jsp",
+      "select": "div.content"
+    }
+  }
+}

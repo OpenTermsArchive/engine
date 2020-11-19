@@ -1,0 +1,9 @@
+{
+  "name": "Planium",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://demo.planium.io/custom/demo/web/venda/assets/politica_privacidade.pdf",
+      "select": "body"
+    }
+  }
+}

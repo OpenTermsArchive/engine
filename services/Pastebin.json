@@ -1,0 +1,13 @@
+{
+  "name": "Pastebin",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://pastebin.com/doc_privacy_statement",
+      "select": "body"
+    },
+    "Terms of Service": {
+      "fetch": "https://pastebin.com/doc_terms_of_service",
+      "select": "body"
+    }
+  }
+}

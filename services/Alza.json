@@ -1,0 +1,9 @@
+{
+  "name": "Alza",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.alza.co.uk/privacy-policy",
+      "select": "div#private_policy"
+    }
+  }
+}

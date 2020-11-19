@@ -1,0 +1,13 @@
+{
+  "name": "Wordfeud",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "http://wordfeud.com/tos/",
+      "select": "body"
+    },
+    "Privacy Policy": {
+      "fetch": "http://wordfeud.com/privacy/",
+      "select": "body"
+    }
+  }
+}

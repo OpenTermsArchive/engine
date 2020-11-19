@@ -1,0 +1,13 @@
+{
+  "name": "IMDb",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://www.imdb.com/conditions",
+      "select": "#main"
+    },
+    "Privacy Policy": {
+      "fetch": "http://www.imdb.com/privacy",
+      "select": "div#pagecontent"
+    }
+  }
+}

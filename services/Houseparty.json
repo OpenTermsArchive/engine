@@ -1,0 +1,13 @@
+{
+  "name": "Houseparty",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.houseparty.com/privacy/",
+      "select": "body"
+    },
+    "Terms of Service": {
+      "fetch": "https://www.houseparty.com/privacy/#houseparty-terms-of-service",
+      "select": "body"
+    }
+  }
+}

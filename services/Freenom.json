@@ -1,0 +1,9 @@
+{
+  "name": "Freenom",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.freenom.com/en/doc_tcfree_freenom_v0110.pdf",
+      "select": "body"
+    }
+  }
+}

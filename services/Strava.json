@@ -1,0 +1,13 @@
+{
+  "name": "Strava",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://www.strava.com/legal/terms",
+      "select": "#legal-body"
+    },
+    "Privacy Policy": {
+      "fetch": "https://www.strava.com/legal/privacy",
+      "select": "#legal-body"
+    }
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "name": "Dribbble",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://dribbble.com/privacy",
+      "select": "#wrap-inner"
+    },
+    "Terms of Service": {
+      "fetch": "https://dribbble.com/terms",
+      "select": "#content"
+    }
+  }
+}

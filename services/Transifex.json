@@ -1,0 +1,9 @@
+{
+  "name": "Transifex",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "http://www.transifex.com/about/privacy/",
+      "select": "html > body article"
+    }
+  }
+}

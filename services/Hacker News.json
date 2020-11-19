@@ -1,0 +1,13 @@
+{
+  "name": "Hacker News",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://www.ycombinator.com/legal/",
+      "select": ".g5"
+    },
+    "Privacy Policy": {
+      "fetch": "https://www.ycombinator.com/legal/",
+      "select": ".g5"
+    }
+  }
+}

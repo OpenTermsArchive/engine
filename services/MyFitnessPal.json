@@ -1,0 +1,9 @@
+{
+  "name": "MyFitnessPal",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://account.underarmour.com/en-us/terms-and-conditions",
+      "select": "html > body"
+    }
+  }
+}

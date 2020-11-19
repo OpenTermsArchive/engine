@@ -1,0 +1,9 @@
+{
+  "name": "bol-d-air.net",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://bol-d-air.net/privacy_policy.html",
+      "select": "body"
+    }
+  }
+}

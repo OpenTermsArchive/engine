@@ -1,0 +1,9 @@
+{
+  "name": "iStudiez",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://istudentpro.com/privacy/",
+      "select": "body"
+    }
+  }
+}

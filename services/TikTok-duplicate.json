@@ -1,0 +1,17 @@
+{
+  "name": "TikTok-duplicate",
+  "documents": {
+    "Copyright Claims Policy": {
+      "fetch": "https://www.tiktok.com/legal/copyright-policy",
+      "select": "body"
+    },
+    "Terms of Service": {
+      "fetch": "https://www.tiktok.com/legal/terms-of-use",
+      "select": "body"
+    },
+    "Community Guidelines": {
+      "fetch": "https://www.tiktok.com/community-guidelines",
+      "select": "body"
+    }
+  }
+}

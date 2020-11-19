@@ -1,0 +1,13 @@
+{
+  "name": "packagetrackr",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.packagetrackr.com/privacy",
+      "select": "div#content"
+    },
+    "Terms of Service": {
+      "fetch": "https://www.packagetrackr.com/tos",
+      "select": "div#content"
+    }
+  }
+}

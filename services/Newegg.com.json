@@ -1,0 +1,9 @@
+{
+  "name": "Newegg.com",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://kb.newegg.com/knowledge-base/privacy-policy-o/",
+      "select": "article.hkb-article"
+    }
+  }
+}

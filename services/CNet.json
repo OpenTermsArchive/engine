@@ -1,0 +1,13 @@
+{
+  "name": "CNet",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.cbsinteractive.com/legal/cbsi/privacy-policy",
+      "select": "body"
+    },
+    "Terms of Service": {
+      "fetch": "https://www.cbsinteractive.com/legal/cbsi/terms-of-use",
+      "select": "body"
+    }
+  }
+}

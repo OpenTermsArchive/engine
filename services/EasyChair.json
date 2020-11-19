@@ -1,0 +1,9 @@
+{
+  "name": "EasyChair",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://easychair.org/account/terms",
+      "select": "body"
+    }
+  }
+}

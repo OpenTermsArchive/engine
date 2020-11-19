@@ -1,0 +1,9 @@
+{
+  "name": "indiegogo",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.indiegogo.com/about/privacy",
+      "select": "body"
+    }
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "name": "Pepper&Carrot",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://www.peppercarrot.com/en/static13/terms-of-service-and-privacy",
+      "select": "#top > div > main > section"
+    }
+  }
+}

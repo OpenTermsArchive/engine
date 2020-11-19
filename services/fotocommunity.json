@@ -1,0 +1,13 @@
+{
+  "name": "fotocommunity",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://fotocommunity.net/de/datenschutz/",
+      "select": "body"
+    },
+    "Terms of Service": {
+      "fetch": "https://fotocommunity.net/de/agb/",
+      "select": "body"
+    }
+  }
+}

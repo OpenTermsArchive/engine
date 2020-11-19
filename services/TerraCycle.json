@@ -1,0 +1,9 @@
+{
+  "name": "TerraCycle",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://www.terracycle.com/en-US/pages/terms-of-use",
+      "select": "html > body"
+    }
+  }
+}

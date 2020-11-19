@@ -1,0 +1,9 @@
+{
+  "name": "Vonage",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.vonage.com/legal/privacy-policy/",
+      "select": "html > body > div:first-of-type > div > div:nth-of-type(2) > div > div > section > div > div > div"
+    }
+  }
+}

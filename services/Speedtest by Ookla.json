@@ -1,0 +1,13 @@
+{
+  "name": "Speedtest by Ookla",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://www.speedtest.net/about/terms",
+      "select": "html > body > div:nth-of-type(2) > div:nth-of-type(2) > main > div > div > div > div:first-of-type"
+    },
+    "Privacy Policy": {
+      "fetch": "https://www.speedtest.net/about/privacy",
+      "select": "html > body > div:nth-of-type(2) > div:nth-of-type(2) > main > div > div > div > div:first-of-type"
+    }
+  }
+}

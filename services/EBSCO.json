@@ -1,0 +1,9 @@
+{
+  "name": "EBSCO",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.ebsco.com/company/privacy-policy",
+      "select": "section.page_container"
+    }
+  }
+}

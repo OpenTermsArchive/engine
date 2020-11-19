@@ -1,0 +1,9 @@
+{
+  "name": "OsmAnd",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://osmand.net/help-online?id=privacy-policy",
+      "select": ".main .article .main"
+    }
+  }
+}

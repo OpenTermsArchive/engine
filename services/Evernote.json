@@ -1,0 +1,13 @@
+{
+  "name": "Evernote",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://evernote.com/legal/terms-of-service",
+      "select": "div.content-container"
+    },
+    "Privacy Policy": {
+      "fetch": "https://evernote.com/privacy/policy",
+      "select": "div.content-container"
+    }
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "name": "PayPal.com - duplicate of service 230",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.paypal.com/sg/webapps/mpp/ua/privacy-full",
+      "select": "html > body > div:first-of-type > div > section > div"
+    }
+  }
+}

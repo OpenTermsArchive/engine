@@ -1,0 +1,13 @@
+{
+  "name": "Mailgun",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://www.mailgun.com/terms/",
+      "select": "html > body > div:first-of-type > div > div > div > div:nth-of-type(2) > div > div > header > div:nth-of-type(2)"
+    },
+    "Privacy Policy": {
+      "fetch": "https://www.mailgun.com/privacy-policy/",
+      "select": "html > body > div:first-of-type > div > div > div > div:nth-of-type(2) > div > div"
+    }
+  }
+}

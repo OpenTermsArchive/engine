@@ -1,0 +1,13 @@
+{
+  "name": "bittorrent",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.bittorrent.com/legal/privacy",
+      "select": "body"
+    },
+    "Terms of Service": {
+      "fetch": "https://www.bittorrent.com/legal/terms-of-use",
+      "select": "body"
+    }
+  }
+}

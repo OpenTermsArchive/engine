@@ -1,0 +1,13 @@
+{
+  "name": "Reputation.com",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "http://www.reputation.com/user-agreement",
+      "select": "html > body > div:first-of-type > main > section > article > div > div"
+    },
+    "Privacy Policy": {
+      "fetch": "http://www.reputation.com/privacy-policy",
+      "select": "html > body > div:first-of-type > main > section > article > div > div"
+    }
+  }
+}

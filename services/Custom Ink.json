@@ -1,0 +1,9 @@
+{
+  "name": "Custom Ink",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.customink.com/about/privacy",
+      "select": "#body"
+    }
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "name": "Khan Academy",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://www.khanacademy.org/about/tos",
+      "select": "article#tos"
+    },
+    "Privacy Policy": {
+      "fetch": "https://www.khanacademy.org/about/privacy-policy",
+      "select": "#privacy-policy"
+    }
+  }
+}

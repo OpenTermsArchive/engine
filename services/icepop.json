@@ -1,0 +1,13 @@
+{
+  "name": "icepop",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "http://www.icepop.com/privacy-policy/",
+      "select": "body"
+    },
+    "Terms of Service": {
+      "fetch": "http://www.icepop.com/terms-of-use/",
+      "select": "body"
+    }
+  }
+}

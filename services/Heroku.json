@@ -1,0 +1,9 @@
+{
+  "name": "Heroku",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://www.heroku.com/policy/aup",
+      "select": ".policy.main.content-with-sidebar"
+    }
+  }
+}

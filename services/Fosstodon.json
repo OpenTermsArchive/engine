@@ -1,0 +1,9 @@
+{
+  "name": "Fosstodon",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://fosstodon.org/terms",
+      "select": "body"
+    }
+  }
+}

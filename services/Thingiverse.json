@@ -1,0 +1,9 @@
+{
+  "name": "Thingiverse",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://www.makerbot.com/legal/terms/",
+      "select": "body"
+    }
+  }
+}

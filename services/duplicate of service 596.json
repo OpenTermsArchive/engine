@@ -1,0 +1,9 @@
+{
+  "name": "duplicate of service 596",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://tosdr.org/terms.html",
+      "select": "#doc"
+    }
+  }
+}

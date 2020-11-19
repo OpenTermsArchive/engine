@@ -1,0 +1,13 @@
+{
+  "name": "HawkHost",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://www.hawkhost.com/Legal/aup",
+      "select": "body"
+    },
+    "Privacy Policy": {
+      "fetch": "https://www.hawkhost.com/Legal/privacy",
+      "select": "body"
+    }
+  }
+}

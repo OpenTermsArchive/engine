@@ -1,0 +1,13 @@
+{
+  "name": "Ruqqus",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://ruqqus.com/help/terms",
+      "select": "#main-content-col"
+    },
+    "Privacy Policy": {
+      "fetch": "https://ruqqus.com/help/privacy",
+      "select": "#main-content-col"
+    }
+  }
+}

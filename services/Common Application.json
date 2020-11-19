@@ -1,0 +1,13 @@
+{
+  "name": "Common Application",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://www.commonapp.org/terms-of-use",
+      "select": "body"
+    },
+    "Privacy Policy": {
+      "fetch": "https://www.commonapp.org/privacy-policy",
+      "select": "body"
+    }
+  }
+}

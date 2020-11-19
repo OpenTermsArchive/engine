@@ -1,0 +1,9 @@
+{
+  "name": "Chaos Computer Club",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.ccc.de/de/datenschutz",
+      "select": "#center_column > div:first-of-type"
+    }
+  }
+}

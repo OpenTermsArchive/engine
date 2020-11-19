@@ -1,0 +1,9 @@
+{
+  "name": "The Hello World Collection",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "http://helloworldcollection.de/",
+      "select": "body"
+    }
+  }
+}

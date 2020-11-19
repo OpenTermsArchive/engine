@@ -1,0 +1,9 @@
+{
+  "name": "Fiverr",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://www.fiverr.com/terms_of_service",
+      "select": "body"
+    }
+  }
+}

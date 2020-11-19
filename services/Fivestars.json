@@ -1,0 +1,9 @@
+{
+  "name": "Fivestars",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.fivestars.com/privacy/",
+      "select": "html > body > main > article > div"
+    }
+  }
+}

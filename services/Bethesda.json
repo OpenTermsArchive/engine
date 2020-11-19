@@ -1,0 +1,9 @@
+{
+  "name": "Bethesda",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://gear.bethesda.net/pages/privacy-policy",
+      "select": "body"
+    }
+  }
+}

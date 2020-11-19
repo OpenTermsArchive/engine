@@ -1,0 +1,9 @@
+{
+  "name": "Sparked Host LLC",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://sparkedhost.us/privacy-policy",
+      "select": "#legal"
+    }
+  }
+}

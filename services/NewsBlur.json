@@ -1,0 +1,13 @@
+{
+  "name": "NewsBlur",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.newsblur.com/privacy",
+      "select": "body"
+    },
+    "Terms of Service": {
+      "fetch": "https://forum.newsblur.com/tos",
+      "select": "body"
+    }
+  }
+}

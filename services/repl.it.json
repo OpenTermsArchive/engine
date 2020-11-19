@@ -1,0 +1,9 @@
+{
+  "name": "repl.it",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://repl.it/site/terms",
+      "select": "body"
+    }
+  }
+}

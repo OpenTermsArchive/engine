@@ -1,0 +1,13 @@
+{
+  "name": "Gab",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://gab.ai/about/privacy",
+      "select": "body"
+    },
+    "Terms of Service": {
+      "fetch": "https://gab.ai/about/tos",
+      "select": "body"
+    }
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "name": "Moddb.com",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.moddb.com/privacy-policy",
+      "select": "html > body > div:first-of-type > div > div:nth-of-type(4) > div > div:nth-of-type(2) > div"
+    }
+  }
+}

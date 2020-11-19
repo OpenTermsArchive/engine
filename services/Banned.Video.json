@@ -1,0 +1,9 @@
+{
+  "name": "Banned.Video",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.iubenda.com/privacy-policy/31079721/legal",
+      "select": "html > body > div:first-of-type > div > div > div"
+    }
+  }
+}

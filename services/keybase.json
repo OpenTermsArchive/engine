@@ -1,0 +1,13 @@
+{
+  "name": "keybase",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://keybase.io/docs/privacypolicy",
+      "select": "html > body > div > div > div:nth-of-type(5)"
+    },
+    "Terms of Service": {
+      "fetch": "https://keybase.io/docs/terms",
+      "select": "html > body > div > div > div:nth-of-type(5)"
+    }
+  }
+}

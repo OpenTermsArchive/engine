@@ -1,0 +1,9 @@
+{
+  "name": "gtrs",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://gtrs-online.de/index.php?id=446",
+      "select": "body"
+    }
+  }
+}

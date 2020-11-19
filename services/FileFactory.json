@@ -1,0 +1,13 @@
+{
+  "name": "FileFactory",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://www.filefactory.com/legal/acceptableusepolicy.php",
+      "select": "body"
+    },
+    "Privacy Policy": {
+      "fetch": "https://www.filefactory.com/legal/privacy.php",
+      "select": "body"
+    }
+  }
+}

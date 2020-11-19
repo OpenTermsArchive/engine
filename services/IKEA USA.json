@@ -1,0 +1,9 @@
+{
+  "name": "IKEA USA",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.ikea.com/ms/en_US/privacy_policy/privacy_policy.html?itm_campaign=Footer&itm_element=Button-DTFooter&itm_content=PrivacyPolicy",
+      "select": "body"
+    }
+  }
+}

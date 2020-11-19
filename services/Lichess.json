@@ -1,0 +1,13 @@
+{
+  "name": "Lichess",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://lichess.org/terms-of-service",
+      "select": "html > body > div:first-of-type > main > div > div"
+    },
+    "Privacy Policy": {
+      "fetch": "https://lichess.org/privacy",
+      "select": "html > body > div:first-of-type > main > div > div"
+    }
+  }
+}

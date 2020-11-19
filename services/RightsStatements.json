@@ -1,0 +1,9 @@
+{
+  "name": "RightsStatements",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://rightsstatements.org/en/privacy_policy.html",
+      "select": "html > body > div:nth-of-type(3) > div > div"
+    }
+  }
+}

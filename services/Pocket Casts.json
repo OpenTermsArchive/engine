@@ -1,0 +1,9 @@
+{
+  "name": "Pocket Casts",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://support.pocketcasts.com/article/privacy-policy/",
+      "select": "html > body > div:nth-of-type(2) > section > div > article > div"
+    }
+  }
+}

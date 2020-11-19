@@ -1,0 +1,13 @@
+{
+  "name": "Grammarly",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.grammarly.com/privacy-policy",
+      "select": "div#page"
+    },
+    "Terms of Service": {
+      "fetch": "https://www.grammarly.com/terms",
+      "select": "div#page"
+    }
+  }
+}

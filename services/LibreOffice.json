@@ -1,0 +1,9 @@
+{
+  "name": "LibreOffice",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.libreoffice.org/about-us/privacy/privacy-policy-en/",
+      "select": "#content1"
+    }
+  }
+}

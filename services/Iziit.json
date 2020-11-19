@@ -1,0 +1,9 @@
+{
+  "name": "Iziit",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://iziit.org/politique-de-confidentialite",
+      "select": "body"
+    }
+  }
+}

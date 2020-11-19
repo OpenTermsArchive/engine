@@ -1,0 +1,13 @@
+{
+  "name": "Jagex",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://www.jagex.com/terms",
+      "select": "body"
+    },
+    "Privacy Policy": {
+      "fetch": "https://www.jagex.com/terms/privacy",
+      "select": "body"
+    }
+  }
+}

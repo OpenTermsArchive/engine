@@ -1,0 +1,9 @@
+{
+  "name": "FullContact",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.fullcontact.com/privacy-center-2/",
+      "select": "body"
+    }
+  }
+}

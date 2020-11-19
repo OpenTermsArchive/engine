@@ -1,0 +1,9 @@
+{
+  "name": "Open Humans",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.openhumans.org/data-use",
+      "select": "#page-data-use > div:nth-of-type(2) > div > div > div:nth-of-type(2)"
+    }
+  }
+}

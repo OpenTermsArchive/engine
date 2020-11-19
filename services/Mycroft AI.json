@@ -1,0 +1,9 @@
+{
+  "name": "Mycroft AI",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://mycroft.ai/embed-privacy-policy/",
+      "select": "body"
+    }
+  }
+}

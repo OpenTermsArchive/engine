@@ -1,0 +1,9 @@
+{
+  "name": "Turnitin",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://help.turnitin.com/Privacy_and_Security/Privacy_and_Security.htm",
+      "select": "body"
+    }
+  }
+}

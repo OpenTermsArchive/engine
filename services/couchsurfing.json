@@ -1,0 +1,13 @@
+{
+  "name": "couchsurfing",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "http://about.couchsurfing.com/terms-of-use/",
+      "select": "section#tos"
+    },
+    "Privacy Policy": {
+      "fetch": "http://about.couchsurfing.com/privacy-policy/",
+      "select": "section#privacy-policy"
+    }
+  }
+}

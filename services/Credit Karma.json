@@ -1,0 +1,13 @@
+{
+  "name": "Credit Karma",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://www.creditkarma.com/about/terms-20180122",
+      "select": "body"
+    },
+    "Privacy Policy": {
+      "fetch": "https://www.creditkarma.com/about/privacy-20180531",
+      "select": "body"
+    }
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "name": "wes.today blog",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://wes.today/tos",
+      "select": "body"
+    }
+  }
+}

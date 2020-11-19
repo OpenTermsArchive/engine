@@ -1,0 +1,13 @@
+{
+  "name": "Zulip",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://zulipchat.com/terms/",
+      "select": "html > body > div > div:first-of-type > div:nth-of-type(2) > div > div:nth-of-type(2) > div:nth-of-type(2) > div"
+    },
+    "Privacy Policy": {
+      "fetch": "https://zulipchat.com/privacy/",
+      "select": "html > body > div > div:first-of-type > div:nth-of-type(2) > div > div:nth-of-type(2) > div:nth-of-type(2) > div"
+    }
+  }
+}

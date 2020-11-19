@@ -1,0 +1,13 @@
+{
+  "name": "Phone2Action",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://phone2action.com/privacy-policy-3/",
+      "select": "div#fl-main-content div.fl-col.fl-node-59c19c87e43d7"
+    },
+    "Terms of Service": {
+      "fetch": "https://phone2action.com/termsofuse/",
+      "select": "div#fl-main-content div.fl-col.fl-node-59c19c87e43d7"
+    }
+  }
+}

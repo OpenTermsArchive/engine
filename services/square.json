@@ -1,0 +1,9 @@
+{
+  "name": "square",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://squareup.com/us/en/legal/general/privacy",
+      "select": "#main-content > section > div > div"
+    }
+  }
+}

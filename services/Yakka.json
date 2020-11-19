@@ -1,0 +1,9 @@
+{
+  "name": "Yakka",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://yakka.agency/privacy",
+      "select": "body"
+    }
+  }
+}

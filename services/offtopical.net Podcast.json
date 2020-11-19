@@ -1,0 +1,9 @@
+{
+  "name": "offtopical.net Podcast",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://offtopical.net/#privacy",
+      "select": "body"
+    }
+  }
+}

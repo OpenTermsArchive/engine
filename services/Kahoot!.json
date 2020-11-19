@@ -1,0 +1,13 @@
+{
+  "name": "Kahoot!",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://kahoot.com/terms-and-conditions/",
+      "select": "#main"
+    },
+    "Privacy Policy": {
+      "fetch": "https://kahoot.com/privacy-policy/",
+      "select": "#main"
+    }
+  }
+}

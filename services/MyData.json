@@ -1,0 +1,9 @@
+{
+  "name": "MyData",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://mydata.org/privacy-policy/",
+      "select": "body"
+    }
+  }
+}

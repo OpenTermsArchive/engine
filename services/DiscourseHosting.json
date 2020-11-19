@@ -1,0 +1,13 @@
+{
+  "name": "DiscourseHosting",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://www.discoursehosting.com/tos/",
+      "select": "body"
+    },
+    "Privacy Policy": {
+      "fetch": "https://www.discoursehosting.com/privacy-policy/",
+      "select": "body"
+    }
+  }
+}

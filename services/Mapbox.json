@@ -1,0 +1,9 @@
+{
+  "name": "Mapbox",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.mapbox.com/legal/privacy/",
+      "select": "div.rich-text.light.w-richtext"
+    }
+  }
+}

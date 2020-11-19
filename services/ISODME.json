@@ -1,0 +1,13 @@
+{
+  "name": "ISODME",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.isodme.com/pp.php",
+      "select": "section.ftco-section div.container div.row.justify-content-center.mb-5.pb-3"
+    },
+    "Terms of Service": {
+      "fetch": "https://www.isodme.com/terms-of-service",
+      "select": "section.ftco-section div.container div.row.justify-content-center.mb-5.pb-3"
+    }
+  }
+}

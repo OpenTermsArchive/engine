@@ -1,0 +1,13 @@
+{
+  "name": "Humble Bundle",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.humblebundle.com/privacy",
+      "select": "div.inner-main-wrapper"
+    },
+    "Terms of Service": {
+      "fetch": "https://www.humblebundle.com/terms",
+      "select": "div.inner-main-wrapper"
+    }
+  }
+}

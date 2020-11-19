@@ -1,0 +1,9 @@
+{
+  "name": "ByGabyArdigo",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://bygabyardigo.com/policies/privacy-policy",
+      "select": "body"
+    }
+  }
+}

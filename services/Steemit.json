@@ -1,0 +1,9 @@
+{
+  "name": "Steemit",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://steemit.com/privacy.html",
+      "select": "div.Privacy.row"
+    }
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "name": "remove.bg",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.remove.bg/privacy",
+      "select": "body"
+    }
+  }
+}

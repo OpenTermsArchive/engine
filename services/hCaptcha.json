@@ -1,0 +1,9 @@
+{
+  "name": "hCaptcha",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.hcaptcha.com/privacy",
+      "select": "html > body > section > div"
+    }
+  }
+}

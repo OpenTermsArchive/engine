@@ -1,0 +1,9 @@
+{
+  "name": "Ko-fi",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://more.ko-fi.com/terms",
+      "select": "body"
+    }
+  }
+}

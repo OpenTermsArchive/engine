@@ -1,0 +1,13 @@
+{
+  "name": "sourceforge",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://slashdotmedia.com/terms-of-use",
+      "select": "body"
+    },
+    "Privacy Policy": {
+      "fetch": "https://slashdotmedia.com/privacy-statement/",
+      "select": "body"
+    }
+  }
+}

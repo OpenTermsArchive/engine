@@ -1,0 +1,9 @@
+{
+  "name": "lib.reviews",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://lib.reviews/terms",
+      "select": "html > body > div:nth-of-type(2) > div:nth-of-type(3)"
+    }
+  }
+}

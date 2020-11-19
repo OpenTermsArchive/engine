@@ -1,0 +1,13 @@
+{
+  "name": "Wikipedia",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://wikimediafoundation.org/wiki/Privacy_policy",
+      "select": "#mw-content-text"
+    },
+    "Terms of Service": {
+      "fetch": "https://wikimediafoundation.org/wiki/Terms_of_Use",
+      "select": "#mw-content-text"
+    }
+  }
+}

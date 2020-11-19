@@ -1,0 +1,9 @@
+{
+  "name": "EteSync",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://www.etesync.com/tos/",
+      "select": "html > body > article"
+    }
+  }
+}

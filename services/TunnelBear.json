@@ -1,0 +1,13 @@
+{
+  "name": "TunnelBear",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.tunnelbear.com/privacy-policy",
+      "select": "body"
+    },
+    "Terms of Service": {
+      "fetch": "https://www.tunnelbear.com/tos",
+      "select": "body"
+    }
+  }
+}

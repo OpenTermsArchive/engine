@@ -1,0 +1,9 @@
+{
+  "name": "Pole-Emotion",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.pole-emotion.ch/politique-de-confidentialite/",
+      "select": "body"
+    }
+  }
+}

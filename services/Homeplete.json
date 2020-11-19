@@ -1,0 +1,13 @@
+{
+  "name": "Homeplete",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://www.homeplete.com/terms-of-use",
+      "select": "#block-5f137dd72a4010553e7b014d"
+    },
+    "Privacy Policy": {
+      "fetch": "https://www.homeplete.com/privacy-policy",
+      "select": "#block-5f739cc4679d4246c3a9c3ef"
+    }
+  }
+}

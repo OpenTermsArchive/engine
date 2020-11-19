@@ -1,0 +1,9 @@
+{
+  "name": "E-Poll Surveys",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://www.epollsurveys.com/epoll/clients/privacy.htm#terms",
+      "select": "body"
+    }
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "name": "tinder",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.gotinder.com/privacy?locale=en",
+      "select": "body"
+    }
+  }
+}

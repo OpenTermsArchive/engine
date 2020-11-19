@@ -1,0 +1,9 @@
+{
+  "name": "xiaomi",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.mi.com/global/about/privacy/",
+      "select": "body"
+    }
+  }
+}

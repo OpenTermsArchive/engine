@@ -1,0 +1,9 @@
+{
+  "name": "Ars Technica",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "http://www.condenast.com/privacy-policy/#privacypolicy",
+      "select": "body"
+    }
+  }
+}

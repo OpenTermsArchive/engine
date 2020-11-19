@@ -1,0 +1,13 @@
+{
+  "name": "Crowdin",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://support.crowdin.com/terms/",
+      "select": "body"
+    },
+    "Privacy Policy": {
+      "fetch": "https://support.crowdin.com/privacy-policy/",
+      "select": "body"
+    }
+  }
+}

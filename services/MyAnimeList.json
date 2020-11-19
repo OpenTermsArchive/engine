@@ -1,0 +1,9 @@
+{
+  "name": "MyAnimeList",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://myanimelist.net/about/privacy_policy",
+      "select": "#content"
+    }
+  }
+}

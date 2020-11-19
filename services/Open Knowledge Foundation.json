@@ -1,0 +1,9 @@
+{
+  "name": "Open Knowledge Foundation",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://okfn.org/privacy-policy/",
+      "select": "main"
+    }
+  }
+}

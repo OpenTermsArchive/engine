@@ -1,0 +1,13 @@
+{
+  "name": "fógraí.ie",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://fógraí.ie/privacy-policy",
+      "select": "body"
+    },
+    "Terms of Service": {
+      "fetch": "https://fógraí.ie/terms-of-use",
+      "select": "body"
+    }
+  }
+}

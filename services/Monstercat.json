@@ -1,0 +1,9 @@
+{
+  "name": "Monstercat",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.monstercat.com/privacy-policy",
+      "select": "body"
+    }
+  }
+}

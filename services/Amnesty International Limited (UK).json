@@ -1,0 +1,9 @@
+{
+  "name": "Amnesty International Limited (UK)",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.amnesty.org/en/about-us/privacy-policy/",
+      "select": "body"
+    }
+  }
+}

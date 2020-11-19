@@ -1,0 +1,9 @@
+{
+  "name": "LinusTechTips.com",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://linustechtips.com/main/privacy/",
+      "select": "div.ipsBox_alt.ipsType_normal.ipsType_richText.ipsPad"
+    }
+  }
+}

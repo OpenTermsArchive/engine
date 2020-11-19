@@ -1,0 +1,13 @@
+{
+  "name": "BitChute",
+  "documents": {
+    "Community Guidelines": {
+      "fetch": "https://support.bitchute.com/policy/guidelines",
+      "select": "body"
+    },
+    "Terms of Service": {
+      "fetch": "https://support.bitchute.com/policy/terms/",
+      "select": "body"
+    }
+  }
+}

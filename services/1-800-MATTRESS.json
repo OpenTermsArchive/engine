@@ -1,0 +1,9 @@
+{
+  "name": "1-800-MATTRESS",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://www.1800mattress.com/terms-of-use.html",
+      "select": "#main"
+    }
+  }
+}

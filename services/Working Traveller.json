@@ -1,0 +1,13 @@
+{
+  "name": "Working Traveller",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://www.workingtraveller.com/legal/terms/",
+      "select": "article#post-53"
+    },
+    "Privacy Policy": {
+      "fetch": "https://www.workingtraveller.com/legal/privacy/",
+      "select": "article#post-295"
+    }
+  }
+}

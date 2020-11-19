@@ -1,0 +1,13 @@
+{
+  "name": "Community Data Solutions",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://communityds.com.au/terms-and-conditions/",
+      "select": "body"
+    },
+    "Privacy Policy": {
+      "fetch": "https://communityds.com.au/privacy-policy-2",
+      "select": "body"
+    }
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "name": "Tresorit",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://tresorit.com/terms-of-use",
+      "select": "body"
+    }
+  }
+}

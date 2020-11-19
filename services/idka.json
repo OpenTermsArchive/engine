@@ -1,0 +1,13 @@
+{
+  "name": "idka",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://www.idka.com/terms-and-conditions/",
+      "select": "body"
+    },
+    "Privacy Policy": {
+      "fetch": "https://www.idka.com/privacy-policy",
+      "select": "body"
+    }
+  }
+}

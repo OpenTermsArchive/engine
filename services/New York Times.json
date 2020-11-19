@@ -1,0 +1,13 @@
+{
+  "name": "New York Times",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://help.nytimes.com/hc/en-us/articles/115014893428-Terms-of-service",
+      "select": "div"
+    },
+    "Privacy Policy": {
+      "fetch": "https://help.nytimes.com/hc/en-us/articles/115014892108-Privacy-policy%20",
+      "select": "div"
+    }
+  }
+}

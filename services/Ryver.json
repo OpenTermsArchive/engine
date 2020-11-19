@@ -1,0 +1,13 @@
+{
+  "name": "Ryver",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://ryver.com/privacy-policy/",
+      "select": "body"
+    },
+    "Terms of Service": {
+      "fetch": "https://ryver.com/terms-of-service/",
+      "select": "body"
+    }
+  }
+}

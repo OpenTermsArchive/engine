@@ -1,0 +1,9 @@
+{
+  "name": "RapidShare",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://rapidshare.io/privacy.html",
+      "select": "body"
+    }
+  }
+}

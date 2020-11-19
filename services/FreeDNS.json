@@ -1,0 +1,9 @@
+{
+  "name": "FreeDNS",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "http://freedns.afraid.org/signup/aup/",
+      "select": "body"
+    }
+  }
+}

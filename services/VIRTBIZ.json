@@ -1,0 +1,13 @@
+{
+  "name": "VIRTBIZ",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://www.virtbiz.com/about/tos/",
+      "select": "#main"
+    },
+    "Privacy Policy": {
+      "fetch": "https://www.virtbiz.com/about/tos/privacy/",
+      "select": "#main"
+    }
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "name": "Mindanao Peacebuilding Institute",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://mpiasia.net/privacy.html",
+      "select": "html > body > div:first-of-type > div > section:nth-of-type(3) > div > div > div > main > div > div:nth-of-type(2)"
+    },
+    "Terms of Service": {
+      "fetch": "https://www.mpiasia.net/termsofuse.html",
+      "select": "html > body > div:first-of-type > div > section:nth-of-type(3) > div > div > div > main > div > div:nth-of-type(2)"
+    }
+  }
+}

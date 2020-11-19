@@ -1,0 +1,13 @@
+{
+  "name": "phpBB",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://www.phpbb.com/community/ucp.php?mode=terms",
+      "select": "div.content"
+    },
+    "Privacy Policy": {
+      "fetch": "https://www.phpbb.com/community/ucp.php?mode=privacy",
+      "select": "div.content"
+    }
+  }
+}

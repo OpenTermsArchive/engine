@@ -1,0 +1,9 @@
+{
+  "name": "Priority Matrix",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://appfluence.com/privacy/",
+      "select": "body"
+    }
+  }
+}

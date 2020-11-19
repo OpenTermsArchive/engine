@@ -1,0 +1,9 @@
+{
+  "name": "IMVU",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://secure.imvu.com/next/policyhub/",
+      "select": "body"
+    }
+  }
+}

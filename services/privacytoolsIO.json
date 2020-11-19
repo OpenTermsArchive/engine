@@ -1,0 +1,9 @@
+{
+  "name": "privacytoolsIO",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.privacytools.io/privacy-policy/",
+      "select": "html > body > div > main"
+    }
+  }
+}

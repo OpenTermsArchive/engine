@@ -1,0 +1,13 @@
+{
+  "name": "Speaky",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.speaky.com/privacy/",
+      "select": "body"
+    },
+    "Terms of Service": {
+      "fetch": "https://www.speaky.com/terms/",
+      "select": "body"
+    }
+  }
+}

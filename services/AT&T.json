@@ -1,0 +1,9 @@
+{
+  "name": "AT&T",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://www.att.com/legal/terms.internetAttTermsOfService.html",
+      "select": "div#termsofservices"
+    }
+  }
+}

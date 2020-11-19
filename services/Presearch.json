@@ -1,0 +1,9 @@
+{
+  "name": "Presearch",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://www.presearch.org/terms",
+      "select": "#main > div"
+    }
+  }
+}

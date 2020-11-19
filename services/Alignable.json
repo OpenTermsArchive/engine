@@ -1,0 +1,13 @@
+{
+  "name": "Alignable",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.alignable.com/privacy-policy",
+      "select": "body"
+    },
+    "Terms of Service": {
+      "fetch": "https://www.alignable.com/terms-conditions",
+      "select": "body"
+    }
+  }
+}

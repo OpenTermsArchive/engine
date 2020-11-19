@@ -1,0 +1,9 @@
+{
+  "name": "carsales",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.carsales.com.au/info/privacy-policy/",
+      "select": "body"
+    }
+  }
+}

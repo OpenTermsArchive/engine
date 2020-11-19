@@ -1,0 +1,9 @@
+{
+  "name": "TekSavvy",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.teksavvy.com/policies/legal-stuff/privacy-policy/",
+      "select": "body"
+    }
+  }
+}

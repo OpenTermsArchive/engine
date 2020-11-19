@@ -1,0 +1,9 @@
+{
+  "name": "Barstool Sports",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.barstoolsports.com/privacy-policy",
+      "select": "body"
+    }
+  }
+}

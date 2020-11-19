@@ -1,0 +1,9 @@
+{
+  "name": "RationalWiki",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://rationalwiki.org/wiki/RationalWiki:Privacy_policy",
+      "select": "div#mw-content-text"
+    }
+  }
+}

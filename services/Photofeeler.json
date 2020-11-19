@@ -1,0 +1,13 @@
+{
+  "name": "Photofeeler",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.photofeeler.com/privacy-policy.php",
+      "select": "html > body > div:nth-of-type(2)"
+    },
+    "Terms of Service": {
+      "fetch": "https://www.photofeeler.com/terms.php",
+      "select": "html > body > div:nth-of-type(2)"
+    }
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "name": "AlienVault",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.alienvault.com/legal/privacy-policy",
+      "select": "body"
+    }
+  }
+}

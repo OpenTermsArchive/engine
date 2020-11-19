@@ -1,0 +1,9 @@
+{
+  "name": "EU Login",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://ecas.ec.europa.eu/cas/privacyStatementPopup.html",
+      "select": "div#content"
+    }
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "name": "edX",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.edx.org/edx-privacy-policy",
+      "select": "body"
+    }
+  }
+}

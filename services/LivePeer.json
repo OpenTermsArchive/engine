@@ -1,0 +1,9 @@
+{
+  "name": "LivePeer",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://livepeer.org/privacy-policy/",
+      "select": "body"
+    }
+  }
+}

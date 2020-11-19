@@ -1,0 +1,9 @@
+{
+  "name": "damyanon.net",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://damyanon.net/privacy/",
+      "select": "body"
+    }
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "name": "Brick Hill",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.brick-hill.com/privacy",
+      "select": "body"
+    },
+    "Terms of Service": {
+      "fetch": "https://www.brick-hill.com/terms",
+      "select": "body"
+    }
+  }
+}

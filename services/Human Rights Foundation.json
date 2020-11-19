@@ -1,0 +1,9 @@
+{
+  "name": "Human Rights Foundation",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://hrf.org/legal/privacy-policy",
+      "select": "#post-3"
+    }
+  }
+}

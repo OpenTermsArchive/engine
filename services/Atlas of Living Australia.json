@@ -1,0 +1,13 @@
+{
+  "name": "Atlas of Living Australia",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.ala.org.au/who-we-are/terms-of-use/privacy-policy/",
+      "select": "body"
+    },
+    "Terms of Service": {
+      "fetch": "https://www.ala.org.au/who-we-are/terms-of-use/",
+      "select": "body"
+    }
+  }
+}

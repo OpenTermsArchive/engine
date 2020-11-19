@@ -1,0 +1,9 @@
+{
+  "name": "BidPlanet",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://www.microsoft.com/en-us/servicesagreement/",
+      "select": "div.row-fluid.grid-container.mscom-grid-container"
+    }
+  }
+}

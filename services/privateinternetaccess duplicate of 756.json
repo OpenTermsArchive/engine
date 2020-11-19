@@ -1,0 +1,9 @@
+{
+  "name": "privateinternetaccess duplicate of 756",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.privateinternetaccess.com/pages/privacy-policy/",
+      "select": "body"
+    }
+  }
+}

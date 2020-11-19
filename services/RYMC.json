@@ -1,0 +1,9 @@
+{
+  "name": "RYMC",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://rymc.io/legal/",
+      "select": "#root div.privacy-policy"
+    }
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "name": "Boost Note",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://boostnote.io/privacy",
+      "select": "html > body > div:first-of-type > main > div"
+    },
+    "Terms of Service": {
+      "fetch": "https://boostnote.io/terms",
+      "select": "html > body > div:first-of-type > main > div"
+    }
+  }
+}

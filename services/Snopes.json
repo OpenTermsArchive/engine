@@ -1,0 +1,13 @@
+{
+  "name": "Snopes",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://www.snopes.com/terms-of-use/",
+      "select": "body"
+    },
+    "Privacy Policy": {
+      "fetch": "https://www.snopes.com/privacy-policy/",
+      "select": "body"
+    }
+  }
+}

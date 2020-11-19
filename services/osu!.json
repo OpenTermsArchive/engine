@@ -1,0 +1,9 @@
+{
+  "name": "osu!",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://osu.ppy.sh/legal/privacy",
+      "select": "div.wiki-page__content"
+    }
+  }
+}

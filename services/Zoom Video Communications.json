@@ -1,0 +1,13 @@
+{
+  "name": "Zoom Video Communications",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://zoom.us/privacy",
+      "select": "body"
+    },
+    "Terms of Service": {
+      "fetch": "https://zoom.us/terms",
+      "select": "body"
+    }
+  }
+}

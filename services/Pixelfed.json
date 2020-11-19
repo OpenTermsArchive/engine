@@ -1,0 +1,13 @@
+{
+  "name": "Pixelfed",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://pixelfed.social/site/terms",
+      "select": "html > body > main > div > div > div > div > div"
+    },
+    "Privacy Policy": {
+      "fetch": "https://pixelfed.social/site/privacy",
+      "select": "html > body > main > div > div > div > div > div"
+    }
+  }
+}

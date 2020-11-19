@@ -1,0 +1,13 @@
+{
+  "name": "Posteo",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://posteo.de/en/site/privacy_policy",
+      "select": "body"
+    },
+    "Terms of Service": {
+      "fetch": "https://posteo.de/en/site/terms",
+      "select": "body"
+    }
+  }
+}

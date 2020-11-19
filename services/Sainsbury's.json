@@ -1,0 +1,9 @@
+{
+  "name": "Sainsbury's",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://privacy-hub.sainsburys.co.uk/privacy-policy/",
+      "select": "body"
+    }
+  }
+}

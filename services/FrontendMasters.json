@@ -1,0 +1,9 @@
+{
+  "name": "FrontendMasters",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://static.frontendmasters.com/assets/legal/PrivacyPolicy.pdf",
+      "select": "body"
+    }
+  }
+}

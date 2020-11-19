@@ -1,0 +1,9 @@
+{
+  "name": "Anecdata",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.anecdata.org/pages/privacy",
+      "select": "body"
+    }
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "name": "adobe",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://www.adobe.com/legal/terms.html",
+      "select": "#root_content_flex"
+    },
+    "Privacy Policy": {
+      "fetch": "https://www.adobe.com/privacy/policy.html",
+      "select": "#root_content_position_1ee8"
+    }
+  }
+}

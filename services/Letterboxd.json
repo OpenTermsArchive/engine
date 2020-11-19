@@ -1,0 +1,9 @@
+{
+  "name": "Letterboxd",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://letterboxd.com/legal/privacy-policy/",
+      "select": "html > body > div:first-of-type > div > div > article"
+    }
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "name": "fivesquid",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://www.fivesquid.com/terms-of-service",
+      "select": "div.row"
+    }
+  }
+}

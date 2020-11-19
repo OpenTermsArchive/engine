@@ -1,0 +1,9 @@
+{
+  "name": "Wigwam Design",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.wigwam.design/privacy",
+      "select": "html > body > div:first-of-type > div > div:nth-of-type(2) > section > div > div:nth-of-type(2) > div"
+    }
+  }
+}

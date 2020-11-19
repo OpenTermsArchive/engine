@@ -1,0 +1,13 @@
+{
+  "name": "npm",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.npmjs.com/policies/privacy",
+      "select": "#flatpage div.policies > div"
+    },
+    "Terms of Service": {
+      "fetch": "https://www.npmjs.com/policies/terms",
+      "select": "#flatpage div.policies > div"
+    }
+  }
+}

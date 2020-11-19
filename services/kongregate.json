@@ -1,0 +1,9 @@
+{
+  "name": "kongregate",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.kongregate.com/privacy",
+      "select": "body"
+    }
+  }
+}

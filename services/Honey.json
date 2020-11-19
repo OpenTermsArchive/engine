@@ -1,0 +1,9 @@
+{
+  "name": "Honey",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.joinhoney.com/privacy",
+      "select": "html > body > div:first-of-type > div > main > div:nth-of-type(2) > div > div > div:first-of-type > div > div:nth-of-type(2)"
+    }
+  }
+}

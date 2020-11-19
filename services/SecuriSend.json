@@ -1,0 +1,13 @@
+{
+  "name": "SecuriSend",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://securisend.com/privacy",
+      "select": "html > body > section > div > div"
+    },
+    "Terms of Service": {
+      "fetch": "https://securisend.com/terms",
+      "select": "html > body > section > div > div"
+    }
+  }
+}

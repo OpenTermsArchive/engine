@@ -1,0 +1,13 @@
+{
+  "name": "The Markup",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://themarkup.org/privacy",
+      "select": "html > body > div:first-of-type > article > div:nth-of-type(2) > div > div"
+    },
+    "Terms of Service": {
+      "fetch": "https://themarkup.org/terms",
+      "select": "html > body > div:first-of-type > article > div:nth-of-type(2) > div > div"
+    }
+  }
+}

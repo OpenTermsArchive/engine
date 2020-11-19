@@ -1,0 +1,13 @@
+{
+  "name": "Endurance International Group",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.endurance.com/privacy/privacy",
+      "select": "body"
+    },
+    "Terms of Service": {
+      "fetch": "https://www.endurance.com/our-policies/terms-of-use",
+      "select": "body"
+    }
+  }
+}

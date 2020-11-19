@@ -1,0 +1,9 @@
+{
+  "name": "Kev Quirk's Blog",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://kevq.uk/privacy",
+      "select": "body"
+    }
+  }
+}

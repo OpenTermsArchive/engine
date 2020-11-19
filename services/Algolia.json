@@ -1,0 +1,9 @@
+{
+  "name": "Algolia",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.algolia.com/policies/privacy/",
+      "select": "body"
+    }
+  }
+}

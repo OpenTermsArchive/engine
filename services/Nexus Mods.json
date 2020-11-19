@@ -1,0 +1,13 @@
+{
+  "name": "Nexus Mods",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://help.nexusmods.com/article/18-terms-of-service",
+      "select": "#fullArticle"
+    },
+    "Privacy Policy": {
+      "fetch": "https://help.nexusmods.com/article/20-privacy-policy",
+      "select": "#fullArticle"
+    }
+  }
+}

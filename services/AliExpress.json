@@ -1,0 +1,9 @@
+{
+  "name": "AliExpress",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://rule.alibaba.com/rule/detail/2041.htm?spm=a271m.8038972.1999288231.4.1d906d82xAj7nI",
+      "select": "body"
+    }
+  }
+}

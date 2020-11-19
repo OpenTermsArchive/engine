@@ -1,0 +1,13 @@
+{
+  "name": "fruux",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://fruux.com/terms-of-service/",
+      "select": "html > body > div:nth-of-type(2) > div:nth-of-type(2)"
+    },
+    "Privacy Policy": {
+      "fetch": "https://fruux.com/privacy/",
+      "select": "html > body > div:nth-of-type(2) > div:nth-of-type(2)"
+    }
+  }
+}

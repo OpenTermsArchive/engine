@@ -1,0 +1,13 @@
+{
+  "name": "Taskade",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.taskade.com/privacy/",
+      "select": "body"
+    },
+    "Terms of Service": {
+      "fetch": "https://www.taskade.com/terms/",
+      "select": "body"
+    }
+  }
+}

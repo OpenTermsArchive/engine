@@ -1,0 +1,9 @@
+{
+  "name": "Bilibili",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.bilibili.com/protocal/licence.html",
+      "select": "body"
+    }
+  }
+}

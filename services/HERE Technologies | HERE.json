@@ -1,0 +1,9 @@
+{
+  "name": "HERE Technologies | HERE",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://legal.here.com/en-gb/terms/acceptable-use-policy",
+      "select": "html > body > div:first-of-type > div > div"
+    }
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "name": "Whirlpool",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://www.whirlpool.com/services/about-us/terms-of-use.html#tableOfContents",
+      "select": "html > body > section > section"
+    }
+  }
+}

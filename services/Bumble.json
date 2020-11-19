@@ -1,0 +1,13 @@
+{
+  "name": "Bumble",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://bumble.com/en/privacy",
+      "select": "div.formatted-text"
+    },
+    "Terms of Service": {
+      "fetch": "https://bumble.com/en/terms",
+      "select": "div.formatted-text"
+    }
+  }
+}

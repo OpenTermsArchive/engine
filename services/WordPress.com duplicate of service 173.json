@@ -1,0 +1,9 @@
+{
+  "name": "WordPress.com duplicate of service 173",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://en.wordpress.com/tos/",
+      "select": "body"
+    }
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "name": "PictureThis",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.picturethisai.com/static/privacy_policy",
+      "select": "html > body > div:first-of-type"
+    },
+    "Terms of Service": {
+      "fetch": "https://www.picturethisai.com/static/user_agreement",
+      "select": "html > body > div:first-of-type"
+    }
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "name": "Totem Project",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://totem-project.org/privacy.html",
+      "select": "section div div.row div.col-lg-12"
+    },
+    "Terms of Service": {
+      "fetch": "https://totem-project.org/terms.html",
+      "select": "section div div.row div.col-lg-12"
+    }
+  }
+}

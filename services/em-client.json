@@ -1,0 +1,9 @@
+{
+  "name": "em-client",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.emclient.com/docs/em-client-privacy-policy.pdf",
+      "select": "div.page"
+    }
+  }
+}

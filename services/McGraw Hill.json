@@ -1,0 +1,13 @@
+{
+  "name": "McGraw Hill",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://www.mheducation.com/terms-use.html",
+      "select": "html > body > main > div > div > div:nth-of-type(2) > section > div > div > div > div > div:nth-of-type(2) > div:first-of-type > div > div > div > div:nth-of-type(2) > div"
+    },
+    "Privacy Policy": {
+      "fetch": "https://www.mheducation.com/privacy.html",
+      "select": "html > body > main > div > div > div:nth-of-type(4) > section > div > div > div > div > div:nth-of-type(2) > div:first-of-type > div > div > div > div:nth-of-type(3) > div"
+    }
+  }
+}

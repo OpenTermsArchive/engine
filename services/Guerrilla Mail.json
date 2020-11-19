@@ -1,0 +1,9 @@
+{
+  "name": "Guerrilla Mail",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://www.guerrillamail.com/tos",
+      "select": "#tos #tos"
+    }
+  }
+}

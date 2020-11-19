@@ -1,0 +1,9 @@
+{
+  "name": "theguardian",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.theguardian.com/help/privacy-policy",
+      "select": "div.content__article-body.from-content-api.js-article__body"
+    }
+  }
+}

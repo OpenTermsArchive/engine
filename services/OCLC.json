@@ -1,0 +1,9 @@
+{
+  "name": "OCLC",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://policies.oclc.org/en/privacy/privacy-statement.html",
+      "select": "body"
+    }
+  }
+}

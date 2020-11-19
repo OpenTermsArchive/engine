@@ -1,0 +1,13 @@
+{
+  "name": "Bill Track 50",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://www.billtrack50.com/terms-of-use",
+      "select": "html > body > div > div > main > div > div > div"
+    },
+    "Privacy Policy": {
+      "fetch": "https://www.billtrack50.com/privacy-policy",
+      "select": "html > body > div > div > main"
+    }
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "name": "nytimes Duplicate of service 727",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "http://www.nytimes.com/content/help/rights/privacy/policy/privacy-policy.html",
+      "select": "body"
+    }
+  }
+}

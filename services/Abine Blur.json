@@ -1,0 +1,9 @@
+{
+  "name": "Abine Blur",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://abine.com/legal.html",
+      "select": "body"
+    }
+  }
+}

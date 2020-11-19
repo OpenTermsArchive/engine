@@ -1,0 +1,9 @@
+{
+  "name": "Nextcloud",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://nextcloud.com/privacy/",
+      "select": "body"
+    }
+  }
+}

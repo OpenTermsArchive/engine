@@ -1,0 +1,9 @@
+{
+  "name": "Wizards of the Coast",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://company.wizards.com/legal/wizards-coasts-privacy-policy",
+      "select": "#main-content > article > section section"
+    }
+  }
+}

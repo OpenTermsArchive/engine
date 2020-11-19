@@ -1,0 +1,9 @@
+{
+  "name": "Threema Web",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://threema.ch/en/privacy",
+      "select": "body"
+    }
+  }
+}

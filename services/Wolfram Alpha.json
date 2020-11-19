@@ -1,0 +1,9 @@
+{
+  "name": "Wolfram Alpha",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "http://www.wolframalpha.com/privacypolicy.html",
+      "select": "body"
+    }
+  }
+}

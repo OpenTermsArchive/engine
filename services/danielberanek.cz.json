@@ -1,0 +1,9 @@
+{
+  "name": "danielberanek.cz",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://danielberanek.cz/ochrana-osobnich-udaju/",
+      "select": "body"
+    }
+  }
+}

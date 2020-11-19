@@ -1,0 +1,9 @@
+{
+  "name": "MusicBrainz",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://metabrainz.org/privacy",
+      "select": "body > div"
+    }
+  }
+}

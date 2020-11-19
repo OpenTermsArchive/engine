@@ -1,0 +1,9 @@
+{
+  "name": "Tricare",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.tricare.mil/Privacy",
+      "select": "body"
+    }
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "name": "Vocalise",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://vocalise.me.uk/privacy-policy",
+      "select": "main div.container"
+    },
+    "Terms of Service": {
+      "fetch": "https://vocalise.me.uk/terms",
+      "select": "main div.container"
+    }
+  }
+}

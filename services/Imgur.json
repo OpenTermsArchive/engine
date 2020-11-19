@@ -1,0 +1,9 @@
+{
+  "name": "Imgur",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "http://imgur.com/privacy",
+      "select": "div.text-content.privacy"
+    }
+  }
+}

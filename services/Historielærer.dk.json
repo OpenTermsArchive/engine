@@ -1,0 +1,9 @@
+{
+  "name": "Historielærer.dk",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://historielaerer.dk/privatlivspolitik/",
+      "select": "body"
+    }
+  }
+}

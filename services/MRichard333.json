@@ -1,0 +1,9 @@
+{
+  "name": "MRichard333",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://MRichard333.com/ToS",
+      "select": "body"
+    }
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "name": "How-To Geek",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.howtogeek.com/privacy-policy/",
+      "select": "html > body > div:nth-of-type(5) > div > main > article > div:first-of-type"
+    }
+  }
+}

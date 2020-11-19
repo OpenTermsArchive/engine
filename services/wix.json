@@ -1,0 +1,9 @@
+{
+  "name": "wix",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "http://www.wix.com/about/privacy",
+      "select": "body"
+    }
+  }
+}

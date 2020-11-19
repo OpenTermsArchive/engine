@@ -1,0 +1,13 @@
+{
+  "name": "hulu",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://secure.hulu.com/privacy",
+      "select": "body"
+    },
+    "Terms of Service": {
+      "fetch": "https://secure.hulu.com/terms",
+      "select": "body"
+    }
+  }
+}

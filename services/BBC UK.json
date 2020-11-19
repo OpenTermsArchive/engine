@@ -1,0 +1,9 @@
+{
+  "name": "BBC UK",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.bbc.co.uk/usingthebbc/privacy-policy/",
+      "select": "article"
+    }
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "name": "Playlectric",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://playlectric.com/privacy-policy",
+      "select": "div.post-content"
+    },
+    "Terms of Service": {
+      "fetch": "https://playlectric.com/terms-of-use",
+      "select": "div.post-content"
+    }
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "name": "U.S.C.K.I. Incognito",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.uscki.nl/?pagina=Wicki&subject=Privacy_Policy",
+      "select": ".panel.WiCKIPage"
+    }
+  }
+}

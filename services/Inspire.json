@@ -1,0 +1,13 @@
+{
+  "name": "Inspire",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.helloinspire.com/policies/privacy-policy",
+      "select": "article"
+    },
+    "Terms of Service": {
+      "fetch": "https://www.helloinspire.com/policies/terms-of-use",
+      "select": "article"
+    }
+  }
+}

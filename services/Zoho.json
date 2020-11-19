@@ -1,0 +1,13 @@
+{
+  "name": "Zoho",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.zoho.com/privacy.html",
+      "select": "body"
+    },
+    "Terms of Service": {
+      "fetch": "https://www.zoho.com/terms.html",
+      "select": "body"
+    }
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "name": "LauraKalbag",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://laurakalbag.com/i-dont-track-you/",
+      "select": "html > body > main > article > div:nth-of-type(2)"
+    }
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "name": "YR",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://hjelp.yr.no/hc/en-us/articles/360003337614-Privacy-policy",
+      "select": "html > body > main > div:nth-of-type(2) > div > article"
+    }
+  }
+}

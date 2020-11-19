@@ -1,0 +1,13 @@
+{
+  "name": "LINE WEBTOON",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://www.webtoons.com/en/terms",
+      "select": "body"
+    },
+    "Privacy Policy": {
+      "fetch": "https://www.webtoons.com/en/terms#privacyPolicy",
+      "select": "body"
+    }
+  }
+}

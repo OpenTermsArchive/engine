@@ -1,0 +1,13 @@
+{
+  "name": "Genius",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://genius.com/static/privacy_policy",
+      "select": "html > body > div:nth-of-type(3) > div"
+    },
+    "Terms of Service": {
+      "fetch": "https://genius.com/static/terms",
+      "select": "html > body > div:nth-of-type(3) > div"
+    }
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "name": "virgin",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.virgin.com/privacy-policy",
+      "select": "body"
+    },
+    "Terms of Service": {
+      "fetch": "https://www.virgin.com/terms",
+      "select": "body"
+    }
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "name": "Retail Zipline",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.retailzipline.com/privacy-policy",
+      "select": "body"
+    },
+    "Terms of Service": {
+      "fetch": "https://www.retailzipline.com/terms-and-conditions",
+      "select": "body"
+    }
+  }
+}

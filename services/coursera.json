@@ -1,0 +1,13 @@
+{
+  "name": "coursera",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://www.coursera.org/about/terms",
+      "select": "div.coursera-about-body"
+    },
+    "Privacy Policy": {
+      "fetch": "https://www.coursera.org/about/privacy",
+      "select": "div.coursera-about-body"
+    }
+  }
+}

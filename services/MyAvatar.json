@@ -1,0 +1,9 @@
+{
+  "name": "MyAvatar",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://en.gravatar.com/site/terms-of-service",
+      "select": "body"
+    }
+  }
+}

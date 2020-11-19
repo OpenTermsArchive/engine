@@ -1,0 +1,9 @@
+{
+  "name": "Mokum",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://mokum.place/about/privacy-policy",
+      "select": "body"
+    }
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "name": "Netflix",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://help.netflix.com/legal/termsofuse",
+      "select": "body"
+    }
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "name": "Politico",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://www.politico.com/terms-of-service",
+      "select": "body"
+    },
+    "Privacy Policy": {
+      "fetch": "https://www.politico.com/privacy-policy",
+      "select": "html > body > div:nth-of-type(2) > main > div:nth-of-type(2) > div > div > section:first-of-type > div:nth-of-type(2) > div > div"
+    }
+  }
+}

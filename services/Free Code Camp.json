@@ -1,0 +1,13 @@
+{
+  "name": "Free Code Camp",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://terms-of-service.freecodecamp.org/",
+      "select": "body"
+    },
+    "Privacy Policy": {
+      "fetch": "https://privacy-policy.freecodecamp.org/",
+      "select": "body"
+    }
+  }
+}

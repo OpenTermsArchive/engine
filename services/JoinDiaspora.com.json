@@ -1,0 +1,9 @@
+{
+  "name": "JoinDiaspora.com",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://joindiaspora.com/terms",
+      "select": "body"
+    }
+  }
+}

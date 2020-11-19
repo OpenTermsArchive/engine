@@ -1,0 +1,13 @@
+{
+  "name": "Urban Dictionary",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://about.urbandictionary.com/tos",
+      "select": ".panel"
+    },
+    "Privacy Policy": {
+      "fetch": "https://about.urbandictionary.com/privacy",
+      "select": ".panel"
+    }
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "name": "tinyurl",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://tinyurl.com/privaicy.php",
+      "select": "body"
+    }
+  }
+}

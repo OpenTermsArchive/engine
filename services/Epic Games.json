@@ -1,0 +1,13 @@
+{
+  "name": "Epic Games",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.epicgames.com/site/en-US/privacypolicy",
+      "select": "div.cms-page-content.privacypolicy.container"
+    },
+    "Terms of Service": {
+      "fetch": "https://www.epicgames.com/site/en-US/tos",
+      "select": "div.cms-page-content.tos.container"
+    }
+  }
+}

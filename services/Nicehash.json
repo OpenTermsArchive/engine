@@ -1,0 +1,9 @@
+{
+  "name": "Nicehash",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.nicehash.com/privacy",
+      "select": "body"
+    }
+  }
+}

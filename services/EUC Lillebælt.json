@@ -1,0 +1,9 @@
+{
+  "name": "EUC Lillebælt",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.eucl.dk/om-os/privatlivspolitik/",
+      "select": "body"
+    }
+  }
+}

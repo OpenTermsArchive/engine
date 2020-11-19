@@ -1,0 +1,9 @@
+{
+  "name": "Join Run",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://join.run/privacy",
+      "select": "body"
+    }
+  }
+}

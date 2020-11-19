@@ -1,0 +1,13 @@
+{
+  "name": "Pandora",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.pandora.com/privacy",
+      "select": "body"
+    },
+    "Copyright Claims Policy": {
+      "fetch": "https://www.pandora.com/legal/intellectual-property/",
+      "select": "body"
+    }
+  }
+}

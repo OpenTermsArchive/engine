@@ -1,0 +1,9 @@
+{
+  "name": "NordPass Experts Group",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://expertsnordpasss.blogspot.com/p/blog-page.html?m=1",
+      "select": "body"
+    }
+  }
+}

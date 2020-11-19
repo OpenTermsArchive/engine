@@ -1,0 +1,13 @@
+{
+  "name": "Healthline",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://www.healthline.com/terms-of-use",
+      "select": "html > body > div:first-of-type > div:nth-of-type(2) > main > div"
+    },
+    "Privacy Policy": {
+      "fetch": "https://www.healthline.com/privacy-policy",
+      "select": "html > body > div:first-of-type > div:nth-of-type(2) > main > div"
+    }
+  }
+}

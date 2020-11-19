@@ -1,0 +1,13 @@
+{
+  "name": "FaceApp",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://faceapp.com/privacy",
+      "select": "body"
+    },
+    "Terms of Service": {
+      "fetch": "https://faceapp.com/terms",
+      "select": "body"
+    }
+  }
+}

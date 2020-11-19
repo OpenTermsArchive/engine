@@ -1,0 +1,9 @@
+{
+  "name": "Hinterland Forums",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://hinterlandforums.com/privacy/",
+      "select": "#ipsLayout_mainArea"
+    }
+  }
+}

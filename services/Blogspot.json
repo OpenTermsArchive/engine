@@ -1,0 +1,13 @@
+{
+  "name": "Blogspot",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.google.com/policies/privacy/",
+      "select": "body"
+    },
+    "Terms of Service": {
+      "fetch": "https://www.google.com/policies/terms/",
+      "select": "body"
+    }
+  }
+}

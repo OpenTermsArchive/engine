@@ -1,0 +1,9 @@
+{
+  "name": "Verizon",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://www.verizonwireless.com/legal/notices/customer-agreement/",
+      "select": "div[data-ck=\"LEGAL_DISCLAIMER_CUSTOMER_AGREEMENT\"]"
+    }
+  }
+}

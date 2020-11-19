@@ -1,0 +1,13 @@
+{
+  "name": "Truestamp",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://www.iubenda.com/terms-and-conditions/41454278",
+      "select": "body"
+    },
+    "Privacy Policy": {
+      "fetch": "https://www.iubenda.com/privacy-policy/41454278/legal",
+      "select": "body"
+    }
+  }
+}

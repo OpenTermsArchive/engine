@@ -1,0 +1,13 @@
+{
+  "name": "Qubes OS",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://www.qubes-os.org/terms/",
+      "select": "html > body > div:first-of-type > div"
+    },
+    "Privacy Policy": {
+      "fetch": "https://www.qubes-os.org/privacy/",
+      "select": "html > body > div:first-of-type"
+    }
+  }
+}

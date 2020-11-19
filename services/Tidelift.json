@@ -1,0 +1,13 @@
+{
+  "name": "Tidelift",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://tidelift.com/about/tos",
+      "select": "div.body-container-wrapper"
+    },
+    "Privacy Policy": {
+      "fetch": "https://tidelift.com/about/privacy",
+      "select": "div.body-container-wrapper"
+    }
+  }
+}

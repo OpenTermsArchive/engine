@@ -1,0 +1,13 @@
+{
+  "name": "Houzz",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://www.houzz.com/termsOfUse",
+      "select": "#main-content"
+    },
+    "Privacy Policy": {
+      "fetch": "https://www.houzz.com/privacyPolicy",
+      "select": "#main-content"
+    }
+  }
+}

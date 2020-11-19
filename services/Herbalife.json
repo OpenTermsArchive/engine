@@ -1,0 +1,9 @@
+{
+  "name": "Herbalife",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://www.herbalife.com/terms-of-use",
+      "select": "html > body > form > table > tbody > tr > td"
+    }
+  }
+}

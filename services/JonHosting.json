@@ -1,0 +1,9 @@
+{
+  "name": "JonHosting",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://jonhosting.com/legal/privacy.html",
+      "select": "body"
+    }
+  }
+}

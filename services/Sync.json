@@ -1,0 +1,13 @@
+{
+  "name": "Sync",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.sync.com/privacy",
+      "select": "body"
+    },
+    "Terms of Service": {
+      "fetch": "https://www.sync.com/terms/",
+      "select": "body"
+    }
+  }
+}

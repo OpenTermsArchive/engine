@@ -1,0 +1,9 @@
+{
+  "name": "Goguardian",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.goguardian.com/privacy.html",
+      "select": "body"
+    }
+  }
+}

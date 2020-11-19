@@ -1,0 +1,9 @@
+{
+  "name": "Tutanota",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://tutanota.com/privacy",
+      "select": "body"
+    }
+  }
+}

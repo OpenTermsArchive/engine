@@ -1,0 +1,13 @@
+{
+  "name": "Disqus",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://help.disqus.com/terms-and-policies/disqus-privacy-policy",
+      "select": "article"
+    },
+    "Terms of Service": {
+      "fetch": "https://help.disqus.com/terms-and-policies/terms-of-service",
+      "select": "article"
+    }
+  }
+}

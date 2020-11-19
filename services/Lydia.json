@@ -1,0 +1,9 @@
+{
+  "name": "Lydia",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://yourlifeyourdata.com/privacy-policy",
+      "select": "body"
+    }
+  }
+}

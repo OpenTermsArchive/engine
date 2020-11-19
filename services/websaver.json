@@ -1,0 +1,9 @@
+{
+  "name": "websaver",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://websaver.ca/en_ca/terms-conditions/",
+      "select": "div.wrapper"
+    }
+  }
+}

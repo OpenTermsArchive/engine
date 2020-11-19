@@ -1,0 +1,13 @@
+{
+  "name": "WebMD",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.webmd.com/about-webmd-policies/about-privacy-policy",
+      "select": "html > body > main > div:nth-of-type(2) > div:nth-of-type(2) > article"
+    },
+    "Terms of Service": {
+      "fetch": "https://www.webmd.com/about-webmd-policies/about-terms-and-conditions-of-use",
+      "select": "#main-container"
+    }
+  }
+}

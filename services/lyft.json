@@ -1,0 +1,13 @@
+{
+  "name": "lyft",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://www.lyft.com/terms#!",
+      "select": "body"
+    },
+    "Privacy Policy": {
+      "fetch": "https://www.lyft.com/privacy",
+      "select": "body"
+    }
+  }
+}

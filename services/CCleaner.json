@@ -1,0 +1,9 @@
+{
+  "name": "CCleaner",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.ccleaner.com/about/privacy-policy",
+      "select": "html > body > div:nth-of-type(3) > main > div > div:first-of-type"
+    }
+  }
+}

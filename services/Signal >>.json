@@ -1,0 +1,9 @@
+{
+  "name": "Signal >>",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://signal.org/legal/",
+      "select": "html > body > section > div > div > div"
+    }
+  }
+}

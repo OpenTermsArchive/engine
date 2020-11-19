@@ -1,0 +1,9 @@
+{
+  "name": "Sophos",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.sophos.com/en-us/legal/sophos-group-privacy-policy.aspx",
+      "select": "#sophos-privacy-policy"
+    }
+  }
+}

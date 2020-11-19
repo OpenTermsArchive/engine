@@ -1,0 +1,13 @@
+{
+  "name": "BBC",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "http://www.bbc.com/usingthebbc/privacy-policy/",
+      "select": "div.gel-wrap"
+    },
+    "Terms of Service": {
+      "fetch": "http://www.bbc.com/usingthebbc/terms-of-use/",
+      "select": "div.gel-wrap"
+    }
+  }
+}

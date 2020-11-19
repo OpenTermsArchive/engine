@@ -1,0 +1,13 @@
+{
+  "name": "WeMod",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://www.wemod.com/terms",
+      "select": "html > body > div:first-of-type > div:first-of-type > div:nth-of-type(2) > section"
+    },
+    "Privacy Policy": {
+      "fetch": "https://www.wemod.com/privacy",
+      "select": "html > body > div:first-of-type > div:first-of-type > div:nth-of-type(2) > section"
+    }
+  }
+}

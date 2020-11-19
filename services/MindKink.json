@@ -1,0 +1,9 @@
+{
+  "name": "MindKink",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.privacypolicies.com/privacy/view/b91431957e6925db55a56cf2e74849dc",
+      "select": "body"
+    }
+  }
+}

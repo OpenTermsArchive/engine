@@ -1,0 +1,9 @@
+{
+  "name": "Trustroots",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.trustroots.org/privacy",
+      "select": "body"
+    }
+  }
+}

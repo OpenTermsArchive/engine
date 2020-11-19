@@ -1,0 +1,9 @@
+{
+  "name": "CBS Interactive",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.cbsinteractive.com/legal/cbsi/privacy-policy/highlights",
+      "select": "body"
+    }
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "name": "TV Tropes",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://tvtropes.org/pmwiki/privacypolicy.php",
+      "select": "#main-entry"
+    }
+  }
+}

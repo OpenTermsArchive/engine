@@ -1,0 +1,9 @@
+{
+  "name": "pure",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://pure.dating/terms",
+      "select": "body"
+    }
+  }
+}

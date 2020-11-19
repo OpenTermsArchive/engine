@@ -1,0 +1,9 @@
+{
+  "name": "WhatIsMyIP.com",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.whatismyip.com/privacy-policy/",
+      "select": "#primary"
+    }
+  }
+}

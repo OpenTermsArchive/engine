@@ -1,0 +1,9 @@
+{
+  "name": "Poker-Engine",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://poker-engine.com/privacy",
+      "select": "body"
+    }
+  }
+}

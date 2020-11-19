@@ -1,0 +1,9 @@
+{
+  "name": "DesignCrowd",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.designcrowd.nl/modal/legal/PrivacyPolicy",
+      "select": "body"
+    }
+  }
+}

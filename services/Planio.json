@@ -1,0 +1,13 @@
+{
+  "name": "Planio",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://plan.io/privacy-policy/",
+      "select": "html > body > div:nth-of-type(5) > div"
+    },
+    "Terms of Service": {
+      "fetch": "https://plan.io/terms-and-conditions/",
+      "select": "html > body > div:nth-of-type(4) > div"
+    }
+  }
+}

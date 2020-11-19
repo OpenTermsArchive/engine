@@ -1,0 +1,13 @@
+{
+  "name": "Securicy",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.securicy.com/privacy-policy/",
+      "select": "html > body"
+    },
+    "Terms of Service": {
+      "fetch": "https://www.securicy.com/terms-of-service/",
+      "select": "html > body"
+    }
+  }
+}

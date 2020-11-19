@@ -1,0 +1,9 @@
+{
+  "name": "Uphold",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://uphold.com/en/legal/privacy-policy#1",
+      "select": "body"
+    }
+  }
+}

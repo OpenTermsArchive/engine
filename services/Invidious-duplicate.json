@@ -1,0 +1,9 @@
+{
+  "name": "Invidious-duplicate",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.invidio.us/privacy",
+      "select": "body"
+    }
+  }
+}

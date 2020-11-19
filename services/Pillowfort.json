@@ -1,0 +1,13 @@
+{
+  "name": "Pillowfort",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://www.pillowfort.social/termsofservice",
+      "select": "body"
+    },
+    "Privacy Policy": {
+      "fetch": "https://www.pillowfort.social/privacypolicy",
+      "select": "body"
+    }
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "name": "nvidia",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.nvidia.com/en-us/about-nvidia/privacy-policy/",
+      "select": "body"
+    }
+  }
+}

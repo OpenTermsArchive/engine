@@ -1,0 +1,9 @@
+{
+  "name": "Mullvad",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://mullvad.net/en/guides/no-logging-data-policy/",
+      "select": "body"
+    }
+  }
+}

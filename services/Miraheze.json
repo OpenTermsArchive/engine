@@ -1,0 +1,13 @@
+{
+  "name": "Miraheze",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://meta.miraheze.org/wiki/Privacy_Policy",
+      "select": "body"
+    },
+    "Terms of Service": {
+      "fetch": "https://meta.miraheze.org/w/index.php?title=Terms_of_Use",
+      "select": ".mw-parser-output"
+    }
+  }
+}

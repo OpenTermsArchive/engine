@@ -1,0 +1,13 @@
+{
+  "name": "Hostelworld",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.hostelworld.com/securityprivacy.php",
+      "select": "body"
+    },
+    "Terms of Service": {
+      "fetch": "https://www.hostelworld.com/hosteltermsandconditions.php",
+      "select": "body"
+    }
+  }
+}

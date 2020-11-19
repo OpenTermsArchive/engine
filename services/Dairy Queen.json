@@ -1,0 +1,13 @@
+{
+  "name": "Dairy Queen",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://www.dairyqueen.com/us-en/Visitor-Agreement/",
+      "select": "html > body > div:nth-of-type(2) > div:nth-of-type(2) > main > div > section > div"
+    },
+    "Privacy Policy": {
+      "fetch": "https://www.dairyqueen.com/us-en/Privacy-Statement/",
+      "select": "html > body > div:nth-of-type(2) > div:nth-of-type(2) > main > div > section > div"
+    }
+  }
+}

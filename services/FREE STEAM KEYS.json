@@ -1,0 +1,13 @@
+{
+  "name": "FREE STEAM KEYS",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://www.freesteamkeys.com/terms-of-use/",
+      "select": "html > body > div:nth-of-type(2) > div > div:nth-of-type(3)"
+    },
+    "Privacy Policy": {
+      "fetch": "https://www.freesteamkeys.com/privacy-policy/",
+      "select": "html > body > div:nth-of-type(2) > div > div:nth-of-type(3)"
+    }
+  }
+}

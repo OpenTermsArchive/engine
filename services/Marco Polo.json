@@ -1,0 +1,9 @@
+{
+  "name": "Marco Polo",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.getjoya.com/privacy.html",
+      "select": "body"
+    }
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "name": "backblaze",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://www.backblaze.com/company/terms.html",
+      "select": "html > body > section:first-of-type > div > div:nth-of-type(2)"
+    }
+  }
+}

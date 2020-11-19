@@ -1,0 +1,9 @@
+{
+  "name": "WordPress.org",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "http://en.wordpress.com/tos/",
+      "select": "div.pagebody"
+    }
+  }
+}

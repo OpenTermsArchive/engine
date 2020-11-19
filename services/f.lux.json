@@ -1,0 +1,9 @@
+{
+  "name": "f.lux",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://justgetflux.com/privacy/",
+      "select": "body"
+    }
+  }
+}

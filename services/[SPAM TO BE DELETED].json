@@ -1,0 +1,9 @@
+{
+  "name": "[SPAM TO BE DELETED]",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.whitehouse.gov/privacy-policy/",
+      "select": "body"
+    }
+  }
+}

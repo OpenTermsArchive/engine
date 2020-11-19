@@ -1,0 +1,9 @@
+{
+  "name": "ActBlue",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://secure.actblue.com/privacy",
+      "select": "#indigo"
+    }
+  }
+}

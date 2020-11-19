@@ -1,0 +1,9 @@
+{
+  "name": "eBird",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://www.birds.cornell.edu/home/terms-of-use/",
+      "select": "body"
+    }
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "name": "Less Likely",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.lesslikely.com/privacy-policy/",
+      "select": "body"
+    }
+  }
+}

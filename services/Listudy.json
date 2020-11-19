@@ -1,0 +1,13 @@
+{
+  "name": "Listudy",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://listudy.org/en/terms-of-service",
+      "select": "html > body > main"
+    },
+    "Privacy Policy": {
+      "fetch": "https://listudy.org/en/privacy",
+      "select": "html > body > main"
+    }
+  }
+}

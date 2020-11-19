@@ -1,0 +1,9 @@
+{
+  "name": "The Omni Group",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.omnigroup.com/legal/privacy",
+      "select": "body"
+    }
+  }
+}

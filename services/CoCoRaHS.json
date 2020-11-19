@@ -1,0 +1,9 @@
+{
+  "name": "CoCoRaHS",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.cocorahs.org/Content.aspx?page=privacypolicy",
+      "select": "body"
+    }
+  }
+}

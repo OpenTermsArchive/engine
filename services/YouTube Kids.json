@@ -1,0 +1,9 @@
+{
+  "name": "YouTube Kids",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://kids.youtube.com/t/privacynotice",
+      "select": "body"
+    }
+  }
+}

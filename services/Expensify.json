@@ -1,0 +1,9 @@
+{
+  "name": "Expensify",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://use.expensify.com/privacy",
+      "select": "body"
+    }
+  }
+}

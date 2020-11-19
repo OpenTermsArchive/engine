@@ -1,0 +1,9 @@
+{
+  "name": "Politics & War",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://politicsandwar.com/terms/",
+      "select": "html > body > div.container > div.row > div#rightcolumn"
+    }
+  }
+}

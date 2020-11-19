@@ -1,0 +1,13 @@
+{
+  "name": "Colloq.io",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://colloq.io/privacy",
+      "select": "body"
+    },
+    "Terms of Service": {
+      "fetch": "https://colloq.io/terms",
+      "select": "#main"
+    }
+  }
+}

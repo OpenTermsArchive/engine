@@ -1,0 +1,13 @@
+{
+  "name": "BetterHelp",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://www.betterhelp.com/terms/",
+      "select": "body"
+    },
+    "Privacy Policy": {
+      "fetch": "https://www.betterhelp.com/privacy/",
+      "select": "body"
+    }
+  }
+}

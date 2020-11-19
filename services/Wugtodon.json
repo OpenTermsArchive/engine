@@ -1,0 +1,9 @@
+{
+  "name": "Wugtodon",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://wug.fun/terms",
+      "select": "html > body > div > div:nth-of-type(2) > div > div:first-of-type > div > div"
+    }
+  }
+}

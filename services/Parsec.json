@@ -1,0 +1,9 @@
+{
+  "name": "Parsec",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://parsecgaming.com/terms",
+      "select": "body"
+    }
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "name": "DnD5e.info",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://dnd5e.info/privacy-statement/",
+      "select": "html > body > div:first-of-type > div > div > div > div > section > div:nth-of-type(2) > article > div"
+    }
+  }
+}

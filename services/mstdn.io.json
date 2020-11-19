@@ -1,0 +1,9 @@
+{
+  "name": "mstdn.io",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://mstdn.io/terms",
+      "select": "html > body > div > div:nth-of-type(2) > div > div:first-of-type > div > div"
+    }
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "name": "SEO Powersuite",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.link-assistant.com/privacy-policy.html",
+      "select": "html > body"
+    }
+  }
+}

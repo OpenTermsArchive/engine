@@ -1,0 +1,13 @@
+{
+  "name": "Genshin Impact",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://genshin.mihoyo.com/en/company/privacy",
+      "select": "body"
+    },
+    "Terms of Service": {
+      "fetch": "https://genshin.mihoyo.com/en/company/terms",
+      "select": "body"
+    }
+  }
+}

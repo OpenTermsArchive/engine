@@ -1,0 +1,9 @@
+{
+  "name": "Diasporg",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://diasp.org/terms",
+      "select": "#tos"
+    }
+  }
+}

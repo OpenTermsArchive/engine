@@ -1,0 +1,9 @@
+{
+  "name": "ResearchSpace",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://www.researchspace.com/terms-conditions",
+      "select": "html > body > div:nth-of-type(2) > div > main > div > div > div > article > div"
+    }
+  }
+}

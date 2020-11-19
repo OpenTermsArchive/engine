@@ -1,0 +1,9 @@
+{
+  "name": "Syniverse",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.syniverse.com/privacy-notice",
+      "select": "html > body > article > section > div"
+    }
+  }
+}

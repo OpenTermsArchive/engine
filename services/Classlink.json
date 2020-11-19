@@ -1,0 +1,9 @@
+{
+  "name": "Classlink",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.classlink.com/company/privacy",
+      "select": "body"
+    }
+  }
+}

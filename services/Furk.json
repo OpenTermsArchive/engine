@@ -1,0 +1,9 @@
+{
+  "name": "Furk",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://www.furk.net/t/terms",
+      "select": "body"
+    }
+  }
+}

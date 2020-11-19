@@ -1,0 +1,13 @@
+{
+  "name": "Steam",
+  "documents": {
+    "Legal Information": {
+      "fetch": "https://store.steampowered.com/legal/",
+      "select": "div#main_content"
+    },
+    "Privacy Policy": {
+      "fetch": "https://store.steampowered.com/privacy_agreement/?l=english",
+      "select": "div#main_content"
+    }
+  }
+}

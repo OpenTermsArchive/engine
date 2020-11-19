@@ -1,0 +1,9 @@
+{
+  "name": "Follow My Health",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.followmyhealth.com/UseDocuments/PrivacyPolicy",
+      "select": "body"
+    }
+  }
+}

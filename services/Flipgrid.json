@@ -1,0 +1,13 @@
+{
+  "name": "Flipgrid",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://legal.flipgrid.com/privacy.html",
+      "select": "html > body > div:nth-of-type(2) > div > div:nth-of-type(2) > div"
+    },
+    "Terms of Service": {
+      "fetch": "https://legal.flipgrid.com/terms-of-use.html",
+      "select": "html > body > div:nth-of-type(2) > div > div:nth-of-type(2) > div"
+    }
+  }
+}

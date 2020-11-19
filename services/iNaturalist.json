@@ -1,0 +1,13 @@
+{
+  "name": "iNaturalist",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.inaturalist.org/pages/privacy",
+      "select": "body"
+    },
+    "Terms of Service": {
+      "fetch": "https://www.inaturalist.org/pages/terms",
+      "select": "body"
+    }
+  }
+}

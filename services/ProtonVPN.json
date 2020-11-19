@@ -1,0 +1,9 @@
+{
+  "name": "ProtonVPN",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://protonvpn.com/privacy-policy",
+      "select": "body"
+    }
+  }
+}

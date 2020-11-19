@@ -1,0 +1,13 @@
+{
+  "name": "AnkiWeb",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://ankiweb.net/account/terms",
+      "select": "body"
+    },
+    "Privacy Policy": {
+      "fetch": "https://ankiweb.net/account/privacy",
+      "select": "body"
+    }
+  }
+}

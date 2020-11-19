@@ -1,0 +1,9 @@
+{
+  "name": "bewelcome",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://bewelcome.org/privacy",
+      "select": "body"
+    }
+  }
+}

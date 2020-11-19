@@ -1,0 +1,13 @@
+{
+  "name": "itch.io",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://itch.io/docs/legal/terms",
+      "select": "div.content_column"
+    },
+    "Privacy Policy": {
+      "fetch": "https://itch.io/docs/legal/privacy-policy",
+      "select": "div.content_column"
+    }
+  }
+}

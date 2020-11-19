@@ -1,0 +1,9 @@
+{
+  "name": "ba.com",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.britishairways.com/en-ch/information/legal/privacy-policy",
+      "select": "body"
+    }
+  }
+}

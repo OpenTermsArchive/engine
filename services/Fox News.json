@@ -1,0 +1,13 @@
+{
+  "name": "Fox News",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "http://www.foxnews.com/terms-use.html",
+      "select": "section.terms-of-use"
+    },
+    "Privacy Policy": {
+      "fetch": "http://www.foxnews.com/privacy-policy.html",
+      "select": "section.privacy-policy"
+    }
+  }
+}

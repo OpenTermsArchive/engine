@@ -1,0 +1,9 @@
+{
+  "name": "jobvite",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://www.jobvite.com/terms-of-use/",
+      "select": "div.container.content-page"
+    }
+  }
+}

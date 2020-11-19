@@ -1,0 +1,13 @@
+{
+  "name": "Cloudant",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.ibm.com/privacy/us/en/",
+      "select": "div#ibm-content-main"
+    },
+    "Terms of Service": {
+      "fetch": "https://www.ibm.com/legal/us/en/",
+      "select": "div#ibm-content-main"
+    }
+  }
+}

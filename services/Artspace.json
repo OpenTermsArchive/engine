@@ -1,0 +1,13 @@
+{
+  "name": "Artspace",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.artspace.com/privacy_policy",
+      "select": "#content"
+    },
+    "Terms of Service": {
+      "fetch": "https://www.artspace.com/legal",
+      "select": "#content"
+    }
+  }
+}

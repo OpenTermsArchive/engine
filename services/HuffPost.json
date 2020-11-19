@@ -1,0 +1,13 @@
+{
+  "name": "HuffPost",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://www.verizonmedia.com/policies/us/en/verizonmedia/terms/otos/index.html",
+      "select": "body"
+    },
+    "Privacy Policy": {
+      "fetch": "https://www.verizonmedia.com/policies/us/en/verizonmedia/privacy/index.html",
+      "select": "body"
+    }
+  }
+}

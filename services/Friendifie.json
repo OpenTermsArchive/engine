@@ -1,0 +1,13 @@
+{
+  "name": "Friendifie",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://woopr.friendifie.com/about/privacy.html",
+      "select": "body"
+    },
+    "Terms of Service": {
+      "fetch": "https://woopr.friendifie.com/about/terms.html",
+      "select": "body"
+    }
+  }
+}

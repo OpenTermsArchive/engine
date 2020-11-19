@@ -1,0 +1,13 @@
+{
+  "name": "HP-67",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://hp-67.com/terms.html",
+      "select": "body"
+    },
+    "Privacy Policy": {
+      "fetch": "https://hp-67.com/privacy.html",
+      "select": "body"
+    }
+  }
+}

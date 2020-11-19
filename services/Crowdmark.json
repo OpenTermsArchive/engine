@@ -1,0 +1,13 @@
+{
+  "name": "Crowdmark",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://crowdmark.com/tos/",
+      "select": "body"
+    },
+    "Privacy Policy": {
+      "fetch": "https://crowdmark.com/privacy/",
+      "select": "body"
+    }
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "name": "Wisconsin Firearms & Transfers",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://drive.google.com/file/d/1bghO64oiFO1sawV2vhsftpHPsSkKESrJ/view",
+      "select": "body"
+    }
+  }
+}

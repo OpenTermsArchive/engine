@@ -1,0 +1,9 @@
+{
+  "name": "HQ",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://hq.hype.space/legal/tou.html",
+      "select": "body"
+    }
+  }
+}

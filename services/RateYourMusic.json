@@ -1,0 +1,9 @@
+{
+  "name": "RateYourMusic",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://rateyourmusic.com/tos",
+      "select": "#content"
+    }
+  }
+}

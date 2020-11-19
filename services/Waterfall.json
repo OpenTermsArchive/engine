@@ -1,0 +1,13 @@
+{
+  "name": "Waterfall",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://waterfall.social/privacy.php",
+      "select": "body"
+    },
+    "Terms of Service": {
+      "fetch": "https://waterfall.social/tos.php",
+      "select": "body"
+    }
+  }
+}

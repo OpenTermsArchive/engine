@@ -1,0 +1,9 @@
+{
+  "name": "Whishlist",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://www.wishlist.com/termsofuse",
+      "select": "body"
+    }
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "name": "dell-support",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "http://www.dell.com/learn/us/en/19/policies-privacy?c=us&l=en&s=gen&delphi:gr=true",
+      "select": "div.uif_maincontent"
+    }
+  }
+}

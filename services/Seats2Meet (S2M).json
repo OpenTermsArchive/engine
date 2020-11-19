@@ -1,0 +1,13 @@
+{
+  "name": "Seats2Meet (S2M)",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://www.seats2meet.com/en/terms",
+      "select": "body"
+    },
+    "Privacy Policy": {
+      "fetch": "https://www.seats2meet.com/en/privacy",
+      "select": "body"
+    }
+  }
+}

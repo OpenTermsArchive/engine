@@ -1,0 +1,9 @@
+{
+  "name": "bluestacks",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://www.bluestacks.com/terms-and-privacy.html",
+      "select": "#terms"
+    }
+  }
+}

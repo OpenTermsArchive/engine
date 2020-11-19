@@ -1,0 +1,9 @@
+{
+  "name": "XVideos",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://info.xvideos.com/legal/privacy",
+      "select": "#main"
+    }
+  }
+}

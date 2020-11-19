@@ -1,0 +1,9 @@
+{
+  "name": "Canadian Dental Association",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.cda-adc.ca/en/important_notices/website_privacy_policy/default.asp",
+      "select": "body"
+    }
+  }
+}

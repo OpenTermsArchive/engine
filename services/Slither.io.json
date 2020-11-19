@@ -1,0 +1,9 @@
+{
+  "name": "Slither.io",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://slither.io/privacy/",
+      "select": "body"
+    }
+  }
+}

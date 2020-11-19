@@ -1,0 +1,9 @@
+{
+  "name": "NordVPN",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://nordvpn.com/privacy-policy/",
+      "select": "body"
+    }
+  }
+}

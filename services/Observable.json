@@ -1,0 +1,9 @@
+{
+  "name": "Observable",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://observablehq.com/terms-of-service",
+      "select": "html > body > div[class*=\"prose\"]"
+    }
+  }
+}

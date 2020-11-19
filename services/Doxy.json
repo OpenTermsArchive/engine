@@ -1,0 +1,13 @@
+{
+  "name": "Doxy",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://doxy.me/en/terms-of-service/",
+      "select": "html > body > div:first-of-type > main > section:nth-of-type(2)"
+    },
+    "Privacy Policy": {
+      "fetch": "https://doxy.me/en/privacy-policy",
+      "select": "html > body > div:first-of-type > main > section:nth-of-type(2) > div > div > div:first-of-type > div"
+    }
+  }
+}

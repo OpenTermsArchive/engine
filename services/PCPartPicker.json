@@ -1,0 +1,13 @@
+{
+  "name": "PCPartPicker",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://pcpartpicker.com/tos/",
+      "select": "div.wrapper.wrapper__pageContent"
+    },
+    "Privacy Policy": {
+      "fetch": "https://pcpartpicker.com/privacy/",
+      "select": "div.wrapper.wrapper__pageContent"
+    }
+  }
+}

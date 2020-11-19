@@ -1,0 +1,9 @@
+{
+  "name": "A Mighty Girl",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.amightygirl.com/privacy-policy",
+      "select": "#privacy-content"
+    }
+  }
+}

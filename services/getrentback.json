@@ -1,0 +1,13 @@
+{
+  "name": "getrentback",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.getrentback.org/privacy%20policy%20Flat%20Justice.pdf",
+      "select": "body"
+    },
+    "Terms of Service": {
+      "fetch": "https://www.getrentback.org/Terms%20&%20Conditions%20Letter%20of%20Authority.pdf",
+      "select": "body"
+    }
+  }
+}

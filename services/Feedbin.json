@@ -1,0 +1,9 @@
+{
+  "name": "Feedbin",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://feedbin.com/privacy-policy",
+      "select": "html > body > section:nth-of-type(2) > div > article"
+    }
+  }
+}

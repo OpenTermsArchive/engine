@@ -1,0 +1,9 @@
+{
+  "name": "Reveal",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://revealapp.com/privacy/",
+      "select": "#post article > div.content"
+    }
+  }
+}

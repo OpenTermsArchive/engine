@@ -1,0 +1,13 @@
+{
+  "name": "WaniKani",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.wanikani.com/privacy",
+      "select": "body"
+    },
+    "Terms of Service": {
+      "fetch": "https://www.wanikani.com/terms",
+      "select": "body"
+    }
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "name": "Microsoft Services",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://privacy.microsoft.com/en-us/privacystatement",
+      "select": "body"
+    }
+  }
+}

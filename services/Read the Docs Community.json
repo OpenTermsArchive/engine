@@ -1,0 +1,9 @@
+{
+  "name": "Read the Docs Community",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://docs.readthedocs.io/en/stable/privacy-policy.html",
+      "select": "div#privacy-policy"
+    }
+  }
+}

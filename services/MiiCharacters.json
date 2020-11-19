@@ -1,0 +1,9 @@
+{
+  "name": "MiiCharacters",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "http://www.miicharacters.com/privacy.php",
+      "select": "#privacy"
+    }
+  }
+}

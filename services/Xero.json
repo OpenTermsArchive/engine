@@ -1,0 +1,9 @@
+{
+  "name": "Xero",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://www.xero.com/au/about/terms/",
+      "select": "body"
+    }
+  }
+}

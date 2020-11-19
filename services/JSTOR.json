@@ -1,0 +1,9 @@
+{
+  "name": "JSTOR",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://about.jstor.org/terms/",
+      "select": "div.content-wrapper"
+    }
+  }
+}

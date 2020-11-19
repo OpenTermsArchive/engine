@@ -1,0 +1,13 @@
+{
+  "name": "Liberapay",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://liberapay.com/about/legal",
+      "select": "html > body > div > div > div"
+    },
+    "Privacy Policy": {
+      "fetch": "https://liberapay.com/about/privacy",
+      "select": "html > body > div > div > div"
+    }
+  }
+}

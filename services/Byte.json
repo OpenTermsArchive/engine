@@ -1,0 +1,13 @@
+{
+  "name": "Byte",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://byte.co/terms",
+      "select": "html > body > div"
+    },
+    "Privacy Policy": {
+      "fetch": "https://byte.co/privacy",
+      "select": "html > body > div"
+    }
+  }
+}

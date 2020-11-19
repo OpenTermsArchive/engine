@@ -1,0 +1,9 @@
+{
+  "name": "Plex Solutions",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://www.plex.tv/about/privacy-legal/plex-terms-of-service/",
+      "select": "div.large-8.medium-12.cell.content"
+    }
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "name": "coveredca",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.coveredca.com/PDFs/privacy/CC_Privacy_Policy.pdf?v=2.0",
+      "select": "body"
+    }
+  }
+}

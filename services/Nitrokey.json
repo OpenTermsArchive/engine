@@ -1,0 +1,9 @@
+{
+  "name": "Nitrokey",
+  "documents": {
+    "Legal Information": {
+      "fetch": "https://www.nitrokey.com/legal-information",
+      "select": "html > body > div:nth-of-type(2) > div:nth-of-type(2) > div > div > div > article > div"
+    }
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "name": "stackexchange",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://stackoverflow.com/legal/terms-of-service/public",
+      "select": "body"
+    }
+  }
+}

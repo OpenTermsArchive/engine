@@ -1,0 +1,13 @@
+{
+  "name": "Paper.li",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://paper.li/privacy.html",
+      "select": "#page-body"
+    },
+    "Terms of Service": {
+      "fetch": "https://paper.li/terms.html",
+      "select": "#page-body"
+    }
+  }
+}

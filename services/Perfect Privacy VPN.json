@@ -1,0 +1,9 @@
+{
+  "name": "Perfect Privacy VPN",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.perfect-privacy.com/en/privacy-policy",
+      "select": "html > body > div:nth-of-type(3) > div > div:first-of-type > div"
+    }
+  }
+}

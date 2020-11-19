@@ -1,0 +1,9 @@
+{
+  "name": "ShoutWiki",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "http://www.shoutwiki.com/wiki/ShoutWiki_Hub:Privacy_Policy",
+      "select": "body"
+    }
+  }
+}

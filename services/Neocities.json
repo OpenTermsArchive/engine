@@ -1,0 +1,13 @@
+{
+  "name": "Neocities",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://neocities.org/privacy",
+      "select": "html > body > div:first-of-type > div:nth-of-type(2)"
+    },
+    "Terms of Service": {
+      "fetch": "https://neocities.org/terms",
+      "select": "html > body > div:first-of-type > div:nth-of-type(2)"
+    }
+  }
+}

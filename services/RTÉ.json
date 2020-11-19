@@ -1,0 +1,9 @@
+{
+  "name": "RTÉ",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.rte.ie/about/en/policies-and-reports/policies-guidelines/2012/0417/317440-rte-privacy-statement/",
+      "select": "body"
+    }
+  }
+}

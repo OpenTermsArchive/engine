@@ -1,0 +1,9 @@
+{
+  "name": "Scientology",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.scientology.org/privacy-notice.html",
+      "select": "html > body > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(4) > div:nth-of-type(2) > article > main"
+    }
+  }
+}

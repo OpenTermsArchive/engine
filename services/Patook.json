@@ -1,0 +1,13 @@
+{
+  "name": "Patook",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://patook.com/Legal/Privacy",
+      "select": "body"
+    },
+    "Terms of Service": {
+      "fetch": "https://patook.com/Legal/Terms",
+      "select": "body"
+    }
+  }
+}

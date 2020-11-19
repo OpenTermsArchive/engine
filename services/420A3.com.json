@@ -1,0 +1,13 @@
+{
+  "name": "420A3.com",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.420a3.com/privacy-policy",
+      "select": "#content > div > div:nth-of-type(2) > div > div"
+    },
+    "Terms of Service": {
+      "fetch": "https://www.420a3.com/terms-of-service",
+      "select": "#content > div > div:nth-of-type(2) > div > div"
+    }
+  }
+}

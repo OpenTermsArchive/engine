@@ -1,0 +1,13 @@
+{
+  "name": "Drop",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://drop.com/privacy",
+      "select": "html > body > div:first-of-type > div > div:nth-of-type(5) > div > section > div"
+    },
+    "Terms of Service": {
+      "fetch": "https://drop.com/terms",
+      "select": "html > body > div:first-of-type > div > div:nth-of-type(5) > div > section > div"
+    }
+  }
+}

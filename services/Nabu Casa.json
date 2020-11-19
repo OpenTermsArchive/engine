@@ -1,0 +1,9 @@
+{
+  "name": "Nabu Casa",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.nabucasa.com/privacy_policy/",
+      "select": "body"
+    }
+  }
+}

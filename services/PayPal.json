@@ -1,0 +1,9 @@
+{
+  "name": "PayPal",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.paypal.com/us/webapps/mpp/ua/privacy-full",
+      "select": "html > body > div:first-of-type > div > div > section > div"
+    }
+  }
+}

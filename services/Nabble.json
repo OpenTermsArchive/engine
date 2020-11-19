@@ -1,0 +1,13 @@
+{
+  "name": "Nabble",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "http://www.nabble.com/Terms.jtp",
+      "select": "div.terms"
+    },
+    "Privacy Policy": {
+      "fetch": "http://www.nabble.com/PrivacyPolicy.jtp",
+      "select": "div.terms"
+    }
+  }
+}

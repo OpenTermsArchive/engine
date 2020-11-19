@@ -1,0 +1,9 @@
+{
+  "name": "Hawthorn Associates of Lake County, LLC",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.myservicetracker.com/PrivacyPolicy.aspx",
+      "select": "body"
+    }
+  }
+}

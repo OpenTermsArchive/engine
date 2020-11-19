@@ -1,0 +1,9 @@
+{
+  "name": "Brentjanderson.com",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.brentjanderson.com/about/",
+      "select": "body"
+    }
+  }
+}

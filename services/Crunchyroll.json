@@ -1,0 +1,9 @@
+{
+  "name": "Crunchyroll",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://www.crunchyroll.com/tos",
+      "select": "html > body > div:first-of-type > div > div:first-of-type > div:nth-of-type(3)"
+    }
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "name": "Privva",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.privva.com/privacy",
+      "select": "body"
+    }
+  }
+}

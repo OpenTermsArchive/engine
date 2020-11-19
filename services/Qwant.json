@@ -1,0 +1,13 @@
+{
+  "name": "Qwant",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://about.qwant.com/legal/terms-of-service/qwant-search/",
+      "select": "body"
+    },
+    "Privacy Policy": {
+      "fetch": "https://about.qwant.com/legal/privacy/",
+      "select": "body"
+    }
+  }
+}

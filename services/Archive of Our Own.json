@@ -1,0 +1,9 @@
+{
+  "name": "Archive of Our Own",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://archiveofourown.org/tos",
+      "select": "#tos"
+    }
+  }
+}

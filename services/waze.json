@@ -1,0 +1,13 @@
+{
+  "name": "waze",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.waze.com/legal/privacy",
+      "select": "#legal-privacy > div:first-of-type > div > div > div:nth-of-type(2)"
+    },
+    "Terms of Service": {
+      "fetch": "https://www.waze.com/legal/tos",
+      "select": "#legal-tos > div:first-of-type > div > div > div:nth-of-type(2)"
+    }
+  }
+}

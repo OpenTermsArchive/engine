@@ -1,0 +1,9 @@
+{
+  "name": "National Hockey League (NHL.com)",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://www.nhl.com/info/terms-of-service",
+      "select": "body"
+    }
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "name": "Ziff Davis",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.ziffdavis.com/privacy-policy",
+      "select": "body"
+    },
+    "Terms of Service": {
+      "fetch": "https://www.ziffdavis.com/terms-of-use",
+      "select": "body"
+    }
+  }
+}

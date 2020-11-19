@@ -1,0 +1,9 @@
+{
+  "name": "Arc Games",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://www.arcgames.com/en/about/terms",
+      "select": "section.module-body"
+    }
+  }
+}

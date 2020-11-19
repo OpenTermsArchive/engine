@@ -1,0 +1,13 @@
+{
+  "name": "Microsoft Store",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://privacy.microsoft.com/en-us/privacystatement#",
+      "select": "body"
+    },
+    "Terms of Service": {
+      "fetch": "https://www.microsoft.com/en-ca/store/b/terms-of-sale",
+      "select": "div.m-rich-content-block.context-ucx"
+    }
+  }
+}

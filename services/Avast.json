@@ -1,0 +1,9 @@
+{
+  "name": "Avast",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.avast.com/privacy-policy",
+      "select": "#content"
+    }
+  }
+}

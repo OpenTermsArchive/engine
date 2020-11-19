@@ -1,0 +1,9 @@
+{
+  "name": "social.coop mastodon",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://social.coop/terms",
+      "select": "body"
+    }
+  }
+}

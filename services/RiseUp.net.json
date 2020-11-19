@@ -1,0 +1,13 @@
+{
+  "name": "RiseUp.net",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://riseup.net/en/about-us/policy/privacy-policy",
+      "select": "body"
+    },
+    "Terms of Service": {
+      "fetch": "https://riseup.net/en/about-us/policy/tos",
+      "select": "body"
+    }
+  }
+}

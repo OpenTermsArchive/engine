@@ -1,0 +1,9 @@
+{
+  "name": "49ers FanZone",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://49ersfanzone.net/datenschutz",
+      "select": "#content"
+    }
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "name": "Clyp",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://clyp.it/privacy",
+      "select": "#content > div > div:nth-of-type(2) > section:nth-of-type(2)"
+    },
+    "Terms of Service": {
+      "fetch": "https://clyp.it/terms",
+      "select": "#content > div > div:nth-of-type(2) > section:nth-of-type(2)"
+    }
+  }
+}

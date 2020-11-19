@@ -1,0 +1,9 @@
+{
+  "name": "Ballotpedia",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://ballotpedia.org/Ballotpedia:Privacy_policy",
+      "select": "body"
+    }
+  }
+}

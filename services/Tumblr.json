@@ -1,0 +1,13 @@
+{
+  "name": "Tumblr",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://www.tumblr.com/policy/en/terms-of-service",
+      "select": "div#left_column"
+    },
+    "Privacy Policy": {
+      "fetch": "https://www.tumblr.com/privacy/en",
+      "select": "div#left_column"
+    }
+  }
+}

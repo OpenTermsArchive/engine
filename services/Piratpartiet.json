@@ -1,0 +1,9 @@
+{
+  "name": "Piratpartiet",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.piratpartiet.no/personvern/",
+      "select": "html > body > div:first-of-type > div > div > div"
+    }
+  }
+}

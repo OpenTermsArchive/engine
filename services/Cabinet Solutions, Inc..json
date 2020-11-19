@@ -1,0 +1,9 @@
+{
+  "name": "Cabinet Solutions, Inc.",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://cabinetsolutions.net/privacy/",
+      "select": "pre#privacy_policy"
+    }
+  }
+}

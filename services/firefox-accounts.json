@@ -1,0 +1,13 @@
+{
+  "name": "firefox-accounts",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://accounts.firefox.com/legal/privacy",
+      "select": "body"
+    },
+    "Terms of Service": {
+      "fetch": "https://accounts.firefox.com/legal/terms",
+      "select": "body"
+    }
+  }
+}
