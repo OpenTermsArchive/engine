@@ -63,6 +63,8 @@ export async function filterHTML({ content, documentDeclaration, filterFunctions
 
   convertRelativeURLsToAbsolute(domFragment, location);
 
+  domFragment.querySelectorAll('script, style').forEach(node => node.remove());
+
   return transform(domFragment);
 }
 
