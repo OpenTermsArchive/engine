@@ -25,12 +25,9 @@ export default async function fetch(url, cssSelectors) {
 
     content = await page.content();
   } catch (error) {
-    if (
-      error.code == 'ENOTFOUND'
-    || error.code == 'ETIMEDOUT'
-    || error.message.includes('ERR_TUNNEL_CONNECTION_FAILED')
-    || error.message.includes('ERR_NAME_NOT_RESOLVED')
-    || error instanceof puppeteer.errors.TimeoutError // Expected elements are not present on the web page
+    if ((error.code && error.code.match(/^(ENOTFOUND|ETIMEDOUT|ECONNRESET)$/))
+      || (error.message && error.message.match(/(ERR_TUNNEL_CONNECTION_FAILED|ERR_NAME_NOT_RESOLVED)/))
+      || error instanceof puppeteer.errors.TimeoutError // Expected elements are not present on the web page
     ) {
       throw new InaccessibleContentError(error.message);
     }
