@@ -1,13 +1,13 @@
 {
-  "name": "Yelp",
+  "name": "yelp",
   "documents": {
-    "Terms of Service": {
-      "fetch": "https://terms.yelp.com/tos/en_gb/20200101_en_gb/",
-      "select": ".article"
-    },
     "Privacy Policy": {
-      "fetch": "https://terms.yelp.com/privacy/en_gb/20200101_en_gb/",
-      "select": ".article"
+      "fetch": "https://terms.yelp.com/privacy/en_us/20200101_en_us/",
+      "select": "#content"
+    },
+    "Terms of Service": {
+      "fetch": "https://terms.yelp.com/tos/en_us/20200101_en_us/",
+      "select": "#content"
     }
   }
 }

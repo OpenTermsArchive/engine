@@ -1,18 +1,17 @@
 {
-  "name": "Deviantart",
-  "importedFrom": "https://github.com/tosdr/tosback2/blob/885c6c80303209c8041e7620897c856c3081461d/rules/deviantart.com.xml",
+  "name": "DeviantArt",
   "documents": {
+    "Terms of Service": {
+      "fetch": "https://about.deviantart.com/policy/service/",
+      "select": ".bubbleview"
+    },
+    "Privacy Policy": {
+      "fetch": "https://about.deviantart.com/policy/privacy/",
+      "select": ".bubbleview"
+    },
     "Community Guidelines": {
       "fetch": "http://about.deviantart.com/policy/etiquette/",
       "select": "div#policy-etiquette"
-    },
-    "Privacy Policy": {
-      "fetch": "http://about.deviantart.com/policy/privacy/",
-      "select": "div#policy-privacy"
-    },
-    "Terms of Service": {
-      "fetch": "http://about.deviantart.com/policy/service/",
-      "select": "div#policy-service"
     }
   }
 }

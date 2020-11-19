@@ -1,6 +1,6 @@
 {
   "name": "Avis",
-  "importedFrom": "https://github.com/tosdr/tosback2/blob/885c6c80303209c8041e7620897c856c3081461d/rules/avis.com.xml",
+  "importedFrom": "https://github.com/tosdr/tosback2/blob/f762cd4bbb2571272985fed009201a23300ba9b2/rules/avis.com.xml",
   "documents": {
     "Privacy Policy": {
       "fetch": "http://www.avis.com/car-rental/html/global/en/terms/privacy_policy.html",

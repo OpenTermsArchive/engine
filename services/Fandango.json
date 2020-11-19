@@ -1,10 +1,13 @@
 {
   "name": "Fandango",
-  "importedFrom": "https://github.com/tosdr/tosback2/blob/885c6c80303209c8041e7620897c856c3081461d/rules/fandango.com.xml",
   "documents": {
     "Privacy Policy": {
-      "fetch": "http://www.fandango.com/PrivacyPolicy.aspx?mode=popup",
-      "select": "body"
+      "fetch": "https://www.fandango.com/policies/privacy-policy",
+      "select": "html > body > main > div > div > section > div:nth-of-type(2)"
+    },
+    "Terms of Service": {
+      "fetch": "https://www.fandango.com/policies/terms-of-use",
+      "select": "html > body > main > div > div > section > div:nth-of-type(2)"
     }
   }
 }

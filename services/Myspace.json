@@ -1,15 +1,9 @@
 {
-  "name": "Myspace",
+  "name": "myspace",
   "documents": {
-    "Terms of Service": {
-      "fetch": "https://myspace.com/pages/terms",
-      "remove": "ol > *:not(li)",
-      "select": "#nms_legal"
-    },
     "Privacy Policy": {
-      "fetch": "https://myspace.com/pages/eeaprivacy",
-      "remove": "ol > *:not(li)",
-      "select": "#nms_legal"
+      "fetch": "https://myspace.com/pages/privacy",
+      "select": "div#nms_legal"
     }
   }
 }

@@ -8,6 +8,10 @@
     "Privacy Policy": {
       "fetch": "https://discord.com/privacy",
       "select": ".document-3OCpS5"
+    },
+    "Community Guidelines": {
+      "fetch": "https://discord.com/guidelines",
+      "select": "html > body > div:first-of-type > div > div > div:nth-of-type(2) > div"
     }
   }
 }

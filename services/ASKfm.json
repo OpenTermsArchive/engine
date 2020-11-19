@@ -8,6 +8,10 @@
     "Privacy Policy": {
       "fetch": "https://ask.fm/docs/privacy_policy/?lang=en",
       "select": "section.container"
+    },
+    "Community Guidelines": {
+      "fetch": "https://about.ask.fm/community-guidelines/",
+      "select": "main[role=\"main\"]"
     }
   }
 }
