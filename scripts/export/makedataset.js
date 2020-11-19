@@ -56,12 +56,6 @@ const doctypeMap = {
   user_consent_policy: 'User Consent Policy'
 };
 
-const [ arg ] = process.argv.filter(el => el.startsWith('--folder-name='));
-
-const exportTarget = arg ? arg.split('=')[1] : 'cgus-dataset';
-
-console.log(`Exporting dataset to ${exportTarget}`);
-
 async function getCommits() {
   const commits = await git.log([ '--stat=4096' ]);
   return commits.map(commit => extractLogInfos(commit));
@@ -125,28 +119,34 @@ async function makeData(commitInfo) {
 }
 
 async function main() {
-  // main function for script
+  const [ folderNameArg ] = process.argv.filter(el => el.startsWith('--folder-name='));
+
+  const exportTargetFolderName = folderNameArg ? folderNameArg.split('=')[1] : 'dataset';
+
   const commits = await getCommits();
 
   const filteredCommits = commits.filter(({ message }) => isValidCommit(message));
 
+  const [ date ] = new Date().toISOString().split('T');
+  const [{ hash }] = filteredCommits;
+  const headCommitShortSha = hash.slice(0, 7);
+  const finalPath = path.resolve(__dirname, '../../data/', `${exportTargetFolderName}-${date}-${headCommitShortSha}`);
+  console.log(`Exporting dataset to ${finalPath}`);
+
   for (const commit of filteredCommits) {
-    console.log(`Handling commit ${commit.hash.slice(0, 5)}: ${commit.message}`);
+    console.log(`Handling commit ${commit.hash.slice(0, 7)}: ${commit.message}`);
 
     await makeData(commit); // eslint-disable-line no-await-in-loop
   }
 
-  // back to master when done
-  git.checkout('master');
+  git.checkout('master'); // back to master when done
 
-  // copy temp dir to final destination
-  const finalPath = path.resolve(__dirname, '../..', exportTarget);
+  await fse.copy(TEMP_WORK_FOLDER, finalPath); // copy temp dir to final destination
 
-  await fse.copy(TEMP_WORK_FOLDER, finalPath);
   await fs.rmdir(TEMP_WORK_FOLDER, { recursive: true });
   console.log(`Dataset is in ${finalPath}`);
 }
 
-(async function () {
+(async () => {
   await main();
-}());
+})();
