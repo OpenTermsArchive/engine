@@ -15,6 +15,10 @@ export const SNAPSHOTS_TARGET_PATH = path.resolve(__dirname, '../../', config.ge
 const README_PATH = path.resolve(__dirname, './initFiles/snapshot-readme.md');
 const LICENSE_PATH = path.resolve(__dirname, './initFiles/snapshot-license');
 
+const EMPTY_TOS_BACK_CONTENT = `<!DOCTYPE html><html><head></head><body>
+
+</body></html>`;
+
 let history;
 (async function () {
   console.time('Total time');
@@ -38,15 +42,29 @@ let history;
 
   const filteredCommits = commits.filter(({ message }) => (message.includes('Start tracking') || message.includes('Update')));
 
-  console.log(`Source repo contains ${filteredCommits.length} commits.\n`);
+  console.log(`Source repo contains ${commits.length} commits.\n`);
 
-  let totalRewritten = 0;
-  let totalNotChanged = 0;
+  const alreadyTrackedByCGus = {};
+
+  const counters = {
+    rewritten: 0,
+    skippedNoChanges: 0,
+    skippedEmptyToSBack: 0,
+    skippedEmptyContent: 0,
+    skippedEmptyCommit: 0,
+    skippedAlreadyTrackedByCGUs: 0,
+  };
   /* eslint-disable no-await-in-loop */
   for (const commit of filteredCommits) {
     console.log(Date.now(), commit.hash, commit.date, commit.message);
 
     await sourceRepo.checkout(commit.hash);
+
+    if (!commit.diff) {
+      console.log('⌙ Skip empty commit');
+      counters.skippedEmptyCommit++;
+      continue;
+    }
 
     const [{ file: relativeFilePath }] = commit.diff.files;
     const absoluteFilePath = `${SNAPSHOTS_SOURCE_PATH}/${relativeFilePath}`;
@@ -63,15 +81,41 @@ let history;
 
     if (serviceDocumentTypesRenamingRules[serviceId] && serviceDocumentTypesRenamingRules[serviceId][documentType]) {
       documentType = serviceDocumentTypesRenamingRules[serviceId][documentType];
-      console.log(`⌙Specific rename document type "${documentType}" to "${serviceDocumentTypesRenamingRules[serviceId][documentType]}" of "${serviceId}" service`);
+      console.log(`⌙ Specific rename document type "${documentType}" to "${serviceDocumentTypesRenamingRules[serviceId][documentType]}" of "${serviceId}" service`);
     }
 
     if (servicesRenamingRules[serviceId]) {
-      console.log(`⌙Rename service "${serviceId}" to "${servicesRenamingRules[serviceId]}"`);
+      console.log(`⌙ Rename service "${serviceId}" to "${servicesRenamingRules[serviceId]}"`);
     }
 
     if (documentTypesRenamingRules[documentType]) {
-      console.log(`⌙Rename document type "${documentType}" to "${documentTypesRenamingRules[documentType]}" of "${serviceId}" service`);
+      console.log(`⌙ Rename document type "${documentType}" to "${documentTypesRenamingRules[documentType]}" of "${serviceId}" service`);
+    }
+
+    if (!content) {
+      console.log(`⌙ Skip empty document "${documentType}" of "${serviceId}" service`);
+      counters.skippedEmptyContent++;
+      continue;
+    }
+
+    let extraChangelogContent;
+    if (isFromToSBack(commit.body)) {
+      if (alreadyTrackedByCGus[serviceId] && alreadyTrackedByCGus[serviceId][documentType]) { // When documents are tracked in parallel by ToSBack and CGUs, keep only the CGUs' one.
+        console.log(`⌙ Skip already tracked by CGUs ToSBack document "${documentType}" of "${serviceId}" service`);
+        counters.skippedAlreadyTrackedByCGUs++;
+        continue;
+      }
+
+      if (content == EMPTY_TOS_BACK_CONTENT) {
+        console.log(`⌙Skip empty ToSBack document "${documentType}" of "${serviceId}" service`);
+        counters.skippedEmptyToSBack++;
+        continue;
+      }
+
+      extraChangelogContent = commit.body;
+    } else {
+      alreadyTrackedByCGus[serviceId] = alreadyTrackedByCGus[serviceId] || {};
+      alreadyTrackedByCGus[serviceId][documentType] = true;
     }
 
     const { id: snapshotId } = await history.recordSnapshot({
@@ -79,17 +123,30 @@ let history;
       documentType: documentTypesRenamingRules[documentType] || documentType,
       content,
       mimeType,
-      authorDate: commit.date
+      authorDate: commit.date,
+      extraChangelogContent,
     });
 
     if (snapshotId) {
-      totalRewritten++;
+      counters.rewritten++;
     } else {
-      totalNotChanged++;
+      counters.skippedNoChanges++;
     }
   }
-  console.log(`\n${totalRewritten} commits rewritten and ${totalNotChanged} not changed on ${filteredCommits.length} source commits.`);
+
+  const totalTreatedCommits = Object.values(counters).reduce((acc, value) => acc + value, 0);
+  console.log(`\nCommits treated: ${totalTreatedCommits} on ${filteredCommits.length}`);
+  console.log(`⌙ Commits rewritten: ${counters.rewritten}`);
+  console.log(`⌙ Skipped not changed commits: ${counters.skippedNoChanges}`);
+  console.log(`⌙ Skipped ToSBack commits already tracked by CGUs: ${counters.skippedAlreadyTrackedByCGUs}`);
+  console.log(`⌙ Skipped empty ToSBack commits: ${counters.skippedEmptyToSBack}`);
+  console.log(`⌙ Skipped empty content commits: ${counters.skippedEmptyContent}`);
+  console.log(`⌙ Skipped empty commits: ${counters.skippedEmptyCommit}\n`);
   console.timeEnd('Total time');
+
+  if (totalTreatedCommits != filteredCommits.length) {
+    console.error('\n⚠ WARNING: Total treated commits does not match the total number of commits to be treated! ⚠');
+  }
 }());
 
 async function initReadmeAndLicense(targetRepo, authorDate) {
@@ -114,6 +171,10 @@ async function initTargetRepo(targetRepoPath) {
   await new Git(targetRepoPath).init();
   await new Git(targetRepoPath).initUser();
   return new Git(targetRepoPath); // Resintanciation of the target repo after initialization is required to ensure configuration made in the Git class is properly done.
+}
+
+function isFromToSBack(message) {
+  return message.includes('Imported from');
 }
 
 async function fileExists(filePath) {
