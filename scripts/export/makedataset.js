@@ -61,14 +61,12 @@ async function getCommits() {
   return commits.map(commit => extractLogInfos(commit));
 }
 
-function extractLogInfos(commit) {
-  // parse a LogInfo object
+function extractLogInfos(commit) { // parse a LogInfo object
   const { hash, date, message, diff: { files: filesChanged } } = commit;
   return { hash, date, message, filesChanged };
 }
 
-function makeFilename(target, filepath, date) {
-  // given a target folder and a file path, create target dataset structure
+function makeFilename(target, filepath, date) { // given a target folder and a file path, create target dataset structure
   const splitted = filepath.split('/');
   let [ service ] = splitted.slice(-2);
   const [ fileName ] = splitted.slice(-1);
@@ -93,24 +91,19 @@ function makeFilename(target, filepath, date) {
   return path.join(target, service, documentType, `${date}.md`);
 }
 
-function isValidCommit(commitMessage) {
-  // util function used for filtering CGUs commits
+function isValidCommit(commitMessage) { // util function used for filtering CGUs commits
   const [ firstVerb ] = commitMessage.split(' ');
   return [ 'Update', 'Start', 'Refilter' ].includes(firstVerb);
 }
 
 async function makeData(commitInfo) {
-  // Given info about a specific commit:
-  // git checkout on that commit
-  await git.checkout(commitInfo.hash);
+  await git.checkout(commitInfo.hash); // git checkout on that commit
 
-  // compute target Folder and File Names
   const [ file ] = commitInfo.filesChanged;
   const filePath = path.join(git.path, file.file);
-  const targetFilePath = makeFilename(TEMP_WORK_FOLDER, filePath, commitInfo.date);
+  const targetFilePath = makeFilename(TEMP_WORK_FOLDER, filePath, commitInfo.date); // compute target Folder and File Names
 
-  // create target (temp) folder if needed
-  const pathCreated = await fs.mkdir(path.dirname(targetFilePath), { recursive: true });
+  const pathCreated = await fs.mkdir(path.dirname(targetFilePath), { recursive: true }); // create target (temp) folder if needed
   if (pathCreated) {
     console.log(`created ${pathCreated} as it did not exist.`);
   }
