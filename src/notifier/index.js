@@ -68,12 +68,41 @@ export default class Notifier {
       const pointsAffected = await this.psqlClient.query(queryTemplate,
         [ documentDeclaration.fetch ]);
       console.log(pointsAffected);
-      await Promise.all(pointsAffected.rows.map(row => {
-        if (content.indexOf(row.quoteText) === -1) {
-          console.log('not found!', row);
-        } else {
-          console.log('found!', row, content.indexOf(row.quoteText), content.indexOf(row.quoteText) + row.quoteText.length);  
+      const documentWords = content.split(' ').map(str => str.trim());
+      await Promise.all(pointsAffected.rows.forEach(row => {
+        const existingWords = row.quoteText.split(' ').map(str => str.trim());
+        // See https://github.com/tosdr/tosback-crawler/issues/6#issuecomment-731179847
+        let unfound = 0;
+        let startWord = 0;
+        let documentPointer;
+        for (let i = 0; i < existingWords.length; i++) {
+          const index = documentWords.indexOf(existingWords[i], startWord);
+          console.log('looking for word', i, existingWords[i], startWord, index, documentWords.length);
+          if (index === -1) {
+            console.log('unfound word', existingWords[i]);
+            unfound++;
+            if (unfound > 2) {
+              return false;
+            }
+            break;
+          } else {
+            unfound = 0;
+          }
+          if (startWord === -1) {
+            startWord = index;
+            documentPointer = index;
+          } else if (index === -1) {
+            unfound++;
+            if (unfound > 2) {
+              return false;
+            }
+          } else if (index - documentPointer > 2) {
+            console.log('startWord failed', startWord, index, documentPointer);
+            startWord = -1;
+          }
         }
+        console.log('found', startWord, documentPointer);
+        return true;
       }));
       console.log('Done saving to edit.tosdr.org');
     } catch (e) {
