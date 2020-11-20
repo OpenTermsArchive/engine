@@ -17,12 +17,12 @@ export default class Notifier {
   // mysqlConnected;
   // psqlConnected;
   constructor() {
-    this.mysqlConnection = mysql.createConnection({
-      host: process.env.MYSQL_HOST,
-      user: process.env.MYSQL_USER,
-      password: process.env.MYSQL_PASSWORD,
-      database: process.env.MYSQL_DATABASE
-    });
+    // this.mysqlConnection = mysql.createConnection({
+    //   host: process.env.MYSQL_HOST,
+    //   user: process.env.MYSQL_USER,
+    //   password: process.env.MYSQL_PASSWORD,
+    //   database: process.env.MYSQL_DATABASE
+    // });
     this.psqlClient = new Client({
       connectionString: process.env.PSQL_CONNECTION_STRING,
       ssl: {
@@ -52,19 +52,33 @@ export default class Notifier {
 
   // eslint-disable-next-line class-methods-use-this
   async saveToEditTosdrOrg({ content, documentDeclaration, snapshotId }) {
-    console.log('saving to edit.tosdr.org', documentDeclaration, snapshotId);
-    console.log(content);
-    if (!this.psqlConnected) {
-      console.log('connecting psqlClient');
-      this.psqlConnected = this.psqlClient.connect();
+    try {
+      console.log('saving to edit.tosdr.org', documentDeclaration, snapshotId);
+      console.log(content);
+      if (!this.psqlConnected) {
+        console.log('connecting psqlClient');
+        this.psqlConnected = this.psqlClient.connect();
+      }
+      await this.psqlConnected;
+      const res = await this.psqlClient.query('UPDATE documents SET text = $1::text, updated_at=now() WHERE url = $2::text',
+        [ content, documentDeclaration.fetch ]);
+      console.log(res);
+      const queryTemplate = 'SELECT p."id", p."quoteText", p."quoteStart", p."quoteEnd" FROM points p INNER JOIN documents d ON p.document_id=d.id '
+        + 'WHERE url = $1::text';
+      const pointsAffected = await this.psqlClient.query(queryTemplate,
+        [ documentDeclaration.fetch ]);
+      console.log(pointsAffected);
+      await Promise.all(pointsAffected.rows.map(row => {
+        if (content.indexOf(row.quoteText) === -1) {
+          console.log('not found!', row);
+        } else {
+          console.log('found!', row, content.indexOf(row.quoteText), content.indexOf(row.quoteText) + row.quoteText.length);  
+        }
+      }));
+      console.log('Done saving to edit.tosdr.org');
+    } catch (e) {
+      console.error(e);
     }
-    await this.psqlConnected;
-    const res = await this.psqlClient.query('UPDATE documents SET text = $1::text, updated_at=now() WHERE url = $2::text',
-      [ content, documentDeclaration.fetch ]);
-
-    console.log('psql result', res);
-    // await Promise.all(res.rows.map(row => console.log(row)));
-    // await this.psqlClient.end();
   }
 
   async onVersionRecorded(serviceId, type, versionId) {
@@ -87,5 +101,9 @@ export default class Notifier {
         }
       });
     });
+  }
+
+  end() {
+    return this.psqlClient.end();
   }
 }
