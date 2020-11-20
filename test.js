@@ -1,4 +1,4 @@
-import pg from 'pg';
+const pg = require('pg');
 
 const { Client } = pg;
 
@@ -15,7 +15,8 @@ async function run() {
   const documentDeclaration = {
     fetch: 'https://MRichard333.com/TOS'
   };
-  const res = await psqlClient.query('UPDATE documents SET text = ? WHERE url = ?', [ content, documentDeclaration.fetch ]);
+  await psqlClient.connect();
+  const res = await psqlClient.query('UPDATE documents SET text = $1::text, updated_at=now() WHERE url = $2::text', [ content, documentDeclaration.fetch ]);
   console.log(res);
 }
 
