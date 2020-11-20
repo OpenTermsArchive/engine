@@ -1,3 +1,4 @@
+// import * as fs from 'fs';
 import * as mysql from 'mysql';
 import pg from 'pg';
 
@@ -23,7 +24,12 @@ export default class Notifier {
       database: process.env.MYSQL_DATABASE
     });
     this.psqlClient = new Client({
-      connectionString: process.env.PSQL_CONNECTION_STRING
+      connectionString: process.env.PSQL_CONNECTION_STRING,
+      ssl: {
+        rejectUnauthorized: false
+        // key: fs.readFileSync('.env/postgresql.key').toString(),
+        // cert: fs.readFileSync('.env/postgresql.cert').toString()
+      }
     });
 
     this.mysqlConnected = false;
@@ -49,9 +55,10 @@ export default class Notifier {
     console.log('saving to edit.tosdr.org', documentDeclaration, snapshotId);
     console.log(content);
     if (!this.psqlConnected) {
-      await this.psqlClient.connect();
-      this.psqlConnected = true;
+      console.log('connecting psqlClient');
+      this.psqlConnected = this.psqlClient.connect();
     }
+    await this.psqlConnected;
     const res = await this.psqlClient.query('SELECT url from documents WHERE url=?', [ documentDeclaration.fetch ]);
     console.log('psql result', res);
     // await Promise.all(res.rows.map(row => console.log(row)));
