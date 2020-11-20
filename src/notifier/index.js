@@ -59,7 +59,7 @@ export default class Notifier {
       this.psqlConnected = this.psqlClient.connect();
     }
     await this.psqlConnected;
-    const res = await this.psqlClient.query('SELECT url from documents WHERE url=?', [ documentDeclaration.fetch ]);
+    const res = await this.psqlClient.query('UPDATE documents SET text = ? WHERE url = ?', [ content, documentDeclaration.fetch ]);
     console.log('psql result', res);
     // await Promise.all(res.rows.map(row => console.log(row)));
     // await this.psqlClient.end();
