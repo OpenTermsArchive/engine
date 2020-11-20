@@ -45,15 +45,16 @@ export default class Notifier {
   }
 
   // eslint-disable-next-line class-methods-use-this
-  async saveToEditTosdrOrg({ serviceId, content, documentType, snapshotId }) {
-    console.log('saving to edit.tosdr.org', serviceId, documentType, snapshotId);
+  async saveToEditTosdrOrg({ content, documentDeclaration, snapshotId }) {
+    console.log('saving to edit.tosdr.org', documentDeclaration, snapshotId);
     console.log(content);
-    if (!this.mysqlConnected) {
+    if (!this.psqlConnected) {
       await this.psqlClient.connect();
       this.psqlConnected = true;
     }
-    const res = await this.psqlClient.query('SELECT d.name, d.xpath, d.url, s.url as domains, s.name as service from documents d inner join services s on d.service_id=s.id LIMIT 1');
-    await Promise.all(res.rows.map(row => console.log(row)));
+    const res = await this.psqlClient.query('SELECT url from documents WHERE url=?', [ documentDeclaration.fetch ]);
+    console.log('psql result', res);
+    // await Promise.all(res.rows.map(row => console.log(row)));
     // await this.psqlClient.end();
   }
 

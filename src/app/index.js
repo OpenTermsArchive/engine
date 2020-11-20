@@ -195,9 +195,8 @@ export default class CGUs extends events.EventEmitter {
       this.notifier = new Notifier();
     }
     await this.notifier.saveToEditTosdrOrg({
-      serviceId,
       content: document,
-      documentType: type,
+      documentDeclaration,
       snapshotId
     });
   }
