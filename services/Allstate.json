@@ -4,7 +4,9 @@
   "documents": {
     "Privacy Policy": {
       "fetch": "http://www.allstate.com/about/privacy-statement-aic.aspx",
-      "select": "body"
+      "filter": [ "removeHeaderAnchors" ],
+      "select": "#bodyColumn",
+      "remove": ".breadcrumb"
     }
   }
 }
