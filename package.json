@@ -8,6 +8,7 @@
     "node": ">=12.17"
   },
   "scripts": {
+    "export": "node scripts/export/makedataset.js",
     "start": "node --max-http-header-size=16384 src/index.js",
     "start:modified": "node --max-http-header-size=16384 src/index.js -- --modified-only",
     "start:prod": "cross-env NODE_ENV=production node --max-http-header-size=16384  src/index.js",
@@ -56,6 +57,7 @@
     "cross-env": "^7.0.2",
     "datauri": "^3.0.0",
     "dotenv": "^8.2.0",
+    "fs-extra": "^9.0.1",
     "http-proxy-agent": "^4.0.1",
     "https-proxy-agent": "^5.0.0",
     "joplin-turndown-plugin-gfm": "^1.0.12",

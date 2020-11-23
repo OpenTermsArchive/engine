@@ -226,6 +226,10 @@ npm start $service_id
 
 See [Ops Readme](ops/README.md).
 
+### Exporting a dataset
+
+See [`export` script Readme](scripts/export/README.md).
+
 - - -
 
 ## License
