@@ -1,5 +1,28 @@
 First of all, thanks for taking the time to contribute! 🎉👍
 
+## Table of Contents
+
+* [Tracking new documents](#tracking-new-documents)
+  * [Declaring a new service](#declaring-a-new-service)
+    * [Service name](#service-name)
+    * [Service ID](#service-id)
+    * [Service declaration](#service-declaration)
+  * [Declaring documents](#declaring-documents)
+    * [fetch](#fetch)
+    * [executeClientScripts](#executeclientscripts)
+    * [select](#select)
+      * [Range selectors](#range-selectors)
+    * [remove](#remove)
+    * [filter](#filter)
+    * [Document type](#document-type)
+      * [Defining a new document type](#defining-a-new-document-type)
+  * [Testing your declaration](#testing-your-declaration)
+* [Editing existing documents](#editing-existing-documents)
+  * [History](#history)
+    * [Declaration history](#declaration-history)
+    * [Filters history](#filters-history)
+  * [Refiltering your documents](#refiltering-your-documents)
+
 # Tracking new documents
 
 Tracking documents is done by _declaring_ them and the service they are associated with. Such a declaration is achieved by editing JSON files in the [`services`](./services) folder.
