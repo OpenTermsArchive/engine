@@ -5,6 +5,7 @@ node_modules
 vault.key
 data
 yarn.lock
+tmp
 
 # AccordProject logs
 log/trace.log
