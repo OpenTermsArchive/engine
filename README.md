@@ -6,6 +6,31 @@
 
 [🇫🇷 Manuel en français](README.fr.md).
 
+## Table of Contents
+
+* [How it works](#how-it-works)
+* [Exploring the versions history](#exploring-the-versions-history)
+  * [Notes](#notes)
+* [Be notified](#be-notified)
+  * [By email](#by-email)
+  * [By RSS](#by-rss)
+    * [Recap of available RSS feeds](#recap-of-available-rss-feeds)
+* [Analysing the snapshots history](#analysing-the-snapshots-history)
+* [Contributing](#contributing)
+  * [Adding a new service](#adding-a-new-service)
+* [Using locally](#using-locally)
+  * [Installing](#installing)
+  * [Setting up the database](#setting-up-the-database)
+  * [Configuring](#configuring)
+    * [Configuration file](#configuration-file)
+    * [Environment variables](#environment-variables)
+      * [SMTP\_HOST and SMTP\_USERNAME](#smtp_host-and-smtp_username)
+      * [HTTP\_PROXY and HTTPS\_PROXY](#http_proxy-and-https_proxy)
+      * [SENDINBLUE\_API\_KEY](#sendinblue_api_key)
+      * [NODE\_ENV](#node_env)
+  * [Running](#running)
+  * [Deploying](#deploying)
+* [License](#license)
 
 ## How it works
 
