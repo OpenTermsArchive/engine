@@ -19,25 +19,32 @@ describe('Services', () => {
 
       /* eslint-disable no-loop-func */
       for (const documentType of expected.getDocumentTypes()) {
-        it('has no history', () => {
-          const { _history: actualHistory } = result[serviceId].getDocumentDeclaration(documentType);
-          expect(actualHistory).to.be.undefined;
-        });
+        context(`${documentType}`, () => {
+          it('has no history', () => {
+            const { _history: actualHistory } = result[serviceId].getDocumentDeclaration(documentType);
+            expect(actualHistory).to.be.undefined;
+          });
 
-        const { filters: expectedFilters } = expected.getDocumentDeclaration(documentType);
-        if (expectedFilters) {
-          for (let indexFilter = 0; indexFilter < expectedFilters.length; indexFilter++) {
-            it(`has the proper "${expectedFilters[indexFilter].name}" filter function`, async () => {
+          const { filters: expectedFilters } = expected.getDocumentDeclaration(documentType);
+          if (expectedFilters) {
+            it('has the proper number of filter functions', async () => {
+              const actualDocument = result[serviceId].getDocumentDeclaration(documentType);
+              expect(actualDocument.filters.length).to.equal(expectedFilters.length);
+            });
+
+            for (let indexFilter = 0; indexFilter < expectedFilters.length; indexFilter++) {
+              it(`has the proper "${expectedFilters[indexFilter].name}" filter function`, async () => {
+                const { filters: actualFilters } = result[serviceId].getDocumentDeclaration(documentType);
+                expect(await actualFilters[indexFilter]()).equal(await expectedFilters[indexFilter]()); // eslint-disable-line no-await-in-loop
+              });
+            }
+          } else {
+            it('has no filters', () => {
               const { filters: actualFilters } = result[serviceId].getDocumentDeclaration(documentType);
-              expect(await actualFilters[indexFilter]()).equal(await expectedFilters[indexFilter]()); // eslint-disable-line no-await-in-loop
+              expect(actualFilters).to.be.undefined;
             });
           }
-        } else {
-          it('has no filters', () => {
-            const { filters: actualFilters } = result[serviceId].getDocumentDeclaration(documentType);
-            expect(actualFilters).to.be.undefined;
-          });
-        }
+        });
       }
       /* eslint-enable no-loop-func */
     }
@@ -53,22 +60,22 @@ describe('Services', () => {
     });
 
     context('when a service has no history', async () => {
-      describe('service_without_history', async () => {
+      describe('Service wihout history', async () => {
         await validateServiceWithoutHistory('service_without_history', expectedServices.service_without_history);
       });
     });
     context('when a service has only delcarations history', async () => {
-      describe('service_with_declaration_history', async () => {
+      describe('Service with declaration history', async () => {
         await validateServiceWithoutHistory('service_with_declaration_history', expectedServices.service_with_declaration_history);
       });
     });
     context('when a service has only filters history', async () => {
-      describe('service_with_filters_history', async () => {
+      describe('Service with filters history', async () => {
         await validateServiceWithoutHistory('service_with_filters_history', expectedServices.service_with_filters_history);
       });
     });
     context('when a service has both filters and delcarations histories', async () => {
-      describe('service_with_history', async () => {
+      describe('Service with history', async () => {
         await validateServiceWithoutHistory('service_with_history', expectedServices.service_with_history);
       });
     });
@@ -84,13 +91,13 @@ describe('Services', () => {
 
       /* eslint-disable no-loop-func */
       for (const documentType of expected.getDocumentTypes()) {
-        context(`for "${documentType}"`, () => {
+        context(`${documentType}`, () => {
           const { _history: expectedHistory } = expected._documents[documentType];
           const expectedHistoryDates = expectedHistory && expectedHistory.map(entry => entry.validUntil);
 
           if (expectedHistoryDates) {
             for (const date of expectedHistoryDates) {
-              context(`for "${date}" history entry`, () => {
+              context(`${date} history entry`, () => {
                 const expectedDocument = expected.getDocumentDeclaration(documentType, date);
                 if (expectedDocument.filters) {
                   it('has the proper number of filter functions', async () => {
@@ -153,22 +160,22 @@ describe('Services', () => {
     });
 
     context('when a service has no history', async () => {
-      describe('service_without_history', async () => {
+      describe('Service wihout history', async () => {
         await validateServiceWithHistory('service_without_history', expectedServices.service_without_history);
       });
     });
     context('when a service has only delcarations history', async () => {
-      describe('service_with_declaration_history', async () => {
+      describe('Service with declaration history', async () => {
         await validateServiceWithHistory('service_with_declaration_history', expectedServices.service_with_declaration_history);
       });
     });
     context('when a service has only filters history', async () => {
-      describe('service_with_filters_history', async () => {
+      describe('Service with filters history', async () => {
         await validateServiceWithHistory('service_with_filters_history', expectedServices.service_with_filters_history);
       });
     });
     context('when a service has both filters and delcarations histories', async () => {
-      describe('service_with_history', async () => {
+      describe('Service with history', async () => {
         await validateServiceWithHistory('service_with_history', expectedServices.service_with_history);
       });
     });
