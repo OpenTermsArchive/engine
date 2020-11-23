@@ -228,19 +228,7 @@ See [Ops Readme](ops/README.md).
 
 ### Exporting a dataset
 
-_NB: The content of a versions repo `CGUs-versions` must be in `./data/versions`._
-
-Export data to a folder named `gcus-dataset` (default):
-
-```
-npm run export
-```
-
-Export data to any folder (path is relative to the root of this repo)
-
-```
-npm run export -- --folder-name=/target/dir
-```
+See [`export` script Readme](scripts/export/README.md).
 
 - - -
 
