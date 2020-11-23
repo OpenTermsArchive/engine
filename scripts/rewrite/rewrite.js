@@ -24,9 +24,7 @@ let history;
   console.time('Total time');
   const init = process.argv.includes('--init');
 
-  const servicesRenamingRules = JSON.parse(await fs.readFile(path.resolve(__dirname, './rules/servicesRenaming.json')));
-  const documentTypesRenamingRules = JSON.parse(await fs.readFile(path.resolve(__dirname, './rules/documentTypeRenaming.json')));
-  const serviceDocumentTypesRenamingRules = JSON.parse(await fs.readFile(path.resolve(__dirname, './rules/serviceDocumentTypeRenaming.json')));
+  const renamingRules = await loadRenamingRules();
 
   const sourceRepo = new Git(SNAPSHOTS_SOURCE_PATH);
   const commits = (await sourceRepo.log([ '--stat=4096' ])).sort((a, b) => new Date(a.date) - new Date(b.date));
@@ -40,7 +38,7 @@ let history;
 
   history = await import(pathToFileURL(path.resolve(__dirname, '../..', 'src/app/history/index.js'))); // history module needs the target repo to be initiliazed. So loads it after target repo initialization.
 
-  const filteredCommits = commits.filter(({ message }) => (message.includes('Start tracking') || message.includes('Update')));
+  const filteredCommits = commits.filter(({ message }) => (message.match(/^(Start tracking|Update)/)));
 
   console.log(`Source repo contains ${commits.length} commits.\n`);
 
@@ -49,12 +47,13 @@ let history;
   const counters = {
     rewritten: 0,
     skippedNoChanges: 0,
-    skippedEmptyToSBack: 0,
     skippedEmptyContent: 0,
     skippedEmptyCommit: 0,
     skippedAlreadyTrackedByCGUs: 0,
   };
+
   /* eslint-disable no-await-in-loop */
+  /* eslint-disable no-continue */
   for (const commit of filteredCommits) {
     console.log(Date.now(), commit.hash, commit.date, commit.message);
 
@@ -67,64 +66,40 @@ let history;
     }
 
     const [{ file: relativeFilePath }] = commit.diff.files;
-    const absoluteFilePath = `${SNAPSHOTS_SOURCE_PATH}/${relativeFilePath}`;
 
-    const mimeType = mime.getType(absoluteFilePath);
-    const readFileOptions = {};
-    if (mimeType.startsWith('text/')) {
-      readFileOptions.encoding = 'utf8';
-    }
-    const content = await fs.readFile(absoluteFilePath, readFileOptions);
+    const { content, mimeType } = await loadFile(relativeFilePath);
 
-    const [ serviceId ] = relativeFilePath.split('/');
+    let serviceId = path.dirname(relativeFilePath);
     let documentType = path.basename(relativeFilePath, path.extname(relativeFilePath));
 
-    if (serviceDocumentTypesRenamingRules[serviceId] && serviceDocumentTypesRenamingRules[serviceId][documentType]) {
-      documentType = serviceDocumentTypesRenamingRules[serviceId][documentType];
-      console.log(`⌙ Specific rename document type "${documentType}" to "${serviceDocumentTypesRenamingRules[serviceId][documentType]}" of "${serviceId}" service`);
-    }
-
-    if (servicesRenamingRules[serviceId]) {
-      console.log(`⌙ Rename service "${serviceId}" to "${servicesRenamingRules[serviceId]}"`);
-    }
-
-    if (documentTypesRenamingRules[documentType]) {
-      console.log(`⌙ Rename document type "${documentType}" to "${documentTypesRenamingRules[documentType]}" of "${serviceId}" service`);
-    }
-
-    if (!content) {
+    if (!content || content == EMPTY_TOS_BACK_CONTENT) {
       console.log(`⌙ Skip empty document "${documentType}" of "${serviceId}" service`);
       counters.skippedEmptyContent++;
       continue;
     }
 
-    let extraChangelogContent;
-    if (isFromToSBack(commit.body)) {
+    const { renamedServiceId, renamedDocumentType } = applyRenamingRules(serviceId, documentType, renamingRules);
+    serviceId = renamedServiceId;
+    documentType = renamedDocumentType;
+
+    if (commit.body.includes('Imported from')) { // The commit is from ToSBack import
       if (alreadyTrackedByCGus[serviceId] && alreadyTrackedByCGus[serviceId][documentType]) { // When documents are tracked in parallel by ToSBack and CGUs, keep only the CGUs' one.
         console.log(`⌙ Skip already tracked by CGUs ToSBack document "${documentType}" of "${serviceId}" service`);
         counters.skippedAlreadyTrackedByCGUs++;
         continue;
       }
-
-      if (content == EMPTY_TOS_BACK_CONTENT) {
-        console.log(`⌙Skip empty ToSBack document "${documentType}" of "${serviceId}" service`);
-        counters.skippedEmptyToSBack++;
-        continue;
-      }
-
-      extraChangelogContent = commit.body;
     } else {
       alreadyTrackedByCGus[serviceId] = alreadyTrackedByCGus[serviceId] || {};
       alreadyTrackedByCGus[serviceId][documentType] = true;
     }
 
     const { id: snapshotId } = await history.recordSnapshot({
-      serviceId: servicesRenamingRules[serviceId] || serviceId,
-      documentType: documentTypesRenamingRules[documentType] || documentType,
+      serviceId,
+      documentType,
       content,
       mimeType,
       authorDate: commit.date,
-      extraChangelogContent,
+      extraChangelogContent: commit.body,
     });
 
     if (snapshotId) {
@@ -139,7 +114,6 @@ let history;
   console.log(`⌙ Commits rewritten: ${counters.rewritten}`);
   console.log(`⌙ Skipped not changed commits: ${counters.skippedNoChanges}`);
   console.log(`⌙ Skipped ToSBack commits already tracked by CGUs: ${counters.skippedAlreadyTrackedByCGUs}`);
-  console.log(`⌙ Skipped empty ToSBack commits: ${counters.skippedEmptyToSBack}`);
   console.log(`⌙ Skipped empty content commits: ${counters.skippedEmptyContent}`);
   console.log(`⌙ Skipped empty commits: ${counters.skippedEmptyCommit}\n`);
   console.timeEnd('Total time');
@@ -170,11 +144,54 @@ async function initTargetRepo(targetRepoPath) {
 
   await new Git(targetRepoPath).init();
   await new Git(targetRepoPath).initUser();
-  return new Git(targetRepoPath); // Resintanciation of the target repo after initialization is required to ensure configuration made in the Git class is properly done.
+  return new Git(targetRepoPath); // Re-intanciation of the target repo after initialization is required to ensure configuration made in the Git class is properly done.
 }
 
-function isFromToSBack(message) {
-  return message.includes('Imported from');
+async function loadRenamingRules() {
+  return {
+    services: JSON.parse(await fs.readFile(path.resolve(__dirname, './renamingRules/services.json'))),
+    documentTypes: JSON.parse(await fs.readFile(path.resolve(__dirname, './renamingRules/documentTypes.json'))),
+    servicesDocumentTypes: JSON.parse(await fs.readFile(path.resolve(__dirname, './renamingRules/servicesDocumentTypes.json'))),
+  };
+}
+
+async function loadFile(relativeFilePath) {
+  const absoluteFilePath = `${SNAPSHOTS_SOURCE_PATH}/${relativeFilePath}`;
+
+  const mimeType = mime.getType(absoluteFilePath);
+  const readFileOptions = {};
+  if (mimeType.startsWith('text/')) {
+    readFileOptions.encoding = 'utf8';
+  }
+  return {
+    content: await fs.readFile(absoluteFilePath, readFileOptions),
+    mimeType,
+  };
+}
+
+function applyRenamingRules(serviceId, documentType, renamingRules) {
+  const renamedServiceId = renamingRules.services[serviceId];
+  if (renamedServiceId) {
+    console.log(`⌙ Rename service "${serviceId}" to "${renamedServiceId}"`);
+    serviceId = renamedServiceId;
+  }
+
+  const renamedDocumentType = renamingRules.documentTypes[documentType];
+  if (renamedDocumentType) {
+    console.log(`⌙ Rename document type "${documentType}" to "${renamedDocumentType}" of "${serviceId}" service`);
+    documentType = renamedDocumentType;
+  }
+
+  const renamedServiceDocumentType = renamingRules.servicesDocumentTypes[serviceId] && renamingRules.servicesDocumentTypes[serviceId][documentType];
+  if (renamedServiceDocumentType) {
+    console.log(`⌙ Specific rename document type "${documentType}" to "${renamedServiceDocumentType}" of "${serviceId}" service`);
+    documentType = renamedServiceDocumentType;
+  }
+
+  return {
+    renamedServiceId: serviceId,
+    renamedDocumentType: documentType,
+  };
 }
 
 async function fileExists(filePath) {
