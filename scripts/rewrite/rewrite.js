@@ -143,7 +143,7 @@ async function initTargetRepo(targetRepoPath) {
   await fs.mkdir(targetRepoPath);
 
   await new Git(targetRepoPath).init();
-  await new Git(targetRepoPath).initUser();
+  await new Git(targetRepoPath).initConfig();
   return new Git(targetRepoPath); // Re-intanciation of the target repo after initialization is required to ensure configuration made in the Git class is properly done.
 }
 
