@@ -97,3 +97,4 @@ Currently, the script will:
 - Skip commits which do not change the document
 - Skip commits from ToSBack import with empty content body
 - Skip commits from ToSBack when CGUs already tracked the related document
+- Rename commits from ToSBack ASKfm to Ask.com
