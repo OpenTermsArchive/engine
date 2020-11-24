@@ -87,7 +87,7 @@ export async function loadWithHistory() {
             const currentlyValidFilters = filters[filterName].find(entry => !entry.validUntil);
             const validFilterForThisDate = filters[filterName].find(entry => new Date(date) <= new Date(entry.validUntil)) || currentlyValidFilters;
 
-            return validFilterForThisDate.fn;
+            return validFilterForThisDate.filter;
           });
         }
 
@@ -164,7 +164,7 @@ async function loadServiceHistoryFiles(serviceId) {
 
     Object.keys(serviceFilters).forEach(filterName => {
       serviceFiltersHistory[filterName] = serviceFiltersHistory[filterName] || [];
-      serviceFiltersHistory[filterName].push({ fn: serviceFilters[filterName] });
+      serviceFiltersHistory[filterName].push({ filter: serviceFilters[filterName] });
     });
   }
 

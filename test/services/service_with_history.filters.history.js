@@ -1,29 +1,29 @@
 export const removeSharesButton = [
   {
     validUntil: '2020-09-30T21:30:21.000Z',
-    fn: async () => 'second-removeSharesButton'
+    filter: async () => 'second-removeSharesButton'
   },
   {
     validUntil: '2020-08-22T11:30:21.000Z',
-    fn: async () => 'first-removeSharesButton'
+    filter: async () => 'first-removeSharesButton'
   },
   {
     validUntil: '2020-11-01T12:30:21.000Z',
-    fn: async () => 'third-removeSharesButton'
+    filter: async () => 'third-removeSharesButton'
   }
 ];
 
 export const removePrintButton = [
   {
     validUntil: '2020-09-29T21:30:21.000Z',
-    fn: async () => 'second-removePrintButton'
+    filter: async () => 'second-removePrintButton'
   },
   {
     validUntil: '2020-07-22T11:30:21.000Z',
-    fn: async () => 'first-removePrintButton'
+    filter: async () => 'first-removePrintButton'
   },
   {
     validUntil: '2020-10-20T12:30:21.000Z',
-    fn: async () => 'third-removePrintButton'
+    filter: async () => 'third-removePrintButton'
   }
 ];

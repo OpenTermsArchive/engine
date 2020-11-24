@@ -50,7 +50,7 @@ export async function filterHTML({ content, documentDeclaration }) {
         fetch: location,
         select: contentSelectors,
         remove: noiseSelectors,
-        filter: serviceSpecificFilters.map(fn => fn.name)
+        filter: serviceSpecificFilters.map(filter => filter.name)
       });
     } catch (error) {
       throw new InaccessibleContentError(`The filter function ${filterFunction} failed: ${error}`);
