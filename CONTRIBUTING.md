@@ -278,24 +278,24 @@ npm run validate:schema [$service_id [, $service_id …]]
 
 # Editing existing documents
 
-As services evolve, documents are also aim to change over time. The service provider can change the document's URL or the document's HTML structure, thus their fetch location, selectors or filters can change.
-CGUs needs to keep track of this changes to be able to regenerate versions history from snapshots history.
+As services evolve, document declarations are also expected to change over time. The service provider can change the document's URL or the document's HTML structure, thus their fetch location, selectors or filters can change.
+CGUs needs to keep track of this changes in order to regenerate versions history from snapshots history.
 
 ## Service history
 
-To keep track of services declarations and filters changes, CGUs has a versioning system. It is optional and should be added only when needed. It works by declaring specific history files for documents declarations and filters, where each entry should be a previous valid declaration or filter function and should have an expiration date.
+To keep track of services declarations and filters changes, CGUs offers a versioning system. It is optional and should be added only when needed. It works by creating history files for documents declarations and filters, where each entry should be a previous valid declaration or filter function and should have an expiry date.
 
-Both for documents and filters history, the expiration date is declared in a property `validUntil`. it should be the exact authored date of the last snapshot commit for which the declaration is still valid.
+Both for documents and filters history, the expiration date is declared in a property `validUntil`. It should be the authored date and time of the last snapshot commit for which the declaration is still valid.
 
-Documents declarations history files and filters history files can both evoluate on their own. Having  one does not implies to create the other.
+Documents declarations history files and filters history files can both evolve on their own. Having one does not imply to create the other.
 
-The current valid declaration has no date and should not appear in the history object.
+The current (latest) valid declaration has no date and should not appear in the history object: it stays in its own file, just like if there was no history at all.
 
 ### Document declaration history
 
-Documents history are declared in a service history declaration JSON file with the following name `services/<$service_id>.history.json`.
+Declarations history are stored in a history JSON file with the following name `services/$service_id.history.json`.
 
-The documents history contain an object with document types as properties. Each document type property is an array of history entries. Each entry has the same format as a normal document declaration, except there is the **mandatory** extra property `validUntil`.
+The document history contains an object with document types as properties. Each document type property is an array of history entries. Each entry has the same format as a normal document declaration, except there is the **mandatory** extra property `validUntil`.
 
 ```json
 {
@@ -314,7 +314,7 @@ The documents history contain an object with document types as properties. Each 
 }
 ```
 
-For example for adding an history entry for the `Terms of Service` of the service `ASKfm`, create the file `services/ASKfm.history.json` with the following:
+For example, to add a history entry for the `Terms of Service` of the service `ASKfm`, create the file `services/ASKfm.history.json` with the following contents:
 
 ```json
 {
@@ -331,20 +331,20 @@ For example for adding an history entry for the `Terms of Service` of the servic
 
 ### Filters history
 
-Filters history are declared in a filters history declaration JavaScript file with the following name `services/<$service_id>.filters.history.js`.
+Filters history is declared in a filters history declaration JavaScript file with the following name: `services/$service_id.filters.history.js`.
 
-For each filter, a variable named like the filter must be exported. This variable should contain an array of filter history entries. Each entry is an object with the expiration date, as `validUntil` property, and the valid functionfor this date, as `fn` property. Both properties are **mandatory**.
+For each filter, a variable named like the filter must be exported. This variable should contain an array of filter history entries. Each entry is an object with the expiration date, as `validUntil` property, and the valid function for this date, under the `fn` property. Both properties are **mandatory**.
 
 ```js
 export const <filterName> = [
   {
     validUntil: "The inclusive expiration date in ISO format",
-    fn: "function body valid until the expiration of the `validUntil` date"
+    fn: function() { /* body valid until the expiration of the `validUntil` date */ }
   }
 ];
 ```
 
-For example for adding an history entry for the `removeSharesButton` filter of the service `ASKfm`, create the file `services/ASKfm.filters.history.js` with the following:
+For example, to add a history entry for the `removeSharesButton` filter of the service `ASKfm`, create the file `services/ASKfm.filters.history.js` with the following content:
 
 ```js
 export const removeSharesButton = [
