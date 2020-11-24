@@ -283,7 +283,7 @@ CGUs needs to keep track of this changes to be able to regenerate versions histo
 
 ## Service history
 
-To keep track of services declarations and filters changes, CGUs has a versioning system. It is optional and should be added only when needed. It works by declaring a specific history files for documents declarations and filters, where each entry should be a previous valid declaration or filter and should have an expiration date.
+To keep track of services declarations and filters changes, CGUs has a versioning system. It is optional and should be added only when needed. It works by declaring specific history files for documents declarations and filters, where each entry should be a previous valid declaration or filter function and should have an expiration date.
 
 Both for documents and filters history, the expiration date is declared in a property `validUntil`. it should be the exact authored date of the last snapshot commit for which the declaration is still valid.
 
