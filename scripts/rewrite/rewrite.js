@@ -83,6 +83,17 @@ let history;
     documentType = renamedDocumentType;
 
     if (commit.body.includes('Imported from')) { // The commit is from ToSBack import
+      if (serviceId == 'ASKfm') { // ToSBack wrongly called Ask.com to ASKfm
+        serviceId = 'Ask.com';
+        console.log(`⌙ Rename ToSBack "ASKfm" to "${serviceId}" service`);
+      }
+
+      if (documentType == 'unknown') {
+        const [ filePath ] = commit.body.match(/\/tosdr\/tosback2\/[^\s]+/g); // Retrieve the document type from message body
+        documentType = decodeURI(path.basename(filePath, path.extname(filePath)));
+        console.log(`⌙ Rename "unknown" to "${documentType}" of "${serviceId}" service`);
+      }
+
       if (alreadyTrackedByCGus[serviceId] && alreadyTrackedByCGus[serviceId][documentType]) { // When documents are tracked in parallel by ToSBack and CGUs, keep only the CGUs' one.
         console.log(`⌙ Skip already tracked by CGUs ToSBack document "${documentType}" of "${serviceId}" service`);
         counters.skippedAlreadyTrackedByCGUs++;
