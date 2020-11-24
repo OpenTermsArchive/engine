@@ -2,6 +2,18 @@
 
 Les services en ligne ont des conditions générales qui évoluent dans le temps. _CGUs_ permet aux défenseurs des droits des utilisateurs, aux régulateurs et à toute personne intéressée de suivre les évolutions de ces conditions générales en étant notifiée à chaque publication d'une nouvelle version, et en explorant leur historique.
 
+## Table des matières
+
+* [Fonctionnement](#fonctionnement)
+* [Naviguer dans l'historique des versions](#naviguer-dans-lhistorique-des-versions)
+  * [Remarques](#remarques)
+* [Recevoir des notifications](#recevoir-des-notifications)
+  * [Par courriel](#par-courriel)
+    * [Recevoir les mises à jour de services ou documents spécifiques](#recevoir-les-mises-%C3%A0-jour-de-services-ou-documents-sp%C3%A9cifiques)
+  * [Par RSS](#par-rss)
+    * [Récapitulatif des flux RSS disponibles](#r%C3%A9capitulatif-des-flux-rss-disponibles)
+* [Contribuer](#contribuer)
+  * [Ajouter un nouveau service](#ajouter-un-nouveau-service)
 
 ## Fonctionnement
 

@@ -7,12 +7,10 @@ import config from 'config';
 import jsonSourceMap from 'json-source-map';
 import { fileURLToPath } from 'url';
 
-import { getModifiedServices } from '../../src/utils/index.js';
+import * as services from '../../src/app/services/index.js';
 import fetch from '../../src/app/fetcher/index.js';
 import filter from '../../src/app/filter/index.js';
-import loadServiceDeclarations from '../../src/app/loader/index.js';
 import serviceSchema from './service.schema.js';
-import { extractCssSelectorsFromDocumentDeclaration } from '../../src/app/utils/index.js';
 
 const fs = fsApi.promises;
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -28,10 +26,10 @@ const modifiedOnly = args.includes('--modified-only');
 let servicesToValidate = args.filter(arg => !arg.startsWith('--'));
 
 (async () => {
-  const serviceDeclarations = await loadServiceDeclarations(path.join(rootPath, config.get('serviceDeclarationsPath')));
+  const serviceDeclarations = await services.load();
 
   if (modifiedOnly) {
-    servicesToValidate = await getModifiedServices();
+    servicesToValidate = await services.getIdsOfModified();
   } else if (!servicesToValidate.length) {
     servicesToValidate = Object.keys(serviceDeclarations);
   }
@@ -52,7 +50,7 @@ let servicesToValidate = args.filter(arg => !arg.startsWith('--'));
         });
 
         if (!schemaOnly) {
-          Object.keys(service.documents).forEach(type => {
+          service.getDocumentTypes().forEach(type => {
             describe(type, () => {
               let content;
               let filteredContent;
@@ -61,11 +59,11 @@ let servicesToValidate = args.filter(arg => !arg.startsWith('--'));
               it('has fetchable URL', async function () {
                 this.timeout(30000);
 
-                const { fetch: location, executeClientScripts } = service.documents[type];
+                const { location, executeClientScripts } = service.getDocumentDeclaration(type);
                 const document = await fetch({
                   url: location,
                   executeClientScripts,
-                  cssSelectors: extractCssSelectorsFromDocumentDeclaration(service.documents[type])
+                  cssSelectors: service.getDocumentDeclaration(type).getCssSelectors()
                 });
                 content = document.content;
                 mimeType = document.mimeType;
@@ -80,7 +78,7 @@ let servicesToValidate = args.filter(arg => !arg.startsWith('--'));
 
                 filteredContent = await filter({
                   content,
-                  documentDeclaration: service.documents[type],
+                  documentDeclaration: service.getDocumentDeclaration(type),
                   filterFunctions: service.filters,
                   mimeType,
                 });
@@ -116,16 +114,16 @@ let servicesToValidate = args.filter(arg => !arg.startsWith('--'));
 
                   this.timeout(30000);
 
-                  const { fetch: location, executeClientScripts } = service.documents[type];
+                  const { location, executeClientScripts } = service.getDocumentDeclaration(type);
                   const document = await fetch({
                     url: location,
                     executeClientScripts,
-                    cssSelectors: extractCssSelectorsFromDocumentDeclaration(service.documents[type])
+                    cssSelectors: service.getDocumentDeclaration(type).getCssSelectors()
                   });
 
                   const secondFilteredContent = await filter({
                     content: document.content,
-                    documentDeclaration: service.documents[type],
+                    documentDeclaration: service.getDocumentDeclaration(type),
                     filterFunctions: service.filters,
                     mimeType: document.mimeType
                   });
