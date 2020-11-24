@@ -333,13 +333,13 @@ For example, to add a history entry for the `Terms of Service` of the service `A
 
 Filters history is declared in a filters history declaration JavaScript file with the following name: `services/$service_id.filters.history.js`.
 
-For each filter, a variable named like the filter must be exported. This variable should contain an array of filter history entries. Each entry is an object with the expiration date, as `validUntil` property, and the valid function for this date, under the `fn` property. Both properties are **mandatory**.
+For each filter, a variable named like the filter must be exported. This variable should contain an array of filter history entries. Each entry is an object with the expiration date, as `validUntil` property, and the valid function for this date, under the `filter` property. Both properties are **mandatory**.
 
 ```js
 export const <filterName> = [
   {
     validUntil: "The inclusive expiration date in ISO format",
-    fn: function() { /* body valid until the expiration of the `validUntil` date */ }
+    filter: function() { /* body valid until the expiration of the `validUntil` date */ }
   }
 ];
 ```
@@ -350,7 +350,7 @@ For example, to add a history entry for the `removeSharesButton` filter of the s
 export const removeSharesButton = [
   {
     validUntil: '2020-08-22T11:30:21.000Z',
-    fn: async (document) => { document.querySelectorAll('.shares').forEach(element => element.remove()) }
+    filter: async (document) => { document.querySelectorAll('.shares').forEach(element => element.remove()) }
   }
 ];
 ```
