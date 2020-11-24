@@ -22,11 +22,14 @@ const EMPTY_TOS_BACK_CONTENT = `<!DOCTYPE html><html><head></head><body>
 let history;
 (async function () {
   console.time('Total time');
+  console.log('Start rewritting history.');
   const init = process.argv.includes('--init');
 
   const renamingRules = await loadRenamingRules();
 
   const sourceRepo = new Git(SNAPSHOTS_SOURCE_PATH);
+
+  console.log('Waiting for git log… (this can take a while)');
   const commits = (await sourceRepo.log([ '--stat=4096' ])).sort((a, b) => new Date(a.date) - new Date(b.date));
 
   if (init) {
