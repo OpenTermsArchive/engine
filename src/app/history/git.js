@@ -15,12 +15,30 @@ export default class Git {
     return this.git.init();
   }
 
+  async initConfig() {
+    return this.git
+      .addConfig('user.name', config.get('history.author').name)
+      .addConfig('user.email', config.get('history.author').email)
+      .addConfig('core.autocrlf', false);
+  }
+
   async add(filepath) {
     return this.git.add(this.relativePath(filepath));
   }
 
-  async commit(filepath, message) {
-    const summary = await this.git.commit(message, this.relativePath(filepath), { '--author': `${config.get('history.author').name} <${config.get('history.author').email}>` });
+  async commit(filepath, message, authorDate) {
+    const options = {
+      '--author': `${config.get('history.author').name} <${config.get('history.author').email}>`,
+    };
+    if (authorDate) {
+      options['--date'] = new Date(authorDate).toISOString();
+    }
+    let summary;
+    if (filepath) {
+      summary = await this.git.commit(message, this.relativePath(filepath), options);
+    } else {
+      summary = await this.git.commit(message, options);
+    }
     return summary.commit.replace('HEAD ', '').replace('(root-commit) ', '');
   }
 
