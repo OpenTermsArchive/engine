@@ -1,0 +1,15 @@
+{
+  "Terms of Service": [
+    {
+      "fetch": "https://www.service-with-declaration-history.example/tos",
+      "select": "main",
+      "filter": [ "removeSharesButton" ],
+      "validUntil": "2020-09-30T21:30:21.000Z"
+    },
+    {
+      "fetch": "https://www.service-with-declaration-history.example/tos",
+      "select": "body",
+      "validUntil": "2020-08-22T21:30:21.000Z"
+    }
+  ]
+}

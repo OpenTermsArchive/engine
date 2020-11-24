@@ -3,7 +3,7 @@ import scheduler from 'node-schedule';
 import CGUs from './app/index.js';
 import logger from './logger/index.js';
 import Notifier from './notifier/index.js';
-import { getModifiedServices } from './utils/index.js';
+import * as services from './app/services/index.js';
 
 const args = process.argv.slice(2);
 const modifiedOnly = args.includes('--modified-only');
@@ -18,7 +18,7 @@ const schedule = args.includes('--schedule');
   let serviceIds = args.filter(arg => !arg.startsWith('--'));
 
   if (modifiedOnly) {
-    serviceIds = await getModifiedServices();
+    serviceIds = await services.getIdsOfModified();
   }
 
   serviceIds = serviceIds.filter(serviceId => {
@@ -37,7 +37,7 @@ const schedule = args.includes('--schedule');
 
   serviceIds = serviceIds.length ? serviceIds : app.serviceIds;
 
-  const numberOfDocuments = serviceIds.reduce((acc, serviceId) => acc + Object.keys(app.serviceDeclarations[serviceId].documents).length, 0);
+  const numberOfDocuments = serviceIds.reduce((acc, serviceId) => acc + app.serviceDeclarations[serviceId].getNumberOfDocuments(), 0);
 
   logger.info(`Refiltering ${numberOfDocuments} documents from ${serviceIds.length} services…`);
   await app.refilterAndRecord(serviceIds);

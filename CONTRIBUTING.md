@@ -1,5 +1,28 @@
 First of all, thanks for taking the time to contribute! 🎉👍
 
+## Table of Contents
+
+* [Tracking new documents](#tracking-new-documents)
+  * [Declaring a new service](#declaring-a-new-service)
+    * [Service name](#service-name)
+    * [Service ID](#service-id)
+    * [Service declaration](#service-declaration)
+  * [Declaring documents](#declaring-documents)
+    * [fetch](#fetch)
+    * [executeClientScripts](#executeclientscripts)
+    * [select](#select)
+      * [Range selectors](#range-selectors)
+    * [remove](#remove)
+    * [filter](#filter)
+    * [Document type](#document-type)
+      * [Defining a new document type](#defining-a-new-document-type)
+  * [Testing your declaration](#testing-your-declaration)
+* [Editing existing documents](#editing-existing-documents)
+  * [History](#history)
+    * [Declaration history](#declaration-history)
+    * [Filters history](#filters-history)
+  * [Refiltering your documents](#refiltering-your-documents)
+
 # Tracking new documents
 
 Tracking documents is done by _declaring_ them and the service they are associated with. Such a declaration is achieved by editing JSON files in the [`services`](./services) folder.
@@ -255,7 +278,86 @@ npm run validate:schema [$service_id [, $service_id …]]
 
 # Editing existing documents
 
-If you change filters or selectors and want to refilter documents from snapshots and regenerate versions only:
+As services evolve, document declarations are also expected to change over time. The service provider can change the document's URL or the document's HTML structure, thus their fetch location, selectors or filters can change.
+CGUs needs to keep track of this changes in order to regenerate versions history from snapshots history.
+
+## Service history
+
+To keep track of services declarations and filters changes, CGUs offers a versioning system. It is optional and should be added only when needed. It works by creating history files for documents declarations and filters, where each entry should be a previous valid declaration or filter function and should have an expiry date.
+
+Both for documents and filters history, the expiration date is declared in a property `validUntil`. It should be the authored date and time of the last snapshot commit for which the declaration is still valid.
+
+Documents declarations history files and filters history files can both evolve on their own. Having one does not imply to create the other.
+
+The current (latest) valid declaration has no date and should not appear in the history object: it stays in its own file, just like if there was no history at all.
+
+### Document declaration history
+
+Declarations history are stored in a history JSON file with the following name `services/$service_id.history.json`.
+
+The document history contains an object with document types as properties. Each document type property is an array of history entries. Each entry has the same format as a normal document declaration, except there is the **mandatory** extra property `validUntil`.
+
+```json
+{
+  …
+  "<document type>": [
+    {
+      "fetch": "The URL where the document can be found",
+      "executeClientScripts": "A boolean to execute client-side JavaScript loaded by the document before accessing the content, in case the DOM modifications are needed to access the content; defaults to false (fetch HTML only)",
+      "filter": "An array of service specific filter function names",
+      "remove": "A CSS selector, a range selector or an array of selectors that target the noise parts of the document that has to be removed. Useful to remove parts that are inside the selected parts",
+      "select": "A CSS selector, a range selector or an array of selectors that target the meaningful parts of the document, excluding elements such as headers, footers and navigation",
+      "validUntil": "The inclusive expiration date in ISO format"
+    }
+  ]
+  …
+}
+```
+
+For example, to add a history entry for the `Terms of Service` of the service `ASKfm`, create the file `services/ASKfm.history.json` with the following contents:
+
+```json
+{
+  "Terms of Service": [
+    {
+      "fetch": "https://ask.fm/docs/terms_of_use/?lang=en",
+      "select": "body",
+      "filter": [ "add" ],
+      "validUntil": "2020-10-29T21:30:00.000Z"
+    }
+  ]
+}
+```
+
+### Filters history
+
+Filters history is declared in a filters history declaration JavaScript file with the following name: `services/$service_id.filters.history.js`.
+
+For each filter, a variable named like the filter must be exported. This variable should contain an array of filter history entries. Each entry is an object with the expiration date, as `validUntil` property, and the valid function for this date, under the `filter` property. Both properties are **mandatory**.
+
+```js
+export const <filterName> = [
+  {
+    validUntil: "The inclusive expiration date in ISO format",
+    filter: function() { /* body valid until the expiration of the `validUntil` date */ }
+  }
+];
+```
+
+For example, to add a history entry for the `removeSharesButton` filter of the service `ASKfm`, create the file `services/ASKfm.filters.history.js` with the following content:
+
+```js
+export const removeSharesButton = [
+  {
+    validUntil: '2020-08-22T11:30:21.000Z',
+    filter: async (document) => { document.querySelectorAll('.shares').forEach(element => element.remove()) }
+  }
+];
+```
+
+## Refiltering your documents
+
+If you change filters or selectors and want to re-apply them on previously fetched documents from snapshots and regenerate versions only:
 
 ```
 npm run refilter [$service_id]

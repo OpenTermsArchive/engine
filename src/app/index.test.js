@@ -30,6 +30,8 @@ describe('CGUs', () => {
   let serviceBSnapshotExpectedContent;
   let serviceBVersionExpectedContent;
 
+  const serviceIds = [ 'service_A', 'service_B' ];
+
   before(async () => {
     serviceASnapshotExpectedContent = await fs.readFile(path.resolve(__dirname, '../../test/fixtures/service_A_terms_snapshot.html'), { encoding: 'utf8' });
     serviceAVersionExpectedContent = await fs.readFile(path.resolve(__dirname, '../../test/fixtures/service_A_terms.md'), { encoding: 'utf8' });
@@ -47,7 +49,7 @@ describe('CGUs', () => {
     });
 
     context('When everything works fine', () => {
-      before(async () => app.trackChanges(app.serviceIds));
+      before(async () => app.trackChanges(serviceIds));
 
       after(resetGitRepository);
 
@@ -77,7 +79,7 @@ describe('CGUs', () => {
         // as there is no more HTTP request mocks for service A, it should throw an `ENOTFOUND` error which is consiedred as an expected error in our workflow
         nock.cleanAll();
         nock('https://www.serviceb.example').get('/privacy').reply(200, serviceBSnapshotExpectedContent, { 'Content-Type': 'application/pdf' });
-        await app.trackChanges(app.serviceIds);
+        await app.trackChanges(serviceIds);
       });
 
       after(resetGitRepository);
@@ -116,7 +118,7 @@ describe('CGUs', () => {
           nock('https://www.serviceb.example').get('/privacy').reply(200, serviceBSnapshotExpectedContent, { 'Content-Type': 'application/pdf' });
           const app = new CGUs();
           await app.init();
-          await app.trackChanges(app.serviceIds);
+          await app.trackChanges(serviceIds);
 
           const [ originalSnapshotCommit ] = await gitSnapshot().log({ file: SERVICE_A_EXPECTED_SNAPSHOT_FILE_PATH });
           originalSnapshotId = originalSnapshotCommit.hash;
@@ -126,9 +128,9 @@ describe('CGUs', () => {
 
           serviceBCommits = await gitVersion().log({ file: SERVICE_B_EXPECTED_VERSION_FILE_PATH });
 
-          app.serviceDeclarations[SERVICE_A_ID].documents[SERVICE_A_TYPE].select = 'h1';
+          app.serviceDeclarations[SERVICE_A_ID].getDocumentDeclaration(SERVICE_A_TYPE).contentSelectors = 'h1';
 
-          await app.refilterAndRecord(app.serviceIds);
+          await app.refilterAndRecord([ 'service_A', 'service_B' ]);
 
           const [ refilterVersionCommit ] = await gitVersion().log({ file: SERVICE_A_EXPECTED_VERSION_FILE_PATH });
           refilterVersionId = refilterVersionCommit.hash;
@@ -169,14 +171,14 @@ describe('CGUs', () => {
           nock('https://www.serviceb.example').get('/privacy').reply(200, serviceBSnapshotExpectedContent, { 'Content-Type': 'application/pdf' });
           const app = new CGUs();
           await app.init();
-          await app.trackChanges(app.serviceIds);
+          await app.trackChanges(serviceIds);
 
-          app.serviceDeclarations[SERVICE_A_ID].documents[SERVICE_A_TYPE].select = 'inexistant-selector';
+          app.serviceDeclarations[SERVICE_A_ID].getDocumentDeclaration(SERVICE_A_TYPE).contentSelectors = 'inexistant-selector';
           inaccessibleContentSpy = sinon.spy();
           versionNotChangedSpy = sinon.spy();
           app.on('inaccessibleContent', inaccessibleContentSpy);
           app.on('versionNotChanged', versionNotChangedSpy);
-          await app.refilterAndRecord(app.serviceIds);
+          await app.refilterAndRecord(serviceIds);
         });
 
         after(resetGitRepository);
@@ -220,15 +222,12 @@ describe('CGUs', () => {
         app.on(event, spies[handlerName]);
       });
 
-      documentADeclaration = {
-        type: SERVICE_A_TYPE,
-        ...app.serviceDeclarations[SERVICE_A_ID].documents[SERVICE_A_TYPE]
-      };
+      documentADeclaration = app.serviceDeclarations[SERVICE_A_ID].getDocumentDeclaration(SERVICE_A_TYPE);
     });
 
     describe('#recordSnapshot', () => {
       context('When it is the first record', () => {
-        before(async () => app.recordSnapshot({ content: 'document content', serviceId: SERVICE_A_ID, type: SERVICE_A_TYPE }));
+        before(async () => app.recordSnapshot({ content: 'document content', documentDeclaration: documentADeclaration }));
 
         after(() => {
           resetSpiesHistory();
@@ -245,9 +244,9 @@ describe('CGUs', () => {
       context('When it is not the first record', () => {
         context('When there are changes', () => {
           before(async () => {
-            await app.recordSnapshot({ content: 'document content', serviceId: SERVICE_A_ID, type: SERVICE_A_TYPE });
+            await app.recordSnapshot({ content: 'document content', documentDeclaration: documentADeclaration });
             resetSpiesHistory();
-            await app.recordSnapshot({ content: 'document content modified', serviceId: SERVICE_A_ID, type: SERVICE_A_TYPE });
+            await app.recordSnapshot({ content: 'document content modified', documentDeclaration: documentADeclaration });
           });
 
           after(() => {
@@ -264,9 +263,9 @@ describe('CGUs', () => {
 
         context('When there are no changes', () => {
           before(async () => {
-            await app.recordSnapshot({ content: 'document content', serviceId: SERVICE_A_ID, type: SERVICE_A_TYPE });
+            await app.recordSnapshot({ content: 'document content', documentDeclaration: documentADeclaration });
             resetSpiesHistory();
-            await app.recordSnapshot({ content: 'document content', serviceId: SERVICE_A_ID, type: SERVICE_A_TYPE });
+            await app.recordSnapshot({ content: 'document content', documentDeclaration: documentADeclaration });
           });
 
           after(() => {
@@ -285,7 +284,7 @@ describe('CGUs', () => {
 
     describe('#recordVersion', () => {
       context('When it is the first record', () => {
-        before(async () => app.recordVersion({ snapshotContent: serviceASnapshotExpectedContent, snapshotId: 'sha', serviceId: SERVICE_A_ID, documentDeclaration: documentADeclaration }));
+        before(async () => app.recordVersion({ snapshotContent: serviceASnapshotExpectedContent, snapshotId: 'sha', documentDeclaration: documentADeclaration }));
 
         after(() => {
           resetSpiesHistory();
@@ -302,9 +301,9 @@ describe('CGUs', () => {
       context('When it is not the first record', () => {
         context('When there are changes', () => {
           before(async () => {
-            await app.recordVersion({ snapshotContent: serviceASnapshotExpectedContent, snapshotId: 'sha', serviceId: SERVICE_A_ID, documentDeclaration: documentADeclaration });
+            await app.recordVersion({ snapshotContent: serviceASnapshotExpectedContent, snapshotId: 'sha', documentDeclaration: documentADeclaration });
             resetSpiesHistory();
-            await app.recordVersion({ snapshotContent: serviceBSnapshotExpectedContent, snapshotId: 'sha', serviceId: SERVICE_A_ID, documentDeclaration: documentADeclaration });
+            await app.recordVersion({ snapshotContent: serviceBSnapshotExpectedContent, snapshotId: 'sha', documentDeclaration: documentADeclaration });
           });
 
           after(() => {
@@ -321,9 +320,9 @@ describe('CGUs', () => {
 
         context('When there are no changes', () => {
           before(async () => {
-            await app.recordVersion({ snapshotContent: serviceASnapshotExpectedContent, snapshotId: 'sha', serviceId: SERVICE_A_ID, documentDeclaration: documentADeclaration });
+            await app.recordVersion({ snapshotContent: serviceASnapshotExpectedContent, snapshotId: 'sha', documentDeclaration: documentADeclaration });
             resetSpiesHistory();
-            await app.recordVersion({ snapshotContent: serviceASnapshotExpectedContent, snapshotId: 'sha', serviceId: SERVICE_A_ID, documentDeclaration: documentADeclaration });
+            await app.recordVersion({ snapshotContent: serviceASnapshotExpectedContent, snapshotId: 'sha', documentDeclaration: documentADeclaration });
           });
 
           after(() => {
@@ -345,7 +344,7 @@ describe('CGUs', () => {
         nock('https://www.servicea.example').get('/tos').reply(200, serviceASnapshotExpectedContent, { 'Content-Type': 'text/html' });
         nock('https://www.serviceb.example').get('/privacy').reply(200, serviceBSnapshotExpectedContent, { 'Content-Type': 'application/pdf' });
 
-        return app.trackChanges(app.serviceIds);
+        return app.trackChanges(serviceIds);
       });
 
       after(() => {
@@ -374,13 +373,13 @@ describe('CGUs', () => {
           nock('https://www.servicea.example').get('/tos').reply(200, serviceASnapshotExpectedContent, { 'Content-Type': 'text/html' });
           nock('https://www.serviceb.example').get('/privacy').reply(200, serviceBSnapshotExpectedContent, { 'Content-Type': 'application/pdf' });
 
-          await app.trackChanges(app.serviceIds);
+          await app.trackChanges(serviceIds);
 
           nock('https://www.servicea.example').get('/tos').reply(200, serviceASnapshotExpectedContent, { 'Content-Type': 'text/html' });
           nock('https://www.serviceb.example').get('/privacy').reply(200, serviceBSnapshotExpectedContent, { 'Content-Type': 'application/pdf' });
 
           resetSpiesHistory();
-          return app.trackChanges(app.serviceIds);
+          return app.trackChanges(serviceIds);
         });
 
         after(() => {
@@ -408,13 +407,13 @@ describe('CGUs', () => {
           nock('https://www.servicea.example').get('/tos').reply(200, serviceASnapshotExpectedContent, { 'Content-Type': 'text/html' });
           nock('https://www.serviceb.example').get('/privacy').reply(200, serviceBSnapshotExpectedContent, { 'Content-Type': 'application/pdf' });
 
-          await app.trackChanges(app.serviceIds);
+          await app.trackChanges(serviceIds);
 
           nock('https://www.servicea.example').get('/tos').reply(200, serviceBSnapshotExpectedContent, { 'Content-Type': 'text/html' });
           nock('https://www.serviceb.example').get('/privacy').reply(200, serviceBSnapshotExpectedContent, { 'Content-Type': 'application/pdf' });
 
           resetSpiesHistory();
-          await app.trackChanges(app.serviceIds);
+          await app.trackChanges(serviceIds);
         });
 
         after(() => {
