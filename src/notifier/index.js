@@ -51,6 +51,69 @@ export default class Notifier {
   }
 
   // eslint-disable-next-line class-methods-use-this
+  getWords(str) {
+    return {
+      words: str.toLowerCase().replace(/<[^>]*>/g, '').split(/\s+/).map(str => str.replace(/[^a-z0-9]/g, '')),
+      sourceMap: {}
+    };
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  wordsLineUp(quoteWords, paragraphWords) {
+    let quotePointer = 0;
+    let paragraphPointer = 0;
+    do {
+      if (paragraphPointer >= paragraphWords.length) {
+        return false;
+      }
+      if (quoteWords[quotePointer] === paragraphWords[paragraphPointer]) {
+        // console.log('in step', quotePointer, paragraphPointer, quoteWords[quotePointer]);
+        quotePointer++;
+        paragraphPointer++;
+      } else if ((quotePointer + 1 < quoteWords.length) && (quoteWords[quotePointer + 1] === paragraphWords[paragraphPointer])) {
+        // console.log('skipping in quote', quotePointer, paragraphPointer, quoteWords[quotePointer], quoteWords[quotePointer + 1]);
+        quotePointer += 2;
+        paragraphPointer++;
+      } else if ((paragraphPointer + 1 < paragraphWords.length) && (quoteWords[quotePointer] === paragraphWords[paragraphPointer + 1])) {
+        // console.log('skipping in paragraph', quotePointer, paragraphPointer, paragraphWords[paragraphPointer], quoteWords[quotePointer]);
+        quotePointer++;
+        paragraphPointer += 2;
+      } else if ((quotePointer + 1 < quoteWords.length) && (paragraphPointer + 1 < paragraphWords.length) && (quoteWords[quotePointer + 1] === paragraphWords[paragraphPointer + 1])) {
+        // console.log('skipping in both', quotePointer, paragraphPointer, quoteWords[quotePointer], quoteWords[quotePointer + 1], paragraphWords[paragraphPointer], paragraphWords[paragraphPointer + 1]);
+        quotePointer += 2;
+        paragraphPointer += 2;
+      } else {
+        // console.log('fork', quotePointer, paragraphPointer, quoteWords[quotePointer], quoteWords[quotePointer + 1], paragraphWords[paragraphPointer], paragraphWords[paragraphPointer + 1]);
+        return false;
+      }
+    } while (quotePointer < quoteWords.length);
+    return paragraphPointer;
+  }
+
+  findQuote(quoteWords, documentWords) {
+    // console.log('Finding quote', quoteWords);
+    let searchStart = 0;
+    let startWord;
+    do {
+      startWord = documentWords.indexOf(quoteWords[0], searchStart);
+      const endWordInParagraph = this.wordsLineUp(quoteWords, documentWords.slice(startWord));
+      if (endWordInParagraph !== false) {
+        // console.log('Found', quoteWords[0], startWord);
+        return {
+          startWord,
+          endWordInParagraph
+        };
+      }
+      searchStart = startWord + 1;
+    } while (startWord !== -1);
+    // throw new Error('quote not found!');
+    return {
+      startWord: false,
+      endWordInParagraph: false
+    };
+  }
+
+  // eslint-disable-next-line class-methods-use-this
   async saveToEditTosdrOrg({ content, documentDeclaration, snapshotId }) {
     try {
       console.log('saving to edit.tosdr.org', documentDeclaration, snapshotId);
@@ -68,42 +131,17 @@ export default class Notifier {
       const pointsAffected = await this.psqlClient.query(queryTemplate,
         [ documentDeclaration.fetch ]);
       console.log(pointsAffected);
-      const documentWords = content.split(' ').map(str => str.trim());
-      await Promise.all(pointsAffected.rows.forEach(row => {
-        const existingWords = row.quoteText.split(' ').map(str => str.trim());
-        // See https://github.com/tosdr/tosback-crawler/issues/6#issuecomment-731179847
-        let unfound = 0;
-        let startWord = 0;
-        let documentPointer;
-        for (let i = 0; i < existingWords.length; i++) {
-          const index = documentWords.indexOf(existingWords[i], startWord);
-          console.log('looking for word', i, existingWords[i], startWord, index, documentWords.length);
-          if (index === -1) {
-            console.log('unfound word', existingWords[i]);
-            unfound++;
-            if (unfound > 2) {
-              return false;
-            }
-            break;
-          } else {
-            unfound = 0;
-          }
-          if (startWord === -1) {
-            startWord = index;
-            documentPointer = index;
-          } else if (index === -1) {
-            unfound++;
-            if (unfound > 2) {
-              return false;
-            }
-          } else if (index - documentPointer > 2) {
-            console.log('startWord failed', startWord, index, documentPointer);
-            startWord = -1;
-          }
-        }
-        console.log('found', startWord, documentPointer);
-        return true;
-      }));
+      const { words, sourceMap } = this.getWords(content);
+      pointsAffected.rows.forEach(row => {
+        const { startWord, endWordInParagraph } = this.findQuote(this.getWords(row.quoteText).words, words);
+        console.log({
+          quoteText: row.quoteText,
+          quoteStartWord: startWord,
+          quoteEndWord: startWord + endWordInParagraph,
+          quoteStart: sourceMap[startWord],
+          quoteEnd: sourceMap[startWord + endWordInParagraph]
+        });
+      });
       console.log('Done saving to edit.tosdr.org');
     } catch (e) {
       console.error(e);

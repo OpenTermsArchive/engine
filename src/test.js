@@ -15,3 +15,5 @@ async function run() {
 
 // ...
 run();
+
+// console.log(notifier.getWords(content));
