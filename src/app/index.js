@@ -47,8 +47,9 @@ export default class CGUs extends events.EventEmitter {
   }
 
   initQueues() {
-    this.trackDocumentChangesQueue = async.queue(async document => this.trackDocumentChanges(document),
-      MAX_PARALLEL_DOCUMENTS_TRACKS);
+    this.trackDocumentChangesQueue = async.queue(async document => this.trackDocumentChanges(document).catch(err => {
+      console.error('Error tracking document changes!', document, err);
+    }), MAX_PARALLEL_DOCUMENTS_TRACKS);
     this.refilterDocumentsQueue = async.queue(async document => this.refilterAndRecordDocument(document),
       MAX_PARALLEL_REFILTERS);
 
