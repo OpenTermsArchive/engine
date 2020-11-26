@@ -1,0 +1,25 @@
+{
+  "Privacy Policy": [
+    {
+      "fetch": "https://www.airbnb.co.uk/help/article/2855/privacy-policy",
+      "select": "#site-content",
+      "remove": "._3mlrvv, ._12t7zck",
+      "validUntil": "2020-10-30T16:30:08.000Z"
+    }
+  ],
+  "Terms of Service": [
+    {
+      "fetch": "https://www.airbnb.co.uk/terms",
+      "select": "div.col-sm-12",
+      "validUntil": "2020-10-30T16:30:08.000Z"
+    }
+  ],
+  "Trackers Policy": [
+    {
+      "fetch": "https://www.airbnb.co.uk/help/article/2866/airbnb-cookie-policy",
+      "select": "#site-content",
+      "remove":"._12t7zck",
+      "validUntil": "2020-10-30T16:30:08.000Z"
+    }
+  ]
+}
