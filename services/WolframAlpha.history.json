@@ -1,0 +1,16 @@
+{
+  "Terms of Service": [
+    {
+      "fetch": "https://www.wolframalpha.com/termsofuse/",
+      "select": "body",
+      "validUntil": "2020-11-09T17:30:03.000Z"
+    }
+  ],
+  "Parent Organization Privacy Policy": [
+    {
+      "fetch": "https://www.wolfram.com/legal/privacy/wolfram/",
+      "select": "body",
+      "validUntil": "2020-11-09T17:30:03.000Z"
+    }
+  ]
+}

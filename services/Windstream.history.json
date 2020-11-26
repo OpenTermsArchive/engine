@@ -1,0 +1,16 @@
+{
+  "Terms of Service": [
+    {
+      "fetch": "https://www.windstream.com/about/legal/Terms-and-Conditions",
+      "select": "body",
+      "validUntil": "2020-11-09T17:30:03.000Z"
+    }
+  ],
+  "Privacy Policy": [
+    {
+      "fetch": "https://www.windstream.com/about/legal/Privacy-Policy",
+      "select": "body",
+      "validUntil": "2020-11-09T17:30:03.000Z"
+    }
+  ]
+}

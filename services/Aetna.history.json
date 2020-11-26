@@ -1,0 +1,9 @@
+{
+  "Privacy Policy": [
+    {
+      "fetch": "https://www.aetna.com/legal-notices/privacy/web-privacy.html",
+      "select": "body",
+      "validUntil": "2020-11-09T17:30:03.000Z"
+    }
+  ]
+}
