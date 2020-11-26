@@ -1,0 +1,17 @@
+{
+  "name": "Vanco Payment Solutions",
+  "importedFrom": "https://github.com/tosdr/tosback2/blob/f762cd4bbb2571272985fed009201a23300ba9b2/rules/veracitypayments.com.xml",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://www.vancopayments.com/terms-and-conditions",
+      "select": {
+        "startAfter": "#section-1",
+        "endBefore": "#section-2"
+      }
+    },
+    "Privacy Policy": {
+      "fetch": "https://www.vancopayments.com/privacy",
+      "select": ".body-container"
+    }
+  }
+}
