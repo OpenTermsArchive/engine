@@ -17,20 +17,22 @@ export default class Notifier {
   // mysqlConnected;
   // psqlConnected;
   constructor() {
-    // this.mysqlConnection = mysql.createConnection({
-    //   host: process.env.MYSQL_HOST,
-    //   user: process.env.MYSQL_USER,
-    //   password: process.env.MYSQL_PASSWORD,
-    //   database: process.env.MYSQL_DATABASE
-    // });
-    this.psqlClient = new Client({
-      connectionString: process.env.PSQL_CONNECTION_STRING,
-      ssl: {
-        rejectUnauthorized: false
-        // key: fs.readFileSync('.env/postgresql.key').toString(),
-        // cert: fs.readFileSync('.env/postgresql.cert').toString()
-      }
+    this.mysqlConnection = mysql.createConnection({
+      host: process.env.MYSQL_HOST,
+      user: process.env.MYSQL_USER,
+      password: process.env.MYSQL_PASSWORD,
+      database: process.env.MYSQL_DATABASE
     });
+    if (process.env.PSQL_CONNECTION_STRING) {
+      this.psqlClient = new Client({
+        connectionString: process.env.PSQL_CONNECTION_STRING,
+        ssl: {
+          rejectUnauthorized: false
+          // key: fs.readFileSync('.env/postgresql.key').toString(),
+          // cert: fs.readFileSync('.env/postgresql.cert').toString()
+        }
+      });
+    }
 
     this.mysqlConnected = false;
     this.psqlConnected = false;
@@ -154,11 +156,14 @@ export default class Notifier {
       this.mysqlConnected = true;
     }
     await new Promise((resolve, reject) => {
-      this.mysqlConnection.query('INSERT INTO notifications (site, name, created_at, updated_at, diff_url) VALUES (?, ?, now(), now(), ?)', [
+      const queryStr = 'INSERT INTO notifications (site, name, created_at, updated_at, diff_url) VALUES (?, ?, now(), now(), ?)';
+      const queryParams = [
         serviceId,
         type,
         versionId
-      ], (err, result, fields) => {
+      ];
+      console.log({ queryStr, queryParams });
+      this.mysqlConnection.query(queryStr, queryParams, (err, result, fields) => {
         if (err) {
           console.log('mysql query fail', err);
           reject(err);
