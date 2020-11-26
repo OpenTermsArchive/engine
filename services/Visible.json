@@ -4,11 +4,11 @@
   "documents": {
     "Privacy Policy": {
       "fetch": "https://www.visible.com/legal/privacy",
-      "select": "div[class*=\"legal\"]"
+      "select": "#privacypolicy"
     },
     "Terms of Service": {
       "fetch": "https://www.visible.com/legal/terms-and-conditions",
-      "select": "div[class*=\"legal\"]"
+      "select": "#main_content"
     }
   }
 }
