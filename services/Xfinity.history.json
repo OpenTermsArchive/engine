@@ -1,0 +1,23 @@
+{
+  "Terms of Service": [
+    {
+      "fetch": "http://my.xfinity.com/terms/web/",
+      "select": "body",
+      "validUntil": "2020-11-09T17:30:03.000Z"
+    }
+  ],
+  "Privacy Policy": [
+    {
+      "fetch": "https://www.xfinity.com/privacy/policy",
+      "select": "body",
+      "validUntil": "2020-11-09T17:30:03.000Z"
+    }
+  ],
+  "Acceptable Use Policy": [
+    {
+      "fetch": "https://www.xfinity.com/Corporate/Customers/Policies/HighSpeedInternetAUP",
+      "select": "body",
+      "validUntil": "2020-11-09T17:30:03.000Z"
+    }
+  ]
+}
