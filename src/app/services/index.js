@@ -31,6 +31,7 @@ export async function load() {
       const {
         filter: filterNames,
         fetch: location,
+        executeClientScripts,
         select: contentSelectors,
         remove: noiseSelectors
       } = serviceDeclaration.documents[documentType];
@@ -46,6 +47,7 @@ export async function load() {
         service,
         type: documentType,
         location,
+        executeClientScripts,
         contentSelectors,
         noiseSelectors,
         filters,
