@@ -39,6 +39,8 @@ let serviceIds = args.filter(arg => !arg.startsWith('--'));
     return;
   }
 
+  app.attach(new Notifier(app.serviceDeclarations));
+
   if (!schedule) {
     logger.info(`Start tracking changes of ${numberOfDocuments} documents from ${serviceIds.length} services…`);
     await app.trackChanges(serviceIds);
@@ -47,8 +49,6 @@ let serviceIds = args.filter(arg => !arg.startsWith('--'));
 
   const rule = new scheduler.RecurrenceRule();
   rule.minute = 30; // at minute 30 past every hour.
-
-  app.attach(new Notifier(app.serviceDeclarations));
 
   logger.info('The scheduler is running…');
   logger.info(`Documents will be tracked at minute ${rule.minute} past every hour.`);
