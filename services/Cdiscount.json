@@ -1,17 +1,17 @@
 {
-    "name": "Cdiscount",
-    "documents": {
-        "Commercial Terms": {
-            "fetch": "https://clients.cdiscount.com/simple/cgv.aspx",
-            "select": ".acDes"
-        },
-        "Terms of Service": {
-            "fetch": "https://i2.cdscdn.com/resources/imagesok/cgu/mkp/cgu_acheteurs_mp_cdiscount.pdf"
-        },
-        "Trackers Policy": {
-            "fetch": "https://www.cdiscount.com/vie-privee-et-cookies.html",
-            "executeClientScripts": true,
-            "select": "#scContent"
-        }
+  "name": "Cdiscount",
+  "documents": {
+    "Commercial Terms": {
+      "fetch": "https://clients.cdiscount.com/simple/cgv.aspx",
+      "select": ".acDes"
+    },
+    "Terms of Service": {
+      "fetch": "https://i2.cdscdn.com/resources/imagesok/cgu/mkp/cgu_acheteurs_mp_cdiscount.pdf"
+    },
+    "Trackers Policy": {
+      "fetch": "https://www.cdiscount.com/vie-privee-et-cookies.html",
+      "executeClientScripts": true,
+      "select": "#scContent"
     }
+  }
 }
