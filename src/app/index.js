@@ -195,11 +195,11 @@ export default class CGUs extends events.EventEmitter {
     if (!this.notifier) {
       this.notifier = new Notifier();
     }
-    await this.notifier.saveToEditTosdrOrg({
-      content: document,
-      documentDeclaration,
-      snapshotId
-    });
+    // await this.notifier.saveToEditTosdrOrg({
+    //   content: document,
+    //   documentDeclaration,
+    //   snapshotId
+    // });
   }
 
   async publish() {
