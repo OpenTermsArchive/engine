@@ -160,7 +160,7 @@ export default class Notifier {
       const queryParams = [
         serviceId,
         type,
-        versionId
+        `https://github.com/tosdr/tosback-versions/commit/${versionId}`
       ];
       console.log({ queryStr, queryParams });
       this.mysqlConnection.query(queryStr, queryParams, (err, result, fields) => {
