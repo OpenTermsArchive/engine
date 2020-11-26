@@ -192,9 +192,11 @@ export default class CGUs extends events.EventEmitter {
 
     this.emit(isFirstRecord ? 'firstVersionRecorded' : 'versionRecorded', serviceId, type, versionId);
 
-    if (!this.notifier) {
-      this.notifier = new Notifier();
-    }
+    // FIXME use the notifier from https://github.com/tosdr/tosback-crawler/blob/master/src/index.js#L42
+    // for this too:
+    // if (!this.notifier) {
+    //   this.notifier = new Notifier();
+    // }
     // await this.notifier.saveToEditTosdrOrg({
     //   content: document,
     //   documentDeclaration,
