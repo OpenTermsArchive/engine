@@ -1,5 +1,4 @@
 import scheduler from 'node-schedule';
-import { ConsoleTransportOptions } from 'winston/lib/winston/transports';
 
 import CGUs from './app/index.js';
 import logger from './logger/index.js';
