@@ -1,4 +1,5 @@
 import scheduler from 'node-schedule';
+import { ConsoleTransportOptions } from 'winston/lib/winston/transports';
 
 import CGUs from './app/index.js';
 import logger from './logger/index.js';
@@ -26,6 +27,13 @@ let serviceIds = args.filter(arg => !arg.startsWith('--'));
   serviceIds = serviceIds.length ? serviceIds : app.serviceIds;
 
   const numberOfDocuments = serviceIds.reduce((acc, serviceId) => acc + Object.keys(app.serviceDeclarations[serviceId].documents).length, 0);
+
+  if (process.env.EXIT_AFTER) {
+    setTimeout(() => {
+      console.log('EXIT_AFTER', process.env.EXIT_AFTER);
+      process.exit(0);
+    }, process.env.EXIT_AFTER);
+  }
 
   if (process.env.SKIP_REFILTER) {
     logger.info('Skipping refilter');
