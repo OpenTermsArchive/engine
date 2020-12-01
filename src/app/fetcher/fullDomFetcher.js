@@ -8,7 +8,7 @@ export default async function fetch(url, cssSelectors) {
   let content;
   let browser;
   let page;
-  const selector = Array.isArray(cssSelectors) ? cssSelectors.join(', ') : cssSelectors;
+  const selectors = [].concat(cssSelectors);
 
   try {
     browser = await puppeteer.launch();
@@ -21,7 +21,7 @@ export default async function fetch(url, cssSelectors) {
       throw new InaccessibleContentError(`Received HTTP code ${statusCode} when trying to fetch '${url}'`);
     }
 
-    await page.waitForSelector(selector, { timeout: config.get('fetcher.waitForElementsTimeout') });
+    await Promise.all(selectors.map(selector => page.waitForSelector(selector, { timeout: config.get('fetcher.waitForElementsTimeout') })));
 
     content = await page.content();
   } catch (error) {
