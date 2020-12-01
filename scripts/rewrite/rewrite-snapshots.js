@@ -48,7 +48,6 @@ let history;
     rewritten: 0,
     skippedNoChanges: 0,
     skippedEmptyContent: 0,
-    skippedEmptyCommit: 0,
     skippedAlreadyTrackedByCGUs: 0,
   };
 
@@ -58,12 +57,6 @@ let history;
     console.log(Date.now(), commit.hash, commit.date, commit.message);
 
     await sourceRepo.checkout(commit.hash);
-
-    if (!commit.diff) {
-      console.log('⌙ Skip empty commit');
-      counters.skippedEmptyCommit++;
-      continue;
-    }
 
     const [{ file: relativeFilePath }] = commit.diff.files;
 
