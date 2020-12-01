@@ -97,6 +97,7 @@ export async function loadWithHistory() {
           service: services[serviceId],
           type: documentType,
           location: declarationForThisDate.fetch,
+          executeClientScripts: declarationForThisDate.executeClientScripts,
           contentSelectors: declarationForThisDate.select,
           noiseSelectors: declarationForThisDate.remove,
           filters: actualFilters,
