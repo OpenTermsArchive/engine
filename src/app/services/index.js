@@ -195,7 +195,7 @@ export async function getIdsOfModified() {
   ];
 
   return modifiedFiles
-    .filter(fileName => fileName.match(/services.*\.json/))
+    .filter(fileName => fileName.match(/services.*\.json/) && !fileName.includes('.history.json'))
     .map(filePath => path.basename(filePath, '.json'));
 }
 
