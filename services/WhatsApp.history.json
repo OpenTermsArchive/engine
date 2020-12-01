@@ -1,0 +1,16 @@
+{
+  "Terms of Service": [
+    {
+      "fetch": "https://www.whatsapp.com/legal?eea=1",
+      "select": "div._-pj:nth-child(3)",
+      "validUntil": "2020-10-23T15:31:00+00:00"
+    }
+  ],
+  "Privacy Policy": [
+    {
+      "fetch": "https://www.whatsapp.com/legal?eea=1",
+      "select": "div._-pj:nth-child(4)",
+      "validUntil": "2020-10-23T15:31:00+00:00"
+    }
+  ]
+}
