@@ -8,7 +8,7 @@
     },
     "Vulnerability Disclosure Policy": {
       "fetch": "https://www.asus.com/Static_WebPage/ASUS-Product-Security-Advisory/",
-      "select": "#main-zone > div > div:nth-of-type(2)"
+      "select": "#member-page-content"
     },
     "Terms of Service": {
       "fetch": "https://www.asus.com/Terms_of_Use_Notice_Privacy_Policy/Official-Site",
