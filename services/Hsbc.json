@@ -1,10 +1,14 @@
 {
-  "name": "Hsbc",
+  "name": "HSBC",
   "importedFrom": "https://github.com/tosdr/tosback2/blob/f762cd4bbb2571272985fed009201a23300ba9b2/rules/hsbc.com.xml",
   "documents": {
     "Privacy Policy": {
-      "fetch": "http://www.hsbc.com/1/2/terms-and-conditions",
-      "select": "body"
+      "fetch": "https://www.hsbc.com/privacy-notice",
+      "select": ""
+    },
+    "Terms of Service": {
+      "fetch": "https://www.hsbc.com/terms-and-conditions",
+      "select": ""
     }
   }
 }
