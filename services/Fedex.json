@@ -1,10 +1,14 @@
 {
-  "name": "Fedex",
+  "name": "FedEx",
   "importedFrom": "https://github.com/tosdr/tosback2/blob/f762cd4bbb2571272985fed009201a23300ba9b2/rules/fedex.com.xml",
   "documents": {
     "Privacy Policy": {
-      "fetch": "http://www.fedex.com/us/security/privacy-policy.html",
+      "fetch": "https://www.fedex.com/en-fr/privacy-policy.html",
       "select": "body"
+    },
+    "Terms of Service": {
+      "fetch": "https://www.fedex.com/en-fr/terms-of-use.html",
+      "select": ""
     }
   }
 }
