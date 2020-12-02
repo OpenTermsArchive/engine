@@ -3,11 +3,11 @@
   "importedFrom": "https://github.com/tosdr/tosback2/blob/f762cd4bbb2571272985fed009201a23300ba9b2/rules/microsoft.com.xml",
   "documents": {
     "Terms of Service": {
-      "fetch": "https://www.microsoft.com/en-us/legal/intellectualproperty/copyright/default.aspx",
-      "select": "section#primaryArea"
+      "fetch": "https://www.microsoft.com/en-gb/servicesagreement/",
+      "select": ""
     },
     "Privacy Policy": {
-      "fetch": "https://privacy.microsoft.com/en-us/privacystatement",
+      "fetch": "https://privacy.microsoft.com/en-gb/privacystatement",
       "select": "div[style=\"background-color:white\"] > div"
     }
   }
