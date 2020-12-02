@@ -1,14 +1,18 @@
 {
-  "name": "Github",
+  "name": "GitHub",
   "importedFrom": "https://github.com/tosdr/tosback2/blob/f762cd4bbb2571272985fed009201a23300ba9b2/rules/github.com.xml",
   "documents": {
     "Privacy Policy": {
-      "fetch": "https://help.github.com/en/articles/github-privacy-statement",
+      "fetch": "https://docs.github.com/en/free-pro-team@latest/github/site-policy/github-privacy-statement",
       "select": "main"
     },
     "Terms of Service": {
-      "fetch": "https://help.github.com/en/articles/github-terms-of-service",
-      "select": "main"
+      "fetch": "https://docs.github.com/en/free-pro-team@latest/github/site-policy/github-terms-of-service",
+      "select": ""
+    },
+    "Copyright Claims Policy": {
+      "fetch": "https://docs.github.com/en/free-pro-team@latest/github/site-policy/dmca-takedown-policy",
+      "select": ""
     }
   }
 }
