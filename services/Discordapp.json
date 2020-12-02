@@ -1,9 +1,13 @@
 {
-  "name": "Discordapp",
+  "name": "Discord",
   "importedFrom": "https://github.com/tosdr/tosback2/blob/f762cd4bbb2571272985fed009201a23300ba9b2/rules/discordapp.com.xml",
   "documents": {
+    "Privacy Policy": {
+      "fetch": "https://discord.com/privacy",
+      "select": ""
+    },
     "Terms of Service": {
-      "fetch": "https://discordapp.com/terms",
+      "fetch": "https://discord.com/terms",
       "select": "body"
     }
   }
