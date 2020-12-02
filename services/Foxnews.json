@@ -1,5 +1,5 @@
 {
-  "name": "Foxnews",
+  "name": "Fox News",
   "importedFrom": "https://github.com/tosdr/tosback2/blob/f762cd4bbb2571272985fed009201a23300ba9b2/rules/foxnews.com.xml",
   "documents": {
     "Closed Captioning Policy": {
@@ -8,11 +8,11 @@
     },
     "Privacy Policy": {
       "fetch": "https://www.foxnews.com/privacy-policy",
-      "select": "section.privacy-policy"
+      "select": ""
     },
     "Terms of Service": {
-      "fetch": "http://www.foxnews.com/terms-use.html",
-      "select": "section.terms-of-use"
+      "fetch": "https://www.foxnews.com/terms-of-use",
+      "select": ""
     }
   }
 }
