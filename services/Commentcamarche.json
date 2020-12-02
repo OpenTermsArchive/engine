@@ -1,10 +1,14 @@
 {
-  "name": "Commentcamarche",
+  "name": "CommentÇaMarche",
   "importedFrom": "https://github.com/tosdr/tosback2/blob/f762cd4bbb2571272985fed009201a23300ba9b2/rules/commentcamarche.net.xml",
   "documents": {
     "Privacy Policy": {
-      "fetch": "http://www.commentcamarche.net/contents/ccmguide/cgu-conditions-generales.php3",
+      "fetch": "https://ccm.net/contents/957-processing-of-personal-data-ccm",
       "select": "body"
+    },
+    "Terms of Service": {
+      "fetch": "https://ccm.net/contents/953-general-terms-and-conditions-of-use",
+      "select": ""
     }
   }
 }
