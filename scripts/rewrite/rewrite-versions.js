@@ -18,6 +18,13 @@ export const VERSIONS_TARGET_PATH = path.resolve(__dirname, '../../', config.get
 
 const initialize = process.argv.includes('--init');
 
+const COUNTERS = {
+  rewritten: 0,
+  skippedNoChanges: 0,
+  skippedInaccessibleContent: 0,
+  skippedUnknownError: 0
+};
+
 let history;
 (async () => {
   console.time('Total time');
@@ -41,13 +48,6 @@ let history;
   await history.init();
 
   const filteredCommits = commits.filter(({ message }) => (message.match(/^(Start tracking|Update)/)));
-
-  const counters = {
-    rewritten: 0,
-    skippedNoChanges: 0,
-    skippedInaccessibleContent: 0,
-    skippedUnknownError: 0
-  };
 
   /* eslint-disable no-await-in-loop */
   /* eslint-disable no-continue */
@@ -100,34 +100,34 @@ let history;
       });
 
       if (versionId) {
-        counters.rewritten++;
+        COUNTERS.rewritten++;
       } else {
-        counters.skippedNoChanges++;
+        COUNTERS.skippedNoChanges++;
       }
     } catch (error) {
       if (error instanceof InaccessibleContentError) {
         console.log('⌙ Skip inacessible content');
-        counters.skippedInaccessibleContent++;
+        COUNTERS.skippedInaccessibleContent++;
       } else {
         console.log('⌙ Unknown error:', error);
-        counters.skippedUnknownError++;
+        COUNTERS.skippedUnknownError++;
       }
     }
   }
 
-  const totalTreatedCommits = Object.values(counters).reduce((acc, value) => acc + value, 0);
+  const totalTreatedCommits = Object.values(COUNTERS).reduce((acc, value) => acc + value, 0);
   console.log(`\nCommits treated: ${totalTreatedCommits} on ${filteredCommits.length}`);
-  console.log(`⌙ Commits rewritten: ${counters.rewritten}`);
-  console.log(`⌙ Skipped not changed commits: ${counters.skippedNoChanges}`);
-  console.log(`⌙ Skipped inacessible content: ${counters.skippedInaccessibleContent}`);
-  console.log(`⌙ Skipped unknown error: ${counters.skippedUnknownError}`);
+  console.log(`⌙ Commits rewritten: ${COUNTERS.rewritten}`);
+  console.log(`⌙ Skipped not changed commits: ${COUNTERS.skippedNoChanges}`);
+  console.log(`⌙ Skipped inacessible content: ${COUNTERS.skippedInaccessibleContent}`);
+  console.log(`⌙ Skipped unknown error: ${COUNTERS.skippedUnknownError}`);
   console.timeEnd('Total time');
 
   if (totalTreatedCommits != filteredCommits.length) {
     console.error('\n⚠ WARNING: Total treated commits does not match the total number of commits to be treated! ⚠');
   }
 
-  if (counters.skippedUnknownError) {
+  if (COUNTERS.skippedUnknownError) {
     console.error('\n⚠ WARNING: Some unknown errors occured, check log! ⚠');
   }
 })();
