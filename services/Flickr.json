@@ -11,7 +11,7 @@
     },
     "Community Guidelines": {
       "fetch": "http://www.flickr.com/help/guidelines/",
-      "select": "div#content"
+      "select": ".help-page-container"
     }
   }
 }
