@@ -3,7 +3,7 @@ import fsApi from 'fs';
 import chai from 'chai';
 
 import { resetGitRepository, gitSnapshot, gitVersion } from '../../../test/helper.js';
-import { SNAPSHOTS_PATH, VERSIONS_PATH, recordSnapshot, recordVersion, recordRefilter } from './index.js';
+import { SNAPSHOTS_PATH, VERSIONS_PATH, init, recordSnapshot, recordVersion, recordRefilter } from './index.js';
 
 const fs = fsApi.promises;
 const { expect } = chai;
@@ -11,6 +11,10 @@ const { expect } = chai;
 describe('History', () => {
   const SERVICE_ID = 'test_service';
   const TYPE = 'Terms of Service';
+
+  before(async () => {
+    await init();
+  });
 
   describe('#recordSnapshot', () => {
     const FILE_CONTENT = '<html><h1>ToS fixture data with UTF-8 çhãràčtęrs</h1></html>';

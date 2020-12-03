@@ -32,6 +32,7 @@ let history;
   }
 
   history = await import(pathToFileURL(path.resolve(__dirname, '../..', 'src/app/history/index.js'))); // history module needs the target repo to be initiliazed. So loads it after target repo initialization.
+  await history.init();
 
   const filteredCommits = commits.filter(({ message }) => (message.match(/^(Start tracking|Update)/)));
 

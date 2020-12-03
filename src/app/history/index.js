@@ -13,8 +13,16 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 export const SNAPSHOTS_PATH = path.resolve(__dirname, '../../..', config.get('history.snapshotsPath'));
 export const VERSIONS_PATH = path.resolve(__dirname, '../../..', config.get('history.versionsPath'));
 
-const snapshotRecorder = new Recorder({ path: SNAPSHOTS_PATH, fileExtension: 'html' });
-const versionRecorder = new Recorder({ path: VERSIONS_PATH, fileExtension: 'md' });
+let snapshotRecorder;
+let versionRecorder;
+
+export async function init() {
+  snapshotRecorder = new Recorder({ path: SNAPSHOTS_PATH, fileExtension: 'html' });
+  await snapshotRecorder.init();
+
+  versionRecorder = new Recorder({ path: VERSIONS_PATH, fileExtension: 'md' });
+  await versionRecorder.init();
+}
 
 export async function recordSnapshot({ serviceId, documentType, content, mimeType, authorDate, extraChangelogContent }) {
   const isFirstRecord = !await snapshotRecorder.isTracked(serviceId, documentType);
