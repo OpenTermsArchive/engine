@@ -4,11 +4,23 @@
   "documents": {
     "Privacy Policy": {
       "fetch": "https://privacy.microsoft.com/en-gb/privacystatement",
-      "select": "div.div_content"
+      "filter": [
+        "removeIrrelevantModulesFromPrivacyPolicy",
+        "removeNavigationHeaders",
+        "removeModuleIDs",
+        "removeInvisibleText"
+      ],
+      "select": "h1, #psp_last_updated, .header_content .Description, .div_content"
     },
     "Terms of Service": {
       "fetch": "https://www.microsoft.com/en-gb/servicesagreement/",
-      "select": ""
+      "filter": [
+        "removeIrrelevantModulesFromTos",
+        "removeNavigationHeaders",
+        "removeModuleIDs",
+        "removeInvisibleText"
+      ],
+      "select": ".pageIntro, .div_content"
     }
   }
 }
