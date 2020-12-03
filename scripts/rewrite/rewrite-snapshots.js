@@ -6,7 +6,7 @@ import config from 'config';
 import Git from '../../src/app/history/git.js';
 import { loadFile } from './utils.js';
 import * as renamer from './renamer/index.js';
-import * as initier from './initializer/index.js';
+import * as initializer from './initializer/index.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -28,7 +28,7 @@ let history;
   if (process.argv.includes('--init')) {
     const targetRepo = await initier.initTargetRepo(SNAPSHOTS_TARGET_PATH);
     const [ readmeCommit ] = commits;
-    await initier.initReadmeAndLicense(targetRepo, SNAPSHOTS_TARGET_PATH, readmeCommit.date);
+    await initializer.initReadmeAndLicense(targetRepo, SNAPSHOTS_TARGET_PATH, readmeCommit.date);
   }
 
   history = await import(pathToFileURL(path.resolve(__dirname, '../..', 'src/app/history/index.js'))); // history module needs the target repo to be initiliazed. So loads it after target repo initialization.
