@@ -13,8 +13,9 @@ import { InaccessibleContentError } from '../../src/app/errors.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-export const SNAPSHOTS_SOURCE_PATH = path.resolve(__dirname, '../../', config.get('rewrite.snapshotsSourcePath'));
-export const VERSIONS_TARGET_PATH = path.resolve(__dirname, '../../', config.get('history.versionsPath'));
+const ROOT_PATH = path.resolve(__dirname, '../../');
+export const SNAPSHOTS_SOURCE_PATH = path.resolve(ROOT_PATH, config.get('rewrite.snapshotsSourcePath'));
+export const VERSIONS_TARGET_PATH = path.resolve(ROOT_PATH, config.get('history.versionsPath'));
 
 const initialize = process.argv.includes('--init');
 
@@ -44,7 +45,7 @@ let history;
     await initializer.initReadmeAndLicense(targetRepo, VERSIONS_TARGET_PATH, readmeCommit.date);
   }
 
-  history = await import(pathToFileURL(path.resolve(__dirname, '../..', 'src/app/history/index.js'))); // history module needs the target repo to be initiliazed. So loads it after target repo initialization.
+  history = await import(pathToFileURL(path.resolve(ROOT_PATH, 'src/app/history/index.js'))); // history module needs the target repo to be initiliazed. So loads it after target repo initialization.
   await history.init();
 
   const filteredCommits = commits.filter(({ message }) => (message.match(/^(Start tracking|Update)/)));
