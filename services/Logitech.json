@@ -4,11 +4,11 @@
   "documents": {
     "Privacy Policy": {
       "fetch": "https://www.logitech.com/en-gb/legal/web-privacy-policy.html",
-      "select": ""
+      "select": "#maincontent .page"
     },
     "Terms of Service": {
       "fetch": "https://www.logitech.com/en-gb/footer/terms-of-use/&id=13177",
-      "select": ""
+      "select": ".col-md-8.col-sm-7.col-xs-12.single-column"
     }
   }
 }
