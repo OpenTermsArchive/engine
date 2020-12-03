@@ -4,11 +4,11 @@
   "documents": {
     "Privacy Policy": {
       "fetch": "http://www.imdb.com/privacy",
-      "select": "div#pagecontent"
+      "select": "div#main"
     },
     "Terms of Service": {
       "fetch": "https://www.imdb.com/conditions",
-      "select": ""
+      "select": "div#main"
     }
   }
 }
