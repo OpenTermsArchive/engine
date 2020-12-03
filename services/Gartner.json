@@ -4,11 +4,11 @@
   "documents": {
     "Privacy Policy": {
       "fetch": "https://www.gartner.com/en/about/policies/privacy",
-      "select": ""
+      "select": ".col-lg-9.col-md-9.col-sm-12.col-xs-12"
     },
     "Terms of Service": {
       "fetch": "https://www.gartner.com/en/about/policies/terms-of-use",
-      "select": ""
+      "select": ".col-lg-9.col-md-9.col-sm-12.col-xs-12"
     }
   }
 }
