@@ -4,11 +4,11 @@
   "documents": {
     "Privacy Policy": {
       "fetch": "https://www.hsbc.com/privacy-notice",
-      "select": ""
+      "select": ".sublayout.article-sublayout"
     },
     "Terms of Service": {
       "fetch": "https://www.hsbc.com/terms-and-conditions",
-      "select": ""
+      "select": ".sublayout.article-sublayout"
     }
   }
 }
