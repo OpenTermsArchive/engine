@@ -4,11 +4,12 @@
   "documents": {
     "Privacy Policy": {
       "fetch": "https://www.ibm.com/be-en/privacy?lnk=flg-priv-been",
-      "select": "div#ibm-content-main"
+      "select": "div#ibm-content-main",
+      "remove": ".ibm-ind-link, .ibm-forward-link, .ibm-anchor-up-link, .ibm-rule.ibm-alternate.ibm-gray-30 + h2"
     },
     "Terms of Service": {
       "fetch": "https://www.ibm.com/be-en/legal?lnk=flg-tous-be-en",
-      "select": "div#ibm-content-main"
+      "select": "div#ibm-content-main > .node__content> div:first-child"
     }
   }
 }
