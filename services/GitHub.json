@@ -4,15 +4,15 @@
   "documents": {
     "Privacy Policy": {
       "fetch": "https://docs.github.com/en/free-pro-team@latest/github/site-policy/github-privacy-statement",
-      "select": "main"
+      "select": "div#article-contents"
     },
     "Terms of Service": {
       "fetch": "https://docs.github.com/en/free-pro-team@latest/github/site-policy/github-terms-of-service",
-      "select": ""
+      "select": "div#article-contents"
     },
     "Copyright Claims Policy": {
       "fetch": "https://docs.github.com/en/free-pro-team@latest/github/site-policy/dmca-takedown-policy",
-      "select": ""
+      "select": "div#article-contents"
     }
   }
 }
