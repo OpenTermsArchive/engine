@@ -73,7 +73,6 @@ let history;
 
     const documentDeclaration = servicesDeclarations[serviceId].getDocumentDeclaration(documentType, commit.date);
 
-
     if (!documentDeclaration) {
       console.log(`⌙ Skip unknown document type "${documentType}" for service "${serviceId}"`);
       continue;
