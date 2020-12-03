@@ -35,7 +35,7 @@ export function applyRules(serviceId, documentType) {
   }
 
   return {
-    renamedServiceId: serviceId,
-    renamedDocumentType: documentType,
+    serviceId,
+    documentType,
   };
 }

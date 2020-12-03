@@ -57,9 +57,7 @@ let history;
     let serviceId = path.dirname(relativeFilePath);
     let documentType = path.basename(relativeFilePath, path.extname(relativeFilePath));
 
-    const { renamedServiceId, renamedDocumentType } = renamer.applyRules(serviceId, documentType);
-    serviceId = renamedServiceId;
-    documentType = renamedDocumentType;
+    ({ serviceId, documentType } = renamer.applyRules(serviceId, documentType));
 
     const { id: snapshotId } = await history.recordSnapshot({
       serviceId,
