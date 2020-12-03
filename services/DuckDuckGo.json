@@ -4,7 +4,7 @@
   "documents": {
     "Privacy Policy": {
       "fetch": "https://duckduckgo.com/privacy",
-      "select": "div#content_wrapper"
+      "select": "div.blk--content"
     }
   }
 }
