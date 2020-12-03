@@ -4,11 +4,13 @@
   "documents": {
     "Privacy Policy": {
       "fetch": "https://help.disqus.com/en/articles/1717103-disqus-privacy-policy",
-      "select": "article"
+      "select": ".article",
+      "remove": ".article__meta"
     },
     "Terms of Service": {
       "fetch": "https://help.disqus.com/en/articles/1717102-terms-of-service",
-      "select": "article"
+      "select": ".article",
+      "remove": ".article__meta"
     }
   }
 }
