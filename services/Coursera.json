@@ -4,7 +4,8 @@
   "documents": {
     "Privacy Policy": {
       "fetch": "https://www.coursera.org/about/privacy",
-      "select": "div.coursera-tos"
+      "select": "div.coursera-tos",
+      "remove": "ul:first-of-type"
     },
     "Terms of Service": {
       "fetch": "https://www.coursera.org/about/terms",
