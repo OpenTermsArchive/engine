@@ -4,15 +4,15 @@
   "documents": {
     "Privacy Policy": {
       "fetch": "https://about.gitlab.com/privacy/",
-      "select": "div.container.txt-lefty"
+      "select": ".col-sm-9.col-md-9"
     },
     "Vulnerability Disclosure Policy": {
       "fetch": "https://about.gitlab.com/security/",
-      "select": "div.wrapper"
+      "select": ".container.md-page"
     },
     "Terms of Service": {
       "fetch": "https://about.gitlab.com/terms/",
-      "select": "div.col-sm-9.col-md-9"
+      "select": ".col-sm-9.col-md-9"
     }
   }
 }
