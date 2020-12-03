@@ -15,6 +15,11 @@ export const SNAPSHOTS_TARGET_PATH = path.resolve(__dirname, '../../', config.ge
 
 const initialize = process.argv.includes('--init');
 
+const COUNTERS = {
+  rewritten: 0,
+  skippedNoChanges: 0
+};
+
 let history;
 (async () => {
   console.time('Total time');
@@ -37,11 +42,6 @@ let history;
   await history.init();
 
   const filteredCommits = commits.filter(({ message }) => (message.match(/^(Start tracking|Update)/)));
-
-  const counters = {
-    rewritten: 0,
-    skippedNoChanges: 0
-  };
 
   /* eslint-disable no-await-in-loop */
   /* eslint-disable no-continue */
@@ -71,16 +71,16 @@ let history;
     });
 
     if (snapshotId) {
-      counters.rewritten++;
+      COUNTERS.rewritten++;
     } else {
-      counters.skippedNoChanges++;
+      COUNTERS.skippedNoChanges++;
     }
   }
 
-  const totalTreatedCommits = Object.values(counters).reduce((acc, value) => acc + value, 0);
+  const totalTreatedCommits = Object.values(COUNTERS).reduce((acc, value) => acc + value, 0);
   console.log(`\nCommits treated: ${totalTreatedCommits} on ${filteredCommits.length}`);
-  console.log(`⌙ Commits rewritten: ${counters.rewritten}`);
-  console.log(`⌙ Skipped not changed commits: ${counters.skippedNoChanges}`);
+  console.log(`⌙ Commits rewritten: ${COUNTERS.rewritten}`);
+  console.log(`⌙ Skipped not changed commits: ${COUNTERS.skippedNoChanges}`);
   console.timeEnd('Total time');
 
   if (totalTreatedCommits != filteredCommits.length) {
