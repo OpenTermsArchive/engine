@@ -18,7 +18,7 @@ let history;
   console.time('Total time');
   console.log('Start rewritting history.');
 
-  const renamingRules = await renamer.loadRules();
+  await renamer.loadRules();
   const sourceRepo = new Git(SNAPSHOTS_SOURCE_PATH);
 
   console.log('Waiting for git log… (this can take a while)');
@@ -54,7 +54,7 @@ let history;
     let serviceId = path.dirname(relativeFilePath);
     let documentType = path.basename(relativeFilePath, path.extname(relativeFilePath));
 
-    const { renamedServiceId, renamedDocumentType } = renamer.applyRules(serviceId, documentType, renamingRules);
+    const { renamedServiceId, renamedDocumentType } = renamer.applyRules(serviceId, documentType);
     serviceId = renamedServiceId;
     documentType = renamedDocumentType;
 
