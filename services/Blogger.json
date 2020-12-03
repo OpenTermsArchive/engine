@@ -4,11 +4,20 @@
   "documents": {
     "Privacy Policy": {
       "fetch": "https://policies.google.com/privacy?hl=en-GB",
-      "select": "div[role=\"article\"]"
+      "filter": [
+        "removeUTMfromUrls"
+      ],
+      "select": "div[role=article]",
+      "remove": ".KMMDve, .TL2alc, .aYyAOe, img[src$='.svg'], img[src^='data:image/svg+xml']"
     },
     "Terms of Service": {
-      "fetch": "https://policies.google.com/u/0/terms?hl=en-GB",
-      "select": "div[role=\"article\"]"
+      "fetch": "https://policies.google.com/terms?hl=en-GB",
+      "filter": [
+        "removeUTMfromUrls",
+        "removeCountryVersion"
+      ],
+      "select": "div[role=article]",
+      "remove": ".bVzSHe + p, .RwC1f, img[src$='.svg'], img[src^='data:image/svg+xml']"
     }
   }
 }
