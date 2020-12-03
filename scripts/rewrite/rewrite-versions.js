@@ -16,6 +16,8 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 export const SNAPSHOTS_SOURCE_PATH = path.resolve(__dirname, '../../', config.get('rewrite.snapshotsSourcePath'));
 export const VERSIONS_TARGET_PATH = path.resolve(__dirname, '../../', config.get('history.versionsPath'));
 
+const initialize = process.argv.includes('--init');
+
 let history;
 (async () => {
   console.time('Total time');
@@ -29,8 +31,8 @@ let history;
   const commits = (await sourceRepo.log([ '--stat=4096' ])).sort((a, b) => new Date(a.date) - new Date(b.date));
   console.log(`Source repo contains ${commits.length} commits.\n`);
 
-  if (process.argv.includes('--init')) {
-    const targetRepo = await initier.initTargetRepo(VERSIONS_TARGET_PATH);
+  if (initialize) {
+    const targetRepo = await initializer.initTargetRepo(VERSIONS_TARGET_PATH);
     const [ readmeCommit ] = commits;
     await initializer.initReadmeAndLicense(targetRepo, VERSIONS_TARGET_PATH, readmeCommit.date);
   }
