@@ -4,11 +4,12 @@
   "documents": {
     "Privacy Policy": {
       "fetch": "https://edition.cnn.com/privacy1",
-      "select": "body"
+      "select": ".l-container",
+      "remove": ".zn-body__read-all > .zn-body__paragraph:first-child, .zn-body__read-all > .el__embedded .cnn_rich_text, .read-more-link"
     },
     "Terms of Service": {
       "fetch": "https://edition.cnn.com/terms",
-      "select": "body"
+      "select": ".l-container"
     }
   }
 }
