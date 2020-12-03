@@ -4,15 +4,15 @@
   "documents": {
     "Privacy Policy": {
       "fetch": "https://help.ft.com/legal-privacy/privacy-policy/",
-      "select": ""
+      "select": ".c-article__content"
     },
     "Terms of Service": {
       "fetch": "https://help.ft.com/legal-privacy/terms-and-conditions/",
-      "select": ""
+      "select": ".c-article__content"
     },
     "Copyright Claims Policy": {
       "fetch": "https://help.ft.com/legal-privacy/copyright-policy/",
-      "select": ""
+      "select": ".c-article__content"
     }
   }
 }
