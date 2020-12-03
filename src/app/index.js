@@ -37,6 +37,7 @@ export default class CGUs extends events.EventEmitter {
     if (!this.services) {
       this.initQueues();
       this.services = await services.load();
+      await history.init();
     }
 
     return this.services;
