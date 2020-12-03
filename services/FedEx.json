@@ -4,11 +4,11 @@
   "documents": {
     "Privacy Policy": {
       "fetch": "https://www.fedex.com/en-fr/privacy-policy.html",
-      "select": "body"
+      "select": ".fxg-wrapper:nth-of-type(2)"
     },
     "Terms of Service": {
       "fetch": "https://www.fedex.com/en-fr/terms-of-use.html",
-      "select": ""
+      "select": ".fxg-wrapper:nth-of-type(2)"
     }
   }
 }
