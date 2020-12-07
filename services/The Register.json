@@ -1,0 +1,14 @@
+{
+  "name": "The Register",
+  "importedFrom": "https://github.com/tosdr/tosback2/blob/f762cd4bbb2571272985fed009201a23300ba9b2/rules/theregister.co.uk.xml",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://www.theregister.com/Profile/terms_and_conditions_of_use/",
+      "select": "#main-col"
+    },
+    "Privacy Policy": {
+      "fetch": "https://www.theregister.com/about/company/privacy/",
+      "select": "#main-col"
+    }
+  }
+}
