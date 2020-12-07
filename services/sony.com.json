@@ -1,0 +1,14 @@
+{
+  "name": "sony.com",
+  "importedFrom": "https://github.com/tosdr/tosback2/blob/f762cd4bbb2571272985fed009201a23300ba9b2/rules/sony.com.xml",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://www.sony.com/en_us/SCA/terms.html",
+      "select": "#main-content"
+    },
+    "Privacy Policy": {
+      "fetch": "https://www.sony.com/en_us/SCA/privacy-policy.html",
+      "select": "#main-content"
+    }
+  }
+}
