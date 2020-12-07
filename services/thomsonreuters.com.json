@@ -1,0 +1,14 @@
+{
+  "name": "thomsonreuters.com",
+  "importedFrom": "https://github.com/tosdr/tosback2/blob/f762cd4bbb2571272985fed009201a23300ba9b2/rules/reuters.com.xml",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://www.thomsonreuters.com/en/terms-of-use.html",
+      "select": ".tr-SemanticMain"
+    },
+    "Privacy Policy": {
+      "fetch": "https://www.thomsonreuters.com/en/privacy-statement.html",
+      "select": ".tr-SemanticMain"
+    }
+  }
+}
