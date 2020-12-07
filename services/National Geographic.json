@@ -1,0 +1,15 @@
+{
+  "name": "National Geographic",
+  "importedFrom": "https://github.com/tosdr/tosback2/blob/f762cd4bbb2571272985fed009201a23300ba9b2/rules/nationalgeographic.com.xml",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://privacy.thewaltdisneycompany.com/en/current-privacy-policy/",
+      "select": "main>.container-fluid:first-of-type",
+      "remove": ".icon-left, .openall"
+    },
+    "Terms of Service": {
+      "fetch": "https://www.nationalgeographic.com/legal/terms/",
+      "select": "article.news__article"
+    }
+  }
+}
