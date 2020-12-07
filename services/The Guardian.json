@@ -1,0 +1,14 @@
+{
+  "name": "The Guardian",
+  "importedFrom": "https://github.com/tosdr/tosback2/blob/f762cd4bbb2571272985fed009201a23300ba9b2/rules/theguardian.com.xml",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://www.theguardian.com/help/terms-of-service",
+      "select": ".article-body-commercial-selector"
+    },
+    "Privacy Policy": {
+      "fetch": "https://www.theguardian.com/help/privacy-policy",
+      "select": ".content__headline, .content__article-body.from-content-api.js-article__body"
+    }
+  }
+}
