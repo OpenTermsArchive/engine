@@ -3,8 +3,8 @@
   "importedFrom": "https://github.com/tosdr/tosback2/blob/f762cd4bbb2571272985fed009201a23300ba9b2/rules/orange.fr.xml",
   "documents": {
     "Privacy Policy": {
-      "fetch": "http://c.orange.fr/donnees-personnelles.html",
-      "select": "body"
+      "fetch": "https://c.orange.fr/pages-juridiques/donnees-personnelles.html",
+      "select": "h1, #o_content .left-container"
     }
   }
 }
