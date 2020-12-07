@@ -11,6 +11,7 @@ import * as services from '../../src/app/services/index.js';
 import fetch from '../../src/app/fetcher/index.js';
 import filter from '../../src/app/filter/index.js';
 import serviceSchema from './service.schema.js';
+import serviceHistorySchema from './service.history.schema.js';
 
 const fs = fsApi.promises;
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -26,7 +27,7 @@ const modifiedOnly = args.includes('--modified-only');
 let servicesToValidate = args.filter(arg => !arg.startsWith('--'));
 
 (async () => {
-  const serviceDeclarations = await services.load();
+  const serviceDeclarations = await services.loadWithHistory();
 
   if (modifiedOnly) {
     servicesToValidate = await services.getIdsOfModified();
@@ -43,11 +44,18 @@ let servicesToValidate = args.filter(arg => !arg.startsWith('--'));
         throw new Error(`Could not find any service with id "${serviceId}"`);
       }
 
-      describe(serviceId, () => {
+      describe(serviceId, async () => {
         it('has a valid declaration', async () => {
           const declaration = JSON.parse(await fs.readFile(path.join(rootPath, config.get('serviceDeclarationsPath'), `${serviceId}.json`)));
           assertValid(serviceSchema, declaration);
         });
+
+        if (service.hasHistory()) {
+          it('has a valid history declaration', async () => {
+            const declarationHistory = JSON.parse(await fs.readFile(path.join(rootPath, config.get('serviceDeclarationsPath'), `${serviceId}.history.json`)));
+            assertValid(serviceHistorySchema, declarationHistory);
+          });
+        }
 
         if (!schemaOnly) {
           service.getDocumentTypes().forEach(type => {
@@ -79,7 +87,6 @@ let servicesToValidate = args.filter(arg => !arg.startsWith('--'));
                 filteredContent = await filter({
                   content,
                   documentDeclaration: service.getDocumentDeclaration(type),
-                  filterFunctions: service.filters,
                   mimeType,
                 });
 
@@ -124,7 +131,6 @@ let servicesToValidate = args.filter(arg => !arg.startsWith('--'));
                   const secondFilteredContent = await filter({
                     content: document.content,
                     documentDeclaration: service.getDocumentDeclaration(type),
-                    filterFunctions: service.filters,
                     mimeType: document.mimeType
                   });
 

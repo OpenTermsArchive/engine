@@ -1,0 +1,16 @@
+{
+  "Terms of Service": [
+    {
+      "fetch": "https://docviewer.zoosk.com/legal-tos-en_eu.html",
+      "select": "body",
+      "validUntil": "2020-11-09T17:30:03.000Z"
+    }
+  ],
+  "Privacy Policy": [
+    {
+      "fetch": "https://docviewer.zoosk.com/legal-privacy-en_eu.html",
+      "select": "body",
+      "validUntil": "2020-11-09T17:30:03.000Z"
+    }
+  ]
+}

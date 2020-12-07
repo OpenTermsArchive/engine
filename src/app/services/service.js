@@ -42,4 +42,8 @@ export default class Service {
   getNumberOfDocuments() {
     return this.getDocumentTypes().length;
   }
+
+  hasHistory() { // If service is loaded without its history it could return false even if an history declaration file exists.
+    return !!Object.keys(this._documents).find(documentType => this._documents[documentType]._history);
+  }
 }
