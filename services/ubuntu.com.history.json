@@ -1,0 +1,16 @@
+{
+  "Terms of Service": [
+    {
+      "fetch": "https://ubuntu.com/legal/terms",
+      "select": "body",
+      "validUntil": "2020-12-08T16:00:00.000Z"
+    }
+  ],
+  "Privacy Policy": [
+    {
+      "fetch": "https://ubuntu.com/legal/data-privacy",
+      "select": "body",
+      "validUntil": "2020-12-08T16:00:00.000Z"
+    }
+  ]
+}

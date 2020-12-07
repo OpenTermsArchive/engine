@@ -1,0 +1,16 @@
+{
+  "Privacy Policy": [
+    {
+      "fetch": "https://policies.google.com/privacy?hl=en-GB",
+      "select": "body",
+      "validUntil": "2020-12-08T16:00:00.000Z"
+    }
+  ],
+  "Terms of Service": [
+    {
+      "fetch": "https://policies.google.com/terms?hl=en-GB",
+      "select": "body",
+      "validUntil": "2020-12-08T16:00:00.000Z"
+    }
+  ]
+}

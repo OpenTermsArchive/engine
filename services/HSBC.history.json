@@ -1,0 +1,16 @@
+{
+  "Privacy Policy": [
+    {
+      "fetch": "https://www.hsbc.com/privacy-notice",
+      "select": "body",
+      "validUntil": "2020-12-08T16:00:00.000Z"
+    }
+  ],
+  "Terms of Service": [
+    {
+      "fetch": "https://www.hsbc.com/terms-and-conditions",
+      "select": "body",
+      "validUntil": "2020-12-08T16:00:00.000Z"
+    }
+  ]
+}

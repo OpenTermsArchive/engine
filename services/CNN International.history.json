@@ -1,0 +1,16 @@
+{
+  "Privacy Policy": [
+    {
+      "fetch": "https://edition.cnn.com/privacy1",
+      "select": "body",
+      "validUntil": "2020-12-08T16:00:00.000Z"
+    }
+  ],
+  "Terms of Service": [
+    {
+      "fetch": "https://edition.cnn.com/terms",
+      "select": "body",
+      "validUntil": "2020-12-08T16:00:00.000Z"
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "Privacy Policy": [
+    {
+      "fetch": "https://www.w3schools.com/about/about_privacy.asp",
+      "select": "body",
+      "validUntil": "2020-12-08T16:00:00.000Z"
+    }
+  ],
+  "Terms of Service": [
+    {
+      "fetch": "https://www.w3schools.com/about/about_copyright.asp",
+      "select": "body",
+      "validUntil": "2020-12-08T16:00:00.000Z"
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "Privacy Policy": [
+    {
+      "fetch": "https://docs.github.com/en/free-pro-team@latest/github/site-policy/github-privacy-statement",
+      "select": "body",
+      "validUntil": "2020-12-08T16:00:00.000Z"
+    }
+  ],
+  "Terms of Service": [
+    {
+      "fetch": "https://docs.github.com/en/free-pro-team@latest/github/site-policy/github-terms-of-service",
+      "select": "body",
+      "validUntil": "2020-12-08T16:00:00.000Z"
+    }
+  ],
+  "Copyright Claims Policy": [
+    {
+      "fetch": "https://docs.github.com/en/free-pro-team@latest/github/site-policy/dmca-takedown-policy",
+      "select": "body",
+      "validUntil": "2020-12-08T16:00:00.000Z"
+    }
+  ]
+}

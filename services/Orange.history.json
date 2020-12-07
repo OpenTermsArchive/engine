@@ -1,0 +1,9 @@
+{
+  "Privacy Policy": [
+    {
+      "fetch": "https://c.orange.fr/pages-juridiques/donnees-personnelles.html",
+      "select": "body",
+      "validUntil": "2020-12-08T16:00:00.000Z"
+    }
+  ]
+}

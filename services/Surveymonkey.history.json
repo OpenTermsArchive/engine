@@ -1,0 +1,16 @@
+{
+  "Terms of Service": [
+    {
+      "fetch": "https://www.surveymonkey.com/mp/legal/terms-of-use/",
+      "select": "body",
+      "validUntil": "2020-12-08T16:00:00.000Z"
+    }
+  ],
+  "Privacy Policy": [
+    {
+      "fetch": "https://www.surveymonkey.com/mp/legal/privacy/",
+      "select": "body",
+      "validUntil": "2020-12-08T16:00:00.000Z"
+    }
+  ]
+}

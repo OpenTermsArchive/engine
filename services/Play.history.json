@@ -1,0 +1,9 @@
+{
+  "Terms of Service": [
+    {
+      "fetch": "https://play.google.com/intl/en_us/about/play-terms.html",
+      "select": "body",
+      "validUntil": "2020-12-08T16:00:00.000Z"
+    }
+  ]
+}
