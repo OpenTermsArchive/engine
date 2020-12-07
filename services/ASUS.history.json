@@ -1,0 +1,23 @@
+{
+  "Privacy Policy": [
+    {
+      "fetch": "https://www.asus.com/Terms_of_Use_Notice_Privacy_Policy/Privacy_Policy/",
+      "select": "body",
+      "validUntil": "2020-12-08T16:00:00.000Z"
+    }
+  ],
+  "Vulnerability Disclosure Policy": [
+    {
+      "fetch": "https://www.asus.com/Static_WebPage/ASUS-Product-Security-Advisory/",
+      "select": "body",
+      "validUntil": "2020-12-08T16:00:00.000Z"
+    }
+  ],
+  "Terms of Service": [
+    {
+      "fetch": "https://www.asus.com/Terms_of_Use_Notice_Privacy_Policy/Official-Site",
+      "select": "body",
+      "validUntil": "2020-12-08T16:00:00.000Z"
+    }
+  ]
+}
