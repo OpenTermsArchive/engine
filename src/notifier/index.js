@@ -1,5 +1,5 @@
 // import * as fs from 'fs';
-import * as mysql from 'mysql';
+import mysql from 'mysql';
 import pg from 'pg';
 
 // FIXME: Somehow Node.js ESM doesn't recognize this export:
@@ -10,14 +10,18 @@ import pg from 'pg';
 //
 // But it does work:
 const { Client } = pg;
-
+const { createConnection } = mysql;
+// console.log(Client);
+// console.log(createConnection);
+// console.log(process.env);
+// process.exit(0);
 export default class Notifier {
   // mysqlConnection;
   // psqlClient;
   // mysqlConnected;
   // psqlConnected;
   constructor() {
-    this.mysqlConnection = mysql.createConnection({
+    this.mysqlConnection = createConnection({
       host: process.env.MYSQL_HOST,
       user: process.env.MYSQL_USER,
       password: process.env.MYSQL_PASSWORD,
@@ -32,6 +36,8 @@ export default class Notifier {
           // cert: fs.readFileSync('.env/postgresql.cert').toString()
         }
       });
+    } else {
+      this.psqlClient = 'please specify PSQL_CONNECTION_STRING';
     }
 
     this.mysqlConnected = false;
@@ -54,10 +60,47 @@ export default class Notifier {
 
   // eslint-disable-next-line class-methods-use-this
   getWords(str) {
-    return {
-      words: str.toLowerCase().replace(/<[^>]*>/g, '').split(/\s+/).map(str => str.replace(/[^a-z0-9]/g, '')),
-      sourceMap: {}
-    };
+    // states:
+    // inTag
+    // inSpace
+    // inWord
+    // when coming out of word, or when at the end, pushWord.
+    let state = 'unknown';
+    let thisWordStart;
+    const words = [];
+    function pushWord(endPos) {
+      const text = str.substring(thisWordStart, endPos);
+      const lower = text.toLowerCase().replace(/[^a-z0-9]/g, '');
+      if (lower.length) {
+        words.push({
+          start: thisWordStart,
+          end: endPos,
+          text,
+          lower
+        });
+      }
+    }
+    for (let i = 0; i < str.length; i++) {
+      if (state === 'in-tag') {
+        if (str[i] === '>') {
+          state = 'unknown';
+        }
+      } else {
+        const newState = (str[i].match(/[a-zA-Z]/) === null ? 'in-space' : 'in-word');
+        if (state === 'in-word' && newState === 'in-space') {
+          pushWord(i);
+        }
+        if (state !== 'in-word' && newState === 'in-word') {
+          thisWordStart = i;
+        }
+        state = newState;
+      }
+    }
+    if (state === 'in-word') {
+      pushWord(str.length);
+    }
+    // console.log(words.map(word => word.lower));
+    return words;
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -98,6 +141,7 @@ export default class Notifier {
     let startWord;
     do {
       startWord = documentWords.indexOf(quoteWords[0], searchStart);
+      // console.log('Found start word!', quoteWords[0], startWord);
       const endWordInParagraph = this.wordsLineUp(quoteWords, documentWords.slice(startWord));
       if (endWordInParagraph !== false) {
         // console.log('Found', quoteWords[0], startWord);
@@ -109,6 +153,7 @@ export default class Notifier {
       searchStart = startWord + 1;
     } while (startWord !== -1);
     // throw new Error('quote not found!');
+    // console.log('quote not found');
     return {
       startWord: false,
       endWordInParagraph: false
@@ -119,7 +164,7 @@ export default class Notifier {
   async saveToEditTosdrOrg({ content, documentDeclaration, snapshotId }) {
     try {
       console.log('saving to edit.tosdr.org', documentDeclaration, snapshotId);
-      console.log(content);
+      // console.log(content);
       if (!this.psqlConnected) {
         console.log('connecting psqlClient');
         this.psqlConnected = this.psqlClient.connect();
@@ -127,23 +172,46 @@ export default class Notifier {
       await this.psqlConnected;
       const res = await this.psqlClient.query('UPDATE documents SET text = $1::text, updated_at=now() WHERE url = $2::text',
         [ content, documentDeclaration.fetch ]);
-      console.log(res);
-      const queryTemplate = 'SELECT p."id", p."quoteText", p."quoteStart", p."quoteEnd" FROM points p INNER JOIN documents d ON p.document_id=d.id '
-        + 'WHERE url = $1::text';
+      // console.log(res);
+      const queryTemplate = 'SELECT p."id", p."quoteText", p."quoteStart", p."quoteEnd", p."status" FROM points p INNER JOIN documents d ON p.document_id=d.id '
+        + 'WHERE d.url = $1::text AND (p."status" = \'approved\' OR p."status" = \'pending\')';
       const pointsAffected = await this.psqlClient.query(queryTemplate,
         [ documentDeclaration.fetch ]);
-      console.log(pointsAffected);
-      const { words, sourceMap } = this.getWords(content);
-      pointsAffected.rows.forEach(row => {
-        const { startWord, endWordInParagraph } = this.findQuote(this.getWords(row.quoteText).words, words);
-        console.log({
-          quoteText: row.quoteText,
-          quoteStartWord: startWord,
-          quoteEndWord: startWord + endWordInParagraph,
-          quoteStart: sourceMap[startWord],
-          quoteEnd: sourceMap[startWord + endWordInParagraph]
-        });
+      // const pointsAffected = {
+      //   rows: [
+      //     {
+      //       quoteText: 'We believe you should always know what data we collect'
+      //     }
+      //   ]
+      // };
+      // console.log(pointsAffected);
+      const words = this.getWords(content);
+      const promises = pointsAffected.rows.map(async row => {
+        const { startWord, endWordInParagraph } = this.findQuote(this.getWords(row.quoteText).map(word => word.lower), words.map(word => word.lower));
+        if (startWord) {
+          // const endWord = startWord + endWordInParagraph;
+          const quoteStart = words[startWord].start;
+          const quoteEnd = words[startWord + endWordInParagraph - 1].end;
+          const quoteText = content.substring(quoteStart, quoteEnd);
+          console.log('found', {
+            id: row.id,
+            quoteText,
+            // quoteStartWord: startWord,
+            // quoteEndWord: endWord,
+            quoteStart,
+            quoteEnd
+          });
+          const queryTemplate = 'UPDATE points SET "quoteText" = $1::text, "quoteStart" = $2::int, "quoteEnd" = $3::int WHERE "id" = $4::int';
+          const queryResult = await this.psqlClient.query(queryTemplate, [ quoteText, quoteStart, quoteEnd, row.id ]);
+          console.log(queryResult);
+        } else {
+          console.log('not found', row);
+          const queryTemplate = 'UPDATE points SET "status" = $1::text WHERE id = $2::int';
+          const queryResult = await this.psqlClient.query(queryTemplate, [ `${row.status}-not-found`, row.id ]);
+          console.log(queryResult);
+        }
       });
+      await Promise.all(promises);
       console.log('Done saving to edit.tosdr.org');
     } catch (e) {
       console.error(e);
