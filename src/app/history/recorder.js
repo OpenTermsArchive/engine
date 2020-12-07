@@ -16,7 +16,10 @@ export default class Recorder {
     this.path = path;
     this.fileExtension = fileExtension;
     this.git = new Git(this.path);
-    this.git.initConfig();
+  }
+
+  async init() {
+    return this.git.initConfig();
   }
 
   async record({ serviceId, documentType, content, changelog, mimeType, authorDate }) {

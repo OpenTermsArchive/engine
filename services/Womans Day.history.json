@@ -1,0 +1,16 @@
+{
+  "Terms of Service": [
+    {
+      "fetch": "https://www.hearst.com/-/us-magazines-terms-of-use",
+      "select": "body",
+      "validUntil": "2020-11-09T17:30:03.000Z"
+    }
+  ],
+  "Privacy Policy": [
+    {
+      "fetch": "https://www.hearst.com/-/us-magazines-privacy-notice",
+      "select": "body",
+      "validUntil": "2020-11-09T17:30:03.000Z"
+    }
+  ]
+}
