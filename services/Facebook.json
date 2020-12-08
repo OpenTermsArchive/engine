@@ -49,6 +49,10 @@
         "cleanUrls"
       ],
       "select": "#content"
+    },
+    "Live Policy":{
+      "fetch": "https://en-gb.facebook.com/policies/live",
+      "select": "#content"
     }
   }
 }
