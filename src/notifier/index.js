@@ -161,7 +161,7 @@ export default class Notifier {
   }
 
   // eslint-disable-next-line class-methods-use-this
-  async saveToEditTosdrOrg({ content, documentDeclaration, snapshotId }) {
+  async saveToEditTosdrOrg({ content, documentDeclaration, snapshotId, userId }) {
     try {
       console.log('saving to edit.tosdr.org', documentDeclaration, snapshotId);
       // console.log(content);
@@ -170,11 +170,17 @@ export default class Notifier {
         this.psqlConnected = this.psqlClient.connect();
       }
       await this.psqlConnected;
-      const res = await this.psqlClient.query('UPDATE documents SET text = $1::text, updated_at=now() WHERE url = $2::text',
-        [ content, documentDeclaration.fetch ]);
+      const res1 = await this.psqlClient.query('SELECT id FROM documents WHERE url = $1::text',
+        [ documentDeclaration.fetch ]);
+      if (res1.rows.length !== 1) {
+        throw new Error(`Found ${res1.rows.length} documents with URL ${documentDeclaration.fetch}`)
+      }
+      await this.psqlClient.query('INSERT INTO document_comments (summary, document_id, user_id, created_at, updated_at) VALUES ($1::text, $2::int, $3::int, now(), now())', [ 'Updated crawl using tosback-crawler', res1.rows[0].id, userId ]);
+      await this.psqlClient.query('UPDATE documents SET text = $1::text, updated_at=now() WHERE id = $2::int',
+        [ content, res1.rows[0].id ]);
       // console.log(res);
       const queryTemplate = 'SELECT p."id", p."quoteText", p."quoteStart", p."quoteEnd", p."status" FROM points p INNER JOIN documents d ON p.document_id=d.id '
-        + 'WHERE d.url = $1::text AND (p."status" = \'approved\' OR p."status" = \'pending\')';
+        + 'WHERE d.url = $1::text AND (p."status" = \'approved\' OR p."status" = \'pending\' OR p."status" = \'approved-not-found\' OR p."status" = \'pending-not-found\')';
       const pointsAffected = await this.psqlClient.query(queryTemplate,
         [ documentDeclaration.fetch ]);
       // const pointsAffected = {
@@ -201,11 +207,20 @@ export default class Notifier {
             quoteStart,
             quoteEnd
           });
-          const queryTemplate = 'UPDATE points SET "quoteText" = $1::text, "quoteStart" = $2::int, "quoteEnd" = $3::int WHERE "id" = $4::int';
-          const queryResult = await this.psqlClient.query(queryTemplate, [ quoteText, quoteStart, quoteEnd, row.id ]);
+          let newStatus = row.status;
+          if (newStatus === 'approved-not-found') {
+            newStatus = 'approved';
+          }
+          if (newStatus === 'pending-not-found') {
+            newStatus = 'pending';
+          }
+          await this.psqlClient.query('INSERT INTO point_comments (summary, point_id, user_id, created_at, updated_at) VALUES ($1::text, $2::int, $3::int, now(), now())', [ 'Found quote', row.id, userId ]);
+          const queryTemplate = 'UPDATE points SET "quoteText" = $1::text, "quoteStart" = $2::int, "quoteEnd" = $3::int, "status" = $4::text WHERE "id" = $5::int';
+          const queryResult = await this.psqlClient.query(queryTemplate, [ quoteText, quoteStart, quoteEnd, newStatus, row.id ]);
           console.log(queryResult);
         } else {
           console.log('not found', row);
+          await this.psqlClient.query('INSERT INTO point_comments (summary, point_id, user_id, created_at, updated_at) VALUES ($1::text, $2::int, $3::int, now(), now())', [ 'Quote not found', row.id, userId ]);
           const queryTemplate = 'UPDATE points SET "status" = $1::text WHERE id = $2::int';
           const queryResult = await this.psqlClient.query(queryTemplate, [ `${row.status}-not-found`, row.id ]);
           console.log(queryResult);

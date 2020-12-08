@@ -1,4 +1,6 @@
 import pg from 'pg';
+import * as fs from 'fs';
+import Notifier from './notifier/index.js';
 
 const { Client } = pg;
 
@@ -84,6 +86,18 @@ async function merge({ userId, model, arg1, arg2, fieldsToCheck, dependentModels
   await deleteRow(model, obj1.id, obj2.id, userId);
 }
 
+async function updateCrawl({ userId, url, localPath }) {
+  const notifier = new Notifier();
+
+  const content = fs.readFileSync(localPath).toString();
+  const documentDeclaration = {
+    fetch: url
+  };
+
+  await notifier.saveToEditTosdrOrg({ content, documentDeclaration, snapshotId: '12345', userId });
+  await notifier.end();
+}
+
 async function run({ userId, command, arg1, arg2 }) {
   await psqlClient.connect();
   console.log({ userId, command, arg1, arg2 });
@@ -91,6 +105,8 @@ async function run({ userId, command, arg1, arg2 }) {
     await merge({ userId, model: 'document', arg1, arg2, fieldsToCheck: [ 'url', 'xpath', 'service_id' ], dependentModels: [ 'point' ] });
   } else if (command === 'merge_services') {
     await merge({ userId, model: 'service', arg1, arg2, fieldsToCheck: [ 'url' ], dependentModels: [ 'point', 'document' ] });
+  } else if (command === 'update_crawl') {
+    await updateCrawl({ userId, url: arg1, localPath: arg2 });
   }
   console.log('ending');
   await psqlClient.end();
