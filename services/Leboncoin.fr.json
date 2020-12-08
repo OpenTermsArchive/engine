@@ -1,0 +1,15 @@
+{
+  "name": "Leboncoin.fr",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://www.leboncoin.fr/dc/cgu",
+      "executeClientScripts": true,
+      "select": "._16HCL"
+    },
+    "Privacy Policy": {
+      "fetch": "https://www.leboncoin.fr/dc/cookies",
+      "executeClientScripts": true,
+      "select": "._16HCL"
+    }
+  }
+}
