@@ -7,7 +7,7 @@
       "select": ".col-sm-9.col-md-9"
     },
     "Vulnerability Disclosure Policy": {
-      "fetch": "https://about.gitlab.com/security/",
+      "fetch": "https://about.gitlab.com/security/disclosure/",
       "select": ".container.md-page"
     },
     "Terms of Service": {
