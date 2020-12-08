@@ -10,6 +10,15 @@
     "Terms of Service": {
       "fetch": "https://www.youtube.com/t/terms",
       "select": "div#article-container"
+    },
+    "Developer Terms": {
+      "fetch": "https://developers.google.com/youtube/terms/developer-policies",
+      "select": "article.devsite-article",
+      "remove": ".devsite-article-meta, .devsite-thumb-rating, .devsite-banner-message"
+    },
+    "Copyright Claims Policy": {
+      "fetch": "https://www.youtube.com/intl/en_be/howyoutubeworks/policies/copyright/",
+      "select": ".ytr-article__content"
     }
   }
 }
