@@ -1,0 +1,10 @@
+{
+  "name": "TIME",
+  "importedFrom": "https://github.com/tosdr/tosback2/blob/f762cd4bbb2571272985fed009201a23300ba9b2/rules/time.com.xml",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.meredith.com/legal-ti/time/generic_privacy_new_eu.html",
+      "select": "body"
+    }
+  }
+}

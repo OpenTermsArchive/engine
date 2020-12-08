@@ -1,0 +1,18 @@
+{
+  "name": "ASUS",
+  "importedFrom": "https://github.com/tosdr/tosback2/blob/f762cd4bbb2571272985fed009201a23300ba9b2/rules/asus.com.xml",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.asus.com/Terms_of_Use_Notice_Privacy_Policy/Privacy_Policy/",
+      "select": "#member-page-content"
+    },
+    "Vulnerability Disclosure Policy": {
+      "fetch": "https://www.asus.com/Static_WebPage/ASUS-Product-Security-Advisory/",
+      "select": "#member-page-content"
+    },
+    "Terms of Service": {
+      "fetch": "https://www.asus.com/Terms_of_Use_Notice_Privacy_Policy/Official-Site",
+      "select": "#member-page-content"
+    }
+  }
+}

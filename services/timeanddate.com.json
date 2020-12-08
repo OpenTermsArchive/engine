@@ -1,0 +1,14 @@
+{
+  "name": "timeanddate.com",
+  "importedFrom": "https://github.com/tosdr/tosback2/blob/f762cd4bbb2571272985fed009201a23300ba9b2/rules/timeanddate.com.xml",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://www.timeanddate.com/information/terms-conditions.html",
+      "select": ".layout-grid__main"
+    },
+    "Privacy Policy": {
+      "fetch": "https://www.timeanddate.com/information/privacy.html",
+      "select": ".layout-grid__main"
+    }
+  }
+}

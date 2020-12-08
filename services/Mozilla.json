@@ -1,0 +1,15 @@
+{
+  "name": "Mozilla",
+  "importedFrom": "https://github.com/tosdr/tosback2/blob/f762cd4bbb2571272985fed009201a23300ba9b2/rules/mozilla.org.xml",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.mozilla.org/en-US/privacy/websites/",
+      "select": "article.mzp-l-main",
+      "remove": ".privacy-logo"
+    },
+    "Community Guidelines": {
+      "fetch": "https://www.mozilla.org/en-GB/about/governance/policies/participation/",
+      "select": "article.mzp-c-article"
+    }
+  }
+}

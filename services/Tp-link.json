@@ -1,0 +1,20 @@
+{
+  "name": "TP-Link",
+  "importedFrom": "https://github.com/tosdr/tosback2/blob/f762cd4bbb2571272985fed009201a23300ba9b2/rules/tp-link.com.xml",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.tp-link.com/en/about-us/privacy/",
+      "select": {
+        "startBefore": "[name=sec_a]",
+        "endBefore": "[name=sec_b]"
+      }
+    },
+    "Terms of Service": {
+      "fetch": "https://www.tp-link.com/en/about-us/privacy/",
+      "select": {
+        "startBefore": "[name=sec_b]",
+        "endAfter": ".content"
+      }
+    }
+  }
+}

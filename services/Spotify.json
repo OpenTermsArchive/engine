@@ -1,0 +1,14 @@
+{
+  "name": "Spotify",
+  "importedFrom": "https://github.com/tosdr/tosback2/blob/f762cd4bbb2571272985fed009201a23300ba9b2/rules/spotify.com.xml",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.spotify.com/us/legal/privacy-policy/",
+      "select": "#content-main"
+    },
+    "Terms of Service": {
+      "fetch": "https://www.spotify.com/us/legal/end-user-agreement/",
+      "select": "#content-main"
+    }
+  }
+}

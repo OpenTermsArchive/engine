@@ -1,0 +1,14 @@
+{
+  "name": "Dailymotion",
+  "importedFrom": "https://github.com/tosdr/tosback2/blob/f762cd4bbb2571272985fed009201a23300ba9b2/rules/dailymotion.com.xml",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.dailymotion.com/legal/privacy?localization=gb",
+      "select": "div#privacy"
+    },
+    "Terms of Service": {
+      "fetch": "https://www.dailymotion.com/legal/terms?localization=gb",
+      "select": "div#contract"
+    }
+  }
+}

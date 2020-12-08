@@ -1,0 +1,16 @@
+{
+  "name": "CommentÇaMarche",
+  "importedFrom": "https://github.com/tosdr/tosback2/blob/f762cd4bbb2571272985fed009201a23300ba9b2/rules/commentcamarche.net.xml",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://ccm.net/contents/957-processing-of-personal-data-ccm",
+      "select": ".ccm_page--content .container",
+      "remove": "#toc, .ccm_page--content img:first-of-type, .content__footer"
+    },
+    "Terms of Service": {
+      "fetch": "https://ccm.net/contents/953-general-terms-and-conditions-of-use",
+      "select": ".ccm_page--content .container",
+      "remove": "#toc, .ccm_page--content img:first-of-type, .ccm_page--content img:nth-child(1), .content__footer"
+    }
+  }
+}

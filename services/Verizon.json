@@ -1,0 +1,14 @@
+{
+  "name": "Verizon",
+  "importedFrom": "https://github.com/tosdr/tosback2/blob/f762cd4bbb2571272985fed009201a23300ba9b2/rules/verizon.com.xml",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.verizon.com/about/privacy/full-privacy-policy",
+      "select": "#block-mainpagecontent"
+    },
+    "Terms of Service": {
+      "fetch": "https://www.verizon.com/about/terms-conditions/terms-of-use",
+      "select": ".component-start"
+    }
+  }
+}

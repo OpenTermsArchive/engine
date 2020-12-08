@@ -1,0 +1,14 @@
+{
+  "name": "Logitech",
+  "importedFrom": "https://github.com/tosdr/tosback2/blob/f762cd4bbb2571272985fed009201a23300ba9b2/rules/logitech.com.xml",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.logitech.com/en-gb/legal/web-privacy-policy.html",
+      "select": "#maincontent .page"
+    },
+    "Terms of Service": {
+      "fetch": "https://www.logitech.com/en-gb/footer/terms-of-use/&id=13177",
+      "select": ".col-md-8.col-sm-7.col-xs-12.single-column"
+    }
+  }
+}

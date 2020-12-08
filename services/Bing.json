@@ -1,0 +1,26 @@
+{
+  "name": "Bing",
+  "importedFrom": "https://github.com/tosdr/tosback2/blob/f762cd4bbb2571272985fed009201a23300ba9b2/rules/bing.com.xml",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://privacy.microsoft.com/en-gb/privacystatement",
+      "filter": [
+        "removeIrrelevantModulesFromPrivacyPolicy",
+        "removeNavigationHeaders",
+        "removeModuleIDs",
+        "removeInvisibleText"
+      ],
+      "select": "h1, #psp_last_updated, .header_content .Description, .div_content"
+    },
+    "Terms of Service": {
+      "fetch": "https://www.microsoft.com/en-gb/servicesagreement/",
+      "filter": [
+        "removeIrrelevantModulesFromTos",
+        "removeNavigationHeaders",
+        "removeModuleIDs",
+        "removeInvisibleText"
+      ],
+      "select": ".pageIntro, .div_content"
+    }
+  }
+}

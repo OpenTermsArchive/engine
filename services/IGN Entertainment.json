@@ -1,0 +1,16 @@
+{
+  "name": "IGN Entertainment",
+  "importedFrom": "https://github.com/tosdr/tosback2/blob/f762cd4bbb2571272985fed009201a23300ba9b2/rules/ign.com.xml",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.ziffdavis.com/privacy-policy",
+      "select": "div#privacy-policy",
+      "remove": ".trustarc"
+    },
+    "Terms of Service": {
+      "fetch": "https://www.ziffdavis.com/terms-of-use",
+      "select": "div#terms-of-use",
+      "remove": ".copyright"
+    }
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "name": "Ubiquiti",
+  "importedFrom": "https://github.com/tosdr/tosback2/blob/f762cd4bbb2571272985fed009201a23300ba9b2/rules/ui.com.xml",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.ui.com/legal/privacypolicy/",
+      "select": ".comContent",
+      "remove": ".comPageSidebar"
+    },
+    "Terms of Service": {
+      "fetch": "https://www.ui.com/legal/services-terms/",
+      "select": ".comContent",
+      "remove": ".comPageSidebar"
+    }
+  }
+}
