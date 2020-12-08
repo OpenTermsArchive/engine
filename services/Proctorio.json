@@ -1,0 +1,15 @@
+{
+  "name": "Proctorio",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://proctorio.com/terms",
+      "executeClientScripts": true,
+      "select": ".content.legal"
+    },
+    "Privacy Policy": {
+      "fetch": "https://proctorio.com/privacy",
+      "executeClientScripts": true,
+      "select": ".content.legal"
+    }
+  }
+}
