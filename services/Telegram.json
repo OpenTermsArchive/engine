@@ -4,6 +4,15 @@
     "Privacy Policy": {
       "fetch": "https://telegram.org/privacy",
       "select": "#dev_page_content_wrap"
+    },
+    "Terms of Service": {
+      "fetch": "https://telegram.org/tos",
+      "select": "#dev_page_content_wrap"
+    },
+    "Developer Terms": {
+      "fetch": "https://core.telegram.org/api/terms",
+      "select": "#dev_page_content_wrap",
+      "remove": ".breadcrumb"
     }
   }
 }
