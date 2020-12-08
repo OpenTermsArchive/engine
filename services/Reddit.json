@@ -10,6 +10,16 @@
       "fetch": "https://www.redditinc.com/policies/privacy-policy",
       "remove": ".filter-holder",
       "select": "#content"
+    },
+    "Live Policy": {
+      "fetch": "https://www.redditinc.com/policies/broadcasting-content-policy",
+      "remove": ".filter-holder",
+      "select": "#content"
+    },
+    "Quality Guidelines": {
+      "fetch": "https://www.redditinc.com/policies/content-policy",
+      "remove": ".filter-holder",
+      "select": "#content"
     }
   }
 }
