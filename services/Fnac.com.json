@@ -1,0 +1,15 @@
+{
+  "name": "Fnac.com",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://www.fnac.com/Help/cgv-fnac-marketplace",
+      "executeClientScripts": true,
+      "select": ".content"
+    },
+    "Privacy Policy": {
+      "fetch": "https://www.fnac.com/Help/donneesPersonnelles",
+      "executeClientScripts": true,
+      "select": ".content"
+    }
+  }
+}
