@@ -1,0 +1,25 @@
+#!/bin/bash
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+cd /home/tosback3/tosback-crawler/
+echo Looking to run the tosback-crawler
+nvm ls
+pwd
+
+export SKIP_REFILTER=true
+export MYSQL_HOST=localhost
+export MYSQL_USER=root
+export MYSQL_PASSWORD="secret"
+export MYSQL_DATABASE=tosback
+export EXIT_AFTER=3600000
+npm start
+echo Pushing snapshots
+cd data/snapshots
+git push
+echo Pushing versions
+cd ../versions
+git push
+cd ../..
+echo Done
+
