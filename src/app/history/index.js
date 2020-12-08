@@ -44,15 +44,15 @@ export async function recordSnapshot({ serviceId, documentType, content, mimeTyp
   };
 }
 
-export async function recordVersion({ serviceId, documentType, content, snapshotId }) {
-  return _recordVersion({ serviceId, documentType, content, snapshotId });
+export async function recordVersion({ serviceId, documentType, content, authorDate, snapshotId }) {
+  return _recordVersion({ serviceId, documentType, content, authorDate, snapshotId });
 }
 
 export async function recordRefilter({ serviceId, documentType, content, snapshotId }) {
   return _recordVersion({ serviceId, documentType, content, snapshotId, isRefiltering: true });
 }
 
-async function _recordVersion({ serviceId, documentType, content, snapshotId, isRefiltering }) {
+async function _recordVersion({ serviceId, documentType, content, authorDate, snapshotId, isRefiltering }) {
   if (!snapshotId) {
     throw new Error(`A snapshot ID is required to ensure data consistency for ${serviceId}'s ${documentType}`);
   }
@@ -70,7 +70,8 @@ This version was recorded after filtering snapshot ${config.get('history.publish
     serviceId,
     documentType,
     content,
-    changelog
+    changelog,
+    authorDate
   });
 
   return {
