@@ -166,5 +166,12 @@
       "audience": "vulnerability reporter",
       "object": "how to report a security vulnerability or issue"
     }
+  },
+  "Live Policy": {
+    "commitment": {
+      "writer": "service provider",
+      "audience": "end user",
+      "object": "end user’s live service usage"
+    }
   }
 }
