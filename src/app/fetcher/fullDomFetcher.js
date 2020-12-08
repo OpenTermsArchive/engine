@@ -1,7 +1,11 @@
-import puppeteer from 'puppeteer';
+import puppeteer from 'puppeteer-extra';
+import StealthPlugin from 'puppeteer-extra-plugin-stealth';
+
 import config from 'config';
 
 import { InaccessibleContentError } from '../errors.js';
+
+puppeteer.use(StealthPlugin());
 
 export default async function fetch(url, cssSelectors) {
   let response;
@@ -11,7 +15,7 @@ export default async function fetch(url, cssSelectors) {
   const selectors = [].concat(cssSelectors);
 
   try {
-    browser = await puppeteer.launch();
+    browser = await puppeteer.launch({ headless: true });
     page = await browser.newPage();
 
     response = await page.goto(url);
@@ -27,7 +31,7 @@ export default async function fetch(url, cssSelectors) {
   } catch (error) {
     if ((error.code && error.code.match(/^(ENOTFOUND|ETIMEDOUT|ECONNRESET)$/))
       || (error.message && error.message.match(/(ERR_TUNNEL_CONNECTION_FAILED|ERR_NAME_NOT_RESOLVED)/))
-      || error instanceof puppeteer.errors.TimeoutError // Expected elements are not present on the web page
+      || error instanceof puppeteer.pptr.errors.TimeoutError // Expected elements are not present on the web page
     ) {
       throw new InaccessibleContentError(error.message);
     }
