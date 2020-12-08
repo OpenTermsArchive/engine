@@ -11,6 +11,14 @@
     "Privacy Policy": {
       "fetch": "https://www.snap.com/en-GB/privacy/privacy-policy",
       "select": ".textarticle-container"
+    },
+    "Trackers Policy": {
+      "fetch": "https://www.snap.com/en-GB/cookie-policy/",
+      "select": ".textarticle-container"
+    },
+    "Community Guidelines": {
+      "fetch": "https://www.snap.com/en-GB/community-guidelines",
+      "select": ".textarticle-container "
     }
   }
 }
