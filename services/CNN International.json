@@ -1,0 +1,15 @@
+{
+  "name": "CNN International",
+  "importedFrom": "https://github.com/tosdr/tosback2/blob/f762cd4bbb2571272985fed009201a23300ba9b2/rules/cnn.com.xml",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://edition.cnn.com/privacy1",
+      "select": ".l-container",
+      "remove": ".zn-body__read-all > .zn-body__paragraph:first-child, .zn-body__read-all > .el__embedded .cnn_rich_text, .read-more-link"
+    },
+    "Terms of Service": {
+      "fetch": "https://edition.cnn.com/terms",
+      "select": ".l-container"
+    }
+  }
+}

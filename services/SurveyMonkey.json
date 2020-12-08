@@ -1,0 +1,14 @@
+{
+  "name": "SurveyMonkey",
+  "importedFrom": "https://github.com/tosdr/tosback2/blob/f762cd4bbb2571272985fed009201a23300ba9b2/rules/surveymonkey.com.xml",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://www.surveymonkey.com/mp/legal/terms-of-use/",
+      "select": ".content-wrapper"
+    },
+    "Privacy Policy": {
+      "fetch": "https://www.surveymonkey.com/mp/legal/privacy/",
+      "select": ".content-wrapper"
+    }
+  }
+}

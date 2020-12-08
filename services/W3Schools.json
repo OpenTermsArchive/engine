@@ -1,0 +1,16 @@
+{
+  "name": "W3Schools",
+  "importedFrom": "https://github.com/tosdr/tosback2/blob/f762cd4bbb2571272985fed009201a23300ba9b2/rules/w3schools.com.xml",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.w3schools.com/about/about_privacy.asp",
+      "select": "#main",
+      "remove": ".nextprev"
+    },
+    "Terms of Service": {
+      "fetch": "https://www.w3schools.com/about/about_copyright.asp",
+      "select": "#main",
+      "remove": ".nextprev"
+    }
+  }
+}

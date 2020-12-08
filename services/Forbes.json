@@ -1,0 +1,11 @@
+{
+  "name": "Forbes",
+  "importedFrom": "https://github.com/tosdr/tosback2/blob/f762cd4bbb2571272985fed009201a23300ba9b2/rules/forbes.com.xml",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.forbes.com/privacy/english/#1a05e1630610",
+      "select": "#row-2",
+      "executeClientScripts": true
+    }
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "name": "Daily Mail",
+  "importedFrom": "https://github.com/tosdr/tosback2/blob/f762cd4bbb2571272985fed009201a23300ba9b2/rules/dailymail.co.uk.xml",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.dailymail.co.uk/home/article-7759273/Privacy-Cookies-Policy-Policy.html",
+      "select": "div[itemprop=articleBody]"
+    },
+    "Terms of Service": {
+      "fetch": "https://www.dailymail.co.uk/home/article-1388146/Terms.html",
+      "select": "div[itemprop=articleBody]",
+      "remove": "[itemprop=articleBody] > h2:nth-of-type(2), ol.mol-bullets-with-font"
+    }
+  }
+}

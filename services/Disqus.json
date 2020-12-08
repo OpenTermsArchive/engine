@@ -1,0 +1,16 @@
+{
+  "name": "Disqus",
+  "importedFrom": "https://github.com/tosdr/tosback2/blob/f762cd4bbb2571272985fed009201a23300ba9b2/rules/disqus.com.xml",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://help.disqus.com/en/articles/1717103-disqus-privacy-policy",
+      "select": ".article",
+      "remove": ".article__meta"
+    },
+    "Terms of Service": {
+      "fetch": "https://help.disqus.com/en/articles/1717102-terms-of-service",
+      "select": ".article",
+      "remove": ".article__meta"
+    }
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "name": "OkCupid",
+  "importedFrom": "https://github.com/tosdr/tosback2/blob/f762cd4bbb2571272985fed009201a23300ba9b2/rules/okcupid.com.xml",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://www.okcupid.com/legal/terms",
+      "executeClientScripts": true,
+      "select": ".legal"
+    },
+    "Privacy Policy": {
+      "fetch": "https://www.okcupid.com/legal/privacy",
+      "executeClientScripts": true,
+      "select": ".legal"
+    }
+  }
+}

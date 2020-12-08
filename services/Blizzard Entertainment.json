@@ -1,0 +1,14 @@
+{
+  "name": "Blizzard Entertainment",
+  "importedFrom": "https://github.com/tosdr/tosback2/blob/f762cd4bbb2571272985fed009201a23300ba9b2/rules/blizzard.com.xml",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.blizzard.com/en-gb/legal/8c41e7e6-0b61-42c4-a674-c91d8e8d68d3/blizzard-entertainment-privacy-policy",
+      "select": "div.legalDocContent"
+    },
+    "Terms of Service": {
+      "fetch": "https://www.blizzard.com/en-gb/legal/511dbf9e-2b2d-4047-8243-4c5c65e0ebf1/terms-of-use-for-blizzards-websites",
+      "select": "div.legalDocContent"
+    }
+  }
+}

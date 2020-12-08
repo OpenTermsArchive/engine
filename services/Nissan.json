@@ -1,0 +1,16 @@
+{
+  "name": "Nissan",
+  "importedFrom": "https://github.com/tosdr/tosback2/blob/f762cd4bbb2571272985fed009201a23300ba9b2/rules/nissan.com.xml",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.nissan-global.com/EN/SITE_INFO/PRIVACY/",
+      "select": "div#mainContent",
+      "remove": ".hdBlock, .goPagetop"
+    },
+    "Terms of Service": {
+      "fetch": "https://www.nissan-global.com/EN/SITE_INFO/ABOUT/",
+      "select": "div#mainContent",
+      "remove": ".hdBlock, .goPagetop"
+    }
+  }
+}

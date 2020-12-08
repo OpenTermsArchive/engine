@@ -1,0 +1,14 @@
+{
+  "name": "Tumblr",
+  "importedFrom": "https://github.com/tosdr/tosback2/blob/f762cd4bbb2571272985fed009201a23300ba9b2/rules/tumblr.com.xml",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.tumblr.com/privacy/en",
+      "select": "div#left_column"
+    },
+    "Terms of Service": {
+      "fetch": "https://www.tumblr.com/policy/en/terms-of-service",
+      "select": "div#left_column"
+    }
+  }
+}

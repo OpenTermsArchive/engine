@@ -1,0 +1,16 @@
+{
+  "Privacy Policy": [
+    {
+      "fetch": "https://www.mozilla.org/en-US/privacy/websites/",
+      "select": "body",
+      "validUntil": "2020-12-08T16:00:00.000Z"
+    }
+  ],
+  "Community Guidelines": [
+    {
+      "fetch": "https://www.mozilla.org/en-GB/about/governance/policies/participation/",
+      "select": "body",
+      "validUntil": "2020-12-08T16:00:00.000Z"
+    }
+  ]
+}

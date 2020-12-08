@@ -1,0 +1,18 @@
+{
+  "name": "Financial Times",
+  "importedFrom": "https://github.com/tosdr/tosback2/blob/f762cd4bbb2571272985fed009201a23300ba9b2/rules/ft.com.xml",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://help.ft.com/legal-privacy/privacy-policy/",
+      "select": ".c-article__content"
+    },
+    "Terms of Service": {
+      "fetch": "https://help.ft.com/legal-privacy/terms-and-conditions/",
+      "select": ".c-article__content"
+    },
+    "Copyright Claims Policy": {
+      "fetch": "https://help.ft.com/legal-privacy/copyright-policy/",
+      "select": ".c-article__content"
+    }
+  }
+}

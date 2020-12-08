@@ -1,0 +1,14 @@
+{
+  "name": "The New York Times",
+  "importedFrom": "https://github.com/tosdr/tosback2/blob/f762cd4bbb2571272985fed009201a23300ba9b2/rules/nytimes.com.xml",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.nytimes.com/privacy/privacy-policy",
+      "select": "div.css-15slb7"
+    },
+    "Terms of Service": {
+      "fetch": "https://help.nytimes.com/hc/en-us/articles/115014893428-Terms-of-service",
+      "select": "div.article-body"
+    }
+  }
+}

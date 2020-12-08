@@ -1,0 +1,14 @@
+{
+  "name": "Gartner",
+  "importedFrom": "https://github.com/tosdr/tosback2/blob/f762cd4bbb2571272985fed009201a23300ba9b2/rules/gartner.com.xml",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.gartner.com/en/about/policies/privacy",
+      "select": ".col-lg-9.col-md-9.col-sm-12.col-xs-12"
+    },
+    "Terms of Service": {
+      "fetch": "https://www.gartner.com/en/about/policies/terms-of-use",
+      "select": ".col-lg-9.col-md-9.col-sm-12.col-xs-12"
+    }
+  }
+}

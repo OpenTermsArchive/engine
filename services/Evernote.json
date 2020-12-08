@@ -1,0 +1,14 @@
+{
+  "name": "Evernote",
+  "importedFrom": "https://github.com/tosdr/tosback2/blob/f762cd4bbb2571272985fed009201a23300ba9b2/rules/evernote.com.xml",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://evernote.com/intl/en-gb/privacy/policy",
+      "select": "div.content-container"
+    },
+    "Terms of Service": {
+      "fetch": "https://evernote.com/intl/en-gb/legal/terms-of-service",
+      "select": "div.content-container"
+    }
+  }
+}

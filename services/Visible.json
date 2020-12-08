@@ -1,0 +1,14 @@
+{
+  "name": "Visible",
+  "importedFrom": "https://github.com/tosdr/tosback2/blob/f762cd4bbb2571272985fed009201a23300ba9b2/rules/visible.com.xml",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.visible.com/legal/privacy",
+      "select": "#privacypolicy"
+    },
+    "Terms of Service": {
+      "fetch": "https://www.visible.com/legal/terms-and-conditions",
+      "select": "#main_content"
+    }
+  }
+}
