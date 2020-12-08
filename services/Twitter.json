@@ -36,6 +36,13 @@
         "removeBanner"
       ],
       "select": ".twtr-grid__yang > div:nth-child(1)"
+    },
+    "Data Processor Agreement": {
+      "fetch": "https://help.twitter.com/en/rules-and-policies/data-processing-legal-bases",
+      "filter": [
+        "removeBanner"
+      ],
+      "select": ".twtr-grid__yang > div:nth-child(1)"
     }
   }
 }
