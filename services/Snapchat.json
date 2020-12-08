@@ -2,14 +2,14 @@
   "name": "Snapchat",
   "documents": {
     "Terms of Service": {
-      "fetch": "https://www.snap.com/terms",
+      "fetch": "https://www.snap.com/en-GB/terms",
       "select": {
         "startBefore": "#terms-row",
         "endAfter": ".textarticle-container > *:last-child"
       }
     },
     "Privacy Policy": {
-      "fetch": "https://www.snap.com/privacy/privacy-policy",
+      "fetch": "https://www.snap.com/en-GB/privacy/privacy-policy",
       "select": ".textarticle-container"
     }
   }
