@@ -18,12 +18,12 @@ function query(template, params) {
   console.log('Q:', template, params);
   return psqlClient.query(template, params);
 }
-async function getRow(tableName, idStr) {
+async function getRow(model, idStr) {
   const id = parseInt(idStr, 10);
   if (Number.isNaN(id)) {
     throw new Error('First document id is not a number');
   }
-  const res = await query(`SELECT * FROM ${tableName} WHERE id= $1::int`, [ id ]);
+  const res = await query(`SELECT * FROM ${model}s WHERE id= $1::int`, [ id ]);
   if (res.rows.length !== 1) {
     throw new Error(`Found ${res.rows.length} rows`);
   }
@@ -50,12 +50,12 @@ async function moveDependents(dependentModelName, mergedModelName, id1, id2, use
   const dependentIds = affected.rows.map(row => row.id);
   console.log(dependentIds);
   const promises = dependentIds.map(async dependentId => {
-    await query(`INSERT INTO ${dependentModelName}_comments (summary, ${dependentModelName}_id, user_i, created_at, updated_at) VALUES ($1::text, $2::int, $3::int, now(), now()`, [
+    await query(`INSERT INTO ${dependentModelName}_comments (summary, ${dependentModelName}_id, user_id, created_at, updated_at) VALUES ($1::text, $2::int, $3::int, now(), now())`, [
       `Moving from ${mergedModelName}_id ${id1} to ${id2} due to ${mergedModelName} merge`,
       dependentId,
       userId
     ]);
-    await query(`UPDATE ${dependentModelName}s SET ${mergedModelName}_id = $1::int WHERE id = $3::int`, [
+    await query(`UPDATE ${dependentModelName}s SET ${mergedModelName}_id = $1::int WHERE id = $2::int`, [
       id2,
       dependentId
     ]);
@@ -63,34 +63,34 @@ async function moveDependents(dependentModelName, mergedModelName, id1, id2, use
   await Promise.all(promises);
 }
 
-async function deleteRow(modelName, id1) {
-  return query(`UPDATE ${modelName}s SET status = 'deleted' WHERE id = $1::int`, [
+async function deleteRow(modelName, id1, id2, userId) {
+  return query(`UPDATE ${modelName}s SET status = 'deleted', name = 'Merged into ${modelName} ${id2} by user ${userId}' WHERE id = $1::int`, [
     id1
   ]);
+}
+
+async function merge({ userId, model, arg1, arg2, fieldsToCheck, dependentModels }) {
+  console.log(`Getting ${model}s`, arg1, arg2);
+  const obj1 = await getRow(model, arg1);
+  const obj2 = await getRow(model, arg2);
+  fieldsToCheck.forEach(field => {
+    if (obj1[field] !== obj2[field]) {
+      throw new Error(`Can only merge ${model}s if their ${field} is the same`);
+    }
+  });
+  console.log('Can merge', obj1.id, obj2.id);
+  await addMergeComment(model, obj1.id, obj2.id, userId);
+  await Promise.all(dependentModels.map(dependentModel => moveDependents(dependentModel, model, obj1.id, obj2.id, userId)));
+  await deleteRow(model, obj1.id, obj2.id, userId);
 }
 
 async function run({ userId, command, arg1, arg2 }) {
   await psqlClient.connect();
   console.log({ userId, command, arg1, arg2 });
   if (command === 'merge_documents') {
-    console.log('Getting documents', arg1, arg2);
-    const doc1 = await getRow('documents', arg1);
-    const doc2 = await getRow('documents', arg2);
-    // console.log(doc1);
-    // console.log(doc2);
-    if (doc1.url !== doc2.url) {
-      throw new Error('Can only merge documents if their URL is the same');
-    }
-    if (doc1.xpath !== doc2.xpath) {
-      throw new Error('Can only merge documents if their xpath is the same');
-    }
-    if (doc1.service_id !== doc2.service_id) {
-      throw new Error('Can only merge documents if their service_id is the same');
-    }
-    console.log('Can merge', doc1.id, doc2.id);
-    await addMergeComment('document', doc1.id, doc2.id, userId);
-    await moveDependents('point', 'document', doc1.id, doc2.id, userId);
-    await deleteRow('document', doc1.id, userId);
+    await merge({ userId, model: 'document', arg1, arg2, fieldsToCheck: [ 'url', 'xpath', 'service_id' ], dependentModels: [ 'point' ] });
+  } else if (command === 'merge_services') {
+    await merge({ userId, model: 'service', arg1, arg2, fieldsToCheck: [ 'url' ], dependentModels: [ 'point', 'document' ] });
   }
   console.log('ending');
   await psqlClient.end();
