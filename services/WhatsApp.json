@@ -10,6 +10,11 @@
       "fetch": "https://www.whatsapp.com/legal/privacy-policy-eea?lang=en",
       "select": "._2zry",
       "remove": "[href='#top-of-page']"
+    },
+    "Trackers Policy": {
+      "fetch": "https://www.whatsapp.com/legal/cookies",
+      "select": "._2zry",
+      "remove": "[href='#top-of-page']"
     }
   }
 }
