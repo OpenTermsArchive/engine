@@ -1,0 +1,22 @@
+{
+  "name": "Signal",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://www.signal.org/legal/",
+      "select": [
+        {
+          "startBefore": "#terms-of-service",
+          "endBefore": "#privacy-policy"
+        },
+        "#document p:nth-last-child(-n+2)"
+      ]
+    },
+    "Privacy Policy": {
+      "fetch": "https://www.signal.org/legal/",
+      "select": {
+        "startBefore": "#privacy-policy",
+        "endAfter": "#document"
+      }
+    }
+  }
+}
