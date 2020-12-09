@@ -159,3 +159,10 @@ export async function checkQuotes(docId, psqlClient, userId) {
   });
   await Promise.all(promises);
 }
+
+export async function updateEtoCrawl(docId, content, psqlClient, userId) {
+  await psqlClient.query('INSERT INTO document_comments (summary, document_id, user_id, created_at, updated_at) VALUES ($1::text, $2::int, $3::int, now(), now())', [ 'Updated crawl using tosback-crawler', docId, userId ]);
+  await psqlClient.query('UPDATE documents SET text = $1::text, updated_at=now() WHERE id = $2::int',
+    [ content, docId ]);
+  // console.log(res);
+}

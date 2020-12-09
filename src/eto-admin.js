@@ -1,6 +1,6 @@
 import pg from 'pg';
 import * as fs from 'fs';
-import Notifier from './notifier/index.js';
+import { checkQuotes, updateEtoCrawl } from './checkQuotes.js';
 
 const { Client } = pg;
 
@@ -86,16 +86,10 @@ async function merge({ userId, model, arg1, arg2, fieldsToCheck, dependentModels
   await deleteRow(model, obj1.id, obj2.id, userId);
 }
 
-async function updateCrawl({ userId, url, localPath }) {
-  const notifier = new Notifier();
-
+async function updateCrawl({ userId, docId, localPath }) {
   const content = fs.readFileSync(localPath).toString();
-  const documentDeclaration = {
-    fetch: url
-  };
-
-  await notifier.saveToEditTosdrOrg({ content, documentDeclaration, snapshotId: '12345', userId });
-  await notifier.end();
+  await updateEtoCrawl(docId, content, psqlClient, userId);
+  await checkQuotes(docId, psqlClient, userId);
 }
 
 async function run({ userId, command, arg1, arg2 }) {
@@ -106,7 +100,7 @@ async function run({ userId, command, arg1, arg2 }) {
   } else if (command === 'merge_services') {
     await merge({ userId, model: 'service', arg1, arg2, fieldsToCheck: [ 'url' ], dependentModels: [ 'point', 'document' ] });
   } else if (command === 'update_crawl') {
-    await updateCrawl({ userId, url: arg1, localPath: arg2 });
+    await updateCrawl({ userId, docId: arg1, localPath: arg2 });
   }
   console.log('ending');
   await psqlClient.end();

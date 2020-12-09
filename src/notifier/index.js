@@ -1,7 +1,7 @@
 // import * as fs from 'fs';
 import mysql from 'mysql';
 import pg from 'pg';
-import { checkQuotes } from '../checkQuotes.js';
+import { checkQuotes, updateEtoCrawl } from '../checkQuotes.js';
 
 // FIXME: Somehow Node.js ESM doesn't recognize this export:
 //
@@ -75,10 +75,7 @@ export default class Notifier {
       if (res1.rows.length !== 1) {
         throw new Error(`Found ${res1.rows.length} documents with URL ${documentDeclaration.fetch}`);
       }
-      await this.psqlClient.query('INSERT INTO document_comments (summary, document_id, user_id, created_at, updated_at) VALUES ($1::text, $2::int, $3::int, now(), now())', [ 'Updated crawl using tosback-crawler', res1.rows[0].id, userId ]);
-      await this.psqlClient.query('UPDATE documents SET text = $1::text, updated_at=now() WHERE id = $2::int',
-        [ content, res1.rows[0].id ]);
-      // console.log(res);
+      await updateEtoCrawl(res1.rows[0].id, content, this.psqlClient, userId);
       await checkQuotes(res1.rows[0].id, this.psqlClient, userId);
       console.log('Done saving to edit.tosdr.org');
     } catch (e) {

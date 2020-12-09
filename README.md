@@ -21,5 +21,5 @@ node src/eto-admin.js 789 merge_documents 456 789
 And to update the crawl for the Twitter PP, as userId 789, run:
 ```sh
 export PSQL_CONNECTION_STRING="..."
-node src/eto-admin.js 789 update_crawl https://twitter.com/en/privacy ../tosback2/crawl_reviewed/twitter.com/Privacy\ Policy.txt
+node src/eto-admin.js 789 update_crawl 90 ../tosback2/crawl_reviewed/twitter.com/Privacy\ Policy.txt
 ```
