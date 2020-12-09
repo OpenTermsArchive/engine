@@ -1,0 +1,15 @@
+{
+  "name": "Rakuten",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://fr.shopping.rakuten.com/newhelp/conditions-generales/",
+      "executeClientScripts": true,
+      "select": "#post-2783"
+    },
+    "Privacy Policy": {
+      "fetch": "https://fr.shopping.rakuten.com/newhelp/vie-privee-et-cookies/",
+      "executeClientScripts": true,
+      "select": "#post-2785"
+    }
+  }
+}
