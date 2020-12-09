@@ -1,0 +1,9 @@
+{
+  "Quality Guidelines": [
+    {
+      "fetch": "https://support.google.com/webmasters/answer/35769",
+      "select": ".article-container",
+      "validUntil": "2020-12-08T15:30:06.000Z"
+    }
+  ]
+}
