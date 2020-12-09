@@ -5,7 +5,7 @@
     "Terms of Service": {
       "fetch": "https://help.sonic.com/hc/en-us/articles/235963988-Sonic-net-Policies",
       "select": ".article-header, .article-content",
-      "remove": ".article-subscribe"
+      "remove": ".article-author, .article-subscribe"
     }
   }
 }
