@@ -99,10 +99,10 @@ function findQuote(quoteWords, documentWords) {
 }
 
 export async function checkQuotes(docId, psqlClient, userId) {
-  const queryTemplate1 = 'SELECT text FROM documents WHERE id = $1:int';
+  const queryTemplate1 = 'SELECT text FROM documents WHERE id = $1::int';
   const contentResult = await psqlClient.query(queryTemplate1,
     [ docId ]);
-  const { content } = contentResult.rows[0];
+  const content = contentResult.rows[0].text;
 
   const queryTemplate2 = 'SELECT p."id", p."quoteText", p."quoteStart", p."quoteEnd", p."status" FROM points p INNER JOIN documents d ON p.document_id=d.id '
     + 'WHERE d.id = $1::int AND (p."status" = \'approved\' OR p."status" = \'pending\' OR p."status" = \'approved-not-found\' OR p."status" = \'pending-not-found\')';
@@ -116,51 +116,78 @@ export async function checkQuotes(docId, psqlClient, userId) {
   //   ]
   // };
   // console.log(pointsAffected);
+  if (content === null) {
+    console.log(docId, 'Document content is null');
+    return;
+  }
   const words = getWords(content);
   const promises = pointsAffected.rows.map(async row => {
-    const { startWord, endWordInParagraph } = findQuote(getWords(row.quoteText).map(word => word.lower), words.map(word => word.lower));
-    let newStatus = row.status;
-    if (startWord) {
-      // const endWord = startWord + endWordInParagraph;
-      const quoteStart = words[startWord].start;
-      const quoteEnd = words[startWord + endWordInParagraph - 1].end;
-      const quoteText = content.substring(quoteStart, quoteEnd);
-      console.log('found', {
-        id: row.id,
-        quoteText,
-        // quoteStartWord: startWord,
-        // quoteEndWord: endWord,
-        quoteStart,
-        quoteEnd
-      });
-      if (newStatus === 'approved-not-found') {
-        newStatus = 'approved';
-      }
-      if (newStatus === 'pending-not-found') {
-        newStatus = 'pending';
-      }
-      await psqlClient.query('INSERT INTO point_comments (summary, point_id, user_id, created_at, updated_at) VALUES ($1::text, $2::int, $3::int, now(), now())', [ 'Found quote', row.id, userId ]);
-      const queryTemplate = 'UPDATE points SET "quoteText" = $1::text, "quoteStart" = $2::int, "quoteEnd" = $3::int, "status" = $4::text WHERE "id" = $5::int';
-      const queryResult = await psqlClient.query(queryTemplate, [ quoteText, quoteStart, quoteEnd, newStatus, row.id ]);
-      console.log(queryResult);
+    const newValues = {
+      status: row.status
+    };
+    let found = false;
+    const exactMatchPos = content.indexOf(row.quoteText);
+    if (exactMatchPos !== -1) {
+      // console.log(row.id, 'Exact quote match');
+      newValues.quoteStart = exactMatchPos;
+      newValues.quoteEnd = exactMatchPos + row.quoteText.length;
+      newValues.quoteText = row.quoteText;
+      found = true;
     } else {
-      if (newStatus === 'approved') {
-        newStatus = 'approved-not-found';
+      const { startWord, endWordInParagraph } = findQuote(getWords(row.quoteText).map(word => word.lower), words.map(word => word.lower));
+      if (startWord) {
+        // const endWord = startWord + endWordInParagraph;
+        newValues.quoteStart = words[startWord].start;
+        newValues.quoteEnd = words[startWord + endWordInParagraph - 1].end;
+        newValues.quoteText = content.substring(newValues.quoteStart, newValues.quoteEnd);
+        found = true;
       }
-      if (newStatus === 'pending') {
-        newStatus = 'pending-not-found';
+    }
+    if (found) {
+      // console.log('found', row.id, newValues);
+      if (newValues.status === 'approved-not-found') {
+        newValues.status = 'approved';
       }
-      console.log('not found', row);
-      await psqlClient.query('INSERT INTO point_comments (summary, point_id, user_id, created_at, updated_at) VALUES ($1::text, $2::int, $3::int, now(), now())', [ 'Quote not found', row.id, userId ]);
-      const queryTemplate = 'UPDATE points SET "status" = $1::text WHERE id = $2::int';
-      const queryResult = await psqlClient.query(queryTemplate, [ newStatus, row.id ]);
-      console.log(queryResult);
+      if (newValues.status === 'pending-not-found') {
+        newValues.status = 'pending';
+      }
+      const changed = [];
+      [ 'quoteText', 'quoteStart', 'quoteEnd', 'status' ].forEach(field => {
+        if (newValues[field] !== row[field]) {
+          changed.push(field);
+        }
+      });
+      if (changed.length) {
+        console.log(row.id, '!!! Found again, changing status');
+        await psqlClient.query('INSERT INTO point_comments (summary, point_id, user_id, created_at, updated_at) VALUES ($1::text, $2::int, $3::int, now(), now())', [ `Found quote, changed: ${changed.join(' ')}`, row.id, userId ]);
+        const queryTemplate = 'UPDATE points SET "quoteText" = $1::text, "quoteStart" = $2::int, "quoteEnd" = $3::int, "status" = $4::text WHERE "id" = $5::int';
+        await psqlClient.query(queryTemplate, [ newValues.quoteText, newValues.quoteStart, newValues.quoteEnd, newValues.status, row.id ]);
+        // console.log(queryResult);
+      } else {
+        console.log(row.id, 'nothing changed, still OK', exactMatchPos);
+      }
+    } else {
+      if (newValues.status === 'approved') {
+        newValues.status = 'approved-not-found';
+      }
+      if (newValues.status === 'pending') {
+        newValues.status = 'pending-not-found';
+      }
+      if (newValues.status !== row.status) {
+        console.log(row.id, '!!! not found, changing status');
+        await psqlClient.query('INSERT INTO point_comments (summary, point_id, user_id, created_at, updated_at) VALUES ($1::text, $2::int, $3::int, now(), now())', [ 'Quote not found', row.id, userId ]);
+        const queryTemplate = 'UPDATE points SET "status" = $1::text WHERE id = $2::int';
+        await psqlClient.query(queryTemplate, [ newValues.status, row.id ]);
+      } else {
+        console.log(row.id, 'nothing changed, still not OK');
+      }
     }
   });
   await Promise.all(promises);
 }
 
 export async function updateEtoCrawl(docId, content, psqlClient, userId) {
+  // console.log('updateEtoCrawl', docId, content, psqlClient, userId);
   await psqlClient.query('INSERT INTO document_comments (summary, document_id, user_id, created_at, updated_at) VALUES ($1::text, $2::int, $3::int, now(), now())', [ 'Updated crawl using tosback-crawler', docId, userId ]);
   await psqlClient.query('UPDATE documents SET text = $1::text, updated_at=now() WHERE id = $2::int',
     [ content, docId ]);

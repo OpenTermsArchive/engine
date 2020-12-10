@@ -17,7 +17,7 @@ const psqlClient = new Client({
 });
 
 function query(template, params) {
-  console.log('Q:', template, params);
+  // console.log('Q:', template, params);
   return psqlClient.query(template, params);
 }
 async function getRow(model, idStr) {
@@ -50,7 +50,7 @@ async function moveDependents(dependentModelName, mergedModelName, id1, id2, use
     id1
   ]);
   const dependentIds = affected.rows.map(row => row.id);
-  console.log(dependentIds);
+  // console.log(dependentIds);
   const promises = dependentIds.map(async dependentId => {
     await query(`INSERT INTO ${dependentModelName}_comments (summary, ${dependentModelName}_id, user_id, created_at, updated_at) VALUES ($1::text, $2::int, $3::int, now(), now())`, [
       `Moving from ${mergedModelName}_id ${id1} to ${id2} due to ${mergedModelName} merge`,
@@ -72,7 +72,7 @@ async function deleteRow(modelName, id1, id2, userId) {
 }
 
 async function merge({ userId, model, arg1, arg2, fieldsToCheck, dependentModels }) {
-  console.log(`Getting ${model}s`, arg1, arg2);
+  // console.log(`Getting ${model}s`, arg1, arg2);
   const obj1 = await getRow(model, arg1);
   const obj2 = await getRow(model, arg2);
   fieldsToCheck.forEach(field => {
@@ -80,7 +80,7 @@ async function merge({ userId, model, arg1, arg2, fieldsToCheck, dependentModels
       throw new Error(`Can only merge ${model}s if their ${field} is the same`);
     }
   });
-  console.log('Can merge', obj1.id, obj2.id);
+  // console.log('Can merge', obj1.id, obj2.id);
   await addMergeComment(model, obj1.id, obj2.id, userId);
   await Promise.all(dependentModels.map(dependentModel => moveDependents(dependentModel, model, obj1.id, obj2.id, userId)));
   await deleteRow(model, obj1.id, obj2.id, userId);
@@ -88,20 +88,40 @@ async function merge({ userId, model, arg1, arg2, fieldsToCheck, dependentModels
 
 async function updateCrawl({ userId, docId, localPath }) {
   const content = fs.readFileSync(localPath).toString();
-  await updateEtoCrawl(docId, content, psqlClient, userId);
-  await checkQuotes(docId, psqlClient, userId);
+  await updateEtoCrawl(docId, content, { query }, userId);
+  await checkQuotes(docId, { query }, userId);
+}
+
+async function checkSomeQuotes({ userId, docId }) {
+  if (typeof docId === 'string') {
+    return checkQuotes(docId, { query }, userId);
+  }
+  const docIds = await query('SELECT id FROM documents');
+  async function next(index) {
+    if (index >= docIds.rows.length) {
+      return;
+    }
+    console.log(`Document ${docIds.rows[index].id} (${index} of ${docIds.rows.length})`);
+    await checkQuotes(docIds.rows[index].id, { query }, userId);
+    // await new Promise(resolve => setTimeout(resolve, 100));
+    return next(index + 1);
+  }
+  return next(0);
 }
 
 async function run({ userId, command, arg1, arg2 }) {
   await psqlClient.connect();
-  console.log({ userId, command, arg1, arg2 });
+  // console.log({ userId, command, arg1, arg2 });
   if (command === 'merge_documents') {
     await merge({ userId, model: 'document', arg1, arg2, fieldsToCheck: [ 'url', 'xpath', 'service_id' ], dependentModels: [ 'point' ] });
   } else if (command === 'merge_services') {
     await merge({ userId, model: 'service', arg1, arg2, fieldsToCheck: [ 'url' ], dependentModels: [ 'point', 'document' ] });
   } else if (command === 'update_crawl') {
     await updateCrawl({ userId, docId: arg1, localPath: arg2 });
+  } else if (command === 'check_quotes') {
+    await checkSomeQuotes({ userId, docId: arg1 });
   }
+
   console.log('ending');
   await psqlClient.end();
 }

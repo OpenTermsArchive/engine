@@ -18,8 +18,20 @@ export PSQL_CONNECTION_STRING="..."
 node src/eto-admin.js 789 merge_documents 456 789
 ```
 
-And to update the crawl for the Twitter PP, as userId 789, run:
+And to update the crawl for the Twitter PP and check quotes, as userId 789, run:
 ```sh
 export PSQL_CONNECTION_STRING="..."
 node src/eto-admin.js 789 update_crawl 90 ../tosback2/crawl_reviewed/twitter.com/Privacy\ Policy.txt
+```
+
+To only check quotes of document 90, as userId 789, run:
+```sh
+export PSQL_CONNECTION_STRING="..."
+node src/eto-admin.js 789 check_quotes 90
+```
+
+To check quotes of all documents, as userId 789, run:
+```sh
+export PSQL_CONNECTION_STRING="..."
+node src/eto-admin.js 789 check_quotes
 ```
