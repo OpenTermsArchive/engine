@@ -73,9 +73,17 @@ export async function filterHTML({ content, documentDeclaration }) {
 }
 
 export async function filterPDF({ content: pdfBuffer }) {
-  const ciceroMarkdown = await pdfTransformer.toCiceroMark(pdfBuffer);
+  try {
+    const ciceroMarkdown = await pdfTransformer.toCiceroMark(pdfBuffer);
 
-  return ciceroMarkTransformer.toMarkdown(ciceroMarkdown);
+    return ciceroMarkTransformer.toMarkdown(ciceroMarkdown);
+  } catch (error) {
+    if (error.parserError) {
+      throw new InaccessibleContentError('Can\'t parse PDF file');
+    }
+
+    throw error;
+  }
 }
 
 function selectRange(document, rangeSelector) {
