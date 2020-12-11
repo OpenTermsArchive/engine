@@ -9,11 +9,11 @@ if (!process.env.PSQL_CONNECTION_STRING) {
 }
 const psqlClient = new Client({
   connectionString: process.env.PSQL_CONNECTION_STRING,
-  ssl: {
+  ssl: (process.env.PSQL_CONNECTION_STRING === 'psql:///phoenix_development' ? false : {
     rejectUnauthorized: false
     // key: fs.readFileSync('.env/postgresql.key').toString(),
     // cert: fs.readFileSync('.env/postgresql.cert').toString()
-  }
+  })
 });
 
 function query(template, params) {
