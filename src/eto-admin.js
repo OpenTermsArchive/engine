@@ -77,6 +77,8 @@ async function merge({ userId, model, arg1, arg2, fieldsToCheck, dependentModels
   const obj2 = await getRow(model, arg2);
   fieldsToCheck.forEach(field => {
     if (obj1[field] !== obj2[field]) {
+      console.log(`${model} ${arg1} has ${field} "${obj1[field]}"`);
+      console.log(`${model} ${arg2} has ${field} "${obj2[field]}"`);
       throw new Error(`Can only merge ${model}s if their ${field} is the same`);
     }
   });
@@ -113,7 +115,7 @@ async function run({ userId, command, arg1, arg2 }) {
   await psqlClient.connect();
   // console.log({ userId, command, arg1, arg2 });
   if (command === 'merge_documents') {
-    await merge({ userId, model: 'document', arg1, arg2, fieldsToCheck: [ 'url', 'xpath', 'service_id' ], dependentModels: [ 'point' ] });
+    await merge({ userId, model: 'document', arg1, arg2, fieldsToCheck: [ /* 'url', 'xpath', */ 'service_id' ], dependentModels: [ 'point' ] });
   } else if (command === 'merge_services') {
     await merge({ userId, model: 'service', arg1, arg2, fieldsToCheck: [ 'url' ], dependentModels: [ 'point', 'document' ] });
   } else if (command === 'update_crawl') {
