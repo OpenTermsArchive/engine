@@ -20,7 +20,7 @@ export default async function fetch(url) {
   try {
     response = await nodeFetch(url, options);
   } catch (error) {
-    if (error.code && error.code.match(/^(ENOTFOUND|ETIMEDOUT|ECONNRESET)$/)) {
+    if (error.code && error.code.match(/^(EAI_AGAIN|ENOTFOUND|ETIMEDOUT|ECONNRESET)$/)) {
       throw new InaccessibleContentError(error.message);
     }
     throw error;

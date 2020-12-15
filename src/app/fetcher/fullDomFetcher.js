@@ -29,7 +29,7 @@ export default async function fetch(url, cssSelectors) {
 
     content = await page.content();
   } catch (error) {
-    if ((error.code && error.code.match(/^(ENOTFOUND|ETIMEDOUT|ECONNRESET)$/))
+    if ((error.code && error.code.match(/^(EAI_AGAIN|ENOTFOUND|ETIMEDOUT|ECONNRESET)$/))
       || (error.message && error.message.match(/(ERR_TUNNEL_CONNECTION_FAILED|ERR_NAME_NOT_RESOLVED)/))
       || error instanceof puppeteer.pptr.errors.TimeoutError // Expected elements are not present on the web page
     ) {
