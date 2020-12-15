@@ -92,11 +92,8 @@ function findQuote(quoteWords, documentWords) {
   } while (startWord !== -1);
   // throw new Error('quote not found!');
   // console.log('quote not found');
-  if (startWord === -1) {
-    startWord = false;
-  }
   return {
-    startWord: false,
+    startWord,
     endWordInParagraph: false
   };
 }
@@ -138,7 +135,7 @@ export async function checkQuotes(docId, psqlClient, userId) {
       found = true;
     } else {
       const { startWord, endWordInParagraph } = findQuote(getWords(row.quoteText).map(word => word.lower), words.map(word => word.lower));
-      if (startWord !== false) {
+      if (startWord !== -1) {
         // const endWord = startWord + endWordInParagraph;
         newValues.quoteStart = words[startWord].start;
         newValues.quoteEnd = words[startWord + endWordInParagraph - 1].end;
