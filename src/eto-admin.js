@@ -117,7 +117,7 @@ async function run({ userId, command, arg1, arg2 }) {
   if (command === 'merge_documents') {
     await merge({ userId, model: 'document', arg1, arg2, fieldsToCheck: [ /* 'url', 'xpath', */ 'service_id' ], dependentModels: [ 'point' ] });
   } else if (command === 'merge_services') {
-    await merge({ userId, model: 'service', arg1, arg2, fieldsToCheck: [ 'url' ], dependentModels: [ 'point', 'document' ] });
+    await merge({ userId, model: 'service', arg1, arg2, fieldsToCheck: [ /* 'url' */ ], dependentModels: [ 'point', 'document' ] });
   } else if (command === 'update_crawl') {
     await updateCrawl({ userId, docId: arg1, localPath: arg2 });
   } else if (command === 'check_quotes') {
