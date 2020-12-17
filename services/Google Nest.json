@@ -8,7 +8,7 @@
         "Privacy Policy": {
             "fetch": "https://store.google.com/gb/magazine/google_nest_privacy",
             "executeClientScripts": true,
-            "select": "div.mqn2-cs7.ng-scope.mqn2-cs9"
+            "select": "div.mqn2-cs7.ng-scope.mqn2-cs9, section.wombat_faq_accordion_module"
         }
     }
 }
