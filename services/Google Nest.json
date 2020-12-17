@@ -1,0 +1,14 @@
+{
+    "name": "Google Nest",
+    "documents": {
+        "Terms of Service": {
+            "fetch": "https://support.google.com/googlenest/answer/9327735?hl=en-GB",
+            "select": "section[class=article-container]"
+        },
+        "Privacy Policy": {
+            "fetch": "https://store.google.com/gb/magazine/google_nest_privacy",
+            "executeClientScripts": true,
+            "select": "div.mqn2-cs7.ng-scope.mqn2-cs9"
+        }
+    }
+}
