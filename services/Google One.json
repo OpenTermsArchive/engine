@@ -1,0 +1,9 @@
+{
+  "name": "Google One",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://one.google.com/terms-of-service",
+      "select": ".vcGo8"
+    }
+  }
+}
