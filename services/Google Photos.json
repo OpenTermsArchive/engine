@@ -1,0 +1,10 @@
+{
+  "name": "Google Photos",
+  "documents": {
+    "Acceptable Use Policy": {
+      "fetch": "https://support.google.com/photos/answer/9292998?hl=en-GB",
+      "select": "section[class=article-container]",
+      "remove": ".scClientFeedbackInlineFeedbacklinkroot"
+    }
+  }
+}
