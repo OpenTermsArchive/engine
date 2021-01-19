@@ -1,0 +1,10 @@
+{
+  "name": "Local Guides",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://maps.google.com/localguides/rules?hl=en_GB",
+      "select": "div.rules",
+      "executeClientScripts": true
+    }
+  }
+}
