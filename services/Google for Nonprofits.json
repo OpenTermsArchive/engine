@@ -5,6 +5,6 @@
             "fetch": "https://support.google.com/nonprofits/answer/9004493?hl=en-GB",
             "select": "section[class=article-container]",
             "remove": ".scClientFeedbackInlineFeedbacklinkroot"
-		}
+        }
     }
 }
