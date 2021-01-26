@@ -1,0 +1,15 @@
+{
+  "name": "Google My Business",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://support.google.com/business/answer/9292476?hl=en-GB",
+      "select": "section[class=article-container]",
+      "remove": ".scClientFeedbackInlineFeedbacklinkroot"
+    },
+    "Acceptable Use Policy": {
+      "fetch": "https://support.google.com/business/answer/3038177?hl=en-GB&ref_topic=4540086",
+      "select": "section[class=article-container]",
+      "remove": ".scClientFeedbackInlineFeedbacklinkroot"
+    }
+  }
+}

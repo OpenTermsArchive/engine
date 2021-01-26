@@ -18,6 +18,10 @@
       ],
       "select": "div[role=article]",
       "remove": ".bVzSHe + p, .RwC1f, img[src$='.svg'], img[src^='data:image/svg+xml']"
+    },
+    "Acceptable Use Policy": {
+      "fetch": "https://www.google.com/gmail/about/policy/?hl=en_GB",
+      "select": ".policy__content"
     }
   }
 }

@@ -1,0 +1,10 @@
+{
+  "name": "Google Meet",
+  "documents": {
+    "Acceptable Use Policy": {
+      "fetch": "https://support.google.com/meet/answer/9847091?hl=en-GB",
+      "select": "section[class=article-container]",
+      "remove": ".scClientFeedbackInlineFeedbacklinkroot"
+    }
+  }
+}
