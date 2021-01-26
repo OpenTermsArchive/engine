@@ -1,0 +1,14 @@
+{
+	"name": "Google Merchant Center",
+	"documents": {
+		"Terms of Service": {
+			"fetch": "https://merchants.google.com/files/tos/extend/GB/tos.html",
+			"select": ".inlined-doc"
+		},
+		"Acceptable Use Policy": {
+			"fetch": "https://support.google.com/merchants/answer/6149970?hl=en-GB",
+			"select": "section[class=article-container]",
+			"remove": ".scClientFeedbackInlineFeedbacklinkroot, img[src='//lh4.ggpht.com/a6ATZem5pygs6xvEh8FOkIDrLOoFKfFV2HpYjPo-qWpLWalSGPW7NOxI-wqr0YxwlMxKVmY=w48'], img[src='//lh6.ggpht.com/7skHn-AkqcyuGzvlsxuUACKw4-yoB5SJ6kV17OvHrKIdcEo9RqG1807r_UDm_LHDcoNWmxzf2A=w48'], img[src='//lh3.ggpht.com/6Zwu1kJ2A2j0P8ad7LrILT33PLuJ4KROB6UqtRcDVLCotV5VJF2H9NeVLIULQshDape0U6Y=w48'], img[src='//www.google.com/images/icons/feature/checklist_pencil-b42.png']"
+		}
+	}
+}

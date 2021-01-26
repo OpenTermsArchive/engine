@@ -1,0 +1,13 @@
+{
+  "name": "Google Pay",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://payments.google.com/payments/apis-secure/u/0/get_legal_document?ldo=0&ldt=buyertos&ldr=GB",
+      "select": "body"
+    },
+    "Privacy Policy": {
+      "fetch": "https://payments.google.com/payments/apis-secure/get_legal_document?ldo=0&ldt=privacynotice&ldl=en",
+      "select": "body"
+    }
+  }
+}

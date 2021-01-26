@@ -1,0 +1,9 @@
+{
+  "name": "Google Store",
+  "documents": {
+    "Commercial Terms": {
+      "fetch": "https://store.google.com/intl/en_uk/about/device-terms/",
+      "select": ".page-content"
+    }
+  }
+}

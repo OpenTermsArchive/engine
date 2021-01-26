@@ -1,0 +1,13 @@
+{
+    "name": "Google Data Studio",
+    "documents": {
+        "Terms of Service": {
+            "fetch": "https://support.google.com/datastudio/answer/7019158?hl=en-GB",
+            "select": "section[class=article-container]"
+        },
+        "Acceptable Use Policy": {
+            "fetch": "https://support.google.com/datastudio/answer/7020012?hl=en&ref_topic=7156687?hl=en-GB",
+            "select": "section[class=article-container]"
+        }
+    }
+}
