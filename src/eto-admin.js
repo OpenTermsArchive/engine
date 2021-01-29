@@ -121,7 +121,11 @@ async function run({ userId, command, arg1, arg2 }) {
   } else if (command === 'update_crawl') {
     await updateCrawl({ userId, docId: arg1, localPath: arg2 });
   } else if (command === 'check_quotes') {
-    await checkSomeQuotes({ userId, docId: arg1 });
+	try {
+		await checkSomeQuotes({ userId, docId: arg1 });
+	} catch (e){
+		console.error(e);
+	}
   }
 
   console.log('ending');
