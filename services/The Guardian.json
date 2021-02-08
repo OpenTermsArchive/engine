@@ -8,7 +8,7 @@
     },
     "Privacy Policy": {
       "fetch": "https://www.theguardian.com/help/privacy-policy",
-      "select": ".content__headline, .content__article-body.from-content-api.js-article__body"
+      "select": ".content__article-body"
     }
   }
 }
