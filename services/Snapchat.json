@@ -3,22 +3,19 @@
   "documents": {
     "Terms of Service": {
       "fetch": "https://www.snap.com/en-GB/terms",
-      "select": {
-        "startBefore": "#terms-row",
-        "endAfter": ".textarticle-container > *:last-child"
-      }
+      "select": "#terms-row"
     },
     "Privacy Policy": {
       "fetch": "https://www.snap.com/en-GB/privacy/privacy-policy",
-      "select": ".textarticle-container"
+      "select": ".TermContainer-sc-1eyc2w4"
     },
     "Trackers Policy": {
       "fetch": "https://www.snap.com/en-GB/cookie-policy/",
-      "select": ".textarticle-container"
+      "select": ".TermContainer-sc-1eyc2w4"
     },
     "Community Guidelines": {
       "fetch": "https://www.snap.com/en-GB/community-guidelines",
-      "select": ".textarticle-container "
+      "select": ".TermContainer-sc-1eyc2w4"
     }
   }
 }
