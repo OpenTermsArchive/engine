@@ -9,7 +9,7 @@
     },
     "Terms of Service": {
       "fetch": "https://www.youtube.com/t/terms",
-      "select": "div#article-container"
+      "select": "div#main-content"
     },
     "Developer Terms": {
       "fetch": "https://developers.google.com/youtube/terms/developer-policies",
