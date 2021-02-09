@@ -2,12 +2,12 @@
   "name": "Twitch",
   "documents": {
     "Terms of Service": {
-      "fetch": "https://www.twitch.tv/p/legal/terms-of-service/",
-      "select": ".editable"
+      "fetch": "https://www.twitch.tv/p/en/legal/terms-of-service/",
+      "select": ".typeset"
     },
     "Privacy Policy": {
-      "fetch": "https://www.twitch.tv/p/legal/privacy-notice/",
-      "select": ".editable"
+      "fetch": "https://www.twitch.tv/p/en/legal/privacy-notice/",
+      "select": ".typeset"
     }
   }
 }
