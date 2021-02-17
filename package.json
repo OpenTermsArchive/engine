@@ -35,7 +35,7 @@
   },
   "homepage": "https://github.com/ambanum/CGUs#readme",
   "devDependencies": {
-    "ajv": "^6.12.3",
+    "ajv": "^7.1.1",
     "chai": "^4.3.0",
     "chai-as-promised": "^7.1.1",
     "eslint": "^7.20.0",
