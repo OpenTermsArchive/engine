@@ -1,3 +1,5 @@
+import './bootstrap.js';
+
 import scheduler from 'node-schedule';
 
 import CGUs from './app/index.js';
