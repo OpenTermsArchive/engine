@@ -1,3 +1,5 @@
+<img src="https://disinfo.quaidorsay.fr/assets/img/logo.png" width="140">
+
 # Open Terms Archive
 
 **Services** have **terms** that can change over time. _Open Terms Archive_ enables users rights advocates, regulatory bodies and any interested citizen to follow the **changes** to these **terms** by being **notified** whenever a new **version** is published, and exploring their entire **history**.
