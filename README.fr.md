@@ -1,3 +1,5 @@
+<img src="https://disinfo.quaidorsay.fr/assets/img/logo.png" width="140">
+
 # Open Terms Archive
 
 Les services en ligne ont des conditions générales qui évoluent dans le temps. _Open Terms Archive_ permet aux défenseurs des droits des utilisateurs, aux régulateurs et à toute personne intéressée de suivre les évolutions de ces conditions générales en étant notifiée à chaque publication d'une nouvelle version, et en explorant leur historique.
