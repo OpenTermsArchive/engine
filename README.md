@@ -192,9 +192,9 @@ An example of a production configuration file can be found in `config/production
 ```json
 {
   "history": {
-    "publicSnapshotsRepository": "https://github.com/ambanum/Open Terms Archive-snapshots.git",
-    "publicVersionsRepository": "https://github.com/ambanum/Open Terms Archive-versions.git",
-    "snapshotsBaseUrl": "https://github.com/ambanum/Open Terms Archive-snapshots/commit/"
+    "publicSnapshotsRepository": "https://github.com/ambanum/CGUs-snapshots.git",
+    "publicVersionsRepository": "https://github.com/ambanum/CGUs-versions.git",
+    "snapshotsBaseUrl": "https://github.com/ambanum/CGUs-snapshots/commit/"
   }
 }
 ```
