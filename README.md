@@ -1,8 +1,8 @@
-# CGUs
+# Open Terms Archive
 
-**Services** have **terms** that can change over time. _CGUs_ enables users rights advocates, regulatory bodies and any interested citizen to follow the **changes** to these **terms** by being **notified** whenever a new **version** is published, and exploring their entire **history**.
+**Services** have **terms** that can change over time. _Open Terms Archive_ enables users rights advocates, regulatory bodies and any interested citizen to follow the **changes** to these **terms** by being **notified** whenever a new **version** is published, and exploring their entire **history**.
 
-> Les services ont des conditions générales qui évoluent dans le temps. _CGUs_ permet aux défenseurs des droits des utilisateurs, aux régulateurs et à toute personne intéressée de suivre les évolutions de ces conditions générales en étant notifiée à chaque publication d'une nouvelle version, et en explorant leur historique.
+> Les services ont des conditions générales qui évoluent dans le temps. _Open Terms Archive_ permet aux défenseurs des droits des utilisateurs, aux régulateurs et à toute personne intéressée de suivre les évolutions de ces conditions générales en étant notifiée à chaque publication d'une nouvelle version, et en explorant leur historique.
 
 [🇫🇷 Manuel en français](README.fr.md).
 
@@ -36,13 +36,13 @@
 
 _Note: Words in bold are [business domain names](https://en.wikipedia.org/wiki/Domain-driven_design)._
 
-**Services** are **declared** within _CGUs_ with a **declaration file** listing all the **documents** that, together, constitute the **terms** under which this **service** can be used. These **documents** all have a **type**, such as “terms and conditions”, “privacy policy”, “developer agreement”…
+**Services** are **declared** within _Open Terms Archive_ with a **declaration file** listing all the **documents** that, together, constitute the **terms** under which this **service** can be used. These **documents** all have a **type**, such as “terms and conditions”, “privacy policy”, “developer agreement”…
 
-In order to **track** their **changes**, **documents** are periodically obtained by **fetching** a web **location** and **selecting content** within the **web page** to remove the **noise** (ads, navigation menu, login fields…). Beyond selecting a subset of a page, some **documents** have additional **noise** (hashes in links, CSRF tokens…) that would be false positives for **changes**. _CGUs_ thus supports specific **filters** for each **document**.
+In order to **track** their **changes**, **documents** are periodically obtained by **fetching** a web **location** and **selecting content** within the **web page** to remove the **noise** (ads, navigation menu, login fields…). Beyond selecting a subset of a page, some **documents** have additional **noise** (hashes in links, CSRF tokens…) that would be false positives for **changes**. _Open Terms Archive_ thus supports specific **filters** for each **document**.
 
 However, the shape of that **noise** can change over time. In order to recover in case of information loss during the **noise filtering** step, a **snapshot** is **recorded** every time there is a **change**. After the **noise** is **filtered out** from the **snapshot**, if there are **changes** in the resulting **document**, a new **version** of the **document** is **recorded**.
 
-Anyone can run their own **private** instance and track changes on their own. However, we also **publish** each **version** on a [**public** instance](https://github.com/ambanum/CGUs-versions) that makes it easy to explore the entire **history** and enables **notifying** over email whenever a new **version** is **recorded**.
+Anyone can run their own **private** instance and track changes on their own. However, we also **publish** each **version** on a [**public** instance](https://github.com/ambanum/Open Terms Archive-versions) that makes it easy to explore the entire **history** and enables **notifying** over email whenever a new **version** is **recorded**.
 Users can [**subscribe** to **notifications**](#be-notified).
 
 _Note: For now, when multiple versions coexist, **terms** are only **tracked** in their English version and for the European jurisdiction._
@@ -50,23 +50,23 @@ _Note: For now, when multiple versions coexist, **terms** are only **tracked** i
 
 ## Exploring the versions history
 
-We offer a public database of versions recorded each time there is a change in the terms of service and other contractual documents of tracked services: [CGUs-Versions](https://github.com/ambanum/CGUs-versions).
+We offer a public database of versions recorded each time there is a change in the terms of service and other contractual documents of tracked services: [Open Terms Archive-Versions](https://github.com/ambanum/Open Terms Archive-versions).
 
-From the **repository homepage** [CGUs-versions](https://github.com/ambanum/CGUs-versions), open the folder of the **service of your choice** (e.g. [WhatsApp](https://github.com/ambanum/CGUs-versions/tree/master/WhatsApp)).
+From the **repository homepage** [Open Terms Archive-versions](https://github.com/ambanum/Open Terms Archive-versions), open the folder of the **service of your choice** (e.g. [WhatsApp](https://github.com/ambanum/Open Terms Archive-versions/tree/master/WhatsApp)).
 
-You will see the **set of documents tracked** for that service, now click **on the document of your choice** (e.g. [WhatsApp's Privacy Policy](https://github.com/ambanum/CGUs-versions/blob/master/WhatsApp/Privacy%20Policy.md)). The **latest version** (updated hourly) will be displayed.
+You will see the **set of documents tracked** for that service, now click **on the document of your choice** (e.g. [WhatsApp's Privacy Policy](https://github.com/ambanum/Open Terms Archive-versions/blob/master/WhatsApp/Privacy%20Policy.md)). The **latest version** (updated hourly) will be displayed.
 
-To view the **history of changes** made to this document, click on **History** at the top right of the document (for our previous [example](https://github.com/ambanum/CGUs-versions/commits/master/WhatsApp/Privacy%20Policy.md)). The **changes** are ordered **by date**, with the latest first.
+To view the **history of changes** made to this document, click on **History** at the top right of the document (for our previous [example](https://github.com/ambanum/Open Terms Archive-versions/commits/master/WhatsApp/Privacy%20Policy.md)). The **changes** are ordered **by date**, with the latest first.
 
-Click on a change to see what it consists of (for example [this one](https://github.com/ambanum/CGUs-versions/commit/58a1d2ae4187a3260ac58f3f3c7dcd3aeacaebcd)). There are **two types of display** you can choose from the icons in the gray bar above the document.
+Click on a change to see what it consists of (for example [this one](https://github.com/ambanum/Open Terms Archive-versions/commit/58a1d2ae4187a3260ac58f3f3c7dcd3aeacaebcd)). There are **two types of display** you can choose from the icons in the gray bar above the document.
 
-- The first one, named *source diff* (button with chevrons) allows you to **display the old version and the new one side by side** (for our [example](https://github.com/ambanum/CGUs-versions/commit/58a1d2ae4187a3260ac58f3f3c7dcd3aeacaebcd#diff-e8bdae8692561f60aeac9d27a55e84fc)). This display has the merit of **explicitly showing** all additions and deletions.
-- The second one, named *rich diff* (button with a document icon) allows you to **unify all the changes in a single document** (for our [example](https://github.com/ambanum/CGUs-versions/commit/58a1d2ae4187a3260ac58f3f3c7dcd3aeacaebcd?short_path=e8bdae8#diff-e8bdae8692561f60aeac9d27a55e84fc)). The **red** color shows **deleted** elements, the **yellow** color shows **modified** paragraphs, and the **green** color shows **added** elements. Be careful, this display **does not show some changes** such as hyperlinks and text style's changes.
+- The first one, named *source diff* (button with chevrons) allows you to **display the old version and the new one side by side** (for our [example](https://github.com/ambanum/Open Terms Archive-versions/commit/58a1d2ae4187a3260ac58f3f3c7dcd3aeacaebcd#diff-e8bdae8692561f60aeac9d27a55e84fc)). This display has the merit of **explicitly showing** all additions and deletions.
+- The second one, named *rich diff* (button with a document icon) allows you to **unify all the changes in a single document** (for our [example](https://github.com/ambanum/Open Terms Archive-versions/commit/58a1d2ae4187a3260ac58f3f3c7dcd3aeacaebcd?short_path=e8bdae8#diff-e8bdae8692561f60aeac9d27a55e84fc)). The **red** color shows **deleted** elements, the **yellow** color shows **modified** paragraphs, and the **green** color shows **added** elements. Be careful, this display **does not show some changes** such as hyperlinks and text style's changes.
 
 ### Notes
 
 - For long documents, unchanged **paragraphs will not be displayed by default**. You can manually make them appear by clicking on the small arrows just above or just below the displayed paragraphs.
-- You can use the **History button anywhere** in the repository CGUs-versions, which will then display the **history of changes made to all documents in the folder** where you are (including sub-folders).
+- You can use the **History button anywhere** in the repository Open Terms Archive-versions, which will then display the **history of changes made to all documents in the folder** where you are (including sub-folders).
 
 ## Be notified
 
@@ -86,28 +86,28 @@ You can receive notification for a specific service or document by subscribing t
 
 To find out the address of the RSS feed you want to subscribe to:
 
-1. [Navigate](#exploring-the-versions-history) to the page with the history of changes you are interested in. _In the WhatsApp example above, this would be [this page](https://github.com/ambanum/CGUs-versions/commits/master/WhatsApp/Privacy%20Policy.md)._
-2. Copy the address of that page from your browser’s address bar. _In the WhatsApp example, this would be `https://github.com/ambanum/CGUs-versions/commits/master/WhatsApp/Privacy%20Policy.md`._
-3. Append `.atom` at the end of this address. _In the WhatsApp example, this would become `https://github.com/ambanum/CGUs-versions/commits/master/WhatsApp/Privacy%20Policy.md.atom`._
+1. [Navigate](#exploring-the-versions-history) to the page with the history of changes you are interested in. _In the WhatsApp example above, this would be [this page](https://github.com/ambanum/Open Terms Archive-versions/commits/master/WhatsApp/Privacy%20Policy.md)._
+2. Copy the address of that page from your browser’s address bar. _In the WhatsApp example, this would be `https://github.com/ambanum/Open Terms Archive-versions/commits/master/WhatsApp/Privacy%20Policy.md`._
+3. Append `.atom` at the end of this address. _In the WhatsApp example, this would become `https://github.com/ambanum/Open Terms Archive-versions/commits/master/WhatsApp/Privacy%20Policy.md.atom`._
 4. Subscribe your RSS feed reader to the resulting address.
 
 #### Recap of available RSS feeds
 
 | Updated for | URL |
 |-------------|--|
-| all services and documents | `https://github.com/ambanum/CGUs-versions/commits.atom` |
-| all the documents of a service | Replace `$serviceId` with the service ID:<br>`https://github.com/ambanum/CGUs-versions/commits/master/$serviceId.atom.` |
-| un document spécifique d'un service | Replace `$serviceId` with the service ID and `$documentType` with the document type:<br>`https://github.com/ambanum/CGUs-versions/commits/master/$serviceId/$documentType.md.atom` |
+| all services and documents | `https://github.com/ambanum/Open Terms Archive-versions/commits.atom` |
+| all the documents of a service | Replace `$serviceId` with the service ID:<br>`https://github.com/ambanum/Open Terms Archive-versions/commits/master/$serviceId.atom.` |
+| un document spécifique d'un service | Replace `$serviceId` with the service ID and `$documentType` with the document type:<br>`https://github.com/ambanum/Open Terms Archive-versions/commits/master/$serviceId/$documentType.md.atom` |
 
 For example:
 
-- To receive all updates of `Facebook` documents, the URL is `https://github.com/ambanum/CGUs-versions/commits/master/Facebook.atom`.
-- To receive all updates of the `Privacy Policy` from `Google`, the URL is `https://github.com/ambanum/CGUs-versions/commits/master/Google/Privacy%20Policy.md.atom`.
+- To receive all updates of `Facebook` documents, the URL is `https://github.com/ambanum/Open Terms Archive-versions/commits/master/Facebook.atom`.
+- To receive all updates of the `Privacy Policy` from `Google`, the URL is `https://github.com/ambanum/Open Terms Archive-versions/commits/master/Google/Privacy%20Policy.md.atom`.
 
 
 ## Analysing the snapshots history
 
-We provide a database of snapshots recorded each time there is a change in the terms of service and other contractual documents of tracked services: [CGUs-Snapshots](https://github.com/ambanum/CGUs-snapshots).
+We provide a database of snapshots recorded each time there is a change in the terms of service and other contractual documents of tracked services: [Open Terms Archive-Snapshots](https://github.com/ambanum/Open Terms Archive-snapshots).
 
 
 ## Contributing
@@ -127,8 +127,8 @@ This module is built with [Node](https://nodejs.org/en/). You will need to [inst
 Clone the repository and install dependencies:
 
 ```sh
-git clone https://github.com/ambanum/CGUs.git
-cd CGUs
+git clone https://github.com/ambanum/Open Terms Archive.git
+cd Open Terms Archive
 npm install
 ```
 
@@ -192,9 +192,9 @@ An example of a production configuration file can be found in `config/production
 ```json
 {
   "history": {
-    "publicSnapshotsRepository": "https://github.com/ambanum/CGUs-snapshots.git",
-    "publicVersionsRepository": "https://github.com/ambanum/CGUs-versions.git",
-    "snapshotsBaseUrl": "https://github.com/ambanum/CGUs-snapshots/commit/"
+    "publicSnapshotsRepository": "https://github.com/ambanum/Open Terms Archive-snapshots.git",
+    "publicVersionsRepository": "https://github.com/ambanum/Open Terms Archive-versions.git",
+    "snapshotsBaseUrl": "https://github.com/ambanum/Open Terms Archive-snapshots/commit/"
   }
 }
 ```
