@@ -21,10 +21,7 @@
   command: npm install -g npm
 
 - name: Install forever
-  npm:
-    name: forever
-    global: yes
-    production: yes
+  npm: name=forever global=yes state=present production=yes # https://github.com/geerlingguy/ansible-for-devops/issues/23
 
 - name: Add GitHub SSH key
   copy:
