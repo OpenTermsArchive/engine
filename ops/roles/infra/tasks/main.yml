@@ -2,9 +2,9 @@
 - name: Install common required packages
   apt:
     pkg:
-    - curl
-    - build-essential
-    - git
+      - curl
+      - build-essential
+      - git
     update_cache: yes
     state: latest
 
@@ -21,7 +21,7 @@
   command: npm install -g npm
 
 - name: Install forever
-  npm: name=forever global=yes state=present production=yes # https://github.com/geerlingguy/ansible-for-devops/issues/23
+  command: npm install -g forever --production=true
 
 - name: Add GitHub SSH key
   copy:
@@ -42,7 +42,7 @@
 - name: Install Chromium
   apt:
     pkg:
-    - chromium
+      - chromium
     update_cache: yes
     state: latest
 
