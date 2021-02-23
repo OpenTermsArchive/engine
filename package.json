@@ -63,7 +63,7 @@
     "https-proxy-agent": "^5.0.0",
     "joplin-turndown-plugin-gfm": "^1.0.12",
     "jsdom": "^16.4.0",
-    "mime": "^2.5.0",
+    "mime": "^2.5.2",
     "node-fetch": "^2.6.1",
     "node-schedule": "^2.0.0",
     "puppeteer": "^7.1.0",
