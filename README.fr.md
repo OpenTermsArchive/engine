@@ -1,6 +1,8 @@
-# CGUs
+<img src="https://disinfo.quaidorsay.fr/assets/img/logo.png" width="140">
 
-Les services en ligne ont des conditions générales qui évoluent dans le temps. _CGUs_ permet aux défenseurs des droits des utilisateurs, aux régulateurs et à toute personne intéressée de suivre les évolutions de ces conditions générales en étant notifiée à chaque publication d'une nouvelle version, et en explorant leur historique.
+# Open Terms Archive
+
+Les services en ligne ont des conditions générales qui évoluent dans le temps. _Open Terms Archive_ permet aux défenseurs des droits des utilisateurs, aux régulateurs et à toute personne intéressée de suivre les évolutions de ces conditions générales en étant notifiée à chaque publication d'une nouvelle version, et en explorant leur historique.
 
 ## Table des matières
 
@@ -19,13 +21,13 @@ Les services en ligne ont des conditions générales qui évoluent dans le temps
 
 _Note: Les mots en gras sont les [termes du domaine](https://fr.wikipedia.org/wiki/Conception_pilot%C3%A9e_par_le_domaine)._
 
-Les **services** sont **déclarés** dans l'outil _CGUs_ grâce à un **fichier de déclaration** listant les **documents** qui forment l'ensemble des **conditions** régissant l'usage du **service**. Ces **documents** peuvent être de plusieurs **types** : « conditions d'utilisation », « politique de confidentialité », « contrat de développeur »…
+Les **services** sont **déclarés** dans l'outil _Open Terms Archive_ grâce à un **fichier de déclaration** listant les **documents** qui forment l'ensemble des **conditions** régissant l'usage du **service**. Ces **documents** peuvent être de plusieurs **types** : « conditions d'utilisation », « politique de confidentialité », « contrat de développeur »…
 
-Afin de **suivre** leurs **évolutions**, les **documents** sont régulièrement mis à jour, en les **téléchargeant** depuis une **adresse** web et en **sélectionnant leur contenu** dans la **page web** pour supprimer le **bruit** (publicités, menus de navigation, champs de connexion…). En plus de simplement sélectionner une zone de la page, certains documents possèdent du **bruit** supplémentaire (hashs dans des liens, jetons CSRF...) créant de faux positifs en terme d'**évolutions**. En conséquence, _CGUs_ supporte des **filtres** spécifiques pour chaque **document**.
+Afin de **suivre** leurs **évolutions**, les **documents** sont régulièrement mis à jour, en les **téléchargeant** depuis une **adresse** web et en **sélectionnant leur contenu** dans la **page web** pour supprimer le **bruit** (publicités, menus de navigation, champs de connexion…). En plus de simplement sélectionner une zone de la page, certains documents possèdent du **bruit** supplémentaire (hashs dans des liens, jetons CSRF...) créant de faux positifs en terme d'**évolutions**. En conséquence, _Open Terms Archive_ supporte des **filtres** spécifiques pour chaque **document**.
 
 Néanmoins, le **bruit** peut changer de forme avec le temps. Afin d'éviter des pertes d'information irrécupérables pendant l'étape de **filtrage du bruit**, un **instantané** de la page Web est **enregistré** à chaque **évolution**. Après avoir **filtré l'instantané** de son **bruit**, si le **document** résultant a changé par rapport à sa **version** précédente, une nouvelle **version** est **enregistrée**.
 
-Vous pouvez disposer de votre propre instance **privée** de l'outil _CGUs_ et suivre vous-même les **évolutions**. Néanmoins, nous **publions** chaque **version** sur une [instance **publique**](https://github.com/ambanum/CGUs-versions) facilitant l'exploration de l'**historique** et **notifiant** par courriels l'**enregistrement** de nouvelles **versions**. Les **utilisateurs** peuvent [**s'abonner** aux **notifications**](#recevoir-des-notifications).
+Vous pouvez disposer de votre propre instance **privée** de l'outil _Open Terms Archive_ et suivre vous-même les **évolutions**. Néanmoins, nous **publions** chaque **version** sur une [instance **publique**](https://github.com/ambanum/CGUs-versions) facilitant l'exploration de l'**historique** et **notifiant** par courriels l'**enregistrement** de nouvelles **versions**. Les **utilisateurs** peuvent [**s'abonner** aux **notifications**](#recevoir-des-notifications).
 
 _Note: Actuellement, nous ne suivons que les **conditions** rédigées en anglais et concernant la juridiction européenne._
 
