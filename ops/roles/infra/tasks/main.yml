@@ -2,9 +2,9 @@
 - name: Install common required packages
   apt:
     pkg:
-    - curl
-    - build-essential
-    - git
+      - curl
+      - build-essential
+      - git
     update_cache: yes
     state: latest
 
@@ -42,7 +42,7 @@
 - name: Install Chromium
   apt:
     pkg:
-    - chromium
+      - chromium
     update_cache: yes
     state: latest
 
