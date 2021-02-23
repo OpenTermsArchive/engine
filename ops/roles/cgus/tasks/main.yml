@@ -11,10 +11,9 @@
     - update
 
 - name: Install NPM packages
-  npm:
-    path: "/home/{{ ansible_user }}/{{ app }}"
-    unsafe_perm: yes
-    production: yes
+  command:
+    cmd: npm i --production --unsafe-perm=true --production=true
+    chdir: "/home/{{ ansible_user }}/{{ app }}"
   tags:
     - setup
     - update
