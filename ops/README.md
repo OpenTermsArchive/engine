@@ -97,3 +97,5 @@ all:
           ansible_ssh_port: 2200
           […]
 ```
+
+Or alternatively you can use the dev-fix config by appending `-i ops/inventories/dev-fix.yml`
