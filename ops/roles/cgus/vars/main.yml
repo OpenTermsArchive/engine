@@ -1,6 +1,0 @@
-app: cgus
-repository: https://github.com/ambanum/CGUs.git
-snapshots_directory: cgus-snapshots
-snapshots_repository: git@github.com:ambanum/CGUs-snapshots.git
-versions_directory: cgus-versions
-versions_repository: git@github.com:ambanum/CGUs-versions.git

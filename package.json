@@ -1,5 +1,5 @@
 {
-  "name": "cgus",
+  "name": "OpenTermsArchive",
   "version": "0.0.1",
   "description": "Tracks and makes visible all changes to the Terms Of Service of online service providers.",
   "main": "index.js",
@@ -26,14 +26,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ambanum/CGUs.git"
+    "url": "git+https://github.com/ambanum/OpenTermsArchive.git"
   },
   "author": "ambanum",
   "license": "EUPL-1.2",
   "bugs": {
-    "url": "https://github.com/ambanum/CGUs/issues"
+    "url": "https://github.com/ambanum/OpenTermsArchive/issues"
   },
-  "homepage": "https://github.com/ambanum/CGUs#readme",
+  "homepage": "https://github.com/ambanum/OpenTermsArchive#readme",
   "devDependencies": {
     "ajv": "^6.12.6",
     "chai": "^4.3.0",
