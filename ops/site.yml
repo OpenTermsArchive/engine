@@ -1,5 +1,5 @@
 ---
-- name: Setup CGUs infra and app
+- name: Setup OpenTermsArchive infra and app
   hosts: all
 
 - import_playbook: infra.yml
