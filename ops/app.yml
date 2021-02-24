@@ -1,6 +1,6 @@
 ---
-- name: Setup CGUs app and databases
+- name: Setup OpenTermsArchive app and databases
   hosts: all
 
   roles:
-    - cgus
+    - ota

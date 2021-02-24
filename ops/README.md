@@ -32,7 +32,7 @@ ansible-playbook ops/infra.yml
 
 Setting up the production infrastructure for publishing on the shared versions repository entails decrypting a private key managed with [Ansible Vault](https://docs.ansible.com/ansible/latest/user_guide/vault.html). It is decrypted with a password that we keep safe. You do not need to decrypt this specific private key on your own production server.
 
-- To setup `CGUs` app only:
+- To setup `OpenTermsArchive` app only:
 ```
 ansible-playbook ops/app.yml
 ```
@@ -51,7 +51,7 @@ Some tags are available to refine what will happen, use them with `--tags`:
  - `restart`: to restart the app
  - `update`: to update the app (pull code, install dependencies and restart app)
 
-For example, you can update `CGUs` by running:
+For example, you can update `OpenTermsArchive` by running:
 ```
 ansible-playbook ops/app.yml --tags update
 ```
@@ -61,7 +61,7 @@ ansible-playbook ops/app.yml --tags update
 You can get logs by connecting to the target machine over SSH and obtaining logs from the process manager:
 
 ```
-ssh user@machine forever logs cgus
+ssh user@machine forever logs ota
 ```
 
 ### Troubleshooting

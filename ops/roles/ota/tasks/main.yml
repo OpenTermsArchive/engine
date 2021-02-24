@@ -25,7 +25,7 @@
   tags:
     - setup
 
-- name: Stop CGUs
+- name: Stop OpenTermsArchive
   command: forever stop "{{ app }}"
   ignore_errors: yes
   tags:
@@ -35,17 +35,17 @@
 
 - include_tasks: database.yml
   vars:
-    name: CGUS-Snapshots
+    name: OpenTermsArchive-Snapshots
     repository: "{{ snapshots_repository }}"
     directory: "{{ snapshots_directory }}"
 
 - include_tasks: database.yml
   vars:
-    name: CGUS-Versions
+    name: OpenTermsArchive-Versions
     repository: "{{ versions_repository }}"
     directory: "{{ versions_directory }}"
 
-- name: Start CGUs
+- name: Start OpenTermsArchive
   command:
     cmd: forever start -m 10 -a --uid "{{ app }}" -c "npm run start:scheduler:prod" ./
     chdir: "/home/{{ ansible_user }}/{{ app }}"
