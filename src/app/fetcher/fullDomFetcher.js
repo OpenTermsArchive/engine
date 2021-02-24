@@ -17,6 +17,7 @@ export default async function fetch(url, cssSelectors) {
   try {
     browser = await puppeteer.launch({ headless: true });
     page = await browser.newPage();
+    await page.setDefaultNavigationTimeout(60000); // 60s
 
     response = await page.goto(url);
     const statusCode = response.status();
