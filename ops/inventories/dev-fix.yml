@@ -3,13 +3,13 @@ all:
     dev:
       hosts:
         '127.0.0.1':
-          ansible_ssh_port: 2200
+          ansible_ssh_port: 2222
           ansible_user: vagrant
           ansible_python_interpreter: /usr/bin/python3
-          base_url: http://disinfo.local
+          base_url: http://ota.local
           enable_https: false
           #
           # ansible_ssh_extra_args: -o StrictHostKeyChecking=no
           # if above does not work
-          ansible_ssh_private_key_file: .vagrant/machines/default/virtualbox/private_key
+          ansible_ssh_private_key_file: .vagrant/machines/ota/virtualbox/private_key
           ansible_ssh_extra_args: -o StrictHostKeyChecking=no -o IdentitiesOnly=yes

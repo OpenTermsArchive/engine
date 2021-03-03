@@ -64,6 +64,13 @@ You can get logs by connecting to the target machine over SSH and obtaining logs
 ssh user@machine forever logs ota
 ```
 
+### commands
+
+```
+deploy:ota:update       ansible-playbook ops/app.yml --tags update -i ops/inventories/production.yml --check --diff
+```
+
+
 ### Troubleshooting
 
 If you have the following error:
