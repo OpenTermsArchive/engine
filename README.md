@@ -130,7 +130,7 @@ Clone the repository and install dependencies:
 
 ```sh
 git clone https://github.com/ambanum/OpenTermsArchive.git
-cd CGUs
+cd OpenTermsArchive
 npm install
 ```
 
