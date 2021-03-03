@@ -109,7 +109,7 @@ For example:
 
 ## Analysing the snapshots history
 
-We provide a database of snapshots recorded each time there is a change in the terms of service and other contractual documents of tracked services: [CGUs-Snapshots](https://github.com/ambanum/OpenTermsArchive-snapshots).
+We provide a database of snapshots recorded each time there is a change in the terms of service and other contractual documents of tracked services: [OpenTermsArchive-Snapshots](https://github.com/ambanum/OpenTermsArchive-snapshots).
 
 
 ## Contributing
@@ -130,7 +130,7 @@ Clone the repository and install dependencies:
 
 ```sh
 git clone https://github.com/ambanum/OpenTermsArchive.git
-cd CGUs
+cd OpenTermsArchive
 npm install
 ```
 
