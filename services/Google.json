@@ -2,7 +2,7 @@
   "name": "Google",
   "documents": {
     "Privacy Policy": {
-      "fetch": "https://policies.google.com/privacy?hl=en-GB",
+      "fetch": "https://policies.google.com/privacy?hl=en-GB&gl=IE",
       "filter": [
         "removeUTMfromUrls"
       ],
@@ -10,7 +10,7 @@
       "remove": ".KMMDve, .TL2alc, img[src$='.svg'], img[src^='data:image/svg+xml']"
     },
     "Terms of Service": {
-      "fetch": "https://policies.google.com/terms?hl=en-GB",
+      "fetch": "https://policies.google.com/terms?hl=en-GB&gl=IE",
       "filter": [
         "removeUTMfromUrls",
         "removeCountryVersion"
