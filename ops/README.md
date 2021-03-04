@@ -67,6 +67,8 @@ ssh user@machine forever logs ota
 ### commands
 
 ```
+deploy:local:ota       ansible-playbook ops/site.yml -i ops/inventories/dev-fix.yml
+
 deploy:ota:update       ansible-playbook ops/app.yml --tags update -i ops/inventories/production.yml --check --diff
 ```
 
