@@ -3,9 +3,9 @@ import './bootstrap.js';
 import scheduler from 'node-schedule';
 
 import CGUs from './app/index.js';
+import * as services from './app/services/index.js';
 import logger from './logger/index.js';
 import Notifier from './notifier/index.js';
-import * as services from './app/services/index.js';
 
 const args = process.argv.slice(2);
 const modifiedOnly = args.includes('--modified-only');
@@ -61,12 +61,9 @@ const schedule = args.includes('--schedule');
     return;
   }
 
-  const rule = new scheduler.RecurrenceRule();
-  rule.minute = 30; // at minute 30 past every hour.
-
   logger.info('The scheduler is running…');
-  logger.info(`Documents will be tracked at minute ${rule.minute} past every hour.`);
-  scheduler.scheduleJob(rule, async () => {
+  logger.info('Documents will be tracked at minute 30 past every 2 hours.');
+  scheduler.scheduleJob('30 */2 * * *', async () => {
     logger.info(`Start tracking changes of ${numberOfDocuments} documents from ${serviceIds.length} services…`);
     await app.trackChanges(serviceIds);
     logger.info(`Tracked changes of ${numberOfDocuments} documents from ${serviceIds.length} services.`);
