@@ -2,12 +2,14 @@ import logger from './logger/index.js';
 
 process.on('unhandledRejection', reason => {
   logger.error(`unhandledRejection ${reason}`);
-  // process.exit(1);
+  logger.error(reason);
+  process.exit(1);
 });
 
 process.on('uncaughtException', err => {
   logger.error(`uncaughtException ${err}`);
-  // process.exit(1);
+  logger.error(err);
+  process.exit(1);
 });
 
 process.on('SIGTERM', () => {
