@@ -9,3 +9,6 @@ tmp
 
 # AccordProject logs
 log/trace.log
+
+# dataset export logs
+last_export.log
