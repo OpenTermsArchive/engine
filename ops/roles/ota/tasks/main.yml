@@ -1,6 +1,6 @@
 - name: install utilities
   apt:
-    name: "{{item}}"
+    name: '{{item}}'
     state: latest
     update_cache: yes
   loop:
@@ -8,14 +8,15 @@
   tags:
     - setup
 
-- name: Install GH -> ⚠️ you need to do "gh auth login" in cgus directory though
-  ansible.builtin.shell: |
-    sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-key C99B11DEB97541F0
-    sudo apt-add-repository https://cli.github.com/packages
-    sudo apt update
-    sudo apt install gh
-  tags:
-    - setup
+# do it manually as it does not seem to work when deploying
+# - name: Install GH -> ⚠️ you need to do "gh auth login" in cgus directory though
+#   ansible.builtin.shell: |
+#     sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-key C99B11DEB97541F0
+#     sudo apt-add-repository https://cli.github.com/packages
+#     sudo apt update
+#     sudo apt install gh
+#   tags:
+#     - setup
 
 - name: Clone Repo
   git:
