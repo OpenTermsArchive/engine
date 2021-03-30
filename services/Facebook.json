@@ -3,54 +3,35 @@
   "documents": {
     "Terms of Service": {
       "fetch": "https://www.facebook.com/legal/terms/plain_text_terms",
-      "filter": [
-        "cleanUrls"
-      ],
+      "filter": ["cleanUrls"],
       "select": ".fb_content"
     },
     "Privacy Policy": {
       "fetch": "https://www.facebook.com/about/privacy",
-      "filter": [
-        "removeReturnToTopButtons",
-        "cleanUrls"
-      ],
+      "filter": ["removeReturnToTopButtons", "cleanUrls"],
       "select": "._5tkp"
     },
     "Developer Terms": {
       "fetch": "https://developers.facebook.com/policy",
-      "filter": [
-        "removeHelpButtons",
-        "cleanUrls"
-      ],
+      "filter": ["removeHelpButtons", "cleanUrls"],
       "select": "._4bl9"
     },
     "Trackers Policy": {
       "fetch": "https://www.facebook.com/policies/cookies",
-      "filter": [
-        "removeImgFromCookiesPolicy",
-        "removeReturnToTopButtons",
-        "cleanUrls"
-      ],
+      "filter": ["removeImgFromCookiesPolicy", "removeReturnToTopButtons", "cleanUrls"],
       "select": "._5tkp"
     },
     "Commercial Terms": {
       "fetch": "https://www.facebook.com/legal/commercial_terms",
-      "filter": [
-        "numberListCorrectly",
-        "removeHelpButtons",
-        "cleanUrls"
-      ],
+      "filter": ["numberListCorrectly", "removeHelpButtons", "cleanUrls"],
       "select": "#content"
     },
     "Data Processor Agreement": {
       "fetch": "https://www.facebook.com/legal/EU_data_transfer_addendum",
-      "filter": [
-        "numberListCorrectly",
-        "cleanUrls"
-      ],
+      "filter": ["numberListCorrectly", "cleanUrls"],
       "select": "#content"
     },
-    "Live Policy":{
+    "Live Policy": {
       "fetch": "https://en-gb.facebook.com/policies/live",
       "select": "#content"
     }

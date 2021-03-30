@@ -1,10 +1,8 @@
-import fsApi from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
-
-import fse from 'fs-extra';
 import config from 'config';
-
+import { fileURLToPath } from 'url';
+import fsApi from 'fs';
+import fse from 'fs-extra';
+import path from 'path';
 import Git from '../../src/app/history/git.js';
 
 const fs = fsApi.promises;
@@ -30,7 +28,7 @@ const serviceMap = {
   LinguaLeo: 'Lingualeo',
   StackOverflow: 'Stack Overflow',
   WeHeartIt: 'We Heart It',
-  WeChatOpenPlatform: 'WeChat Open Platform'
+  WeChatOpenPlatform: 'WeChat Open Platform',
 };
 
 const doctypeMap = {
@@ -53,20 +51,27 @@ const doctypeMap = {
   terms_of_service: 'Terms of Service',
   terms_of_service_parent_company: 'Parent Organization Terms',
   tos_parent: 'Parent Organization Terms',
-  user_consent_policy: 'User Consent Policy'
+  user_consent_policy: 'User Consent Policy',
 };
 
 async function getCommits() {
   const commits = await git.log(['--stat=4096', '--no-merges']);
-  return commits.map(commit => extractLogInfos(commit));
+  return commits.map((commit) => extractLogInfos(commit));
 }
 
-function extractLogInfos(commit) { // parse a LogInfo object
-  const { hash, date, message, diff: { files: filesChanged } } = commit;
+function extractLogInfos(commit) {
+  // parse a LogInfo object
+  const {
+    hash,
+    date,
+    message,
+    diff: { files: filesChanged },
+  } = commit;
   return { hash, date, message, filesChanged };
 }
 
-function makeFilename(target, filepath, date) { // given a target folder and a file path, create target dataset structure
+function makeFilename(target, filepath, date) {
+  // given a target folder and a file path, create target dataset structure
   const splitted = filepath.split('/');
   let [service] = splitted.slice(-2);
   const [fileName] = splitted.slice(-1);
@@ -91,7 +96,8 @@ function makeFilename(target, filepath, date) { // given a target folder and a f
   return path.join(target, service, documentType, `${safeDateString}.md`);
 }
 
-function isValidCommit(commitMessage) { // util function used for filtering CGUs commits
+function isValidCommit(commitMessage) {
+  // util function used for filtering CGUs commits
   const [firstVerb] = commitMessage.split(' ');
   return ['Update', 'Start', 'Refilter'].includes(firstVerb);
 }
@@ -112,7 +118,7 @@ async function makeData(commitInfo) {
 }
 
 async function main() {
-  const [folderNameArg] = process.argv.filter(el => el.startsWith('--folder-name='));
+  const [folderNameArg] = process.argv.filter((el) => el.startsWith('--folder-name='));
 
   const exportTargetFolderName = folderNameArg ? folderNameArg.split('=')[1] : 'dataset';
 
@@ -123,7 +129,11 @@ async function main() {
   const [date] = new Date().toISOString().split('T');
   const [{ hash }] = filteredCommits;
   const headCommitShortSha = hash.slice(0, 7);
-  const finalPath = path.resolve(__dirname, '../../data/', `${exportTargetFolderName}-${date}-${headCommitShortSha}`);
+  const finalPath = path.resolve(
+    __dirname,
+    '../../data/',
+    `${exportTargetFolderName}-${date}-${headCommitShortSha}`
+  );
   console.log(`Exporting dataset to ${finalPath}`);
 
   for (const commit of filteredCommits) {

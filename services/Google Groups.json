@@ -1,10 +1,10 @@
 {
-    "name": "Google Groups",
-    "documents": {
-        "Acceptable Use Policy": {
-            "fetch": "https://support.google.com/groups/answer/4561696?hl=en-GB",
-            "select": "section[class=article-container]",
-            "remove": ".scClientFeedbackInlineFeedbacklinkroot"
-        }
+  "name": "Google Groups",
+  "documents": {
+    "Acceptable Use Policy": {
+      "fetch": "https://support.google.com/groups/answer/4561696?hl=en-GB",
+      "select": "section[class=article-container]",
+      "remove": ".scClientFeedbackInlineFeedbacklinkroot"
     }
+  }
 }

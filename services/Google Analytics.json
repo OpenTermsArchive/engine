@@ -7,9 +7,7 @@
     },
     "Parent Organization Privacy Policy": {
       "fetch": "https://policies.google.com/privacy?hl=en-GB",
-      "filter": [
-        "removeUTMfromUrls"
-      ],
+      "filter": ["removeUTMfromUrls"],
       "select": "div[role=article]",
       "remove": ".KMMDve, .TL2alc, img[src$='.svg']"
     },

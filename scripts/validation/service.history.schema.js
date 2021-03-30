@@ -7,15 +7,12 @@ const AVAILABLE_TYPES_NAME = Object.keys(TYPES);
 
 const documentsProperties = () => {
   const result = {};
-  AVAILABLE_TYPES_NAME.forEach(type => {
+  AVAILABLE_TYPES_NAME.forEach((type) => {
     result[type] = {
       type: 'array',
       items: {
-        oneOf: [
-          { $ref: '#/definitions/document' },
-          { $ref: '#/definitions/pdfDocument' },
-        ]
-      }
+        oneOf: [{ $ref: '#/definitions/document' }, { $ref: '#/definitions/pdfDocument' }],
+      },
     };
   });
   return result;
@@ -33,14 +30,12 @@ const schema = {
     pdfDocument: {
       type: 'object',
       additionalProperties: false,
-      required: [
-        'fetch',
-      ],
+      required: ['fetch'],
       properties: {
         fetch: {
           type: 'string',
-          pattern: '^https?://.+\.[pP][dD][fF](\\?.+)?$',
-          description: 'The URL where the document can be found'
+          pattern: '^https?://.+.[pP][dD][fF](\\?.+)?$',
+          description: 'The URL where the document can be found',
         },
         validUntil: {
           type: 'string',
@@ -51,15 +46,12 @@ const schema = {
     document: {
       type: 'object',
       additionalProperties: false,
-      required: [
-        'fetch',
-        'select',
-      ],
+      required: ['fetch', 'select'],
       properties: {
         fetch: {
           type: 'string',
           format: 'uri',
-          description: 'The URL where the document can be found'
+          description: 'The URL where the document can be found',
         },
         select: {
           description: 'Selector(s) that targets element to include',
@@ -69,21 +61,18 @@ const schema = {
             {
               type: 'array',
               items: {
-                oneOf: [
-                  { $ref: '#/definitions/cssSelector' },
-                  { $ref: '#/definitions/range' },
-                ]
-              }
-            }
-          ]
+                oneOf: [{ $ref: '#/definitions/cssSelector' }, { $ref: '#/definitions/range' }],
+              },
+            },
+          ],
         },
         filter: {
           type: 'array',
           items: {
             type: 'string',
             pattern: '^.+$',
-            description: 'Filter function name'
-          }
+            description: 'Filter function name',
+          },
         },
         remove: {
           description: 'Selector(s) that targets element to exclude',
@@ -93,12 +82,9 @@ const schema = {
             {
               type: 'array',
               items: {
-                oneOf: [
-                  { $ref: '#/definitions/cssSelector' },
-                  { $ref: '#/definitions/range' },
-                ]
-              }
-            }
+                oneOf: [{ $ref: '#/definitions/cssSelector' }, { $ref: '#/definitions/range' }],
+              },
+            },
           ],
         },
         validUntil: {
@@ -107,14 +93,15 @@ const schema = {
         },
         executeClientScripts: {
           type: 'boolean',
-          description: 'Execute client-side JavaScript loaded by the document before accessing the content, in case the DOM modifications are needed to access the content.',
-        }
-      }
+          description:
+            'Execute client-side JavaScript loaded by the document before accessing the content, in case the DOM modifications are needed to access the content.',
+        },
+      },
     },
     cssSelector: {
       type: 'string',
       pattern: '^.+$',
-      description: 'A CSS selector'
+      description: 'A CSS selector',
     },
     range: {
       type: 'object',
@@ -122,16 +109,16 @@ const schema = {
         startBefore: { $ref: '#/definitions/cssSelector' },
         startAfter: { $ref: '#/definitions/cssSelector' },
         endBefore: { $ref: '#/definitions/cssSelector' },
-        endAfter: { $ref: '#/definitions/cssSelector' }
+        endAfter: { $ref: '#/definitions/cssSelector' },
       },
       oneOf: [
-        { required: [ 'startBefore', 'endBefore' ] },
-        { required: [ 'startBefore', 'endAfter' ] },
-        { required: [ 'startAfter', 'endBefore' ] },
-        { required: [ 'startAfter', 'endAfter' ] },
-      ]
-    }
-  }
+        { required: ['startBefore', 'endBefore'] },
+        { required: ['startBefore', 'endAfter'] },
+        { required: ['startAfter', 'endBefore'] },
+        { required: ['startAfter', 'endAfter'] },
+      ],
+    },
+  },
 };
 
 export default schema;

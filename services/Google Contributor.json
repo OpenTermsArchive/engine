@@ -1,9 +1,9 @@
 {
-    "name": "Google Contributor",
-    "documents": {
-        "Terms of Service": {
-            "fetch": "https://contributor.google.com/v/termsofservice",
-            "select": ".CoFAIf-Dogjgd-eKpHRd-UDALgf"
-        }
+  "name": "Google Contributor",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://contributor.google.com/v/termsofservice",
+      "select": ".CoFAIf-Dogjgd-eKpHRd-UDALgf"
     }
+  }
 }

@@ -1,17 +1,15 @@
 {
-	"name": "Reserve with Google",
-	"documents": {
-	  "Terms of Service": {
+  "name": "Reserve with Google",
+  "documents": {
+    "Terms of Service": {
       "fetch": "https://www.google.com/maps/reserve/terms",
       "select": "div.st6sTb.BRcyT"
     },
     "Privacy Policy": {
       "fetch": "https://policies.google.com/privacy?hl=en-GB",
-      "filter": [
-        "removeUTMfromUrls"
-      ],
+      "filter": ["removeUTMfromUrls"],
       "select": "div[role=article]",
       "remove": ".KMMDve, .TL2alc, img[src$='.svg'], img[src^='data:image/svg+xml']"
     }
-	}
+  }
 }

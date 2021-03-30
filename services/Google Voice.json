@@ -1,9 +1,9 @@
 {
-	"name": "Google Voice",
-	"documents": {
-	  "Terms of Service": {
-		  "fetch": "https://support.google.com/voice/answer/9231816?hl=en-GB",
-		  "select": ".article-container"
+  "name": "Google Voice",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://support.google.com/voice/answer/9231816?hl=en-GB",
+      "select": ".article-container"
     },
     "Acceptable Use Policy": {
       "fetch": "https://support.google.com/voice/answer/9230450?hl=en-GB",
@@ -11,11 +11,9 @@
     },
     "Privacy Policy": {
       "fetch": "https://policies.google.com/privacy?hl=en-GB",
-      "filter": [
-        "removeUTMfromUrls"
-      ],
+      "filter": ["removeUTMfromUrls"],
       "select": "div[role=article]",
       "remove": ".KMMDve, .TL2alc, .aYyAOe, img[src$='.svg'], img[src^='data:image/svg+xml']"
     }
-	}
+  }
 }

@@ -4,7 +4,7 @@
     "Terms of Service": {
       "fetch": "https://www.service-with-declaration-history.example/terms",
       "select": "main",
-      "filter": [ "removeSharesButton", "removePrintButton" ]
+      "filter": ["removeSharesButton", "removePrintButton"]
     }
   }
 }
