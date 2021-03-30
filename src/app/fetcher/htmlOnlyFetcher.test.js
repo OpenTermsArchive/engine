@@ -1,11 +1,9 @@
-import fs from 'fs';
-import path from 'path';
-
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import nock from 'nock';
 import { fileURLToPath } from 'url';
-
+import fs from 'fs';
+import nock from 'nock';
+import path from 'path';
 import fetch from './htmlOnlyFetcher.js';
 import { InaccessibleContentError } from '../errors.js';
 
@@ -46,13 +44,14 @@ describe('HtmlOnlyFetcher', () => {
 
     context('when web page is not available', () => {
       before(() => {
-        nock('https://not.available.example')
-          .get('/')
-          .reply(404);
+        nock('https://not.available.example').get('/').reply(404);
       });
 
       it('throws an InaccessibleContentError error', async () => {
-        await expect(fetch('https://not.available.example')).to.be.rejectedWith(InaccessibleContentError, /404/);
+        await expect(fetch('https://not.available.example')).to.be.rejectedWith(
+          InaccessibleContentError,
+          /404/
+        );
       });
     });
 
@@ -62,7 +61,9 @@ describe('HtmlOnlyFetcher', () => {
       let expectedPDFContent;
 
       before(async () => {
-        expectedPDFContent = fs.readFileSync(path.resolve(__dirname, '../../../test/fixtures/terms.pdf'));
+        expectedPDFContent = fs.readFileSync(
+          path.resolve(__dirname, '../../../test/fixtures/terms.pdf')
+        );
 
         nock('https://domain.example.com', { reqheaders: { 'Accept-Language': 'en' } })
           .get('/terms.pdf')

@@ -1,14 +1,14 @@
 {
-    "name": "Google Earth",
-    "documents": {
-        "Terms of Service": {
-            "fetch": "https://www.google.com/help/terms_maps/?hl=en_GB",
-            "select": ".main-article"
-		},
-		"Acceptable Use Policy": {
-            "fetch": "https://support.google.com/earth/answer/9477965?hl=en-GB",
-            "select": "section[class=article-container]",
-            "remove": ".scClientFeedbackInlineFeedbacklinkroot"
-        }
+  "name": "Google Earth",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://www.google.com/help/terms_maps/?hl=en_GB",
+      "select": ".main-article"
+    },
+    "Acceptable Use Policy": {
+      "fetch": "https://support.google.com/earth/answer/9477965?hl=en-GB",
+      "select": "section[class=article-container]",
+      "remove": ".scClientFeedbackInlineFeedbacklinkroot"
     }
+  }
 }

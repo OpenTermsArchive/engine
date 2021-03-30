@@ -8,9 +8,7 @@
     "Developer Terms": {
       "fetch": "https://open.weixin.qq.com/cgi-bin/frame?t=news/protocol_developer_tmpl",
       "select": "#en_US_tpl",
-      "filter": [
-        "convertScriptToDiv"
-      ]
+      "filter": ["convertScriptToDiv"]
     }
   }
 }

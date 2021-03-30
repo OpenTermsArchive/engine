@@ -17,31 +17,22 @@
     },
     "Copyright Claims Policy": {
       "fetch": "https://help.twitter.com/en/rules-and-policies/copyright-policy",
-      "filter": [
-        "removeBanner",
-        "removeScripts"
-      ],
+      "filter": ["removeBanner", "removeScripts"],
       "select": ".twtr-grid__yang > div:nth-child(1)"
     },
     "Law Enforcement Guidelines": {
       "fetch": "https://help.twitter.com/en/rules-and-policies/twitter-law-enforcement-support",
-      "filter": [
-        "removeBanner"
-      ],
+      "filter": ["removeBanner"],
       "select": ".twtr-grid__yang > div:nth-child(1)"
     },
     "Trackers Policy": {
       "fetch": "https://help.twitter.com/en/rules-and-policies/twitter-cookies",
-      "filter": [
-        "removeBanner"
-      ],
+      "filter": ["removeBanner"],
       "select": ".twtr-grid__yang > div:nth-child(1)"
     },
     "Data Processor Agreement": {
       "fetch": "https://help.twitter.com/en/rules-and-policies/data-processing-legal-bases",
-      "filter": [
-        "removeBanner"
-      ],
+      "filter": ["removeBanner"],
       "select": ".twtr-grid__yang > div:nth-child(1)"
     }
   }

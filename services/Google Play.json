@@ -11,9 +11,7 @@
     },
     "Brand Guidelines": {
       "fetch": "https://developer.android.com/distribute/marketing-tools/brand-guidelines",
-      "filter": [
-        "downloadImages"
-      ],
+      "filter": ["downloadImages"],
       "select": "article.devsite-article"
     },
     "Review Guidelines": {

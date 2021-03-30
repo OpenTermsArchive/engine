@@ -1,10 +1,9 @@
-import fs from 'fs';
-
 import chai from 'chai';
+import fs from 'fs';
+import { gitSnapshot, resetGitRepository } from '../../../test/helper.js';
 
-import { resetGitRepository, gitSnapshot } from '../../../test/helper.js';
-import { SNAPSHOTS_PATH } from './index.js';
 import Recorder from './recorder.js';
+import { SNAPSHOTS_PATH } from './index.js';
 
 const { expect } = chai;
 
@@ -23,11 +22,12 @@ describe('Recorder', () => {
 
   describe('#save', () => {
     context('when service’s directory already exist', () => {
-      before(async () => subject.save({
-        serviceId: SERVICE_PROVIDER_ID,
-        documentType: TYPE,
-        content: FILE_CONTENT,
-      }));
+      before(async () =>
+        subject.save({
+          serviceId: SERVICE_PROVIDER_ID,
+          documentType: TYPE,
+          content: FILE_CONTENT,
+        }));
 
       after(resetGitRepository);
 
@@ -68,7 +68,9 @@ describe('Recorder', () => {
           content: FILE_CONTENT,
         });
 
-        expect(fs.readFileSync(NEW_SERVICE_EXPECTED_FILE_PATH, { encoding: 'utf8' })).to.equal(FILE_CONTENT);
+        expect(fs.readFileSync(NEW_SERVICE_EXPECTED_FILE_PATH, { encoding: 'utf8' })).to.equal(
+          FILE_CONTENT
+        );
       });
     });
   });
@@ -86,7 +88,7 @@ describe('Recorder', () => {
       });
       id = await subject.commit(EXPECTED_FILE_PATH, commitMessage);
       const commits = await gitSnapshot().log();
-      [ commit ] = commits;
+      [commit] = commits;
     });
 
     after(resetGitRepository);
@@ -116,7 +118,7 @@ describe('Recorder', () => {
       id = recordId;
       path = recordFilePath;
       const commits = await gitSnapshot().log();
-      [ commit ] = commits;
+      [commit] = commits;
     });
 
     after(resetGitRepository);
@@ -164,7 +166,9 @@ describe('Recorder', () => {
 
     context('With provided extension', () => {
       it('returns the file path with given extension for the given service provider’s document type', async () => {
-        expect(subject.getPathFor(SERVICE_PROVIDER_ID, TYPE, 'pdf')).to.equal(EXPECTED_PDF_FILE_PATH);
+        expect(subject.getPathFor(SERVICE_PROVIDER_ID, TYPE, 'pdf')).to.equal(
+          EXPECTED_PDF_FILE_PATH
+        );
       });
     });
   });
@@ -184,7 +188,7 @@ describe('Recorder', () => {
           serviceId: SERVICE_PROVIDER_ID,
           documentType: TYPE,
           content: FILE_CONTENT,
-          changelog: 'Start tracking document'
+          changelog: 'Start tracking document',
         });
       });
 
@@ -237,7 +241,7 @@ describe('Recorder', () => {
             serviceId: SERVICE_PROVIDER_ID,
             documentType: TYPE,
             content: `${FILE_CONTENT} (with fake pdf file)`,
-            mimeType: 'application/pdf'
+            mimeType: 'application/pdf',
           });
           lastSnapshotId = recordId;
           latestRecord = await subject.getLatestRecord(SERVICE_PROVIDER_ID, TYPE);
