@@ -1,12 +1,10 @@
 /**
-* This file is the boundary beyond which the usage of git is abstracted.
-* Commit SHAs are used as opaque unique IDs.
-*/
+ * This file is the boundary beyond which the usage of git is abstracted.
+ * Commit SHAs are used as opaque unique IDs.
+ */
 
 import fsApi from 'fs';
-
 import mime from 'mime';
-
 import Git from './git.js';
 
 const fs = fsApi.promises;
@@ -36,7 +34,7 @@ export default class Recorder {
   async save({ serviceId, documentType, content, fileExtension }) {
     const directory = `${this.path}/${serviceId}`;
 
-    if (!await fileExists(directory)) {
+    if (!(await fileExists(directory))) {
       await fs.mkdir(directory, { recursive: true });
     }
 
@@ -52,7 +50,9 @@ export default class Recorder {
       await this.git.add(filePath);
       return await this.git.commit(filePath, message, authorDate);
     } catch (error) {
-      throw new Error(`Could not commit ${filePath} with message "${message}" due to error: "${error}"`);
+      throw new Error(
+        `Could not commit ${filePath} with message "${message}" due to error: "${error}"`
+      );
     }
   }
 

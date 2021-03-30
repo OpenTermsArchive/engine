@@ -1,18 +1,15 @@
 {
-    "name": "Chrome and Chrome OS",
-    "documents": {
-        "Terms of Service": {
-            "fetch": "https://www.google.com/chrome/terms/?hl=en_GB",
-            "select": "div[class=chrm-text-only]",
-            "remove": [
-                "div[class=chr-header__logo]",
-                "footer"
-            ]
-        },
-        "Privacy Policy": {
-            "fetch": "https://www.google.com/chrome/privacy/?hl=en_GB",
-            "select": "div[role=main]",
-            "remove": "div[class=chr-privacy-history-dropdown]"
-        }
+  "name": "Chrome and Chrome OS",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://www.google.com/chrome/terms/?hl=en_GB",
+      "select": "div[class=chrm-text-only]",
+      "remove": ["div[class=chr-header__logo]", "footer"]
+    },
+    "Privacy Policy": {
+      "fetch": "https://www.google.com/chrome/privacy/?hl=en_GB",
+      "select": "div[role=main]",
+      "remove": "div[class=chr-privacy-history-dropdown]"
     }
+  }
 }

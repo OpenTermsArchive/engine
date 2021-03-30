@@ -1,30 +1,31 @@
-import fsApi from 'fs';
-import path from 'path';
-
 import Ajv from 'ajv';
 import chai from 'chai';
 import config from 'config';
-import jsonSourceMap from 'json-source-map';
 import { fileURLToPath } from 'url';
-
-import * as services from '../../src/app/services/index.js';
-import fetch from '../../src/app/fetcher/index.js';
+import fsApi from 'fs';
+import jsonSourceMap from 'json-source-map';
+import path from 'path';
 import filter from '../../src/app/filter/index.js';
-import serviceSchema from './service.schema.js';
+import fetch from '../../src/app/fetcher/index.js';
+import * as services from '../../src/app/services/index.js';
 import serviceHistorySchema from './service.history.schema.js';
+import serviceSchema from './service.schema.js';
 
 const fs = fsApi.promises;
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const { expect } = chai;
 const rootPath = path.join(__dirname, '../..');
 const MIN_DOC_LENGTH = 100;
-const filePathRelativeToRoot = path.relative(rootPath, fileURLToPath(import.meta.url)).split(path.sep).join('/'); // Convert possible Windows path to POSIX version from args
+const filePathRelativeToRoot = path
+  .relative(rootPath, fileURLToPath(import.meta.url))
+  .split(path.sep)
+  .join('/'); // Convert possible Windows path to POSIX version from args
 
 const args = process.argv.slice(process.argv.indexOf(filePathRelativeToRoot) + 1); // Keep only args that are after the script filename
 
 const schemaOnly = args.includes('--schema-only');
 const modifiedOnly = args.includes('--modified-only');
-let servicesToValidate = args.filter(arg => !arg.startsWith('--'));
+let servicesToValidate = args.filter((arg) => !arg.startsWith('--'));
 
 (async () => {
   const serviceDeclarations = await services.loadWithHistory();
@@ -36,7 +37,7 @@ let servicesToValidate = args.filter(arg => !arg.startsWith('--'));
   }
 
   describe('Services validation', async () => {
-    servicesToValidate.forEach(serviceId => {
+    servicesToValidate.forEach((serviceId) => {
       const service = serviceDeclarations[serviceId];
 
       if (!service) {
@@ -46,19 +47,31 @@ let servicesToValidate = args.filter(arg => !arg.startsWith('--'));
 
       describe(serviceId, async () => {
         it('has a valid declaration', async () => {
-          const declaration = JSON.parse(await fs.readFile(path.join(rootPath, config.get('serviceDeclarationsPath'), `${serviceId}.json`)));
+          const declaration = JSON.parse(
+            await fs.readFile(
+              path.join(rootPath, config.get('serviceDeclarationsPath'), `${serviceId}.json`)
+            )
+          );
           assertValid(serviceSchema, declaration);
         });
 
         if (service.hasHistory()) {
           it('has a valid history declaration', async () => {
-            const declarationHistory = JSON.parse(await fs.readFile(path.join(rootPath, config.get('serviceDeclarationsPath'), `${serviceId}.history.json`)));
+            const declarationHistory = JSON.parse(
+              await fs.readFile(
+                path.join(
+                  rootPath,
+                  config.get('serviceDeclarationsPath'),
+                  `${serviceId}.history.json`
+                )
+              )
+            );
             assertValid(serviceHistorySchema, declarationHistory);
           });
         }
 
         if (!schemaOnly) {
-          service.getDocumentTypes().forEach(type => {
+          service.getDocumentTypes().forEach((type) => {
             describe(type, () => {
               let content;
               let filteredContent;
@@ -71,7 +84,7 @@ let servicesToValidate = args.filter(arg => !arg.startsWith('--'));
                 const document = await fetch({
                   url: location,
                   executeClientScripts,
-                  cssSelectors: service.getDocumentDeclaration(type).getCssSelectors()
+                  cssSelectors: service.getDocumentDeclaration(type).getCssSelectors(),
                 });
                 content = document.content;
                 mimeType = document.mimeType;
@@ -125,13 +138,13 @@ let servicesToValidate = args.filter(arg => !arg.startsWith('--'));
                   const document = await fetch({
                     url: location,
                     executeClientScripts,
-                    cssSelectors: service.getDocumentDeclaration(type).getCssSelectors()
+                    cssSelectors: service.getDocumentDeclaration(type).getCssSelectors(),
                   });
 
                   const secondFilteredContent = await filter({
                     content: document.content,
                     documentDeclaration: service.getDocumentDeclaration(type),
-                    mimeType: document.mimeType
+                    mimeType: document.mimeType,
                   });
 
                   expect(secondFilteredContent).to.equal(filteredContent);
@@ -160,11 +173,13 @@ function assertValid(schema, subject) {
     let errorMessage = '';
     const sourceMap = jsonSourceMap.stringify(subject, null, 2);
     const jsonLines = sourceMap.json.split('\n');
-    validator.errors.forEach(error => {
-      errorMessage += `\n\n${validator.errorsText([ error ])}`;
+    validator.errors.forEach((error) => {
+      errorMessage += `\n\n${validator.errorsText([error])}`;
       const errorPointer = sourceMap.pointers[error.dataPath];
       if (errorPointer) {
-        errorMessage += `\n> ${jsonLines.slice(errorPointer.value.line, errorPointer.valueEnd.line).join('\n> ')}`;
+        errorMessage += `\n> ${jsonLines
+          .slice(errorPointer.value.line, errorPointer.valueEnd.line)
+          .join('\n> ')}`;
         errorPointers.add(errorPointer);
       } else {
         errorMessage += ' (in entire file)\n';

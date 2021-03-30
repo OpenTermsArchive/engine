@@ -1,5 +1,5 @@
-import Service from '../../src/app/services/service.js';
 import DocumentDeclaration from '../../src/app/services/documentDeclaration.js';
+import Service from '../../src/app/services/service.js';
 
 const service = new Service({
   id: 'service_with_filters_history',
@@ -12,7 +12,7 @@ const filters = [
   },
   async function removePrintButton() {
     return 'last-removePrintButton';
-  }
+  },
 ];
 
 const latest = new DocumentDeclaration({
@@ -22,7 +22,7 @@ const latest = new DocumentDeclaration({
   contentSelectors: 'main',
   noiseSelectors: undefined,
   filters,
-  validUntil: null
+  validUntil: null,
 });
 
 const history = [
@@ -38,9 +38,9 @@ const history = [
       },
       async function removePrintButton() {
         return 'first-removePrintButton';
-      }
+      },
     ],
-    validUntil: '2020-07-22T11:30:21.000Z'
+    validUntil: '2020-07-22T11:30:21.000Z',
   }),
   new DocumentDeclaration({
     service,
@@ -54,9 +54,9 @@ const history = [
       },
       async function removePrintButton() {
         return 'second-removePrintButton';
-      }
+      },
     ],
-    validUntil: '2020-08-22T11:30:21.000Z'
+    validUntil: '2020-08-22T11:30:21.000Z',
   }),
   new DocumentDeclaration({
     service,
@@ -70,9 +70,9 @@ const history = [
       },
       async function removePrintButton() {
         return 'second-removePrintButton';
-      }
+      },
     ],
-    validUntil: '2020-09-29T21:30:21.000Z'
+    validUntil: '2020-09-29T21:30:21.000Z',
   }),
   new DocumentDeclaration({
     service,
@@ -86,9 +86,9 @@ const history = [
       },
       async function removePrintButton() {
         return 'third-removePrintButton';
-      }
+      },
     ],
-    validUntil: '2020-09-30T21:30:21.000Z'
+    validUntil: '2020-09-30T21:30:21.000Z',
   }),
   new DocumentDeclaration({
     service,
@@ -102,9 +102,9 @@ const history = [
       },
       async function removePrintButton() {
         return 'third-removePrintButton';
-      }
+      },
     ],
-    validUntil: '2020-10-20T12:30:21.000Z'
+    validUntil: '2020-10-20T12:30:21.000Z',
   }),
   new DocumentDeclaration({
     service,
@@ -118,9 +118,9 @@ const history = [
       },
       async function removePrintButton() {
         return 'last-removePrintButton';
-      }
+      },
     ],
-    validUntil: '2020-11-01T12:30:21.000Z'
+    validUntil: '2020-11-01T12:30:21.000Z',
   }),
 ];
 
@@ -128,7 +128,7 @@ service._documents = {
   'Terms of Service': {
     _latest: latest,
     _history: history,
-  }
+  },
 };
 
 export default service;

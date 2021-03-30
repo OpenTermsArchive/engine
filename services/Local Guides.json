@@ -3,7 +3,7 @@
   "documents": {
     "Terms of Service": {
       "fetch": "https://maps.google.com/localguides/rules?hl=en_GB",
-      "select": "div.rules",
+      "select": "section.article-container",
       "executeClientScripts": true
     }
   }

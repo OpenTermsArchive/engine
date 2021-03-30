@@ -6,7 +6,7 @@
   },
   "logger": {
     "sendMailOnError": {
-      "to": "martinratinaud@gmail.com",
+      "to": "martin.ratinaud@beta.gouv.fr",
       "from": "admin.ambassadeur-numerique@diplomatie.gouv.fr"
     }
   },
