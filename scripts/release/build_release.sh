@@ -4,11 +4,11 @@
 
 echo "=============== [1] ==============="
 echo "Checking that version database exists"
-if [ -d "./data/versions" ]
-then 
-    echo "Directory ./data/version exists."
+if [ -d "$1" ]
+then
+    echo "Directory $1 exists."
 else
-    echo "Directory ./data/version does not exists."
+    echo "Directory $1 does not exists."
     exit 1
 fi
 echo ""
@@ -26,6 +26,7 @@ echo "Tag: $TAG"
 
 echo ""
 
+mkdir -p ./data
 
 echo "=============== [3] ==============="
 echo "Zipping dataset"
