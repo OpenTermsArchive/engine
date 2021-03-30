@@ -18,7 +18,7 @@
     {
       "fetch": "https://www.airbnb.co.uk/help/article/2866/airbnb-cookie-policy",
       "select": "#site-content",
-      "remove":"._12t7zck",
+      "remove": "._12t7zck",
       "validUntil": "2020-10-30T16:30:08.000Z"
     }
   ]

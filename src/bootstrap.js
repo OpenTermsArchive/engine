@@ -1,11 +1,11 @@
 import logger from './logger/index.js';
 
-process.on('unhandledRejection', reason => {
+process.on('unhandledRejection', (reason) => {
   logger.error(`unhandledRejection ${reason}`);
   // process.exit(1);
 });
 
-process.on('uncaughtException', err => {
+process.on('uncaughtException', (err) => {
   logger.error(`uncaughtException ${err}`);
   // process.exit(1);
 });

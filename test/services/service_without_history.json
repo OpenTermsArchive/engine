@@ -4,7 +4,7 @@
     "Terms of Service": {
       "fetch": "https://www.service-wihout-history.example/tos",
       "select": "body",
-      "filter": [ "removeSharesButton", "removePrintButton" ]
+      "filter": ["removeSharesButton", "removePrintButton"]
     }
   }
 }

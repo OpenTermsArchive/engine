@@ -3,7 +3,7 @@
   "documents": {
     "Commercial Terms": {
       "fetch": "https://clients.cdiscount.com/simple/cgv.aspx",
-      "filter": [ "recoverReplacementCharacters" ],
+      "filter": ["recoverReplacementCharacters"],
       "select": ".acDes"
     },
     "Terms of Service": {

@@ -1,28 +1,35 @@
-import fsApi from 'fs';
-import path from 'path';
-import { pathToFileURL, fileURLToPath } from 'url';
+import { fileURLToPath, pathToFileURL } from 'url';
 
 import config from 'config';
+import fsApi from 'fs';
+import path from 'path';
 import simpleGit from 'simple-git';
-
-import DocumentDeclaration from './documentDeclaration.js';
 import Service from './service.js';
+import DocumentDeclaration from './documentDeclaration.js';
 
 const fs = fsApi.promises;
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const SERVICE_DECLARATIONS_PATH = path.resolve(__dirname, '../../..', config.get('serviceDeclarationsPath'));
+const SERVICE_DECLARATIONS_PATH = path.resolve(
+  __dirname,
+  '../../..',
+  config.get('serviceDeclarationsPath')
+);
 
 export async function load() {
   const services = {};
   const fileNames = await fs.readdir(SERVICE_DECLARATIONS_PATH);
-  const serviceFileNames = fileNames.filter(fileName => path.extname(fileName) == '.json' && !fileName.includes('.history.json'));
+  const serviceFileNames = fileNames.filter(
+    (fileName) => path.extname(fileName) == '.json' && !fileName.includes('.history.json')
+  );
 
   for (const fileName of serviceFileNames) {
-    const serviceDeclaration = JSON.parse(await fs.readFile(path.join(SERVICE_DECLARATIONS_PATH, fileName))); // eslint-disable-line no-await-in-loop
+    const serviceDeclaration = JSON.parse(
+      await fs.readFile(path.join(SERVICE_DECLARATIONS_PATH, fileName))
+    ); // eslint-disable-line no-await-in-loop
 
     const service = new Service({
       id: path.basename(fileName, '.json'),
-      name: serviceDeclaration.name
+      name: serviceDeclaration.name,
     });
 
     services[service.id] = service;
@@ -33,14 +40,16 @@ export async function load() {
         fetch: location,
         executeClientScripts,
         select: contentSelectors,
-        remove: noiseSelectors
+        remove: noiseSelectors,
       } = serviceDeclaration.documents[documentType];
 
       let filters;
       if (filterNames) {
         const filterFilePath = fileName.replace('.json', '.filters.js');
-        const serviceFilters = await import(pathToFileURL(path.join(SERVICE_DECLARATIONS_PATH, filterFilePath))); // eslint-disable-line no-await-in-loop
-        filters = filterNames.map(filterName => serviceFilters[filterName]);
+        const serviceFilters = await import(
+          pathToFileURL(path.join(SERVICE_DECLARATIONS_PATH, filterFilePath))
+        ); // eslint-disable-line no-await-in-loop
+        filters = filterNames.map((filterName) => serviceFilters[filterName]);
       }
 
       const document = new DocumentDeclaration({
@@ -69,40 +78,49 @@ export async function loadWithHistory() {
     for (const documentType of Object.keys(declaration)) {
       const documenTypeDeclarationEntries = declaration[documentType];
 
-      const filterNames = [ ...new Set(documenTypeDeclarationEntries.flatMap(declaration => declaration.filter)) ].filter(el => el);
+      const filterNames = [
+        ...new Set(documenTypeDeclarationEntries.flatMap((declaration) => declaration.filter)),
+      ].filter((el) => el);
 
       const allHistoryDates = extractHistoryDates({
         documenTypeDeclarationEntries,
         filters,
-        filterNames
+        filterNames,
       });
 
-      const currentlyValidDocumentDeclaration = documenTypeDeclarationEntries.find(entry => !entry.validUntil);
+      const currentlyValidDocumentDeclaration = documenTypeDeclarationEntries.find(
+        (entry) => !entry.validUntil
+      );
 
-      allHistoryDates.forEach(date => {
-        const declarationForThisDate = documenTypeDeclarationEntries.find(entry => new Date(date) <= new Date(entry.validUntil)) || currentlyValidDocumentDeclaration;
+      allHistoryDates.forEach((date) => {
+        const declarationForThisDate = documenTypeDeclarationEntries.find(
+          (entry) => new Date(date) <= new Date(entry.validUntil)
+        ) || currentlyValidDocumentDeclaration;
         const { filter: declarationForThisDateFilterNames } = declarationForThisDate;
 
         let actualFilters;
         if (declarationForThisDateFilterNames) {
-          actualFilters = declarationForThisDateFilterNames.map(filterName => {
-            const currentlyValidFilters = filters[filterName].find(entry => !entry.validUntil);
-            const validFilterForThisDate = filters[filterName].find(entry => new Date(date) <= new Date(entry.validUntil)) || currentlyValidFilters;
+          actualFilters = declarationForThisDateFilterNames.map((filterName) => {
+            const currentlyValidFilters = filters[filterName].find((entry) => !entry.validUntil);
+            const validFilterForThisDate = filters[filterName].find((entry) => new Date(date) <= new Date(entry.validUntil))
+              || currentlyValidFilters;
 
             return validFilterForThisDate.filter;
           });
         }
 
-        services[serviceId].addDocumentDeclaration(new DocumentDeclaration({
-          service: services[serviceId],
-          type: documentType,
-          location: declarationForThisDate.fetch,
-          executeClientScripts: declarationForThisDate.executeClientScripts,
-          contentSelectors: declarationForThisDate.select,
-          noiseSelectors: declarationForThisDate.remove,
-          filters: actualFilters,
-          validUntil: date,
-        }));
+        services[serviceId].addDocumentDeclaration(
+          new DocumentDeclaration({
+            service: services[serviceId],
+            type: documentType,
+            location: declarationForThisDate.fetch,
+            executeClientScripts: declarationForThisDate.executeClientScripts,
+            contentSelectors: declarationForThisDate.select,
+            noiseSelectors: declarationForThisDate.remove,
+            filters: actualFilters,
+            validUntil: date,
+          })
+        );
       });
     }
   }
@@ -113,7 +131,7 @@ export async function loadWithHistory() {
 function extractHistoryDates({ filters, filterNames, documenTypeDeclarationEntries }) {
   const allHistoryDates = [];
 
-  Object.keys(filters).forEach(filterName => {
+  Object.keys(filters).forEach((filterName) => {
     if (filterNames.includes(filterName)) {
       filters[filterName].forEach(({ validUntil }) => allHistoryDates.push(validUntil));
     }
@@ -122,12 +140,12 @@ function extractHistoryDates({ filters, filterNames, documenTypeDeclarationEntri
   documenTypeDeclarationEntries.forEach(({ validUntil }) => allHistoryDates.push(validUntil));
 
   const sortedDates = allHistoryDates.sort((a, b) => new Date(a) - new Date(b));
-  const uniqSortedDates = [ ...new Set(sortedDates) ];
+  const uniqSortedDates = [...new Set(sortedDates)];
   return uniqSortedDates;
 }
 
 function sortHistory(history = {}) {
-  Object.keys(history).forEach(entry => {
+  Object.keys(history).forEach((entry) => {
     history[entry].sort((a, b) => new Date(a.validUntil) - new Date(b.validUntil));
   });
 }
@@ -138,7 +156,10 @@ async function loadServiceHistoryFiles(serviceId) {
 
   const serviceHistoryFileName = path.join(SERVICE_DECLARATIONS_PATH, `${serviceId}.history.json`);
   const serviceFiltersFileName = path.join(SERVICE_DECLARATIONS_PATH, `${serviceId}.filters.js`);
-  const serviceFiltersHistoryFileName = path.join(SERVICE_DECLARATIONS_PATH, `${serviceId}.filters.history.js`);
+  const serviceFiltersHistoryFileName = path.join(
+    SERVICE_DECLARATIONS_PATH,
+    `${serviceId}.filters.history.js`
+  );
 
   let serviceHistory = {};
   const serviceFiltersHistory = {};
@@ -148,7 +169,7 @@ async function loadServiceHistoryFiles(serviceId) {
     serviceHistory = JSON.parse(await fs.readFile(serviceHistoryFileName));
   }
 
-  Object.keys(serviceDeclaration.documents).forEach(documentType => {
+  Object.keys(serviceDeclaration.documents).forEach((documentType) => {
     serviceHistory[documentType] = serviceHistory[documentType] || [];
     serviceHistory[documentType].push(serviceDeclaration.documents[documentType]);
   });
@@ -157,7 +178,7 @@ async function loadServiceHistoryFiles(serviceId) {
 
   if (await fileExists(serviceFiltersHistoryFileName)) {
     serviceFiltersHistoryModule = await import(pathToFileURL(serviceFiltersHistoryFileName));
-    Object.keys(serviceFiltersHistoryModule).forEach(filterName => {
+    Object.keys(serviceFiltersHistoryModule).forEach((filterName) => {
       serviceFiltersHistory[filterName] = serviceFiltersHistoryModule[filterName];
     });
   }
@@ -165,7 +186,7 @@ async function loadServiceHistoryFiles(serviceId) {
   if (await fileExists(serviceFiltersFileName)) {
     const serviceFilters = await import(pathToFileURL(serviceFiltersFileName));
 
-    Object.keys(serviceFilters).forEach(filterName => {
+    Object.keys(serviceFilters).forEach((filterName) => {
       serviceFiltersHistory[filterName] = serviceFiltersHistory[filterName] || [];
       serviceFiltersHistory[filterName].push({ filter: serviceFilters[filterName] });
     });
@@ -184,19 +205,19 @@ export async function getIdsOfModified() {
   const rootPath = path.join(__dirname, '../../../');
 
   const git = simpleGit(rootPath, { maxConcurrentProcesses: 1 });
-  const committedFiles = await git.diff([ '--name-only', 'master...HEAD', '--', 'services/*.json' ]);
+  const committedFiles = await git.diff(['--name-only', 'master...HEAD', '--', 'services/*.json']);
   const status = await git.status();
   const modifiedFiles = [
     ...status.not_added, // Files created but not already in staged area
     ...status.modified, // Files modified
     ...status.created, // Files created and in the staged area
     ...status.renamed.map(({ to }) => to), // Files renamed
-    ...committedFiles.trim().split('\n') // Files committed
+    ...committedFiles.trim().split('\n'), // Files committed
   ];
 
   return modifiedFiles
-    .filter(fileName => fileName.match(/services.*\.json/) && !fileName.includes('.history.json'))
-    .map(filePath => path.basename(filePath, '.json'));
+    .filter((fileName) => fileName.match(/services.*\.json/) && !fileName.includes('.history.json'))
+    .map((filePath) => path.basename(filePath, '.json'));
 }
 
 async function fileExists(filePath) {

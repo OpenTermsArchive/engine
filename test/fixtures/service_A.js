@@ -1,5 +1,5 @@
-import Service from '../../src/app/services/service.js';
 import DocumentDeclaration from '../../src/app/services/documentDeclaration.js';
+import Service from '../../src/app/services/service.js';
 
 const service = new Service({
   id: 'service_A',
@@ -13,13 +13,13 @@ const latest = new DocumentDeclaration({
   contentSelectors: 'body',
   noiseSelectors: undefined,
   filters: undefined,
-  validUntil: null
+  validUntil: null,
 });
 
 service._documents = {
   'Terms of Service': {
-    _latest: latest
-  }
+    _latest: latest,
+  },
 };
 
 export default service;
