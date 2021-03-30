@@ -10,7 +10,7 @@
   },
   "scripts": {
     "export": "node scripts/export/makedataset.js",
-    "release": "node scripts/release/releasedataset.js",
+    "release": "node scripts/release/build_release.js",
     "start": "node --max-http-header-size=32768 src/index.js",
     "start:modified": "node --max-http-header-size=32768 src/index.js -- --modified-only",
     "start:prod": "cross-env NODE_ENV=production node --max-http-header-size=32768  src/index.js",

@@ -6,6 +6,7 @@ import * as services from './app/services/index.js';
 import CGUs from './app/index.js';
 import Notifier from './notifier/index.js';
 import logger from './logger/index.js';
+import { publishRelease } from '../scripts/release/releasedataset.js';
 
 const args = process.argv.slice(2);
 const modifiedOnly = args.includes('--modified-only');
@@ -78,5 +79,12 @@ const schedule = args.includes('--schedule');
     logger.info(
       `Tracked changes of ${numberOfDocuments} documents from ${serviceIds.length} services.`
     );
+  });
+
+  logger.info('Release will be created if needed every night at 1:20am');
+  scheduler.scheduleJob('20 1 * * *', async () => {
+    logger.info(`Start Release ${new Date()}`);
+    await publishRelease();
+    logger.info(`End Release ${new Date()}`);
   });
 })();
