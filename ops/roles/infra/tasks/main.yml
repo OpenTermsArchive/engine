@@ -51,14 +51,14 @@
   command: sysctl -w kernel.unprivileged_userns_clone=1
 
 # do it manually as it does not seem to work when deploying
-- name: Install GH -> ⚠️ you need to do "gh auth login" in cgus directory though
-  become: yes
-  ansible.builtin.shell: |
-    sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-key C99B11DEB97541F0
-    sudo apt-add-repository https://cli.github.com/packages
-    sudo apt update -y
-  tags:
-    - setup
+# - name: Install GH -> ⚠️ you need to do "gh auth login" in cgus directory though
+#   become: yes
+#   ansible.builtin.shell: |
+#     sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-key C99B11DEB97541F0
+#     sudo apt-add-repository https://cli.github.com/packages
+#     sudo apt update -y
+#   tags:
+#     - setup
 
 - name: install utilities
   become: yes
