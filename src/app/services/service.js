@@ -15,7 +15,10 @@ export default class Service {
       return currentlyValidDocumentDeclaration;
     }
 
-    return (_history && _history.find(entry => new Date(date) <= new Date(entry.validUntil))) || currentlyValidDocumentDeclaration;
+    return (
+      (_history && _history.find((entry) => new Date(date) <= new Date(entry.validUntil)))
+      || currentlyValidDocumentDeclaration
+    );
   }
 
   getDocumentTypes() {
@@ -36,14 +39,19 @@ export default class Service {
 
     this._documents[document.type]._history = this._documents[document.type]._history || [];
     this._documents[document.type]._history.push(document);
-    this._documents[document.type]._history.sort((a, b) => new Date(a.validUntil) - new Date(b.validUntil));
+    this._documents[document.type]._history.sort(
+      (a, b) => new Date(a.validUntil) - new Date(b.validUntil)
+    );
   }
 
   getNumberOfDocuments() {
     return this.getDocumentTypes().length;
   }
 
-  hasHistory() { // If service is loaded without its history it could return false even if an history declaration file exists.
-    return !!Object.keys(this._documents).find(documentType => this._documents[documentType]._history);
+  hasHistory() {
+    // If service is loaded without its history it could return false even if an history declaration file exists.
+    return !!Object.keys(this._documents).find(
+      (documentType) => this._documents[documentType]._history
+    );
   }
 }

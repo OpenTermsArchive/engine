@@ -1,10 +1,10 @@
 - name: Clone Repo
   git:
-    repo: "{{ repository }}"
-    dest: "/home/{{ ansible_user }}/{{ app }}"
+    repo: '{{ repository }}'
+    dest: '/home/{{ ansible_user }}/{{ app }}'
     force: yes
     accept_hostkey: yes
-    key_file: "/home/{{ ansible_user }}/.ssh/cgus-bot-key"
+    key_file: '/home/{{ ansible_user }}/.ssh/cgus-bot-key'
   register: git_clone_app_finished
   tags:
     - setup
@@ -13,7 +13,7 @@
 - name: Install NPM packages
   command:
     cmd: npm i --production --unsafe-perm=true --production=true
-    chdir: "/home/{{ ansible_user }}/{{ app }}"
+    chdir: '/home/{{ ansible_user }}/{{ app }}'
   tags:
     - setup
     - update
@@ -21,7 +21,7 @@
 - name: Add .env file
   copy:
     src: .env
-    dest: "/home/{{ ansible_user }}/{{ app }}/.env"
+    dest: '/home/{{ ansible_user }}/{{ app }}/.env'
   tags:
     - setup
 
@@ -36,19 +36,19 @@
 - include_tasks: database.yml
   vars:
     name: OpenTermsArchive-Snapshots
-    repository: "{{ snapshots_repository }}"
-    directory: "{{ snapshots_directory }}"
+    repository: '{{ snapshots_repository }}'
+    directory: '{{ snapshots_directory }}'
 
 - include_tasks: database.yml
   vars:
     name: OpenTermsArchive-Versions
-    repository: "{{ versions_repository }}"
-    directory: "{{ versions_directory }}"
+    repository: '{{ versions_repository }}'
+    directory: '{{ versions_directory }}'
 
 - name: Start OpenTermsArchive
   command:
     cmd: forever start -m 10 -a --uid "{{ app }}" -c "npm run start:scheduler:prod" ./
-    chdir: "/home/{{ ansible_user }}/{{ app }}"
+    chdir: '/home/{{ ansible_user }}/{{ app }}'
   environment:
     NODE_ENV: production
   tags:

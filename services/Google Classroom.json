@@ -1,10 +1,10 @@
 {
-    "name": "Google Classroom",
-    "documents": {
-        "Acceptable Use Policy": {
-            "fetch": "https://support.google.com/edu/classroom/answer/7165963?hl=en-GB",
-            "select": "section[class=article-container]",
-            "remove": ".scClientFeedbackInlineFeedbacklinkroot"
-        }
+  "name": "Google Classroom",
+  "documents": {
+    "Acceptable Use Policy": {
+      "fetch": "https://support.google.com/edu/classroom/answer/7165963?hl=en-GB",
+      "select": "section[class=article-container]",
+      "remove": ".scClientFeedbackInlineFeedbacklinkroot"
     }
+  }
 }

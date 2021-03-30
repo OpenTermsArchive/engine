@@ -1,13 +1,13 @@
 {
-    "name": "Google Maps",
-    "documents": {
-        "Terms of Service": {
-            "fetch": "https://www.google.com/help/terms_maps/?hl=en_GB",
-            "select": ".main-article"
-        },
-        "Developer Terms":{
-            "fetch": "https://www.google.com/help/legalnotices_maps/?hl=en_GB",
-            "select": ".main-article"
-        }
+  "name": "Google Maps",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://www.google.com/help/terms_maps/?hl=en_GB",
+      "select": ".main-article"
+    },
+    "Developer Terms": {
+      "fetch": "https://www.google.com/help/legalnotices_maps/?hl=en_GB",
+      "select": ".main-article"
     }
+  }
 }

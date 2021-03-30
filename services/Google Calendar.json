@@ -1,18 +1,15 @@
 {
-    "name": "Google Calendar",
-    "documents": {
-        "Terms of Service": {
-            "fetch": "https://policies.google.com/terms?hl=en-GB",
-            "filter": [
-                "removeUTMfromUrls",
-                "removeCountryVersion"
-            ],
-            "select": "div[role=article]",
-            "remove": "img[src$='.svg'], img[src^='data:image/svg+xml']"
-        },
-        "Acceptable Use Policy": {
-            "fetch": "https://www.google.com/intl/en-GB_FR/googlecalendar/program_policies.html",
-            "select": "div[role=main]"
-        }
+  "name": "Google Calendar",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://policies.google.com/terms?hl=en-GB",
+      "filter": ["removeUTMfromUrls", "removeCountryVersion"],
+      "select": "div[role=article]",
+      "remove": "img[src$='.svg'], img[src^='data:image/svg+xml']"
+    },
+    "Acceptable Use Policy": {
+      "fetch": "https://www.google.com/intl/en-GB_FR/googlecalendar/program_policies.html",
+      "select": "div[role=main]"
     }
+  }
 }

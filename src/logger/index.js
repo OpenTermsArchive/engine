@@ -7,7 +7,8 @@ import dotenv from 'dotenv';
 dotenv.config();
 const { combine, timestamp, printf, colorize } = winston.format;
 
-const alignedWithColorsAndTime = combine(colorize(),
+const alignedWithColorsAndTime = combine(
+  colorize(),
   timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
   printf(({ level, message, timestamp, serviceId, type }) => {
     let prefix = '';
@@ -15,11 +16,12 @@ const alignedWithColorsAndTime = combine(colorize(),
       prefix = `${serviceId} — ${type}`;
     }
     return `${timestamp} ${level.padEnd(15)} ${prefix.padEnd(55)} ${message}`;
-  }));
+  })
+);
 
 const consoleTransport = new winston.transports.Console();
 
-const transports = [ consoleTransport ];
+const transports = [consoleTransport];
 
 if (config.get('logger.sendMailOnError')) {
   const mailerOptions = {
@@ -29,20 +31,24 @@ if (config.get('logger.sendMailOnError')) {
     username: process.env.SMTP_USERNAME,
     password: process.env.SMTP_PASSWORD,
     ssl: true,
-    formatter: args => args[Object.getOwnPropertySymbols(args)[1]] // Returns the full error message, the same visible in the console. It is referenced in the argument object with a Symbol of which we do not have the reference but we know it is the second one.
+    formatter: (args) => args[Object.getOwnPropertySymbols(args)[1]], // Returns the full error message, the same visible in the console. It is referenced in the argument object with a Symbol of which we do not have the reference but we know it is the second one.
   };
 
-  transports.push(new winston.transports.Mail({
-    ...mailerOptions,
-    level: 'error',
-    subject: '[CGUs] Error Report',
-  }));
+  transports.push(
+    new winston.transports.Mail({
+      ...mailerOptions,
+      level: 'error',
+      subject: '[CGUs] Error Report',
+    })
+  );
 
-  transports.push(new winston.transports.Mail({
-    ...mailerOptions,
-    level: 'warn',
-    subject: '[CGUs] Inaccessible content',
-  }));
+  transports.push(
+    new winston.transports.Mail({
+      ...mailerOptions,
+      level: 'warn',
+      subject: '[CGUs] Inaccessible content',
+    })
+  );
 }
 
 const logger = winston.createLogger({

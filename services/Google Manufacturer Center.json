@@ -1,14 +1,14 @@
 {
-    "name": "Google Manufacturer Center",
-    "documents": {
-        "Terms of Service": {
-            "fetch": "https://manufacturers.google.com/files/tos/US/2017-04-18-tos.html",
-            "select": "body"
-		},
-		"Acceptable Use Policy": {
-			"fetch": "https://support.google.com/manufacturers/answer/6124032?hl=en-GB",
-            "select": "section[class=article-container]",
-            "remove": ".scClientFeedbackInlineFeedbacklinkroot, img[src='//lh3.googleusercontent.com/YK5hJkGl9i8S3b0-YqqVKvmpe8UFFm4wnNRJTj6_vVD6CbBzOsTetsmAO3PCOOZ90UY=w16']"
-		}
+  "name": "Google Manufacturer Center",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://manufacturers.google.com/files/tos/US/2017-04-18-tos.html",
+      "select": "body"
+    },
+    "Acceptable Use Policy": {
+      "fetch": "https://support.google.com/manufacturers/answer/6124032?hl=en-GB",
+      "select": "section[class=article-container]",
+      "remove": ".scClientFeedbackInlineFeedbacklinkroot, img[src='//lh3.googleusercontent.com/YK5hJkGl9i8S3b0-YqqVKvmpe8UFFm4wnNRJTj6_vVD6CbBzOsTetsmAO3PCOOZ90UY=w16']"
     }
+  }
 }

@@ -1,5 +1,4 @@
 import chai from 'chai';
-
 import DocumentDeclaration from './documentDeclaration.js';
 
 const { expect } = chai;
@@ -11,7 +10,7 @@ describe('DocumentDeclaration', () => {
         it('extracts selectors', async () => {
           const result = new DocumentDeclaration({ contentSelectors: 'body' }).getCssSelectors();
 
-          expect(result).to.deep.equal([ 'body' ]);
+          expect(result).to.deep.equal(['body']);
         });
       });
 
@@ -20,11 +19,11 @@ describe('DocumentDeclaration', () => {
           const result = new DocumentDeclaration({
             contentSelectors: {
               startBefore: '#startBefore',
-              endBefore: '#endBefore'
-            }
+              endBefore: '#endBefore',
+            },
           }).getCssSelectors();
 
-          expect(result).to.deep.equal([ '#startBefore', '#endBefore' ]);
+          expect(result).to.deep.equal(['#startBefore', '#endBefore']);
         });
       });
 
@@ -34,13 +33,13 @@ describe('DocumentDeclaration', () => {
             contentSelectors: [
               {
                 startBefore: '#startBefore',
-                endBefore: '#endBefore'
+                endBefore: '#endBefore',
               },
-              'body'
-            ]
+              'body',
+            ],
           }).getCssSelectors();
 
-          expect(result).to.deep.equal([ '#startBefore', '#endBefore', 'body' ]);
+          expect(result).to.deep.equal(['#startBefore', '#endBefore', 'body']);
         });
       });
     });
@@ -49,10 +48,10 @@ describe('DocumentDeclaration', () => {
       context('With string selector', () => {
         it('extracts selectors', async () => {
           const result = new DocumentDeclaration({
-            noiseSelectors: 'body'
+            noiseSelectors: 'body',
           }).getCssSelectors();
 
-          expect(result).to.deep.equal([ 'body' ]);
+          expect(result).to.deep.equal(['body']);
         });
       });
 
@@ -61,11 +60,11 @@ describe('DocumentDeclaration', () => {
           const result = new DocumentDeclaration({
             noiseSelectors: {
               startBefore: '#startBefore',
-              endBefore: '#endBefore'
-            }
+              endBefore: '#endBefore',
+            },
           }).getCssSelectors();
 
-          expect(result).to.deep.equal([ '#startBefore', '#endBefore' ]);
+          expect(result).to.deep.equal(['#startBefore', '#endBefore']);
         });
       });
 
@@ -75,13 +74,13 @@ describe('DocumentDeclaration', () => {
             noiseSelectors: [
               {
                 startBefore: '#startBefore',
-                endBefore: '#endBefore'
+                endBefore: '#endBefore',
               },
-              'body'
-            ]
+              'body',
+            ],
           }).getCssSelectors();
 
-          expect(result).to.deep.equal([ '#startBefore', '#endBefore', 'body' ]);
+          expect(result).to.deep.equal(['#startBefore', '#endBefore', 'body']);
         });
       });
     });
@@ -91,10 +90,10 @@ describe('DocumentDeclaration', () => {
         it('extracts selectors', async () => {
           const result = new DocumentDeclaration({
             contentSelectors: 'body',
-            noiseSelectors: 'h1'
+            noiseSelectors: 'h1',
           }).getCssSelectors();
 
-          expect(result).to.deep.equal([ 'body', 'h1' ]);
+          expect(result).to.deep.equal(['body', 'h1']);
         });
       });
 
@@ -103,15 +102,20 @@ describe('DocumentDeclaration', () => {
           const result = new DocumentDeclaration({
             contentSelectors: {
               startBefore: '#startBefore',
-              endBefore: '#endBefore'
+              endBefore: '#endBefore',
             },
             noiseSelectors: {
               startBefore: '#startBefore',
-              endBefore: '#endBefore'
-            }
+              endBefore: '#endBefore',
+            },
           }).getCssSelectors();
 
-          expect(result).to.deep.equal([ '#startBefore', '#endBefore', '#startBefore', '#endBefore' ]);
+          expect(result).to.deep.equal([
+            '#startBefore',
+            '#endBefore',
+            '#startBefore',
+            '#endBefore',
+          ]);
         });
       });
 
@@ -121,20 +125,27 @@ describe('DocumentDeclaration', () => {
             contentSelectors: [
               {
                 startBefore: '#startBefore',
-                endBefore: '#endBefore'
+                endBefore: '#endBefore',
               },
-              'body'
+              'body',
             ],
             noiseSelectors: [
               {
                 startBefore: '#startBefore',
-                endBefore: '#endBefore'
+                endBefore: '#endBefore',
               },
-              'body'
-            ]
+              'body',
+            ],
           }).getCssSelectors();
 
-          expect(result).to.deep.equal([ '#startBefore', '#endBefore', 'body', '#startBefore', '#endBefore', 'body' ]);
+          expect(result).to.deep.equal([
+            '#startBefore',
+            '#endBefore',
+            'body',
+            '#startBefore',
+            '#endBefore',
+            'body',
+          ]);
         });
       });
     });
