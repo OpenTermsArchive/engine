@@ -44,6 +44,8 @@ export async function filterHTML({ content, documentDeclaration }) {
 
   for (const filterFunction of serviceSpecificFilters) {
     try {
+      /* eslint-disable no-await-in-loop */
+      // We want this to be made in series
       await filterFunction(webPageDOM, {
         // eslint-disable-line no-await-in-loop
         fetch: location,
@@ -51,6 +53,7 @@ export async function filterHTML({ content, documentDeclaration }) {
         remove: noiseSelectors,
         filter: serviceSpecificFilters.map((filter) => filter.name),
       });
+      /* eslint-enable no-await-in-loop */
     } catch (error) {
       throw new InaccessibleContentError(`The filter function ${filterFunction} failed: ${error}`);
     }

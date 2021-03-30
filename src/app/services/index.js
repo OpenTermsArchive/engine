@@ -22,49 +22,54 @@ export async function load() {
     (fileName) => path.extname(fileName) == '.json' && !fileName.includes('.history.json')
   );
 
-  for (const fileName of serviceFileNames) {
-    const serviceDeclaration = JSON.parse(
-      await fs.readFile(path.join(SERVICE_DECLARATIONS_PATH, fileName))
-    ); // eslint-disable-line no-await-in-loop
-
-    const service = new Service({
-      id: path.basename(fileName, '.json'),
-      name: serviceDeclaration.name,
-    });
-
-    services[service.id] = service;
-
-    for (const documentType of Object.keys(serviceDeclaration.documents)) {
-      const {
-        filter: filterNames,
-        fetch: location,
-        executeClientScripts,
-        select: contentSelectors,
-        remove: noiseSelectors,
-      } = serviceDeclaration.documents[documentType];
-
-      let filters;
-      if (filterNames) {
-        const filterFilePath = fileName.replace('.json', '.filters.js');
-        const serviceFilters = await import(
-          pathToFileURL(path.join(SERVICE_DECLARATIONS_PATH, filterFilePath))
-        ); // eslint-disable-line no-await-in-loop
-        filters = filterNames.map((filterName) => serviceFilters[filterName]);
-      }
-
-      const document = new DocumentDeclaration({
-        service,
-        type: documentType,
-        location,
-        executeClientScripts,
-        contentSelectors,
-        noiseSelectors,
-        filters,
+  await Promise.all(
+    serviceFileNames.map(async (fileName) => {
+      const serviceDeclaration = JSON.parse(
+        await fs.readFile(path.join(SERVICE_DECLARATIONS_PATH, fileName))
+      );
+      const service = new Service({
+        id: path.basename(fileName, '.json'),
+        name: serviceDeclaration.name,
       });
 
-      services[service.id].addDocumentDeclaration(document);
-    }
-  }
+      services[service.id] = service;
+
+      const documentNames = Object.keys(serviceDeclaration.documents);
+
+      await Promise.all(
+        documentNames.map(async (documentName) => {
+          const documentType = serviceDeclaration.documents[documentName];
+          const {
+            filter: filterNames,
+            fetch: location,
+            executeClientScripts,
+            select: contentSelectors,
+            remove: noiseSelectors,
+          } = documentType;
+
+          let filters;
+          if (filterNames) {
+            const filterFilePath = fileName.replace('.json', '.filters.js');
+            const serviceFilters = await import(
+              pathToFileURL(path.join(SERVICE_DECLARATIONS_PATH, filterFilePath))
+            ); // eslint-disable-line no-await-in-loop
+            filters = filterNames.map((filterName) => serviceFilters[filterName]);
+          }
+          const document = new DocumentDeclaration({
+            service,
+            type: documentName,
+            location,
+            executeClientScripts,
+            contentSelectors,
+            noiseSelectors,
+            filters,
+          });
+
+          services[service.id].addDocumentDeclaration(document);
+        })
+      );
+    })
+  );
 
   return services;
 }
