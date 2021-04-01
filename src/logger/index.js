@@ -1,8 +1,8 @@
-import winston from 'winston';
 import 'winston-mail';
 
 import config from 'config';
 import dotenv from 'dotenv';
+import winston from 'winston';
 
 dotenv.config();
 const { combine, timestamp, printf, colorize } = winston.format;
@@ -31,6 +31,7 @@ if (config.get('logger.sendMailOnError')) {
     username: process.env.SMTP_USERNAME,
     password: process.env.SMTP_PASSWORD,
     ssl: true,
+    timeout: 30 * 1000,
     formatter: (args) => args[Object.getOwnPropertySymbols(args)[1]], // Returns the full error message, the same visible in the console. It is referenced in the argument object with a Symbol of which we do not have the reference but we know it is the second one.
   };
 
@@ -38,7 +39,7 @@ if (config.get('logger.sendMailOnError')) {
     new winston.transports.Mail({
       ...mailerOptions,
       level: 'error',
-      subject: '[CGUs] Error Report',
+      subject: '[OTA] Error Report',
     })
   );
 
@@ -46,7 +47,7 @@ if (config.get('logger.sendMailOnError')) {
     new winston.transports.Mail({
       ...mailerOptions,
       level: 'warn',
-      subject: '[CGUs] Inaccessible content',
+      subject: '[OTA] Inaccessible content',
     })
   );
 }
