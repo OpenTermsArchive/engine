@@ -2,14 +2,14 @@
   "name": "WhatsApp",
   "documents": {
     "Terms of Service": {
-      "fetch": "https://www.whatsapp.com/legal/terms-of-service-eea?lang=en",
+      "fetch": "https://www.whatsapp.com/legal/updates/terms-of-service-eea?lang=en",
       "select": "._2zry",
       "remove": "[href='#top-of-page']"
     },
     "Privacy Policy": {
-      "fetch": "https://www.whatsapp.com/legal/privacy-policy-eea?lang=en",
+      "fetch": "https://www.whatsapp.com/legal/updates/privacy-policy-eea?lang=en",
       "select": "._2zry",
-      "remove": "[href='#top-of-page']"
+      "remove": "[href='#top-of-page'],._-pk > ul:nth-child(3)"
     },
     "Trackers Policy": {
       "fetch": "https://www.whatsapp.com/legal/cookies",
