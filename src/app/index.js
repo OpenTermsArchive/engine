@@ -85,34 +85,56 @@ export default class CGUs extends events.EventEmitter {
   }
 
   async trackDocumentChanges(documentDeclaration) {
-    const { location, executeClientScripts } = documentDeclaration;
-
-    const { mimeType, content } = await fetch({
-      url: location,
+    const {
+      location,
       executeClientScripts,
-      cssSelectors: documentDeclaration.getCssSelectors(),
-    });
+      service,
+      contentSelectors,
+      noiseSelectors,
+      type,
+    } = documentDeclaration;
 
-    if (!content) {
-      return;
+    try {
+      const { mimeType, content } = await fetch({
+        url: location,
+        executeClientScripts,
+        cssSelectors: documentDeclaration.getCssSelectors(),
+      });
+
+      if (!content) {
+        return;
+      }
+
+      const snapshotId = await this.recordSnapshot({
+        content,
+        mimeType,
+        documentDeclaration,
+      });
+
+      if (!snapshotId) {
+        return;
+      }
+
+      return this.recordVersion({
+        snapshotContent: content,
+        mimeType,
+        snapshotId,
+        documentDeclaration,
+      });
+    } catch (e) {
+      if (e instanceof InaccessibleContentError) {
+        // send error with more info
+        throw new InaccessibleContentError({
+          contentSelectors,
+          noiseSelectors,
+          url: location,
+          name: service.id,
+          documentType: type,
+          message: e.toString(),
+        });
+      }
+      throw e;
     }
-
-    const snapshotId = await this.recordSnapshot({
-      content,
-      mimeType,
-      documentDeclaration,
-    });
-
-    if (!snapshotId) {
-      return;
-    }
-
-    return this.recordVersion({
-      snapshotContent: content,
-      mimeType,
-      snapshotId,
-      documentDeclaration,
-    });
   }
 
   async refilterAndRecord(servicesIds) {
@@ -180,32 +202,48 @@ export default class CGUs extends events.EventEmitter {
     documentDeclaration,
     isRefiltering,
   }) {
-    const { service, type } = documentDeclaration;
-    const content = await filter({
-      content: snapshotContent,
-      mimeType,
-      documentDeclaration,
-    });
+    const { service, type, contentSelectors, noiseSelectors, location } = documentDeclaration;
+    try {
+      const content = await filter({
+        content: snapshotContent,
+        mimeType,
+        documentDeclaration,
+      });
 
-    const recordFunction = !isRefiltering ? 'recordVersion' : 'recordRefilter';
+      const recordFunction = !isRefiltering ? 'recordVersion' : 'recordRefilter';
 
-    const { id: versionId, isFirstRecord } = await history[recordFunction]({
-      serviceId: service.id,
-      content,
-      documentType: type,
-      snapshotId,
-    });
+      const { id: versionId, isFirstRecord } = await history[recordFunction]({
+        serviceId: service.id,
+        content,
+        documentType: type,
+        snapshotId,
+      });
 
-    if (!versionId) {
-      return this.emit('versionNotChanged', service.id, type);
+      if (!versionId) {
+        return this.emit('versionNotChanged', service.id, type);
+      }
+
+      this.emit(
+        isFirstRecord ? 'firstVersionRecorded' : 'versionRecorded',
+        service.id,
+        type,
+        versionId
+      );
+    } catch (e) {
+      if (e instanceof InaccessibleContentError) {
+        // send error with more info
+        throw new InaccessibleContentError({
+          contentSelectors,
+          noiseSelectors,
+          url: location,
+          name: service.id,
+          documentType: type,
+          message: e.toString(),
+        });
+      }
+
+      throw e;
     }
-
-    this.emit(
-      isFirstRecord ? 'firstVersionRecorded' : 'versionRecorded',
-      service.id,
-      type,
-      versionId
-    );
   }
 
   async publish() {
