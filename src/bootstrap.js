@@ -7,9 +7,18 @@ process.on('unhandledRejection', (reason) => {
 });
 
 process.on('uncaughtException', (err) => {
-  logger.error(`uncaughtException ${err}`);
-  logger.error(err);
-  process.exit(1);
+  if (Object.keys(err).includes('smtp')) {
+    console.error(
+      'This is an smtp error that we do not know how to handle in winston but do not want to track'
+    ); // eslint-disable-line
+    console.error(
+      'We do not use logger.error here because it would potentially retry to send the error by email'
+    ); // eslint-disable-line
+  } else {
+    logger.error(`uncaughtException ${err}`);
+    logger.error(Object.keys(err));
+    process.exit(1);
+  }
 });
 
 process.on('SIGTERM', () => {
