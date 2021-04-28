@@ -8,7 +8,7 @@
     },
     "Privacy Policy": {
       "fetch": "https://www.meredith.com/nmg/privacy",
-      "select": ".WordSection1"
+      "select": "#main"
     }
   }
 }
