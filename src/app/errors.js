@@ -1,4 +1,4 @@
-const CONTRIBUTE_URL = 'http://51.75.169.235:7022/contribute/service';
+const CONTRIBUTE_URL = 'https://disinfo.quaidorsay.fr/preprod/open-terms-archive/disinfo/contribute/service';
 const GITHUB_VERSIONS_URL = 'https://github.com/ambanum/OpenTermsArchive-versions/blob/master';
 const GITHUB_REPO_URL = 'https://github.com/ambanum/OpenTermsArchive/blob/master/services';
 const GOOGLE_URL = 'https://www.google.com/search?q=';
@@ -18,15 +18,21 @@ export class InaccessibleContentError extends Error {
         documentType,
       } = messageOrObject;
 
+      /* eslint-disable no-nested-ternary */
       const contentSelectorsAsArray = (typeof contentSelectors === 'string'
         ? contentSelectors.split(',')
-        : contentSelectors || []
+        : Array.isArray(contentSelectors)
+          ? contentSelectors
+          : []
       ).map(encodeURIComponent);
 
       const noiseSelectorsAsArray = (typeof noiseSelectors === 'string'
         ? noiseSelectors.split(',')
-        : noiseSelectors || []
+        : Array.isArray(noiseSelectors)
+          ? noiseSelectors
+          : []
       ).map(encodeURIComponent);
+      /* eslint-enable no-nested-ternary */
 
       const contentSelectorsQueryString = contentSelectorsAsArray.length
         ? `&selectedCss[]=${contentSelectorsAsArray.join('&selectedCss[]=')}`
