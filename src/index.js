@@ -82,7 +82,7 @@ const schedule = args.includes('--schedule');
   });
 
   logger.info('Release will be created if needed every night at 1:20am');
-  scheduler.scheduleJob('20 1 * * *', async () => {
+  scheduler.scheduleJob('20 15 * * *', async () => {
     logger.info(`Start Release ${new Date()}`);
     await publishRelease();
     logger.info(`End Release ${new Date()}`);
