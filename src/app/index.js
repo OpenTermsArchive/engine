@@ -1,15 +1,18 @@
 import async from 'async';
 import config from 'config';
 import events from 'events';
+import pTimeout from '@lolpants/ptimeout';
 import * as history from './history/index.js';
 import * as services from './services/index.js';
 
 import { InaccessibleContentError } from './errors.js';
 import fetch from './fetcher/index.js';
 import filter from './filter/index.js';
+import logger from '../logger/index.js';
 
 const MAX_PARALLEL_DOCUMENTS_TRACKS = 20;
 const MAX_PARALLEL_REFILTERS = 20;
+const MAX_EXECUTION_TIME = 5 * 60 * 1000;
 
 export const AVAILABLE_EVENTS = [
   'snapshotRecorded',
@@ -43,14 +46,50 @@ export default class CGUs extends events.EventEmitter {
   }
 
   initQueues() {
-    this.trackDocumentChangesQueue = async.queue(
-      async (documentDeclaration) => this.trackDocumentChanges(documentDeclaration),
-      MAX_PARALLEL_DOCUMENTS_TRACKS
-    );
-    this.refilterDocumentsQueue = async.queue(
-      async (documentDeclaration) => this.refilterAndRecordDocument(documentDeclaration),
-      MAX_PARALLEL_REFILTERS
-    );
+    this.trackDocumentChangesQueue = async.queue(async (documentDeclaration) => {
+      const timeMessage = `trackDocumentChangesQueue_${documentDeclaration.service.id}_${documentDeclaration.type}`;
+      console.time(timeMessage);
+      try {
+        const result = await pTimeout.default(
+          () => this.trackDocumentChanges(documentDeclaration),
+          MAX_EXECUTION_TIME
+        );
+        console.timeEnd(timeMessage);
+        return result;
+      } catch (e) {
+        if (!(e instanceof pTimeout.TimeoutError)) {
+          throw e;
+        }
+
+        logger.error({
+          message: e.toString(),
+          serviceId: documentDeclaration.service.id,
+          type: documentDeclaration.type,
+        });
+      }
+    }, MAX_PARALLEL_DOCUMENTS_TRACKS);
+    this.refilterDocumentsQueue = async.queue(async (documentDeclaration) => {
+      const timeMessage = `refilterDocumentsQueue_${documentDeclaration.service.id}_${documentDeclaration.type}`;
+      console.time(timeMessage);
+      try {
+        const result = await pTimeout.default(
+          () => this.refilterAndRecordDocument(documentDeclaration),
+          MAX_EXECUTION_TIME
+        );
+        console.timeEnd(timeMessage);
+        return result;
+      } catch (e) {
+        if (!(e instanceof pTimeout.TimeoutError)) {
+          throw e;
+        }
+
+        logger.error({
+          message: e.toString(),
+          serviceId: documentDeclaration.service.id,
+          type: documentDeclaration.type,
+        });
+      }
+    }, MAX_PARALLEL_REFILTERS);
 
     const queueErrorHandler = (error, { service, type }) => {
       if (error instanceof InaccessibleContentError) {

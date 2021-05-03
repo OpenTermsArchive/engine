@@ -57,6 +57,7 @@
   "dependencies": {
     "@accordproject/markdown-cicero": "^0.12.12",
     "@accordproject/markdown-pdf": "^0.12.4",
+    "@lolpants/ptimeout": "^1.0.3",
     "async": "^3.2.0",
     "chai-exclude": "^2.0.2",
     "config": "^3.3.3",
