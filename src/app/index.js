@@ -10,8 +10,8 @@ import fetch from './fetcher/index.js';
 import filter from './filter/index.js';
 import logger from '../logger/index.js';
 
-const MAX_PARALLEL_DOCUMENTS_TRACKS = 20;
-const MAX_PARALLEL_REFILTERS = 20;
+const MAX_PARALLEL_DOCUMENTS_TRACKS = 1;
+const MAX_PARALLEL_REFILTERS = 1;
 const MAX_EXECUTION_TIME = 5 * 60 * 1000;
 
 export const AVAILABLE_EVENTS = [
@@ -57,6 +57,7 @@ export default class CGUs extends events.EventEmitter {
         console.timeEnd(timeMessage);
         return result;
       } catch (e) {
+        console.timeEnd(timeMessage);
         if (!(e instanceof pTimeout.TimeoutError)) {
           throw e;
         }
@@ -79,6 +80,7 @@ export default class CGUs extends events.EventEmitter {
         console.timeEnd(timeMessage);
         return result;
       } catch (e) {
+        console.timeEnd(timeMessage);
         if (!(e instanceof pTimeout.TimeoutError)) {
           throw e;
         }
