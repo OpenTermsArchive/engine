@@ -53,7 +53,7 @@ const schedule = args.includes('--schedule');
     return;
   }
 
-  if (process.env.NODE_ENV == 'production') {
+  if (process.env.NODE_ENV === 'production') {
     app.attach(new Notifier(app.serviceDeclarations));
   }
 
