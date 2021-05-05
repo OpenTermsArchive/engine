@@ -1,5 +1,6 @@
 import config from 'config';
 import dotenv from 'dotenv';
+import pTimeout from '@lolpants/ptimeout';
 import sendInBlue from 'sib-api-v3-sdk';
 
 dotenv.config();
@@ -37,13 +38,21 @@ export default class Notifier {
       },
     };
 
-    return this.send(
-      [
-        config.get('notifier.sendInBlue.administratorsListId'),
-        config.get('notifier.sendInBlue.updatesListId'),
-      ],
-      sendParams
-    );
+    try {
+      return pTimeout.default(
+        () =>
+          this.send(
+            [
+              config.get('notifier.sendInBlue.administratorsListId'),
+              config.get('notifier.sendInBlue.updatesListId'),
+            ],
+            sendParams
+          ),
+        1 * 60 * 1000
+      );
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   async send(lists, sendParams) {
