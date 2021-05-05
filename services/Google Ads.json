@@ -35,6 +35,11 @@
       "fetch": "https://developers.google.com/adwords/api/docs/terms",
       "select": ".devsite-article-body",
       "remove": "style"
-    }
+    },
+    "Ad Publishing Policy": {
+    "fetch": "https://support.google.com/adsense/answer/9335564#",
+    "select": ".article-container",
+    "remove": ".guide-button-container, .scClientFeedbackInlineFeedbacklinkroot"
+  }
   }
 }
