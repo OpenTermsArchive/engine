@@ -4,8 +4,8 @@
     "Terms of Service": {
       "fetch": "https://www.wechat.com/en/service_terms.html",
       "remove": {
-        "startBefore": "#wechat-terms-of-service-usa-specific-terms-",
-        "endBefore": "#wechat-terms-of-service-european-union-specific-terms-"
+        "startBefore": "#wechat-terms-of-service-usa-specific-terms",
+        "endBefore": "#wechat-terms-of-service-european-union-specific-terms"
       },
       "select": "#agreement"
     },
