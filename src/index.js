@@ -65,6 +65,10 @@ const schedule = args.includes('--schedule');
     `Tracked changes of ${numberOfDocuments} documents from ${serviceIds.length} services.`
   );
 
+  logger.info(`Start Release ${new Date()}`);
+  await publishRelease();
+  logger.info(`End Release ${new Date()}`);
+
   if (!schedule) {
     return;
   }
