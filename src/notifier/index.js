@@ -22,9 +22,13 @@ export default class Notifier {
   }
 
   async onRecordsPublished() {
-    this.delayedVersionNotificationsParams.forEach(({ serviceId, type, versionId }) => {
-      this.notifyVersionRecorded(serviceId, type, versionId);
-    });
+    for (const { serviceId, type, versionId } of this.delayedVersionNotificationsParams) {
+      console.log(
+        `notifyVersionRecorded for "${serviceId}" type "${type}" and versionId "${versionId}"`
+      );
+      await this.notifyVersionRecorded(serviceId, type, versionId); // eslint-disable-line
+    }
+
     this.delayedVersionNotificationsParams = [];
   }
 
