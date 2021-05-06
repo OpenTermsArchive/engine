@@ -34,7 +34,16 @@
 
 - name: Get latest data from public instance of {{ name }}
   command:
-    cmd: git pull origin master
+    cmd: git fetch origin
+    chdir: '/home/{{ ansible_user }}/{{ directory }}'
+  tags:
+    - restart
+    - start
+    - update
+
+- name: Clean {{ name }} repository
+  command:
+    cmd: git reset --hard origin/master
     chdir: '/home/{{ ansible_user }}/{{ directory }}'
   tags:
     - restart
