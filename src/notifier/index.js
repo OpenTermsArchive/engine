@@ -26,7 +26,14 @@ export default class Notifier {
       console.log(
         `notifyVersionRecorded for "${serviceId}" type "${type}" and versionId "${versionId}"`
       );
-      await this.notifyVersionRecorded(serviceId, type, versionId); // eslint-disable-line
+      try {
+        // eslint-disable-next-line
+        await pTimeout.default(async () => {
+          await this.notifyVersionRecorded(serviceId, type, versionId);
+        }, 1 * 60 * 1000);
+      } catch (e) {
+        console.error(e);
+      }
     }
 
     this.delayedVersionNotificationsParams = [];
@@ -42,21 +49,13 @@ export default class Notifier {
       },
     };
 
-    try {
-      return pTimeout.default(
-        () =>
-          this.send(
-            [
-              config.get('notifier.sendInBlue.administratorsListId'),
-              config.get('notifier.sendInBlue.updatesListId'),
-            ],
-            sendParams
-          ),
-        1 * 60 * 1000
-      );
-    } catch (e) {
-      console.error(e);
-    }
+    return this.send(
+      [
+        config.get('notifier.sendInBlue.administratorsListId'),
+        config.get('notifier.sendInBlue.updatesListId'),
+      ],
+      sendParams
+    );
   }
 
   async send(lists, sendParams) {
