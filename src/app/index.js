@@ -51,7 +51,7 @@ export default class CGUs extends events.EventEmitter {
       console.time(timeMessage);
       try {
         const result = await pTimeout.default(
-          () => this.trackDocumentChanges(documentDeclaration),
+          async () => this.trackDocumentChanges(documentDeclaration),
           MAX_EXECUTION_TIME
         );
         console.timeEnd(timeMessage);
@@ -74,7 +74,7 @@ export default class CGUs extends events.EventEmitter {
       console.time(timeMessage);
       try {
         const result = await pTimeout.default(
-          () => this.refilterAndRecordDocument(documentDeclaration),
+          async () => this.refilterAndRecordDocument(documentDeclaration),
           MAX_EXECUTION_TIME
         );
         console.timeEnd(timeMessage);
