@@ -18,6 +18,8 @@ const schedule = args.includes('--schedule');
   app.attach(logger);
   await app.init();
 
+  logger.info('Starting Service');
+
   let serviceIds = args.filter((arg) => !arg.startsWith('--') && arg !== '/home/debian/cgus/');
 
   if (modifiedOnly) {

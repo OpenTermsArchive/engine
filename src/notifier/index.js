@@ -65,10 +65,7 @@ export default class Notifier {
 
     contacts = contacts.flat();
 
-    const uniqueContacts = contacts.reduce((acc, current) => {
-      const found = !acc.find((contact) => contact.id === current.id);
-      return found ? acc : acc.concat([current]);
-    }, []);
+    const uniqueContacts = [...new Map(contacts.map((item) => [item.id, item])).values()];
 
     const sendPromises = uniqueContacts.map((contact) =>
       this.apiInstance.sendTransacEmail({ ...sendParams, to: [{ email: contact.email }] }));
