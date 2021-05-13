@@ -118,8 +118,9 @@ export default class CGUs extends events.EventEmitter {
   }
 
   async trackChanges(servicesIds) {
-    this._forEachDocumentOf(servicesIds, (documentDeclaration) =>
-      this.trackDocumentChangesQueue.push(documentDeclaration));
+    this._forEachDocumentOf(servicesIds, async (documentDeclaration) =>
+      this.trackDocumentChangesQueue.push(documentDeclaration)
+    );
 
     await this.trackDocumentChangesQueue.drain();
     await this.publish();
@@ -180,7 +181,8 @@ export default class CGUs extends events.EventEmitter {
 
   async refilterAndRecord(servicesIds) {
     this._forEachDocumentOf(servicesIds, (documentDeclaration) =>
-      this.refilterDocumentsQueue.push(documentDeclaration));
+      this.refilterDocumentsQueue.push(documentDeclaration)
+    );
 
     await this.refilterDocumentsQueue.drain();
     await this.publish();
