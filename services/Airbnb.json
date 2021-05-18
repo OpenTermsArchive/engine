@@ -3,8 +3,11 @@
   "documents": {
     "Privacy Policy": {
       "fetch": "https://www.airbnb.co.uk/help/article/2855/privacy-policy",
-      "select": "#site-content",
-      "remove": "._3mlrvv, ._12t7zck"
+      "select": ["#site-content > section"],
+      "remove": [
+        "#site-content > section > *:nth-last-child(2)",
+        "#site-content > section > div:nth-child(2) > div:last-child"
+      ]
     },
     "Terms of Service": {
       "fetch": "https://www.airbnb.co.uk/help/article/2908/terms-of-service",
@@ -16,8 +19,8 @@
     },
     "Trackers Policy": {
       "fetch": "https://www.airbnb.co.uk/help/article/2866/airbnb-cookie-policy",
-      "select": "#site-content",
-      "remove": "._12t7zck"
+      "select": ["#site-content > section"],
+      "remove": ["#site-content > section > *:nth-last-child(2)"]
     }
   }
 }
