@@ -44,13 +44,15 @@ if (config.get('logger.sendMailOnError')) {
     })
   );
 
-  transports.push(
-    new winston.transports.Mail({
-      ...mailerOptions,
-      level: 'warn',
-      subject: '[OTA] Inaccessible content',
-    })
-  );
+  if (config.get('logger.sendMailOnError.sendWarnings')) {
+    transports.push(
+      new winston.transports.Mail({
+        ...mailerOptions,
+        level: 'warn',
+        subject: '[OTA] Inaccessible content',
+      })
+    );
+  }
 }
 
 const logger = winston.createLogger({
