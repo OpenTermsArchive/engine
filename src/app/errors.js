@@ -1,4 +1,4 @@
-const CONTRIBUTE_URL = 'https://disinfo.quaidorsay.fr/preprod/open-terms-archive/disinfo/contribute/service';
+const CONTRIBUTE_URL = 'https://opentermsarchive.org/contribute/service';
 const GITHUB_VERSIONS_URL = 'https://github.com/ambanum/OpenTermsArchive-versions/blob/master';
 const GITHUB_REPO_URL = 'https://github.com/ambanum/OpenTermsArchive/blob/master/services';
 const GOOGLE_URL = 'https://www.google.com/search?q=';
@@ -22,15 +22,15 @@ export class InaccessibleContentError extends Error {
       const contentSelectorsAsArray = (typeof contentSelectors === 'string'
         ? contentSelectors.split(',')
         : Array.isArray(contentSelectors)
-          ? contentSelectors
-          : []
+        ? contentSelectors
+        : []
       ).map(encodeURIComponent);
 
       const noiseSelectorsAsArray = (typeof noiseSelectors === 'string'
         ? noiseSelectors.split(',')
         : Array.isArray(noiseSelectors)
-          ? noiseSelectors
-          : []
+        ? noiseSelectors
+        : []
       ).map(encodeURIComponent);
       /* eslint-enable no-nested-ternary */
 
