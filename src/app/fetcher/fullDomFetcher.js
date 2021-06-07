@@ -15,7 +15,10 @@ export default async function fetch(url, cssSelectors) {
   const selectors = [].concat(cssSelectors);
 
   try {
-    browser = await puppeteer.launch({ headless: true });
+    browser = await puppeteer.launch({
+      headless: true,
+      args: ['--no-sandbox', '--disable-setuid-sandbox'],
+    });
     page = await browser.newPage();
     await page.setDefaultNavigationTimeout(PUPPETEER_TIMEOUT);
 
