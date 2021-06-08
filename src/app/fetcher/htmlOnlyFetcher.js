@@ -1,8 +1,7 @@
 import HttpProxyAgent from 'http-proxy-agent';
 import HttpsProxyAgent from 'https-proxy-agent';
-import nodeFetch from 'node-fetch';
 import { InaccessibleContentError } from '../errors.js';
-
+import nodeFetch from 'node-fetch';
 const LANGUAGE = 'en';
 
 export default async function fetch(url) {
@@ -16,10 +15,14 @@ export default async function fetch(url) {
   options.headers = { 'Accept-Language': LANGUAGE };
 
   let response;
+
   try {
     response = await nodeFetch(url, options);
   } catch (error) {
-    if (error.code && error.code.match(/^(EAI_AGAIN|ENOTFOUND|ETIMEDOUT|ECONNRESET)$/)) {
+    if (
+      error.code &&
+      error.code.match(/^(EAI_AGAIN|ENOTFOUND|ETIMEDOUT|ECONNRESET|CERT_HAS_EXPIRED)$/)
+    ) {
       throw new InaccessibleContentError(error.message);
     }
     throw error;
