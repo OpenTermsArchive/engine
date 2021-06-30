@@ -1,0 +1,21 @@
+{
+  "name": "Amazon Advertising",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://www.amazon.co.uk/gp/help/customer/display.html/?ie=UTF8&nodeId=1040616&ref_=a20m_us_fnav_l_cndtns_gb",
+      "select": [".help-content"]
+    },
+    "Privacy Policy": {
+      "fetch": "https://www.amazon.co.uk/gp/help/customer/display.html/?nodeId=201909010&ref_=a20m_us_fnav_l_prvcy_gb",
+      "select": [".help-content"]
+    },
+    "Trackers Policy": {
+      "fetch": "https://www.amazon.co.uk/gp/help/customer/display.html?ie=UTF8&nodeId=201890250&ref_=a20m_us_fnav_l_cook_gb",
+      "select": [".help-content"]
+    },
+    "Ad Publishing Policy": {
+      "fetch": "https://advertising.amazon.com/resources/ad-policy/creative-acceptance",
+      "select": [".container:nth-child(1) > .column"]
+    }
+  }
+}
