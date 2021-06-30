@@ -1,0 +1,17 @@
+{
+  "name": "Amazon Publisher",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://ams.amazon.com/webpublisher/apsmanaged/apsagreement.html",
+      "select": [".col-md-12"]
+    },
+    "Privacy Policy": {
+      "fetch": "https://aps.amazon.com/aps/privacy-policy/",
+      "select": [".et_pb_text_inner"]
+    },
+    "Ad Publishing Policy": {
+      "fetch": "https://ams.amazon.com/webpublisher/apsmanaged/apsprogrampolicy.html",
+      "select": "#legalPage"
+    }
+  }
+}
