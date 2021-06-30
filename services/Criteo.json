@@ -1,0 +1,16 @@
+{
+  "name": "Criteo",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://www.criteo.com/wp-content/uploads/2021/06/Criteo-Terms_Display_Jun21_EN.pdf"
+    },
+    "Privacy Policy": {
+      "fetch": "https://www.criteo.com/privacy/",
+      "select": ["#basic-page-content"]
+    },
+    "Ad Publishing Policy": {
+      "fetch": "https://www.criteo.com/advertising-guidelines/",
+      "select": ["#basic-page-header, #basic-page-content"]
+    }
+  }
+}
