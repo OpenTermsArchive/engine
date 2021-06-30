@@ -12,6 +12,10 @@
     "Trackers Policy": {
       "fetch": "https://www.adsupply.com/cookie-policy/",
       "select": [".entry-content"]
+    },
+    "Ad Publishing Policy": {
+      "fetch": "https://www.adsupply.com/advertiser-terms/",
+      "select": [".entry-content"]
     }
   }
 }
