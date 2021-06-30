@@ -1,0 +1,22 @@
+{
+  "name": "Taboola",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://www.taboola.com/policies/terms-of-use",
+      "select": [".legal-portal-content__container"]
+    },
+    "Privacy Policy": {
+      "fetch": "https://www.taboola.com/policies/privacy-policy",
+      "select": [".legal-portal-content__container"]
+    },
+    "Trackers Policy": {
+      "fetch": "https://www.taboola.com/policies/cookie-policy",
+      "select": [".legal-portal-content__container"]
+    },
+    "Ad Publishing Policy": {
+      "fetch": "https://help.taboola.com/hc/en-us/articles/115007068368-Prohibited-Content-Products-and-Services",
+      "select": [".article"],
+      "remove": [".avatar,.article-meta,.article-subscribe,.article-votes,.article-relatives"]
+    }
+  }
+}
