@@ -1,0 +1,13 @@
+{
+  "name": "The Reach Group",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://trg.de/en/general-terms-and-conditions-of-contract/",
+      "select": [".gr--push-1\\@l"]
+    },
+    "Privacy Policy": {
+      "fetch": "https://trg.de/en/privacy-statement/",
+      "select": [".gr--push-1\\@l"]
+    }
+  }
+}
