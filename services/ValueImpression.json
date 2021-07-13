@@ -1,0 +1,13 @@
+{
+  "name": "ValueImpression",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://valueimpression.com/privacy.html",
+      "select": [".textwidget-half"]
+    },
+    "Terms of Service": {
+      "fetch": "https://valueimpression.com/term.html",
+      "select": ["article"]
+    }
+  }
+}
