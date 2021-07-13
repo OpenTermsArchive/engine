@@ -1,0 +1,17 @@
+{
+  "name": "Exponential",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://exponential.com/privacy/",
+      "select": ["#page-7977"],
+      "remove": [
+        "table:nth-child(1) td:nth-child(1)",
+        "table:nth-child(1) td:nth-child(2)",
+        ".table-of-contents"
+      ]
+    },
+    "Ad Publishing Policy": {
+      "fetch": "https://exponential.com/documents/publisher-code-of-conduct/?wpdmdl=17753"
+    }
+  }
+}
