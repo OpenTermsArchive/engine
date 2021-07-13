@@ -50,8 +50,8 @@ export default class Git {
     } catch (error) {
       if (
         !(
-          error.message.includes('unknown revision or path not in the working tree')
-          || error.message.includes('does not have any commits yet')
+          error.message.includes('unknown revision or path not in the working tree') ||
+          error.message.includes('does not have any commits yet')
         )
       ) {
         throw error;

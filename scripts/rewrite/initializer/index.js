@@ -1,8 +1,8 @@
+import Git from '../../../src/app/history/git.js';
+import { fileExists } from '../utils.js';
 import { fileURLToPath } from 'url';
 import fsApi from 'fs';
 import path from 'path';
-import { fileExists } from '../utils.js';
-import Git from '../../../src/app/history/git.js';
 
 const fs = fsApi.promises;
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
