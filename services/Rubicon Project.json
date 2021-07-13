@@ -1,0 +1,17 @@
+{
+  "name": "Rubicon Project",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://rubiconproject.com/privacy-policy/",
+      "select": [".main-wrapper > .col-xs-12 > div"]
+    },
+    "Ad Publishing Policy": {
+      "fetch": "https://rubiconproject.com/terms-conditions/rubicon-project-ad-quality-guidelines/",
+      "select": [".main-wrapper > .col-xs-12 > div"]
+    },
+    "Trackers Policy": {
+      "fetch": "https://rubiconproject.com/privacy-policy/website-cookie-statement/",
+      "select": [".main-wrapper > .col-xs-12 > div"]
+    }
+  }
+}
