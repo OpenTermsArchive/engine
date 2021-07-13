@@ -15,7 +15,8 @@
     },
     "Ad Publishing Policy": {
       "fetch": "https://www.outbrain.com/advertisers/guidelines/",
-      "select": ["#main"]
+      "select": ["#main"],
+      "remove": ".image"
     }
   }
 }
