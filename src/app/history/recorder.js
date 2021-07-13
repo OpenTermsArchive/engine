@@ -3,9 +3,9 @@
  * Commit SHAs are used as opaque unique IDs.
  */
 
+import Git from './git.js';
 import fsApi from 'fs';
 import mime from 'mime';
-import Git from './git.js';
 
 const fs = fsApi.promises;
 
