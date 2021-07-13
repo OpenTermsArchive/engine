@@ -1,0 +1,14 @@
+{
+  "name": "Infolinks",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.infolinks.com/privacy-policy/",
+      "select": ["#legal-docs .col"],
+      "remove": [".print"]
+    },
+    "Ad Publishing Policy": {
+      "fetch": "https://www.infolinks.com/service-agreement/",
+      "select": [".section-title", "ol:nth-child(4)"]
+    }
+  }
+}
