@@ -17,6 +17,7 @@ export default class Recorder {
   }
 
   async init() {
+    this.git.optimizeLogGraph();
     return this.git.initConfig();
   }
 
