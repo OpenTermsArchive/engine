@@ -71,6 +71,10 @@ export default class Recorder {
     const recordFilePath = `${this.path}/${filePath}`;
     const mimeType = mime.getType(filePath);
 
+    if (!fsApi.existsSync(recordFilePath)) {
+      return {};
+    }
+
     const readFileOptions = {};
     if (mimeType.startsWith('text/')) {
       readFileOptions.encoding = 'utf8';

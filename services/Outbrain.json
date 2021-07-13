@@ -1,0 +1,21 @@
+{
+  "name": "Outbrain",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.outbrain.com/legal/privacy#privacy-policy",
+      "select": ["#contract-id-10717 h2", "#version-6089b136c27a991ba715ca8e-locale-en-us > .body"]
+    },
+    "Trackers Policy": {
+      "fetch": "https://www.outbrain.com/legal/privacy#cookies",
+      "select": ["#contract-id-10793 h2", "#version-5fc7d64ee9c65d1e147281a9-locale-en-us > .body"]
+    },
+    "Terms of Service": {
+      "fetch": "https://www.outbrain.com/legal/#terms-of-use",
+      "select": ["#contract-id-17863 h2", ".js-body-5df169d257b44f228c507306"]
+    },
+    "Ad Publishing Policy": {
+      "fetch": "https://www.outbrain.com/advertisers/guidelines/",
+      "select": ["#main"]
+    }
+  }
+}
