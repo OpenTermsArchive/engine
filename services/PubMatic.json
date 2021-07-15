@@ -1,0 +1,9 @@
+{
+  "name": "PubMatic",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://pubmatic.com/legal/publisher-master-services-agreement/",
+      "select": [".main > .container"]
+    }
+  }
+}
