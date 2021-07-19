@@ -1,3 +1,4 @@
+const LOCAL_CONTRIBUTE_URL = 'http://localhost:3000/contribute/service';
 const CONTRIBUTE_URL = 'https://opentermsarchive.org/contribute/service';
 const GITHUB_VERSIONS_URL = 'https://github.com/ambanum/OpenTermsArchive-versions/blob/master';
 const GITHUB_REPO_URL = 'https://github.com/ambanum/OpenTermsArchive/blob/master/services';
@@ -46,6 +47,7 @@ export class InaccessibleContentError extends Error {
       const encodedUrl = encodeURIComponent(url);
 
       const verificationUrl = `${CONTRIBUTE_URL}?step=2&url=${encodedUrl}&name=${encodedName}&documentType=${encodedType}${noiseSelectorsQueryString}${contentSelectorsQueryString}`;
+      const localVerificationUrl = `${LOCAL_CONTRIBUTE_URL}?step=2&url=${encodedUrl}&name=${encodedName}&documentType=${encodedType}${noiseSelectorsQueryString}${contentSelectorsQueryString}`;
 
       const githubVersionUrl = `${GITHUB_VERSIONS_URL}/${encodedName}/${encodedType}.md`;
 
@@ -60,6 +62,8 @@ export class InaccessibleContentError extends Error {
       ${name} - ${documentType}
 
       Try modify it here: ${verificationUrl}
+
+      Or on your local: ${localVerificationUrl}
 
       See what has already been tracked here: ${githubVersionUrl}
 
