@@ -2,26 +2,26 @@ First of all, thanks for taking the time to contribute! 🎉👍
 
 ## Table of Contents
 
-* [Tracking new documents](#tracking-new-documents)
-  * [Declaring a new service](#declaring-a-new-service)
-    * [Service name](#service-name)
-    * [Service ID](#service-id)
-    * [Service declaration](#service-declaration)
-  * [Declaring documents](#declaring-documents)
-    * [`fetch`](#fetch)
-    * [`executeClientScripts`](#executeclientscripts)
-    * [`select`](#select)
-      * [Range selectors](#range-selectors)
-    * [`remove`](#remove)
-    * [`filter`](#filter)
-    * [Document type](#document-type)
-      * [Defining a new document type](#defining-a-new-document-type)
-  * [Testing your declaration](#testing-your-declaration)
-* [Editing existing documents](#editing-existing-documents)
-  * [Service history](#service-history)
-    * [Document declaration history](#document-declaration-history)
-    * [Filters history](#filters-history)
-  * [Refiltering your documents](#refiltering-your-documents)
+- [Tracking new documents](#tracking-new-documents)
+  - [Declaring a new service](#declaring-a-new-service)
+    - [Service name](#service-name)
+    - [Service ID](#service-id)
+    - [Service declaration](#service-declaration)
+  - [Declaring documents](#declaring-documents)
+    - [`fetch`](#fetch)
+    - [`executeClientScripts`](#executeclientscripts)
+    - [`select`](#select)
+      - [Range selectors](#range-selectors)
+    - [`remove`](#remove)
+    - [`filter`](#filter)
+    - [Document type](#document-type)
+      - [Defining a new document type](#defining-a-new-document-type)
+  - [Testing your declaration](#testing-your-declaration)
+- [Editing existing documents](#editing-existing-documents)
+  - [Service history](#service-history)
+    - [Document declaration history](#document-declaration-history)
+    - [Filters history](#filters-history)
+  - [Refiltering your documents](#refiltering-your-documents)
 
 # Tracking new documents
 
@@ -165,7 +165,7 @@ Beyond [selecting a subset of a web page](#select), some documents will have non
 
 > Examples:
 >
->```json
+> ```json
 > {
 >   "fetch": "https://support.google.com/adsense/answer/48182",
 >   "select": ".article-container",
@@ -214,9 +214,8 @@ For example, you can scope the selection in your filter with the `selector` defi
 ```js
 export function removeImages(document, { select: selector }) {
   const images = document.querySelectorAll(`${selector} img`);
-  images.forEach(el => el.remove());
+  images.forEach((el) => el.remove());
 }
-
 ```
 
 You can find examples of filters in [`/services/*.filters.js`](./services) files.
@@ -275,7 +274,6 @@ Since this operation fetches documents and could be long, you can also validate 
 npm run validate:schema [$service_id [, $service_id …]]
 ```
 
-
 # Editing existing documents
 
 As services evolve, document declarations are also expected to change over time. The service provider can change the document's URL or the document's HTML structure, thus their fetch location, selectors or filters can change.
@@ -283,7 +281,7 @@ OpenTermsArchive needs to keep track of this changes in order to regenerate vers
 
 ## Service history
 
-To keep track of services declarations and filters changes, CGUs offers a versioning system. It is optional and should be added only when needed. It works by creating history files for documents declarations and filters, where each entry should be a previous valid declaration or filter function and should have an expiry date.
+To keep track of services declarations and filters changes, Open Terms Archive offers a versioning system. It is optional and should be added only when needed. It works by creating history files for documents declarations and filters, where each entry should be a previous valid declaration or filter function and should have an expiry date.
 
 Both for documents and filters history, the expiration date is declared in a property `validUntil`. It should be the authored date and time of the last snapshot commit for which the declaration is still valid.
 
@@ -322,7 +320,7 @@ For example, to add a history entry for the `Terms of Service` of the service `A
     {
       "fetch": "https://ask.fm/docs/terms_of_use/?lang=en",
       "select": "body",
-      "filter": [ "add" ],
+      "filter": ["add"],
       "validUntil": "2020-10-29T21:30:00.000Z"
     }
   ]
@@ -350,8 +348,10 @@ For example, to add a history entry for the `removeSharesButton` filter of the s
 export const removeSharesButton = [
   {
     validUntil: '2020-08-22T11:30:21.000Z',
-    filter: async (document) => { document.querySelectorAll('.shares').forEach(element => element.remove()) }
-  }
+    filter: async (document) => {
+      document.querySelectorAll('.shares').forEach((element) => element.remove());
+    },
+  },
 ];
 ```
 
