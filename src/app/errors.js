@@ -38,7 +38,7 @@ export class InaccessibleContentError extends Error {
       const contentSelectorsQueryString = contentSelectorsAsArray.length
         ? `&selectedCss[]=${contentSelectorsAsArray.join('&selectedCss[]=')}`
         : '';
-      const noiseSelectorsQueryString = noiseSelectorsAsArray
+      const noiseSelectorsQueryString = noiseSelectorsAsArray.length
         ? `&removedCss[]=${noiseSelectorsAsArray.join('&removedCss[]=')}`
         : '';
 
