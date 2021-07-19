@@ -1,10 +1,11 @@
 # Rewrite history
 
-As some document types or service names can change over time or as we need to import history from other tools, provided they have an history with the same structure as CGUs, we need a way to rewrite, reorder and apply changes to the snapshots or versions history.
+As some document types or service names can change over time or as we need to import history from other tools, provided they have an history with the same structure as Open Terms Archive, we need a way to rewrite, reorder and apply changes to the snapshots or versions history.
 
 The script works by reading commits from a **source** repository, applying changes and then committing the result in another, empty or not, **target** repository. So a source repository with commits is required.
 
 When re-writting versions, filters are re-applied on snapshots, so services declarations and history are required.
+
 ## Rewrite snapshots
 
 ### Configuring
@@ -94,7 +95,6 @@ The resulting rewritten history can be found in the configured target repository
 
 ## Adding renaming rules
 
-
 ### Service
 
 To rename a service, add a rule in `renamer/rules/services.json`, for example, to rename "GoogleAds" to "Google Ads", add the following line in the file:
@@ -133,6 +133,7 @@ To rename a document type only for a specific service, add a rule in `renamer/ru
 ### Currently handled cases:
 
 Currently, the script will:
+
 - Ignore commits which are not a document snapshot (like renaming or documentation commits)
 - Reorder commits according to their author date
 - Rename document types according to declared rules

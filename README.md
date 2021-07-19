@@ -10,29 +10,29 @@
 
 ## Table of Contents
 
-* [How it works](#how-it-works)
-* [Exploring the versions history](#exploring-the-versions-history)
-  * [Notes](#notes)
-* [Be notified](#be-notified)
-  * [By email](#by-email)
-  * [By RSS](#by-rss)
-    * [Recap of available RSS feeds](#recap-of-available-rss-feeds)
-* [Analysing the snapshots history](#analysing-the-snapshots-history)
-* [Contributing](#contributing)
-  * [Adding a new service](#adding-a-new-service)
-* [Using locally](#using-locally)
-  * [Installing](#installing)
-  * [Setting up the database](#setting-up-the-database)
-  * [Configuring](#configuring)
-    * [Configuration file](#configuration-file)
-    * [Environment variables](#environment-variables)
-      * [SMTP\_HOST and SMTP\_USERNAME](#smtp_host-and-smtp_username)
-      * [HTTP\_PROXY and HTTPS\_PROXY](#http_proxy-and-https_proxy)
-      * [SENDINBLUE\_API\_KEY](#sendinblue_api_key)
-      * [NODE\_ENV](#node_env)
-  * [Running](#running)
-  * [Deploying](#deploying)
-* [License](#license)
+- [How it works](#how-it-works)
+- [Exploring the versions history](#exploring-the-versions-history)
+  - [Notes](#notes)
+- [Be notified](#be-notified)
+  - [By email](#by-email)
+  - [By RSS](#by-rss)
+    - [Recap of available RSS feeds](#recap-of-available-rss-feeds)
+- [Analysing the snapshots history](#analysing-the-snapshots-history)
+- [Contributing](#contributing)
+  - [Adding a new service](#adding-a-new-service)
+- [Using locally](#using-locally)
+  - [Installing](#installing)
+  - [Setting up the database](#setting-up-the-database)
+  - [Configuring](#configuring)
+    - [Configuration file](#configuration-file)
+    - [Environment variables](#environment-variables)
+      - [SMTP_HOST and SMTP_USERNAME](#smtp_host-and-smtp_username)
+      - [HTTP_PROXY and HTTPS_PROXY](#http_proxy-and-https_proxy)
+      - [SENDINBLUE_API_KEY](#sendinblue_api_key)
+      - [NODE_ENV](#node_env)
+  - [Running](#running)
+  - [Deploying](#deploying)
+- [License](#license)
 
 ## How it works
 
@@ -49,12 +49,11 @@ Users can [**subscribe** to **notifications**](#be-notified).
 
 _Note: For now, when multiple versions coexist, **terms** are only **tracked** in their English version and for the European jurisdiction._
 
-
 ## Exploring the versions history
 
-We offer a public database of versions recorded each time there is a change in the terms of service and other contractual documents of tracked services: [CGUs-Versions](https://github.com/ambanum/OpenTermsArchive-versions).
+We offer a public database of versions recorded each time there is a change in the terms of service and other contractual documents of tracked services: [OpenTermsArchive-versions](https://github.com/ambanum/OpenTermsArchive-versions).
 
-From the **repository homepage** [CGUs-versions](https://github.com/ambanum/OpenTermsArchive-versions), open the folder of the **service of your choice** (e.g. [WhatsApp](https://github.com/ambanum/OpenTermsArchive-versions/tree/master/WhatsApp)).
+From the **repository homepage** [OpenTermsArchive-versions](https://github.com/ambanum/OpenTermsArchive-versions), open the folder of the **service of your choice** (e.g. [WhatsApp](https://github.com/ambanum/OpenTermsArchive-versions/tree/master/WhatsApp)).
 
 You will see the **set of documents tracked** for that service, now click **on the document of your choice** (e.g. [WhatsApp's Privacy Policy](https://github.com/ambanum/OpenTermsArchive-versions/blob/master/WhatsApp/Privacy%20Policy.md)). The **latest version** (updated hourly) will be displayed.
 
@@ -62,13 +61,13 @@ To view the **history of changes** made to this document, click on **History** a
 
 Click on a change to see what it consists of (for example [this one](https://github.com/ambanum/OpenTermsArchive-versions/commit/58a1d2ae4187a3260ac58f3f3c7dcd3aeacaebcd)). There are **two types of display** you can choose from the icons in the gray bar above the document.
 
-- The first one, named *source diff* (button with chevrons) allows you to **display the old version and the new one side by side** (for our [example](https://github.com/ambanum/OpenTermsArchive-versions/commit/58a1d2ae4187a3260ac58f3f3c7dcd3aeacaebcd#diff-e8bdae8692561f60aeac9d27a55e84fc)). This display has the merit of **explicitly showing** all additions and deletions.
-- The second one, named *rich diff* (button with a document icon) allows you to **unify all the changes in a single document** (for our [example](https://github.com/ambanum/OpenTermsArchive-versions/commit/58a1d2ae4187a3260ac58f3f3c7dcd3aeacaebcd?short_path=e8bdae8#diff-e8bdae8692561f60aeac9d27a55e84fc)). The **red** color shows **deleted** elements, the **yellow** color shows **modified** paragraphs, and the **green** color shows **added** elements. Be careful, this display **does not show some changes** such as hyperlinks and text style's changes.
+- The first one, named _source diff_ (button with chevrons) allows you to **display the old version and the new one side by side** (for our [example](https://github.com/ambanum/OpenTermsArchive-versions/commit/58a1d2ae4187a3260ac58f3f3c7dcd3aeacaebcd#diff-e8bdae8692561f60aeac9d27a55e84fc)). This display has the merit of **explicitly showing** all additions and deletions.
+- The second one, named _rich diff_ (button with a document icon) allows you to **unify all the changes in a single document** (for our [example](https://github.com/ambanum/OpenTermsArchive-versions/commit/58a1d2ae4187a3260ac58f3f3c7dcd3aeacaebcd?short_path=e8bdae8#diff-e8bdae8692561f60aeac9d27a55e84fc)). The **red** color shows **deleted** elements, the **yellow** color shows **modified** paragraphs, and the **green** color shows **added** elements. Be careful, this display **does not show some changes** such as hyperlinks and text style's changes.
 
 ### Notes
 
 - For long documents, unchanged **paragraphs will not be displayed by default**. You can manually make them appear by clicking on the small arrows just above or just below the displayed paragraphs.
-- You can use the **History button anywhere** in the repository CGUs-versions, which will then display the **history of changes made to all documents in the folder** where you are (including sub-folders).
+- You can use the **History button anywhere** in the repository OpenTermsArchive-versions, which will then display the **history of changes made to all documents in the folder** where you are (including sub-folders).
 
 ## Be notified
 
@@ -95,10 +94,10 @@ To find out the address of the RSS feed you want to subscribe to:
 
 #### Recap of available RSS feeds
 
-| Updated for | URL |
-|-------------|--|
-| all services and documents | `https://github.com/ambanum/OpenTermsArchive-versions/commits.atom` |
-| all the documents of a service | Replace `$serviceId` with the service ID:<br>`https://github.com/ambanum/OpenTermsArchive-versions/commits/master/$serviceId.atom.` |
+| Updated for                         | URL                                                                                                                                                                                            |
+| ----------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| all services and documents          | `https://github.com/ambanum/OpenTermsArchive-versions/commits.atom`                                                                                                                            |
+| all the documents of a service      | Replace `$serviceId` with the service ID:<br>`https://github.com/ambanum/OpenTermsArchive-versions/commits/master/$serviceId.atom.`                                                            |
 | un document spécifique d'un service | Replace `$serviceId` with the service ID and `$documentType` with the document type:<br>`https://github.com/ambanum/OpenTermsArchive-versions/commits/master/$serviceId/$documentType.md.atom` |
 
 For example:
@@ -106,11 +105,9 @@ For example:
 - To receive all updates of `Facebook` documents, the URL is `https://github.com/ambanum/OpenTermsArchive-versions/commits/master/Facebook.atom`.
 - To receive all updates of the `Privacy Policy` from `Google`, the URL is `https://github.com/ambanum/OpenTermsArchive-versions/commits/master/Google/Privacy%20Policy.md.atom`.
 
-
 ## Analysing the snapshots history
 
 We provide a database of snapshots recorded each time there is a change in the terms of service and other contractual documents of tracked services: [OpenTermsArchive-Snapshots](https://github.com/ambanum/OpenTermsArchive-snapshots).
-
 
 ## Contributing
 
@@ -137,6 +134,7 @@ npm install
 ### Setting up the database
 
 Initialize the database:
+
 ```sh
 npm run setup
 ```
@@ -160,7 +158,7 @@ The default configuration can be read and changed in `config/default.json`.
     }
   },
   "fetcher": {
-    "waitForElementsTimeout": "Maximum time (in milliseconds) to wait for elements to be present in the page when fetching document in a headless browser",
+    "waitForElementsTimeout": "Maximum time (in milliseconds) to wait for elements to be present in the page when fetching document in a headless browser"
   },
   "notifier": {
     "sendInBlue": {
@@ -176,7 +174,7 @@ The default configuration is merged with (and overridden by) environment-specifi
 
 An example of a production configuration file can be found in `config/production.json`. It includes the extra configuration for:
 
-* A logging mechanism, to be notified upon error (this requires a valid SMTP configuration, see [environment variables](#environment-variables) below):
+- A logging mechanism, to be notified upon error (this requires a valid SMTP configuration, see [environment variables](#environment-variables) below):
 
 ```json
 {
@@ -189,7 +187,7 @@ An example of a production configuration file can be found in `config/production
 }
 ```
 
-* Public URLs to the snapshots and versions repositories, used to automate the initial database setup (`publicSnapshotsRepository` and `publicVersionsRepository` which are used by `npm setup`) and for the links in notifications (`snapshotsBaseUrl`):
+- Public URLs to the snapshots and versions repositories, used to automate the initial database setup (`publicSnapshotsRepository` and `publicVersionsRepository` which are used by `npm setup`) and for the links in notifications (`snapshotsBaseUrl`):
 
 ```json
 {
@@ -209,8 +207,8 @@ These environment variables can be provided in a `.env` file at the root of the 
 
 In order to be notified for errors over email, a valid SMTP configuration should be provided through the following environment variables:
 
-* `SMTP_HOST` for the SMTP server hostname.
-* `SMTP_USERNAME` / `SMTP_PASSWORD` for the credentials.
+- `SMTP_HOST` for the SMTP server hostname.
+- `SMTP_USERNAME` / `SMTP_PASSWORD` for the credentials.
 
 ##### `HTTP_PROXY` and `HTTPS_PROXY`
 
@@ -223,7 +221,6 @@ In order to use the default [SendInBlue](https://www.sendinblue.com)-based notif
 ##### `NODE_ENV`
 
 The `NODE_ENV` environment variable loads additional [configuration files](#configuration-file).
-
 
 ### Running
 
@@ -257,7 +254,7 @@ See [Ops Readme](ops/README.md).
 
 See [`export` script Readme](scripts/export/README.md).
 
-- - -
+---
 
 ## License
 

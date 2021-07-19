@@ -1,8 +1,8 @@
-# CGUs-ops
+# Open Terms Archive Ops
 
-Recipes to set up the infrastructure for the CGUs app and deploy it.
+Recipes to set up the infrastructure for the Open Terms Archive app and deploy it.
 
-> Recettes pour mettre en place l'infrastructure et déployer l'application CGUs
+> Recettes pour mettre en place l'infrastructure et déployer l'application Open Terms Archive
 
 ## Requirements
 
@@ -21,11 +21,13 @@ To avoid making changes on the production server by mistake, by default all comm
 To execute commands on the production server you should specify it by adding the option `--inventory ops/inventories/production.yml` to the following commands:
 
 - To setup a full [(phoenix)](https://martinfowler.com/bliki/PhoenixServer.html) server:
+
 ```
 ansible-playbook ops/site.yml
 ```
 
 - To setup infrastructure only:
+
 ```
 ansible-playbook ops/infra.yml
 ```
@@ -33,11 +35,13 @@ ansible-playbook ops/infra.yml
 Setting up the production infrastructure for publishing on the shared versions repository entails decrypting a private key managed with [Ansible Vault](https://docs.ansible.com/ansible/latest/user_guide/vault.html). It is decrypted with a password that we keep safe. You do not need to decrypt this specific private key on your own production server.
 
 - To setup `OpenTermsArchive` app only:
+
 ```
 ansible-playbook ops/app.yml
 ```
 
 Some useful options can be used to:
+
 - see what changed with `--diff`
 - simulate execution with `--check`
 - see what will be changed with `--check --diff`
@@ -45,13 +49,15 @@ Some useful options can be used to:
 ### Tags
 
 Some tags are available to refine what will happen, use them with `--tags`:
- - `setup`: to only setup system dependencies required by the app (cloning repo, installing app dependencies, all config files, and so on…)
- - `start`: to start the app
- - `stop`: to stop the app
- - `restart`: to restart the app
- - `update`: to update the app (pull code, install dependencies and restart app)
+
+- `setup`: to only setup system dependencies required by the app (cloning repo, installing app dependencies, all config files, and so on…)
+- `start`: to start the app
+- `stop`: to stop the app
+- `restart`: to restart the app
+- `update`: to update the app (pull code, install dependencies and restart app)
 
 For example, you can update `OpenTermsArchive` by running:
+
 ```
 ansible-playbook ops/app.yml --tags update
 ```
@@ -72,21 +78,23 @@ deploy:local:ota       ansible-playbook ops/site.yml -i ops/inventories/dev-fix.
 deploy:ota:update       ansible-playbook ops/app.yml --tags update -i ops/inventories/production.yml --check --diff
 ```
 
-
 ### Troubleshooting
 
 If you have the following error:
+
 ```
 Failed to connect to the host via ssh: ssh: connect to host 127.0.0.1 port 2222: Connection refused
 ```
 
 You may have a collision on the default port `2222` used by vagrant to forward ssh commands.
 Run the following command to know which ports are forwarded for the virtual machine:
+
 ```
 vagrant port
 ```
 
 It should display something like that:
+
 ```
 The forwarded ports for the machine are listed below. Please note that
 these values may differ from values configured in the Vagrantfile if the
@@ -96,6 +104,7 @@ provider supports automatic port collision detection and resolution.
 ```
 
 Modify ansible ssh options to the `ops/inventories/dev.yml` file with the proper `ansible_ssh_port`:
+
 ```
 all:
   children:
