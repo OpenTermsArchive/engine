@@ -66,6 +66,7 @@
     "dotenv": "^8.2.0",
     "fs-extra": "^9.1.0",
     "http-proxy-agent": "^4.0.1",
+    "https": "^1.0.0",
     "https-proxy-agent": "^5.0.0",
     "joplin-turndown-plugin-gfm": "^1.0.12",
     "jsdom": "^16.4.0",
