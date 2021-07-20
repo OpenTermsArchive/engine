@@ -3,11 +3,33 @@
   "documents": {
     "Terms of Service": {
       "fetch": "https://stackoverflow.com/legal/terms-of-service",
-      "select": ".grid--cell9"
+      "select": [".gsy"],
+      "remove": ["#top > .mb24"]
     },
     "Privacy Policy": {
       "fetch": "https://stackoverflow.com/legal/privacy-policy",
-      "select": ".grid--cell9"
+      "select": [".gsy"],
+      "remove": [".fc-green-400", ".fc-red-400 "]
+    },
+    "Trackers Policy": {
+      "fetch": "https://stackoverflow.com/legal/cookie-policy",
+      "select": [".gsy"],
+      "remove": [".fc-green-400", ".fc-red-400 "]
+    },
+    "Developer Terms": {
+      "fetch": "https://stackoverflow.com/legal/api-terms-of-use",
+      "select": [".gsy"],
+      "remove": [".fc-green-400", ".fc-red-400 "]
+    },
+    "Acceptable Use Policy": {
+      "fetch": "https://stackoverflow.com/legal/acceptable-use-policy",
+      "select": [".gsy"],
+      "remove": [".fc-green-400", ".fc-red-400 "]
+    },
+    "Brand Guidelines": {
+      "fetch": "https://stackoverflow.com/legal/trademark-guidance",
+      "select": [".gsy"],
+      "remove": [".fc-green-400", ".fc-red-400 "]
     }
   }
 }
