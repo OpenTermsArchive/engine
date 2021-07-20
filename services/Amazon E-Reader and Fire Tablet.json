@@ -4,7 +4,16 @@
   "documents": {
     "Terms of Service": {
       "fetch": "https://www.amazon.com/gp/help/customer/display.html?nodeId=200699130",
-      "select": "div.help-content"
+      "select": ".cs-help-content",
+      "remove": [
+        ".cs-help-breadcrumb",
+        "#csg-search-cu",
+        "#hmd-FeedbackBox",
+        "#cf-div",
+        "#hmd-ReasonBox",
+        "#hmd-ConfirmYesBox",
+        "#hmd-ConfirmNoBox"
+      ]
     }
   }
 }
