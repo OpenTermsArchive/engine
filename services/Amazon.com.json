@@ -3,19 +3,56 @@
   "documents": {
     "Terms of Service": {
       "fetch": "https://www.amazon.com/gp/help/customer/display.html/ref=hp_left_v4_sib?ie=UTF8&nodeId=201909000",
-      "select": "div.help-content"
+      "select": ".cs-help-content",
+      "remove": [
+        ".cs-help-breadcrumb",
+        "#csg-search-cu",
+        "#hmd-FeedbackBox",
+        "#cf-div",
+        "#hmd-ReasonBox",
+        "#hmd-ConfirmYesBox",
+        "#hmd-ConfirmNoBox"
+      ]
     },
     "Privacy Policy": {
       "fetch": "https://www.amazon.com/gp/help/customer/display.html/ref=hp_left_v4_sib?ie=UTF8&nodeId=GX7NJQ4ZB8MHFRNJ",
-      "select": "div.help-content"
+      "select": ".cs-help-content",
+      "remove": [
+        ".cs-help-breadcrumb",
+        "#csg-search-cu",
+        "#hmd-FeedbackBox",
+        "#GUID-8966E75F-9B92-4A2B-BFD5-967D57513A40__UL_DFA4C8F9EB2F46FEA1AB2B8DE9A8D313",
+        "#cf-div",
+        "#hmd-ReasonBox",
+        "#hmd-ConfirmYesBox",
+        "#hmd-ConfirmNoBox"
+      ]
     },
     "Commercial Terms": {
       "fetch": "https://www.amazon.com/gp/help/customer/display.html?nodeId=202119380",
-      "select": "div.help-content"
+      "select": ".cs-help-content",
+      "remove": [
+        ".cs-help-breadcrumb",
+        "#csg-search-cu",
+        "#hmd-FeedbackBox",
+        "#cf-div",
+        "#hmd-ReasonBox",
+        "#hmd-ConfirmYesBox",
+        "#hmd-ConfirmNoBox"
+      ]
     },
     "Acceptable Use Policy": {
       "fetch": "https://www.amazon.com/gp/help/customer/display.html?ie=UTF8&nodeId=GFUSWPZP368LFFA9",
-      "select": "div.help-content"
+      "select": ".cs-help-content",
+      "remove": [
+        ".cs-help-breadcrumb",
+        "#csg-search-cu",
+        "#hmd-FeedbackBox",
+        "#cf-div",
+        "#hmd-ReasonBox",
+        "#hmd-ConfirmYesBox",
+        "#hmd-ConfirmNoBox"
+      ]
     }
   }
 }
