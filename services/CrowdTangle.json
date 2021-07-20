@@ -1,0 +1,17 @@
+{
+  "name": "CrowdTangle",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://www.crowdtangle.com/eu-terms",
+      "select": [".jumbotron", ".main-container"]
+    },
+    "Trackers Policy": {
+      "fetch": "https://www.crowdtangle.com/cookie-policy",
+      "select": [".jumbotron", ".main-container"]
+    },
+    "Privacy Policy": {
+      "fetch": "https://www.crowdtangle.com/data-policy",
+      "select": [".jumbotron", ".main-container"]
+    }
+  }
+}
