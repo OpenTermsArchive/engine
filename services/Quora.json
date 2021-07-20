@@ -3,15 +3,13 @@
   "documents": {
     "Terms of Service": {
       "fetch": "https://www.quora.com/about/tos",
-      "select": [
-        "#mainContent > .q-box > .q-box"
-      ]
+      "select": [".qu-px--large"],
+      "remove": [".q-inlineBlock"]
     },
     "Privacy Policy": {
       "fetch": "https://www.quora.com/about/privacy",
-      "select": [
-        ".qu-userSelect--text"
-      ]
+      "select": [".qu-px--large"],
+      "remove": [".q-inlineBlock"]
     }
   }
 }
