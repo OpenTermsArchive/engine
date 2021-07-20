@@ -4,13 +4,11 @@
   "documents": {
     "Terms of Service": {
       "fetch": "https://www.theregister.com/Profile/terms_and_conditions_of_use/",
-      "select": "#main-col",
-      "remove": ".adun"
+      "select": ["#article-wrapper"]
     },
     "Privacy Policy": {
-      "fetch": "https://www.theregister.com/about/company/privacy/",
-      "select": "#main-col",
-      "remove": ".adun"
+      "fetch": "https://www.theregister.com/Profile/privacy/",
+      "select": ["#article-wrapper"]
     }
   }
 }
