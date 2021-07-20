@@ -1,0 +1,14 @@
+{
+  "name": "YellowPages",
+  "importedFrom": "https://github.com/tosdr/tosback2/blob/f762cd4bbb2571272985fed009201a23300ba9b2/rules/yellowpages.com.xml",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://corporate.thryv.com/privacy/",
+      "select": [".col-lg-11", ".mx-auto"]
+    },
+    "Terms of Service": {
+      "fetch": "https://corporate.thryv.com/terms-of-use/",
+      "select": [".wrapper-newsTop", ".mx-auto"]
+    }
+  }
+}
