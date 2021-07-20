@@ -3,7 +3,7 @@
   "documents": {
     "Terms of Service": {
       "fetch": "https://www.google.com/maps/reserve/terms",
-      "select": "div.st6sTb.BRcyT"
+      "select": ".jic4te"
     },
     "Privacy Policy": {
       "fetch": "https://policies.google.com/privacy?hl=en-GB",
