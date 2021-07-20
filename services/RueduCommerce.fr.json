@@ -3,13 +3,13 @@
   "documents": {
     "Terms of Service": {
       "fetch": "https://www.rueducommerce.fr/info/mentions-legales/cgu-gm",
-      "executeClientScripts": true,
-      "select": ".page-title, .content"
+      "select": "#cms",
+      "remove": ["#cms-new-1019-line-1"]
     },
     "Privacy Policy": {
       "fetch": "https://www.rueducommerce.fr/info/mentions-legales/confidentialite",
-      "executeClientScripts": true,
-      "select": ".page-title, .content"
+      "select": "#cms",
+      "remove": ["#cms-new-991-line-4"]
     }
   }
 }
