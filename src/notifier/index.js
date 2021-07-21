@@ -30,7 +30,7 @@ export default class Notifier {
         // eslint-disable-next-line
         await pTimeout.default(async () => {
           await this.notifyVersionRecorded(serviceId, type, versionId); // eslint-disable-line
-        }, 1 * 10 * 1000);
+        }, 2 * 60 * 1000);
       } catch (e) {
         console.error(e);
       }
