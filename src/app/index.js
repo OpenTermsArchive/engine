@@ -1,6 +1,8 @@
 import * as history from './history/index.js';
 import * as services from './services/index.js';
 
+import filter, { cleanSnapshotHTML } from './filter/index.js';
+
 import { InaccessibleContentError } from './errors.js';
 import async from 'async';
 import config from 'config';
@@ -146,8 +148,12 @@ export default class CGUs extends events.EventEmitter {
         return;
       }
 
+      // Sometimes the document contains changing content, but the snapshot is the same.
+      // We need to replace it before trying to save it
+      const cleanedContent = cleanSnapshotHTML(content);
+
       const snapshotId = await this.recordSnapshot({
-        content,
+        content: cleanedContent,
         mimeType,
         documentDeclaration,
       });
@@ -157,7 +163,7 @@ export default class CGUs extends events.EventEmitter {
       }
 
       return this.recordVersion({
-        snapshotContent: content,
+        snapshotContent: cleanedContent,
         mimeType,
         snapshotId,
         documentDeclaration,
