@@ -28,6 +28,16 @@ export default async function filter({ content, mimeType, documentDeclaration })
   });
 }
 
+export function cleanSnapshotHTML(content) {
+  if (typeof content !== 'string') {
+    return content;
+  }
+  const cleanedContent = content
+    .replace(/href="((.*?)\/email-protection#)[0-9a-fA-F]+"/gim, 'href="$1"')
+    .replace(/data-cfemail="[0-9a-fA-F]+"/gim, 'data-cfemail=""');
+  return cleanedContent;
+}
+
 export async function filterHTML({ content, documentDeclaration }) {
   const {
     location,
