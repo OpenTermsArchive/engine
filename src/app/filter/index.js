@@ -1,10 +1,10 @@
+import { InaccessibleContentError } from '../errors.js';
 import TurndownService from 'turndown';
 import ciceroMark from '@accordproject/markdown-cicero';
 import jsdom from 'jsdom';
 import mardownPdf from '@accordproject/markdown-pdf';
 import turndownPluginGithubFlavouredMarkdown from 'joplin-turndown-plugin-gfm';
 import url from 'url';
-import { InaccessibleContentError } from '../errors.js';
 
 const { JSDOM } = jsdom;
 const turndownService = new TurndownService();
