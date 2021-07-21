@@ -1,14 +1,13 @@
-import async from 'async';
-import config from 'config';
-import events from 'events';
-import pTimeout from '@lolpants/ptimeout';
 import * as history from './history/index.js';
 import * as services from './services/index.js';
 
 import { InaccessibleContentError } from './errors.js';
+import async from 'async';
+import config from 'config';
+import events from 'events';
 import fetch from './fetcher/index.js';
-import filter from './filter/index.js';
 import logger from '../logger/index.js';
+import pTimeout from '@lolpants/ptimeout';
 
 const MAX_PARALLEL_DOCUMENTS_TRACKS = 1;
 const MAX_PARALLEL_REFILTERS = 1;
