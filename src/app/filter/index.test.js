@@ -1,11 +1,17 @@
+import {
+  cleanSnapshotHTML,
+  convertRelativeURLsToAbsolute,
+  filterHTML,
+  filterPDF,
+} from './index.js';
+
+import DocumentDeclaration from '../services/documentDeclaration.js';
+import { InaccessibleContentError } from '../errors.js';
 import chai from 'chai';
 import { fileURLToPath } from 'url';
 import fsApi from 'fs';
 import jsdom from 'jsdom';
 import path from 'path';
-import DocumentDeclaration from '../services/documentDeclaration.js';
-import { InaccessibleContentError } from '../errors.js';
-import { convertRelativeURLsToAbsolute, filterHTML, filterPDF } from './index.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const fs = fsApi.promises;
@@ -39,6 +45,40 @@ const expectedFiltered = `Title
 
 const expectedFilteredWithAdditional = `Title
 =====`;
+
+const snapshotHTML = `
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>TOS</title>
+  </head>
+  <body>
+    <h1>Title</h1>
+    <p><a id="link1" href="/relative/link">link 1</a></p>
+    <p><a id="link2" href="#anchor">link 2</a></p>
+    <p><a id="link3" href="http://absolute.url/link">link 3</a></p>
+    <a href="/cdn-cgi/l/email-protection#d9aaaca9a9b6abad99aab1b6bab2aeb8afbcf7bab6b4"><span class="__cf_email__" data-cfemail="d9aaaca9a9b6abad99aab1b6bab2aeb8afbcf7bab6b4">[email&#160;protected]</span></a>
+    <a href="/cdn-cgi/l/email-protection#9ae9efeaeaf5e8eedae9f2f5f9f1edfbecffb4f9f5f7"><span class="__cf_email__" data-cfemail="9ae9efeaeaf5e8eedae9f2f5f9f1edfbecffb4f9f5f7">[email&#160;protected]</span></a>
+  </body>
+</html>`;
+
+const expectedSnapshotCleaned = `
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>TOS</title>
+  </head>
+  <body>
+    <h1>Title</h1>
+    <p><a id="link1" href="/relative/link">link 1</a></p>
+    <p><a id="link2" href="#anchor">link 2</a></p>
+    <p><a id="link3" href="http://absolute.url/link">link 3</a></p>
+    <a href="/cdn-cgi/l/email-protection#"><span class="__cf_email__" data-cfemail="">[email&#160;protected]</span></a>
+    <a href="/cdn-cgi/l/email-protection#"><span class="__cf_email__" data-cfemail="">[email&#160;protected]</span></a>
+  </body>
+</html>`;
 
 const additionalFilter = {
   removeLinks: function removeLinks(document) {
@@ -75,6 +115,13 @@ describe('Filter', () => {
 
     it('leaves absolute urls untouched', async () => {
       expect(subject).to.include('http://absolute.url/link');
+    });
+  });
+
+  describe('#cleanSnapshotHTML', () => {
+    it('should replace auto generated tokens that change everytime by nothing', async () => {
+      const result = cleanSnapshotHTML(snapshotHTML);
+      expect(result).to.equal(expectedSnapshotCleaned);
     });
   });
 

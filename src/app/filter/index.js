@@ -1,10 +1,10 @@
+import { InaccessibleContentError } from '../errors.js';
 import TurndownService from 'turndown';
 import ciceroMark from '@accordproject/markdown-cicero';
 import jsdom from 'jsdom';
 import mardownPdf from '@accordproject/markdown-pdf';
 import turndownPluginGithubFlavouredMarkdown from 'joplin-turndown-plugin-gfm';
 import url from 'url';
-import { InaccessibleContentError } from '../errors.js';
 
 const { JSDOM } = jsdom;
 const turndownService = new TurndownService();
@@ -26,6 +26,16 @@ export default async function filter({ content, mimeType, documentDeclaration })
     content,
     documentDeclaration,
   });
+}
+
+export function cleanSnapshotHTML(content) {
+  if (typeof content !== 'string') {
+    return content;
+  }
+  const cleanedContent = content
+    .replace(/href="((.*?)\/email-protection#)[0-9a-fA-F]+"/gim, 'href="$1"')
+    .replace(/data-cfemail="[0-9a-fA-F]+"/gim, 'data-cfemail=""');
+  return cleanedContent;
 }
 
 export async function filterHTML({ content, documentDeclaration }) {
