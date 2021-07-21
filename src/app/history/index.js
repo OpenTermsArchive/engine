@@ -88,8 +88,8 @@ async function _recordVersion({
   const changelog = `${prefix} ${serviceId} ${documentType}
 
 This version was recorded after filtering snapshot ${
-  config.get('history.publish') ? config.get('history.snapshotsBaseUrl') : ''
-}${snapshotId}`;
+    config.get('history.publish') ? config.get('history.snapshotsBaseUrl') : ''
+  }${snapshotId}`;
 
   const recordResult = await versionRecorder.record({
     serviceId,

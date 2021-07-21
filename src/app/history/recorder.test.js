@@ -27,7 +27,8 @@ describe('Recorder', () => {
           serviceId: SERVICE_PROVIDER_ID,
           documentType: TYPE,
           content: FILE_CONTENT,
-        }));
+        })
+      );
 
       after(resetGitRepository);
 

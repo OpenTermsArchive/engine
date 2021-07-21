@@ -17,7 +17,8 @@ describe('FullDomFetcher', function FullDomFetcher() {
   let temporaryServer;
 
   before((done) => {
-    termsHTML = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>First provider TOS</title></head><body><h1>Terms of service</h1><p>Dapibus quis diam sagittis</p></body></html>';
+    termsHTML =
+      '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>First provider TOS</title></head><body><h1>Terms of service</h1><p>Dapibus quis diam sagittis</p></body></html>';
 
     temporaryServer = http
       .createServer((request, response) => {

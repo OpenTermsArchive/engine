@@ -297,7 +297,8 @@ describe('CGUs', () => {
           app.recordSnapshot({
             content: 'document content',
             documentDeclaration: documentADeclaration,
-          }));
+          })
+        );
 
         after(() => {
           resetSpiesHistory();
@@ -377,7 +378,8 @@ describe('CGUs', () => {
             snapshotContent: serviceASnapshotExpectedContent,
             snapshotId: 'sha',
             documentDeclaration: documentADeclaration,
-          }));
+          })
+        );
 
         after(() => {
           resetSpiesHistory();

@@ -16,8 +16,8 @@ export default class Service {
     }
 
     return (
-      (_history && _history.find((entry) => new Date(date) <= new Date(entry.validUntil)))
-      || currentlyValidDocumentDeclaration
+      (_history && _history.find((entry) => new Date(date) <= new Date(entry.validUntil))) ||
+      currentlyValidDocumentDeclaration
     );
   }
 

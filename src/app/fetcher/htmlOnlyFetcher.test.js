@@ -15,7 +15,8 @@ describe('HtmlOnlyFetcher', () => {
   let termsHTML;
 
   before(() => {
-    termsHTML = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>First provider TOS</title></head><body><h1>Terms of service</h1><p>Dapibus quis diam sagittis</p></body></html>';
+    termsHTML =
+      '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>First provider TOS</title></head><body><h1>Terms of service</h1><p>Dapibus quis diam sagittis</p></body></html>';
 
     nock('https://domain.example', { reqheaders: { 'Accept-Language': 'en' } })
       .get('/terms.html')

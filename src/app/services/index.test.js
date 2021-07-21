@@ -113,7 +113,8 @@ describe('Services', () => {
       for (const documentType of expected.getDocumentTypes()) {
         context(`${documentType}`, () => {
           const { _history: expectedHistory } = expected._documents[documentType];
-          const expectedHistoryDates = expectedHistory && expectedHistory.map((entry) => entry.validUntil);
+          const expectedHistoryDates =
+            expectedHistory && expectedHistory.map((entry) => entry.validUntil);
 
           if (expectedHistoryDates) {
             for (const date of expectedHistoryDates) {

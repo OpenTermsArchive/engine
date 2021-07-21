@@ -98,17 +98,19 @@ export async function loadWithHistory() {
       );
 
       allHistoryDates.forEach((date) => {
-        const declarationForThisDate = documenTypeDeclarationEntries.find(
-          (entry) => new Date(date) <= new Date(entry.validUntil)
-        ) || currentlyValidDocumentDeclaration;
+        const declarationForThisDate =
+          documenTypeDeclarationEntries.find(
+            (entry) => new Date(date) <= new Date(entry.validUntil)
+          ) || currentlyValidDocumentDeclaration;
         const { filter: declarationForThisDateFilterNames } = declarationForThisDate;
 
         let actualFilters;
         if (declarationForThisDateFilterNames) {
           actualFilters = declarationForThisDateFilterNames.map((filterName) => {
             const currentlyValidFilters = filters[filterName].find((entry) => !entry.validUntil);
-            const validFilterForThisDate = filters[filterName].find((entry) => new Date(date) <= new Date(entry.validUntil))
-              || currentlyValidFilters;
+            const validFilterForThisDate =
+              filters[filterName].find((entry) => new Date(date) <= new Date(entry.validUntil)) ||
+              currentlyValidFilters;
 
             return validFilterForThisDate.filter;
           });
