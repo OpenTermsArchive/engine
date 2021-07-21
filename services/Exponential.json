@@ -11,7 +11,8 @@
       ]
     },
     "Ad Publishing Policy": {
-      "fetch": "https://exponential.com/documents/publisher-code-of-conduct/?wpdmdl=17753"
+      "fetch": "https://exponential.com/documents/publisher-code-of-conduct/?wpdmdl=17753",
+      "select": "necesary to bypass validation because url is not ending with .pdf"
     }
   }
 }
