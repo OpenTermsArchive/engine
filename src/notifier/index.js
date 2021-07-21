@@ -49,13 +49,19 @@ export default class Notifier {
       },
     };
 
-    return this.send(
-      [
-        config.get('notifier.sendInBlue.administratorsListId'),
-        config.get('notifier.sendInBlue.updatesListId'),
-      ],
-      sendParams
-    );
+    const lists = [
+      config.get('notifier.sendInBlue.administratorsListId'),
+      config.get('notifier.sendInBlue.updatesListId'),
+    ];
+
+    const notificationListName = `${this.serviceProviders[serviceProviderId].name} - ${documentTypeId} - Update`;
+    const notificationList = await this.searchContactList(notificationListName);
+
+    if (notificationList?.id) {
+      lists.push(notificationList.id);
+    }
+
+    return this.send(lists, sendParams);
   }
 
   async send(lists, sendParams) {
@@ -68,9 +74,37 @@ export default class Notifier {
     const uniqueContacts = [...new Map(contacts.map((item) => [item.id, item])).values()];
 
     const sendPromises = uniqueContacts.map((contact) =>
-      this.apiInstance.sendTransacEmail({ ...sendParams, to: [{ email: contact.email }] }));
+      this.apiInstance.sendTransacEmail({ ...sendParams, to: [{ email: contact.email }] })
+    );
 
     return Promise.all(sendPromises);
+  }
+
+  async getAllContactLists() {
+    const limit = 50;
+    const offset = 0;
+    const { count, lists } = await this.contactsInstance.getLists({
+      limit,
+      offset,
+    });
+    return {
+      count,
+      lists: await this.getAllPaginatedEntries(
+        'getLists',
+        undefined,
+        'lists',
+        lists,
+        count,
+        offset + limit
+      ),
+    };
+  }
+
+  async searchContactList(name) {
+    const { lists } = await this.getAllContactLists();
+
+    const list = lists.find((list) => list.name === name);
+    return list;
   }
 
   async getListContacts(listId) {
@@ -98,10 +132,15 @@ export default class Notifier {
       return accumulator;
     }
 
-    const result = await this.contactsInstance[functionName](resourceIdParameter, {
-      limit: paginationSize,
-      offset,
-    });
+    const promise = resourceIdParameter
+      ? this.contactsInstance[functionName](resourceIdParameter, {
+          limit: paginationSize,
+          offset,
+        })
+      : this.contactsInstance[functionName](paginationSize, offset);
+
+    const result = await promise;
+
     accumulator = accumulator.concat(result[resultKey]);
     return this.getAllPaginatedEntries(
       functionName,
