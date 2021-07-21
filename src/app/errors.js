@@ -46,8 +46,9 @@ export class InaccessibleContentError extends Error {
       const encodedType = encodeURIComponent(documentType);
       const encodedUrl = encodeURIComponent(url);
 
-      const verificationUrl = `${CONTRIBUTE_URL}?step=2&url=${encodedUrl}&name=${encodedName}&documentType=${encodedType}${noiseSelectorsQueryString}${contentSelectorsQueryString}`;
-      const localVerificationUrl = `${LOCAL_CONTRIBUTE_URL}?step=2&url=${encodedUrl}&name=${encodedName}&documentType=${encodedType}${noiseSelectorsQueryString}${contentSelectorsQueryString}`;
+      const urlQueryParams = `step=2&url=${encodedUrl}&name=${encodedName}&documentType=${encodedType}${noiseSelectorsQueryString}${contentSelectorsQueryString}&expertMode=true`;
+      const verificationUrl = `${CONTRIBUTE_URL}?${urlQueryParams}`;
+      const localVerificationUrl = `${LOCAL_CONTRIBUTE_URL}?${urlQueryParams}`;
 
       const githubVersionUrl = `${GITHUB_VERSIONS_URL}/${encodedName}/${encodedType}.md`;
 
