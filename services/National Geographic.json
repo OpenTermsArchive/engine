@@ -8,8 +8,13 @@
       "remove": ".icon-left, .openall"
     },
     "Terms of Service": {
-      "fetch": "https://www.nationalgeographic.com/legal/terms/",
-      "select": "article.news__article"
+      "fetch": "https://disneytermsofuse.com/english-united-kingdom/",
+      "select": [
+        ".entry"
+      ],
+      "remove": [
+        ".button_link"
+      ]
     }
   }
 }
