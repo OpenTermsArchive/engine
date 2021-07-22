@@ -1,12 +1,12 @@
 import './bootstrap.js';
 
-import scheduler from 'node-schedule';
 import * as services from './app/services/index.js';
 
 import CGUs from './app/index.js';
 import Notifier from './notifier/index.js';
 import logger from './logger/index.js';
 import { publishRelease } from '../scripts/release/releasedataset.js';
+import scheduler from 'node-schedule';
 
 const args = process.argv.slice(2);
 const modifiedOnly = args.includes('--modified-only');
@@ -72,8 +72,8 @@ const schedule = args.includes('--schedule');
   }
 
   logger.info('The scheduler is running…');
-  logger.info('Documents will be tracked at minute 30 past every 2 hours.');
-  scheduler.scheduleJob('30 */2 * * *', async () => {
+  logger.info('Documents will be tracked at minute 30 past every 6 hours.');
+  scheduler.scheduleJob('30 */6 * * *', async () => {
     logger.info(
       `Start tracking changes of ${numberOfDocuments} documents from ${serviceIds.length} services…`
     );
@@ -83,8 +83,8 @@ const schedule = args.includes('--schedule');
     );
   });
 
-  logger.info('Release will be created if needed every night at 1:20am');
-  scheduler.scheduleJob('20 15 * * *', async () => {
+  logger.info('Release will be created if needed every night at 4:15am');
+  scheduler.scheduleJob('15 4 * * *', async () => {
     logger.info(`Start Release ${new Date()}`);
     await publishRelease();
     logger.info(`End Release ${new Date()}`);
