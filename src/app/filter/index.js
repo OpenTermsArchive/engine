@@ -33,8 +33,12 @@ export function cleanSnapshotHTML(content) {
     return content;
   }
   const cleanedContent = content
-    .replace(/href="((.*?)\/email-protection#)[0-9a-fA-F]+"/gim, 'href="$1"')
-    .replace(/data-cfemail="[0-9a-fA-F]+"/gim, 'data-cfemail=""');
+    .replace(/href="((.*?)\/email-protection#)[0-9a-fA-F]+"/gim, 'href="$1"') // Windstream  and Schockwave.com
+    .replace(/data-cfemail="[0-9a-fA-F]+"/gim, 'data-cfemail=""') // Windstream and Schockwave.com
+    // beacon numbers are always changing numbers
+    .replace(/data-cf-beacon="(.*?)"/gim, 'data-cf-beacon=""') // OkCupid
+    // replace empty styles tags
+    .replace(/<style (.*?)><\/style>/gim, ''); // OkCupid
   return cleanedContent;
 }
 
