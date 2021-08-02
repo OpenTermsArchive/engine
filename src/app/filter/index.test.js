@@ -60,6 +60,7 @@ const snapshotHTML = `
     <p><a id="link3" href="http://absolute.url/link">link 3</a></p>
     <a href="/cdn-cgi/l/email-protection#d9aaaca9a9b6abad99aab1b6bab2aeb8afbcf7bab6b4"><span class="__cf_email__" data-cfemail="d9aaaca9a9b6abad99aab1b6bab2aeb8afbcf7bab6b4">[email&#160;protected]</span></a>
     <a href="/cdn-cgi/l/email-protection#9ae9efeaeaf5e8eedae9f2f5f9f1edfbecffb4f9f5f7"><span class="__cf_email__" data-cfemail="9ae9efeaeaf5e8eedae9f2f5f9f1edfbecffb4f9f5f7">[email&#160;protected]</span></a>
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-MGFFD8" height="0" width="0" style="display:none;visibility:hidden" nonce="e10cb49759b9fd4ef9eb7494da2e231e51dea01947f1d93a36f56262fa639be5f3b764ecd98b26c4MjAyMS0wNy0zMFQxODozMTowMCswMTowMA=="></iframe></noscript>
   </body>
 </html>`;
 
@@ -77,6 +78,7 @@ const expectedSnapshotCleaned = `
     <p><a id="link3" href="http://absolute.url/link">link 3</a></p>
     <a href="/cdn-cgi/l/email-protection#"><span class="__cf_email__" data-cfemail="">[email&#160;protected]</span></a>
     <a href="/cdn-cgi/l/email-protection#"><span class="__cf_email__" data-cfemail="">[email&#160;protected]</span></a>
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-MGFFD8" height="0" width="0" style="display:none;visibility:hidden" nonce=""></iframe></noscript>
   </body>
 </html>`;
 
