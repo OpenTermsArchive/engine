@@ -10,6 +10,16 @@
         ".footer",
         ".subfooter"
       ]
+    },
+    "Terms of Service": {
+      "fetch": "https://www.mailjet.com/terms-and-conditions/",
+      "select": [
+        ".section-content"
+      ],
+      "remove": [
+        ".footer",
+        ".subfooter"
+      ]
     }
   }
 }
