@@ -8,6 +8,14 @@
         ".versionSwitcher:nth-child(1)",
         ".pageSection:nth-child(3) > .container"
       ]
+    },
+    "Acceptable Use Policy": {
+      "fetch": "https://tresorit.com/acceptable-use-policy",
+      "select": [
+        "h1",
+        ".main > .container",
+        ".container > p:nth-child(2)"
+      ]
     }
   }
 }
