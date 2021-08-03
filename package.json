@@ -16,6 +16,7 @@
     "start:prod": "cross-env NODE_ENV=production node --max-http-header-size=32768  src/index.js",
     "start:scheduler": "node --max-http-header-size=32768 src/index.js --schedule",
     "start:scheduler:prod": "cross-env NODE_ENV=production node --max-http-header-size=32768 src/index.js --schedule",
+    "sync-git": "cd data/versions && git fetch && git reset --hard origin/master && cd ../snapshots && git fetch && git reset --hard origin/master",
     "refilter": "node src/index.js --refilter-only",
     "setup": "node scripts/setup.js",
     "lint": "prettier -c test src services config decision-records",
