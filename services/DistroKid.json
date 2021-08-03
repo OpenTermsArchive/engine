@@ -1,0 +1,11 @@
+{
+  "name": "DistroKid",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://distrokid.com/terms/",
+      "select": [
+        ".outer2:nth-child(1) > .inner2 > div"
+      ]
+    }
+  }
+}
