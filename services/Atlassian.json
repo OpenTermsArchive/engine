@@ -1,0 +1,11 @@
+{
+  "name": "Atlassian",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.atlassian.com/legal/privacy-policy",
+      "select": [
+        "main .column-lg-7"
+      ]
+    }
+  }
+}
