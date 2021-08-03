@@ -1,0 +1,15 @@
+{
+  "name": "Mailjet",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.mailjet.com/privacy-policy/",
+      "select": [
+        ".section-content"
+      ],
+      "remove": [
+        ".footer",
+        ".subfooter"
+      ]
+    }
+  }
+}
