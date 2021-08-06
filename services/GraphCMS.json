@@ -1,0 +1,11 @@
+{
+  "name": "GraphCMS",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://graphcms.com/privacy",
+      "select": [
+        ".py-12 > .mx-auto"
+      ]
+    }
+  }
+}
