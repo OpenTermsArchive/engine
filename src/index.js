@@ -46,6 +46,7 @@ const schedule = args.includes('--schedule');
     (acc, serviceId) => acc + app.serviceDeclarations[serviceId].getNumberOfDocuments(),
     0
   );
+  serviceIds = serviceIds.sort((a, b) => a.localeCompare(b));
 
   logger.info(`Refiltering ${numberOfDocuments} documents from ${serviceIds.length} services…`);
   await app.refilterAndRecord(serviceIds);
