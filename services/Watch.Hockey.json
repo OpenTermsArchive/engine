@@ -6,6 +6,12 @@
       "select": [
         ".WordSection1"
       ]
+    },
+    "Terms of Service": {
+      "fetch": "https://fih-vpc-images-fih-nagra.s3.amazonaws.com/Terms_of_use.htm",
+      "select": [
+        ".WordSection1"
+      ]
     }
   }
 }
