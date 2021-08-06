@@ -1,0 +1,11 @@
+{
+  "name": "Watch.Hockey",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://fih-vpc-images-fih-nagra.s3.amazonaws.com/Privacy_Notice.htm",
+      "select": [
+        ".WordSection1"
+      ]
+    }
+  }
+}
