@@ -11,11 +11,7 @@
     },
     "Acceptable Use Policy": {
       "fetch": "https://tresorit.com/acceptable-use-policy",
-      "select": [
-        "h1",
-        ".main > .container",
-        ".container > p:nth-child(2)"
-      ]
+      "select": ["h1", ".main > .container", ".container > p:nth-child(2)"]
     }
   }
 }

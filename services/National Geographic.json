@@ -9,12 +9,8 @@
     },
     "Terms of Service": {
       "fetch": "https://disneytermsofuse.com/english-united-kingdom/",
-      "select": [
-        ".entry"
-      ],
-      "remove": [
-        ".button_link"
-      ]
+      "select": [".entry"],
+      "remove": [".button_link"]
     }
   }
 }

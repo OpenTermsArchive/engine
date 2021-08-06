@@ -3,23 +3,13 @@
   "documents": {
     "Privacy Policy": {
       "fetch": "https://www.mailjet.com/privacy-policy/",
-      "select": [
-        ".section-content"
-      ],
-      "remove": [
-        ".footer",
-        ".subfooter"
-      ]
+      "select": [".section-content"],
+      "remove": [".footer", ".subfooter"]
     },
     "Terms of Service": {
       "fetch": "https://www.mailjet.com/terms-and-conditions/",
-      "select": [
-        ".section-content"
-      ],
-      "remove": [
-        ".footer",
-        ".subfooter"
-      ]
+      "select": [".section-content"],
+      "remove": [".footer", ".subfooter"]
     }
   }
 }
