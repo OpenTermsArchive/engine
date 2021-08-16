@@ -1,0 +1,17 @@
+{
+  "name": "Scalingo",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://scalingo.com/terms-of-service",
+      "select": [".title", ".mx-sm-auto"]
+    },
+    "Privacy Policy": {
+      "fetch": "https://scalingo.com/privacy-policy",
+      "select": [".title", ".mx-sm-auto"]
+    },
+    "Data Processor Agreement": {
+      "fetch": "https://scalingo.com/data-processing-agreement",
+      "select": [".title", ".mx-sm-auto"]
+    }
+  }
+}
