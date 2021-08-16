@@ -1,0 +1,20 @@
+{
+  "name": "Energia",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://www.energia.ie/privacy/smart-terms-conditions",
+      "select": [".privacy"],
+      "remove": [".privacy-menus"]
+    },
+    "Privacy Policy": {
+      "fetch": "https://www.energia.ie/privacy/privacy-statement",
+      "select": [".privacy"],
+      "remove": [".privacy-menus"]
+    },
+    "Trackers Policy": {
+      "fetch": "https://www.energia.ie/privacy/privacy-statement",
+      "select": [".privacy"],
+      "remove": [".privacy-menus"]
+    }
+  }
+}
