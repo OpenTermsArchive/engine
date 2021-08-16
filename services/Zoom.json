@@ -1,0 +1,14 @@
+{
+  "name": "Zoom",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://zoom.us/terms",
+      "select": [".mini-layout-body"]
+    },
+    "Privacy Policy": {
+      "fetch": "https://zoom.us/privacy",
+      "select": [".mini-layout-body"],
+      "remove": [".category"]
+    }
+  }
+}
