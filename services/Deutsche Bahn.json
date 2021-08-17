@@ -1,0 +1,15 @@
+{
+  "name": "Deutsche Bahn",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://www.bahn.com/en/terms-of-use/customer-accounts-terms-of-use",
+      "select": [".wrapper > .flex-100"],
+      "remove": [".breadcrumb__list"]
+    },
+    "Privacy Policy": {
+      "fetch": "https://www.bahn.com/en/privacy/privacy-customer",
+      "select": [".wrapper > .flex-100"],
+      "remove": [".breadcrumb__list"]
+    }
+  }
+}
