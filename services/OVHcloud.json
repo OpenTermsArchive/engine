@@ -1,0 +1,11 @@
+{
+  "name": "OVHcloud",
+  "documents": {
+    "Data Processor Agreement": {
+      "fetch": "https://www.ovh.ie/support/termsofservice/Data%20Processing%20Agreement%20(ie).pdf"
+    },
+    "Terms of Service": {
+      "fetch": "https://storage.gra.cloud.ovh.net/v1/AUTH_325716a587c64897acbef9a4a4726e38/contracts/a50e2ae-contrat_genServices-IE-5.0.pdf"
+    }
+  }
+}
