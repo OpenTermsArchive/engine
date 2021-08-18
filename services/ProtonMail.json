@@ -1,0 +1,13 @@
+{
+  "name": "ProtonMail",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://protonmail.com/terms-and-conditions",
+      "select": [".content"]
+    },
+    "Privacy Policy": {
+      "fetch": "https://protonmail.com/privacy-policy",
+      "select": [".content"]
+    }
+  }
+}
