@@ -1,0 +1,13 @@
+{
+  "name": "meet.jit.si",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://jitsi.org/meet-jit-si-privacy/",
+      "select": [".img-text-holder"]
+    },
+    "Terms of Service": {
+      "fetch": "https://jitsi.org/meet-jit-si-terms-of-service/",
+      "select": [".img-text-holder"]
+    }
+  }
+}
