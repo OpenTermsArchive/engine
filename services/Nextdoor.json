@@ -1,0 +1,17 @@
+{
+  "name": "Nextdoor",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://legal.nextdoor.com/gb-privacy-policy-2021/",
+      "select": [".post-wrapper"]
+    },
+    "Trackers Policy": {
+      "fetch": "https://legal.nextdoor.com/gb-cookie-policy-2021/",
+      "select": [".post-wrapper"]
+    },
+    "Community Guidelines": {
+      "fetch": "https://help.nextdoor.com/s/article/community-guidelines?language=en_GB",
+      "select": [[".article-head", ".articlecontent"]]
+    }
+  }
+}
