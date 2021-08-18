@@ -10,7 +10,7 @@
       "fetch": "https://www.airbnb.co.uk/help/article/2908/terms-of-service",
       "select": {
         "startBefore": "#EUTOS",
-        "endBefore": ".f1icougz"
+        "endBefore": "#TOS"
       }
     },
     "Trackers Policy": {
