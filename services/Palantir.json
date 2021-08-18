@@ -1,0 +1,20 @@
+{
+  "name": "Palantir",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://www.palantir.com/terms-and-conditions/",
+      "select": [".design__heading__j18gsz", ".design__text200__1xw780a"],
+      "executeClientScripts": true
+    },
+    "Privacy Policy": {
+      "fetch": "https://www.palantir.com/privacy-and-security/",
+      "select": [".design__heading__j18gsz", ".design__text200__1xw780a"],
+      "executeClientScripts": true
+    },
+    "Trackers Policy": {
+      "fetch": "https://www.palantir.com/cookie-statement/",
+      "select": [".design__heading__j18gsz", ".design__text__1xw780a"],
+      "executeClientScripts": true
+    }
+  }
+}
