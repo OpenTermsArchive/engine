@@ -1,0 +1,13 @@
+{
+  "name": "Olvid",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://olvid.io/terms/en/",
+      "select": [".container > .row > .col-12"]
+    },
+    "Privacy Policy": {
+      "fetch": "https://olvid.io/privacy/en/",
+      "select": [".container > .row > .col-12"]
+    }
+  }
+}
