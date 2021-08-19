@@ -1,0 +1,19 @@
+{
+  "name": "Y Combinator",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.ycombinator.com/legal/",
+      "select": {
+        "startBefore": "#privacy",
+        "endBefore": "#tou"
+      }
+    },
+    "Terms of Service": {
+      "fetch": "https://www.ycombinator.com/legal/",
+      "select": {
+        "startBefore": "#tou",
+        "endBefore": "#trademarks"
+      }
+    }
+  }
+}
