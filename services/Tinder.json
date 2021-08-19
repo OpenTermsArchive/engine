@@ -1,0 +1,21 @@
+{
+  "name": "Tinder",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://policies.tinder.com/terms/intl/en",
+      "select": [".TextContent-kkmgbg-0"]
+    },
+    "Privacy Policy": {
+      "fetch": "https://policies.tinder.com/privacy/intl/en",
+      "select": [".TextContent-kkmgbg-0"]
+    },
+    "Trackers Policy": {
+      "fetch": "https://policies.tinder.com/cookie-policy/intl/en",
+      "select": [".TextContent-kkmgbg-0"]
+    },
+    "Community Guidelines": {
+      "fetch": "https://policies.tinder.com/community-guidelines/intl/en",
+      "select": [".TextContent-kkmgbg-0"]
+    }
+  }
+}
