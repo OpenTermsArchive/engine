@@ -1,0 +1,17 @@
+{
+  "name": "happn",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://www.happn.com/en/terms/",
+      "select": [".split__content"]
+    },
+    "Privacy Policy": {
+      "fetch": "https://www.happn.com/en/privacy/",
+      "select": [".split__content"]
+    },
+    "Trackers Policy": {
+      "fetch": "https://www.happn.com/en/cookies/",
+      "select": [".split__content"]
+    }
+  }
+}
