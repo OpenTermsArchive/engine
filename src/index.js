@@ -69,7 +69,7 @@ const schedule = args.includes('--schedule');
   );
 
   if (!schedule) {
-    process.exit(0)
+    process.exit(0);
   }
 
   logger.info('The scheduler is running…');

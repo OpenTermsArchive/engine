@@ -1,3 +1,7 @@
+import CGUs, { AVAILABLE_EVENTS } from './index.js';
+import { SNAPSHOTS_PATH, VERSIONS_PATH } from './history/index.js';
+import { gitSnapshot, gitVersion, resetGitRepository } from '../../test/helper.js';
+
 import chai from 'chai';
 import { fileURLToPath } from 'url';
 import fsApi from 'fs';
@@ -5,9 +9,6 @@ import nock from 'nock';
 import path from 'path';
 import sinon from 'sinon';
 import sinonChai from 'sinon-chai';
-import { gitSnapshot, gitVersion, resetGitRepository } from '../../test/helper.js';
-import { SNAPSHOTS_PATH, VERSIONS_PATH } from './history/index.js';
-import CGUs, { AVAILABLE_EVENTS } from './index.js';
 
 const fs = fsApi.promises;
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
