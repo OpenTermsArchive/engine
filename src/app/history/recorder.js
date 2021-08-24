@@ -49,7 +49,7 @@ export default class Recorder {
   async commit(filePath, message, authorDate) {
     try {
       await this.git.add(filePath);
-      return await this.git.commit(filePath, message, authorDate);
+      return this.git.commit(filePath, message, authorDate);
     } catch (error) {
       throw new Error(
         `Could not commit ${filePath} with message "${message}" due to error: "${error}"`
