@@ -1,9 +1,9 @@
-import chai from 'chai';
-import fs from 'fs';
 import { gitSnapshot, resetGitRepository } from '../../../test/helper.js';
 
 import Recorder from './recorder.js';
 import { SNAPSHOTS_PATH } from './index.js';
+import chai from 'chai';
+import fs from 'fs';
 
 const { expect } = chai;
 
@@ -210,11 +210,13 @@ describe('Recorder', () => {
           serviceId: SERVICE_PROVIDER_ID,
           documentType: TYPE,
           content: FILE_CONTENT,
+          changelog: 'commit this',
         });
         const { id: recordId } = await subject.record({
           serviceId: SERVICE_PROVIDER_ID,
           documentType: TYPE,
           content: UPDATED_FILE_CONTENT,
+          changelog: 'commit this',
         });
         lastSnapshotId = recordId;
         latestRecord = await subject.getLatestRecord(SERVICE_PROVIDER_ID, TYPE);
@@ -243,6 +245,7 @@ describe('Recorder', () => {
             documentType: TYPE,
             content: `${FILE_CONTENT} (with fake pdf file)`,
             mimeType: 'application/pdf',
+            changelog: `${FILE_CONTENT} (with fake pdf file)`,
           });
           lastSnapshotId = recordId;
           latestRecord = await subject.getLatestRecord(SERVICE_PROVIDER_ID, TYPE);
