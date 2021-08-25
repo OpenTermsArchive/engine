@@ -90,10 +90,6 @@ export default class CGUs extends events.EventEmitter {
         return result;
       } catch (e) {
         console.timeEnd(timeMessage);
-
-        if (error instanceof InaccessibleContentError) {
-          return null;
-        }
         if (!(e instanceof pTimeout.TimeoutError)) {
           throw e;
         }
@@ -251,7 +247,6 @@ And some info about what has already been tracked
 Thanks
 `;
     await github.createIssueIfNotExist({ body, title, labels: ['fix-document'] });
-    // throw new InaccessibleContentError("nope");
   }
 
   async refilterAndRecord(servicesIds) {
@@ -274,14 +269,23 @@ Thanks
     if (!snapshotId) {
       return;
     }
-
-    return this.recordVersion({
-      snapshotContent,
-      mimeType,
-      snapshotId,
-      documentDeclaration,
-      isRefiltering: true,
-    });
+    try {
+      return await this.recordVersion({
+        snapshotContent,
+        mimeType,
+        snapshotId,
+        documentDeclaration,
+        isRefiltering: true,
+      });
+    } catch (e) {
+      if (e instanceof InaccessibleContentError) {
+        logger.warn('In refiltering', e);
+        // previous snapshot did not have the corresponding selectors
+        // we can safely ignore this error as it will be fixed in next tracking change
+        return null;
+      }
+      throw e;
+    }
   }
 
   async _forEachDocumentOf(servicesIds = [], callback) {
@@ -321,47 +325,31 @@ Thanks
     isRefiltering,
   }) {
     const { service, type, contentSelectors, noiseSelectors, location } = documentDeclaration;
-    try {
-      const content = await filter({
-        content: snapshotContent,
-        mimeType,
-        documentDeclaration,
-      });
+    const content = await filter({
+      content: snapshotContent,
+      mimeType,
+      documentDeclaration,
+    });
 
-      const recordFunction = !isRefiltering ? 'recordVersion' : 'recordRefilter';
+    const recordFunction = !isRefiltering ? 'recordVersion' : 'recordRefilter';
 
-      const { id: versionId, isFirstRecord } = await history[recordFunction]({
-        serviceId: service.id,
-        content,
-        documentType: type,
-        snapshotId,
-      });
+    const { id: versionId, isFirstRecord } = await history[recordFunction]({
+      serviceId: service.id,
+      content,
+      documentType: type,
+      snapshotId,
+    });
 
-      if (!versionId) {
-        return this.emit('versionNotChanged', service.id, type);
-      }
-
-      this.emit(
-        isFirstRecord ? 'firstVersionRecorded' : 'versionRecorded',
-        service.id,
-        type,
-        versionId
-      );
-    } catch (e) {
-      if (e instanceof InaccessibleContentError) {
-        // send error with more info
-        await this.createError({
-          contentSelectors,
-          noiseSelectors,
-          url: location,
-          name: service.id,
-          documentType: type,
-          message: e.toString(),
-        });
-      }
-
-      throw e;
+    if (!versionId) {
+      return this.emit('versionNotChanged', service.id, type);
     }
+
+    this.emit(
+      isFirstRecord ? 'firstVersionRecorded' : 'versionRecorded',
+      service.id,
+      type,
+      versionId
+    );
   }
 
   async publish() {
