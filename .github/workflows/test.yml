@@ -13,8 +13,8 @@ jobs:
 
     steps:
       - run: |
-          git config --global user.name 'AmbNum Bot'
-          git config --global user.email 'ambnum.bot@disinfo.quaidorsay.fr'
+          git config --global user.name 'OTA Bot'
+          git config --global user.email 'bot@opentermsarchive.org'
           git config --global core.autocrlf false
       - uses: actions/checkout@v2
       - name: Use Node.js

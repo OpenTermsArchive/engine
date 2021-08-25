@@ -3,14 +3,8 @@
   "documents": {
     "Privacy Policy": {
       "fetch": "https://www.post.ch/en/pages/footer/data-protection-and-disclaimer",
-      "select": [
-        "#main"
-      ],
-      "remove": [
-        ".ppm-share .col-12",
-        ".col-lg-3",
-        ".ppm-breadcrumb > .container"
-      ]
+      "select": ["#main"],
+      "remove": [".ppm-share .col-12", ".col-lg-3", ".ppm-breadcrumb > .container"]
     }
   }
 }

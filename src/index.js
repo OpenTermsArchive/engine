@@ -48,9 +48,9 @@ const schedule = args.includes('--schedule');
   );
   serviceIds = serviceIds.sort((a, b) => a.localeCompare(b));
 
-  logger.info(`Refiltering ${numberOfDocuments} documents from ${serviceIds.length} services…`);
+  logger.info(`👇 Refiltering ${numberOfDocuments} documents from ${serviceIds.length} services…`);
   await app.refilterAndRecord(serviceIds);
-  logger.info(`Refiltered ${numberOfDocuments} documents from ${serviceIds.length} services.\n`);
+  logger.info(`👆 Refiltered ${numberOfDocuments} documents from ${serviceIds.length} services.\n`);
 
   if (refilterOnly) {
     return;
@@ -61,15 +61,15 @@ const schedule = args.includes('--schedule');
   }
 
   logger.info(
-    `Start tracking changes of ${numberOfDocuments} documents from ${serviceIds.length} services…`
+    `👇 Start tracking changes of ${numberOfDocuments} documents from ${serviceIds.length} services…`
   );
   await app.trackChanges(serviceIds);
   logger.info(
-    `Tracked changes of ${numberOfDocuments} documents from ${serviceIds.length} services.`
+    `👆 Tracked changes of ${numberOfDocuments} documents from ${serviceIds.length} services.`
   );
 
   if (!schedule) {
-    return;
+    process.exit(0);
   }
 
   logger.info('The scheduler is running…');

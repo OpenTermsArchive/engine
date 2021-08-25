@@ -1,16 +1,18 @@
+import CGUs, { AVAILABLE_EVENTS } from './index.js';
+import { SNAPSHOTS_PATH, VERSIONS_PATH } from './history/index.js';
+import { gitSnapshot, gitVersion, resetGitRepository } from '../../test/helper.js';
+
 import chai from 'chai';
-import { fileURLToPath } from 'url';
 import fsApi from 'fs';
 import nock from 'nock';
 import path from 'path';
 import sinon from 'sinon';
 import sinonChai from 'sinon-chai';
-import { gitSnapshot, gitVersion, resetGitRepository } from '../../test/helper.js';
-import { SNAPSHOTS_PATH, VERSIONS_PATH } from './history/index.js';
-import CGUs, { AVAILABLE_EVENTS } from './index.js';
 
 const fs = fsApi.promises;
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+const __dirname = path.resolve();
+
 chai.use(sinonChai);
 const { expect } = chai;
 
@@ -33,18 +35,18 @@ describe('CGUs', () => {
 
   before(async () => {
     serviceASnapshotExpectedContent = await fs.readFile(
-      path.resolve(__dirname, '../../test/fixtures/service_A_terms_snapshot.html'),
+      path.resolve(__dirname, 'test/fixtures/service_A_terms_snapshot.html'),
       { encoding: 'utf8' }
     );
     serviceAVersionExpectedContent = await fs.readFile(
-      path.resolve(__dirname, '../../test/fixtures/service_A_terms.md'),
+      path.resolve(__dirname, 'test/fixtures/service_A_terms.md'),
       { encoding: 'utf8' }
     );
     serviceBSnapshotExpectedContent = await fs.readFile(
-      path.resolve(__dirname, '../../test/fixtures/terms.pdf')
+      path.resolve(__dirname, 'test/fixtures/terms.pdf')
     );
     serviceBVersionExpectedContent = await fs.readFile(
-      path.resolve(__dirname, '../../test/fixtures/termsFromPDF.md'),
+      path.resolve(__dirname, 'test/fixtures/termsFromPDF.md'),
       { encoding: 'utf8' }
     );
   });
@@ -247,8 +249,8 @@ describe('CGUs', () => {
 
         after(resetGitRepository);
 
-        it('emits an inaccessibleContent event when an error happens during refiltering', async () => {
-          expect(inaccessibleContentSpy).to.have.been.called;
+        it('does not emit an inaccessibleContent event when an error happens during refiltering', async () => {
+          expect(inaccessibleContentSpy).to.not.have.been.called;
         });
 
         it('still refilters other services', async () => {

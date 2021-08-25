@@ -1,3 +1,4 @@
+import * as github from '../github/index.js';
 import * as history from './history/index.js';
 import * as services from './services/index.js';
 
@@ -26,6 +27,12 @@ export const AVAILABLE_EVENTS = [
   'inaccessibleContent',
   'error',
 ];
+
+const LOCAL_CONTRIBUTE_URL = 'http://localhost:3000/contribute/service';
+const CONTRIBUTE_URL = 'https://opentermsarchive.org/contribute/service';
+const GITHUB_VERSIONS_URL = 'https://github.com/ambanum/OpenTermsArchive-versions/blob/master';
+const GITHUB_REPO_URL = 'https://github.com/ambanum/OpenTermsArchive/blob/master/services';
+const GOOGLE_URL = 'https://www.google.com/search?q=';
 
 export default class CGUs extends events.EventEmitter {
   get serviceDeclarations() {
@@ -70,6 +77,7 @@ export default class CGUs extends events.EventEmitter {
         });
       }
     }, MAX_PARALLEL_DOCUMENTS_TRACKS);
+
     this.refilterDocumentsQueue = async.queue(async (documentDeclaration) => {
       const timeMessage = `refilterDocumentsQueue_${documentDeclaration.service.id}_${documentDeclaration.type}`;
       console.time(timeMessage);
@@ -85,7 +93,6 @@ export default class CGUs extends events.EventEmitter {
         if (!(e instanceof pTimeout.TimeoutError)) {
           throw e;
         }
-
         logger.error({
           message: e.toString(),
           serviceId: documentDeclaration.service.id,
@@ -171,7 +178,7 @@ export default class CGUs extends events.EventEmitter {
     } catch (e) {
       if (e instanceof InaccessibleContentError) {
         // send error with more info
-        throw new InaccessibleContentError({
+        await this.createError({
           contentSelectors,
           noiseSelectors,
           url: location,
@@ -182,6 +189,64 @@ export default class CGUs extends events.EventEmitter {
       }
       throw e;
     }
+  }
+
+  async createError(messageOrObject) {
+    const { message, contentSelectors, noiseSelectors, url, name, documentType } = messageOrObject;
+
+    /* eslint-disable no-nested-ternary */
+    const contentSelectorsAsArray = (typeof contentSelectors === 'string'
+      ? contentSelectors.split(',')
+      : Array.isArray(contentSelectors)
+      ? contentSelectors
+      : []
+    ).map(encodeURIComponent);
+
+    const noiseSelectorsAsArray = (typeof noiseSelectors === 'string'
+      ? noiseSelectors.split(',')
+      : Array.isArray(noiseSelectors)
+      ? noiseSelectors
+      : []
+    ).map(encodeURIComponent);
+    /* eslint-enable no-nested-ternary */
+
+    const contentSelectorsQueryString = contentSelectorsAsArray.length
+      ? `&selectedCss[]=${contentSelectorsAsArray.join('&selectedCss[]=')}`
+      : '';
+    const noiseSelectorsQueryString = noiseSelectorsAsArray.length
+      ? `&removedCss[]=${noiseSelectorsAsArray.join('&removedCss[]=')}`
+      : '';
+
+    const encodedName = encodeURIComponent(name);
+    const encodedType = encodeURIComponent(documentType);
+    const encodedUrl = encodeURIComponent(url);
+
+    const urlQueryParams = `step=2&url=${encodedUrl}&name=${encodedName}&documentType=${encodedType}${noiseSelectorsQueryString}${contentSelectorsQueryString}&expertMode=true`;
+
+    const message404 = message.includes('404')
+      ? `- Search Google to get the new url: ${GOOGLE_URL}%22${encodedName}%22+%22${encodedType}%22`
+      : '';
+
+    const title = `Fix ${name} - ${documentType}`;
+
+    const body = `
+This service is not available anymore.
+Please fix it.
+
+\`${message}\`
+
+Here some ideas on how to fix this issue:
+- See what's wrong online: ${CONTRIBUTE_URL}?${urlQueryParams}
+- Or on your local: ${LOCAL_CONTRIBUTE_URL}?${urlQueryParams}
+${message404}
+
+And some info about what has already been tracked
+- See all versions tracked here: ${GITHUB_VERSIONS_URL}/${encodedName}/${encodedType}.md
+- See original JSON file: ${GITHUB_REPO_URL}/${encodedName}.json
+
+Thanks
+`;
+    await github.createIssueIfNotExist({ body, title, labels: ['fix-document'] });
   }
 
   async refilterAndRecord(servicesIds) {
@@ -204,14 +269,23 @@ export default class CGUs extends events.EventEmitter {
     if (!snapshotId) {
       return;
     }
-
-    return this.recordVersion({
-      snapshotContent,
-      mimeType,
-      snapshotId,
-      documentDeclaration,
-      isRefiltering: true,
-    });
+    try {
+      return await this.recordVersion({
+        snapshotContent,
+        mimeType,
+        snapshotId,
+        documentDeclaration,
+        isRefiltering: true,
+      });
+    } catch (e) {
+      if (e instanceof InaccessibleContentError) {
+        logger.warn('In refiltering', e);
+        // previous snapshot did not have the corresponding selectors
+        // we can safely ignore this error as it will be fixed in next tracking change
+        return null;
+      }
+      throw e;
+    }
   }
 
   async _forEachDocumentOf(servicesIds = [], callback) {
@@ -251,47 +325,31 @@ export default class CGUs extends events.EventEmitter {
     isRefiltering,
   }) {
     const { service, type, contentSelectors, noiseSelectors, location } = documentDeclaration;
-    try {
-      const content = await filter({
-        content: snapshotContent,
-        mimeType,
-        documentDeclaration,
-      });
+    const content = await filter({
+      content: snapshotContent,
+      mimeType,
+      documentDeclaration,
+    });
 
-      const recordFunction = !isRefiltering ? 'recordVersion' : 'recordRefilter';
+    const recordFunction = !isRefiltering ? 'recordVersion' : 'recordRefilter';
 
-      const { id: versionId, isFirstRecord } = await history[recordFunction]({
-        serviceId: service.id,
-        content,
-        documentType: type,
-        snapshotId,
-      });
+    const { id: versionId, isFirstRecord } = await history[recordFunction]({
+      serviceId: service.id,
+      content,
+      documentType: type,
+      snapshotId,
+    });
 
-      if (!versionId) {
-        return this.emit('versionNotChanged', service.id, type);
-      }
-
-      this.emit(
-        isFirstRecord ? 'firstVersionRecorded' : 'versionRecorded',
-        service.id,
-        type,
-        versionId
-      );
-    } catch (e) {
-      if (e instanceof InaccessibleContentError) {
-        // send error with more info
-        throw new InaccessibleContentError({
-          contentSelectors,
-          noiseSelectors,
-          url: location,
-          name: service.id,
-          documentType: type,
-          message: e.toString(),
-        });
-      }
-
-      throw e;
+    if (!versionId) {
+      return this.emit('versionNotChanged', service.id, type);
     }
+
+    this.emit(
+      isFirstRecord ? 'firstVersionRecorded' : 'versionRecorded',
+      service.id,
+      type,
+      versionId
+    );
   }
 
   async publish() {
