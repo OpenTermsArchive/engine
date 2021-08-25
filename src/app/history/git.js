@@ -20,7 +20,7 @@ export default class Git {
     return this.git.addConfig('core.autocrlf', false);
   }
 
-  async optimizeLogGraph() {
+  optimizeLogGraph() {
     const graphLockFile = `${this.path}/.git/objects/info/commit-graph.lock`;
     if (fs.existsSync(graphLockFile)) {
       return;
