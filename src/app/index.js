@@ -77,6 +77,7 @@ export default class CGUs extends events.EventEmitter {
         });
       }
     }, MAX_PARALLEL_DOCUMENTS_TRACKS);
+
     this.refilterDocumentsQueue = async.queue(async (documentDeclaration) => {
       const timeMessage = `refilterDocumentsQueue_${documentDeclaration.service.id}_${documentDeclaration.type}`;
       console.time(timeMessage);
@@ -89,10 +90,13 @@ export default class CGUs extends events.EventEmitter {
         return result;
       } catch (e) {
         console.timeEnd(timeMessage);
+
+        if (error instanceof InaccessibleContentError) {
+          return null;
+        }
         if (!(e instanceof pTimeout.TimeoutError)) {
           throw e;
         }
-
         logger.error({
           message: e.toString(),
           serviceId: documentDeclaration.service.id,
