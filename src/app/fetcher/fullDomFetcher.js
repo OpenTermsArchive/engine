@@ -7,18 +7,21 @@ puppeteer.use(StealthPlugin());
 
 const PUPPETEER_TIMEOUT = 60 * 1000; // 60s
 
+let browser;
+
 export default async function fetch(url, cssSelectors) {
   let response;
   let content;
-  let browser;
   let page;
   const selectors = [].concat(cssSelectors);
 
   try {
-    browser = await puppeteer.launch({
-      headless: true,
-      args: ['--no-sandbox', '--disable-setuid-sandbox'],
-    });
+    if (!browser) {
+      browser = await puppeteer.launch({
+        headless: true,
+        args: ['--no-sandbox', '--disable-setuid-sandbox'],
+      });
+    }
     page = await browser.newPage();
     await page.setDefaultNavigationTimeout(PUPPETEER_TIMEOUT);
 
@@ -52,10 +55,6 @@ export default async function fetch(url, cssSelectors) {
   } finally {
     if (page) {
       await page.close();
-    }
-
-    if (browser) {
-      await browser.close();
     }
   }
 
