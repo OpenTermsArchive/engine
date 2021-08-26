@@ -69,7 +69,11 @@ const schedule = args.includes('--schedule');
   );
 
   if (!schedule) {
-    // process.exit(0);
+    // here, we do not want to exit as the queue errors are processed
+    // asynchronously but not awaited, due to the fact that the queue error
+    // function is not async at all
+    // So if we exited here, we would not see the errors processed
+
     return;
   }
 
