@@ -3,12 +3,12 @@
   "documents": {
     "Terms of Service": {
       "fetch": "https://www.binance.com/en/terms",
-      "select": [".css-bs00pt"],
+      "select": ["main"],
       "executeClientScripts": true
     },
     "Privacy Policy": {
       "fetch": "https://www.binance.com/en/privacy",
-      "select": [".css-bs00pt"],
+      "select": ["main"],
       "executeClientScripts": true
     }
   }
