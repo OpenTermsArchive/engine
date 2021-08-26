@@ -4,16 +4,19 @@
   "documents": {
     "Closed Captioning Policy": {
       "fetch": "https://www.foxnews.com/closed-captioning",
-      "select": "div.content",
-      "remove": "img:first-of-type"
+      "select": ".main-content",
+      "remove": "img:first-of-type",
+      "executeClientScripts": true
     },
     "Privacy Policy": {
       "fetch": "https://www.foxnews.com/privacy-policy",
-      "select": ".privacy-policy"
+      "select": ".privacy-policy",
+      "executeClientScripts": true
     },
     "Terms of Service": {
       "fetch": "https://www.foxnews.com/terms-of-use",
-      "select": ".terms-of-use"
+      "select": ".terms-of-use",
+      "executeClientScripts": true
     }
   }
 }
