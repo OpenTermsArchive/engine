@@ -3,15 +3,18 @@
   "documents": {
     "Terms of Service": {
       "fetch": "https://www.crowdtangle.com/eu-terms",
-      "select": [".jumbotron", ".main-container"]
+      "select": [".jumbotron", ".main-container"],
+      "executeClientScripts": true
     },
     "Trackers Policy": {
       "fetch": "https://www.crowdtangle.com/cookie-policy",
-      "select": [".jumbotron", ".main-container"]
+      "select": [".jumbotron", ".main-container"],
+      "executeClientScripts": true
     },
     "Privacy Policy": {
       "fetch": "https://www.crowdtangle.com/data-policy",
-      "select": [".jumbotron", ".main-container"]
+      "select": [".jumbotron", ".main-container"],
+      "executeClientScripts": true
     }
   }
 }
