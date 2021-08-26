@@ -101,9 +101,27 @@ export default class CGUs extends events.EventEmitter {
       }
     }, MAX_PARALLEL_REFILTERS);
 
-    const queueErrorHandler = (error, { service, type }) => {
+    const queueErrorHandler = (createError) => (error, messageOrObject) => {
+      const { location, service, contentSelectors, noiseSelectors, type } = messageOrObject;
+
       if (error instanceof InaccessibleContentError) {
-        return this.emit('inaccessibleContent', error, service.id, type);
+        if (!createError) {
+          return this.emit('inaccessibleContent', error, service.id, type);
+        }
+
+        // this is a promise and as error handler is not async
+        // it might resolve
+        return this.createError({
+          contentSelectors,
+          noiseSelectors,
+          url: location,
+          name: service.id,
+          documentType: type,
+          message: error.toString(),
+        }).then(() => {
+          // as queueErrorHandler is not async
+          // we just use an empty callback
+        });
       }
 
       this.emit('error', error, service.id, type);
@@ -111,8 +129,8 @@ export default class CGUs extends events.EventEmitter {
       throw error;
     };
 
-    this.trackDocumentChangesQueue.error(queueErrorHandler);
-    this.refilterDocumentsQueue.error(queueErrorHandler);
+    this.trackDocumentChangesQueue.error(queueErrorHandler(true));
+    this.refilterDocumentsQueue.error(queueErrorHandler(false));
   }
 
   attach(listener) {
@@ -131,6 +149,7 @@ export default class CGUs extends events.EventEmitter {
     );
 
     await this.trackDocumentChangesQueue.drain();
+
     await this.publish();
   }
 
@@ -144,51 +163,36 @@ export default class CGUs extends events.EventEmitter {
       type,
     } = documentDeclaration;
 
-    try {
-      const { mimeType, content } = await fetch({
-        url: location,
-        executeClientScripts,
-        cssSelectors: documentDeclaration.getCssSelectors(),
-      });
+    const { mimeType, content } = await fetch({
+      url: location,
+      executeClientScripts,
+      cssSelectors: documentDeclaration.getCssSelectors(),
+    });
 
-      if (!content) {
-        return;
-      }
-
-      // Sometimes the document contains changing content, but the snapshot is the same.
-      // We need to replace it before trying to save it
-      const cleanedContent = cleanSnapshotHTML(content);
-
-      const snapshotId = await this.recordSnapshot({
-        content: cleanedContent,
-        mimeType,
-        documentDeclaration,
-      });
-
-      if (!snapshotId) {
-        return;
-      }
-
-      return this.recordVersion({
-        snapshotContent: cleanedContent,
-        mimeType,
-        snapshotId,
-        documentDeclaration,
-      });
-    } catch (e) {
-      if (e instanceof InaccessibleContentError) {
-        // send error with more info
-        await this.createError({
-          contentSelectors,
-          noiseSelectors,
-          url: location,
-          name: service.id,
-          documentType: type,
-          message: e.toString(),
-        });
-      }
-      throw e;
+    if (!content) {
+      return;
     }
+
+    // Sometimes the document contains changing content, but the snapshot is the same.
+    // We need to replace it before trying to save it
+    const cleanedContent = cleanSnapshotHTML(content);
+
+    const snapshotId = await this.recordSnapshot({
+      content: cleanedContent,
+      mimeType,
+      documentDeclaration,
+    });
+
+    if (!snapshotId) {
+      return;
+    }
+
+    return await this.recordVersion({
+      snapshotContent: cleanedContent,
+      mimeType,
+      snapshotId,
+      documentDeclaration,
+    });
   }
 
   async createError(messageOrObject) {
@@ -324,7 +328,7 @@ Thanks
     documentDeclaration,
     isRefiltering,
   }) {
-    const { service, type, contentSelectors, noiseSelectors, location } = documentDeclaration;
+    const { service, type } = documentDeclaration;
     const content = await filter({
       content: snapshotContent,
       mimeType,

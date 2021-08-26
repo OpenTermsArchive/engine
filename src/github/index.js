@@ -1,6 +1,9 @@
 import { Octokit } from 'octokit';
-
-const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN_CREATE_ISSUE });
+import logger from '../logger/index.js';
+const octokit = new Octokit({
+  auth: process.env.GITHUB_TOKEN_CREATE_ISSUE,
+  userAgent: `opentermsarchive`,
+});
 const GITHUB_OTA_OWNER = process.env.GITHUB_OTA_OWNER || '';
 const GITHUB_OTA_REPO = process.env.GITHUB_OTA_REPO || '';
 
@@ -77,6 +80,11 @@ export const createIssueIfNotExist = async ({ title, body, labels }) => {
       body,
       labels,
     });
+
+    logger.info(
+      `🤖 Creating Github issue for ${title} ${existingIssue.html_url}`,
+      existingIssue.html_url
+    );
   }
 
   return existingIssue;
