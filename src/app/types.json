@@ -110,8 +110,8 @@
   "Copyright Claims Policy": {
     "commitment": {
       "writer": "service provider",
-      "audience": "end user",
-      "object": "copyright complaints (DMCA…)"
+      "audience": "anyone",
+      "object": "how copyright complaints (DMCA…) will be handled"
     },
     "translations": {
       "fr": ["Politique de réclamation de droits d'auteur"]
