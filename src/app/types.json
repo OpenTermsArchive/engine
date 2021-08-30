@@ -266,5 +266,12 @@
     "translations": {
       "fr": ["Politique de publication des annonces"]
     }
+  },
+  "Complaints Policy": {
+    "commitment": {
+      "writer": "service provider",
+      "audience": "anyone",
+      "object": "how generic complaints will be handled"
+    }
   }
 }
