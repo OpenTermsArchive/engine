@@ -1,0 +1,9 @@
+{
+  "name": "Cloudflare",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://www.cloudflare.com/terms/",
+      "select": [".col-lg-8 > .rich-text-renderer"]
+    }
+  }
+}
