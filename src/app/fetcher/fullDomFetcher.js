@@ -25,7 +25,7 @@ export default async function fetch(url, cssSelectors) {
     page = await browser.newPage();
     await page.setDefaultNavigationTimeout(PUPPETEER_TIMEOUT);
 
-    response = await page.goto(url);
+    response = await page.goto(url, { waitUntil: 'networkidle0' });
     const statusCode = response.status();
 
     if (statusCode < 200 || statusCode >= 300) {
