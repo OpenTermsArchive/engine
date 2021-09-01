@@ -22,7 +22,7 @@
     "lint": "prettier -c test src services config decision-records",
     "lint-fix": "prettier --write test src services config decision-records",
     "posttest": "npm run lint",
-    "prepare": "husky install",
+    "prepare": "husky install || false",
     "test": "cross-env NODE_ENV=test mocha --file './test/helper.js' --recursive \"./src/**/*.test.js\" --exit",
     "test:debug": "cross-env NODE_ENV=test mocha --file './test/helper.js' --recursive \"./src/**/*.test.js\" --inspect-brk --exit",
     "validate": "cross-env NODE_ENV=validation npx --node-arg=--insecure-http-parser --node-arg=--unhandled-rejections=strict --node-arg=--max-http-header-size=32768 node_modules/.bin/mocha --delay --file './test/helper.js' scripts/validation/validate.js",
