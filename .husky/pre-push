@@ -4,8 +4,7 @@
 branch="$(git rev-parse --abbrev-ref HEAD)"
 
 if [ $branch = "master" ]; then
-
-    # Behat
+    # Tests
     printf "\e[1;33mpre-push:\e[0m: Running Tests\n"
     npm test
     if [ $? -eq 0 ]
@@ -16,5 +15,14 @@ if [ $branch = "master" ]; then
         exit 1
     fi
 
+    printf "\e[1;33mpre-push:\e[0m: Validate modified services\n"
+    npm run validate:modified
+    if [ $? -eq 0 ]
+    then
+        printf "\e[1;32mSuccessful:\e[0m Validate modified services\n"
+    else
+        printf "\e[1;31mError:\e[0m Validate modified services\n"
+        exit 1
+    fi
     printf "\n\n=========================================\n"
 fi
