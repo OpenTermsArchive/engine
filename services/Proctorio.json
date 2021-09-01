@@ -3,13 +3,13 @@
   "documents": {
     "Terms of Service": {
       "fetch": "https://proctorio.com/terms",
-      "executeClientScripts": true,
-      "select": ".content.legal"
+      "select": ["#section-termsofservice"],
+      "remove": [".policy-toc"]
     },
     "Privacy Policy": {
       "fetch": "https://proctorio.com/privacy",
-      "executeClientScripts": true,
-      "select": ".content.legal"
+      "select": [".hero", ".pt-20", "#policy-container"],
+      "remove": [".policy-toc"]
     }
   }
 }
