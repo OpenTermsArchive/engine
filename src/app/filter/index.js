@@ -43,6 +43,15 @@ export function cleanSnapshotHTML(content) {
     .replace(/data-cf-beacon=('|")((.*)?)("|')/gim, 'data-cf-beacon=""') // OkCupid
     // nonce is an always changing numbers
     .replace(/nonce="(.*?)"/gim, 'nonce=""') // OkCupid
+    // csrf-token also
+    .replace(
+      /<meta(.*?)name="csrf-token"(.*?)content="(.*?)"(.*?)>/gim,
+      '<meta$1name="csrf-token"$2content="<removed>"$4>'
+    ) // initially for Y Combinator
+    .replace(
+      /<meta(.*?)content="(.*?)"(.*?)name="csrf-token"(.*?)>/gim,
+      '<meta$1content="<removed>"$3name="csrf-token"$4>'
+    ) // initially for Y Combinator
     // replace empty styles tags
     .replace(/<style (.*?)><\/style>/gim, ''); // OkCupid
   return cleanedContent;

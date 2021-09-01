@@ -52,6 +52,9 @@ const snapshotHTML = `
   <head>
     <meta charset="UTF-8">
     <title>TOS</title>
+    <meta name="csrf-token" content="sFyiVS7MBTkzuIPtXxNlQaeiXRkCbF8mOCVKfmZq43l0jST+fE9s9usULZSXx9xf0Er+zJf2hye5O9tLNSZs1w==" />
+    <meta content="sFyiVS7MBTkzuIPtXxNlQaeiXRkCbF8mOCVKfmZq43l0jST+fE9s9usULZSXx9xf0Er+zJf2hye5O9tLNSZs1w==" name="csrf-token" rel="test" />
+    <meta rel="test" content="sFyiVS7MBTkzuIPtXxNlQaeiXRkCbF8mOCVKfmZq43l0jST+fE9s9usULZSXx9xf0Er+zJf2hye5O9tLNSZs1w==" name="csrf-token" />
   </head>
   <body>
     <h1>Title</h1>
@@ -71,6 +74,9 @@ const expectedSnapshotCleaned = `
   <head>
     <meta charset="UTF-8">
     <title>TOS</title>
+    <meta name="csrf-token" content="<removed>" />
+    <meta content="<removed>" name="csrf-token" rel="test" />
+    <meta rel="test" content="<removed>" name="csrf-token" />
   </head>
   <body>
     <h1>Title</h1>
