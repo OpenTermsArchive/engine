@@ -81,11 +81,14 @@ let servicesToValidate = args.filter((arg) => !arg.startsWith('--'));
               it('has fetchable URL', async function () {
                 this.timeout(30000);
 
-                const { location, executeClientScripts } = service.getDocumentDeclaration(type);
+                const { location, executeClientScripts, headers } = service.getDocumentDeclaration(
+                  type
+                );
                 const document = await fetch({
                   url: location,
                   executeClientScripts,
                   cssSelectors: service.getDocumentDeclaration(type).getCssSelectors(),
+                  headers,
                 });
                 content = document.content;
                 mimeType = document.mimeType;
@@ -135,11 +138,16 @@ let servicesToValidate = args.filter((arg) => !arg.startsWith('--'));
 
                   this.timeout(30000);
 
-                  const { location, executeClientScripts } = service.getDocumentDeclaration(type);
+                  const {
+                    location,
+                    executeClientScripts,
+                    headers,
+                  } = service.getDocumentDeclaration(type);
                   const document = await fetch({
                     url: location,
                     executeClientScripts,
                     cssSelectors: service.getDocumentDeclaration(type).getCssSelectors(),
+                    headers,
                   });
 
                   const secondFilteredContent = await filter({

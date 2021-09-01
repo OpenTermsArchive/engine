@@ -9,7 +9,7 @@ const PUPPETEER_TIMEOUT = 60 * 1000; // 60s
 
 let browser;
 
-export default async function fetch(url, cssSelectors) {
+export default async function fetch(url, cssSelectors, headers = {}) {
   let response;
   let content;
   let page;
@@ -26,6 +26,10 @@ export default async function fetch(url, cssSelectors) {
     await page.setDefaultNavigationTimeout(PUPPETEER_TIMEOUT);
 
     response = await page.goto(url, { waitUntil: 'networkidle0' });
+    await page.setExtraHTTPHeaders({
+      ...headers,
+    });
+
     const statusCode = response.status();
 
     if (statusCode < 200 || statusCode >= 300) {

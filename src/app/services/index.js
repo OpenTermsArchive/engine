@@ -1,11 +1,11 @@
 import { fileURLToPath, pathToFileURL } from 'url';
 
+import DocumentDeclaration from './documentDeclaration.js';
+import Service from './service.js';
 import config from 'config';
 import fsApi from 'fs';
 import path from 'path';
 import simpleGit from 'simple-git';
-import Service from './service.js';
-import DocumentDeclaration from './documentDeclaration.js';
 
 const fs = fsApi.promises;
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -42,6 +42,7 @@ export async function load() {
           const {
             filter: filterNames,
             fetch: location,
+            headers,
             executeClientScripts,
             select: contentSelectors,
             remove: noiseSelectors,
@@ -63,6 +64,7 @@ export async function load() {
             contentSelectors,
             noiseSelectors,
             filters,
+            headers,
           });
 
           services[service.id].addDocumentDeclaration(document);

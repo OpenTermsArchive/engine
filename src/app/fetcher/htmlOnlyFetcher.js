@@ -5,7 +5,7 @@ import https from 'https';
 import nodeFetch from 'node-fetch';
 const LANGUAGE = 'en';
 
-export default async function fetch(url) {
+export default async function fetch(url, { headers = {} } = {}) {
   const options = {};
 
   if (url.startsWith('https:') && process.env.HTTPS_PROXY) {
@@ -18,7 +18,9 @@ export default async function fetch(url) {
       rejectUnauthorized: false,
     });
   }
-  options.headers = { 'Accept-Language': LANGUAGE };
+
+  options.credentials = 'include';
+  options.headers = { 'Accept-Language': LANGUAGE, ...headers };
 
   let response;
 
