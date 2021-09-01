@@ -8,7 +8,8 @@
     },
     "Privacy Policy": {
       "fetch": "https://www.worldmarket.com/category/customer-service/privacy-and-security.do",
-      "select": "#privacy"
+      "select": "#privacy",
+      "executeClientScripts": true
     }
   }
 }
