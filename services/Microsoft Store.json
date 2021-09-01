@@ -13,9 +13,8 @@
       "select": "h1, #psp_last_updated, .header_content .Description, .div_content"
     },
     "Terms of Service": {
-      "fetch": "https://www.microsoft.com/en-gb/legal/intellectualproperty/copyright/default",
-      "select": "#primaryR1",
-      "remove": ".f-lean"
+      "fetch": "https://www.microsoft.com/en-us/legal/terms-of-use",
+      "select": "#primaryR1"
     }
   }
 }
