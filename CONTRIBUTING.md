@@ -14,6 +14,7 @@ First of all, thanks for taking the time to contribute! 🎉👍
       - [Range selectors](#range-selectors)
     - [`remove`](#remove)
     - [`filter`](#filter)
+    - [`headers`](#headers)
     - [Document type](#document-type)
       - [Defining a new document type](#defining-a-new-document-type)
   - [Testing your declaration](#testing-your-declaration)
@@ -103,6 +104,7 @@ Documents are declared in a service declaration file, under the `documents` prop
       "filter": "An array of service specific filter function names",
       "remove": "A CSS selector, a range selector or an array of selectors that target the noise parts of the document that has to be removed. Useful to remove parts that are inside the selected parts",
       "select": "A CSS selector, a range selector or an array of selectors that target the meaningful parts of the document, excluding elements such as headers, footers and navigation",
+      "headers": "An object representing headers to be passed to the url fetcher",
     }
   }
   …
@@ -221,6 +223,17 @@ export function removeImages(document, { select: selector }) {
 You can find examples of filters in [`/services/*.filters.js`](./services) files.
 
 You can also learn more about [usual noise](https://github.com/ambanum/OpenTermsArchive/wiki/Usual-noise) and ways to handle it on the wiki, and share your own learnings there.
+
+### `headers`
+
+_This property is optional._
+
+It can happen that retrieving a document through scraping needs some additional headers to work correctly.
+
+Some of theme could be
+
+- **user-agent**: to force a specific user agent
+- **Cookie**: to pass meaningful data such as a language to fetch the data in (i.e. for Instagram: `"headers": { "Cookie": "locale=en_GB" }`)
 
 ### Document type
 

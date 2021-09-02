@@ -157,6 +157,7 @@ export default class CGUs extends events.EventEmitter {
     const {
       location,
       executeClientScripts,
+      headers,
       service,
       contentSelectors,
       noiseSelectors,
@@ -167,6 +168,7 @@ export default class CGUs extends events.EventEmitter {
       url: location,
       executeClientScripts,
       cssSelectors: documentDeclaration.getCssSelectors(),
+      headers,
     });
 
     await github.closeIssueIfExists({
