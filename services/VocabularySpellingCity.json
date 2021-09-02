@@ -1,0 +1,13 @@
+{
+  "name": "VocabularySpellingCity",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.spellingcity.com/privacy-policy.html",
+      "select": ["#wp-main"]
+    },
+    "Terms of Service": {
+      "fetch": "https://www.spellingcity.com/terms-of-service.html",
+      "select": ["#wp-main"]
+    }
+  }
+}
