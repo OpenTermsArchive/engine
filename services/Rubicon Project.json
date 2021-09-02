@@ -6,8 +6,8 @@
       "select": [".main-wrapper > .col-xs-12 > div"]
     },
     "Ad Publishing Policy": {
-      "fetch": "https://rubiconproject.com/terms-conditions/rubicon-project-ad-quality-guidelines/",
-      "select": [".main-wrapper > .col-xs-12 > div"]
+      "fetch": "https://www.magnite.com/legal/ad-quality-guidelines/",
+      "select": [".page-header", ".content-wrapper"]
     },
     "Trackers Policy": {
       "fetch": "https://rubiconproject.com/privacy-policy/website-cookie-statement/",
