@@ -4,7 +4,7 @@
   "documents": {
     "Privacy Policy": {
       "fetch": "https://www.toyota.com/support/privacy-rights",
-      "select": ".tcom-support-privacy-rights"
+      "select": ".section"
     }
   }
 }
