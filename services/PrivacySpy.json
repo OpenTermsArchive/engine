@@ -1,0 +1,13 @@
+{
+  "name": "PrivacySpy",
+  "documents": {
+    "User Consent Policy": {
+      "fetch": "https://privacyspy.org/conduct/",
+      "select": [".max-w-2xl"]
+    },
+    "Privacy Policy": {
+      "fetch": "https://privacyspy.org/terms-and-privacy/",
+      "select": [".max-w-2xl"]
+    }
+  }
+}
