@@ -4,6 +4,16 @@ Recipes to set up the infrastructure for the Open Terms Archive app and deploy i
 
 > Recettes pour mettre en place l'infrastructure et déployer l'application Open Terms Archive
 
+## Automatic build and deploy from Github
+
+Although the following docs will show you how to deploy from your local machine, a CI process will deploy a new version of the app everytime a tag is created.
+
+So if you want to benefit from this, create a new tag on the `master` branch with
+
+```
+npm version <patch|minor|major>
+```
+
 ## Requirements
 
 - Install [Ansible](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html)
