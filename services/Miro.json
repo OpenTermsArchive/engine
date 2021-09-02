@@ -1,0 +1,13 @@
+{
+  "name": "Miro",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://miro.com/legal/terms-of-service/",
+      "select": [".legal-features-1__content"]
+    },
+    "Privacy Policy": {
+      "fetch": "https://miro.com/legal/privacy-policy/",
+      "select": [".legal-features-1__content"]
+    }
+  }
+}
