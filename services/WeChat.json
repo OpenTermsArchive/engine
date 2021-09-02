@@ -7,7 +7,8 @@
     },
     "Privacy Policy": {
       "fetch": "https://www.wechat.com/en/privacy_policy.html",
-      "select": "#agreement6"
+      "select": "#agreement6",
+      "executeClientScripts": true
     },
     "Acceptable Use Policy": {
       "fetch": "https://www.wechat.com/en/acceptable_use_policy.html",
