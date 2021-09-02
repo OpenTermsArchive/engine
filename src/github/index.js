@@ -7,6 +7,9 @@ const octokit = new Octokit({
 const GITHUB_OTA_OWNER = process.env.GITHUB_OTA_OWNER || '';
 const GITHUB_OTA_REPO = process.env.GITHUB_OTA_REPO || '';
 
+const ISSUE_STATE_CLOSED = 'closed';
+const ISSUE_STATE_OPEN = 'open';
+
 const commonParams = {
   owner: GITHUB_OTA_OWNER,
   repo: GITHUB_OTA_REPO,
@@ -24,7 +27,8 @@ export const createIssue = async (params) => {
 
     return data;
   } catch (e) {
-    console.error(e);
+    logger.error('Could not create issue');
+    logger.error(e.toString());
     return null;
   }
 };
@@ -44,7 +48,8 @@ export const searchIssue = async (params) => {
       item.repository_url.endsWith(`${params.owner}/${params.repo}`)
     )[0];
   } catch (e) {
-    console.error(e);
+    logger.error('Could not search issue');
+    logger.error(e.toString());
     return null;
   }
 };
@@ -57,12 +62,13 @@ export const addCommentToIssue = async (params) => {
     const { data } = await octokit.rest.issues.createComment(params);
     return data;
   } catch (e) {
-    console.error(e);
+    logger.error('Could not add comment to issue');
+    logger.error(e.toString());
     return null;
   }
 };
 
-export const createIssueIfNotExist = async ({ title, body, labels }) => {
+export const createIssueIfNotExist = async ({ title, body, labels, comment }) => {
   if (!isEnabled) {
     return;
   }
@@ -80,11 +86,53 @@ export const createIssueIfNotExist = async ({ title, body, labels }) => {
       body,
       labels,
     });
+    if (existingIssue) {
+      logger.info(`🤖 Creating Github issue for ${title}: ${existingIssue.html_url}`);
+    } else {
+      logger.error(`🤖 Could not create Github issue for ${title}`);
+    }
+  } else if (existingIssue.state === 'closed') {
+    await octokit.rest.issues.update({
+      ...commonParams,
+      issue_number: existingIssue.number,
+      state: ISSUE_STATE_OPEN,
+    });
+    await addCommentToIssue({
+      ...commonParams,
+      issue_number: existingIssue.number,
+      body: comment,
+    });
+  }
 
-    logger.info(
-      `🤖 Creating Github issue for ${title} ${existingIssue.html_url}`,
-      existingIssue.html_url
-    );
+  return existingIssue;
+};
+
+export const closeIssueIfExists = async ({ title, comment }) => {
+  if (!isEnabled) {
+    return;
+  }
+
+  let existingIssue = await searchIssue({
+    ...commonParams,
+    // baseUrl should be the way to go but it goes with a 404 using octokit
+    // baseUrl: `https://api.github.com/${GITHUB_OTA_OWNER}/${GITHUB_OTA_REPO}`,
+    q: `is:issue is:${ISSUE_STATE_OPEN} "${title}"`,
+  });
+
+  if (existingIssue) {
+    logger.info(`🤖 `);
+    await octokit.rest.issues.update({
+      ...commonParams,
+      issue_number: existingIssue.number,
+      state: ISSUE_STATE_CLOSED,
+    });
+    logger.info(`🤖 `);
+    await addCommentToIssue({
+      ...commonParams,
+      issue_number: existingIssue.number,
+      body: comment,
+    });
+    logger.info(`🤖 Github issue closed for ${title}: ${existingIssue.html_url}`);
   }
 
   return existingIssue;

@@ -169,6 +169,11 @@ export default class CGUs extends events.EventEmitter {
       cssSelectors: documentDeclaration.getCssSelectors(),
     });
 
+    await github.closeIssueIfExists({
+      title: `Fix ${service.id} - ${type}`,
+      comment: `🤖 Closed automatically as data was gathered successfully`,
+    });
+
     if (!content) {
       return;
     }
@@ -250,7 +255,12 @@ And some info about what has already been tracked
 
 Thanks
 `;
-    await github.createIssueIfNotExist({ body, title, labels: ['fix-document'] });
+    await github.createIssueIfNotExist({
+      body,
+      title,
+      labels: ['fix-document'],
+      comment: `🤖 Reopened automatically as an error occured`,
+    });
   }
 
   async refilterAndRecord(servicesIds) {
