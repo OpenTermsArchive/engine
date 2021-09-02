@@ -7,7 +7,7 @@
     },
     "Privacy Policy": {
       "fetch": "https://www.wildskymedia.com/privacy-policy/",
-      "select": ".privacy-policy__PrivacyPolicyWrapper-o94py9-0"
+      "select": ".privacy-policy__PrivacyPolicyWrapper-sc-o94py9-0"
     }
   }
 }
