@@ -1,0 +1,14 @@
+{
+  "name": "Lydia",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://lydia-app.com/ie/info/terms-of-service.html",
+      "select": [".centered-v", ".white"]
+    },
+    "Privacy Policy": {
+      "fetch": "https://support.lydia-app.com/l/en/article/6ogzqxbjos-lydia-personal-data-protection-policy",
+      "select": [".card-block:nth-child(1)"],
+      "remove": [".meta"]
+    }
+  }
+}
