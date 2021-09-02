@@ -9,8 +9,8 @@
     },
     "Privacy Policy": {
       "fetch": "https://docviewer.zoosk.com/legal-privacy-en_eu.html",
-      "select": ".flex-frame",
-      "remove": ".frame-header > a"
+      "select": ".legal__inner",
+      "executeClientScripts": true
     }
   }
 }
