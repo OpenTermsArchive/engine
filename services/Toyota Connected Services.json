@@ -5,6 +5,10 @@
     "Privacy Policy": {
       "fetch": "https://www.toyota.com/support/privacy-rights",
       "select": ".section"
+    },
+    "Terms of Service": {
+      "fetch": "https://www.toyota.com/support/legal-terms/",
+      "select": ".section"
     }
   }
 }
