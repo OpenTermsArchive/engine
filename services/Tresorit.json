@@ -3,11 +3,7 @@
   "documents": {
     "Terms of Service": {
       "fetch": "https://tresorit.com/terms-of-use",
-      "select": [
-        ".pageHeadline .active",
-        ".versionSwitcher:nth-child(1)",
-        ".pageSection:nth-child(3) > .container"
-      ]
+      "select": [".TermsOfUse-module--terms-of-use--1aCf6"]
     },
     "Acceptable Use Policy": {
       "fetch": "https://tresorit.com/acceptable-use-policy",
