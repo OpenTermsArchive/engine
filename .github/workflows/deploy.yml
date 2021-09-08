@@ -2,11 +2,10 @@ name: Deploy
 
 on:
   push:
-    tags:
+    tags: '*'
 
 jobs:
   deploy:
-    if: github.event.base_ref == 'refs/heads/master'
     runs-on: ubuntu-latest
 
     steps:
