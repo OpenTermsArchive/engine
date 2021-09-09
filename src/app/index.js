@@ -109,6 +109,11 @@ export default class CGUs extends events.EventEmitter {
           return this.emit('inaccessibleContent', error, service.id, type);
         }
 
+        if (error.toString().includes('HttpError: API rate limit exceeded for user ID')) {
+          // This is an error due to send in blue quota, bypass
+          return;
+        }
+
         // this is a promise and as error handler is not async
         // it might resolve
         return this.createError({
