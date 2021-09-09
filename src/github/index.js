@@ -50,7 +50,7 @@ export const searchIssue = async (params) => {
   } catch (e) {
     logger.error('Could not search issue');
     logger.error(e.toString());
-    return null;
+    throw e;
   }
 };
 
@@ -72,39 +72,42 @@ export const createIssueIfNotExist = async ({ title, body, labels, comment }) =>
   if (!isEnabled) {
     return;
   }
-  let existingIssue = await searchIssue({
-    ...commonParams,
-    // baseUrl should be the way to go but it goes with a 404 using octokit
-    // baseUrl: `https://api.github.com/${GITHUB_OTA_OWNER}/${GITHUB_OTA_REPO}`,
-    q: `is:issue "${title}"`,
-  });
-
-  if (!existingIssue) {
-    existingIssue = await createIssue({
+  try {
+    let existingIssue = await searchIssue({
       ...commonParams,
-      title,
-      body,
-      labels,
+      // baseUrl should be the way to go but it goes with a 404 using octokit
+      // baseUrl: `https://api.github.com/${GITHUB_OTA_OWNER}/${GITHUB_OTA_REPO}`,
+      q: `is:issue "${title}"`,
     });
-    if (existingIssue) {
-      logger.info(`🤖 Creating Github issue for ${title}: ${existingIssue.html_url}`);
-    } else {
-      logger.error(`🤖 Could not create Github issue for ${title}`);
+
+    if (!existingIssue) {
+      existingIssue = await createIssue({
+        ...commonParams,
+        title,
+        body,
+        labels,
+      });
+      if (existingIssue) {
+        logger.info(`🤖 Creating Github issue for ${title}: ${existingIssue.html_url}`);
+      } else {
+        logger.error(`🤖 Could not create Github issue for ${title}`);
+      }
+    } else if (existingIssue.state === 'closed') {
+      await octokit.rest.issues.update({
+        ...commonParams,
+        issue_number: existingIssue.number,
+        state: ISSUE_STATE_OPEN,
+      });
+      await addCommentToIssue({
+        ...commonParams,
+        issue_number: existingIssue.number,
+        body: comment,
+      });
     }
-  } else if (existingIssue.state === 'closed') {
-    await octokit.rest.issues.update({
-      ...commonParams,
-      issue_number: existingIssue.number,
-      state: ISSUE_STATE_OPEN,
-    });
-    await addCommentToIssue({
-      ...commonParams,
-      issue_number: existingIssue.number,
-      body: comment,
-    });
+    return existingIssue;
+  } catch (e) {
+    logger.error('Could not create issue', e.toString());
   }
-
-  return existingIssue;
 };
 
 export const closeIssueIfExists = async ({ title, comment }) => {
