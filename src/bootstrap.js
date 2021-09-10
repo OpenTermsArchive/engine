@@ -10,10 +10,12 @@ process.on('uncaughtException', (err) => {
   if (Object.keys(err).includes('smtp')) {
     console.error(
       'This is an smtp error that we do not know how to handle in winston but do not want to track'
-    ); // eslint-disable-line
+    );
     console.error(
       'We do not use logger.error here because it would potentially retry to send the error by email'
-    ); // eslint-disable-line
+    );
+  } else if (Object.keys(err).includes('HttpError: API rate limit exceeded for user ID')) {
+    console.error(Object.keys(err));
   } else {
     logger.error(`uncaughtException ${err}`);
     logger.error(Object.keys(err));
