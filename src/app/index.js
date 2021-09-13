@@ -175,8 +175,8 @@ export default class CGUs extends events.EventEmitter {
       cssSelectors: documentDeclaration.getCssSelectors(),
       headers,
     });
-
     await github.closeIssueIfExists({
+      labels: ['fix-document'],
       title: `Fix ${service.id} - ${type}`,
       comment: `🤖 Closed automatically as data was gathered successfully`,
     });

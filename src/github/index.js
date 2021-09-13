@@ -39,19 +39,41 @@ export const createIssue = async (params) => {
   }
 };
 
-export const searchIssue = async (params) => {
+const cachedIssues = {};
+
+export const searchIssue = async ({ title, q, ...params }) => {
   if (!isEnabled) {
     return;
   }
   try {
-    const { data } = await octokit.rest.search.issuesAndPullRequests(params);
+    const qOnRepo = `${q} repo:${params.owner}/${params.repo}`;
 
+    if (
+      !cachedIssues[qOnRepo] ||
+      (cachedIssues[qOnRepo].lastUpdated &&
+        new Date().getTime() - cachedIssues[qOnRepo].lastUpdated > 1000 * 60 * 30) // cache is more than 30 minutes
+    ) {
+      // TODO add pagination to be sure to get all items
+      const { data, headers } = await octokit.rest.search.issuesAndPullRequests({
+        ...params,
+        q: qOnRepo,
+        per_page: 100,
+      });
+      cachedIssues[qOnRepo] = {
+        lastUpdatedAt: new Date().getTime(),
+        items: data.items,
+      };
+
+      logger.info(`x-ratelimit-remaining: ${headers['x-ratelimit-remaining']}`);
+    }
+    const items = cachedIssues[qOnRepo].items || [];
     // baseUrl should be the way to go instead of this ugly filter
     // that may not work in case there are too many issues
     // but it goes with a 404 using octokit
     // baseUrl: `https://api.github.com/${GITHUB_OTA_OWNER}/${GITHUB_OTA_REPO}`,
-    return ((data && data.items) || []).filter((item) =>
-      item.repository_url.endsWith(`${params.owner}/${params.repo}`)
+    return items.filter(
+      (item) =>
+        item.repository_url.endsWith(`${params.owner}/${params.repo}`) && item.title === title
     )[0];
   } catch (e) {
     logger.error('Could not search issue');
@@ -81,9 +103,8 @@ export const createIssueIfNotExist = async ({ title, body, labels, comment }) =>
   try {
     let existingIssue = await searchIssue({
       ...commonParams,
-      // baseUrl should be the way to go but it goes with a 404 using octokit
-      // baseUrl: `https://api.github.com/${GITHUB_OTA_OWNER}/${GITHUB_OTA_REPO}`,
-      q: `is:issue "${title}"`,
+      title,
+      q: `is:issue label:${labels.join(',')}`,
     });
 
     if (!existingIssue) {
@@ -116,26 +137,23 @@ export const createIssueIfNotExist = async ({ title, body, labels, comment }) =>
   }
 };
 
-export const closeIssueIfExists = async ({ title, comment }) => {
+export const closeIssueIfExists = async ({ title, comment, labels }) => {
   if (!isEnabled) {
     return;
   }
 
   let existingIssue = await searchIssue({
     ...commonParams,
-    // baseUrl should be the way to go but it goes with a 404 using octokit
-    // baseUrl: `https://api.github.com/${GITHUB_OTA_OWNER}/${GITHUB_OTA_REPO}`,
-    q: `is:issue is:${ISSUE_STATE_OPEN} "${title}"`,
+    title,
+    q: `is:issue is:${ISSUE_STATE_OPEN} label:${labels.join(',')}`,
   });
 
   if (existingIssue) {
-    logger.info(`🤖 `);
     await octokit.rest.issues.update({
       ...commonParams,
       issue_number: existingIssue.number,
       state: ISSUE_STATE_CLOSED,
     });
-    logger.info(`🤖 `);
     await addCommentToIssue({
       ...commonParams,
       issue_number: existingIssue.number,
