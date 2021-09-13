@@ -1,8 +1,14 @@
 import { Octokit } from 'octokit';
+import fs from 'fs';
 import logger from '../logger/index.js';
+
+const { version } = JSON.parse(
+  fs.readFileSync(new URL('../../package.json', import.meta.url)).toString()
+);
+
 const octokit = new Octokit({
   auth: process.env.GITHUB_TOKEN_CREATE_ISSUE,
-  userAgent: `opentermsarchive`,
+  userAgent: `opentermsarchive/${version}`,
 });
 const GITHUB_OTA_OWNER = process.env.GITHUB_OTA_OWNER || '';
 const GITHUB_OTA_REPO = process.env.GITHUB_OTA_REPO || '';
