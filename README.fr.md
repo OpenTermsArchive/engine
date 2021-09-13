@@ -53,13 +53,27 @@ Cliquez sur une modification pour voir en quoi elle consiste (par exemple [celle
 
 ### Par courriel
 
+#### Document par document
+
+You can go on the official front website [opentermsarchive.org](https://opentermsarchive.org). From there, you can select a service and then the corresponding document type.
+After you enter your email and click on subscribe, we will add your email to the correspondning mailing list in send in blue and will not sore your email anywhere else.
+Then, everytime a modification is found on the correspondning document, we will send you an email.
+
+You can unsubscribe at any moment by clicking on the `unsubscribe` link at the bottom of the received email.
+
+#### Pour tous les documents d'un coup
+
 Vous pouvez [vous abonner](https://59692a77.sibforms.com/serve/MUIEAKuTv3y67e27PkjAiw7UkHCn0qVrcD188cQb-ofHVBGpvdUWQ6EraZ5AIb6vJqz3L8LDvYhEzPb2SE6eGWP35zXrpwEFVJCpGuER9DKPBUrifKScpF_ENMqwE_OiOZ3FdCV2ra-TXQNxB2sTEL13Zj8HU7U0vbbeF7TnbFiW8gGbcOa5liqmMvw_rghnEB2htMQRCk6A3eyj) pour recevoir un courriel à chaque modification d'un document dans l'ensemble de la base.
 
-**Attention, ce service est en version bêta et vous risquez de recevoir de nombreuses notifications !** Vous pourrez vous désabonner en répondant à n'importe quel courriel reçu.
+**Attention, vous risquez de recevoir de nombreuses notifications !** Vous pourrez vous désabonner en répondant à n'importe quel courriel reçu.
 
 #### Recevoir les mises à jour de services ou documents spécifiques
 
-Pour recevoir les mises à jour de services ou documents spécifiques par courriel, vous pouvez utiliser les instructions de notification [par RSS](#par-rss) et mettre en place un service tiers comme [FeedRabbit](https://feedrabbit.com/) pour vous envoyer un courriel à chaque changement.
+Vous pouvez vous rendre sur le site officiel [opentermsarchive.org] (https://opentermsarchive.org). De là, vous pouvez sélectionner un service, puis le type de document correspondant.
+Après avoir entré votre adresse électronique et cliqué sur "S'inscrire", nous ajouterons votre adresse à la liste de diffusion correspondante dans [SendInBlue](https://www.sendinblue.com/) et nous ne la conserverons nulle part ailleurs.
+Ensuite, chaque fois qu'une modification sera trouvée sur le document correspondant, nous vous enverrons un e-mail.
+
+Vous pouvez vous désinscrire à tout moment en cliquant sur le lien "désinscription" en bas de l'email reçu.
 
 ### Par RSS
 
