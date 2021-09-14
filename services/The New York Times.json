@@ -4,11 +4,13 @@
   "documents": {
     "Privacy Policy": {
       "fetch": "https://www.nytimes.com/privacy/privacy-policy",
-      "select": "div.css-15slb7"
+      "select": "div.css-15slb7",
+      "executeClientScripts": true
     },
     "Terms of Service": {
       "fetch": "https://help.nytimes.com/hc/en-us/articles/115014893428-Terms-of-service",
-      "select": "div.article-body"
+      "select": "div.article-body",
+      "executeClientScripts": true
     }
   }
 }
