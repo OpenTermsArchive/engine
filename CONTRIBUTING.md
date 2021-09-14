@@ -222,6 +222,9 @@ export function removeImages(document, { select: selector }) {
 
 You can find examples of filters in [`/services/*.filters.js`](./services) files.
 
+Also, filters used on may services has been extracted for better reusability in `services/_common.filters.js`.
+You can use them in your filters file with `export { removeSIDfromUrls } from './_common.filters.js';`
+
 You can also learn more about [usual noise](https://github.com/ambanum/OpenTermsArchive/wiki/Usual-noise) and ways to handle it on the wiki, and share your own learnings there.
 
 ### `headers`
