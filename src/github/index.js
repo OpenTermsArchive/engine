@@ -53,7 +53,7 @@ export const searchIssue = async ({ title, q, ...params }) => {
       (cachedIssues[qOnRepo].lastUpdated &&
         new Date().getTime() - cachedIssues[qOnRepo].lastUpdated > 1000 * 60 * 30) // cache is more than 30 minutes
     ) {
-      const nbPerPage = 10;
+      const nbPerPage = 100;
       const request = {
         ...params,
         q: qOnRepo,
