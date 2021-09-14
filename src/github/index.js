@@ -22,7 +22,7 @@ const commonParams = {
   accept: 'application/vnd.github.v3+json',
 };
 
-export const isEnabled = !!process.env.GITHUB_TOKEN_CREATE_ISSUE;
+export const isEnabled = !!process.env.GITHUB_TOKEN_CREATE_ISSUE && process.env.NODE_ENV !== 'test';
 
 export const createIssue = async (params) => {
   if (!isEnabled) {
@@ -53,18 +53,46 @@ export const searchIssue = async ({ title, q, ...params }) => {
       (cachedIssues[qOnRepo].lastUpdated &&
         new Date().getTime() - cachedIssues[qOnRepo].lastUpdated > 1000 * 60 * 30) // cache is more than 30 minutes
     ) {
-      // TODO add pagination to be sure to get all items
-      const { data, headers } = await octokit.rest.search.issuesAndPullRequests({
+      const nbPerPage = 10;
+      const request = {
         ...params,
         q: qOnRepo,
-        per_page: 100,
-      });
-      cachedIssues[qOnRepo] = {
-        lastUpdatedAt: new Date().getTime(),
-        items: data.items,
+        per_page: nbPerPage,
+        page: 1,
       };
 
-      logger.info(`x-ratelimit-remaining: ${headers['x-ratelimit-remaining']}`);
+      const { data, headers } = await octokit.rest.search.issuesAndPullRequests(request);
+      logger.info(`Page 1: ${qOnRepo} (Left: ${headers['x-ratelimit-remaining']})`);
+      let foundItems = data.items;
+      // we need to do this because error being asynchronous, if we do not and wait for
+      // subsequent pages to be fetch, we could end up in a situation when
+      // a new error comes in and fetches also the first page as cache is not setup yet
+      cachedIssues[qOnRepo] = {
+        lastUpdatedAt: new Date().getTime(),
+        items: foundItems,
+      };
+
+      const nbPages = Math.ceil(data.total_count / nbPerPage);
+      if (nbPages > 1) {
+        for (let page = 2; page <= nbPages; page++) {
+          const {
+            data: paginatedData,
+            headers: paginatedHeaders,
+          } = await octokit.rest.search.issuesAndPullRequests({
+            ...request,
+            page,
+          });
+          logger.info(
+            `Page ${page}: ${qOnRepo} (Left: ${paginatedHeaders['x-ratelimit-remaining']})`
+          );
+          foundItems = [...foundItems, ...paginatedData.items];
+        }
+      }
+
+      cachedIssues[qOnRepo] = {
+        lastUpdatedAt: new Date().getTime(),
+        items: foundItems,
+      };
     }
     const items = cachedIssues[qOnRepo].items || [];
     // baseUrl should be the way to go instead of this ugly filter
