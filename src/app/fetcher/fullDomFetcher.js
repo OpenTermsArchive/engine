@@ -32,7 +32,7 @@ export default async function fetch(url, cssSelectors, headers = {}) {
 
     const statusCode = response.status();
 
-    if (statusCode < 200 || statusCode >= 300) {
+    if (statusCode < 200 || (statusCode >= 300 && statusCode !== 304)) {
       throw new InaccessibleContentError(
         `Received HTTP code ${statusCode} when trying to fetch '${url}'`
       );
