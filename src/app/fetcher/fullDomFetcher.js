@@ -32,7 +32,7 @@ export default async function fetch(url, cssSelectors, headers = {}, { retry } =
     console.log(url, cssSelectors, headers); //eslint-disable-line
     console.log('╚════END════retry══════════════════════════════════════════════════'); //eslint-disable-line
 
-    if (retry !== 0) {
+    if (retry !== 0 && process.env.NODE_ENV !== 'test') {
       try {
         const randomProxy = await getRandomProxy();
         console.log(''); //eslint-disable-line
@@ -79,7 +79,8 @@ export default async function fetch(url, cssSelectors, headers = {}, { retry } =
       (error.message.includes('Received HTTP code 403') ||
         error.message.includes('TimeoutError') ||
         error.message.includes('Navigation timeout')) &&
-      retry !== 0
+      retry !== 0 &&
+      process.env.NODE_ENV !== 'test'
     ) {
       console.log('REFETCHING');
 
