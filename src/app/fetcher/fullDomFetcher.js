@@ -1,7 +1,9 @@
 import { InaccessibleContentError } from '../errors.js';
 import StealthPlugin from 'puppeteer-extra-plugin-stealth';
 import config from 'config';
+import { getRandomProxy } from './proxy.js';
 import puppeteer from 'puppeteer-extra';
+import useProxy from 'puppeteer-page-proxy';
 
 puppeteer.use(StealthPlugin());
 
@@ -22,7 +24,9 @@ export default async function fetch(url, cssSelectors, headers = {}) {
         args: ['--no-sandbox', '--disable-setuid-sandbox'],
       });
     }
+
     page = await browser.newPage();
+    await useProxy(page, await getRandomProxy());
     await page.setDefaultNavigationTimeout(PUPPETEER_TIMEOUT);
 
     response = await page.goto(url, { waitUntil: 'networkidle0' });
