@@ -49,7 +49,7 @@ const schedule = args.includes('--schedule');
   serviceIds = serviceIds.sort((a, b) => a.localeCompare(b));
 
   logger.info(`👇 Refiltering ${numberOfDocuments} documents from ${serviceIds.length} services…`);
-  await app.refilterAndRecord(serviceIds);
+  // await app.refilterAndRecord(serviceIds);
   logger.info(`👆 Refiltered ${numberOfDocuments} documents from ${serviceIds.length} services.\n`);
 
   if (refilterOnly) {
@@ -63,7 +63,8 @@ const schedule = args.includes('--schedule');
   logger.info(
     `👇 Start tracking changes of ${numberOfDocuments} documents from ${serviceIds.length} services…`
   );
-  await app.trackChanges(serviceIds);
+  const onlyServiceIds = ['Coinbase'];
+  await app.trackChanges(onlyServiceIds);
   logger.info(
     `👆 Tracked changes of ${numberOfDocuments} documents from ${serviceIds.length} services.`
   );
