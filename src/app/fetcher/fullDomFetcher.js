@@ -1,5 +1,6 @@
 import { InaccessibleContentError } from '../errors.js';
 import StealthPlugin from 'puppeteer-extra-plugin-stealth';
+import UserAgent from 'user-agents';
 import config from 'config';
 import { getRandomProxy } from './proxy.js';
 import logger from '../../logger/index.js';
@@ -25,8 +26,10 @@ export default async function fetch(url, cssSelectors, headers = {}, { retry } =
         args: ['--no-sandbox', '--disable-setuid-sandbox'],
       });
     }
+    const userAgent = new UserAgent();
 
     page = await browser.newPage();
+    await page.setUserAgent(userAgent.toString());
 
     if (retry > 0 && process.env.NODE_ENV !== 'test') {
       try {
