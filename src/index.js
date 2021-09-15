@@ -63,7 +63,16 @@ const schedule = args.includes('--schedule');
   logger.info(
     `👇 Start tracking changes of ${numberOfDocuments} documents from ${serviceIds.length} services…`
   );
-  const onlyServiceIds = ['Coinbase'];
+  const onlyServiceIds = [
+    'Shockwave.com',
+    'The New York Times',
+    'Sonic.net',
+    'Rakuten',
+    'Taboola',
+    'World Market',
+    'Xfinity',
+    'Coinbase',
+  ];
   await app.trackChanges(onlyServiceIds);
   logger.info(
     `👆 Tracked changes of ${numberOfDocuments} documents from ${serviceIds.length} services.`

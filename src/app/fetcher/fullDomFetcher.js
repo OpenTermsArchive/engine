@@ -11,7 +11,7 @@ const PUPPETEER_TIMEOUT = 60 * 1000; // 60s
 
 let browser;
 
-export default async function fetch(url, cssSelectors, headers = {}) {
+export default async function fetch(url, cssSelectors, headers = {}, { retry } = { retry: 3 }) {
   let response;
   let content;
   let page;
@@ -26,13 +26,32 @@ export default async function fetch(url, cssSelectors, headers = {}) {
     }
 
     page = await browser.newPage();
-    await useProxy(page, await getRandomProxy());
+    console.log(''); //eslint-disable-line
+    console.log('╔════START══retry══════════════════════════════════════════════════'); //eslint-disable-line
+    console.log(retry); //eslint-disable-line
+    console.log(url, cssSelectors, headers); //eslint-disable-line
+    console.log('╚════END════retry══════════════════════════════════════════════════'); //eslint-disable-line
+
+    if (retry !== 0) {
+      try {
+        const randomProxy = await getRandomProxy();
+        console.log(''); //eslint-disable-line
+        console.log('╔════START════════════════════════════════════════════════════'); //eslint-disable-line
+        console.log(randomProxy); //eslint-disable-line
+        console.log('╚════END══════════════════════════════════════════════════════'); //eslint-disable-line
+
+        await useProxy(page, randomProxy);
+      } catch (e) {
+        console.error('Could not use proxy');
+      }
+    }
     await page.setDefaultNavigationTimeout(PUPPETEER_TIMEOUT);
 
-    response = await page.goto(url, { waitUntil: 'networkidle0' });
     await page.setExtraHTTPHeaders({
       ...headers,
     });
+
+    response = await page.goto(url, { waitUntil: 'networkidle0' });
 
     const statusCode = response.status();
 
@@ -50,6 +69,29 @@ export default async function fetch(url, cssSelectors, headers = {}) {
 
     content = await page.content();
   } catch (error) {
+    console.log(''); //eslint-disable-line
+    console.log('╔════START══error══════════════════════════════════════════════════'); //eslint-disable-line
+    console.log(url); //eslint-disable-line
+    console.log(error); //eslint-disable-line
+    console.log(error.message); //eslint-disable-line
+    console.log('╚════END════error══════════════════════════════════════════════════'); //eslint-disable-line
+    if (
+      (error.message.includes('Received HTTP code 403') ||
+        error.message.includes('TimeoutError') ||
+        error.message.includes('Navigation timeout')) &&
+      retry !== 0
+    ) {
+      console.log('REFETCHING');
+
+      return fetch(url, cssSelectors, headers, { retry: retry - 1 });
+    }
+    console.log(''); //eslint-disable-line
+    console.log('╔════START══error═after═════════════════════════════════════════════════'); //eslint-disable-line
+    console.log(url); //eslint-disable-line
+    console.log(error); //eslint-disable-line
+    console.log(error.message); //eslint-disable-line
+    console.log('╚════END════error══════════════════════════════════════════════════'); //eslint-disable-line
+
     if (
       (error.code && error.code.match(/^(EAI_AGAIN|ENOTFOUND|ETIMEDOUT|ECONNRESET)$/)) ||
       (error.message &&
