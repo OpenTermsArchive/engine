@@ -35,11 +35,6 @@ export default async function fetch(url, cssSelectors, headers = {}, { retry } =
     if (retry !== 0 && process.env.NODE_ENV !== 'test') {
       try {
         const randomProxy = await getRandomProxy();
-        console.log(''); //eslint-disable-line
-        console.log('╔════START════════════════════════════════════════════════════'); //eslint-disable-line
-        console.log(randomProxy); //eslint-disable-line
-        console.log('╚════END══════════════════════════════════════════════════════'); //eslint-disable-line
-
         await useProxy(page, randomProxy);
       } catch (e) {
         console.error('Could not use proxy');
@@ -77,14 +72,14 @@ export default async function fetch(url, cssSelectors, headers = {}, { retry } =
     console.log('╚════END════error══════════════════════════════════════════════════'); //eslint-disable-line
     if (
       (error.message.includes('Received HTTP code 403') ||
-        error.message.includes('TimeoutError') ||
+        error.message.includes('Received HTTP code 404') ||
         error.message.includes('Navigation timeout')) &&
       retry !== 0 &&
       process.env.NODE_ENV !== 'test'
     ) {
       console.log('REFETCHING');
 
-      return fetch(url, cssSelectors, headers, { retry: retry - 1 });
+      return await fetch(url, cssSelectors, headers, { retry: retry - 1 });
     }
     console.log(''); //eslint-disable-line
     console.log('╔════START══error═after═════════════════════════════════════════════════'); //eslint-disable-line

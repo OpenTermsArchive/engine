@@ -168,6 +168,11 @@ export default class CGUs extends events.EventEmitter {
       noiseSelectors,
       type,
     } = documentDeclaration;
+    console.log(''); //eslint-disable-line
+    console.log(
+      '╔════START══════trackDocumentChanges══════════════════════════════════════════════'
+    ); //eslint-disable-line
+    console.log(); //eslint-disable-line
 
     const { mimeType, content } = await fetch({
       url: location,
@@ -175,6 +180,9 @@ export default class CGUs extends events.EventEmitter {
       cssSelectors: documentDeclaration.getCssSelectors(),
       headers,
     });
+    console.log(
+      '╚════END════trackDocumentChanges═══════════════════════════════════════════════════'
+    ); //eslint-disable-line
     await github.closeIssueIfExists({
       labels: ['fix-document'],
       title: `Fix ${service.id} - ${type}`,
