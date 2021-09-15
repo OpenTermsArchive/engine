@@ -41,7 +41,7 @@ export const createIssue = async (params) => {
 
 const cachedIssues = {};
 
-export const searchIssue = async ({ title, q, ...params }) => {
+export const searchIssues = async ({ title, q, ...params }) => {
   if (!isEnabled) {
     return;
   }
@@ -102,7 +102,7 @@ export const searchIssue = async ({ title, q, ...params }) => {
     return items.filter(
       (item) =>
         item.repository_url.endsWith(`${params.owner}/${params.repo}`) && item.title === title
-    )[0];
+    );
   } catch (e) {
     logger.error('Could not search issue');
     logger.error(e.toString());
@@ -129,14 +129,14 @@ export const createIssueIfNotExist = async ({ title, body, labels, comment }) =>
     return;
   }
   try {
-    let existingIssue = await searchIssue({
+    let existingIssues = await searchIssues({
       ...commonParams,
       title,
       q: `is:issue label:${labels.join(',')}`,
     });
 
-    if (!existingIssue) {
-      existingIssue = await createIssue({
+    if (!existingIssues[0]) {
+      const existingIssue = await createIssue({
         ...commonParams,
         title,
         body,
@@ -147,19 +147,30 @@ export const createIssueIfNotExist = async ({ title, body, labels, comment }) =>
       } else {
         logger.error(`🤖 Could not create Github issue for ${title}`);
       }
-    } else if (existingIssue.state === 'closed') {
-      await octokit.rest.issues.update({
-        ...commonParams,
-        issue_number: existingIssue.number,
-        state: ISSUE_STATE_OPEN,
-      });
-      await addCommentToIssue({
-        ...commonParams,
-        issue_number: existingIssue.number,
-        body: comment,
-      });
+      return existingIssue;
     }
-    return existingIssue;
+    const openedIssues = existingIssues.filter(
+      (existingIssue) => existingIssue.state === ISSUE_STATE_OPEN
+    );
+
+    const hasNoneOpened = openedIssues === 0;
+
+    for (const existingIssue of existingIssues) {
+      if (hasNoneOpened) {
+        await octokit.rest.issues.update({
+          ...commonParams,
+          issue_number: existingIssue.number,
+          state: ISSUE_STATE_OPEN,
+        });
+        await addCommentToIssue({
+          ...commonParams,
+          issue_number: existingIssue.number,
+          body: comment,
+        });
+        break;
+      }
+    }
+    return existingIssues;
   } catch (e) {
     logger.error('Could not create issue', e.toString());
   }
@@ -170,25 +181,27 @@ export const closeIssueIfExists = async ({ title, comment, labels }) => {
     return;
   }
 
-  let existingIssue = await searchIssue({
+  let existingIssues = await searchIssues({
     ...commonParams,
     title,
     q: `is:issue is:${ISSUE_STATE_OPEN} label:${labels.join(',')}`,
   });
 
-  if (existingIssue) {
-    await octokit.rest.issues.update({
-      ...commonParams,
-      issue_number: existingIssue.number,
-      state: ISSUE_STATE_CLOSED,
-    });
-    await addCommentToIssue({
-      ...commonParams,
-      issue_number: existingIssue.number,
-      body: comment,
-    });
-    logger.info(`🤖 Github issue closed for ${title}: ${existingIssue.html_url}`);
+  if (existingIssues) {
+    for (const existingIssue of existingIssues) {
+      await octokit.rest.issues.update({
+        ...commonParams,
+        issue_number: existingIssue.number,
+        state: ISSUE_STATE_CLOSED,
+      });
+      await addCommentToIssue({
+        ...commonParams,
+        issue_number: existingIssue.number,
+        body: comment,
+      });
+      logger.info(`🤖 Github issue closed for ${title}: ${existingIssue.html_url}`);
+    }
   }
 
-  return existingIssue;
+  return existingIssues;
 };
