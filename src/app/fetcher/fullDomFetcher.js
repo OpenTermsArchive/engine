@@ -82,7 +82,7 @@ export default async function fetch(url, cssSelectors, headers = {}, { retry } =
     if (
       (error.code && error.code.match(/^(EAI_AGAIN|ENOTFOUND|ETIMEDOUT|ECONNRESET)$/)) ||
       (error.message &&
-        error.message.match(/(ERR_TUNNEL_CONNECTION_FAILED|ERR_NAME_NOT_RESOLVED)/)) ||
+        error.message.match(/(ERR_FAILED|ERR_TUNNEL_CONNECTION_FAILED|ERR_NAME_NOT_RESOLVED)/)) ||
       error instanceof puppeteer.pptr.errors.TimeoutError // Expected elements are not present on the web page
     ) {
       throw new InaccessibleContentError(error.message);

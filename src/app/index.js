@@ -168,27 +168,17 @@ export default class CGUs extends events.EventEmitter {
       noiseSelectors,
       type,
     } = documentDeclaration;
-    console.log(''); //eslint-disable-line
-    console.log(
-      '╔════START══════trackDocumentChanges══════════════════════════════════════════════'
-    ); //eslint-disable-line
-    console.log(); //eslint-disable-line
-
     const { mimeType, content } = await fetch({
       url: location,
       executeClientScripts,
       cssSelectors: documentDeclaration.getCssSelectors(),
       headers,
     });
-    console.log('Closing issue if exists', `Fix ${service.id} - ${type}`);
     await github.closeIssueIfExists({
       labels: ['fix-document'],
       title: `Fix ${service.id} - ${type}`,
       comment: `🤖 Closed automatically as data was gathered successfully`,
     });
-    console.log(
-      '╚════END════trackDocumentChanges═══════════════════════════════════════════════════'
-    ); //eslint-disable-line
 
     if (!content) {
       return;
