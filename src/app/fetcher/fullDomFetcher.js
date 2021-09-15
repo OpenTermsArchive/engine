@@ -8,10 +8,10 @@ import useProxy from 'puppeteer-page-proxy';
 puppeteer.use(StealthPlugin());
 
 const PUPPETEER_TIMEOUT = 60 * 1000; // 60s
-
+const MAX_RETRIES = 3;
 let browser;
 
-export default async function fetch(url, cssSelectors, headers = {}, { retry } = { retry: 3 }) {
+export default async function fetch(url, cssSelectors, headers = {}, { retry } = { retry: 0 }) {
   let response;
   let content;
   let page;
@@ -26,16 +26,12 @@ export default async function fetch(url, cssSelectors, headers = {}, { retry } =
     }
 
     page = await browser.newPage();
-    console.log(''); //eslint-disable-line
-    console.log('╔════START══retry══════════════════════════════════════════════════'); //eslint-disable-line
-    console.log(retry); //eslint-disable-line
-    console.log(url, cssSelectors, headers); //eslint-disable-line
-    console.log('╚════END════retry══════════════════════════════════════════════════'); //eslint-disable-line
 
-    if (retry !== 0 && process.env.NODE_ENV !== 'test') {
+    if (retry > 0 && process.env.NODE_ENV !== 'test') {
       try {
         const randomProxy = await getRandomProxy();
         await useProxy(page, randomProxy);
+        console.log(`Retry ${retry} with proxy ${randomProxy} for url ${url}`);
       } catch (e) {
         console.error('Could not use proxy');
       }
@@ -47,6 +43,13 @@ export default async function fetch(url, cssSelectors, headers = {}, { retry } =
     });
 
     response = await page.goto(url, { waitUntil: 'networkidle0' });
+
+    if (!response) {
+      if (retry === MAX_RETRIES) {
+        throw new InaccessibleContentError(`Response is empty when trying to fetch '${url}'`);
+      }
+      return await fetch(url, cssSelectors, headers, { retry: retry + 1 });
+    }
 
     const statusCode = response.status();
 
@@ -64,29 +67,17 @@ export default async function fetch(url, cssSelectors, headers = {}, { retry } =
 
     content = await page.content();
   } catch (error) {
-    console.log(''); //eslint-disable-line
-    console.log('╔════START══error══════════════════════════════════════════════════'); //eslint-disable-line
-    console.log(url); //eslint-disable-line
-    console.log(error); //eslint-disable-line
-    console.log(error.message); //eslint-disable-line
-    console.log('╚════END════error══════════════════════════════════════════════════'); //eslint-disable-line
     if (
       (error.message.includes('Received HTTP code 403') ||
         error.message.includes('Received HTTP code 404') ||
         error.message.includes('Navigation timeout')) &&
-      retry !== 0 &&
+      retry < MAX_RETRIES &&
       process.env.NODE_ENV !== 'test'
     ) {
-      console.log('REFETCHING');
+      console.warn(`Error ${error.message} on url ${url}, retrying again ${retry + 1} times`);
 
-      return await fetch(url, cssSelectors, headers, { retry: retry - 1 });
+      return await fetch(url, cssSelectors, headers, { retry: retry + 1 });
     }
-    console.log(''); //eslint-disable-line
-    console.log('╔════START══error═after═════════════════════════════════════════════════'); //eslint-disable-line
-    console.log(url); //eslint-disable-line
-    console.log(error); //eslint-disable-line
-    console.log(error.message); //eslint-disable-line
-    console.log('╚════END════error══════════════════════════════════════════════════'); //eslint-disable-line
 
     if (
       (error.code && error.code.match(/^(EAI_AGAIN|ENOTFOUND|ETIMEDOUT|ECONNRESET)$/)) ||

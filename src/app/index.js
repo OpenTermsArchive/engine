@@ -180,14 +180,15 @@ export default class CGUs extends events.EventEmitter {
       cssSelectors: documentDeclaration.getCssSelectors(),
       headers,
     });
-    console.log(
-      '╚════END════trackDocumentChanges═══════════════════════════════════════════════════'
-    ); //eslint-disable-line
+    console.log('Closing issue if exists', `Fix ${service.id} - ${type}`);
     await github.closeIssueIfExists({
       labels: ['fix-document'],
       title: `Fix ${service.id} - ${type}`,
       comment: `🤖 Closed automatically as data was gathered successfully`,
     });
+    console.log(
+      '╚════END════trackDocumentChanges═══════════════════════════════════════════════════'
+    ); //eslint-disable-line
 
     if (!content) {
       return;
