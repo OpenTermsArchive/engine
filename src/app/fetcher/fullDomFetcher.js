@@ -8,7 +8,7 @@ import useProxy from 'puppeteer-page-proxy';
 
 puppeteer.use(StealthPlugin());
 
-const PUPPETEER_TIMEOUT = 60 * 1000; // 60s
+const PUPPETEER_TIMEOUT = 30 * 1000; // 30s
 const MAX_RETRIES = 3;
 let browser;
 
