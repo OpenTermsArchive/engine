@@ -1,0 +1,12 @@
+{
+  "name": "NOYB",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://noyb.eu/en/legal",
+      "select": {
+        "startBefore": "#privacy",
+        "endBefore": "#copyright"
+      }
+    }
+  }
+}
