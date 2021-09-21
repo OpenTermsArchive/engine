@@ -1,0 +1,13 @@
+{
+  "name": "Bitwarden",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://bitwarden.com/terms/",
+      "select": ["main>.chakra-container"]
+    },
+    "Privacy Policy": {
+      "fetch": "https://bitwarden.com/privacy/",
+      "select": ["main>.chakra-container"]
+    }
+  }
+}
