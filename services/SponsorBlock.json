@@ -1,0 +1,9 @@
+{
+  "name": "SponsorBlock",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://gist.github.com/ajayyy/aa9f8ded2b573d4f73a3ffa0ef74f796",
+      "select": ["#file-sponsorblock-privacy-policy-md-readme"]
+    }
+  }
+}
