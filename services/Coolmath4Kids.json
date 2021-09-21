@@ -1,0 +1,13 @@
+{
+  "name": "Coolmath4Kids",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.coolmath4kids.com/privacy-policy",
+      "select": ["#content"]
+    },
+    "Copyright Claims Policy": {
+      "fetch": "https://www.coolmath4kids.com/fairuse",
+      "select": ["#content"]
+    }
+  }
+}
