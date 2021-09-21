@@ -1,0 +1,13 @@
+{
+  "name": "Jacksfilms",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://jacksfilms.shop/policies/terms-of-service",
+      "select": ["#content > .container"]
+    },
+    "Privacy Policy": {
+      "fetch": "https://jacksfilms.shop/policies/privacy-policy",
+      "select": ["#content > .container"]
+    }
+  }
+}
