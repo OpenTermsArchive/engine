@@ -34,6 +34,11 @@
     "Live Policy": {
       "fetch": "https://en-gb.facebook.com/policies/live",
       "select": "#content"
+    },
+    "Law Enforcement Guidelines": {
+      "fetch": "https://www.facebook.com/safety/groups/law/guidelines",
+      "select": ["._4xy4 > div"],
+      "remove": [".img"]
     }
   }
 }
