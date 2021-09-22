@@ -1,0 +1,20 @@
+{
+  "name": "Kraken",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://www.kraken.com/en-us/legal#complete-tos",
+      "select": {
+        "startBefore": "#complete-tos",
+        "endBefore": "#margin-disclosure-statement"
+      }
+    },
+    "Privacy Policy": {
+      "fetch": "https://www.kraken.com/en-us/legal/privacy",
+      "select": [".kraken-article-body"]
+    },
+    "Trackers Policy": {
+      "fetch": "https://www.kraken.com/en-us/legal/cookies",
+      "select": [".kraken-article-body"]
+    }
+  }
+}
