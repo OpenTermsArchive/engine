@@ -16,7 +16,8 @@
     "Ad Publishing Policy": {
       "fetch": "https://help.taboola.com/hc/en-us/articles/115007068368-Prohibited-Content-Products-and-Services",
       "select": [".article"],
-      "remove": [".avatar,.article-meta,.article-subscribe,.article-votes,.article-relatives"]
+      "remove": [".avatar,.article-meta,.article-subscribe,.article-votes,.article-relatives"],
+      "executeClientScripts": true
     }
   }
 }
