@@ -15,7 +15,7 @@
       "select": "article.devsite-article"
     },
     "Review Guidelines": {
-      "fetch": "https://support.google.com/googleplay/android-developer/answer/10477564?hl=en-IE",
+      "fetch": "https://support.google.com/googleplay/android-developer/answer/11044265?hl=en-IE",
       "select": "article.page",
       "remove": [".scClientFeedbackInlineFeedbacklinkroot", ".article-survey-container"]
     }
