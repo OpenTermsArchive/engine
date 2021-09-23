@@ -12,7 +12,8 @@
     "Privacy Policy": {
       "fetch": "https://www.xfinity.com/privacy/policy",
       "select": ".hero__content .x-display3, .privacy-copy__container",
-      "remove": "#pdf--language"
+      "remove": "#pdf--language",
+      "executeClientScripts": true
     },
     "Acceptable Use Policy": {
       "fetch": "https://www.xfinity.com/Corporate/Customers/Policies/HighSpeedInternetAUP",
