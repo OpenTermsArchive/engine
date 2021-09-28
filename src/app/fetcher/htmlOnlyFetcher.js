@@ -23,13 +23,14 @@ export default async function fetch(url, { headers = {} } = {}) {
   options.headers = { 'Accept-Language': LANGUAGE, ...headers };
 
   let response;
-
   try {
     response = await nodeFetch(url, options);
   } catch (error) {
     if (
       error.code &&
-      error.code.match(/^(EAI_AGAIN|ENOTFOUND|ETIMEDOUT|ECONNRESET|CERT_HAS_EXPIRED)$/)
+      error.code.match(
+        /^(EAI_AGAIN|ENOTFOUND|ETIMEDOUT|ECONNRESET|CERT_HAS_EXPIRED|ERR_INVALID_PROTOCOL)$/
+      )
     ) {
       throw new InaccessibleContentError(error.message);
     }
