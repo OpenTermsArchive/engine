@@ -1,0 +1,20 @@
+{
+  "name": "Wire",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://wire.com/en/legal/#privacy",
+      "select": [".css-1s3xlz6 + .css-175adb5"],
+      "executeClientScripts": true
+    },
+    "Terms of service": {
+      "fetch": "https://wire.com/en/legal/#terms",
+      "select": [".css-1s3xlz6 + .css-175adb5"],
+      "executeClientScripts": true
+    },
+    "Data Processor Agreement": {
+      "fetch": "https://wire.com/en/legal/#dpa",
+      "select": [".css-1s3xlz6 + .css-175adb5"],
+      "executeClientScripts": true
+    }
+  }
+}
