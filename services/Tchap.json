@@ -1,0 +1,16 @@
+{
+  "name": "Tchap",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.tchap.gouv.fr/faq/#_Toc4344724_04",
+      "select": {
+        "startBefore": "#_Toc4344721",
+        "endBefore": "#_Toc4344722"
+      }
+    },
+    "Terms of Service": {
+      "fetch": "https://www.tchap.gouv.fr/cgu/",
+      "select": ["body"]
+    }
+  }
+}
