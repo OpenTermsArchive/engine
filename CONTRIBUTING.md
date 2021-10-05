@@ -23,6 +23,7 @@ First of all, thanks for taking the time to contribute! 🎉👍
     - [Document declaration history](#document-declaration-history)
     - [Filters history](#filters-history)
   - [Refiltering your documents](#refiltering-your-documents)
+- [Commits convention] (#commits-convention)
 
 # Tracking new documents
 
@@ -378,3 +379,10 @@ If you change filters or selectors and want to re-apply them on previously fetch
 ```
 npm run refilter [$service_id]
 ```
+
+# Commits convention
+
+We use [Conventional Commits](https://www.conventionalcommits.org/) (`feat:` `fix:` `chore:` `docs:`...) with the following specificities:
+
+- `new-doc:` for additions of a new services or documents
+- `fix-doc:` for patches of documents
