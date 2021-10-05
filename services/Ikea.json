@@ -1,0 +1,20 @@
+{
+  "name": "Ikea",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.ikea.com/ie/en/customer-service/privacy-policy/",
+      "select": [".pub__page-container__main"],
+      "remove": [".bc-breadcrumb__list"]
+    },
+    "Trackers Policy": {
+      "fetch": "https://www.ikea.com/ie/en/customer-service/cookie-policy/",
+      "select": [".pub__page-container__main"],
+      "remove": [".bc-breadcrumb__list"]
+    },
+    "Terms of Service": {
+      "fetch": "https://www.ikea.com/ie/en/customer-service/terms-conditions/",
+      "select": [".pub__page-container__main"],
+      "remove": [".bc-breadcrumb__list"]
+    }
+  }
+}
