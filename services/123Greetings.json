@@ -4,7 +4,8 @@
   "documents": {
     "Privacy Policy": {
       "fetch": "http://info.123greetings.com/company/privacy_policy.html",
-      "select": ".main_content"
+      "select": ["#main"],
+      "remove": [".breadcrumb"]
     }
   }
 }
