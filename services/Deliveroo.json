@@ -1,0 +1,17 @@
+{
+  "name": "Deliveroo",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://deliveroo.ie/legal",
+      "select": [".StaticPage-599770692c57b3b7"]
+    },
+    "Privacy Policy": {
+      "fetch": "https://deliveroo.ie/privacy",
+      "select": [".StaticPage-599770692c57b3b7"]
+    },
+    "Trackers Policy": {
+      "fetch": "https://deliveroo.ie/cookies",
+      "select": [".StaticPage-599770692c57b3b7"]
+    }
+  }
+}
