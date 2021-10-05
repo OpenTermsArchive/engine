@@ -6,7 +6,7 @@
       "select": [".css-1s3xlz6 + .css-175adb5"],
       "executeClientScripts": true
     },
-    "Terms of service": {
+    "Terms of Service": {
       "fetch": "https://wire.com/en/legal/#terms",
       "select": [".css-1s3xlz6 + .css-175adb5"],
       "executeClientScripts": true
