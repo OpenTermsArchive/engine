@@ -2,7 +2,7 @@
   "name": "Contrat Pro SNCF",
   "documents": {
     "Terms of Service": {
-      "fetch": "https://pro-adhesion.sncf.com/pme/pdf/Conditions-Generales-d_Utilisation-Contrat-Pro-SNCF.pdf"
+      "fetch": "https://medias.sncf.com/sncfcom/pdf/pro/CGU_Contrat-pro.pdf"
     }
   }
 }
