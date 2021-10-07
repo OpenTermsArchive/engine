@@ -1,0 +1,10 @@
+{
+  "name": "LinkedIn",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://www.linkedin.com/legal/privacy-policy",
+      "select": ["#component-container"],
+      "remove": [".callout > svg", ".expandable-section__header", ".banner__image-container "]
+    }
+  }
+}
