@@ -14,6 +14,15 @@
     "Terms of Service": {
       "fetch": "https://www.linkedin.com/legal/l/service-terms",
       "select": ["main"]
+    },
+    "Developer Terms": {
+      "fetch": "https://legal.linkedin.com/api-terms-of-use",
+      "select": ["#content"]
+    },
+    "Brand Guidelines": {
+      "fetch": "https://brand.linkedin.com/policies",
+      "select": ["#content"],
+      "remove": ["#banner-content-container-banner_1202100886"]
     }
   }
 }
