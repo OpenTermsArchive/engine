@@ -1,0 +1,13 @@
+{
+  "name": "Bolt Drivers",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://bolt.eu/en/legal/ie/terms-for-drivers/",
+      "select": [".document > .container"]
+    },
+    "Privacy Policy": {
+      "fetch": "https://bolt.eu/en/legal/ie/privacy-for-drivers/",
+      "select": [".document > .container"]
+    }
+  }
+}
