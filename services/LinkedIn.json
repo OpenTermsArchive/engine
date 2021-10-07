@@ -5,6 +5,15 @@
       "fetch": "https://www.linkedin.com/legal/privacy-policy",
       "select": ["#component-container"],
       "remove": [".callout > svg", ".expandable-section__header", ".banner__image-container "]
+    },
+    "Trackers Policy": {
+      "fetch": "https://www.linkedin.com/legal/cookie-policy",
+      "select": ["#component-container"],
+      "remove": [".callout > svg", ".expandable-section__header", ".banner__image-container "]
+    },
+    "Terms of Service": {
+      "fetch": "https://www.linkedin.com/legal/l/service-terms",
+      "select": ["main"]
     }
   }
 }
