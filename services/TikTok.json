@@ -9,11 +9,12 @@
       }
     },
     "Privacy Policy": {
-      "fetch": "https://www.tiktok.com/legal/privacy-policy?lang=en",
-      "select": {
-        "startBefore": "#privacy-eea",
-        "endBefore": "#privacy-row"
-      }
+      "fetch": "https://www.tiktok.com/legal/privacy-policy-eea?lang=en",
+      "select": "article",
+      "remove": [
+        ".language-selection",
+        "img[src=\"data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAiIGhlaWdodD0iMzAiIHZpZXdCb3g9IjAgMCAzMCAzMCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZmlsbC1ydWxlPSJldmVub2RkIiBjbGlwLXJ1bGU9ImV2ZW5vZGQiIGQ9Ik0xNC4xMTYxIDIwLjI1ODlMNS4xODMwNiAxMS4zMjU4QzQuOTM4OTggMTEuMDgxNyA0LjkzODk4IDEwLjY4NiA1LjE4MzA2IDEwLjQ0MTlMNi4wNjY5NCA5LjU1ODA2QzYuMzExMDIgOS4zMTM5OCA2LjcwNjc1IDkuMzEzOTggNi45NTA4MyA5LjU1ODA2TDE1IDE3LjYwNzJMMjMuMDQ5MiA5LjU1ODA2QzIzLjI5MzMgOS4zMTM5OCAyMy42ODkgOS4zMTM5OCAyMy45MzMxIDkuNTU4MDZMMjQuODE2OSAxMC40NDE5QzI1LjA2MSAxMC42ODYgMjUuMDYxIDExLjA4MTcgMjQuODE2OSAxMS4zMjU4TDE1Ljg4MzkgMjAuMjU4OUMxNS4zOTU3IDIwLjc0NyAxNC42MDQzIDIwLjc0NyAxNC4xMTYxIDIwLjI1ODlaIiBmaWxsPSJibGFjayIvPgo8L3N2Zz4K\"]"
+      ]
     },
     "Community Guidelines": {
       "fetch": "https://www.tiktok.com/community-guidelines?lang=en",

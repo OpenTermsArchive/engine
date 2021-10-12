@@ -1,0 +1,12 @@
+{
+  "Privacy Policy": [
+    {
+      "fetch": "https://www.tiktok.com/legal/privacy-policy?lang=en",
+      "select": {
+        "startBefore": "#privacy-eea",
+        "endBefore": "#privacy-row"
+      },
+      "validUntil": "2021-07-15T15:06:00.000Z"
+    }
+  ]
+}
