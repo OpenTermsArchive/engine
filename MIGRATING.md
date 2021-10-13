@@ -1,10 +1,8 @@
-First of all, thanks for taking the time to contribute! 🎉👍
-
 ## 2021-02-24 Name change
 
-`CGUs` thus has become a new project called `OpentermsArchive`
+`CGUs` is now called `OpenTermsArchive`.
 
-To reflect this change, if you already have this project on your local, go to the given folder and launch
+To reflect this change, if you already have this project on your local, go to the given folder and execute:
 
 ```
     cd ..
@@ -12,4 +10,3 @@ To reflect this change, if you already have this project on your local, go to th
     cd OpenTermsArchive
     git remote set-url origin https://github.com/ambanum/OpenTermsArchive.git
 ```
-
