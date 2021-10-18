@@ -1,6 +1,6 @@
 {
   "name": "OpenTermsArchive",
-  "version": "0.14.0",
+  "version": "0.14.1",
   "description": "Tracks and makes visible all changes to the Terms Of Service of online service providers.",
   "main": "index.js",
   "type": "module",
