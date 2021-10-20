@@ -37,6 +37,7 @@
     },
     "Law Enforcement Guidelines": {
       "fetch": "https://www.facebook.com/safety/groups/law/guidelines",
+      "filter": ["cleanUrls"],
       "select": ["._4xy4 > div"],
       "remove": [".img"]
     }
