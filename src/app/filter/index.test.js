@@ -1,9 +1,4 @@
-import {
-  cleanSnapshotHTML,
-  convertRelativeURLsToAbsolute,
-  filterHTML,
-  filterPDF,
-} from './index.js';
+import { convertRelativeURLsToAbsolute, filterHTML, filterPDF } from './index.js';
 
 import DocumentDeclaration from '../services/documentDeclaration.js';
 import { InaccessibleContentError } from '../errors.js';
@@ -125,13 +120,6 @@ describe('Filter', () => {
 
     it('leaves absolute urls untouched', async () => {
       expect(subject).to.include('http://absolute.url/link');
-    });
-  });
-
-  describe('#cleanSnapshotHTML', () => {
-    it('should replace auto generated tokens that change everytime by nothing', async () => {
-      const result = cleanSnapshotHTML(snapshotHTML);
-      expect(result).to.equal(expectedSnapshotCleaned);
     });
   });
 

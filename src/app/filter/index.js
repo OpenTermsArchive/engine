@@ -28,35 +28,6 @@ export default async function filter({ content, mimeType, documentDeclaration })
   });
 }
 
-/**
- * TODO This function should be removed in favor of a version global filter instead
- * We want to keep the real snapshots of the content, not the transformed one
- */
-export function cleanSnapshotHTML(content) {
-  if (typeof content !== 'string') {
-    return content;
-  }
-  const cleanedContent = content
-    .replace(/href="((.*?)\/email-protection#)[0-9a-fA-F]+"/gim, 'href="$1"') // Windstream and Schockwave.com
-    .replace(/data-cfemail="[0-9a-fA-F]+"/gim, 'data-cfemail=""') // Windstream and Schockwave.com
-    // beacon numbers are always changing numbers
-    .replace(/data-cf-beacon=('|")((.*)?)("|')/gim, 'data-cf-beacon=""') // OkCupid
-    // nonce is an always changing numbers
-    .replace(/nonce="(.*?)"/gim, 'nonce=""') // OkCupid
-    // csrf-token also
-    .replace(
-      /<meta(.*?)name="csrf-token"(.*?)content="(.*?)"(.*?)>/gim,
-      '<meta$1name="csrf-token"$2content="<removed>"$4>'
-    ) // initially for Y Combinator
-    .replace(
-      /<meta(.*?)content="(.*?)"(.*?)name="csrf-token"(.*?)>/gim,
-      '<meta$1content="<removed>"$3name="csrf-token"$4>'
-    ) // initially for Y Combinator
-    // replace empty styles tags
-    .replace(/<style (.*?)><\/style>/gim, ''); // OkCupid
-  return cleanedContent;
-}
-
 export async function filterHTML({ content, documentDeclaration }) {
   const {
     location,
