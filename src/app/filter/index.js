@@ -73,6 +73,13 @@ export async function filterHTML({ content, documentDeclaration }) {
 
   domFragment.querySelectorAll('script, style').forEach((node) => node.remove());
 
+  // clean code from common changing patterns - initially for Windstream
+  domFragment.querySelectorAll('a[href*="/email-protection"]').forEach((node) => {
+    if (node.href.match(/((.*?)\/email-protection#)[0-9a-fA-F]+/gim)) {
+      node.href = `${node.href.split('#')[0]}#removed`;
+    }
+  });
+
   return transform(domFragment);
 }
 
