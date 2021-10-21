@@ -27,7 +27,7 @@ MongoDB seems to meet the constraints:
 - It supports concurrent access.
 - It has [In-Memory storage engine](https://docs.mongodb.com/manual/core/inmemory/) as an option for performance.
 
-We also did a simple test to ensure that access time and insert time also meets the requirements. We populated a database with one million entries and tried accessing snapshots with random dates and we found that access times remained stable.
+We also did a simple test to ensure that access time and insert time also meets the requirements. We populated a database with one million entries and tried accessing snapshots with random dates and we found that access times remained stable. In our test on 1000 sequential access to random snapshot, the average access time was ~3.5ms with a maximum of ~50ms.
 
 Moreover, MongoDB has the following benefits:
 
