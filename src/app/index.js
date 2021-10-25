@@ -175,11 +175,6 @@ export default class CGUs extends events.EventEmitter {
       cssSelectors: documentDeclaration.getCssSelectors(),
       headers,
     });
-    await github.closeIssueIfExists({
-      labels: ['fix-document'],
-      title: `Fix ${service.id} - ${type}`,
-      comment: `🤖 Closed automatically as data was gathered successfully`,
-    });
 
     if (!content) {
       return;
@@ -199,12 +194,19 @@ export default class CGUs extends events.EventEmitter {
       return;
     }
 
-    return await this.recordVersion({
+    const recordedVersion = await this.recordVersion({
       snapshotContent: cleanedContent,
       mimeType,
       snapshotId,
       documentDeclaration,
     });
+
+    await github.closeIssueIfExists({
+      labels: ['fix-document'],
+      title: `Fix ${service.id} - ${type}`,
+      comment: `🤖 Closed automatically as data was gathered successfully`,
+    });
+    return recordedVersion;
   }
 
   async createError(messageOrObject) {
