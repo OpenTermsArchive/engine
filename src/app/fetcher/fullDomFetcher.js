@@ -2,10 +2,8 @@ import { InaccessibleContentError } from '../errors.js';
 import StealthPlugin from 'puppeteer-extra-plugin-stealth';
 import UserAgent from 'user-agents';
 import config from 'config';
-import { getRandomProxy } from './proxy.js';
 import logger from '../../logger/index.js';
 import puppeteer from 'puppeteer-extra';
-import useProxy from 'puppeteer-page-proxy';
 
 puppeteer.use(StealthPlugin());
 
@@ -31,15 +29,6 @@ export default async function fetch(url, cssSelectors, headers = {}, { retry } =
     page = await browser.newPage();
     await page.setUserAgent(userAgent.toString());
 
-    if (retry > 0 && process.env.NODE_ENV !== 'test') {
-      try {
-        const randomProxy = await getRandomProxy();
-        await useProxy(page, randomProxy);
-        logger.info(`Retry ${retry} with proxy ${randomProxy} for url ${url}`);
-      } catch (e) {
-        logger.error('Could not use proxy');
-      }
-    }
     await page.setDefaultNavigationTimeout(PUPPETEER_TIMEOUT);
 
     await page.setExtraHTTPHeaders({
