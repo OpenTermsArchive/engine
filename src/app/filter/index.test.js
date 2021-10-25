@@ -47,8 +47,12 @@ const rawHTMLWithCommonChangingItems = `
   <head>
     <meta charset="UTF-8">
     <title>TOS</title>
+    <style>body { background: red }</style>
+    <script>console.log("test")</script>
   </head>
   <body>
+    <style>body { background: blue }</style>
+    <script>console.log("test")</script>
     <h1>Title</h1>
     <p><a id="link1" href="/relative/link">link 1</a></p>
     <p><a id="link2" href="#anchor">link 2</a></p>
