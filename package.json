@@ -76,7 +76,7 @@
     "mime": "^2.5.2",
     "node-fetch": "^2.6.1",
     "node-schedule": "^2.0.0",
-    "octokit": "^1.5.0",
+    "octokit": "^1.7.0",
     "pdfjs-dist": "^2.9.359",
     "puppeteer": "^7.1.0",
     "puppeteer-extra": "^3.1.17",
