@@ -8,8 +8,7 @@
     },
     "Terms of Service": {
       "fetch": "https://www.ziffdavis.com/terms-of-use",
-      "select": "div#terms-of-use",
-      "remove": ".copyright"
+      "select": ["#content"]
     }
   }
 }
