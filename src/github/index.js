@@ -153,7 +153,7 @@ export const createIssueIfNotExist = async ({ title, body, labels, comment }) =>
       (existingIssue) => existingIssue.state === ISSUE_STATE_OPEN
     );
 
-    const hasNoneOpened = openedIssues === 0;
+    const hasNoneOpened = openedIssues.length === 0;
 
     for (const existingIssue of existingIssues) {
       if (hasNoneOpened) {
