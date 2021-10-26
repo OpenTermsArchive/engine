@@ -1,0 +1,9 @@
+{
+  "Data Processor Agreement": [
+    {
+      "fetch": "https://privacy.google.com/businesses/processorterms/",
+      "select": ".ads-controller",
+      "validUntil": "2020-08-16T12:30:05+04:00"
+    }
+  ]
+}
