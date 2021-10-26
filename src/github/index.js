@@ -62,7 +62,7 @@ export const searchIssues = async ({ title, q, ...params }) => {
       };
 
       const { data, headers } = await octokit.rest.search.issuesAndPullRequests(request);
-      logger.info(`Page 1: ${qOnRepo} (Left: ${headers['x-ratelimit-remaining']})`);
+
       let foundItems = data.items;
       // we need to do this because error being asynchronous, if we do not and wait for
       // subsequent pages to be fetch, we could end up in a situation when
@@ -82,9 +82,7 @@ export const searchIssues = async ({ title, q, ...params }) => {
             ...request,
             page,
           });
-          logger.info(
-            `Page ${page}: ${qOnRepo} (Left: ${paginatedHeaders['x-ratelimit-remaining']})`
-          );
+
           foundItems = [...foundItems, ...paginatedData.items];
         }
       }
