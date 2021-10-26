@@ -4,9 +4,7 @@
   "documents": {
     "Privacy Policy": {
       "fetch": "https://www.starbucks.com/terms/privacy-policy",
-      "select": [
-        ".sb-siteNarrowWidth"
-      ],
+      "select": [".sb-contentColumn"],
       "remove": [
         "a[href=\"//privacy.truste.com/privacy-seal/validation?rid=625f045f-b082-4cd8-af08-fcf9445e95d8\"]"
       ]
