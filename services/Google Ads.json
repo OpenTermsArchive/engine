@@ -7,9 +7,7 @@
     },
     "Parent Organization Privacy Policy": {
       "fetch": "https://policies.google.com/privacy?hl=en-GB",
-      "filter": [
-        "removeUTMfromUrls"
-      ],
+      "filter": ["removeUTMfromUrls"],
       "select": "div[role=article]",
       "remove": ".KMMDve, .TL2alc, img[src$='.svg']"
     },
@@ -19,15 +17,11 @@
     },
     "Data Controller Agreement": {
       "fetch": "https://privacy.google.com/businesses/controllerterms/",
-      "select": [
-        ".terms-page"
-      ]
+      "select": [".terms-page"]
     },
     "Data Processor Agreement": {
       "fetch": "https://privacy.google.com/businesses/processorterms/",
-      "select": [
-        ".terms-page"
-      ]
+      "select": [".terms-page"]
     },
     "Trackers Policy": {
       "fetch": "https://policies.google.com/technologies/ads",
@@ -44,12 +38,8 @@
     },
     "Ad Publishing Policy": {
       "fetch": "https://support.google.com/adsense/answer/9335564",
-      "select": [
-        ".page"
-      ],
-      "remove": [
-        ".fixed-sidebar-container"
-      ]
+      "select": [".page"],
+      "remove": [".fixed-sidebar-container"]
     }
   }
 }

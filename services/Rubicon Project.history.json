@@ -9,18 +9,14 @@
   "Trackers Policy": [
     {
       "fetch": "https://rubiconproject.com/privacy-policy/website-cookie-statement/",
-      "select": [
-        ".main-wrapper > .col-xs-12 > div"
-      ],
+      "select": [".main-wrapper > .col-xs-12 > div"],
       "validUntil": "2021-07-13T21:55:16+04:00"
     }
   ],
   "Privacy Policy": [
     {
       "fetch": "https://rubiconproject.com/privacy-policy/",
-      "select": [
-        ".main-wrapper > .col-xs-12 > div"
-      ],
+      "select": [".main-wrapper > .col-xs-12 > div"],
       "validUntil": "2021-07-13T21:55:15+04:00"
     }
   ]
