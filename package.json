@@ -61,6 +61,7 @@
     "@accordproject/markdown-cicero": "^0.14.0",
     "@accordproject/markdown-pdf": "^0.12.4",
     "@lolpants/ptimeout": "^1.0.3",
+    "abort-controller": "^3.0.0",
     "async": "^3.2.0",
     "chai-exclude": "^2.0.2",
     "config": "^3.3.3",
