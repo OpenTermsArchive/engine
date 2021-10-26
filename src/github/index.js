@@ -16,6 +16,12 @@ const GITHUB_OTA_REPO = process.env.GITHUB_OTA_REPO || '';
 const ISSUE_STATE_CLOSED = 'closed';
 const ISSUE_STATE_OPEN = 'open';
 
+const LOCAL_CONTRIBUTE_URL = 'http://localhost:3000/contribute/service';
+const CONTRIBUTE_URL = 'https://opentermsarchive.org/contribute/service';
+const GITHUB_VERSIONS_URL = 'https://github.com/ambanum/OpenTermsArchive-versions/blob/master';
+const GITHUB_REPO_URL = 'https://github.com/ambanum/OpenTermsArchive/blob/master/services';
+const GOOGLE_URL = 'https://www.google.com/search?q=';
+
 const commonParams = {
   owner: GITHUB_OTA_OWNER,
   repo: GITHUB_OTA_REPO,
@@ -126,6 +132,7 @@ export const createIssueIfNotExist = async ({ title, body, labels, comment }) =>
   if (!isEnabled) {
     return;
   }
+
   try {
     let existingIssues = await searchIssues({
       ...commonParams,
@@ -173,6 +180,68 @@ export const createIssueIfNotExist = async ({ title, body, labels, comment }) =>
     logger.error('Could not create issue', e.toString());
   }
 };
+
+export function createIssueTitleAndBody(messageOrObject) {
+  const { message, contentSelectors, noiseSelectors, url, name, documentType } = messageOrObject;
+
+  /* eslint-disable no-nested-ternary */
+  const contentSelectorsAsArray = (typeof contentSelectors === 'string'
+    ? contentSelectors.split(',')
+    : Array.isArray(contentSelectors)
+    ? contentSelectors
+    : []
+  ).map(encodeURIComponent);
+
+  const noiseSelectorsAsArray = (typeof noiseSelectors === 'string'
+    ? noiseSelectors.split(',')
+    : Array.isArray(noiseSelectors)
+    ? noiseSelectors
+    : []
+  ).map(encodeURIComponent);
+  /* eslint-enable no-nested-ternary */
+
+  const contentSelectorsQueryString = contentSelectorsAsArray.length
+    ? `&selectedCss[]=${contentSelectorsAsArray.join('&selectedCss[]=')}`
+    : '';
+  const noiseSelectorsQueryString = noiseSelectorsAsArray.length
+    ? `&removedCss[]=${noiseSelectorsAsArray.join('&removedCss[]=')}`
+    : '';
+
+  const encodedName = encodeURIComponent(name);
+  const encodedType = encodeURIComponent(documentType);
+  const encodedUrl = encodeURIComponent(url);
+
+  const urlQueryParams = `step=2&url=${encodedUrl}&name=${encodedName}&documentType=${encodedType}${noiseSelectorsQueryString}${contentSelectorsQueryString}&expertMode=true`;
+
+  const message404 = message.includes('404')
+    ? `- Search Google to get the new url: ${GOOGLE_URL}%22${encodedName}%22+%22${encodedType}%22`
+    : '';
+
+  const title = `Fix ${name} - ${documentType}`;
+
+  const body = `
+This service is not available anymore.
+Please fix it.
+
+\`${message}\`
+
+Here some ideas on how to fix this issue:
+- See what's wrong online: ${CONTRIBUTE_URL}?${urlQueryParams}
+- Or on your local: ${LOCAL_CONTRIBUTE_URL}?${urlQueryParams}
+${message404}
+
+And some info about what has already been tracked
+- See all versions tracked here: ${GITHUB_VERSIONS_URL}/${encodedName}/${encodedType}.md
+- See original JSON file: ${GITHUB_REPO_URL}/${encodedName}.json
+
+Thanks
+`;
+
+  return {
+    title,
+    body,
+  }
+}
 
 export const closeIssueIfExists = async ({ title, comment, labels }) => {
   if (!isEnabled) {
