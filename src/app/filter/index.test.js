@@ -1,9 +1,4 @@
-import {
-  cleanSnapshotHTML,
-  convertRelativeURLsToAbsolute,
-  filterHTML,
-  filterPDF,
-} from './index.js';
+import { convertRelativeURLsToAbsolute, filterHTML, filterPDF } from './index.js';
 
 import DocumentDeclaration from '../services/documentDeclaration.js';
 import { InaccessibleContentError } from '../errors.js';
@@ -46,49 +41,36 @@ const expectedFiltered = `Title
 const expectedFilteredWithAdditional = `Title
 =====`;
 
-const snapshotHTML = `
+const rawHTMLWithCommonChangingItems = `
 <!DOCTYPE html>
 <html>
   <head>
     <meta charset="UTF-8">
     <title>TOS</title>
-    <meta name="csrf-token" content="sFyiVS7MBTkzuIPtXxNlQaeiXRkCbF8mOCVKfmZq43l0jST+fE9s9usULZSXx9xf0Er+zJf2hye5O9tLNSZs1w==" />
-    <meta content="sFyiVS7MBTkzuIPtXxNlQaeiXRkCbF8mOCVKfmZq43l0jST+fE9s9usULZSXx9xf0Er+zJf2hye5O9tLNSZs1w==" name="csrf-token" rel="test" />
-    <meta rel="test" content="sFyiVS7MBTkzuIPtXxNlQaeiXRkCbF8mOCVKfmZq43l0jST+fE9s9usULZSXx9xf0Er+zJf2hye5O9tLNSZs1w==" name="csrf-token" />
+    <style>body { background: red }</style>
+    <script>console.log("test")</script>
   </head>
   <body>
+    <style>body { background: blue }</style>
+    <script>console.log("test")</script>
     <h1>Title</h1>
     <p><a id="link1" href="/relative/link">link 1</a></p>
     <p><a id="link2" href="#anchor">link 2</a></p>
     <p><a id="link3" href="http://absolute.url/link">link 3</a></p>
-    <a href="/cdn-cgi/l/email-protection#d9aaaca9a9b6abad99aab1b6bab2aeb8afbcf7bab6b4"><span class="__cf_email__" data-cfemail="d9aaaca9a9b6abad99aab1b6bab2aeb8afbcf7bab6b4">[email&#160;protected]</span></a>
-    <a href="/cdn-cgi/l/email-protection#9ae9efeaeaf5e8eedae9f2f5f9f1edfbecffb4f9f5f7"><span class="__cf_email__" data-cfemail="9ae9efeaeaf5e8eedae9f2f5f9f1edfbecffb4f9f5f7">[email&#160;protected]</span></a>
-    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-MGFFD8" height="0" width="0" style="display:none;visibility:hidden" nonce="e10cb49759b9fd4ef9eb7494da2e231e51dea01947f1d93a36f56262fa639be5f3b764ecd98b26c4MjAyMS0wNy0zMFQxODozMTowMCswMTowMA=="></iframe></noscript>
-    <script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"rayId":"678e956a287d0877","token":"6f9a2202213848f5bff934592489e351","version":"2021.7.0","si":10}'></script>
+    <a href="/cdn-cgi/l/email-protection#3b4c52555f484f495e5a56154b49524d5a584215484f5a4f5e565e554f7b4c52555f484f495e5a5615585456">[email&#160;protected]</a>
   </body>
 </html>`;
 
-const expectedSnapshotCleaned = `
-<!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="UTF-8">
-    <title>TOS</title>
-    <meta name="csrf-token" content="<removed>" />
-    <meta content="<removed>" name="csrf-token" rel="test" />
-    <meta rel="test" content="<removed>" name="csrf-token" />
-  </head>
-  <body>
-    <h1>Title</h1>
-    <p><a id="link1" href="/relative/link">link 1</a></p>
-    <p><a id="link2" href="#anchor">link 2</a></p>
-    <p><a id="link3" href="http://absolute.url/link">link 3</a></p>
-    <a href="/cdn-cgi/l/email-protection#"><span class="__cf_email__" data-cfemail="">[email&#160;protected]</span></a>
-    <a href="/cdn-cgi/l/email-protection#"><span class="__cf_email__" data-cfemail="">[email&#160;protected]</span></a>
-    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-MGFFD8" height="0" width="0" style="display:none;visibility:hidden" nonce=""></iframe></noscript>
-    <script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon=""></script>
-  </body>
-</html>`;
+const expectedFilteredWithCommonChangingItems = `Title
+=====
+
+[link 1](https://exemple.com/relative/link)
+
+[link 2](#anchor)
+
+[link 3](http://absolute.url/link)
+
+[\\[email protected\\]](https://exemple.com/cdn-cgi/l/email-protection#removed)`;
 
 const additionalFilter = {
   removeLinks: function removeLinks(document) {
@@ -128,15 +110,19 @@ describe('Filter', () => {
     });
   });
 
-  describe('#cleanSnapshotHTML', () => {
-    it('should replace auto generated tokens that change everytime by nothing', async () => {
-      const result = cleanSnapshotHTML(snapshotHTML);
-      expect(result).to.equal(expectedSnapshotCleaned);
-    });
-  });
-
   describe('#filterHTML', () => {
     context('With string selector', () => {
+      it('filters the given HTML content with common changing items', async () => {
+        const result = await filterHTML({
+          content: rawHTMLWithCommonChangingItems,
+          documentDeclaration: new DocumentDeclaration({
+            location: virtualLocation,
+            contentSelectors: 'body',
+          }),
+        });
+        expect(result).to.equal(expectedFilteredWithCommonChangingItems);
+      });
+
       it('filters the given HTML content', async () => {
         const result = await filterHTML({
           content: rawHTML,
