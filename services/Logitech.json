@@ -8,7 +8,9 @@
     },
     "Terms of Service": {
       "fetch": "https://www.logitech.com/en-gb/footer/terms-of-use/&id=13177",
-      "select": ".col-md-8.col-sm-7.col-xs-12.single-column"
+      "select": [
+        "#section-i50f58221a2b37ea46c77cfa9452ed85a-padding-options > div:nth-child(2)"
+      ]
     }
   }
 }
