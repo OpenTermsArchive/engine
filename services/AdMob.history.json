@@ -1,0 +1,9 @@
+{
+  "Data Controller Agreement": [
+    {
+      "fetch": "https://privacy.google.com/businesses/controllerterms/",
+      "select": ".ads-controller",
+      "validUntil": "2021-02-15T12:59:42+04:00"
+    }
+  ]
+}
