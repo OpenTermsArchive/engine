@@ -402,7 +402,16 @@ To help reviewers, make sure to add to your PR a **clear text explanation** of y
 
 ## Commits naming convention
 
-We use [Conventional Commits](https://www.conventionalcommits.org/) (`feat:` `fix:` `chore:` `docs:`…) with the following specificities:
+We strive to follow this [recommendation](https://chris.beams.io/posts/git-commit) to write our commit messages, with the following rules:
 
-- `new-doc:` for additions of a new services or documents
-- `fix-doc:` for patches of documents
+- [Separate subject from body with a blank line](https://chris.beams.io/posts/git-commit/#separate)
+- [Limit the subject line to 50 characters](https://chris.beams.io/posts/git-commit/#limit-50)
+- [Capitalize the subject line](https://chris.beams.io/posts/git-commit/#capitalize)
+- [Do not end the subject line with a period](https://chris.beams.io/posts/git-commit/#end)
+- [Use the imperative mood in the subject line](https://chris.beams.io/posts/git-commit/#imperative)
+- [Wrap the body at 72 characters](https://chris.beams.io/posts/git-commit/#wrap-72)
+- [Use the body to explain what and why vs. how](https://chris.beams.io/posts/git-commit/#why-not-how)
+
+with this additional rule:
+
+- No github issue reference number in commit message
