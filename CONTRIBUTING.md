@@ -2,6 +2,7 @@ First of all, thanks for taking the time to contribute! 🎉👍
 
 ## Table of Contents
 
+### Document related contributions
 - [Tracking new documents](#tracking-new-documents)
   - [Declaring a new service](#declaring-a-new-service)
     - [Service name](#service-name)
@@ -23,15 +24,21 @@ First of all, thanks for taking the time to contribute! 🎉👍
     - [Document declaration history](#document-declaration-history)
     - [Filters history](#filters-history)
   - [Refiltering your documents](#refiltering-your-documents)
+
+### Code related contributions
+- [Pull requests](#pull-requests)
 - [Commits naming convention](#commits-naming-convention)
 
-# Tracking new documents
+---
+# Document related contributions
+
+## Tracking new documents
 
 Tracking documents is done by _declaring_ them and the service they are associated with. Such a declaration is achieved by editing JSON files in the [`services`](./services) folder.
 
 Before adding a new document, open the [`services`](./services) folder and check if the service you want to track documents for is already declared. If a JSON file with the name of the service is already present, you can jump straight to [declaring documents](#declaring-documents). Otherwise, keep reading!
 
-## Declaring a new service
+### Declaring a new service
 
 Before declaring a service, you will need to choose its name and ID. The ID will be the name of the JSON file in which the service will be declared. It is a normalised version of the service name.
 
@@ -115,7 +122,7 @@ Documents are declared in a service declaration file, under the `documents` prop
 
 The only mandatory keys are `fetch` and `select` (except for PDF files, for which only `fetch` is needed). Let’s start by defining these keys!
 
-### `fetch`
+#### `fetch`
 
 This property should simply contain the URL at which the document you want to track can be downloaded. HTML and PDF files are supported.
 
@@ -123,14 +130,14 @@ When multiple versions coexist, **terms are only tracked in their English versio
 
 > We intend to expand coverage, but we focus for the moment on this subset of documents to fine-tune the system.
 
-### `executeClientScripts`
+#### `executeClientScripts`
 
 In some cases, the content of the document is only loaded (or is modified dynamically) by client scripts.
 When set to `true`, this boolean property loads the page in a headless browser to load all assets and execute client scripts before trying to get document content.
 
 Since the performance cost of this approach is high, it is set to `false` by default, relying on the HTML content only.
 
-### `select`
+#### `select`
 
 _This property is not needed for PDF documents._
 
@@ -138,7 +145,7 @@ Most of the time, contractual documents are exposed as web pages, with a header,
 
 The `select` value can be of two types: either a [CSS selector](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors) or a [range selector](#range-selectors).
 
-#### Range selectors
+##### Range selectors
 
 A range selector is defined with a _start_ and an _end_ CSS selector. It is also necessary to define if the range starts before or after the element targeted by the _start_ CSS selector and to define if it ends before or after the element targeted by the _end_ CSS selector.
 
@@ -160,7 +167,7 @@ To that end, a range selector is a JSON object containing two keys out of the fo
 > }
 > ```
 
-### `remove`
+#### `remove`
 
 _This property is optional._
 
@@ -187,7 +194,7 @@ Beyond [selecting a subset of a web page](#select), some documents will have non
 > }
 > ```
 
-### `filter`
+#### `filter`
 
 _This property is optional._
 
@@ -228,7 +235,7 @@ You can use them in your filters file with `export { removeSIDfromUrls } from '.
 
 You can also learn more about [usual noise](https://github.com/ambanum/OpenTermsArchive/wiki/Usual-noise) and ways to handle it on the wiki, and share your own learnings there.
 
-### `headers`
+#### `headers`
 
 _This property is optional._
 
@@ -239,7 +246,7 @@ Some of theme could be
 - **user-agent**: to force a specific user agent
 - **Cookie**: to pass meaningful data such as a language to fetch the data in (i.e. for Instagram: `"headers": { "Cookie": "locale=en_GB" }`)
 
-### Document type
+#### Document type
 
 Great, your document declaration is now almost complete! We simply need to write it under the appropriate document type in the `documents` JSON object within the service declaration. In order to distinguish between the many documents that can be associated with a service and enable cross-services comparison of similar documents, we maintain a unique list of document types. You can find the list of allowed values for the `<document type>` key in [`/src/app/types.json`](./src/app/types.json).
 
@@ -247,7 +254,7 @@ The types might not always match the exact name given by the service provider. F
 
 If the document you want to add matches no existing document type, you can create a new one in the same pull request in which you declare the service that would use it. If you're in doubt, please list the potential synonyms you have considered, we will help you find the most appropriate one 🙂
 
-#### Defining a new document type
+##### Defining a new document type
 
 Before defining a new document type, please note that wanting to multiply documents types is usually a symptom that the service needs to be broken down into several services. For example, rather than considering that Facebook has several specific variations of “Terms of Service”, it is more accurate to declare “Terms of Service” documents for the “Facebook” (social network service for the general public), “Facebook Ads” (ads service for advertisers) and “Facebook Payments” (payment service for developers) services. On the other hand, the “Google Ads” service is a commercial suite acting as an umbrella for several pieces of software that all share the same contractual documents, and there is thus no need to separate each of them. See practical guidelines for [provider prefixing](https://github.com/ambanum/OpenTermsArchive/wiki/Naming-services#provider-prefixing) on the wiki.
 
@@ -275,7 +282,7 @@ A document type thus looks like:
 
 Please note that we do not want [service-specific types](https://github.com/ambanum/OpenTermsArchive/pull/89) such as “Twitter Privacy Policy”. Document types should be generic, even if only one service uses them at a given time. Otherwise, duplication occurs and [important efforts](https://github.com/ambanum/OpenTermsArchive/pull/88) have to be deployed to deduplicate. The triptych form “writer / audience / object” is precisely used to avoid this sort of duplication.
 
-## Testing your declaration
+### Testing your declaration
 
 You can test the declarations you created or changed by running the following command:
 
@@ -291,12 +298,12 @@ Since this operation fetches documents and could be long, you can also validate 
 npm run validate:schema [$service_id [, $service_id …]]
 ```
 
-# Editing existing documents
+## Editing existing documents
 
 As services evolve, document declarations are also expected to change over time. The service provider can change the document's URL or the document's HTML structure, thus their fetch location, selectors or filters can change.
 OpenTermsArchive needs to keep track of this changes in order to regenerate versions history from snapshots history.
 
-## Service history
+### Service history
 
 To keep track of services declarations and filters changes, Open Terms Archive offers a versioning system. It is optional and should be added only when needed. It works by creating history files for documents declarations and filters, where each entry should be a previous valid declaration or filter function and should have an expiry date.
 
@@ -306,7 +313,7 @@ Documents declarations history files and filters history files can both evolve o
 
 The current (latest) valid declaration has no date and should not appear in the history object: it stays in its own file, just like if there was no history at all.
 
-### Document declaration history
+#### Document declaration history
 
 Declarations history are stored in a history JSON file with the following name `services/$service_id.history.json`.
 
@@ -344,7 +351,7 @@ For example, to add a history entry for the `Terms of Service` of the service `A
 }
 ```
 
-### Filters history
+#### Filters history
 
 Filters history is declared in a filters history declaration JavaScript file with the following name: `services/$service_id.filters.history.js`.
 
@@ -372,7 +379,7 @@ export const removeSharesButton = [
 ];
 ```
 
-## Refiltering your documents
+### Refiltering your documents
 
 If you change filters or selectors and want to re-apply them on previously fetched documents from snapshots and regenerate versions only:
 
@@ -380,7 +387,20 @@ If you change filters or selectors and want to re-apply them on previously fetch
 npm run refilter [$service_id]
 ```
 
-# Commits naming convention
+# Code related contributions
+## Pull requests
+
+We follow the [GitHub Flow](https://guides.github.com/introduction/flow/): all code contributions are submitted via a pull request towards the `master` branch.
+
+Opening a Pull Request means you want that code to be merged. If you want to only discuss it, send a link to your branch along with your questions through whichever communication channel you prefer.
+
+### Peer reviews
+
+All pull requests must be reviewed by someone else than their original author.
+
+To help reviewers, make sure to add to your PR a **clear text explanation** of your changes.
+
+## Commits naming convention
 
 We use [Conventional Commits](https://www.conventionalcommits.org/) (`feat:` `fix:` `chore:` `docs:`…) with the following specificities:
 
