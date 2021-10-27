@@ -9,11 +9,9 @@ import events from 'events';
 import fetch from './fetcher/index.js';
 import filter from './filter/index.js';
 import logger from '../logger/index.js';
-import pTimeout from '@lolpants/ptimeout';
 
 const MAX_PARALLEL_DOCUMENTS_TRACKS = 1;
 const MAX_PARALLEL_REFILTERS = 1;
-const MAX_EXECUTION_TIME = 5 * 60 * 1000;
 
 export const AVAILABLE_EVENTS = [
   'snapshotRecorded',
@@ -26,12 +24,6 @@ export const AVAILABLE_EVENTS = [
   'inaccessibleContent',
   'error',
 ];
-
-const LOCAL_CONTRIBUTE_URL = 'http://localhost:3000/contribute/service';
-const CONTRIBUTE_URL = 'https://opentermsarchive.org/contribute/service';
-const GITHUB_VERSIONS_URL = 'https://github.com/ambanum/OpenTermsArchive-versions/blob/master';
-const GITHUB_REPO_URL = 'https://github.com/ambanum/OpenTermsArchive/blob/master/services';
-const GOOGLE_URL = 'https://www.google.com/search?q=';
 
 export default class CGUs extends events.EventEmitter {
   get serviceDeclarations() {
@@ -53,79 +45,46 @@ export default class CGUs extends events.EventEmitter {
   }
 
   initQueues() {
-    this.trackDocumentChangesQueue = async.queue(async (documentDeclaration) => {
-      const timeMessage = `trackDocumentChangesQueue_${documentDeclaration.service.id}_${documentDeclaration.type}`;
-      console.time(timeMessage);
-      try {
-        const result = await pTimeout.default(
-          async () => this.trackDocumentChanges(documentDeclaration),
-          MAX_EXECUTION_TIME
-        );
-        console.timeEnd(timeMessage);
-        return result;
-      } catch (e) {
-        console.timeEnd(timeMessage);
-        if (!(e instanceof pTimeout.TimeoutError)) {
-          throw e;
-        }
+    this.trackDocumentChangesQueue = async.queue(
+      async (documentDeclaration) => this.trackDocumentChanges(documentDeclaration),
+      MAX_PARALLEL_DOCUMENTS_TRACKS
+    );
+    this.refilterDocumentsQueue = async.queue(
+      async (documentDeclaration) => this.refilterAndRecordDocument(documentDeclaration),
+      MAX_PARALLEL_REFILTERS
+    );
 
-        logger.error({
-          message: e.toString(),
-          serviceId: documentDeclaration.service.id,
-          type: documentDeclaration.type,
-        });
+    const queueErrorHandler = (createGithubError) => async (
+      error,
+      { location, service, contentSelectors, noiseSelectors, type }
+    ) => {
+      if (error.toString().includes('HttpError: API rate limit exceeded for user ID')) {
+        // This is an error due to SendInBlue quota, bypass
+        return;
       }
-    }, MAX_PARALLEL_DOCUMENTS_TRACKS);
-
-    this.refilterDocumentsQueue = async.queue(async (documentDeclaration) => {
-      const timeMessage = `refilterDocumentsQueue_${documentDeclaration.service.id}_${documentDeclaration.type}`;
-      console.time(timeMessage);
-      try {
-        const result = await pTimeout.default(
-          async () => this.refilterAndRecordDocument(documentDeclaration),
-          MAX_EXECUTION_TIME
-        );
-        console.timeEnd(timeMessage);
-        return result;
-      } catch (e) {
-        console.timeEnd(timeMessage);
-        if (!(e instanceof pTimeout.TimeoutError)) {
-          throw e;
-        }
-        logger.error({
-          message: e.toString(),
-          serviceId: documentDeclaration.service.id,
-          type: documentDeclaration.type,
-        });
-      }
-    }, MAX_PARALLEL_REFILTERS);
-
-    const queueErrorHandler = (createError) => (error, messageOrObject) => {
-      const { location, service, contentSelectors, noiseSelectors, type } = messageOrObject;
 
       if (error instanceof InaccessibleContentError) {
-        if (!createError) {
-          return this.emit('inaccessibleContent', error, service.id, type);
+        this.emit('inaccessibleContent', error, service.id, type);
+
+        if (createGithubError) {
+          const { title, body } = github.formatIssueTitleAndBody({
+            contentSelectors,
+            noiseSelectors,
+            url: location,
+            name: service.id,
+            documentType: type,
+            message: error.toString(),
+          });
+
+          await github.createIssueIfNotExist({
+            title,
+            body,
+            labels: ['fix-document'],
+            comment: '🤖 Reopened automatically as an error occured',
+          });
         }
 
-        if (error.toString().includes('HttpError: API rate limit exceeded for user ID')) {
-          // This is an error due to send in blue quota, bypass
-          return;
-        }
-
-        // this is a promise and as error handler is not async
-        // it might resolve
-        return this.createError({
-          contentSelectors,
-          noiseSelectors,
-          url: location,
-          name: service.id,
-          documentType: type,
-          message: error.toString(),
-        }).then(() => {
-          // as queueErrorHandler is not async
-          // we just use an empty callback
-        });
+        return;
       }
 
       this.emit('error', error, service.id, type);
@@ -148,7 +107,7 @@ export default class CGUs extends events.EventEmitter {
   }
 
   async trackChanges(servicesIds) {
-    this._forEachDocumentOf(servicesIds, async (documentDeclaration) =>
+    this._forEachDocumentOf(servicesIds, (documentDeclaration) =>
       this.trackDocumentChangesQueue.push(documentDeclaration)
     );
 
@@ -158,15 +117,7 @@ export default class CGUs extends events.EventEmitter {
   }
 
   async trackDocumentChanges(documentDeclaration) {
-    const {
-      location,
-      executeClientScripts,
-      headers,
-      service,
-      contentSelectors,
-      noiseSelectors,
-      type,
-    } = documentDeclaration;
+    const { location, executeClientScripts, headers, service, type } = documentDeclaration;
 
     const { mimeType, content } = await fetch({
       url: location,
@@ -199,72 +150,10 @@ export default class CGUs extends events.EventEmitter {
     await github.closeIssueIfExists({
       labels: ['fix-document'],
       title: `Fix ${service.id} - ${type}`,
-      comment: `🤖 Closed automatically as data was gathered successfully`,
+      comment: '🤖 Closed automatically as data was gathered successfully',
     });
+
     return recordedVersion;
-  }
-
-  async createError(messageOrObject) {
-    const { message, contentSelectors, noiseSelectors, url, name, documentType } = messageOrObject;
-
-    /* eslint-disable no-nested-ternary */
-    const contentSelectorsAsArray = (typeof contentSelectors === 'string'
-      ? contentSelectors.split(',')
-      : Array.isArray(contentSelectors)
-      ? contentSelectors
-      : []
-    ).map(encodeURIComponent);
-
-    const noiseSelectorsAsArray = (typeof noiseSelectors === 'string'
-      ? noiseSelectors.split(',')
-      : Array.isArray(noiseSelectors)
-      ? noiseSelectors
-      : []
-    ).map(encodeURIComponent);
-    /* eslint-enable no-nested-ternary */
-
-    const contentSelectorsQueryString = contentSelectorsAsArray.length
-      ? `&selectedCss[]=${contentSelectorsAsArray.join('&selectedCss[]=')}`
-      : '';
-    const noiseSelectorsQueryString = noiseSelectorsAsArray.length
-      ? `&removedCss[]=${noiseSelectorsAsArray.join('&removedCss[]=')}`
-      : '';
-
-    const encodedName = encodeURIComponent(name);
-    const encodedType = encodeURIComponent(documentType);
-    const encodedUrl = encodeURIComponent(url);
-
-    const urlQueryParams = `step=2&url=${encodedUrl}&name=${encodedName}&documentType=${encodedType}${noiseSelectorsQueryString}${contentSelectorsQueryString}&expertMode=true`;
-
-    const message404 = message.includes('404')
-      ? `- Search Google to get the new url: ${GOOGLE_URL}%22${encodedName}%22+%22${encodedType}%22`
-      : '';
-
-    const title = `Fix ${name} - ${documentType}`;
-
-    const body = `
-This service is not available anymore.
-Please fix it.
-
-\`${message}\`
-
-Here some ideas on how to fix this issue:
-- See what's wrong online: ${CONTRIBUTE_URL}?${urlQueryParams}
-- Or on your local: ${LOCAL_CONTRIBUTE_URL}?${urlQueryParams}
-${message404}
-
-And some info about what has already been tracked
-- See all versions tracked here: ${GITHUB_VERSIONS_URL}/${encodedName}/${encodedType}.md
-- See original JSON file: ${GITHUB_REPO_URL}/${encodedName}.json
-
-Thanks
-`;
-    await github.createIssueIfNotExist({
-      body,
-      title,
-      labels: ['fix-document'],
-      comment: `🤖 Reopened automatically as an error occured`,
-    });
   }
 
   async refilterAndRecord(servicesIds) {

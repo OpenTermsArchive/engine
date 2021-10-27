@@ -3,10 +3,18 @@ import HttpsProxyAgent from 'https-proxy-agent';
 import { InaccessibleContentError } from '../errors.js';
 import https from 'https';
 import nodeFetch from 'node-fetch';
+import AbortController from 'abort-controller';
+
 const LANGUAGE = 'en';
+const TIMEOUT = 5 * 60 * 1000; // 5 minutes in ms
 
 export default async function fetch(url, { headers = {} } = {}) {
-  const options = {};
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), TIMEOUT);
+
+  const options = {
+    signal: controller.signal,
+  };
 
   if (url.startsWith('https:') && process.env.HTTPS_PROXY) {
     options.agent = new HttpsProxyAgent(process.env.HTTPS_PROXY);
@@ -26,15 +34,9 @@ export default async function fetch(url, { headers = {} } = {}) {
   try {
     response = await nodeFetch(url, options);
   } catch (error) {
-    if (
-      error.code &&
-      error.code.match(
-        /^(EAI_AGAIN|ENOTFOUND|ETIMEDOUT|ECONNRESET|CERT_HAS_EXPIRED|ERR_INVALID_PROTOCOL)$/
-      )
-    ) {
-      throw new InaccessibleContentError(error.message);
-    }
-    throw error;
+    handleErrors(error);
+  } finally {
+    clearTimeout(timeout);
   }
 
   if (!response.ok) {
@@ -49,4 +51,19 @@ export default async function fetch(url, { headers = {} } = {}) {
     mimeType,
     content: await (mimeType.startsWith('text/') ? response.text() : response.buffer()),
   };
+}
+
+function handleErrors(error) {
+  if (
+    error.code &&
+    error.code.match(/^(EAI_AGAIN|ENOTFOUND|ECONNRESET|CERT_HAS_EXPIRED|ERR_INVALID_PROTOCOL)$/)
+  ) {
+    throw new InaccessibleContentError(error.message);
+  }
+
+  if (error.name === 'AbortError') {
+    throw new InaccessibleContentError(`The request timed out after ${TIMEOUT / 1000} seconds.`);
+  }
+
+  throw error;
 }
