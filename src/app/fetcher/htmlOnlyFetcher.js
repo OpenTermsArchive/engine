@@ -13,7 +13,7 @@ export default async function fetch(url, { headers = {} } = {}) {
   const timeout = setTimeout(() => controller.abort(), TIMEOUT);
 
   const options = {
-    signal: controller.signal
+    signal: controller.signal,
   };
 
   if (url.startsWith('https:') && process.env.HTTPS_PROXY) {
@@ -56,9 +56,7 @@ export default async function fetch(url, { headers = {} } = {}) {
 function handleErrors(error) {
   if (
     error.code &&
-    error.code.match(
-      /^(EAI_AGAIN|ENOTFOUND|ECONNRESET|CERT_HAS_EXPIRED|ERR_INVALID_PROTOCOL)$/
-    )
+    error.code.match(/^(EAI_AGAIN|ENOTFOUND|ECONNRESET|CERT_HAS_EXPIRED|ERR_INVALID_PROTOCOL)$/)
   ) {
     throw new InaccessibleContentError(error.message);
   }

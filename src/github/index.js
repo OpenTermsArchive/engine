@@ -240,7 +240,7 @@ Thanks
   return {
     title,
     body,
-  }
+  };
 }
 
 export const closeIssueIfExists = async ({ title, comment, labels }) => {

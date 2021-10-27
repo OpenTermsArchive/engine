@@ -13,7 +13,6 @@ import logger from '../logger/index.js';
 const MAX_PARALLEL_DOCUMENTS_TRACKS = 1;
 const MAX_PARALLEL_REFILTERS = 1;
 
-
 export const AVAILABLE_EVENTS = [
   'snapshotRecorded',
   'firstSnapshotRecorded',
@@ -46,10 +45,19 @@ export default class CGUs extends events.EventEmitter {
   }
 
   initQueues() {
-    this.trackDocumentChangesQueue = async.queue(async (documentDeclaration) => this.trackDocumentChanges(documentDeclaration), MAX_PARALLEL_DOCUMENTS_TRACKS);
-    this.refilterDocumentsQueue = async.queue(async (documentDeclaration) => this.refilterAndRecordDocument(documentDeclaration), MAX_PARALLEL_REFILTERS);
+    this.trackDocumentChangesQueue = async.queue(
+      async (documentDeclaration) => this.trackDocumentChanges(documentDeclaration),
+      MAX_PARALLEL_DOCUMENTS_TRACKS
+    );
+    this.refilterDocumentsQueue = async.queue(
+      async (documentDeclaration) => this.refilterAndRecordDocument(documentDeclaration),
+      MAX_PARALLEL_REFILTERS
+    );
 
-    const queueErrorHandler = (createGithubError) => async (error, { location, service, contentSelectors, noiseSelectors, type }) => {
+    const queueErrorHandler = (createGithubError) => async (
+      error,
+      { location, service, contentSelectors, noiseSelectors, type }
+    ) => {
       if (error.toString().includes('HttpError: API rate limit exceeded for user ID')) {
         // This is an error due to SendInBlue quota, bypass
         return;
@@ -72,7 +80,7 @@ export default class CGUs extends events.EventEmitter {
             title,
             body,
             labels: ['fix-document'],
-            comment: '🤖 Reopened automatically as an error occured'
+            comment: '🤖 Reopened automatically as an error occured',
           });
         }
 
@@ -99,7 +107,9 @@ export default class CGUs extends events.EventEmitter {
   }
 
   async trackChanges(servicesIds) {
-    this._forEachDocumentOf(servicesIds, (documentDeclaration) => this.trackDocumentChangesQueue.push(documentDeclaration));
+    this._forEachDocumentOf(servicesIds, (documentDeclaration) =>
+      this.trackDocumentChangesQueue.push(documentDeclaration)
+    );
 
     await this.trackDocumentChangesQueue.drain();
 
@@ -107,13 +117,7 @@ export default class CGUs extends events.EventEmitter {
   }
 
   async trackDocumentChanges(documentDeclaration) {
-    const {
-      location,
-      executeClientScripts,
-      headers,
-      service,
-      type,
-    } = documentDeclaration;
+    const { location, executeClientScripts, headers, service, type } = documentDeclaration;
 
     const { mimeType, content } = await fetch({
       url: location,
