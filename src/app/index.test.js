@@ -149,7 +149,9 @@ describe('CGUs', () => {
         let refilterVersionMessageBody;
         let serviceBCommits;
 
-        before(async () => {
+        before(async function () {
+          this.timeout(5000);
+
           nock('https://www.servicea.example')
             .get('/tos')
             .reply(200, serviceASnapshotExpectedContent, { 'Content-Type': 'text/html' });
