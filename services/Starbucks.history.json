@@ -1,12 +1,25 @@
 {
   "Privacy Policy": [
     {
+      "fetch": "https://www.starbucks.com/terms/privacy-policy",
+      "select": [".sb-siteNarrowWidth"],
+      "remove": [
+        "a[href=\"//privacy.truste.com/privacy-seal/validation?rid=625f045f-b082-4cd8-af08-fcf9445e95d8\"]"
+      ],
+      "validUntil": "2021-07-28T10:35:33+04:00"
+    },
+    {
       "fetch": "https://www.starbucks.com/about-us/company-information/online-policies/privacy-policy",
       "select": "body",
       "validUntil": "2020-12-08T16:00:00.000Z"
     }
   ],
   "Terms of Service": [
+    {
+      "fetch": "https://www.starbucks.com/terms/starbucks-terms-of-use",
+      "select": [".sb-siteNarrowWidth"],
+      "validUntil": "2021-07-20T20:38:21+04:00"
+    },
     {
       "fetch": "https://www.starbucks.com/about-us/company-information/online-policies/terms-of-use",
       "select": "body",

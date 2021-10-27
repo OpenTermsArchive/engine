@@ -1,0 +1,10 @@
+{
+  "name": "Yuka",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://help.yuka.io/l/en/article/2a12869y56",
+      "select": [".max-w-3xl"],
+      "remove": ["#feedback"]
+    }
+  }
+}

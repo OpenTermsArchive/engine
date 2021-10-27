@@ -3,7 +3,7 @@
   "documents": {
     "Data Controller Agreement": {
       "fetch": "https://privacy.google.com/businesses/controllerterms/",
-      "select": ".ads-controller"
+      "select": [".terms-page"]
     },
     "Trackers Policy": {
       "fetch": "https://policies.google.com/technologies/ads",

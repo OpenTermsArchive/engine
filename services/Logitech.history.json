@@ -9,6 +9,11 @@
   "Terms of Service": [
     {
       "fetch": "https://www.logitech.com/en-gb/footer/terms-of-use/&id=13177",
+      "select": ".col-md-8.col-sm-7.col-xs-12.single-column",
+      "validUntil": "2020-12-09T20:31:28+04:00"
+    },
+    {
+      "fetch": "https://www.logitech.com/en-gb/footer/terms-of-use/&id=13177",
       "select": "body",
       "validUntil": "2020-12-08T16:00:00.000Z"
     }

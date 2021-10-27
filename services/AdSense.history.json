@@ -5,5 +5,12 @@
       "select": ".article-container",
       "validUntil": "2020-12-08T15:30:06.000Z"
     }
+  ],
+  "Data Controller Agreement": [
+    {
+      "fetch": "https://privacy.google.com/businesses/controllerterms/",
+      "select": ".ads-controller",
+      "validUntil": "2021-02-15T12:59:43+04:00"
+    }
   ]
 }

@@ -13,7 +13,7 @@
     },
     "Data Processor Agreement": {
       "fetch": "https://privacy.google.com/businesses/processorterms/",
-      "select": ".ads-controller"
+      "select": [".terms-page"]
     },
     "Trackers Policy": {
       "fetch": "https://policies.google.com/technologies/ads",

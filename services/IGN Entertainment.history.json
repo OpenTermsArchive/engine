@@ -4,6 +4,12 @@
       "fetch": "https://www.ziffdavis.com/privacy-policy",
       "select": "body",
       "validUntil": "2020-12-08T16:00:00.000Z"
+    },
+    {
+      "fetch": "https://www.ziffdavis.com/privacy-policy",
+      "select": "div#privacy-policy",
+      "remove": ".trustarc",
+      "validUntil": "2021-10-25T08:00:00.000Z"
     }
   ],
   "Terms of Service": [
@@ -11,6 +17,12 @@
       "fetch": "https://www.ziffdavis.com/terms-of-use",
       "select": "body",
       "validUntil": "2020-12-08T16:00:00.000Z"
+    },
+    {
+      "fetch": "https://www.ziffdavis.com/terms-of-use",
+      "select": "div#terms-of-use",
+      "remove": ".copyright",
+      "validUntil": "2021-10-25T08:00:00.000Z"
     }
   ]
 }

@@ -3,7 +3,7 @@
   "documents": {
     "Privacy Policy": {
       "fetch": "https://rubiconproject.com/privacy-policy/",
-      "select": [".main-wrapper > .col-xs-12 > div"]
+      "select": [".page-header", ".content"]
     },
     "Ad Publishing Policy": {
       "fetch": "https://www.magnite.com/legal/ad-quality-guidelines/",
@@ -11,7 +11,7 @@
     },
     "Trackers Policy": {
       "fetch": "https://rubiconproject.com/privacy-policy/website-cookie-statement/",
-      "select": [".main-wrapper > .col-xs-12 > div"]
+      "select": [".page-header", ".content"]
     }
   }
 }
