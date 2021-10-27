@@ -181,7 +181,7 @@ export const createIssueIfNotExist = async ({ title, body, labels, comment }) =>
   }
 };
 
-export function createIssueTitleAndBody(messageOrObject) {
+export function formatIssueTitleAndBody(messageOrObject) {
   const { message, contentSelectors, noiseSelectors, url, name, documentType } = messageOrObject;
 
   /* eslint-disable no-nested-ternary */

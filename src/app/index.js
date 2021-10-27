@@ -67,7 +67,7 @@ export default class CGUs extends events.EventEmitter {
         this.emit('inaccessibleContent', error, service.id, type);
 
         if (createGithubError) {
-          const { title, body } = github.createIssueTitleAndBody({
+          const { title, body } = github.formatIssueTitleAndBody({
             contentSelectors,
             noiseSelectors,
             url: location,
