@@ -12,9 +12,11 @@ const alignedWithColorsAndTime = combine(
   timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
   printf(({ level, message, timestamp, serviceId, type }) => {
     let prefix = '';
+
     if (serviceId && type) {
       prefix = `${serviceId} — ${type}`;
     }
+
     return `${timestamp} ${level.padEnd(15)} ${prefix.padEnd(55)} ${message}`;
   })
 );

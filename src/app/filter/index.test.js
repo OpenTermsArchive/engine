@@ -75,6 +75,7 @@ const expectedFilteredWithCommonChangingItems = `Title
 const additionalFilter = {
   removeLinks: function removeLinks(document) {
     const links = document.querySelectorAll('a');
+
     links.forEach(link => {
       link.remove();
     });
@@ -83,6 +84,7 @@ const additionalFilter = {
     return new Promise(resolve => {
       setTimeout(() => {
         const links = document.querySelectorAll('a');
+
         links.forEach(link => {
           link.remove();
         });
@@ -95,8 +97,10 @@ const additionalFilter = {
 describe('Filter', () => {
   describe('#convertRelativeURLsToAbsolute', () => {
     let subject;
+
     before(() => {
       const { document: webPageDOM } = new JSDOM(rawHTML).window;
+
       convertRelativeURLsToAbsolute(webPageDOM, virtualLocation);
       subject = Array.from(webPageDOM.querySelectorAll('a[href]')).map(el => el.href);
     });
@@ -120,6 +124,7 @@ describe('Filter', () => {
             contentSelectors: 'body',
           }),
         });
+
         expect(result).to.equal(expectedFilteredWithCommonChangingItems);
       });
 
@@ -131,6 +136,7 @@ describe('Filter', () => {
             contentSelectors: 'body',
           }),
         });
+
         expect(result).to.equal(expectedFiltered);
       });
 
@@ -156,6 +162,7 @@ describe('Filter', () => {
               filters: [ additionalFilter.removeLinks ],
             }),
           });
+
           expect(result).to.equal(expectedFilteredWithAdditional);
         });
       });
@@ -170,6 +177,7 @@ describe('Filter', () => {
               filters: [ additionalFilter.removeLinksAsync ],
             }),
           });
+
           expect(result).to.equal(expectedFilteredWithAdditional);
         });
       });
@@ -183,6 +191,7 @@ describe('Filter', () => {
               contentSelectors: 'h1, #link2',
             }),
           });
+
           expect(result).to.equal('Title\n=====\n\n[link 2](#anchor)');
         });
       });
@@ -197,6 +206,7 @@ describe('Filter', () => {
             contentSelectors: [ 'h1', '#link2' ],
           }),
         });
+
         expect(result).to.equal('Title\n=====\n\n[link 2](#anchor)');
       });
     });
@@ -214,6 +224,7 @@ describe('Filter', () => {
               },
             }),
           });
+
           expect(result).to.equal('[link 1](https://exemple.com/relative/link)');
         });
       });
@@ -229,6 +240,7 @@ describe('Filter', () => {
               },
             }),
           });
+
           expect(result).to.equal('[link 2](#anchor)');
         });
       });
@@ -244,6 +256,7 @@ describe('Filter', () => {
               },
             }),
           });
+
           expect(result).to.equal('[link 2](#anchor)');
         });
       });
@@ -259,6 +272,7 @@ describe('Filter', () => {
               },
             }),
           });
+
           expect(result).to.equal('[link 3](http://absolute.url/link)');
         });
       });
@@ -310,6 +324,7 @@ describe('Filter', () => {
             ],
           }),
         });
+
         expect(result).to.equal('[link 2](#anchor)\n\n[link 3](http://absolute.url/link)');
       });
     });
@@ -329,6 +344,7 @@ describe('Filter', () => {
             ],
           }),
         });
+
         expect(result).to.equal('Title\n=====\n\n[link 3](http://absolute.url/link)');
       });
     });
@@ -344,6 +360,7 @@ describe('Filter', () => {
               noiseSelectors: 'h1',
             }),
           });
+
           expect(result).to.equal('[link 1](https://exemple.com/relative/link)\n\n[link 2](#anchor)\n\n[link 3](http://absolute.url/link)');
         });
       });
@@ -358,6 +375,7 @@ describe('Filter', () => {
               noiseSelectors: [ 'h1', '#link3' ],
             }),
           });
+
           expect(result).to.equal('[link 1](https://exemple.com/relative/link)\n\n[link 2](#anchor)');
         });
       });
@@ -375,6 +393,7 @@ describe('Filter', () => {
               },
             }),
           });
+
           expect(result).to.equal('Title\n=====');
         });
         context('With a "start" selector that has no match', () => {
@@ -427,6 +446,7 @@ describe('Filter', () => {
               ],
             }),
           });
+
           expect(result).to.equal('[link 1](https://exemple.com/relative/link)\n\n[link 2](#anchor)');
         });
       });
@@ -447,6 +467,7 @@ describe('Filter', () => {
               ],
             }),
           });
+
           expect(result).to.equal('[link 1](https://exemple.com/relative/link)\n\n[link 2](#anchor)');
         });
       });

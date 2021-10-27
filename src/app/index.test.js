@@ -53,6 +53,7 @@ describe('CGUs', function () {
 
   describe('#trackChanges', () => {
     let app;
+
     before(async () => {
       nock('https://www.servicea.example')
         .get('/tos')
@@ -74,6 +75,7 @@ describe('CGUs', function () {
           path.resolve(__dirname, SERVICE_A_EXPECTED_SNAPSHOT_FILE_PATH),
           { encoding: 'utf8' }
         );
+
         expect(resultingSnapshotTerms).to.equal(serviceASnapshotExpectedContent);
       });
 
@@ -82,11 +84,13 @@ describe('CGUs', function () {
           path.resolve(__dirname, SERVICE_A_EXPECTED_VERSION_FILE_PATH),
           { encoding: 'utf8' }
         );
+
         expect(resultingTerms).to.equal(serviceAVersionExpectedContent);
       });
 
       it('records snapshot for service B', async () => {
         const resultingSnapshotTerms = await fs.readFile(path.resolve(__dirname, SERVICE_B_EXPECTED_SNAPSHOT_FILE_PATH));
+
         expect(resultingSnapshotTerms.equals(serviceBSnapshotExpectedContent)).to.be.true;
       });
 
@@ -95,6 +99,7 @@ describe('CGUs', function () {
           path.resolve(__dirname, SERVICE_B_EXPECTED_VERSION_FILE_PATH),
           { encoding: 'utf8' }
         );
+
         expect(resultingTerms).to.equal(serviceBVersionExpectedContent);
       });
     });
@@ -123,6 +128,7 @@ describe('CGUs', function () {
 
       it('still records snapshot for service B', async () => {
         const resultingSnapshotTerms = await fs.readFile(path.resolve(__dirname, SERVICE_B_EXPECTED_SNAPSHOT_FILE_PATH));
+
         expect(resultingSnapshotTerms.equals(serviceBSnapshotExpectedContent)).to.be.true;
       });
 
@@ -131,6 +137,7 @@ describe('CGUs', function () {
           path.resolve(__dirname, SERVICE_B_EXPECTED_VERSION_FILE_PATH),
           { encoding: 'utf8' }
         );
+
         expect(resultingTerms).to.equal(serviceBVersionExpectedContent);
       });
     });
@@ -153,17 +160,20 @@ describe('CGUs', function () {
             .get('/privacy')
             .reply(200, serviceBSnapshotExpectedContent, { 'Content-Type': 'application/pdf' });
           const app = new CGUs();
+
           await app.init();
           await app.trackChanges(serviceIds);
 
           const [ originalSnapshotCommit ] = await gitSnapshot().log({
             file: SERVICE_A_EXPECTED_SNAPSHOT_FILE_PATH,
           });
+
           originalSnapshotId = originalSnapshotCommit.hash;
 
           const [ firstVersionCommit ] = await gitVersion().log({
             file: SERVICE_A_EXPECTED_VERSION_FILE_PATH,
           });
+
           firstVersionId = firstVersionCommit.hash;
 
           serviceBCommits = await gitVersion().log({ file: SERVICE_B_EXPECTED_VERSION_FILE_PATH });
@@ -175,6 +185,7 @@ describe('CGUs', function () {
           const [ refilterVersionCommit ] = await gitVersion().log({
             file: SERVICE_A_EXPECTED_VERSION_FILE_PATH,
           });
+
           refilterVersionId = refilterVersionCommit.hash;
           refilterVersionMessageBody = refilterVersionCommit.body;
         });
@@ -186,6 +197,7 @@ describe('CGUs', function () {
             path.resolve(__dirname, SERVICE_A_EXPECTED_VERSION_FILE_PATH),
             { encoding: 'utf8' }
           );
+
           expect(serviceAContent).to.equal('Terms of service with UTF-8 \'çhãràčtęrs"\n========================================');
         });
 
@@ -202,6 +214,7 @@ describe('CGUs', function () {
             path.resolve(__dirname, SERVICE_B_EXPECTED_VERSION_FILE_PATH),
             { encoding: 'utf8' }
           );
+
           expect(serviceBVersion).to.equal(serviceBVersionExpectedContent);
         });
 
@@ -209,6 +222,7 @@ describe('CGUs', function () {
           const serviceBCommitsAfterRefiltering = await gitVersion().log({
             file: SERVICE_B_EXPECTED_VERSION_FILE_PATH,
           });
+
           expect(serviceBCommitsAfterRefiltering.map(commit => commit.hash)).to.deep.equal(serviceBCommits.map(commit => commit.hash));
         });
       });
@@ -216,6 +230,7 @@ describe('CGUs', function () {
       context('When there is an expected error', () => {
         let inaccessibleContentSpy;
         let versionNotChangedSpy;
+
         before(async () => {
           nock('https://www.servicea.example')
             .get('/tos')
@@ -224,6 +239,7 @@ describe('CGUs', function () {
             .get('/privacy')
             .reply(200, serviceBSnapshotExpectedContent, { 'Content-Type': 'application/pdf' });
           const app = new CGUs();
+
           await app.init();
           await app.trackChanges(serviceIds);
 
@@ -260,6 +276,7 @@ describe('CGUs', function () {
     function emitsOnly(eventNames) {
       AVAILABLE_EVENTS.filter(el => eventNames.indexOf(el) < 0).forEach(event => {
         const handlerName = `on${event[0].toUpperCase()}${event.substr(1)}`;
+
         it(`emits no "${event}" event`, () => {
           expect(spies[handlerName]).to.have.not.been.called;
         });
@@ -272,6 +289,7 @@ describe('CGUs', function () {
 
       AVAILABLE_EVENTS.forEach(event => {
         const handlerName = `on${event[0].toUpperCase()}${event.substr(1)}`;
+
         spies[handlerName] = sinon.spy();
         app.on(event, spies[handlerName]);
       });
@@ -289,6 +307,7 @@ describe('CGUs', function () {
 
         after(() => {
           resetSpiesHistory();
+
           return resetGitRepository();
         });
 
@@ -318,6 +337,7 @@ describe('CGUs', function () {
 
           after(() => {
             resetSpiesHistory();
+
             return resetGitRepository();
           });
 
@@ -343,6 +363,7 @@ describe('CGUs', function () {
 
           after(() => {
             resetSpiesHistory();
+
             return resetGitRepository();
           });
 
@@ -369,6 +390,7 @@ describe('CGUs', function () {
 
         after(() => {
           resetSpiesHistory();
+
           return resetGitRepository();
         });
 
@@ -400,6 +422,7 @@ describe('CGUs', function () {
 
           after(() => {
             resetSpiesHistory();
+
             return resetGitRepository();
           });
 
@@ -427,6 +450,7 @@ describe('CGUs', function () {
 
           after(() => {
             resetSpiesHistory();
+
             return resetGitRepository();
           });
 
@@ -453,6 +477,7 @@ describe('CGUs', function () {
 
       after(() => {
         resetSpiesHistory();
+
         return resetGitRepository();
       });
 
@@ -491,11 +516,13 @@ describe('CGUs', function () {
             .reply(200, serviceBSnapshotExpectedContent, { 'Content-Type': 'application/pdf' });
 
           resetSpiesHistory();
+
           return app.trackChanges(serviceIds);
         });
 
         after(() => {
           resetSpiesHistory();
+
           return resetGitRepository();
         });
 
@@ -538,6 +565,7 @@ describe('CGUs', function () {
 
         after(() => {
           resetSpiesHistory();
+
           return resetGitRepository();
         });
 

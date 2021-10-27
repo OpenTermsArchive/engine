@@ -7,6 +7,7 @@ const AVAILABLE_TYPES_NAME = Object.keys(TYPES);
 
 const documentsProperties = () => {
   const result = {};
+
   AVAILABLE_TYPES_NAME.forEach(type => {
     result[type] = {
       type: 'array',
@@ -15,6 +16,7 @@ const documentsProperties = () => {
       },
     };
   });
+
   return result;
 };
 

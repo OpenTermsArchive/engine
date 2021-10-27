@@ -50,6 +50,7 @@ let servicesToValidate = args.filter(arg => !arg.startsWith('--'));
       describe(serviceId, async () => {
         it('has a valid declaration', async () => {
           const declaration = JSON.parse(await fs.readFile(path.join(rootPath, config.get('serviceDeclarationsPath'), `${serviceId}.json`)));
+
           assertValid(serviceSchema, declaration);
         });
 
@@ -60,6 +61,7 @@ let servicesToValidate = args.filter(arg => !arg.startsWith('--'));
               config.get('serviceDeclarationsPath'),
               `${serviceId}.history.json`
             )));
+
             assertValid(serviceHistorySchema, declarationHistory);
           });
         }
@@ -82,6 +84,7 @@ let servicesToValidate = args.filter(arg => !arg.startsWith('--'));
                   cssSelectors: service.getDocumentDeclaration(type).getCssSelectors(),
                   headers,
                 });
+
                 content = document.content;
                 mimeType = document.mimeType;
               });
@@ -144,7 +147,6 @@ let servicesToValidate = args.filter(arg => !arg.startsWith('--'));
                     cssSelectors: service.getDocumentDeclaration(type).getCssSelectors(),
                     headers,
                   });
-
                   const secondFilteredContent = await filter({
                     content: document.content,
                     documentDeclaration: service.getDocumentDeclaration(type),
@@ -177,9 +179,11 @@ function assertValid(schema, subject) {
     let errorMessage = '';
     const sourceMap = jsonSourceMap.stringify(subject, null, 2);
     const jsonLines = sourceMap.json.split('\n');
+
     validator.errors.forEach(error => {
       errorMessage += `\n\n${validator.errorsText([ error ])}`;
       const errorPointer = sourceMap.pointers[error.dataPath];
+
       if (errorPointer) {
         errorMessage += `\n> ${jsonLines
           .slice(errorPointer.value.line, errorPointer.valueEnd.line)

@@ -22,6 +22,7 @@ export default class Git {
 
   optimizeLogGraph() {
     const graphLockFile = `${this.path}/.git/objects/info/commit-graph.lock`;
+
     if (fs.existsSync(graphLockFile)) {
       return;
     }
@@ -44,15 +45,18 @@ export default class Git {
     const options = {
       '--author': `${config.get('history.author').name} <${config.get('history.author').email}>`,
     };
+
     if (authorDate) {
       options['--date'] = new Date(authorDate).toISOString();
     }
     let summary;
+
     if (filepath) {
       summary = await this.git.commit(message, this.relativePath(filepath), options);
     } else {
       summary = await this.git.commit(message, options);
     }
+
     return summary.commit.replace('HEAD ', '').replace('(root-commit) ', '');
   }
 
@@ -64,6 +68,7 @@ export default class Git {
     try {
       options.file = options.file && this.relativePath(options.file);
       const logSummary = await this.git.log(options);
+
       return logSummary.all;
     } catch (error) {
       if (
@@ -74,12 +79,14 @@ export default class Git {
       ) {
         throw error;
       }
+
       return [];
     }
   }
 
   async isTracked(filepath) {
     const result = await this.git.raw('ls-files', this.relativePath(filepath));
+
     return !!result;
   }
 

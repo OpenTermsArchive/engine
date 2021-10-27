@@ -57,6 +57,7 @@ const doctypeMap = {
 
 async function getCommits() {
   const commits = await git.log([ '--stat=4096', '--no-merges' ]);
+
   return commits.map(commit => extractLogInfos(commit));
 }
 
@@ -68,6 +69,7 @@ function extractLogInfos(commit) {
     message,
     diff: { files: filesChanged },
   } = commit;
+
   return { hash, date, message, filesChanged };
 }
 
@@ -94,12 +96,14 @@ function makeFilename(target, filepath, date) {
     }
   }
   const [ safeDateString ] = date.replace('T', '--').replace(/:/g, '-').split('+');
+
   return path.join(target, service, documentType, `${safeDateString}.md`);
 }
 
 function isValidCommit(commitMessage) {
   // util function used for filtering CGUs commits
   const [ firstVerb ] = commitMessage.split(' ');
+
   return [ 'Update', 'Start', 'Refilter' ].includes(firstVerb);
 }
 
@@ -111,6 +115,7 @@ async function makeData(commitInfo) {
   const targetFilePath = makeFilename(TEMP_WORK_FOLDER, filePath, commitInfo.date); // compute target Folder and File Names
 
   const pathCreated = await fs.mkdir(path.dirname(targetFilePath), { recursive: true }); // create target (temp) folder if needed
+
   if (pathCreated) {
     console.log(`created ${pathCreated} as it did not exist.`);
   }
@@ -135,6 +140,7 @@ async function main() {
     '../../data/',
     `${exportTargetFolderName}-${date}-${headCommitShortSha}`
   );
+
   console.log(`Exporting dataset to ${finalPath}`);
 
   for (const commit of filteredCommits) {

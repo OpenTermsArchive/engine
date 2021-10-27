@@ -43,9 +43,11 @@ export async function load() {
       } = documentType;
 
       let filters;
+
       if (filterNames) {
         const filterFilePath = fileName.replace('.json', '.filters.js');
         const serviceFilters = await import(pathToFileURL(path.join(SERVICE_DECLARATIONS_PATH, filterFilePath))); // eslint-disable-line no-await-in-loop
+
         filters = filterNames.map(filterName => serviceFilters[filterName]);
       }
       const document = new DocumentDeclaration({
@@ -90,6 +92,7 @@ export async function loadWithHistory() {
         const { filter: declarationForThisDateFilterNames } = declarationForThisDate;
 
         let actualFilters;
+
         if (declarationForThisDateFilterNames) {
           actualFilters = declarationForThisDateFilterNames.map(filterName => {
             const currentlyValidFilters = filters[filterName].find(entry => !entry.validUntil);
@@ -130,6 +133,7 @@ function extractHistoryDates({ filters, filterNames, documenTypeDeclarationEntri
 
   const sortedDates = allHistoryDates.sort((a, b) => new Date(a) - new Date(b));
   const uniqSortedDates = [ ...new Set(sortedDates) ];
+
   return uniqSortedDates;
 }
 
@@ -212,6 +216,7 @@ export async function getIdsOfModified() {
 async function fileExists(filePath) {
   try {
     await fs.access(filePath);
+
     return true;
   } catch (error) {
     if (error.code === 'ENOENT') {

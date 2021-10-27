@@ -11,6 +11,7 @@ export default class Service {
     }
 
     const { _latest: currentlyValidDocumentDeclaration, _history } = this._documents[documentType];
+
     if (!date) {
       return currentlyValidDocumentDeclaration;
     }
@@ -34,6 +35,7 @@ export default class Service {
 
     if (!document.validUntil) {
       this._documents[document.type]._latest = document;
+
       return;
     }
 

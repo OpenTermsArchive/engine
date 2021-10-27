@@ -3,10 +3,12 @@ export function moveAppPrivacyPolicyIntoGlobalPrivacyPolicy(document) {
   const endOfToS = document.querySelector('[name=coppa] ~ h2');
 
   const appPrivacyPolicy = document.createRange();
+
   appPrivacyPolicy.setStartBefore(startOfAppPrivacyPolicy);
   appPrivacyPolicy.setEndBefore(endOfToS);
 
   const endOfPrivacyPolicy = document.querySelector('[name="#privacy"] ~ h2 ~ h2');
+
   document
     .querySelector('#lt2_content_interior')
     .insertBefore(appPrivacyPolicy.cloneContents(), endOfPrivacyPolicy);

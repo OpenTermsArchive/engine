@@ -8,6 +8,7 @@ export default class Notifier {
   constructor(passedServiceProviders) {
     const defaultClient = sendInBlue.ApiClient.instance;
     const authentication = defaultClient.authentications['api-key'];
+
     authentication.apiKey = process.env.SENDINBLUE_API_KEY;
 
     this.apiInstance = new sendInBlue.SMTPApi();
@@ -84,6 +85,7 @@ export default class Notifier {
       limit,
       offset,
     });
+
     return {
       count,
       lists: await this.getAllPaginatedEntries(
@@ -101,6 +103,7 @@ export default class Notifier {
     const { lists } = await this.getAllContactLists();
 
     const list = lists.find(list => list.name === name);
+
     return list;
   }
 
@@ -139,6 +142,7 @@ export default class Notifier {
     const result = await promise;
 
     accumulator = accumulator.concat(result[resultKey]);
+
     return this.getAllPaginatedEntries(
       functionName,
       resourceIdParameter,

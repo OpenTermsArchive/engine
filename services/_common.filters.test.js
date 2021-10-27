@@ -38,6 +38,7 @@ const applyFilters = document => {
 describe('Common Filters', () => {
   it('should replace data according to filters', async () => {
     const { document } = new JSDOM(snapshotHTML).window;
+
     applyFilters(document);
     const result = document.getElementById('html').outerHTML;
 
@@ -47,6 +48,7 @@ describe('Common Filters', () => {
 
   it('should be idempotent', async () => {
     const { document } = new JSDOM(snapshotHTML).window;
+
     applyFilters(document);
     applyFilters(document);
     const result = document.getElementById('html').outerHTML;

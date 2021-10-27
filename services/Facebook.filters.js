@@ -1,7 +1,9 @@
 export function removeHelpButtons(document) {
   const imgs = document.querySelectorAll('img[src*="https://scontent"]');
+
   imgs.forEach(img => {
     const parent = img.parentNode;
+
     if (parent.tagName === 'A' && !parent.text) {
       parent.remove();
     }

@@ -43,10 +43,12 @@ describe('History', () => {
         content: FILE_CONTENT,
         mimeType: MIME_TYPE,
       });
+
       id = snapshotId;
       filepath = snapshotPath;
       isFirstRecord = isFirstSnapshotRecord;
       const commits = await gitSnapshot().log();
+
       [ commit ] = commits;
     });
 
@@ -87,10 +89,12 @@ describe('History', () => {
           content: MODIFIED_FILE_CONTENT,
           mimeType: MIME_TYPE,
         });
+
         id = snapshotId;
         filepath = snapshotPath;
         isFirstRecord = isFirstSnapshotRecord;
         const commits = await gitSnapshot().log();
+
         [ commit ] = commits;
       });
 
@@ -116,6 +120,7 @@ describe('History', () => {
 
       context('when the content has not changed', () => {
         let commitsBefore;
+
         before(async () => {
           commitsBefore = await gitSnapshot().log();
           const { id: snapshotId, path: snapshotPath } = await recordSnapshot({
@@ -124,12 +129,14 @@ describe('History', () => {
             content: MODIFIED_FILE_CONTENT,
             mimeType: MIME_TYPE,
           });
+
           id = snapshotId;
           filepath = snapshotPath;
         });
 
         it('does not commit', async () => {
           const commitsAfter = await gitSnapshot().log();
+
           expect(commitsAfter).to.deep.equal(commitsBefore);
         });
       });
@@ -157,10 +164,12 @@ describe('History', () => {
         content: FILE_CONTENT,
         snapshotId: SNAPSHOT_ID,
       });
+
       id = versionId;
       filepath = versionPath;
       isFirstRecord = isFirstVersionRecord;
       const commits = await gitVersion().log();
+
       [ commit ] = commits;
     });
 
@@ -210,6 +219,7 @@ describe('History', () => {
         filepath = versionPath;
         isFirstRecord = isFirstVersionRecord;
         const commits = await gitVersion().log();
+
         [ commit ] = commits;
       });
 
@@ -239,6 +249,7 @@ describe('History', () => {
 
       context('when the content has not changed', () => {
         let commitsBefore;
+
         before(async () => {
           commitsBefore = await gitVersion().log();
           const { id: versionId, path: versionPath } = await recordVersion({
@@ -247,14 +258,17 @@ describe('History', () => {
             content: MODIFIED_FILE_CONTENT,
             snapshotId: SNAPSHOT_ID,
           });
+
           id = versionId;
           filepath = versionPath;
           const commits = await gitVersion().log();
+
           [ commit ] = commits;
         });
 
         it('does not commit', async () => {
           const commitsAfter = await gitVersion().log();
+
           expect(commitsAfter).to.deep.equal(commitsBefore);
         });
       });
@@ -267,6 +281,7 @@ describe('History', () => {
         } catch (e) {
           expect(e).to.be.an('error');
           expect(e.message).to.contain('snapshot ID');
+
           return;
         }
         expect.fail('No error was thrown');
@@ -295,10 +310,12 @@ describe('History', () => {
         content: FILE_CONTENT,
         snapshotId: SNAPSHOT_ID,
       });
+
       id = versionId;
       filepath = versionPath;
       isFirstRecord = isFirstVersionRecord;
       const commits = await gitVersion().log();
+
       [ commit ] = commits;
     });
 
@@ -345,10 +362,12 @@ describe('History', () => {
           content: MODIFIED_FILE_CONTENT,
           snapshotId: SNAPSHOT_ID,
         });
+
         id = versionId;
         filepath = versionPath;
         isFirstRecord = isFirstVersionRecord;
         const commits = await gitVersion().log();
+
         [ commit ] = commits;
       });
 
@@ -387,14 +406,17 @@ describe('History', () => {
             content: MODIFIED_FILE_CONTENT,
             snapshotId: SNAPSHOT_ID,
           });
+
           id = versionId;
           filepath = versionPath;
           const commits = await gitVersion().log();
+
           [ commit ] = commits;
         });
 
         it('does not commit', async () => {
           const commitsAfter = await gitVersion().log();
+
           expect(commitsAfter).to.deep.equal(commitsBefore);
         });
       });
@@ -407,6 +429,7 @@ describe('History', () => {
         } catch (e) {
           expect(e).to.be.an('error');
           expect(e.message).to.contain('snapshot ID');
+
           return;
         }
         expect.fail('No error was thrown');

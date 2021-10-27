@@ -86,6 +86,7 @@ describe('Recorder', () => {
       });
       id = await subject.commit(EXPECTED_FILE_PATH, commitMessage);
       const commits = await gitSnapshot().log();
+
       [ commit ] = commits;
     });
 
@@ -113,9 +114,11 @@ describe('Recorder', () => {
         content: FILE_CONTENT,
         changelog,
       });
+
       id = recordId;
       path = recordFilePath;
       const commits = await gitSnapshot().log();
+
       [ commit ] = commits;
     });
 
@@ -146,6 +149,7 @@ describe('Recorder', () => {
           changelog,
           mimeType: 'application/pdf',
         });
+
         path = recordFilePath;
       });
 
@@ -213,6 +217,7 @@ describe('Recorder', () => {
           content: UPDATED_FILE_CONTENT,
           changelog: 'commit this',
         });
+
         lastSnapshotId = recordId;
         latestRecord = await subject.getLatestRecord(SERVICE_PROVIDER_ID, TYPE);
       });
@@ -242,6 +247,7 @@ describe('Recorder', () => {
             mimeType: 'application/pdf',
             changelog: `${FILE_CONTENT} (with fake pdf file)`,
           });
+
           lastSnapshotId = recordId;
           latestRecord = await subject.getLatestRecord(SERVICE_PROVIDER_ID, TYPE);
         });

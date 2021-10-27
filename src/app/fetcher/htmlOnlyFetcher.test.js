@@ -10,6 +10,7 @@ import { InaccessibleContentError } from '../errors.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const { expect } = chai;
+
 chai.use(chaiAsPromised);
 
 describe('HtmlOnlyFetcher', () => {
@@ -30,6 +31,7 @@ describe('HtmlOnlyFetcher', () => {
 
       before(async () => {
         const result = await fetch('https://domain.example/terms.html');
+
         content = result.content;
         mimeType = result.mimeType;
       });
@@ -69,6 +71,7 @@ describe('HtmlOnlyFetcher', () => {
           .reply(200, expectedPDFContent, { 'Content-Type': 'application/pdf' });
 
         const result = await fetch('https://domain.example.com/terms.pdf');
+
         content = result.content;
         mimeType = result.mimeType;
       });

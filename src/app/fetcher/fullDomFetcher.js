@@ -42,6 +42,7 @@ export default async function fetch(url, cssSelectors, headers = {}, { retry } =
       if (retry === MAX_RETRIES) {
         throw new InaccessibleContentError(`Response is empty when trying to fetch '${url}'`);
       }
+
       return await fetch(url, cssSelectors, headers, { retry: retry + 1 });
     }
 

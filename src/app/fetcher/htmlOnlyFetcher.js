@@ -32,6 +32,7 @@ export default async function fetch(url, { headers = {} } = {}) {
   options.headers = { 'Accept-Language': LANGUAGE, ...headers };
 
   let response;
+
   try {
     response = await nodeFetch(url, options);
   } catch (error) {

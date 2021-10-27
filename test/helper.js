@@ -13,12 +13,14 @@ after(eraseRepo);
 
 export async function resetGitRepository() {
   await eraseRepo();
+
   return initRepo();
 }
 
 async function initRepo() {
   _gitVersion = new Git(VERSIONS_PATH);
   _gitSnapshot = new Git(SNAPSHOTS_PATH);
+
   return Promise.all([ _gitVersion.init(), _gitSnapshot.init() ]);
 }
 

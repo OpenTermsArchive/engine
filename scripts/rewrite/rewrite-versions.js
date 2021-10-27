@@ -13,6 +13,7 @@ import { loadFile } from './utils.js';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const ROOT_PATH = path.resolve(__dirname, '../../');
+
 export const SNAPSHOTS_SOURCE_PATH = path.resolve(
   ROOT_PATH,
   config.get('rewrite.snapshotsSourcePath')
@@ -29,6 +30,7 @@ const COUNTERS = {
 };
 
 let history;
+
 (async () => {
   console.time('Total time');
   console.log('Start rewritting history.');
@@ -39,11 +41,13 @@ let history;
 
   console.log('Waiting for git log… (this can take a while)');
   const commits = (await sourceRepo.log([ '--stat=4096' ])).sort((a, b) => new Date(a.date) - new Date(b.date));
+
   console.log(`Source repo contains ${commits.length} commits.\n`);
 
   if (initialize) {
     const targetRepo = await initializer.initTargetRepo(VERSIONS_TARGET_PATH);
     const [ readmeCommit ] = commits;
+
     await initializer.initReadmeAndLicense(targetRepo, VERSIONS_TARGET_PATH, readmeCommit.date);
   }
 
@@ -120,6 +124,7 @@ let history;
   }
 
   const totalTreatedCommits = Object.values(COUNTERS).reduce((acc, value) => acc + value, 0);
+
   console.log(`\nCommits treated: ${totalTreatedCommits} on ${filteredCommits.length}`);
   console.log(`⌙ Commits rewritten: ${COUNTERS.rewritten}`);
   console.log(`⌙ Skipped not changed commits: ${COUNTERS.skippedNoChanges}`);

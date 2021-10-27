@@ -34,11 +34,13 @@ const DOWNLOAD_HISTORY_MESSAGE = `Download the entire history of terms of servic
       await fs.mkdir(config.get('history.snapshotsPath'), { recursive: true });
       await fs.mkdir(config.get('history.versionsPath'), { recursive: true });
       let git = simpleGit(path.resolve(__dirname, '../', config.get('history.snapshotsPath')));
+
       await git.init();
       git = simpleGit(path.resolve(__dirname, '../', config.get('history.versionsPath')));
       await git.init();
     } else {
       const git = simpleGit();
+
       await git.clone(
         config.get('history.publicVersionsRepository'),
         config.get('history.versionsPath')

@@ -9,6 +9,7 @@ import { InaccessibleContentError } from '../errors.js';
 
 const { JSDOM } = jsdom;
 const turndownService = new TurndownService();
+
 turndownService.use(turndownPluginGithubFlavouredMarkdown.gfm);
 
 export const LINKS_TO_CONVERT_SELECTOR = 'a[href]:not([href^="#"])';
@@ -128,6 +129,7 @@ function remove(webPageDOM, noiseSelectors) {
   [].concat(noiseSelectors).forEach(selector => {
     if (typeof selector === 'object') {
       const rangeSelection = selectRange(webPageDOM, selector);
+
       rangeSelection.deleteContents();
     } else {
       Array.from(webPageDOM.querySelectorAll(selector)).forEach(node => node.remove());
@@ -141,6 +143,7 @@ function select(webPageDOM, contentSelectors) {
   [].concat(contentSelectors).forEach(selector => {
     if (typeof selector === 'object') {
       const rangeSelection = selectRange(webPageDOM, selector);
+
       result.appendChild(rangeSelection.cloneContents());
     } else {
       webPageDOM.querySelectorAll(selector).forEach(element => result.appendChild(element));

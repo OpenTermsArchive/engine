@@ -43,6 +43,7 @@ export async function recordSnapshot({
   const isFirstRecord = !(await snapshotRecorder.isTracked(serviceId, documentType));
   const prefix = isFirstRecord ? 'Start tracking' : 'Update';
   let changelog = `${prefix} ${serviceId} ${documentType}`;
+
   changelog = extraChangelogContent ? `${changelog}\n\n${extraChangelogContent}` : changelog;
   const recordResult = await snapshotRecorder.record({
     serviceId,
@@ -82,6 +83,7 @@ async function _recordVersion({
   let prefix = isRefiltering ? 'Refilter' : 'Update';
 
   const isFirstRecord = !(await versionRecorder.isTracked(serviceId, documentType));
+
   prefix = isFirstRecord ? 'Start tracking' : prefix;
 
   const changelog = `${prefix} ${serviceId} ${documentType}

@@ -44,6 +44,7 @@ export function removeIrrelevantModulesFromPrivacyPolicy(document) {
 
   document.querySelectorAll('.divModuleDescription').forEach(moduleDescription => {
     let moduleName = moduleDescription.querySelector('#moduleName');
+
     if (moduleName) {
       moduleName = moduleName.textContent;
     }
@@ -58,6 +59,7 @@ export function removeIrrelevantModulesFromTos(document) {
 
   document.querySelectorAll('.divModuleDescription').forEach(moduleDescription => {
     let moduleName = moduleDescription.querySelector('.FileName');
+
     if (moduleName) {
       moduleName = moduleName.textContent;
     }

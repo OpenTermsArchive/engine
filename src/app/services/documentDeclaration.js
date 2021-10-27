@@ -45,6 +45,7 @@ export default class DocumentDeclaration {
   static extractCssSelectorsFromSelector(selector) {
     if (typeof selector === 'object') {
       const { startBefore, endBefore, startAfter, endAfter } = selector;
+
       return [ startBefore, endBefore, startAfter, endAfter ].filter(rangeSelector => rangeSelector);
     }
 

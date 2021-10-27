@@ -45,14 +45,8 @@ export default class CGUs extends events.EventEmitter {
   }
 
   initQueues() {
-    this.trackDocumentChangesQueue = async.queue(
-      async documentDeclaration => this.trackDocumentChanges(documentDeclaration),
-      MAX_PARALLEL_DOCUMENTS_TRACKS
-    );
-    this.refilterDocumentsQueue = async.queue(
-      async documentDeclaration => this.refilterAndRecordDocument(documentDeclaration),
-      MAX_PARALLEL_REFILTERS
-    );
+    this.trackDocumentChangesQueue = async.queue(async documentDeclaration => this.trackDocumentChanges(documentDeclaration), MAX_PARALLEL_DOCUMENTS_TRACKS);
+    this.refilterDocumentsQueue = async.queue(async documentDeclaration => this.refilterAndRecordDocument(documentDeclaration), MAX_PARALLEL_REFILTERS);
 
     const queueErrorHandler = createGithubError => async (
       error,
@@ -185,6 +179,7 @@ export default class CGUs extends events.EventEmitter {
     } catch (e) {
       if (e instanceof InaccessibleContentError) {
         logger.warn('In refiltering', e);
+
         // previous snapshot did not have the corresponding selectors
         // we can safely ignore this error as it will be fixed in next tracking change
         return null;
@@ -219,6 +214,7 @@ export default class CGUs extends events.EventEmitter {
       type,
       snapshotId
     );
+
     return snapshotId;
   }
 

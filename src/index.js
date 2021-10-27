@@ -15,6 +15,7 @@ const schedule = args.includes('--schedule');
 
 (async () => {
   const app = new CGUs();
+
   app.attach(logger);
   await app.init();
 
@@ -28,6 +29,7 @@ const schedule = args.includes('--schedule');
 
   serviceIds = serviceIds.filter(serviceId => {
     const isServiceDeclared = app.serviceDeclarations[serviceId];
+
     if (!isServiceDeclared) {
       logger.warn(`Service ${serviceId} does not exist and will be ignored.`);
     }
@@ -37,12 +39,14 @@ const schedule = args.includes('--schedule');
 
   if (modifiedOnly && !serviceIds.length) {
     logger.warn('No services have been modified');
+
     return;
   }
 
   serviceIds = serviceIds.length ? serviceIds : app.serviceIds;
 
   const numberOfDocuments = serviceIds.reduce((acc, serviceId) => acc + app.serviceDeclarations[serviceId].getNumberOfDocuments(), 0);
+
   serviceIds = serviceIds.sort((a, b) => a.localeCompare(b));
 
   logger.info(`👇 Refiltering ${numberOfDocuments} documents from ${serviceIds.length} services…`);

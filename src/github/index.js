@@ -41,6 +41,7 @@ export const createIssue = async params => {
   } catch (e) {
     logger.error('Could not create issue');
     logger.error(e.toString());
+
     return null;
   }
 };
@@ -70,6 +71,7 @@ export const searchIssues = async ({ title, q, ...params }) => {
       const { data } = await octokit.rest.search.issuesAndPullRequests(request);
 
       let foundItems = data.items;
+
       // we need to do this because error being asynchronous, if we do not and wait for
       // subsequent pages to be fetch, we could end up in a situation when
       // a new error comes in and fetches also the first page as cache is not setup yet
@@ -79,6 +81,7 @@ export const searchIssues = async ({ title, q, ...params }) => {
       };
 
       const nbPages = Math.ceil(data.total_count / nbPerPage);
+
       if (nbPages > 1) {
         for (let page = 2; page <= nbPages; page++) {
           const {
@@ -98,6 +101,7 @@ export const searchIssues = async ({ title, q, ...params }) => {
       };
     }
     const items = cachedIssues[qOnRepo].items || [];
+
     // baseUrl should be the way to go instead of this ugly filter
     // that may not work in case there are too many issues
     // but it goes with a 404 using octokit
@@ -116,10 +120,12 @@ export const addCommentToIssue = async params => {
   }
   try {
     const { data } = await octokit.rest.issues.createComment(params);
+
     return data;
   } catch (e) {
     logger.error('Could not add comment to issue');
     logger.error(e.toString());
+
     return null;
   }
 };
@@ -143,11 +149,13 @@ export const createIssueIfNotExist = async ({ title, body, labels, comment }) =>
         body,
         labels,
       });
+
       if (existingIssue) {
         logger.info(`🤖 Creating Github issue for ${title}: ${existingIssue.html_url}`);
       } else {
         logger.error(`🤖 Could not create Github issue for ${title}`);
       }
+
       return existingIssue;
     }
     const openedIssues = existingIssues.filter(existingIssue => existingIssue.state === ISSUE_STATE_OPEN);
@@ -169,6 +177,7 @@ export const createIssueIfNotExist = async ({ title, body, labels, comment }) =>
         break;
       }
     }
+
     return existingIssues;
   } catch (e) {
     logger.error('Could not create issue', e.toString());

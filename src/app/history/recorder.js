@@ -19,6 +19,7 @@ export default class Recorder {
 
   async init() {
     this.git.optimizeLogGraph();
+
     return this.git.initConfig();
   }
 
@@ -50,6 +51,7 @@ export default class Recorder {
   async commit(filePath, message, authorDate) {
     try {
       await this.git.add(filePath);
+
       return this.git.commit(filePath, message, authorDate);
     } catch (error) {
       throw new Error(`Could not commit ${filePath} with message "${message}" due to error: "${error}"`);
@@ -76,6 +78,7 @@ export default class Recorder {
     }
 
     const readFileOptions = {};
+
     if (mimeType.startsWith('text/')) {
       readFileOptions.encoding = 'utf8';
     }
@@ -93,6 +96,7 @@ export default class Recorder {
 
   async isTracked(serviceId, documentType) {
     const filePath = this.getPathFor(serviceId, documentType, '*');
+
     return this.git.isTracked(filePath);
   }
 }
@@ -100,6 +104,7 @@ export default class Recorder {
 async function fileExists(filePath) {
   try {
     await fs.access(filePath);
+
     return true;
   } catch (error) {
     if (error.code === 'ENOENT') {
