@@ -6,7 +6,7 @@ import nodeFetch from 'node-fetch';
 import AbortController from 'abort-controller';
 
 const LANGUAGE = 'en';
-const TIMEOUT = 5 * 60 * 1000; // ms
+const TIMEOUT = 5 * 60 * 1000; // 5 minutes in ms
 
 export default async function fetch(url, { headers = {} } = {}) {
   const controller = new AbortController();
