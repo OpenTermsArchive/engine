@@ -401,9 +401,9 @@ Opening a Pull Request means you want that code to be merged. If you want to onl
 
 ### Peer reviews
 
-All pull requests must be reviewed by at least one person which is not their original author.
+All pull requests must be reviewed by at least one person who is not their original author.
 
-To help reviewers, make sure to add to your PR a **clear text explanation** of your changes.
+To help reviewers, make sure to describe your pull request with a **clear text explanation** of your changes.
 
 ## Commit messages
 
