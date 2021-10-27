@@ -24,7 +24,7 @@ rules:
   consistent-return: 0
   function-paren-newline:
   - error
-  - never
+  - multiline
   implicit-arrow-linebreak:
   - 'off'
   import/extensions:
