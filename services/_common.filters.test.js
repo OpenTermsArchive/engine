@@ -30,7 +30,7 @@ const expectedSnapshotCleaned = `
   </body>
 </html>`;
 
-const applyFilters = (document) => {
+const applyFilters = document => {
   removeSIDfromUrls(document);
 };
 
@@ -41,9 +41,7 @@ describe('Common Filters', () => {
     const result = document.getElementById('html').outerHTML;
 
     // TODO we should retrieve the whole HTML with doctype but could not figure out a way to do so
-    expect(prettier.format(result, { parser: 'html' })).to.equal(
-      prettier.format(expectedSnapshotCleaned, { parser: 'html' })
-    );
+    expect(prettier.format(result, { parser: 'html' })).to.equal(prettier.format(expectedSnapshotCleaned, { parser: 'html' }));
   });
 
   it('should be idempotent', async () => {
@@ -53,8 +51,6 @@ describe('Common Filters', () => {
     const result = document.getElementById('html').outerHTML;
 
     // TODO we should retrieve the whole HTML with doctype but could not figure out a way to do so
-    expect(prettier.format(result, { parser: 'html' })).to.equal(
-      prettier.format(expectedSnapshotCleaned, { parser: 'html' })
-    );
+    expect(prettier.format(result, { parser: 'html' })).to.equal(prettier.format(expectedSnapshotCleaned, { parser: 'html' }));
   });
 });

@@ -21,7 +21,7 @@ const alignedWithColorsAndTime = combine(
 
 const consoleTransport = new winston.transports.Console();
 
-const transports = [consoleTransport];
+const transports = [ consoleTransport ];
 
 if (config.get('logger.sendMailOnError')) {
   const mailerOptions = {
@@ -32,26 +32,22 @@ if (config.get('logger.sendMailOnError')) {
     password: process.env.SMTP_PASSWORD,
     ssl: true,
     timeout: 30 * 1000,
-    formatter: (args) => args[Object.getOwnPropertySymbols(args)[1]], // Returns the full error message, the same visible in the console. It is referenced in the argument object with a Symbol of which we do not have the reference but we know it is the second one.
+    formatter: args => args[Object.getOwnPropertySymbols(args)[1]], // Returns the full error message, the same visible in the console. It is referenced in the argument object with a Symbol of which we do not have the reference but we know it is the second one.
     exitOnError: false,
   };
 
-  transports.push(
-    new winston.transports.Mail({
-      ...mailerOptions,
-      level: 'error',
-      subject: '[OTA] Error Report',
-    })
-  );
+  transports.push(new winston.transports.Mail({
+    ...mailerOptions,
+    level: 'error',
+    subject: '[OTA] Error Report',
+  }));
 
   if (config.get('logger.sendMailOnError.sendWarnings')) {
-    transports.push(
-      new winston.transports.Mail({
-        ...mailerOptions,
-        level: 'warn',
-        subject: '[OTA] Inaccessible content',
-      })
-    );
+    transports.push(new winston.transports.Mail({
+      ...mailerOptions,
+      level: 'warn',
+      subject: '[OTA] Inaccessible content',
+    }));
   }
 }
 

@@ -1,11 +1,11 @@
+import async from 'async';
+import config from 'config';
+import events from 'events';
 import * as github from '../github/index.js';
 import * as history from './history/index.js';
 import * as services from './services/index.js';
 
 import { InaccessibleContentError } from './errors.js';
-import async from 'async';
-import config from 'config';
-import events from 'events';
 import fetch from './fetcher/index.js';
 import filter from './filter/index.js';
 import logger from '../logger/index.js';
@@ -46,15 +46,15 @@ export default class CGUs extends events.EventEmitter {
 
   initQueues() {
     this.trackDocumentChangesQueue = async.queue(
-      async (documentDeclaration) => this.trackDocumentChanges(documentDeclaration),
+      async documentDeclaration => this.trackDocumentChanges(documentDeclaration),
       MAX_PARALLEL_DOCUMENTS_TRACKS
     );
     this.refilterDocumentsQueue = async.queue(
-      async (documentDeclaration) => this.refilterAndRecordDocument(documentDeclaration),
+      async documentDeclaration => this.refilterAndRecordDocument(documentDeclaration),
       MAX_PARALLEL_REFILTERS
     );
 
-    const queueErrorHandler = (createGithubError) => async (
+    const queueErrorHandler = createGithubError => async (
       error,
       { location, service, contentSelectors, noiseSelectors, type }
     ) => {
@@ -79,7 +79,7 @@ export default class CGUs extends events.EventEmitter {
           await github.createIssueIfNotExist({
             title,
             body,
-            labels: ['fix-document'],
+            labels: [ 'fix-document' ],
             comment: '🤖 Reopened automatically as an error occured',
           });
         }
@@ -97,7 +97,7 @@ export default class CGUs extends events.EventEmitter {
   }
 
   attach(listener) {
-    AVAILABLE_EVENTS.forEach((event) => {
+    AVAILABLE_EVENTS.forEach(event => {
       const handlerName = `on${event[0].toUpperCase()}${event.substr(1)}`;
 
       if (listener[handlerName]) {
@@ -107,9 +107,8 @@ export default class CGUs extends events.EventEmitter {
   }
 
   async trackChanges(servicesIds) {
-    this._forEachDocumentOf(servicesIds, (documentDeclaration) =>
-      this.trackDocumentChangesQueue.push(documentDeclaration)
-    );
+    this._forEachDocumentOf(servicesIds, documentDeclaration =>
+      this.trackDocumentChangesQueue.push(documentDeclaration));
 
     await this.trackDocumentChangesQueue.drain();
 
@@ -148,7 +147,7 @@ export default class CGUs extends events.EventEmitter {
     });
 
     await github.closeIssueIfExists({
-      labels: ['fix-document'],
+      labels: [ 'fix-document' ],
       title: `Fix ${service.id} - ${type}`,
       comment: '🤖 Closed automatically as data was gathered successfully',
     });
@@ -157,9 +156,8 @@ export default class CGUs extends events.EventEmitter {
   }
 
   async refilterAndRecord(servicesIds) {
-    this._forEachDocumentOf(servicesIds, (documentDeclaration) =>
-      this.refilterDocumentsQueue.push(documentDeclaration)
-    );
+    this._forEachDocumentOf(servicesIds, documentDeclaration =>
+      this.refilterDocumentsQueue.push(documentDeclaration));
 
     await this.refilterDocumentsQueue.drain();
     await this.publish();
@@ -196,8 +194,8 @@ export default class CGUs extends events.EventEmitter {
   }
 
   async _forEachDocumentOf(servicesIds = [], callback) {
-    servicesIds.forEach((serviceId) => {
-      this.services[serviceId].getDocumentTypes().forEach((documentType) => {
+    servicesIds.forEach(serviceId => {
+      this.services[serviceId].getDocumentTypes().forEach(documentType => {
         callback(this.services[serviceId].getDocumentDeclaration(documentType));
       });
     });

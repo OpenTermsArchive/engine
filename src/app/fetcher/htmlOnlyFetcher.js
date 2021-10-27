@@ -1,9 +1,9 @@
 import HttpProxyAgent from 'http-proxy-agent';
 import HttpsProxyAgent from 'https-proxy-agent';
-import { InaccessibleContentError } from '../errors.js';
 import https from 'https';
 import nodeFetch from 'node-fetch';
 import AbortController from 'abort-controller';
+import { InaccessibleContentError } from '../errors.js';
 
 const LANGUAGE = 'en';
 const TIMEOUT = 5 * 60 * 1000; // 5 minutes in ms
@@ -40,9 +40,7 @@ export default async function fetch(url, { headers = {} } = {}) {
   }
 
   if (!response.ok) {
-    throw new InaccessibleContentError(
-      `Received HTTP code ${response.status} when trying to fetch '${url}'`
-    );
+    throw new InaccessibleContentError(`Received HTTP code ${response.status} when trying to fetch '${url}'`);
   }
 
   const mimeType = response.headers.get('content-type');
@@ -55,8 +53,8 @@ export default async function fetch(url, { headers = {} } = {}) {
 
 function handleErrors(error) {
   if (
-    error.code &&
-    error.code.match(/^(EAI_AGAIN|ENOTFOUND|ECONNRESET|CERT_HAS_EXPIRED|ERR_INVALID_PROTOCOL)$/)
+    error.code
+    && error.code.match(/^(EAI_AGAIN|ENOTFOUND|ECONNRESET|CERT_HAS_EXPIRED|ERR_INVALID_PROTOCOL)$/)
   ) {
     throw new InaccessibleContentError(error.message);
   }

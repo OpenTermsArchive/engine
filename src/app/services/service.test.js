@@ -47,7 +47,7 @@ describe('Service', () => {
       });
 
       it('adds the document in the history', async () => {
-        expect(subject._documents['Terms of Service']._history).to.have.members([firstDeclaration]);
+        expect(subject._documents['Terms of Service']._history).to.have.members([ firstDeclaration ]);
       });
     });
   });
@@ -88,9 +88,7 @@ describe('Service', () => {
 
       context('with a date', () => {
         it('returns the last document declaration', async () => {
-          expect(
-            subject.getDocumentDeclaration('Terms of Service', '2020-08-21T11:30:21.000Z')
-          ).to.eql(lastDeclaration);
+          expect(subject.getDocumentDeclaration('Terms of Service', '2020-08-21T11:30:21.000Z')).to.eql(lastDeclaration);
         });
       });
     });
@@ -111,16 +109,12 @@ describe('Service', () => {
 
       context('with a date', () => {
         it('returns the document declaration according to the given date', async () => {
-          expect(
-            subject.getDocumentDeclaration('Terms of Service', '2020-08-21T11:30:21.000Z')
-          ).to.eql(secondDeclaration);
+          expect(subject.getDocumentDeclaration('Terms of Service', '2020-08-21T11:30:21.000Z')).to.eql(secondDeclaration);
         });
 
         context('strictly equal to a document declaration validity date', () => {
           it('returns the document declaration with the validity date equal to the given date', async () => {
-            expect(
-              subject.getDocumentDeclaration('Terms of Service', secondDeclaration.validUntil)
-            ).to.eql(secondDeclaration);
+            expect(subject.getDocumentDeclaration('Terms of Service', secondDeclaration.validUntil)).to.eql(secondDeclaration);
           });
         });
       });

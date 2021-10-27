@@ -7,7 +7,7 @@ const AVAILABLE_TYPES_NAME = Object.keys(TYPES);
 
 const documentsProperties = () => {
   const result = {};
-  AVAILABLE_TYPES_NAME.forEach((type) => {
+  AVAILABLE_TYPES_NAME.forEach(type => {
     result[type] = {
       oneOf: [{ $ref: '#/definitions/document' }, { $ref: '#/definitions/pdfDocument' }],
     };
@@ -19,12 +19,12 @@ const schema = {
   type: 'object',
   additionalProperties: false,
   title: 'Service declaration',
-  required: ['name', 'documents'],
+  required: [ 'name', 'documents' ],
   properties: {
     name: {
       type: 'string',
       title: 'Service public name',
-      examples: ['Facebook'],
+      examples: [ 'Facebook' ],
     },
     documents: {
       type: 'object',
@@ -45,7 +45,7 @@ const schema = {
     pdfDocument: {
       type: 'object',
       additionalProperties: false,
-      required: ['fetch'],
+      required: [ 'fetch' ],
       properties: {
         fetch: {
           type: 'string',
@@ -57,7 +57,7 @@ const schema = {
     document: {
       type: 'object',
       additionalProperties: false,
-      required: ['fetch', 'select'],
+      required: [ 'fetch', 'select' ],
       properties: {
         fetch: {
           type: 'string',
@@ -128,10 +128,10 @@ const schema = {
         endAfter: { $ref: '#/definitions/cssSelector' },
       },
       oneOf: [
-        { required: ['startBefore', 'endBefore'] },
-        { required: ['startBefore', 'endAfter'] },
-        { required: ['startAfter', 'endBefore'] },
-        { required: ['startAfter', 'endAfter'] },
+        { required: [ 'startBefore', 'endBefore' ] },
+        { required: [ 'startBefore', 'endAfter' ] },
+        { required: [ 'startAfter', 'endBefore' ] },
+        { required: [ 'startAfter', 'endAfter' ] },
       ],
     },
   },

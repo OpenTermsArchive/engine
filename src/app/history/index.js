@@ -75,9 +75,7 @@ async function _recordVersion({
   isRefiltering,
 }) {
   if (!snapshotId) {
-    throw new Error(
-      `A snapshot ID is required to ensure data consistency for ${serviceId}'s ${documentType}`
-    );
+    throw new Error(`A snapshot ID is required to ensure data consistency for ${serviceId}'s ${documentType}`);
   }
 
   let prefix = isRefiltering ? 'Refilter' : 'Update';
@@ -88,8 +86,8 @@ async function _recordVersion({
   const changelog = `${prefix} ${serviceId} ${documentType}
 
 This version was recorded after filtering snapshot ${
-    config.get('history.publish') ? config.get('history.snapshotsBaseUrl') : ''
-  }${snapshotId}`;
+  config.get('history.publish') ? config.get('history.snapshotsBaseUrl') : ''
+}${snapshotId}`;
 
   const recordResult = await versionRecorder.record({
     serviceId,
@@ -106,7 +104,7 @@ This version was recorded after filtering snapshot ${
 }
 
 export async function publish() {
-  return Promise.all([snapshotRecorder.publish(), versionRecorder.publish()]);
+  return Promise.all([ snapshotRecorder.publish(), versionRecorder.publish() ]);
 }
 
 export function getLatestSnapshot(serviceId, documentType) {

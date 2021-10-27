@@ -38,14 +38,12 @@ let history;
   const sourceRepo = new Git(SNAPSHOTS_SOURCE_PATH);
 
   console.log('Waiting for git log… (this can take a while)');
-  const commits = (await sourceRepo.log(['--stat=4096'])).sort(
-    (a, b) => new Date(a.date) - new Date(b.date)
-  );
+  const commits = (await sourceRepo.log([ '--stat=4096' ])).sort((a, b) => new Date(a.date) - new Date(b.date));
   console.log(`Source repo contains ${commits.length} commits.\n`);
 
   if (initialize) {
     const targetRepo = await initializer.initTargetRepo(VERSIONS_TARGET_PATH);
-    const [readmeCommit] = commits;
+    const [ readmeCommit ] = commits;
     await initializer.initReadmeAndLicense(targetRepo, VERSIONS_TARGET_PATH, readmeCommit.date);
   }
 
@@ -130,9 +128,7 @@ let history;
   console.timeEnd('Total time');
 
   if (totalTreatedCommits != filteredCommits.length) {
-    console.error(
-      '\n⚠ WARNING: Total treated commits does not match the total number of commits to be treated! ⚠'
-    );
+    console.error('\n⚠ WARNING: Total treated commits does not match the total number of commits to be treated! ⚠');
   }
 
   if (COUNTERS.skippedUnknownError) {

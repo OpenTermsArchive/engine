@@ -3,9 +3,9 @@
  * Commit SHAs are used as opaque unique IDs.
  */
 
-import Git from './git.js';
 import fsApi from 'fs';
 import mime from 'mime';
+import Git from './git.js';
 
 const fs = fsApi.promises;
 
@@ -51,9 +51,7 @@ export default class Recorder {
       await this.git.add(filePath);
       return this.git.commit(filePath, message, authorDate);
     } catch (error) {
-      throw new Error(
-        `Could not commit ${filePath} with message "${message}" due to error: "${error}"`
-      );
+      throw new Error(`Could not commit ${filePath} with message "${message}" due to error: "${error}"`);
     }
   }
 

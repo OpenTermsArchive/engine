@@ -55,8 +55,8 @@ const doctypeMap = {
 };
 
 async function getCommits() {
-  const commits = await git.log(['--stat=4096', '--no-merges']);
-  return commits.map((commit) => extractLogInfos(commit));
+  const commits = await git.log([ '--stat=4096', '--no-merges' ]);
+  return commits.map(commit => extractLogInfos(commit));
 }
 
 function extractLogInfos(commit) {
@@ -73,8 +73,8 @@ function extractLogInfos(commit) {
 function makeFilename(target, filepath, date) {
   // given a target folder and a file path, create target dataset structure
   const splitted = filepath.split('/');
-  let [service] = splitted.slice(-2);
-  const [fileName] = splitted.slice(-1);
+  let [ service ] = splitted.slice(-2);
+  const [ fileName ] = splitted.slice(-1);
   let documentType = path.basename(fileName, '.md');
 
   if (doctypeMap[documentType]) {
@@ -92,20 +92,20 @@ function makeFilename(target, filepath, date) {
       documentType = 'Parent Organization Terms';
     }
   }
-  const [safeDateString] = date.replace('T', '--').replace(/:/g, '-').split('+');
+  const [ safeDateString ] = date.replace('T', '--').replace(/:/g, '-').split('+');
   return path.join(target, service, documentType, `${safeDateString}.md`);
 }
 
 function isValidCommit(commitMessage) {
   // util function used for filtering CGUs commits
-  const [firstVerb] = commitMessage.split(' ');
-  return ['Update', 'Start', 'Refilter'].includes(firstVerb);
+  const [ firstVerb ] = commitMessage.split(' ');
+  return [ 'Update', 'Start', 'Refilter' ].includes(firstVerb);
 }
 
 async function makeData(commitInfo) {
   await git.checkout(commitInfo.hash); // git checkout on that commit
 
-  const [file] = commitInfo.filesChanged;
+  const [ file ] = commitInfo.filesChanged;
   const filePath = path.join(git.path, file.file);
   const targetFilePath = makeFilename(TEMP_WORK_FOLDER, filePath, commitInfo.date); // compute target Folder and File Names
 
@@ -118,7 +118,7 @@ async function makeData(commitInfo) {
 }
 
 async function main() {
-  const [folderNameArg] = process.argv.filter((el) => el.startsWith('--folder-name='));
+  const [ folderNameArg ] = process.argv.filter(el => el.startsWith('--folder-name='));
 
   const exportTargetFolderName = folderNameArg ? folderNameArg.split('=')[1] : 'dataset';
 
@@ -126,7 +126,7 @@ async function main() {
 
   const filteredCommits = commits.filter(({ message }) => isValidCommit(message));
 
-  const [date] = new Date().toISOString().split('T');
+  const [ date ] = new Date().toISOString().split('T');
   const [{ hash }] = filteredCommits;
   const headCommitShortSha = hash.slice(0, 7);
   const finalPath = path.resolve(

@@ -68,8 +68,8 @@ export default class Git {
     } catch (error) {
       if (
         !(
-          error.message.includes('unknown revision or path not in the working tree') ||
-          error.message.includes('does not have any commits yet')
+          error.message.includes('unknown revision or path not in the working tree')
+          || error.message.includes('does not have any commits yet')
         )
       ) {
         throw error;
@@ -84,18 +84,16 @@ export default class Git {
   }
 
   async findUnique(glob) {
-    const [latestCommit] = await this.log(['-n', '1', '--stat=4096', glob]);
+    const [ latestCommit ] = await this.log([ '-n', '1', '--stat=4096', glob ]);
 
     if (!latestCommit) {
       return {};
     }
 
-    const filePaths = latestCommit.diff.files.map((file) => file.file);
+    const filePaths = latestCommit.diff.files.map(file => file.file);
 
     if (filePaths.length > 1) {
-      throw new Error(
-        `Only one document should have been recorded in ${latestCommit.hash}, but all these documents were recorded: ${filePaths}`
-      );
+      throw new Error(`Only one document should have been recorded in ${latestCommit.hash}, but all these documents were recorded: ${filePaths}`);
     }
 
     return {

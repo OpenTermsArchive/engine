@@ -46,7 +46,7 @@ describe('History', () => {
       filepath = snapshotPath;
       isFirstRecord = isFirstSnapshotRecord;
       const commits = await gitSnapshot().log();
-      [commit] = commits;
+      [ commit ] = commits;
     });
 
     after(resetGitRepository);
@@ -90,13 +90,11 @@ describe('History', () => {
         filepath = snapshotPath;
         isFirstRecord = isFirstSnapshotRecord;
         const commits = await gitSnapshot().log();
-        [commit] = commits;
+        [ commit ] = commits;
       });
 
       it('creates the file with the proper content', async () => {
-        expect(await fs.readFile(EXPECTED_FILE_PATH, { encoding: 'utf8' })).to.equal(
-          MODIFIED_FILE_CONTENT
-        );
+        expect(await fs.readFile(EXPECTED_FILE_PATH, { encoding: 'utf8' })).to.equal(MODIFIED_FILE_CONTENT);
       });
 
       it('returns the file path', () => {
@@ -162,7 +160,7 @@ describe('History', () => {
       filepath = versionPath;
       isFirstRecord = isFirstVersionRecord;
       const commits = await gitVersion().log();
-      [commit] = commits;
+      [ commit ] = commits;
     });
 
     after(resetGitRepository);
@@ -211,13 +209,11 @@ describe('History', () => {
         filepath = versionPath;
         isFirstRecord = isFirstVersionRecord;
         const commits = await gitVersion().log();
-        [commit] = commits;
+        [ commit ] = commits;
       });
 
       it('creates the file with the proper content', async () => {
-        expect(await fs.readFile(EXPECTED_FILE_PATH, { encoding: 'utf8' })).to.equal(
-          MODIFIED_FILE_CONTENT
-        );
+        expect(await fs.readFile(EXPECTED_FILE_PATH, { encoding: 'utf8' })).to.equal(MODIFIED_FILE_CONTENT);
       });
 
       it('returns the file path', () => {
@@ -253,7 +249,7 @@ describe('History', () => {
           id = versionId;
           filepath = versionPath;
           const commits = await gitVersion().log();
-          [commit] = commits;
+          [ commit ] = commits;
         });
 
         it('does not commit', async () => {
@@ -302,7 +298,7 @@ describe('History', () => {
       filepath = versionPath;
       isFirstRecord = isFirstVersionRecord;
       const commits = await gitVersion().log();
-      [commit] = commits;
+      [ commit ] = commits;
     });
 
     after(resetGitRepository);
@@ -352,13 +348,11 @@ describe('History', () => {
         filepath = versionPath;
         isFirstRecord = isFirstVersionRecord;
         const commits = await gitVersion().log();
-        [commit] = commits;
+        [ commit ] = commits;
       });
 
       it('creates the file with the proper content', async () => {
-        expect(await fs.readFile(EXPECTED_FILE_PATH, { encoding: 'utf8' })).to.equal(
-          MODIFIED_FILE_CONTENT
-        );
+        expect(await fs.readFile(EXPECTED_FILE_PATH, { encoding: 'utf8' })).to.equal(MODIFIED_FILE_CONTENT);
       });
 
       it('returns the file path', () => {
@@ -395,7 +389,7 @@ describe('History', () => {
           id = versionId;
           filepath = versionPath;
           const commits = await gitVersion().log();
-          [commit] = commits;
+          [ commit ] = commits;
         });
 
         it('does not commit', async () => {
