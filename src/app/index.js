@@ -73,7 +73,7 @@ export default class CGUs extends events.EventEmitter {
           await github.createIssueIfNotExist({
             title,
             body,
-            labels: [ 'fix-document' ],
+            labels: ['fix-document'],
             comment: '🤖 Reopened automatically as an error occured',
           });
         }
@@ -141,7 +141,7 @@ export default class CGUs extends events.EventEmitter {
     });
 
     await github.closeIssueIfExists({
-      labels: [ 'fix-document' ],
+      labels: ['fix-document'],
       title: `Fix ${service.id} - ${type}`,
       comment: '🤖 Closed automatically as data was gathered successfully',
     });

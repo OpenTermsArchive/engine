@@ -77,7 +77,7 @@ export async function loadWithHistory() {
     for (const documentType of Object.keys(declaration)) {
       const documenTypeDeclarationEntries = declaration[documentType];
 
-      const filterNames = [ ...new Set(documenTypeDeclarationEntries.flatMap(declaration => declaration.filter)) ].filter(el => el);
+      const filterNames = [...new Set(documenTypeDeclarationEntries.flatMap(declaration => declaration.filter))].filter(el => el);
 
       const allHistoryDates = extractHistoryDates({
         documenTypeDeclarationEntries,
@@ -132,7 +132,7 @@ function extractHistoryDates({ filters, filterNames, documenTypeDeclarationEntri
   documenTypeDeclarationEntries.forEach(({ validUntil }) => allHistoryDates.push(validUntil));
 
   const sortedDates = allHistoryDates.sort((a, b) => new Date(a) - new Date(b));
-  const uniqSortedDates = [ ...new Set(sortedDates) ];
+  const uniqSortedDates = [...new Set(sortedDates)];
 
   return uniqSortedDates;
 }

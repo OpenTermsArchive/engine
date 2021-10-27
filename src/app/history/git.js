@@ -91,7 +91,7 @@ export default class Git {
   }
 
   async findUnique(glob) {
-    const [ latestCommit ] = await this.log([ '-n', '1', '--stat=4096', glob ]);
+    const [latestCommit] = await this.log([ '-n', '1', '--stat=4096', glob ]);
 
     if (!latestCommit) {
       return {};

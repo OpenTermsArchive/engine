@@ -26,7 +26,7 @@ const schema = {
     name: {
       type: 'string',
       title: 'Service public name',
-      examples: [ 'Facebook' ],
+      examples: ['Facebook'],
     },
     documents: {
       type: 'object',
@@ -47,7 +47,7 @@ const schema = {
     pdfDocument: {
       type: 'object',
       additionalProperties: false,
-      required: [ 'fetch' ],
+      required: ['fetch'],
       properties: {
         fetch: {
           type: 'string',

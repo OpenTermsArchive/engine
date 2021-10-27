@@ -49,6 +49,6 @@ export default class DocumentDeclaration {
       return [ startBefore, endBefore, startAfter, endAfter ].filter(rangeSelector => rangeSelector);
     }
 
-    return [ selector ];
+    return [selector];
   }
 }

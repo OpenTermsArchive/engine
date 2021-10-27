@@ -49,7 +49,7 @@ describe('History', () => {
       isFirstRecord = isFirstSnapshotRecord;
       const commits = await gitSnapshot().log();
 
-      [ commit ] = commits;
+      [commit] = commits;
     });
 
     after(resetGitRepository);
@@ -95,7 +95,7 @@ describe('History', () => {
         isFirstRecord = isFirstSnapshotRecord;
         const commits = await gitSnapshot().log();
 
-        [ commit ] = commits;
+        [commit] = commits;
       });
 
       it('creates the file with the proper content', async () => {
@@ -170,7 +170,7 @@ describe('History', () => {
       isFirstRecord = isFirstVersionRecord;
       const commits = await gitVersion().log();
 
-      [ commit ] = commits;
+      [commit] = commits;
     });
 
     after(resetGitRepository);
@@ -220,7 +220,7 @@ describe('History', () => {
         isFirstRecord = isFirstVersionRecord;
         const commits = await gitVersion().log();
 
-        [ commit ] = commits;
+        [commit] = commits;
       });
 
       it('creates the file with the proper content', async () => {
@@ -263,7 +263,7 @@ describe('History', () => {
           filepath = versionPath;
           const commits = await gitVersion().log();
 
-          [ commit ] = commits;
+          [commit] = commits;
         });
 
         it('does not commit', async () => {
@@ -316,7 +316,7 @@ describe('History', () => {
       isFirstRecord = isFirstVersionRecord;
       const commits = await gitVersion().log();
 
-      [ commit ] = commits;
+      [commit] = commits;
     });
 
     after(resetGitRepository);
@@ -368,7 +368,7 @@ describe('History', () => {
         isFirstRecord = isFirstVersionRecord;
         const commits = await gitVersion().log();
 
-        [ commit ] = commits;
+        [commit] = commits;
       });
 
       it('creates the file with the proper content', async () => {
@@ -411,7 +411,7 @@ describe('History', () => {
           filepath = versionPath;
           const commits = await gitVersion().log();
 
-          [ commit ] = commits;
+          [commit] = commits;
         });
 
         it('does not commit', async () => {

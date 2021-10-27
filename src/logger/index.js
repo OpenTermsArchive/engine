@@ -23,7 +23,7 @@ const alignedWithColorsAndTime = combine(
 
 const consoleTransport = new winston.transports.Console();
 
-const transports = [ consoleTransport ];
+const transports = [consoleTransport];
 
 if (config.get('logger.sendMailOnError')) {
   const mailerOptions = {

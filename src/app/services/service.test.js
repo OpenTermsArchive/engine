@@ -48,7 +48,7 @@ describe('Service', () => {
       });
 
       it('adds the document in the history', async () => {
-        expect(subject._documents['Terms of Service']._history).to.have.members([ firstDeclaration ]);
+        expect(subject._documents['Terms of Service']._history).to.have.members([firstDeclaration]);
       });
     });
   });

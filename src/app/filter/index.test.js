@@ -161,7 +161,7 @@ describe('Filter', () => {
             documentDeclaration: new DocumentDeclaration({
               location: virtualLocation,
               contentSelectors: 'body',
-              filters: [ additionalFilter.removeLinks ],
+              filters: [additionalFilter.removeLinks],
             }),
           });
 
@@ -176,7 +176,7 @@ describe('Filter', () => {
             documentDeclaration: new DocumentDeclaration({
               location: virtualLocation,
               contentSelectors: 'body',
-              filters: [ additionalFilter.removeLinksAsync ],
+              filters: [additionalFilter.removeLinksAsync],
             }),
           });
 

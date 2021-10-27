@@ -164,13 +164,13 @@ describe('CGUs', function () {
           await app.init();
           await app.trackChanges(serviceIds);
 
-          const [ originalSnapshotCommit ] = await gitSnapshot().log({
+          const [originalSnapshotCommit] = await gitSnapshot().log({
             file: SERVICE_A_EXPECTED_SNAPSHOT_FILE_PATH,
           });
 
           originalSnapshotId = originalSnapshotCommit.hash;
 
-          const [ firstVersionCommit ] = await gitVersion().log({
+          const [firstVersionCommit] = await gitVersion().log({
             file: SERVICE_A_EXPECTED_VERSION_FILE_PATH,
           });
 
@@ -182,7 +182,7 @@ describe('CGUs', function () {
 
           await app.refilterAndRecord([ 'service_A', 'service_B' ]);
 
-          const [ refilterVersionCommit ] = await gitVersion().log({
+          const [refilterVersionCommit] = await gitVersion().log({
             file: SERVICE_A_EXPECTED_VERSION_FILE_PATH,
           });
 
@@ -318,7 +318,7 @@ describe('CGUs', function () {
           );
         });
 
-        emitsOnly([ 'firstSnapshotRecorded' ]);
+        emitsOnly(['firstSnapshotRecorded']);
       });
 
       context('When it is not the first record', () => {
@@ -345,7 +345,7 @@ describe('CGUs', function () {
             expect(spies.onSnapshotRecorded).to.have.been.calledWith(SERVICE_A_ID, SERVICE_A_TYPE);
           });
 
-          emitsOnly([ 'snapshotRecorded' ]);
+          emitsOnly(['snapshotRecorded']);
         });
 
         context('When there are no changes', () => {
@@ -374,7 +374,7 @@ describe('CGUs', function () {
             );
           });
 
-          emitsOnly([ 'snapshotNotChanged' ]);
+          emitsOnly(['snapshotNotChanged']);
         });
       });
     });
@@ -401,7 +401,7 @@ describe('CGUs', function () {
           );
         });
 
-        emitsOnly([ 'firstVersionRecorded' ]);
+        emitsOnly(['firstVersionRecorded']);
       });
 
       context('When it is not the first record', () => {
@@ -430,7 +430,7 @@ describe('CGUs', function () {
             expect(spies.onVersionRecorded).to.have.been.calledWith(SERVICE_A_ID, SERVICE_A_TYPE);
           });
 
-          emitsOnly([ 'versionRecorded' ]);
+          emitsOnly(['versionRecorded']);
         });
 
         context('When there are no changes', () => {
@@ -458,7 +458,7 @@ describe('CGUs', function () {
             expect(spies.onVersionNotChanged).to.have.been.calledWith(SERVICE_A_ID, SERVICE_A_TYPE);
           });
 
-          emitsOnly([ 'versionNotChanged' ]);
+          emitsOnly(['versionNotChanged']);
         });
       });
     });

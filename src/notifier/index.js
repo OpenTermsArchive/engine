@@ -70,7 +70,7 @@ export default class Notifier {
 
     contacts = contacts.flat();
 
-    const uniqueContacts = [ ...new Map(contacts.map(item => [ item.id, item ])).values() ];
+    const uniqueContacts = [...new Map(contacts.map(item => [ item.id, item ])).values()];
 
     const sendPromises = uniqueContacts.map(contact =>
       this.apiInstance.sendTransacEmail({ ...sendParams, to: [{ email: contact.email }] }));

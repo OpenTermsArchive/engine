@@ -31,13 +31,13 @@ let history;
   const sourceRepo = new Git(SNAPSHOTS_SOURCE_PATH);
 
   console.log('Waiting for git log… (this can take a while)');
-  const commits = (await sourceRepo.log([ '--stat=4096' ])).sort((a, b) => new Date(a.date) - new Date(b.date));
+  const commits = (await sourceRepo.log(['--stat=4096'])).sort((a, b) => new Date(a.date) - new Date(b.date));
 
   console.log(`Source repo contains ${commits.length} commits.\n`);
 
   if (initialize) {
     const targetRepo = await initializer.initTargetRepo(SNAPSHOTS_TARGET_PATH);
-    const [ readmeCommit ] = commits;
+    const [readmeCommit] = commits;
 
     await initializer.initReadmeAndLicense(targetRepo, SNAPSHOTS_TARGET_PATH, readmeCommit.date);
   }

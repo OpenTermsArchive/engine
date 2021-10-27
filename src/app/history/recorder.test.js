@@ -87,7 +87,7 @@ describe('Recorder', () => {
       id = await subject.commit(EXPECTED_FILE_PATH, commitMessage);
       const commits = await gitSnapshot().log();
 
-      [ commit ] = commits;
+      [commit] = commits;
     });
 
     after(resetGitRepository);
@@ -119,7 +119,7 @@ describe('Recorder', () => {
       path = recordFilePath;
       const commits = await gitSnapshot().log();
 
-      [ commit ] = commits;
+      [commit] = commits;
     });
 
     after(resetGitRepository);
