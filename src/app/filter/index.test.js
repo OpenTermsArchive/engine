@@ -61,6 +61,7 @@ const rawHTMLWithCommonChangingItems = `
   </body>
 </html>`;
 
+/* eslint-disable no-irregular-whitespace */
 const expectedFilteredWithCommonChangingItems = `Title
 =====
 
@@ -70,7 +71,8 @@ const expectedFilteredWithCommonChangingItems = `Title
 
 [link 3](http://absolute.url/link)
 
-[\\[email protected\\]](https://exemple.com/cdn-cgi/l/email-protection#removed)`;
+[\\[email protected\\]](https://exemple.com/cdn-cgi/l/email-protection#removed)`;
+/* eslint-enable no-irregular-whitespace */
 
 const additionalFilter = {
   removeLinks: function removeLinks(document) {
