@@ -1,6 +1,7 @@
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import http from 'http';
+
 import fetch from './fullDomFetcher.js';
 import { InaccessibleContentError } from '../errors.js';
 

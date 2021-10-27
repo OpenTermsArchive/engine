@@ -1,4 +1,5 @@
 import chai from 'chai';
+
 import DocumentDeclaration from './documentDeclaration.js';
 
 const { expect } = chai;

@@ -32,6 +32,12 @@ rules:
   - always
   - ignorePackages: true
   import/prefer-default-export: 0
+  import/order:
+  - error
+  - groups:
+    - - builtin
+      - external
+    newlines-between: always
   indent:
   - error
   - 2

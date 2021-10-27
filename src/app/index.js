@@ -1,10 +1,10 @@
 import async from 'async';
 import config from 'config';
 import events from 'events';
+
 import * as github from '../github/index.js';
 import * as history from './history/index.js';
 import * as services from './services/index.js';
-
 import { InaccessibleContentError } from './errors.js';
 import fetch from './fetcher/index.js';
 import filter from './filter/index.js';

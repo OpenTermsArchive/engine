@@ -1,9 +1,9 @@
 import './bootstrap.js';
 
 import scheduler from 'node-schedule';
-import * as services from './app/services/index.js';
 
 import CGUs from './app/index.js';
+import * as services from './app/services/index.js';
 import Notifier from './notifier/index.js';
 import logger from './logger/index.js';
 import { publishRelease } from '../scripts/release/releasedataset.js';

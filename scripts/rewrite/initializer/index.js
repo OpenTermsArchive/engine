@@ -1,6 +1,7 @@
 import { fileURLToPath } from 'url';
 import fsApi from 'fs';
 import path from 'path';
+
 import { fileExists } from '../utils.js';
 import Git from '../../../src/app/history/git.js';
 

@@ -1,7 +1,7 @@
 import fsApi from 'fs';
 import path from 'path';
-import { SNAPSHOTS_PATH, VERSIONS_PATH } from '../src/app/history/index.js';
 
+import { SNAPSHOTS_PATH, VERSIONS_PATH } from '../src/app/history/index.js';
 import Git from '../src/app/history/git.js';
 
 const fs = fsApi.promises;

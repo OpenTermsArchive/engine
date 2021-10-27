@@ -4,6 +4,7 @@ import nock from 'nock';
 import path from 'path';
 import sinon from 'sinon';
 import sinonChai from 'sinon-chai';
+
 import { gitSnapshot, gitVersion, resetGitRepository } from '../../test/helper.js';
 import { SNAPSHOTS_PATH, VERSIONS_PATH } from './history/index.js';
 import CGUs, { AVAILABLE_EVENTS } from './index.js';

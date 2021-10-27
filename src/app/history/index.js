@@ -5,6 +5,7 @@
 import config from 'config';
 import { fileURLToPath } from 'url';
 import path from 'path';
+
 import Recorder from './recorder.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));

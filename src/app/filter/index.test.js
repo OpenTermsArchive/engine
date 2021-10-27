@@ -3,6 +3,7 @@ import { fileURLToPath } from 'url';
 import fsApi from 'fs';
 import jsdom from 'jsdom';
 import path from 'path';
+
 import DocumentDeclaration from '../services/documentDeclaration.js';
 import { InaccessibleContentError } from '../errors.js';
 import { convertRelativeURLsToAbsolute, filterHTML, filterPDF } from './index.js';

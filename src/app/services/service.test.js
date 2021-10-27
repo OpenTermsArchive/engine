@@ -1,4 +1,5 @@
 import chai from 'chai';
+
 import DocumentDeclaration from './documentDeclaration.js';
 import Service from './service.js';
 

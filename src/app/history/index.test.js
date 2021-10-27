@@ -1,5 +1,6 @@
 import chai from 'chai';
 import fsApi from 'fs';
+
 import {
   SNAPSHOTS_PATH,
   VERSIONS_PATH,
