@@ -2,7 +2,8 @@ First of all, thanks for taking the time to contribute! 🎉👍
 
 ## Table of Contents
 
-### Document related contributions
+### Contributing documents
+
 - [Tracking new documents](#tracking-new-documents)
   - [Declaring a new service](#declaring-a-new-service)
     - [Service name](#service-name)
@@ -25,12 +26,15 @@ First of all, thanks for taking the time to contribute! 🎉👍
     - [Filters history](#filters-history)
   - [Refiltering your documents](#refiltering-your-documents)
 
-### Code related contributions
+### Contributing code
+
 - [Pull requests](#pull-requests)
-- [Commits naming convention](#commits-naming-convention)
+- [Peer reviews](#peer-reviews)
+- [Commit messages](#commits-naming-convention)
 
 ---
-# Document related contributions
+
+# Contributing documents
 
 ## Tracking new documents
 
@@ -387,7 +391,8 @@ If you change filters or selectors and want to re-apply them on previously fetch
 npm run refilter [$service_id]
 ```
 
-# Code related contributions
+# Contributing code
+
 ## Pull requests
 
 We follow the [GitHub Flow](https://guides.github.com/introduction/flow/): all code contributions are submitted via a pull request towards the `master` branch.
@@ -400,7 +405,7 @@ All pull requests must be reviewed by at least one person which is not their ori
 
 To help reviewers, make sure to add to your PR a **clear text explanation** of your changes.
 
-## Commits naming convention
+## Commit messages
 
 We strive to follow this [recommendation](https://chris.beams.io/posts/git-commit) to write our commit messages, which contains the following rules:
 
