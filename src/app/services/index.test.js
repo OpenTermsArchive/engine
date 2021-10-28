@@ -1,7 +1,7 @@
-import * as services from './index.js';
-
 import chai from 'chai';
 import chaiExclude from 'chai-exclude';
+
+import * as services from './index.js';
 import expectedServices from '../../../test/fixtures/services.js';
 
 chai.use(chaiExclude);
@@ -13,41 +13,38 @@ describe('Services', () => {
 
     async function validateServiceWithoutHistory(serviceId, expected) {
       it('has the proper structure', () => {
-        expect(result[serviceId]).excludingEvery(['filters', '_history']).to.deep.equal(expected);
+        expect(result[serviceId]).excludingEvery([ 'filters', '_history' ]).to.deep.equal(expected);
       });
 
       /* eslint-disable no-loop-func */
       for (const documentType of expected.getDocumentTypes()) {
         context(`${documentType}`, () => {
           it('has no history', () => {
-            const { _history: actualHistory } = result[serviceId].getDocumentDeclaration(
-              documentType
-            );
+            const { _history: actualHistory } = result[serviceId].getDocumentDeclaration(documentType);
+
             expect(actualHistory).to.be.undefined;
           });
 
           const { filters: expectedFilters } = expected.getDocumentDeclaration(documentType);
+
           if (expectedFilters) {
             it('has the proper number of filter functions', async () => {
               const actualDocument = result[serviceId].getDocumentDeclaration(documentType);
+
               expect(actualDocument.filters.length).to.equal(expectedFilters.length);
             });
 
             for (let indexFilter = 0; indexFilter < expectedFilters.length; indexFilter++) {
               it(`has the proper "${expectedFilters[indexFilter].name}" filter function`, async () => {
-                const { filters: actualFilters } = result[serviceId].getDocumentDeclaration(
-                  documentType
-                );
-                expect(await actualFilters[indexFilter]()).equal(
-                  await expectedFilters[indexFilter]()
-                ); // eslint-disable-line no-await-in-loop
+                const { filters: actualFilters } = result[serviceId].getDocumentDeclaration(documentType);
+
+                expect(await actualFilters[indexFilter]()).equal(await expectedFilters[indexFilter]()); // eslint-disable-line no-await-in-loop
               });
             }
           } else {
             it('has no filters', () => {
-              const { filters: actualFilters } = result[serviceId].getDocumentDeclaration(
-                documentType
-              );
+              const { filters: actualFilters } = result[serviceId].getDocumentDeclaration(documentType);
+
               expect(actualFilters).to.be.undefined;
             });
           }
@@ -114,19 +111,20 @@ describe('Services', () => {
       for (const documentType of expected.getDocumentTypes()) {
         context(`${documentType}`, () => {
           const { _history: expectedHistory } = expected._documents[documentType];
-          const expectedHistoryDates =
-            expectedHistory && expectedHistory.map((entry) => entry.validUntil);
+          const expectedHistoryDates = expectedHistory && expectedHistory.map(entry => entry.validUntil);
 
           if (expectedHistoryDates) {
             for (const date of expectedHistoryDates) {
               context(`${date} history entry`, () => {
                 const expectedDocument = expected.getDocumentDeclaration(documentType, date);
+
                 if (expectedDocument.filters) {
                   it('has the proper number of filter functions', async () => {
                     const actualDocument = result[serviceId].getDocumentDeclaration(
                       documentType,
                       date
                     );
+
                     expect(actualDocument.filters.length).to.equal(expectedDocument.filters.length);
                   });
 
@@ -140,9 +138,8 @@ describe('Services', () => {
                         documentType,
                         date
                       );
-                      expect(await actualDocument.filters[indexFilter]()).equal(
-                        await expectedDocument.filters[indexFilter]()
-                      ); // eslint-disable-line no-await-in-loop
+
+                      expect(await actualDocument.filters[indexFilter]()).equal(await expectedDocument.filters[indexFilter]()); // eslint-disable-line no-await-in-loop
                     });
                   }
                 } else {
@@ -151,6 +148,7 @@ describe('Services', () => {
                       documentType,
                       date
                     );
+
                     expect(actualDocument.filters).to.be.undefined;
                   });
                 }
@@ -159,12 +157,15 @@ describe('Services', () => {
           } else {
             it('has no history', async () => {
               const { _history } = result[serviceId]._documents[documentType];
+
               expect(_history).to.be.undefined;
             });
             const expectedDocument = expected.getDocumentDeclaration(documentType);
+
             if (expectedDocument.filters) {
               it('has the proper number of filter functions', async () => {
                 const actualDocument = result[serviceId].getDocumentDeclaration(documentType);
+
                 expect(actualDocument.filters.length).to.equal(expectedDocument.filters.length);
               });
 
@@ -175,14 +176,14 @@ describe('Services', () => {
               ) {
                 it(`has the proper "${expectedDocument.filters[indexFilter].name}" filter function`, async () => {
                   const actualDocument = result[serviceId].getDocumentDeclaration(documentType);
-                  expect(await actualDocument.filters[indexFilter]()).equal(
-                    await expectedDocument.filters[indexFilter]()
-                  ); // eslint-disable-line no-await-in-loop
+
+                  expect(await actualDocument.filters[indexFilter]()).equal(await expectedDocument.filters[indexFilter]()); // eslint-disable-line no-await-in-loop
                 });
               }
             } else {
               it('has no filters', () => {
                 const actualDocument = result[serviceId].getDocumentDeclaration(documentType);
+
                 expect(actualDocument.filters).to.be.undefined;
               });
             }

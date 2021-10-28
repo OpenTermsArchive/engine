@@ -1,4 +1,5 @@
 import chai from 'chai';
+
 import DocumentDeclaration from './documentDeclaration.js';
 
 const { expect } = chai;
@@ -23,7 +24,7 @@ describe('DocumentDeclaration', () => {
             },
           }).getCssSelectors();
 
-          expect(result).to.deep.equal(['#startBefore', '#endBefore']);
+          expect(result).to.deep.equal([ '#startBefore', '#endBefore' ]);
         });
       });
 
@@ -39,7 +40,7 @@ describe('DocumentDeclaration', () => {
             ],
           }).getCssSelectors();
 
-          expect(result).to.deep.equal(['#startBefore', '#endBefore', 'body']);
+          expect(result).to.deep.equal([ '#startBefore', '#endBefore', 'body' ]);
         });
       });
     });
@@ -64,7 +65,7 @@ describe('DocumentDeclaration', () => {
             },
           }).getCssSelectors();
 
-          expect(result).to.deep.equal(['#startBefore', '#endBefore']);
+          expect(result).to.deep.equal([ '#startBefore', '#endBefore' ]);
         });
       });
 
@@ -80,7 +81,7 @@ describe('DocumentDeclaration', () => {
             ],
           }).getCssSelectors();
 
-          expect(result).to.deep.equal(['#startBefore', '#endBefore', 'body']);
+          expect(result).to.deep.equal([ '#startBefore', '#endBefore', 'body' ]);
         });
       });
     });
@@ -93,7 +94,7 @@ describe('DocumentDeclaration', () => {
             noiseSelectors: 'h1',
           }).getCssSelectors();
 
-          expect(result).to.deep.equal(['body', 'h1']);
+          expect(result).to.deep.equal([ 'body', 'h1' ]);
         });
       });
 

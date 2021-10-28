@@ -1,9 +1,9 @@
-import { gitSnapshot, resetGitRepository } from '../../../test/helper.js';
-
-import Recorder from './recorder.js';
-import { SNAPSHOTS_PATH } from './index.js';
 import chai from 'chai';
 import fs from 'fs';
+
+import { gitSnapshot, resetGitRepository } from '../../../test/helper.js';
+import Recorder from './recorder.js';
+import { SNAPSHOTS_PATH } from './index.js';
 
 const { expect } = chai;
 
@@ -27,8 +27,7 @@ describe('Recorder', () => {
           serviceId: SERVICE_PROVIDER_ID,
           documentType: TYPE,
           content: FILE_CONTENT,
-        })
-      );
+        }));
 
       after(resetGitRepository);
 
@@ -69,9 +68,7 @@ describe('Recorder', () => {
           content: FILE_CONTENT,
         });
 
-        expect(fs.readFileSync(NEW_SERVICE_EXPECTED_FILE_PATH, { encoding: 'utf8' })).to.equal(
-          FILE_CONTENT
-        );
+        expect(fs.readFileSync(NEW_SERVICE_EXPECTED_FILE_PATH, { encoding: 'utf8' })).to.equal(FILE_CONTENT);
       });
     });
   });
@@ -89,6 +86,7 @@ describe('Recorder', () => {
       });
       id = await subject.commit(EXPECTED_FILE_PATH, commitMessage);
       const commits = await gitSnapshot().log();
+
       [commit] = commits;
     });
 
@@ -116,9 +114,11 @@ describe('Recorder', () => {
         content: FILE_CONTENT,
         changelog,
       });
+
       id = recordId;
       path = recordFilePath;
       const commits = await gitSnapshot().log();
+
       [commit] = commits;
     });
 
@@ -149,6 +149,7 @@ describe('Recorder', () => {
           changelog,
           mimeType: 'application/pdf',
         });
+
         path = recordFilePath;
       });
 
@@ -167,9 +168,7 @@ describe('Recorder', () => {
 
     context('With provided extension', () => {
       it('returns the file path with given extension for the given service provider’s document type', async () => {
-        expect(subject.getPathFor(SERVICE_PROVIDER_ID, TYPE, 'pdf')).to.equal(
-          EXPECTED_PDF_FILE_PATH
-        );
+        expect(subject.getPathFor(SERVICE_PROVIDER_ID, TYPE, 'pdf')).to.equal(EXPECTED_PDF_FILE_PATH);
       });
     });
   });
@@ -218,6 +217,7 @@ describe('Recorder', () => {
           content: UPDATED_FILE_CONTENT,
           changelog: 'commit this',
         });
+
         lastSnapshotId = recordId;
         latestRecord = await subject.getLatestRecord(SERVICE_PROVIDER_ID, TYPE);
       });
@@ -247,6 +247,7 @@ describe('Recorder', () => {
             mimeType: 'application/pdf',
             changelog: `${FILE_CONTENT} (with fake pdf file)`,
           });
+
           lastSnapshotId = recordId;
           latestRecord = await subject.getLatestRecord(SERVICE_PROVIDER_ID, TYPE);
         });

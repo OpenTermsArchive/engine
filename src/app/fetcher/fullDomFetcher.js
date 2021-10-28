@@ -1,9 +1,10 @@
-import { InaccessibleContentError } from '../errors.js';
 import StealthPlugin from 'puppeteer-extra-plugin-stealth';
 import UserAgent from 'user-agents';
 import config from 'config';
-import logger from '../../logger/index.js';
 import puppeteer from 'puppeteer-extra';
+
+import logger from '../../logger/index.js';
+import { InaccessibleContentError } from '../errors.js';
 
 puppeteer.use(StealthPlugin());
 
@@ -21,7 +22,7 @@ export default async function fetch(url, cssSelectors, headers = {}, { retry } =
     if (!browser) {
       browser = await puppeteer.launch({
         headless: true,
-        args: ['--no-sandbox', '--disable-setuid-sandbox'],
+        args: [ '--no-sandbox', '--disable-setuid-sandbox' ],
       });
     }
     const userAgent = new UserAgent();
@@ -41,22 +42,17 @@ export default async function fetch(url, cssSelectors, headers = {}, { retry } =
       if (retry === MAX_RETRIES) {
         throw new InaccessibleContentError(`Response is empty when trying to fetch '${url}'`);
       }
+
       return await fetch(url, cssSelectors, headers, { retry: retry + 1 });
     }
 
     const statusCode = response.status();
 
     if (statusCode < 200 || (statusCode >= 300 && statusCode !== 304)) {
-      throw new InaccessibleContentError(
-        `Received HTTP code ${statusCode} when trying to fetch '${url}'`
-      );
+      throw new InaccessibleContentError(`Received HTTP code ${statusCode} when trying to fetch '${url}'`);
     }
 
-    await Promise.all(
-      selectors.map((selector) =>
-        page.waitForSelector(selector, { timeout: config.get('fetcher.waitForElementsTimeout') })
-      )
-    );
+    await Promise.all(selectors.map(selector => page.waitForSelector(selector, { timeout: config.get('fetcher.waitForElementsTimeout') })));
 
     content = await page.content();
   } catch (error) {
@@ -67,10 +63,10 @@ export default async function fetch(url, cssSelectors, headers = {}, { retry } =
     }
 
     if (
-      (error.code && error.code.match(/^(EAI_AGAIN|ENOTFOUND|ETIMEDOUT|ECONNRESET)$/)) ||
-      (error.message &&
-        error.message.match(/(ERR_FAILED|ERR_TUNNEL_CONNECTION_FAILED|ERR_NAME_NOT_RESOLVED)/)) ||
-      error instanceof puppeteer.pptr.errors.TimeoutError // Expected elements are not present on the web page
+      (error.code && error.code.match(/^(EAI_AGAIN|ENOTFOUND|ETIMEDOUT|ECONNRESET)$/))
+      || (error.message
+        && error.message.match(/(ERR_FAILED|ERR_TUNNEL_CONNECTION_FAILED|ERR_NAME_NOT_RESOLVED)/))
+      || error instanceof puppeteer.pptr.errors.TimeoutError // Expected elements are not present on the web page
     ) {
       throw new InaccessibleContentError(error.message);
     }

@@ -4,7 +4,6 @@
   "description": "Tracks and makes visible all changes to the Terms Of Service of online service providers.",
   "main": "index.js",
   "type": "module",
-  "prettier": "prettier-config-ambanum",
   "engines": {
     "node": ">=12.17"
   },
@@ -19,8 +18,8 @@
     "sync-git": "cd data/versions && git fetch && git reset --hard origin/master && cd ../snapshots && git fetch && git reset --hard origin/master",
     "refilter": "node src/index.js --refilter-only",
     "setup": "node scripts/setup.js",
-    "lint": "prettier -c test src services config decision-records",
-    "lint-fix": "prettier --write test src services config decision-records",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "posttest": "npm run lint",
     "prepare": "command -v husky >/dev/null && husky install || exit 0",
     "test": "cross-env NODE_ENV=test mocha --file './test/helper.js' --recursive \"./src/**/*.test.js\" --recursive \"./services/**/*.test.js\" --exit",
@@ -53,7 +52,6 @@
     "mocha": "^8.3.0",
     "nock": "^13.0.7",
     "prettier": "^2.2.1",
-    "prettier-config-ambanum": "^1.0.1",
     "sinon": "^9.2.4",
     "sinon-chai": "^3.5.0"
   },

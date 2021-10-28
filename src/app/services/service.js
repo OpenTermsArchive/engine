@@ -11,13 +11,14 @@ export default class Service {
     }
 
     const { _latest: currentlyValidDocumentDeclaration, _history } = this._documents[documentType];
+
     if (!date) {
       return currentlyValidDocumentDeclaration;
     }
 
     return (
-      (_history && _history.find((entry) => new Date(date) <= new Date(entry.validUntil))) ||
-      currentlyValidDocumentDeclaration
+      (_history && _history.find(entry => new Date(date) <= new Date(entry.validUntil)))
+      || currentlyValidDocumentDeclaration
     );
   }
 
@@ -34,14 +35,13 @@ export default class Service {
 
     if (!document.validUntil) {
       this._documents[document.type]._latest = document;
+
       return;
     }
 
     this._documents[document.type]._history = this._documents[document.type]._history || [];
     this._documents[document.type]._history.push(document);
-    this._documents[document.type]._history.sort(
-      (a, b) => new Date(a.validUntil) - new Date(b.validUntil)
-    );
+    this._documents[document.type]._history.sort((a, b) => new Date(a.validUntil) - new Date(b.validUntil));
   }
 
   getNumberOfDocuments() {
@@ -50,8 +50,6 @@ export default class Service {
 
   hasHistory() {
     // If service is loaded without its history it could return false even if an history declaration file exists.
-    return !!Object.keys(this._documents).find(
-      (documentType) => this._documents[documentType]._history
-    );
+    return !!Object.keys(this._documents).find(documentType => this._documents[documentType]._history);
   }
 }

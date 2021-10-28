@@ -1,12 +1,12 @@
 import './bootstrap.js';
 
-import * as services from './app/services/index.js';
+import scheduler from 'node-schedule';
 
 import CGUs from './app/index.js';
+import * as services from './app/services/index.js';
 import Notifier from './notifier/index.js';
 import logger from './logger/index.js';
 import { publishRelease } from '../scripts/release/releasedataset.js';
-import scheduler from 'node-schedule';
 
 const args = process.argv.slice(2);
 const modifiedOnly = args.includes('--modified-only');
@@ -15,19 +15,21 @@ const schedule = args.includes('--schedule');
 
 (async () => {
   const app = new CGUs();
+
   app.attach(logger);
   await app.init();
 
   logger.info('Starting Service');
 
-  let serviceIds = args.filter((arg) => !arg.startsWith('--') && arg !== '/home/debian/cgus/');
+  let serviceIds = args.filter(arg => !arg.startsWith('--') && arg !== '/home/debian/cgus/');
 
   if (modifiedOnly) {
     serviceIds = await services.getIdsOfModified();
   }
 
-  serviceIds = serviceIds.filter((serviceId) => {
+  serviceIds = serviceIds.filter(serviceId => {
     const isServiceDeclared = app.serviceDeclarations[serviceId];
+
     if (!isServiceDeclared) {
       logger.warn(`Service ${serviceId} does not exist and will be ignored.`);
     }
@@ -37,15 +39,14 @@ const schedule = args.includes('--schedule');
 
   if (modifiedOnly && !serviceIds.length) {
     logger.warn('No services have been modified');
+
     return;
   }
 
   serviceIds = serviceIds.length ? serviceIds : app.serviceIds;
 
-  const numberOfDocuments = serviceIds.reduce(
-    (acc, serviceId) => acc + app.serviceDeclarations[serviceId].getNumberOfDocuments(),
-    0
-  );
+  const numberOfDocuments = serviceIds.reduce((acc, serviceId) => acc + app.serviceDeclarations[serviceId].getNumberOfDocuments(), 0);
+
   serviceIds = serviceIds.sort((a, b) => a.localeCompare(b));
 
   logger.info(`👇 Refiltering ${numberOfDocuments} documents from ${serviceIds.length} services…`);
@@ -60,13 +61,9 @@ const schedule = args.includes('--schedule');
     app.attach(new Notifier(app.serviceDeclarations));
   }
 
-  logger.info(
-    `👇 Start tracking changes of ${numberOfDocuments} documents from ${serviceIds.length} services…`
-  );
+  logger.info(`👇 Start tracking changes of ${numberOfDocuments} documents from ${serviceIds.length} services…`);
   await app.trackChanges(serviceIds);
-  logger.info(
-    `👆 Tracked changes of ${numberOfDocuments} documents from ${serviceIds.length} services.`
-  );
+  logger.info(`👆 Tracked changes of ${numberOfDocuments} documents from ${serviceIds.length} services.`);
 
   if (!schedule) {
     // here, we do not want to exit as the queue errors are processed
@@ -80,13 +77,9 @@ const schedule = args.includes('--schedule');
   logger.info('The scheduler is running…');
   logger.info('Documents will be tracked at minute 30 past every 6 hours.');
   scheduler.scheduleJob('30 */6 * * *', async () => {
-    logger.info(
-      `Start tracking changes of ${numberOfDocuments} documents from ${serviceIds.length} services…`
-    );
+    logger.info(`Start tracking changes of ${numberOfDocuments} documents from ${serviceIds.length} services…`);
     await app.trackChanges(serviceIds);
-    logger.info(
-      `Tracked changes of ${numberOfDocuments} documents from ${serviceIds.length} services.`
-    );
+    logger.info(`Tracked changes of ${numberOfDocuments} documents from ${serviceIds.length} services.`);
   });
 
   logger.info('Release will be created if needed every night at 4:15am');

@@ -1,14 +1,15 @@
-import * as services from '../../src/app/services/index.js';
-
+/* eslint-disable import/no-extraneous-dependencies */
 import Ajv from 'ajv';
 import chai from 'chai';
 import config from 'config';
-import fetch from '../../src/app/fetcher/index.js';
 import { fileURLToPath } from 'url';
-import filter from '../../src/app/filter/index.js';
 import fsApi from 'fs';
 import jsonSourceMap from 'json-source-map';
 import path from 'path';
+
+import filter from '../../src/app/filter/index.js';
+import fetch from '../../src/app/fetcher/index.js';
+import * as services from '../../src/app/services/index.js';
 import serviceHistorySchema from './service.history.schema.js';
 import serviceSchema from './service.schema.js';
 
@@ -26,7 +27,7 @@ const args = process.argv.slice(process.argv.indexOf(filePathRelativeToRoot) + 1
 
 const schemaOnly = args.includes('--schema-only');
 const modifiedOnly = args.includes('--modified-only');
-let servicesToValidate = args.filter((arg) => !arg.startsWith('--'));
+let servicesToValidate = args.filter(arg => !arg.startsWith('--'));
 
 (async () => {
   const serviceDeclarations = await services.loadWithHistory();
@@ -38,7 +39,7 @@ let servicesToValidate = args.filter((arg) => !arg.startsWith('--'));
   }
 
   describe('Services validation', async () => {
-    servicesToValidate.forEach((serviceId) => {
+    servicesToValidate.forEach(serviceId => {
       const service = serviceDeclarations[serviceId];
 
       if (!service) {
@@ -48,53 +49,48 @@ let servicesToValidate = args.filter((arg) => !arg.startsWith('--'));
 
       describe(serviceId, async () => {
         it('has a valid declaration', async () => {
-          const declaration = JSON.parse(
-            await fs.readFile(
-              path.join(rootPath, config.get('serviceDeclarationsPath'), `${serviceId}.json`)
-            )
-          );
+          const declaration = JSON.parse(await fs.readFile(path.join(rootPath, config.get('serviceDeclarationsPath'), `${serviceId}.json`)));
+
           assertValid(serviceSchema, declaration);
         });
 
         if (service.hasHistory()) {
           it('has a valid history declaration', async () => {
-            const declarationHistory = JSON.parse(
-              await fs.readFile(
-                path.join(
-                  rootPath,
-                  config.get('serviceDeclarationsPath'),
-                  `${serviceId}.history.json`
-                )
-              )
-            );
+            const declarationHistory = JSON.parse(await fs.readFile(path.join(
+              rootPath,
+              config.get('serviceDeclarationsPath'),
+              `${serviceId}.history.json`
+            )));
+
             assertValid(serviceHistorySchema, declarationHistory);
           });
         }
 
         if (!schemaOnly) {
-          service.getDocumentTypes().forEach((type) => {
+          service.getDocumentTypes().forEach(type => {
             describe(type, () => {
               let content;
               let filteredContent;
               let mimeType;
 
-              it('has fetchable URL', async function () {
+              // do not use arrow function to avoid binding to `this` and to allow `this.timeout` to work
+              it('has fetchable URL', async function () { // eslint-disable-line func-names
                 this.timeout(30000);
 
-                const { location, executeClientScripts, headers } = service.getDocumentDeclaration(
-                  type
-                );
+                const { location, executeClientScripts, headers } = service.getDocumentDeclaration(type);
                 const document = await fetch({
                   url: location,
                   executeClientScripts,
                   cssSelectors: service.getDocumentDeclaration(type).getCssSelectors(),
                   headers,
                 });
+
                 content = document.content;
                 mimeType = document.mimeType;
               });
 
-              it('has a selector that matches an element in the web page', async function () {
+              // do not use arrow function to avoid binding to `this` and to allow `this.skip` to work
+              it('has a selector that matches an element in the web page', async function () { // eslint-disable-line func-names
                 if (!content) {
                   console.log('      (Tests skipped as url is not fetchable)');
                   this.skip();
@@ -110,7 +106,8 @@ let servicesToValidate = args.filter((arg) => !arg.startsWith('--'));
                 expect(filteredContent).to.not.be.empty;
               });
 
-              it(`has a resulting filtered content with at least ${MIN_DOC_LENGTH}`, async function () {
+              // do not use arrow function to avoid binding to `this` and to allow `this.skip` to work
+              it(`has a resulting filtered content with at least ${MIN_DOC_LENGTH}`, async function () { // eslint-disable-line func-names
                 if (!content) {
                   console.log('      (Tests skipped as url is not fetchable)');
                   this.skip();
@@ -125,7 +122,8 @@ let servicesToValidate = args.filter((arg) => !arg.startsWith('--'));
               });
 
               context('When fetched and filtered twice in a row', () => {
-                it('has consistent filtered content', async function () {
+                // do not use arrow function to avoid binding to `this` and to allow `this.skip` to work
+                it('has consistent filtered content', async function () { // eslint-disable-line func-names
                   if (!content) {
                     console.log('      (Tests skipped as url is not fetchable)');
                     this.skip();
@@ -149,7 +147,6 @@ let servicesToValidate = args.filter((arg) => !arg.startsWith('--'));
                     cssSelectors: service.getDocumentDeclaration(type).getCssSelectors(),
                     headers,
                   });
-
                   const secondFilteredContent = await filter({
                     content: document.content,
                     documentDeclaration: service.getDocumentDeclaration(type),
@@ -182,9 +179,11 @@ function assertValid(schema, subject) {
     let errorMessage = '';
     const sourceMap = jsonSourceMap.stringify(subject, null, 2);
     const jsonLines = sourceMap.json.split('\n');
-    validator.errors.forEach((error) => {
+
+    validator.errors.forEach(error => {
       errorMessage += `\n\n${validator.errorsText([error])}`;
       const errorPointer = sourceMap.pointers[error.dataPath];
+
       if (errorPointer) {
         errorMessage += `\n> ${jsonLines
           .slice(errorPointer.value.line, errorPointer.valueEnd.line)

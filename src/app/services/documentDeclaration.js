@@ -29,14 +29,14 @@ export default class DocumentDeclaration {
       ...DocumentDeclaration.extractCssSelectorsFromProperty(noiseSelectors),
     ];
 
-    return result.filter((selector) => selector);
+    return result.filter(selector => selector);
   }
 
   static extractCssSelectorsFromProperty(property) {
     if (Array.isArray(property)) {
       return []
         .concat(property)
-        .flatMap((selector) => DocumentDeclaration.extractCssSelectorsFromSelector(selector));
+        .flatMap(selector => DocumentDeclaration.extractCssSelectorsFromSelector(selector));
     }
 
     return DocumentDeclaration.extractCssSelectorsFromSelector(property);
@@ -45,9 +45,8 @@ export default class DocumentDeclaration {
   static extractCssSelectorsFromSelector(selector) {
     if (typeof selector === 'object') {
       const { startBefore, endBefore, startAfter, endAfter } = selector;
-      return [startBefore, endBefore, startAfter, endAfter].filter(
-        (rangeSelector) => rangeSelector
-      );
+
+      return [ startBefore, endBefore, startAfter, endAfter ].filter(rangeSelector => rangeSelector);
     }
 
     return [selector];

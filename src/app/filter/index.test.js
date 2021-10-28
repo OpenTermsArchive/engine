@@ -1,12 +1,12 @@
-import { convertRelativeURLsToAbsolute, filterHTML, filterPDF } from './index.js';
-
-import DocumentDeclaration from '../services/documentDeclaration.js';
-import { InaccessibleContentError } from '../errors.js';
 import chai from 'chai';
 import { fileURLToPath } from 'url';
 import fsApi from 'fs';
 import jsdom from 'jsdom';
 import path from 'path';
+
+import DocumentDeclaration from '../services/documentDeclaration.js';
+import { InaccessibleContentError } from '../errors.js';
+import { convertRelativeURLsToAbsolute, filterHTML, filterPDF } from './index.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const fs = fsApi.promises;
@@ -61,6 +61,7 @@ const rawHTMLWithCommonChangingItems = `
   </body>
 </html>`;
 
+/* eslint-disable no-irregular-whitespace */
 const expectedFilteredWithCommonChangingItems = `Title
 =====
 
@@ -71,19 +72,22 @@ const expectedFilteredWithCommonChangingItems = `Title
 [link 3](http://absolute.url/link)
 
 [\\[email protected\\]](https://exemple.com/cdn-cgi/l/email-protection#removed)`;
+/* eslint-enable no-irregular-whitespace */
 
 const additionalFilter = {
   removeLinks: function removeLinks(document) {
     const links = document.querySelectorAll('a');
-    links.forEach((link) => {
+
+    links.forEach(link => {
       link.remove();
     });
   },
   removeLinksAsync: async function removeLinksAsync(document) {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       setTimeout(() => {
         const links = document.querySelectorAll('a');
-        links.forEach((link) => {
+
+        links.forEach(link => {
           link.remove();
         });
         resolve();
@@ -95,10 +99,12 @@ const additionalFilter = {
 describe('Filter', () => {
   describe('#convertRelativeURLsToAbsolute', () => {
     let subject;
+
     before(() => {
       const { document: webPageDOM } = new JSDOM(rawHTML).window;
+
       convertRelativeURLsToAbsolute(webPageDOM, virtualLocation);
-      subject = Array.from(webPageDOM.querySelectorAll('a[href]')).map((el) => el.href);
+      subject = Array.from(webPageDOM.querySelectorAll('a[href]')).map(el => el.href);
     });
 
     it('converts relative urls', async () => {
@@ -120,6 +126,7 @@ describe('Filter', () => {
             contentSelectors: 'body',
           }),
         });
+
         expect(result).to.equal(expectedFilteredWithCommonChangingItems);
       });
 
@@ -131,20 +138,19 @@ describe('Filter', () => {
             contentSelectors: 'body',
           }),
         });
+
         expect(result).to.equal(expectedFiltered);
       });
 
       context('With no match for the given selector', () => {
         it('throws an InaccessibleContentError error', async () => {
-          await expect(
-            filterHTML({
-              content: rawHTML,
-              documentDeclaration: new DocumentDeclaration({
-                location: virtualLocation,
-                contentSelectors: '#thisAnchorDoesNotExist',
-              }),
-            })
-          ).to.be.rejectedWith(InaccessibleContentError, /#thisAnchorDoesNotExist/);
+          await expect(filterHTML({
+            content: rawHTML,
+            documentDeclaration: new DocumentDeclaration({
+              location: virtualLocation,
+              contentSelectors: '#thisAnchorDoesNotExist',
+            }),
+          })).to.be.rejectedWith(InaccessibleContentError, /#thisAnchorDoesNotExist/);
         });
       });
 
@@ -158,6 +164,7 @@ describe('Filter', () => {
               filters: [additionalFilter.removeLinks],
             }),
           });
+
           expect(result).to.equal(expectedFilteredWithAdditional);
         });
       });
@@ -172,6 +179,7 @@ describe('Filter', () => {
               filters: [additionalFilter.removeLinksAsync],
             }),
           });
+
           expect(result).to.equal(expectedFilteredWithAdditional);
         });
       });
@@ -185,6 +193,7 @@ describe('Filter', () => {
               contentSelectors: 'h1, #link2',
             }),
           });
+
           expect(result).to.equal('Title\n=====\n\n[link 2](#anchor)');
         });
       });
@@ -196,9 +205,10 @@ describe('Filter', () => {
           content: rawHTML,
           documentDeclaration: new DocumentDeclaration({
             location: virtualLocation,
-            contentSelectors: ['h1', '#link2'],
+            contentSelectors: [ 'h1', '#link2' ],
           }),
         });
+
         expect(result).to.equal('Title\n=====\n\n[link 2](#anchor)');
       });
     });
@@ -216,6 +226,7 @@ describe('Filter', () => {
               },
             }),
           });
+
           expect(result).to.equal('[link 1](https://exemple.com/relative/link)');
         });
       });
@@ -231,6 +242,7 @@ describe('Filter', () => {
               },
             }),
           });
+
           expect(result).to.equal('[link 2](#anchor)');
         });
       });
@@ -246,6 +258,7 @@ describe('Filter', () => {
               },
             }),
           });
+
           expect(result).to.equal('[link 2](#anchor)');
         });
       });
@@ -261,39 +274,36 @@ describe('Filter', () => {
               },
             }),
           });
+
           expect(result).to.equal('[link 3](http://absolute.url/link)');
         });
       });
       context('With a "start" selector that has no match', () => {
         it('throws an InaccessibleContentError error', async () => {
-          await expect(
-            filterHTML({
-              content: rawHTML,
-              documentDeclaration: new DocumentDeclaration({
-                location: virtualLocation,
-                contentSelectors: {
-                  startAfter: '#paragraph1',
-                  endAfter: '#link2',
-                },
-              }),
-            })
-          ).to.be.rejectedWith(InaccessibleContentError, /"start" selector has no match/);
+          await expect(filterHTML({
+            content: rawHTML,
+            documentDeclaration: new DocumentDeclaration({
+              location: virtualLocation,
+              contentSelectors: {
+                startAfter: '#paragraph1',
+                endAfter: '#link2',
+              },
+            }),
+          })).to.be.rejectedWith(InaccessibleContentError, /"start" selector has no match/);
         });
       });
       context('With an "end" selector that has no match', () => {
         it('throws an InaccessibleContentError error', async () => {
-          await expect(
-            filterHTML({
-              content: rawHTML,
-              documentDeclaration: new DocumentDeclaration({
-                location: virtualLocation,
-                contentSelectors: {
-                  startAfter: '#link2',
-                  endAfter: '#paragraph1',
-                },
-              }),
-            })
-          ).to.be.rejectedWith(InaccessibleContentError, /"end" selector has no match/);
+          await expect(filterHTML({
+            content: rawHTML,
+            documentDeclaration: new DocumentDeclaration({
+              location: virtualLocation,
+              contentSelectors: {
+                startAfter: '#link2',
+                endAfter: '#paragraph1',
+              },
+            }),
+          })).to.be.rejectedWith(InaccessibleContentError, /"end" selector has no match/);
         });
       });
     });
@@ -316,6 +326,7 @@ describe('Filter', () => {
             ],
           }),
         });
+
         expect(result).to.equal('[link 2](#anchor)\n\n[link 3](http://absolute.url/link)');
       });
     });
@@ -335,6 +346,7 @@ describe('Filter', () => {
             ],
           }),
         });
+
         expect(result).to.equal('Title\n=====\n\n[link 3](http://absolute.url/link)');
       });
     });
@@ -350,9 +362,8 @@ describe('Filter', () => {
               noiseSelectors: 'h1',
             }),
           });
-          expect(result).to.equal(
-            '[link 1](https://exemple.com/relative/link)\n\n[link 2](#anchor)\n\n[link 3](http://absolute.url/link)'
-          );
+
+          expect(result).to.equal('[link 1](https://exemple.com/relative/link)\n\n[link 2](#anchor)\n\n[link 3](http://absolute.url/link)');
         });
       });
 
@@ -363,12 +374,11 @@ describe('Filter', () => {
             documentDeclaration: new DocumentDeclaration({
               location: virtualLocation,
               contentSelectors: 'body',
-              noiseSelectors: ['h1', '#link3'],
+              noiseSelectors: [ 'h1', '#link3' ],
             }),
           });
-          expect(result).to.equal(
-            '[link 1](https://exemple.com/relative/link)\n\n[link 2](#anchor)'
-          );
+
+          expect(result).to.equal('[link 1](https://exemple.com/relative/link)\n\n[link 2](#anchor)');
         });
       });
 
@@ -385,40 +395,37 @@ describe('Filter', () => {
               },
             }),
           });
+
           expect(result).to.equal('Title\n=====');
         });
         context('With a "start" selector that has no match', () => {
           it('throws an InaccessibleContentError error', async () => {
-            await expect(
-              filterHTML({
-                content: rawHTML,
-                documentDeclaration: new DocumentDeclaration({
-                  location: virtualLocation,
-                  contentSelectors: 'body',
-                  noiseSelectors: {
-                    startAfter: '#paragraph1',
-                    endAfter: '#link2',
-                  },
-                }),
-              })
-            ).to.be.rejectedWith(InaccessibleContentError, /"start" selector has no match/);
+            await expect(filterHTML({
+              content: rawHTML,
+              documentDeclaration: new DocumentDeclaration({
+                location: virtualLocation,
+                contentSelectors: 'body',
+                noiseSelectors: {
+                  startAfter: '#paragraph1',
+                  endAfter: '#link2',
+                },
+              }),
+            })).to.be.rejectedWith(InaccessibleContentError, /"start" selector has no match/);
           });
         });
         context('With an "end" selector that has no match', () => {
           it('throws an InaccessibleContentError error', async () => {
-            await expect(
-              filterHTML({
-                content: rawHTML,
-                documentDeclaration: new DocumentDeclaration({
-                  location: virtualLocation,
-                  contentSelectors: 'body',
-                  noiseSelectors: {
-                    startAfter: '#link2',
-                    endAfter: '#paragraph1',
-                  },
-                }),
-              })
-            ).to.be.rejectedWith(InaccessibleContentError, /"end" selector has no match/);
+            await expect(filterHTML({
+              content: rawHTML,
+              documentDeclaration: new DocumentDeclaration({
+                location: virtualLocation,
+                contentSelectors: 'body',
+                noiseSelectors: {
+                  startAfter: '#link2',
+                  endAfter: '#paragraph1',
+                },
+              }),
+            })).to.be.rejectedWith(InaccessibleContentError, /"end" selector has no match/);
           });
         });
       });
@@ -441,9 +448,8 @@ describe('Filter', () => {
               ],
             }),
           });
-          expect(result).to.equal(
-            '[link 1](https://exemple.com/relative/link)\n\n[link 2](#anchor)'
-          );
+
+          expect(result).to.equal('[link 1](https://exemple.com/relative/link)\n\n[link 2](#anchor)');
         });
       });
 
@@ -463,9 +469,8 @@ describe('Filter', () => {
               ],
             }),
           });
-          expect(result).to.equal(
-            '[link 1](https://exemple.com/relative/link)\n\n[link 2](#anchor)'
-          );
+
+          expect(result).to.equal('[link 1](https://exemple.com/relative/link)\n\n[link 2](#anchor)');
         });
       });
     });

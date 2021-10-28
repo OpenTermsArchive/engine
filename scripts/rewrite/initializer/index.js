@@ -1,8 +1,9 @@
-import Git from '../../../src/app/history/git.js';
-import { fileExists } from '../utils.js';
 import { fileURLToPath } from 'url';
 import fsApi from 'fs';
 import path from 'path';
+
+import { fileExists } from '../utils.js';
+import Git from '../../../src/app/history/git.js';
 
 const fs = fsApi.promises;
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -13,6 +14,7 @@ const LICENSE_PATH = path.resolve(__dirname, './files/license');
 export async function initReadmeAndLicense(targetRepo, targetPath, authorDate) {
   const targetReadmeFilePath = path.resolve(targetPath, 'README.md');
   const targetLicenseFilePath = path.resolve(targetPath, 'LICENSE');
+
   await fs.copyFile(README_PATH, targetReadmeFilePath);
   await fs.copyFile(LICENSE_PATH, targetLicenseFilePath);
   await targetRepo.add(targetReadmeFilePath);
@@ -30,7 +32,9 @@ export async function initTargetRepo(targetRepoPath) {
   await fs.mkdir(targetRepoPath);
 
   const targetRepo = await new Git(targetRepoPath);
+
   await targetRepo.init();
   await targetRepo.initConfig();
+
   return targetRepo;
 }

@@ -22,6 +22,7 @@ export default class Git {
 
   optimizeLogGraph() {
     const graphLockFile = `${this.path}/.git/objects/info/commit-graph.lock`;
+
     if (fs.existsSync(graphLockFile)) {
       return;
     }
@@ -44,15 +45,18 @@ export default class Git {
     const options = {
       '--author': `${config.get('history.author').name} <${config.get('history.author').email}>`,
     };
+
     if (authorDate) {
       options['--date'] = new Date(authorDate).toISOString();
     }
     let summary;
+
     if (filepath) {
       summary = await this.git.commit(message, this.relativePath(filepath), options);
     } else {
       summary = await this.git.commit(message, options);
     }
+
     return summary.commit.replace('HEAD ', '').replace('(root-commit) ', '');
   }
 
@@ -64,38 +68,39 @@ export default class Git {
     try {
       options.file = options.file && this.relativePath(options.file);
       const logSummary = await this.git.log(options);
+
       return logSummary.all;
     } catch (error) {
       if (
         !(
-          error.message.includes('unknown revision or path not in the working tree') ||
-          error.message.includes('does not have any commits yet')
+          error.message.includes('unknown revision or path not in the working tree')
+          || error.message.includes('does not have any commits yet')
         )
       ) {
         throw error;
       }
+
       return [];
     }
   }
 
   async isTracked(filepath) {
     const result = await this.git.raw('ls-files', this.relativePath(filepath));
+
     return !!result;
   }
 
   async findUnique(glob) {
-    const [latestCommit] = await this.log(['-n', '1', '--stat=4096', glob]);
+    const [latestCommit] = await this.log([ '-n', '1', '--stat=4096', glob ]);
 
     if (!latestCommit) {
       return {};
     }
 
-    const filePaths = latestCommit.diff.files.map((file) => file.file);
+    const filePaths = latestCommit.diff.files.map(file => file.file);
 
     if (filePaths.length > 1) {
-      throw new Error(
-        `Only one document should have been recorded in ${latestCommit.hash}, but all these documents were recorded: ${filePaths}`
-      );
+      throw new Error(`Only one document should have been recorded in ${latestCommit.hash}, but all these documents were recorded: ${filePaths}`);
     }
 
     return {

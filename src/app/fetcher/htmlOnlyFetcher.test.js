@@ -4,19 +4,20 @@ import { fileURLToPath } from 'url';
 import fs from 'fs';
 import nock from 'nock';
 import path from 'path';
+
 import fetch from './htmlOnlyFetcher.js';
 import { InaccessibleContentError } from '../errors.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const { expect } = chai;
+
 chai.use(chaiAsPromised);
 
 describe('HtmlOnlyFetcher', () => {
   let termsHTML;
 
   before(() => {
-    termsHTML =
-      '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>First provider TOS</title></head><body><h1>Terms of service</h1><p>Dapibus quis diam sagittis</p></body></html>';
+    termsHTML = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>First provider TOS</title></head><body><h1>Terms of service</h1><p>Dapibus quis diam sagittis</p></body></html>';
 
     nock('https://domain.example', { reqheaders: { 'Accept-Language': 'en' } })
       .get('/terms.html')
@@ -30,6 +31,7 @@ describe('HtmlOnlyFetcher', () => {
 
       before(async () => {
         const result = await fetch('https://domain.example/terms.html');
+
         content = result.content;
         mimeType = result.mimeType;
       });
@@ -62,15 +64,14 @@ describe('HtmlOnlyFetcher', () => {
       let expectedPDFContent;
 
       before(async () => {
-        expectedPDFContent = fs.readFileSync(
-          path.resolve(__dirname, '../../../test/fixtures/terms.pdf')
-        );
+        expectedPDFContent = fs.readFileSync(path.resolve(__dirname, '../../../test/fixtures/terms.pdf'));
 
         nock('https://domain.example.com', { reqheaders: { 'Accept-Language': 'en' } })
           .get('/terms.pdf')
           .reply(200, expectedPDFContent, { 'Content-Type': 'application/pdf' });
 
         const result = await fetch('https://domain.example.com/terms.pdf');
+
         content = result.content;
         mimeType = result.mimeType;
       });

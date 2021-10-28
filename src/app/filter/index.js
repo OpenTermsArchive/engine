@@ -1,4 +1,3 @@
-import { InaccessibleContentError } from '../errors.js';
 import TurndownService from 'turndown';
 import ciceroMark from '@accordproject/markdown-cicero';
 import jsdom from 'jsdom';
@@ -6,8 +5,11 @@ import mardownPdf from '@accordproject/markdown-pdf';
 import turndownPluginGithubFlavouredMarkdown from 'joplin-turndown-plugin-gfm';
 import url from 'url';
 
+import { InaccessibleContentError } from '../errors.js';
+
 const { JSDOM } = jsdom;
 const turndownService = new TurndownService();
+
 turndownService.use(turndownPluginGithubFlavouredMarkdown.gfm);
 
 export const LINKS_TO_CONVERT_SELECTOR = 'a[href]:not([href^="#"])';
@@ -51,7 +53,7 @@ export async function filterHTML({ content, documentDeclaration }) {
         fetch: location,
         select: contentSelectors,
         remove: noiseSelectors,
-        filter: serviceSpecificFilters.map((filter) => filter.name),
+        filter: serviceSpecificFilters.map(filter => filter.name),
       });
       /* eslint-enable no-await-in-loop */
     } catch (error) {
@@ -64,17 +66,15 @@ export async function filterHTML({ content, documentDeclaration }) {
   const domFragment = select(webPageDOM, contentSelectors);
 
   if (!domFragment.children.length) {
-    throw new InaccessibleContentError(
-      `The provided selector "${contentSelectors}" has no match in the web page ${location}.`
-    );
+    throw new InaccessibleContentError(`The provided selector "${contentSelectors}" has no match in the web page ${location}.`);
   }
 
   convertRelativeURLsToAbsolute(domFragment, location);
 
-  domFragment.querySelectorAll('script, style').forEach((node) => node.remove());
+  domFragment.querySelectorAll('script, style').forEach(node => node.remove());
 
   // clean code from common changing patterns - initially for Windstream
-  domFragment.querySelectorAll('a[href*="/email-protection"]').forEach((node) => {
+  domFragment.querySelectorAll('a[href*="/email-protection"]').forEach(node => {
     if (node.href.match(/((.*?)\/email-protection#)[0-9a-fA-F]+/gim)) {
       node.href = `${node.href.split('#')[0]}#removed`;
     }
@@ -105,15 +105,11 @@ function selectRange(document, rangeSelector) {
   const endNode = document.querySelector(endBefore || endAfter);
 
   if (!startNode) {
-    throw new InaccessibleContentError(
-      `The "start" selector has no match in document in: ${JSON.stringify(rangeSelector)}`
-    );
+    throw new InaccessibleContentError(`The "start" selector has no match in document in: ${JSON.stringify(rangeSelector)}`);
   }
 
   if (!endNode) {
-    throw new InaccessibleContentError(
-      `The "end" selector has no match in document in: ${JSON.stringify(rangeSelector)}`
-    );
+    throw new InaccessibleContentError(`The "end" selector has no match in document in: ${JSON.stringify(rangeSelector)}`);
   }
 
   selection[startBefore ? 'setStartBefore' : 'setStartAfter'](startNode);
@@ -123,19 +119,20 @@ function selectRange(document, rangeSelector) {
 }
 
 export function convertRelativeURLsToAbsolute(document, baseURL) {
-  Array.from(document.querySelectorAll(LINKS_TO_CONVERT_SELECTOR)).forEach((link) => {
+  Array.from(document.querySelectorAll(LINKS_TO_CONVERT_SELECTOR)).forEach(link => {
     link.href = url.resolve(baseURL, link.href);
   });
 }
 
 // Works in place
 function remove(webPageDOM, noiseSelectors) {
-  [].concat(noiseSelectors).forEach((selector) => {
+  [].concat(noiseSelectors).forEach(selector => {
     if (typeof selector === 'object') {
       const rangeSelection = selectRange(webPageDOM, selector);
+
       rangeSelection.deleteContents();
     } else {
-      Array.from(webPageDOM.querySelectorAll(selector)).forEach((node) => node.remove());
+      Array.from(webPageDOM.querySelectorAll(selector)).forEach(node => node.remove());
     }
   });
 }
@@ -143,12 +140,13 @@ function remove(webPageDOM, noiseSelectors) {
 function select(webPageDOM, contentSelectors) {
   const result = webPageDOM.createDocumentFragment();
 
-  [].concat(contentSelectors).forEach((selector) => {
+  [].concat(contentSelectors).forEach(selector => {
     if (typeof selector === 'object') {
       const rangeSelection = selectRange(webPageDOM, selector);
+
       result.appendChild(rangeSelection.cloneContents());
     } else {
-      webPageDOM.querySelectorAll(selector).forEach((element) => result.appendChild(element));
+      webPageDOM.querySelectorAll(selector).forEach(element => result.appendChild(element));
     }
   });
 

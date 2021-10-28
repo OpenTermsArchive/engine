@@ -8,6 +8,7 @@ export default class Notifier {
   constructor(passedServiceProviders) {
     const defaultClient = sendInBlue.ApiClient.instance;
     const authentication = defaultClient.authentications['api-key'];
+
     authentication.apiKey = process.env.SENDINBLUE_API_KEY;
 
     this.apiInstance = new sendInBlue.SMTPApi();
@@ -23,9 +24,7 @@ export default class Notifier {
 
   async onRecordsPublished() {
     for (const { serviceId, type, versionId } of this.delayedVersionNotificationsParams) {
-      console.log(
-        `notifyVersionRecorded for "${serviceId}" type "${type}" and versionId "${versionId}"`
-      );
+      console.log(`notifyVersionRecorded for "${serviceId}" type "${type}" and versionId "${versionId}"`);
       try {
         // eslint-disable-next-line
         await pTimeout.default(async () => {
@@ -65,17 +64,16 @@ export default class Notifier {
   }
 
   async send(lists, sendParams) {
-    const promises = lists.map((listId) => this.getListContacts(listId));
+    const promises = lists.map(listId => this.getListContacts(listId));
 
     let contacts = await Promise.all(promises);
 
     contacts = contacts.flat();
 
-    const uniqueContacts = [...new Map(contacts.map((item) => [item.id, item])).values()];
+    const uniqueContacts = [...new Map(contacts.map(item => [ item.id, item ])).values()];
 
-    const sendPromises = uniqueContacts.map((contact) =>
-      this.apiInstance.sendTransacEmail({ ...sendParams, to: [{ email: contact.email }] })
-    );
+    const sendPromises = uniqueContacts.map(contact =>
+      this.apiInstance.sendTransacEmail({ ...sendParams, to: [{ email: contact.email }] }));
 
     return Promise.all(sendPromises);
   }
@@ -87,6 +85,7 @@ export default class Notifier {
       limit,
       offset,
     });
+
     return {
       count,
       lists: await this.getAllPaginatedEntries(
@@ -103,7 +102,8 @@ export default class Notifier {
   async searchContactList(name) {
     const { lists } = await this.getAllContactLists();
 
-    const list = lists.find((list) => list.name === name);
+    const list = lists.find(list => list.name === name);
+
     return list;
   }
 
@@ -134,14 +134,15 @@ export default class Notifier {
 
     const promise = resourceIdParameter
       ? this.contactsInstance[functionName](resourceIdParameter, {
-          limit: paginationSize,
-          offset,
-        })
+        limit: paginationSize,
+        offset,
+      })
       : this.contactsInstance[functionName](paginationSize, offset);
 
     const result = await promise;
 
     accumulator = accumulator.concat(result[resultKey]);
+
     return this.getAllPaginatedEntries(
       functionName,
       resourceIdParameter,

@@ -11,6 +11,7 @@ export function removeSecurityUpdates(document) {
   }
 
   let nextEl = found.nextSibling;
+
   while (nextEl != null) {
     found.parentNode.removeChild(nextEl);
     nextEl = found.nextSibling;

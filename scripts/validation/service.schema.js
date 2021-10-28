@@ -7,11 +7,13 @@ const AVAILABLE_TYPES_NAME = Object.keys(TYPES);
 
 const documentsProperties = () => {
   const result = {};
-  AVAILABLE_TYPES_NAME.forEach((type) => {
+
+  AVAILABLE_TYPES_NAME.forEach(type => {
     result[type] = {
       oneOf: [{ $ref: '#/definitions/document' }, { $ref: '#/definitions/pdfDocument' }],
     };
   });
+
   return result;
 };
 
@@ -19,7 +21,7 @@ const schema = {
   type: 'object',
   additionalProperties: false,
   title: 'Service declaration',
-  required: ['name', 'documents'],
+  required: [ 'name', 'documents' ],
   properties: {
     name: {
       type: 'string',
@@ -57,7 +59,7 @@ const schema = {
     document: {
       type: 'object',
       additionalProperties: false,
-      required: ['fetch', 'select'],
+      required: [ 'fetch', 'select' ],
       properties: {
         fetch: {
           type: 'string',
@@ -128,10 +130,10 @@ const schema = {
         endAfter: { $ref: '#/definitions/cssSelector' },
       },
       oneOf: [
-        { required: ['startBefore', 'endBefore'] },
-        { required: ['startBefore', 'endAfter'] },
-        { required: ['startAfter', 'endBefore'] },
-        { required: ['startAfter', 'endAfter'] },
+        { required: [ 'startBefore', 'endBefore' ] },
+        { required: [ 'startBefore', 'endAfter' ] },
+        { required: [ 'startAfter', 'endBefore' ] },
+        { required: [ 'startAfter', 'endAfter' ] },
       ],
     },
   },
