@@ -16,7 +16,9 @@ const __dirname = path.resolve();
 chai.use(sinonChai);
 const { expect } = chai;
 
-describe('CGUs', () => {
+describe('CGUs', function () {
+  this.timeout(5000);
+
   const SERVICE_A_ID = 'service_A';
   const SERVICE_A_TYPE = 'Terms of Service';
   const SERVICE_A_EXPECTED_SNAPSHOT_FILE_PATH = `${SNAPSHOTS_PATH}/${SERVICE_A_ID}/${SERVICE_A_TYPE}.html`;
@@ -149,9 +151,7 @@ describe('CGUs', () => {
         let refilterVersionMessageBody;
         let serviceBCommits;
 
-        before(async function () {
-          this.timeout(5000);
-
+        before(async () => {
           nock('https://www.servicea.example')
             .get('/tos')
             .reply(200, serviceASnapshotExpectedContent, { 'Content-Type': 'text/html' });
