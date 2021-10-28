@@ -62,7 +62,6 @@ export default class Github {
     });
   }
 
-  /* eslint-disable no-await-in-loop */
   async createIssue(params) {
     try {
       const { data } = await this.octokit.rest.issues.create(params);
@@ -80,10 +79,8 @@ export default class Github {
     try {
       const qOnRepo = `${q} repo:${params.owner}/${params.repo}`;
 
-      if (
-        !this.cachedIssues[qOnRepo]
-        || (this.cachedIssues[qOnRepo].lastUpdated
-          && new Date().getTime() - this.cachedIssues[qOnRepo].lastUpdated > 1000 * 60 * 30) // cache is more than 30 minutes
+      if (!this.cachedIssues[qOnRepo]
+        || (this.cachedIssues[qOnRepo].lastUpdated && new Date().getTime() - this.cachedIssues[qOnRepo].lastUpdated > 1000 * 60 * 30) // cache is more than 30 minutes
       ) {
         const nbPerPage = 100;
         const request = {
@@ -100,30 +97,19 @@ export default class Github {
         // we need to do this because error being asynchronous, if we do not and wait for
         // subsequent pages to be fetch, we could end up in a situation when
         // a new error comes in and fetches also the first page as cache is not setup yet
-        this.cachedIssues[qOnRepo] = {
-          lastUpdatedAt: new Date().getTime(),
-          items: foundItems,
-        };
+        this.cachedIssues[qOnRepo] = { lastUpdatedAt: new Date().getTime(), items: foundItems };
 
         const nbPages = Math.ceil(data.total_count / nbPerPage);
 
         if (nbPages > 1) {
           for (let page = 2; page <= nbPages; page++) {
-            const {
-              data: paginatedData,
-            } = await this.octokit.rest.search.issuesAndPullRequests({
-              ...request,
-              page,
-            });
+            const { data: paginatedData } = await this.octokit.rest.search.issuesAndPullRequests({ ...request, page }); // eslint-disable-line no-await-in-loop
 
             foundItems = [ ...foundItems, ...paginatedData.items ];
           }
         }
 
-        this.cachedIssues[qOnRepo] = {
-          lastUpdatedAt: new Date().getTime(),
-          items: foundItems,
-        };
+        this.cachedIssues[qOnRepo] = { lastUpdatedAt: new Date().getTime(), items: foundItems };
       }
       const items = this.cachedIssues[qOnRepo].items || [];
 
@@ -145,8 +131,7 @@ export default class Github {
 
       return data;
     } catch (e) {
-      logger.error('Could not add comment to issue');
-      logger.error(e.toString());
+      logger.error('Could not add comment to issue:', e.toString());
 
       return null;
     }
@@ -167,22 +152,14 @@ export default class Github {
 
         return existingIssue;
       }
-      const openedIssues = existingIssues.filter(existingIssue => existingIssue.state === ISSUE_STATE_OPEN);
 
+      const openedIssues = existingIssues.filter(existingIssue => existingIssue.state === ISSUE_STATE_OPEN);
       const hasNoneOpened = openedIssues.length === 0;
 
       for (const existingIssue of existingIssues) {
         if (hasNoneOpened) {
-          await this.octokit.rest.issues.update({
-            ...this.commonParams,
-            issue_number: existingIssue.number,
-            state: ISSUE_STATE_OPEN,
-          });
-          await this.addCommentToIssue({
-            ...this.commonParams,
-            issue_number: existingIssue.number,
-            body: comment,
-          });
+          await this.octokit.rest.issues.update({ ...this.commonParams, issue_number: existingIssue.number, state: ISSUE_STATE_OPEN }); // eslint-disable-line no-await-in-loop
+          await this.addCommentToIssue({ ...this.commonParams, issue_number: existingIssue.number, body: comment }); // eslint-disable-line no-await-in-loop
           break;
         }
       }
@@ -194,24 +171,12 @@ export default class Github {
   }
 
   async closeIssueIfExists({ title, comment, labels }) {
-    const existingIssues = await this.searchIssues({
-      ...this.commonParams,
-      title,
-      q: `is:issue is:${ISSUE_STATE_OPEN} label:${labels.join(',')}`,
-    });
+    const existingIssues = await this.searchIssues({ ...this.commonParams, title, q: `is:issue is:${ISSUE_STATE_OPEN} label:${labels.join(',')}` });
 
     if (existingIssues) {
       for (const existingIssue of existingIssues) {
-        await this.octokit.rest.issues.update({
-          ...this.commonParams,
-          issue_number: existingIssue.number,
-          state: ISSUE_STATE_CLOSED,
-        });
-        await this.addCommentToIssue({
-          ...this.commonParams,
-          issue_number: existingIssue.number,
-          body: comment,
-        });
+        await this.octokit.rest.issues.update({ ...this.commonParams, issue_number: existingIssue.number, state: ISSUE_STATE_CLOSED }); // eslint-disable-line no-await-in-loop
+        await this.addCommentToIssue({ ...this.commonParams, issue_number: existingIssue.number, body: comment }); // eslint-disable-line no-await-in-loop
         logger.info(`🤖 Github issue closed for ${title}: ${existingIssue.html_url}`);
       }
     }
@@ -221,29 +186,26 @@ export default class Github {
 
   static formatIssueTitleAndBody(messageOrObject) {
     const { message, contentSelectors, noiseSelectors, url, name, documentType } = messageOrObject;
+    let contentSelectorsAsArray = contentSelectors;
+    let noiseSelectorsAsArray = noiseSelectors;
 
-    /* eslint-disable no-nested-ternary */
-    const contentSelectorsAsArray = (typeof contentSelectors === 'string'
-      ? contentSelectors.split(',')
-      : Array.isArray(contentSelectors)
-        ? contentSelectors
-        : []
-    ).map(encodeURIComponent);
+    if (typeof contentSelectors === 'string') {
+      contentSelectorsAsArray = contentSelectors.split(',');
+    } else if (!Array.isArray(contentSelectors)) {
+      contentSelectorsAsArray = [];
+    }
 
-    const noiseSelectorsAsArray = (typeof noiseSelectors === 'string'
-      ? noiseSelectors.split(',')
-      : Array.isArray(noiseSelectors)
-        ? noiseSelectors
-        : []
-    ).map(encodeURIComponent);
-    /* eslint-enable no-nested-ternary */
+    if (typeof noiseSelectors === 'string') {
+      noiseSelectorsAsArray = noiseSelectors.split(',');
+    } else if (!Array.isArray(noiseSelectors)) {
+      noiseSelectorsAsArray = [];
+    }
 
-    const contentSelectorsQueryString = contentSelectorsAsArray.length
-      ? `&selectedCss[]=${contentSelectorsAsArray.join('&selectedCss[]=')}`
-      : '';
-    const noiseSelectorsQueryString = noiseSelectorsAsArray.length
-      ? `&removedCss[]=${noiseSelectorsAsArray.join('&removedCss[]=')}`
-      : '';
+    const contentSelectorsAsArrayEncoded = contentSelectorsAsArray.map(encodeURIComponent);
+    const noiseSelectorsAsArrayEncoded = noiseSelectorsAsArray.map(encodeURIComponent);
+
+    const contentSelectorsQueryString = contentSelectorsAsArrayEncoded.length ? `&selectedCss[]=${contentSelectorsAsArrayEncoded.join('&selectedCss[]=')}` : '';
+    const noiseSelectorsQueryString = noiseSelectorsAsArrayEncoded.length ? `&removedCss[]=${noiseSelectorsAsArrayEncoded.join('&removedCss[]=')}` : '';
 
     const encodedName = encodeURIComponent(name);
     const encodedType = encodeURIComponent(documentType);
@@ -251,9 +213,7 @@ export default class Github {
 
     const urlQueryParams = `step=2&url=${encodedUrl}&name=${encodedName}&documentType=${encodedType}${noiseSelectorsQueryString}${contentSelectorsQueryString}&expertMode=true`;
 
-    const message404 = message.includes('404')
-      ? `- Search Google to get the new url: ${GOOGLE_URL}%22${encodedName}%22+%22${encodedType}%22`
-      : '';
+    const message404 = message.includes('404') ? `- Search Google to get the new url: ${GOOGLE_URL}%22${encodedName}%22+%22${encodedType}%22` : '';
 
     const title = `Fix ${name} - ${documentType}`;
 
