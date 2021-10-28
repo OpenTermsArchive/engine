@@ -1,4 +1,3 @@
----
 extends: airbnb-base
 parserOptions:
   ecmaVersion: 2020
@@ -7,40 +6,40 @@ env:
   mocha: true
   es6: true
 plugins:
-- chai-friendly
+  - chai-friendly
 rules:
   arrow-parens:
-  - error
-  - as-needed
+    - error
+    - as-needed
   array-bracket-spacing:
-  - error
-  - always
-  - objectsInArrays: false
-    arraysInArrays: false
-    singleValue: false
+    - error
+    - always
+    - objectsInArrays: false
+      arraysInArrays: false
+      singleValue: false
   eqeqeq: 0
   chai-friendly/no-unused-expressions: 2
   comma-dangle: 0
   consistent-return: 0
   function-paren-newline:
-  - error
-  - multiline
+    - error
+    - multiline
   implicit-arrow-linebreak:
-  - 'off'
+    - 'off'
   import/extensions:
-  - error
-  - always
-  - ignorePackages: true
+    - error
+    - always
+    - ignorePackages: true
   import/prefer-default-export: 0
   import/order:
-  - error
-  - groups:
-    - - builtin
-      - external
-    newlines-between: always
+    - error
+    - groups:
+        - - builtin
+          - external
+      newlines-between: always
   indent:
-  - error
-  - 2
+    - error
+    - 2
   max-len: 0
   no-console: 0
   no-param-reassign: 0
@@ -51,30 +50,27 @@ rules:
   no-underscore-dangle: 0
   no-unused-expressions: 0
   no-unused-vars:
-  - error
-  - argsIgnorePattern: next
+    - error
+    - argsIgnorePattern: next
   no-use-before-define: 0
   object-curly-newline: 0
   padding-line-between-statements:
-  - error
-  - blankLine: always
-    prev: "*"
-    next: return
-  - blankLine: always
-    prev:
-    - const
-    - let
-    - var
-    next: "*"
-  - blankLine: any
-    prev:
-    - const
-    - let
-    - var
-    next:
-    - const
-    - let
-    - var
-
-
-
+    - error
+    - blankLine: always
+      prev: '*'
+      next: return
+    - blankLine: always
+      prev:
+        - const
+        - let
+        - var
+      next: '*'
+    - blankLine: any
+      prev:
+        - const
+        - let
+        - var
+      next:
+        - const
+        - let
+        - var
