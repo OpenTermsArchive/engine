@@ -42,6 +42,10 @@ export default class Github {
     });
   }
 
+  async onFirstVersionRecorded(serviceId, type) {
+    await this.onVersionRecorded(serviceId, type);
+  }
+
   async onInaccessibleContent(error, serviceId, type, documentDeclaration) {
     const { location, contentSelectors, noiseSelectors } = documentDeclaration;
 
