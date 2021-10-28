@@ -256,8 +256,8 @@ describe('CGUs', function () {
 
         after(resetGitRepository);
 
-        it('does not emit an inaccessibleContent event when an error happens during refiltering', async () => {
-          expect(inaccessibleContentSpy).to.not.have.been.called;
+        it('emits an inaccessibleContent event when an error happens during refiltering', async () => {
+          expect(inaccessibleContentSpy).to.have.been.called;
         });
 
         it('still refilters other services', async () => {
