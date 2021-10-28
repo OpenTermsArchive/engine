@@ -47,10 +47,9 @@ export default class CGUs extends events.EventEmitter {
     this.trackDocumentChangesQueue = async.queue(async documentDeclaration => this.trackDocumentChanges(documentDeclaration), MAX_PARALLEL_DOCUMENTS_TRACKS);
     this.refilterDocumentsQueue = async.queue(async documentDeclaration => this.refilterAndRecordDocument(documentDeclaration), MAX_PARALLEL_REFILTERS);
 
-    const queueErrorHandler = createGithubError => async (
-      error,
-      { location, service, contentSelectors, noiseSelectors, type }
-    ) => {
+    const queueErrorHandler = async (error, documentDeclaration) => {
+      const { service, type } = documentDeclaration;
+
       if (error.toString().includes('HttpError: API rate limit exceeded for user ID')) {
         // This is an error due to SendInBlue quota, bypass
         return;
@@ -82,8 +81,7 @@ export default class CGUs extends events.EventEmitter {
   }
 
   async trackChanges(servicesIds) {
-    this._forEachDocumentOf(servicesIds, documentDeclaration =>
-      this.trackDocumentChangesQueue.push(documentDeclaration));
+    this._forEachDocumentOf(servicesIds, documentDeclaration => this.trackDocumentChangesQueue.push(documentDeclaration));
 
     await this.trackDocumentChangesQueue.drain();
 
@@ -125,8 +123,7 @@ export default class CGUs extends events.EventEmitter {
   }
 
   async refilterAndRecord(servicesIds) {
-    this._forEachDocumentOf(servicesIds, documentDeclaration =>
-      this.refilterDocumentsQueue.push(documentDeclaration));
+    this._forEachDocumentOf(servicesIds, documentDeclaration => this.refilterDocumentsQueue.push(documentDeclaration));
 
     await this.refilterDocumentsQueue.drain();
     await this.publish();
@@ -173,23 +170,12 @@ export default class CGUs extends events.EventEmitter {
       return this.emit('snapshotNotChanged', service.id, type);
     }
 
-    this.emit(
-      isFirstRecord ? 'firstSnapshotRecorded' : 'snapshotRecorded',
-      service.id,
-      type,
-      snapshotId
-    );
+    this.emit(isFirstRecord ? 'firstSnapshotRecorded' : 'snapshotRecorded', service.id, type, snapshotId);
 
     return snapshotId;
   }
 
-  async recordVersion({
-    snapshotContent,
-    mimeType,
-    snapshotId,
-    documentDeclaration,
-    isRefiltering,
-  }) {
+  async recordVersion({ snapshotContent, mimeType, snapshotId, documentDeclaration, isRefiltering }) {
     const { service, type } = documentDeclaration;
     const content = await filter({
       content: snapshotContent,
@@ -210,12 +196,7 @@ export default class CGUs extends events.EventEmitter {
       return this.emit('versionNotChanged', service.id, type);
     }
 
-    this.emit(
-      isFirstRecord ? 'firstVersionRecorded' : 'versionRecorded',
-      service.id,
-      type,
-      versionId
-    );
+    this.emit(isFirstRecord ? 'firstVersionRecorded' : 'versionRecorded', service.id, type, versionId);
   }
 
   async publish() {
