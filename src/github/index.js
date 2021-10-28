@@ -141,7 +141,7 @@ export default class Github {
     try {
       const existingIssues = await this.searchIssues({ ...this.commonParams, title, q: `is:issue label:${labels.join(',')}` });
 
-      if (!existingIssues[0]) {
+      if (!existingIssues.length) {
         const existingIssue = await this.createIssue({ ...this.commonParams, title, body, labels });
 
         if (existingIssue) {
