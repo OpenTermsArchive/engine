@@ -12,6 +12,8 @@ const GITHUB_OTA_REPO = process.env.GITHUB_OTA_REPO || '';
 const ISSUE_STATE_CLOSED = 'closed';
 const ISSUE_STATE_OPEN = 'open';
 
+const FIX_DOCUMENT_LABEL = 'fix-document';
+
 const LOCAL_CONTRIBUTE_URL = 'http://localhost:3000/contribute/service';
 const CONTRIBUTE_URL = 'https://opentermsarchive.org/contribute/service';
 const GITHUB_VERSIONS_URL = 'https://github.com/ambanum/OpenTermsArchive-versions/blob/master';
@@ -34,7 +36,7 @@ export default class Github {
 
   async onVersionRecorded(serviceId, type) {
     await this.closeIssueIfExists({
-      labels: ['fix-document'],
+      labels: [FIX_DOCUMENT_LABEL],
       title: `Fix ${serviceId} - ${type}`,
       comment: '🤖 Closed automatically as data was gathered successfully',
     });
@@ -55,7 +57,7 @@ export default class Github {
     await this.createIssueIfNotExist({
       title,
       body,
-      labels: ['fix-document'],
+      labels: [FIX_DOCUMENT_LABEL],
       comment: '🤖 Reopened automatically as an error occured',
     });
   }
