@@ -2,9 +2,10 @@
  * This module is the boundary beyond which the persistence method (filesystem and git) is abstracted.
  */
 
-import config from 'config';
-import { fileURLToPath } from 'url';
 import path from 'path';
+import { fileURLToPath } from 'url';
+
+import config from 'config';
 
 import Recorder from './recorder.js';
 

@@ -2,11 +2,12 @@ import './bootstrap.js';
 
 import scheduler from 'node-schedule';
 
+import { publishRelease } from '../scripts/release/releasedataset.js';
+
 import CGUs from './app/index.js';
 import * as services from './app/services/index.js';
-import Notifier from './notifier/index.js';
 import logger from './logger/index.js';
-import { publishRelease } from '../scripts/release/releasedataset.js';
+import Notifier from './notifier/index.js';
 
 const args = process.argv.slice(2);
 const modifiedOnly = args.includes('--modified-only');

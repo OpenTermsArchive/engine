@@ -1,4 +1,5 @@
 import fsApi from 'fs';
+
 import mime from 'mime';
 
 const fs = fsApi.promises;

@@ -1,8 +1,9 @@
+import https from 'https';
+
+import AbortController from 'abort-controller';
 import HttpProxyAgent from 'http-proxy-agent';
 import HttpsProxyAgent from 'https-proxy-agent';
-import https from 'https';
 import nodeFetch from 'node-fetch';
-import AbortController from 'abort-controller';
 
 import { InaccessibleContentError } from '../errors.js';
 

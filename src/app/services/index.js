@@ -1,11 +1,12 @@
-import { fileURLToPath, pathToFileURL } from 'url';
-import config from 'config';
 import fsApi from 'fs';
 import path from 'path';
+import { fileURLToPath, pathToFileURL } from 'url';
+
+import config from 'config';
 import simpleGit from 'simple-git';
 
-import Service from './service.js';
 import DocumentDeclaration from './documentDeclaration.js';
+import Service from './service.js';
 
 const fs = fsApi.promises;
 const __dirname = path.dirname(fileURLToPath(import.meta.url));

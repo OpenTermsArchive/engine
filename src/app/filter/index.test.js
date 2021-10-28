@@ -1,11 +1,13 @@
-import chai from 'chai';
-import { fileURLToPath } from 'url';
 import fsApi from 'fs';
-import jsdom from 'jsdom';
 import path from 'path';
+import { fileURLToPath } from 'url';
 
-import DocumentDeclaration from '../services/documentDeclaration.js';
+import chai from 'chai';
+import jsdom from 'jsdom';
+
 import { InaccessibleContentError } from '../errors.js';
+import DocumentDeclaration from '../services/documentDeclaration.js';
+
 import { convertRelativeURLsToAbsolute, filterHTML, filterPDF } from './index.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));

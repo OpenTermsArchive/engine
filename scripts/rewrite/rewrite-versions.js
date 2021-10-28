@@ -1,13 +1,15 @@
-import { fileURLToPath, pathToFileURL } from 'url';
-import config from 'config';
 import path from 'path';
+import { fileURLToPath, pathToFileURL } from 'url';
+
+import config from 'config';
+
+import { InaccessibleContentError } from '../../src/app/errors.js';
+import filter from '../../src/app/filter/index.js';
+import Git from '../../src/app/history/git.js';
+import * as services from '../../src/app/services/index.js';
 
 import * as initializer from './initializer/index.js';
 import * as renamer from './renamer/index.js';
-import * as services from '../../src/app/services/index.js';
-import Git from '../../src/app/history/git.js';
-import { InaccessibleContentError } from '../../src/app/errors.js';
-import filter from '../../src/app/filter/index.js';
 import { loadFile } from './utils.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));

@@ -1,8 +1,9 @@
-import config from 'config';
-import { fileURLToPath } from 'url';
 import fsApi from 'fs';
-import fse from 'fs-extra';
 import path from 'path';
+import { fileURLToPath } from 'url';
+
+import config from 'config';
+import fse from 'fs-extra';
 
 import Git from '../../src/app/history/git.js';
 
