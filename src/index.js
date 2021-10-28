@@ -6,6 +6,7 @@ import { publishRelease } from '../scripts/release/releasedataset.js';
 
 import CGUs from './app/index.js';
 import * as services from './app/services/index.js';
+import Github from './github/index.js';
 import logger from './logger/index.js';
 import Notifier from './notifier/index.js';
 
@@ -60,6 +61,10 @@ const schedule = args.includes('--schedule');
 
   if (process.env.NODE_ENV === 'production') {
     app.attach(new Notifier(app.serviceDeclarations));
+  }
+
+  if (!!process.env.GITHUB_TOKEN_CREATE_ISSUE && process.env.NODE_ENV !== 'test') {
+    app.attach(new Github());
   }
 
   logger.info(`👇 Start tracking changes of ${numberOfDocuments} documents from ${serviceIds.length} services…`);

@@ -3,9 +3,6 @@ import events from 'events';
 import async from 'async';
 import config from 'config';
 
-import * as github from '../github/index.js';
-import logger from '../logger/index.js';
-
 import { InaccessibleContentError } from './errors.js';
 import fetch from './fetcher/index.js';
 import filter from './filter/index.js';
@@ -60,25 +57,7 @@ export default class CGUs extends events.EventEmitter {
       }
 
       if (error instanceof InaccessibleContentError) {
-        this.emit('inaccessibleContent', error, service.id, type);
-
-        if (createGithubError) {
-          const { title, body } = github.formatIssueTitleAndBody({
-            contentSelectors,
-            noiseSelectors,
-            url: location,
-            name: service.id,
-            documentType: type,
-            message: error.toString(),
-          });
-
-          await github.createIssueIfNotExist({
-            title,
-            body,
-            labels: ['fix-document'],
-            comment: '🤖 Reopened automatically as an error occured',
-          });
-        }
+        this.emit('inaccessibleContent', error, service.id, type, documentDeclaration);
 
         return;
       }
@@ -88,8 +67,8 @@ export default class CGUs extends events.EventEmitter {
       throw error;
     };
 
-    this.trackDocumentChangesQueue.error(queueErrorHandler(true));
-    this.refilterDocumentsQueue.error(queueErrorHandler(false));
+    this.trackDocumentChangesQueue.error(queueErrorHandler);
+    this.refilterDocumentsQueue.error(queueErrorHandler);
   }
 
   attach(listener) {
@@ -112,7 +91,7 @@ export default class CGUs extends events.EventEmitter {
   }
 
   async trackDocumentChanges(documentDeclaration) {
-    const { location, executeClientScripts, headers, service, type } = documentDeclaration;
+    const { location, executeClientScripts, headers } = documentDeclaration;
 
     const { mimeType, content } = await fetch({
       url: location,
@@ -142,12 +121,6 @@ export default class CGUs extends events.EventEmitter {
       documentDeclaration,
     });
 
-    await github.closeIssueIfExists({
-      labels: ['fix-document'],
-      title: `Fix ${service.id} - ${type}`,
-      comment: '🤖 Closed automatically as data was gathered successfully',
-    });
-
     return recordedVersion;
   }
 
@@ -170,24 +143,14 @@ export default class CGUs extends events.EventEmitter {
     if (!snapshotId) {
       return;
     }
-    try {
-      return await this.recordVersion({
-        snapshotContent,
-        mimeType,
-        snapshotId,
-        documentDeclaration,
-        isRefiltering: true,
-      });
-    } catch (e) {
-      if (e instanceof InaccessibleContentError) {
-        logger.warn('In refiltering', e);
 
-        // previous snapshot did not have the corresponding selectors
-        // we can safely ignore this error as it will be fixed in next tracking change
-        return null;
-      }
-      throw e;
-    }
+    return this.recordVersion({
+      snapshotContent,
+      mimeType,
+      snapshotId,
+      documentDeclaration,
+      isRefiltering: true,
+    });
   }
 
   async _forEachDocumentOf(servicesIds = [], callback) {
