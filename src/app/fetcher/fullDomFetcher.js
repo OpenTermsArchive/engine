@@ -8,7 +8,7 @@ import { InaccessibleContentError } from '../errors.js';
 
 puppeteer.use(StealthPlugin());
 
-const PUPPETEER_TIMEOUT = 30 * 1000; // 30s
+const PUPPETEER_TIMEOUT = 30 * 1000; // 30 seconds in ms
 const MAX_RETRIES = 3;
 let browser;
 
