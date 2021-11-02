@@ -3,9 +3,6 @@ import events from 'events';
 import async from 'async';
 import config from 'config';
 
-import * as github from '../github/index.js';
-import logger from '../logger/index.js';
-
 import { InaccessibleContentError } from './errors.js';
 import fetch from './fetcher/index.js';
 import filter from './filter/index.js';
@@ -50,35 +47,16 @@ export default class CGUs extends events.EventEmitter {
     this.trackDocumentChangesQueue = async.queue(async documentDeclaration => this.trackDocumentChanges(documentDeclaration), MAX_PARALLEL_DOCUMENTS_TRACKS);
     this.refilterDocumentsQueue = async.queue(async documentDeclaration => this.refilterAndRecordDocument(documentDeclaration), MAX_PARALLEL_REFILTERS);
 
-    const queueErrorHandler = createGithubError => async (
-      error,
-      { location, service, contentSelectors, noiseSelectors, type }
-    ) => {
+    const queueErrorHandler = async (error, documentDeclaration) => {
+      const { service, type } = documentDeclaration;
+
       if (error.toString().includes('HttpError: API rate limit exceeded for user ID')) {
         // This is an error due to SendInBlue quota, bypass
         return;
       }
 
       if (error instanceof InaccessibleContentError) {
-        this.emit('inaccessibleContent', error, service.id, type);
-
-        if (createGithubError) {
-          const { title, body } = github.formatIssueTitleAndBody({
-            contentSelectors,
-            noiseSelectors,
-            url: location,
-            name: service.id,
-            documentType: type,
-            message: error.toString(),
-          });
-
-          await github.createIssueIfNotExist({
-            title,
-            body,
-            labels: ['fix-document'],
-            comment: '🤖 Reopened automatically as an error occured',
-          });
-        }
+        this.emit('inaccessibleContent', error, service.id, type, documentDeclaration);
 
         return;
       }
@@ -88,8 +66,8 @@ export default class CGUs extends events.EventEmitter {
       throw error;
     };
 
-    this.trackDocumentChangesQueue.error(queueErrorHandler(true));
-    this.refilterDocumentsQueue.error(queueErrorHandler(false));
+    this.trackDocumentChangesQueue.error(queueErrorHandler);
+    this.refilterDocumentsQueue.error(queueErrorHandler);
   }
 
   attach(listener) {
@@ -103,8 +81,7 @@ export default class CGUs extends events.EventEmitter {
   }
 
   async trackChanges(servicesIds) {
-    this._forEachDocumentOf(servicesIds, documentDeclaration =>
-      this.trackDocumentChangesQueue.push(documentDeclaration));
+    this._forEachDocumentOf(servicesIds, documentDeclaration => this.trackDocumentChangesQueue.push(documentDeclaration));
 
     await this.trackDocumentChangesQueue.drain();
 
@@ -112,7 +89,7 @@ export default class CGUs extends events.EventEmitter {
   }
 
   async trackDocumentChanges(documentDeclaration) {
-    const { location, executeClientScripts, headers, service, type } = documentDeclaration;
+    const { location, executeClientScripts, headers } = documentDeclaration;
 
     const { mimeType, content } = await fetch({
       url: location,
@@ -142,18 +119,11 @@ export default class CGUs extends events.EventEmitter {
       documentDeclaration,
     });
 
-    await github.closeIssueIfExists({
-      labels: ['fix-document'],
-      title: `Fix ${service.id} - ${type}`,
-      comment: '🤖 Closed automatically as data was gathered successfully',
-    });
-
     return recordedVersion;
   }
 
   async refilterAndRecord(servicesIds) {
-    this._forEachDocumentOf(servicesIds, documentDeclaration =>
-      this.refilterDocumentsQueue.push(documentDeclaration));
+    this._forEachDocumentOf(servicesIds, documentDeclaration => this.refilterDocumentsQueue.push(documentDeclaration));
 
     await this.refilterDocumentsQueue.drain();
     await this.publish();
@@ -170,24 +140,14 @@ export default class CGUs extends events.EventEmitter {
     if (!snapshotId) {
       return;
     }
-    try {
-      return await this.recordVersion({
-        snapshotContent,
-        mimeType,
-        snapshotId,
-        documentDeclaration,
-        isRefiltering: true,
-      });
-    } catch (e) {
-      if (e instanceof InaccessibleContentError) {
-        logger.warn('In refiltering', e);
 
-        // previous snapshot did not have the corresponding selectors
-        // we can safely ignore this error as it will be fixed in next tracking change
-        return null;
-      }
-      throw e;
-    }
+    return this.recordVersion({
+      snapshotContent,
+      mimeType,
+      snapshotId,
+      documentDeclaration,
+      isRefiltering: true,
+    });
   }
 
   async _forEachDocumentOf(servicesIds = [], callback) {
@@ -210,23 +170,12 @@ export default class CGUs extends events.EventEmitter {
       return this.emit('snapshotNotChanged', service.id, type);
     }
 
-    this.emit(
-      isFirstRecord ? 'firstSnapshotRecorded' : 'snapshotRecorded',
-      service.id,
-      type,
-      snapshotId
-    );
+    this.emit(isFirstRecord ? 'firstSnapshotRecorded' : 'snapshotRecorded', service.id, type, snapshotId);
 
     return snapshotId;
   }
 
-  async recordVersion({
-    snapshotContent,
-    mimeType,
-    snapshotId,
-    documentDeclaration,
-    isRefiltering,
-  }) {
+  async recordVersion({ snapshotContent, mimeType, snapshotId, documentDeclaration, isRefiltering }) {
     const { service, type } = documentDeclaration;
     const content = await filter({
       content: snapshotContent,
@@ -247,12 +196,7 @@ export default class CGUs extends events.EventEmitter {
       return this.emit('versionNotChanged', service.id, type);
     }
 
-    this.emit(
-      isFirstRecord ? 'firstVersionRecorded' : 'versionRecorded',
-      service.id,
-      type,
-      versionId
-    );
+    this.emit(isFirstRecord ? 'firstVersionRecorded' : 'versionRecorded', service.id, type, versionId);
   }
 
   async publish() {
