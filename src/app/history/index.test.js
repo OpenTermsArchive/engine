@@ -1,5 +1,8 @@
-import chai from 'chai';
 import fsApi from 'fs';
+
+import chai from 'chai';
+
+import { gitSnapshot, gitVersion, resetGitRepository } from '../../../test/helper.js';
 
 import {
   SNAPSHOTS_PATH,
@@ -9,7 +12,6 @@ import {
   recordSnapshot,
   recordVersion,
 } from './index.js';
-import { gitSnapshot, gitVersion, resetGitRepository } from '../../../test/helper.js';
 
 const fs = fsApi.promises;
 const { expect } = chai;

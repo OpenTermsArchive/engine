@@ -1,7 +1,7 @@
-import StealthPlugin from 'puppeteer-extra-plugin-stealth';
-import UserAgent from 'user-agents';
 import config from 'config';
 import puppeteer from 'puppeteer-extra';
+import StealthPlugin from 'puppeteer-extra-plugin-stealth';
+import UserAgent from 'user-agents';
 
 import logger from '../../logger/index.js';
 import { InaccessibleContentError } from '../errors.js';

@@ -1,9 +1,11 @@
-import chai from 'chai';
-import chaiAsPromised from 'chai-as-promised';
 import http from 'http';
 
-import fetch from './fullDomFetcher.js';
+import chai from 'chai';
+import chaiAsPromised from 'chai-as-promised';
+
 import { InaccessibleContentError } from '../errors.js';
+
+import fetch from './fullDomFetcher.js';
 
 const { expect } = chai;
 

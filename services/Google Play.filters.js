@@ -1,5 +1,5 @@
-import mime from 'mime';
 import DataURIParser from 'datauri/parser.js';
+import mime from 'mime';
 
 import fetch from '../src/app/fetcher/htmlOnlyFetcher.js';
 

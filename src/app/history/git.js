@@ -1,7 +1,8 @@
-import config from 'config';
 import { execSync } from 'child_process';
 import fs from 'fs';
 import path from 'path';
+
+import config from 'config';
 import simpleGit from 'simple-git';
 
 process.env.LC_ALL = 'en_GB'; // Ensure git messages will be in English as some errors are handled by analysing the message content

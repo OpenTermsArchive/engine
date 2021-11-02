@@ -1,5 +1,6 @@
-import { Octokit } from 'octokit';
 import fs from 'fs';
+
+import { Octokit } from 'octokit';
 
 import logger from '../logger/index.js';
 

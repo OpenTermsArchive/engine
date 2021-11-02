@@ -44,7 +44,7 @@
     "eslint": "^7.32.0",
     "eslint-config-airbnb-base": "^14.2.1",
     "eslint-plugin-chai-friendly": "^0.6.0",
-    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-import": "^2.25.2",
     "inquirer": "^8.1.2",
     "json-source-map": "^0.6.1",
     "mocha": "^8.3.0",

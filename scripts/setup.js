@@ -1,9 +1,10 @@
 /* eslint-disable import/no-extraneous-dependencies */
-import config from 'config';
-import { fileURLToPath } from 'url';
 import fsApi from 'fs';
-import inquirer from 'inquirer';
 import path from 'path';
+import { fileURLToPath } from 'url';
+
+import config from 'config';
+import inquirer from 'inquirer';
 import simpleGit from 'simple-git';
 
 const fs = fsApi.promises;

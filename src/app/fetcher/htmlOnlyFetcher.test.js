@@ -1,12 +1,14 @@
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import { fileURLToPath } from 'url';
-import fs from 'fs';
 import nock from 'nock';
-import path from 'path';
+
+import { InaccessibleContentError } from '../errors.js';
 
 import fetch from './htmlOnlyFetcher.js';
-import { InaccessibleContentError } from '../errors.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const { expect } = chai;

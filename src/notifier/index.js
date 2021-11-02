@@ -1,6 +1,6 @@
+import pTimeout from '@lolpants/ptimeout';
 import config from 'config';
 import dotenv from 'dotenv';
-import pTimeout from '@lolpants/ptimeout';
 import sendInBlue from 'sib-api-v3-sdk';
 
 dotenv.config();

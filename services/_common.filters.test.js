@@ -1,5 +1,5 @@
-import { JSDOM } from 'jsdom';
 import { expect } from 'chai';
+import { JSDOM } from 'jsdom';
 import prettier from 'prettier';
 
 import { removeSIDfromUrls } from './_common.filters.js';

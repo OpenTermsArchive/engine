@@ -1,10 +1,12 @@
-import { fileURLToPath, pathToFileURL } from 'url';
-import config from 'config';
 import path from 'path';
+import { fileURLToPath, pathToFileURL } from 'url';
+
+import config from 'config';
+
+import Git from '../../src/app/history/git.js';
 
 import * as initializer from './initializer/index.js';
 import * as renamer from './renamer/index.js';
-import Git from '../../src/app/history/git.js';
 import { loadFile } from './utils.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
