@@ -63,7 +63,7 @@ const schedule = args.includes('--schedule');
     app.attach(new Notifier(app.serviceDeclarations));
   }
 
-  if (!!process.env.GITHUB_TOKEN_CREATE_ISSUE && process.env.NODE_ENV !== 'test') {
+  if (process.env.GITHUB_TOKEN_CREATE_ISSUE) {
     app.attach(new Github());
   }
 
