@@ -55,19 +55,13 @@ export default async function fetch(url, cssSelectors, headers = {}, { retry } =
     await Promise.all(selectors.map(selector => page.waitForSelector(selector, { timeout: config.get('fetcher.waitForElementsTimeout') })));
 
     content = await page.content();
+
+    return {
+      mimeType: 'text/html',
+      content,
+    };
   } catch (error) {
-    if (retry < MAX_RETRIES && process.env.NODE_ENV !== 'test') {
-      logger.warn(`Error ${error.message} on url ${url}, retrying again ${retry + 1} times`);
-
-      return await fetch(url, cssSelectors, headers, { retry: retry + 1 });
-    }
-
-    if (
-      (error.code && error.code.match(/^(EAI_AGAIN|ENOTFOUND|ETIMEDOUT|ECONNRESET)$/))
-      || (error.message
-        && error.message.match(/(ERR_FAILED|ERR_TUNNEL_CONNECTION_FAILED|ERR_NAME_NOT_RESOLVED)/))
-      || error instanceof puppeteer.pptr.errors.TimeoutError // Expected elements are not present on the web page
-    ) {
+    if (error instanceof puppeteer.pptr.errors.TimeoutError) { // Expected elements are not present on the web page
       throw new InaccessibleContentError(error.message);
     }
 
@@ -77,9 +71,4 @@ export default async function fetch(url, cssSelectors, headers = {}, { retry } =
       await page.close();
     }
   }
-
-  return {
-    mimeType: 'text/html',
-    content,
-  };
 }

@@ -71,7 +71,7 @@
     "joplin-turndown-plugin-gfm": "^1.0.12",
     "jsdom": "^17.0.0",
     "mime": "^2.5.2",
-    "node-fetch": "^2.6.1",
+    "node-fetch": "^3.0.0",
     "node-schedule": "^2.0.0",
     "octokit": "^1.7.0",
     "pdfjs-dist": "^2.9.359",

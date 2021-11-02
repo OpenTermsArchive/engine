@@ -1,7 +1,7 @@
 import AbortController from 'abort-controller';
 import HttpProxyAgent from 'http-proxy-agent';
 import HttpsProxyAgent from 'https-proxy-agent';
-import nodeFetch from 'node-fetch';
+import nodeFetch, { AbortError } from 'node-fetch';
 
 import { InaccessibleContentError } from '../errors.js';
 
@@ -14,6 +14,8 @@ export default async function fetch(url, { headers = {} } = {}) {
 
   const options = {
     signal: controller.signal,
+    credentials: 'include',
+    headers: { 'Accept-Language': LANGUAGE, ...headers },
   };
 
   if (url.startsWith('https:') && process.env.HTTPS_PROXY) {
@@ -22,42 +24,26 @@ export default async function fetch(url, { headers = {} } = {}) {
     options.agent = new HttpProxyAgent(process.env.HTTP_PROXY);
   }
 
-  options.credentials = 'include';
-  options.headers = { 'Accept-Language': LANGUAGE, ...headers };
-
-  let response;
-
   try {
-    response = await nodeFetch(url, options);
+    const response = await nodeFetch(url, options);
+
+    if (!response.ok) {
+      throw new InaccessibleContentError(`Received HTTP code ${response.status} when trying to fetch '${url}'`);
+    }
+
+    const mimeType = response.headers.get('content-type');
+
+    return {
+      mimeType,
+      content: await (mimeType.startsWith('text/') ? response.text() : response.buffer()),
+    };
   } catch (error) {
-    handleErrors(error);
+    if (error instanceof AbortError) {
+      throw new InaccessibleContentError(`The request timed out after ${TIMEOUT / 1000} seconds.`);
+    }
+
+    throw error;
   } finally {
     clearTimeout(timeout);
   }
-
-  if (!response.ok) {
-    throw new InaccessibleContentError(`Received HTTP code ${response.status} when trying to fetch '${url}'`);
-  }
-
-  const mimeType = response.headers.get('content-type');
-
-  return {
-    mimeType,
-    content: await (mimeType.startsWith('text/') ? response.text() : response.buffer()),
-  };
-}
-
-function handleErrors(error) {
-  if (
-    error.code
-    && error.code.match(/^(EAI_AGAIN|ENOTFOUND|ECONNRESET|CERT_HAS_EXPIRED|ERR_INVALID_PROTOCOL)$/)
-  ) {
-    throw new InaccessibleContentError(error.message);
-  }
-
-  if (error.name === 'AbortError') {
-    throw new InaccessibleContentError(`The request timed out after ${TIMEOUT / 1000} seconds.`);
-  }
-
-  throw error;
 }
