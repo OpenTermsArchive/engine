@@ -58,7 +58,7 @@ export default class GitHub {
       message: error.toString(),
     });
 
-    await this.createIssueIfNotExist({
+    await this.createIssueIfNotExists({
       title,
       body,
       labels: [FIX_DOCUMENT_LABEL],
@@ -141,7 +141,7 @@ export default class GitHub {
     }
   }
 
-  async createIssueIfNotExist({ title, body, labels, comment }) {
+  async createIssueIfNotExists({ title, body, labels, comment }) {
     try {
       const existingIssues = await this.searchIssues({ ...this.commonParams, title, q: `is:issue label:${labels.join(',')}` });
 
