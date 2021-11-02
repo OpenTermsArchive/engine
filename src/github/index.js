@@ -43,7 +43,7 @@ export default class GitHub {
   }
 
   async onFirstVersionRecorded(serviceId, type) {
-    await this.onVersionRecorded(serviceId, type);
+    return this.onVersionRecorded(serviceId, type);
   }
 
   async onInaccessibleContent(error, serviceId, type, documentDeclaration) {
