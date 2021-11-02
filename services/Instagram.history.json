@@ -28,5 +28,15 @@
       },
       "validUntil": "2021-05-27T06:32:34+04:00"
     }
+  ],
+  "Privacy Policy": [
+    {
+      "fetch": "https://help.instagram.com/519522125107875",
+      "select": "#faq-page",
+      "headers": {
+        "Cookie": "locale=en_GB"
+      },
+      "validUntil": "2021-03-03T11:26:19+04:00"
+    }
   ]
 }

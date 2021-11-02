@@ -10,10 +10,9 @@
     },
     "Privacy Policy": {
       "fetch": "https://help.instagram.com/519522125107875",
-      "select": "#faq-page",
-      "headers": {
-        "Cookie": "locale=en_GB"
-      }
+      "select": ["h1", "[role='main'] > div > div > div:nth-child(2)"],
+      "executeClientScripts": true,
+      "filter": ["cleanUrls"]
     },
     "Community Guidelines": {
       "fetch": "https://help.instagram.com/477434105621119",
