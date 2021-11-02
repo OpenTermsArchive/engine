@@ -17,10 +17,9 @@
     },
     "Community Guidelines": {
       "fetch": "https://help.instagram.com/477434105621119",
-      "select": "#faq-page",
-      "headers": {
-        "Cookie": "locale=en_GB"
-      }
+      "select": ["h1", "[role='main'] > div > div > div:nth-child(2)"],
+      "executeClientScripts": true,
+      "filter": ["cleanUrls"]
     },
     "Law Enforcement Guidelines": {
       "fetch": "https://help.instagram.com/494561080557017",

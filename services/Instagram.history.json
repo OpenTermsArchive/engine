@@ -18,5 +18,15 @@
       },
       "validUntil": "2021-05-27T00:32:28+04:00"
     }
+  ],
+  "Community Guidelines": [
+    {
+      "fetch": "https://help.instagram.com/477434105621119",
+      "select": "#faq-page",
+      "headers": {
+        "Cookie": "locale=en_GB"
+      },
+      "validUntil": "2021-05-27T06:32:34+04:00"
+    }
   ]
 }
