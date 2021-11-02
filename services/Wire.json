@@ -2,8 +2,11 @@
   "name": "Wire",
   "documents": {
     "Privacy Policy": {
-      "fetch": "https://wire.com/en/legal/privacy-policy/",
-      "select": [".legalbody"],
+      "fetch": "https://wire.com/en/legal/terms-of-use-personal/#legal3",
+      "select": [
+        "#legal3 .text-regular:nth-child(1)",
+        "#legal3 > .legalbody > .container > .container-legal"
+      ],
       "executeClientScripts": true
     },
     "Terms of Service": {
