@@ -3,7 +3,6 @@ import puppeteer from 'puppeteer-extra';
 import StealthPlugin from 'puppeteer-extra-plugin-stealth';
 import UserAgent from 'user-agents';
 
-import logger from '../../logger/index.js';
 import { InaccessibleContentError } from '../errors.js';
 
 puppeteer.use(StealthPlugin());
