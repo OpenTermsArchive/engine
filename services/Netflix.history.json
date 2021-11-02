@@ -9,6 +9,11 @@
   "Terms of Service": [
     {
       "fetch": "https://help.netflix.com/legal/termsofuse",
+      "select": "section.kb-article.kb-article-variant.gradient",
+      "validUntil": "2021-03-03T11:26:52+04:00"
+    },
+    {
+      "fetch": "https://help.netflix.com/legal/termsofuse",
       "select": "body",
       "validUntil": "2020-12-08T16:00:00.000Z"
     }

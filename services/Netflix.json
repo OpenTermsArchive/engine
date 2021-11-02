@@ -8,7 +8,7 @@
     },
     "Terms of Service": {
       "fetch": "https://help.netflix.com/legal/termsofuse",
-      "select": "section.kb-article.kb-article-variant.gradient"
+      "select": [".kb-title", ".kb-article"]
     }
   }
 }
