@@ -1,0 +1,12 @@
+{
+  "Developer Terms": [
+    {
+      "fetch": "https://developers.facebook.com/terms",
+      "select": "#faq-page",
+      "headers": {
+        "Cookie": "locale=en_GB"
+      },
+      "validUntil": "2021-03-15T22:31:32+04:00"
+    }
+  ]
+}
