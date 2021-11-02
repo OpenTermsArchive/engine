@@ -1,0 +1,10 @@
+{
+  "Privacy Policy": [
+    {
+      "fetch": "https://zoom.us/privacy",
+      "select": [".mini-layout-body"],
+      "remove": [".category"],
+      "validUntil": "2021-10-08T01:14:03+04:00"
+    }
+  ]
+}

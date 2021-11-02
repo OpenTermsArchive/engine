@@ -8,7 +8,7 @@
     },
     "Privacy Policy": {
       "fetch": "https://zoom.us/privacy",
-      "select": [".mini-layout-body"],
+      "select": [".main-DefaultTemplate"],
       "remove": [".category"]
     }
   }
