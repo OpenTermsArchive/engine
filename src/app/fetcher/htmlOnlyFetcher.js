@@ -1,5 +1,3 @@
-import https from 'https';
-
 import AbortController from 'abort-controller';
 import HttpProxyAgent from 'http-proxy-agent';
 import HttpsProxyAgent from 'https-proxy-agent';
@@ -22,11 +20,6 @@ export default async function fetch(url, { headers = {} } = {}) {
     options.agent = new HttpsProxyAgent(process.env.HTTPS_PROXY);
   } else if (url.startsWith('http:') && process.env.HTTP_PROXY) {
     options.agent = new HttpProxyAgent(process.env.HTTP_PROXY);
-  } else if (url.startsWith('https:')) {
-    // Way to prevent reason: unable to verify the first certificate
-    options.agent = https.Agent({
-      rejectUnauthorized: false,
-    });
   }
 
   options.credentials = 'include';
