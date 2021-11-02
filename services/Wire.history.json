@@ -1,0 +1,12 @@
+{
+  "Data Processor Agreement": [
+    {
+      "fetch": "https://wire.com/en/legal/data-processing-addendum/",
+      "select": [
+        ".legalbody"
+      ],
+      "executeClientScripts": true,
+      "validUntil": "2021-10-14T05:18:13+04:00"
+    }
+  ]
+}

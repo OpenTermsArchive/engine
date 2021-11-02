@@ -12,8 +12,11 @@
       "executeClientScripts": true
     },
     "Data Processor Agreement": {
-      "fetch": "https://wire.com/en/legal/data-processing-addendum/",
-      "select": [".legalbody"],
+      "fetch": "https://wire.com/en/legal/terms-of-use-personal/#legal4",
+      "select": [
+        "#legal4 .text-regular:nth-child(1)",
+        "#legal4 > .legalbody > .container > .container-legal"
+      ],
       "executeClientScripts": true
     }
   }
