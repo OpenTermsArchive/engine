@@ -20,7 +20,7 @@ const GITHUB_VERSIONS_URL = 'https://github.com/ambanum/OpenTermsArchive-version
 const GITHUB_REPO_URL = 'https://github.com/ambanum/OpenTermsArchive/blob/master/services';
 const GOOGLE_URL = 'https://www.google.com/search?q=';
 
-export default class Github {
+export default class GitHub {
   constructor() {
     this.octokit = new Octokit({
       auth: process.env.GITHUB_TOKEN_CREATE_ISSUE,
@@ -49,7 +49,7 @@ export default class Github {
   async onInaccessibleContent(error, serviceId, type, documentDeclaration) {
     const { location, contentSelectors, noiseSelectors } = documentDeclaration;
 
-    const { title, body } = Github.formatIssueTitleAndBody({
+    const { title, body } = GitHub.formatIssueTitleAndBody({
       contentSelectors,
       noiseSelectors,
       url: location,
