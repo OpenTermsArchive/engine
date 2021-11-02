@@ -38,5 +38,15 @@
       },
       "validUntil": "2021-03-03T11:26:19+04:00"
     }
+  ],
+  "Terms of Service": [
+    {
+      "fetch": "https://help.instagram.com/581066165581870",
+      "select": "#faq-page",
+      "headers": {
+        "Cookie": "locale=en_GB"
+      },
+      "validUntil": "2021-03-03T11:26:20+04:00"
+    }
   ]
 }

@@ -3,10 +3,9 @@
   "documents": {
     "Terms of Service": {
       "fetch": "https://help.instagram.com/581066165581870",
-      "select": "#faq-page",
-      "headers": {
-        "Cookie": "locale=en_GB"
-      }
+      "select": ["h1", "[role='main'] > div > div > div:nth-child(2)"],
+      "executeClientScripts": true,
+      "filter": ["cleanUrls"]
     },
     "Privacy Policy": {
       "fetch": "https://help.instagram.com/519522125107875",
