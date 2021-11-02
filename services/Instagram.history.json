@@ -8,5 +8,15 @@
       },
       "validUntil": "2021-03-15T22:31:32+04:00"
     }
+  ],
+  "Law Enforcement Guidelines": [
+    {
+      "fetch": "https://help.instagram.com/494561080557017",
+      "select": "#faq-page",
+      "headers": {
+        "Cookie": "locale=en_GB"
+      },
+      "validUntil": "2021-05-27T00:32:28+04:00"
+    }
   ]
 }
