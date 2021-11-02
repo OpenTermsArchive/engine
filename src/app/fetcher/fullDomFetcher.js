@@ -20,21 +20,14 @@ export default async function fetch(url, cssSelectors, headers = {}, { retry } =
 
   try {
     if (!browser) {
-      browser = await puppeteer.launch({
-        headless: true,
-        args: [ '--no-sandbox', '--disable-setuid-sandbox' ],
-      });
+      browser = await puppeteer.launch({ headless: true, args: [ '--no-sandbox', '--disable-setuid-sandbox' ] });
     }
     const userAgent = new UserAgent();
 
     page = await browser.newPage();
     await page.setUserAgent(userAgent.toString());
-
     await page.setDefaultNavigationTimeout(PUPPETEER_TIMEOUT);
-
-    await page.setExtraHTTPHeaders({
-      ...headers,
-    });
+    await page.setExtraHTTPHeaders({ ...headers });
 
     response = await page.goto(url, { waitUntil: 'networkidle0' });
 

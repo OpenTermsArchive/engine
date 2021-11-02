@@ -76,10 +76,7 @@ describe('FullDomFetcher', function FullDomFetcher() {
 
     context('when web page is not available', () => {
       it('throws an InaccessibleContentError error', async () => {
-        await expect(fetch(`http://localhost:${SERVER_PORT}/404`, 'body')).to.be.rejectedWith(
-          InaccessibleContentError,
-          /404/
-        );
+        await expect(fetch(`http://localhost:${SERVER_PORT}/404`, 'body')).to.be.rejectedWith(InaccessibleContentError, /404/);
       });
     });
   });
