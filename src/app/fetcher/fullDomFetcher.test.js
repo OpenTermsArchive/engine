@@ -14,7 +14,6 @@ chai.use(chaiAsPromised);
 const SERVER_PORT = 8976;
 
 describe('FullDomFetcher', function FullDomFetcher() {
-  // eslint-disable-line func-names
   this.timeout(10000);
 
   let termsHTML;
@@ -75,21 +74,9 @@ describe('FullDomFetcher', function FullDomFetcher() {
       });
     });
 
-    context('when server is not resolved', () => {
-      it('throws an InaccessibleContentError error', async () => {
-        await expect(fetch('https://not.available.example', 'body')).to.be.rejectedWith(
-          InaccessibleContentError,
-          /ERR_NAME_NOT_RESOLVED/
-        );
-      });
-    });
-
     context('when web page is not available', () => {
       it('throws an InaccessibleContentError error', async () => {
-        await expect(fetch(`http://localhost:${SERVER_PORT}/404`, 'body')).to.be.rejectedWith(
-          InaccessibleContentError,
-          /404/
-        );
+        await expect(fetch(`http://localhost:${SERVER_PORT}/404`, 'body')).to.be.rejectedWith(InaccessibleContentError, /404/);
       });
     });
   });

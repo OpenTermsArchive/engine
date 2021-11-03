@@ -26,6 +26,10 @@ describe('HtmlOnlyFetcher', () => {
       .reply(200, termsHTML, { 'Content-Type': 'text/html' });
   });
 
+  after(() => {
+    nock.restore();
+  });
+
   describe('#fetch', () => {
     context('when web page is available', () => {
       let content;

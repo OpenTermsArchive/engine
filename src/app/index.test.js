@@ -58,6 +58,7 @@ describe('CGUs', function () {
     let app;
 
     before(async () => {
+      nock.activate();
       nock('https://www.servicea.example')
         .get('/tos')
         .reply(200, serviceASnapshotExpectedContent, { 'Content-Type': 'text/html' });
