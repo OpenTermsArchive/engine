@@ -14,7 +14,7 @@ Les services en ligne ont des conditions générales qui évoluent dans le temps
     - [Recevoir les mises à jour de services ou documents spécifiques](#recevoir-les-mises-%C3%A0-jour-de-services-ou-documents-sp%C3%A9cifiques)
   - [Par RSS](#par-rss)
     - [Récapitulatif des flux RSS disponibles](#r%C3%A9capitulatif-des-flux-rss-disponibles)
-- [Désabonnement](#desabonnement)
+  - [Désabonnement](#désabonnement)
 - [Contribuer](#contribuer)
   - [Ajouter un nouveau service](#ajouter-un-nouveau-service)
 
@@ -102,7 +102,7 @@ Par exemple :
 - Pour recevoir toutes les mises à jour des documents de `Facebook`, abonnez-vous à `https://github.com/ambanum/OpenTermsArchive-versions/commits/master/Facebook.atom`.
 - Pour recevoir toutes les mises à jour des `Privacy Policy` de `Google`, abonnez-vous à `https://github.com/ambanum/OpenTermsArchive-versions/commits/master/Google/Privacy%20Policy.md.atom`.
 
-## Désabonnement
+### Désabonnement
 
 Afin de ne plus recevoir d'e-mails de mise à jour des services, deux liens sont inclus dans chaque e-mail reçu
 
