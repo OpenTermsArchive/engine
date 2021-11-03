@@ -17,6 +17,7 @@
   - [By email](#by-email)
   - [By RSS](#by-rss)
     - [Recap of available RSS feeds](#recap-of-available-rss-feeds)
+  - [Unsubscribe](#unsubscribe)
 - [Analysing the snapshots history](#analysing-the-snapshots-history)
 - [Contributing](#contributing)
   - [Adding a new service](#adding-a-new-service)
@@ -112,6 +113,15 @@ For example:
 
 - To receive all updates of `Facebook` documents, the URL is `https://github.com/ambanum/OpenTermsArchive-versions/commits/master/Facebook.atom`.
 - To receive all updates of the `Privacy Policy` from `Google`, the URL is `https://github.com/ambanum/OpenTermsArchive-versions/commits/master/Google/Privacy%20Policy.md.atom`.
+
+### Unsubscribe
+
+In order to not receive emails of updated services anymore, two links are included in every email received:
+
+- one to stop receiving all emails from bot@opentermsarchive.org
+- one to stop receiving emails of a particular document
+
+The latter consists in sending an email to contact@opentermsarchive.org to be manually removed from the corresponding list.
 
 ## Analysing the snapshots history
 
