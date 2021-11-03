@@ -1,0 +1,18 @@
+{
+  "Data Processor Agreement": [
+    {
+      "fetch": "https://wire.com/en/legal/data-processing-addendum/",
+      "select": [".legalbody"],
+      "executeClientScripts": true,
+      "validUntil": "2021-10-14T05:18:13+04:00"
+    }
+  ],
+  "Privacy Policy": [
+    {
+      "fetch": "https://wire.com/en/legal/privacy-policy/",
+      "select": [".legalbody"],
+      "executeClientScripts": true,
+      "validUntil": "2021-10-07T21:56:25+04:00"
+    }
+  ]
+}

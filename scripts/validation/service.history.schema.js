@@ -12,7 +12,10 @@ const documentsProperties = () => {
     result[type] = {
       type: 'array',
       items: {
-        oneOf: [{ $ref: '#/definitions/document' }, { $ref: '#/definitions/pdfDocument' }],
+        oneOf: [
+          { $ref: '#/definitions/document' },
+          { $ref: '#/definitions/pdfDocument' },
+        ],
       },
     };
   });
@@ -63,7 +66,10 @@ const schema = {
             {
               type: 'array',
               items: {
-                oneOf: [{ $ref: '#/definitions/cssSelector' }, { $ref: '#/definitions/range' }],
+                oneOf: [
+                  { $ref: '#/definitions/cssSelector' },
+                  { $ref: '#/definitions/range' },
+                ],
               },
             },
           ],
@@ -84,7 +90,10 @@ const schema = {
             {
               type: 'array',
               items: {
-                oneOf: [{ $ref: '#/definitions/cssSelector' }, { $ref: '#/definitions/range' }],
+                oneOf: [
+                  { $ref: '#/definitions/cssSelector' },
+                  { $ref: '#/definitions/range' },
+                ],
               },
             },
           ],
@@ -97,6 +106,15 @@ const schema = {
           type: 'boolean',
           description:
             'Execute client-side JavaScript loaded by the document before accessing the content, in case the DOM modifications are needed to access the content.',
+        },
+        headers: {
+          type: 'object',
+          properties: {
+            'user-agent': { type: 'string' },
+            Cookie: { type: 'string' },
+          },
+          additionalProperties: true,
+          description: 'Headers object as supported by node-fetch',
         },
       },
     },

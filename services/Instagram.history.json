@@ -1,0 +1,52 @@
+{
+  "Developer Terms": [
+    {
+      "fetch": "https://developers.facebook.com/terms",
+      "select": "#faq-page",
+      "headers": {
+        "Cookie": "locale=en_GB"
+      },
+      "validUntil": "2021-03-15T22:31:32+04:00"
+    }
+  ],
+  "Law Enforcement Guidelines": [
+    {
+      "fetch": "https://help.instagram.com/494561080557017",
+      "select": "#faq-page",
+      "headers": {
+        "Cookie": "locale=en_GB"
+      },
+      "validUntil": "2021-05-27T00:32:28+04:00"
+    }
+  ],
+  "Community Guidelines": [
+    {
+      "fetch": "https://help.instagram.com/477434105621119",
+      "select": "#faq-page",
+      "headers": {
+        "Cookie": "locale=en_GB"
+      },
+      "validUntil": "2021-05-27T06:32:34+04:00"
+    }
+  ],
+  "Privacy Policy": [
+    {
+      "fetch": "https://help.instagram.com/519522125107875",
+      "select": "#faq-page",
+      "headers": {
+        "Cookie": "locale=en_GB"
+      },
+      "validUntil": "2021-03-03T11:26:19+04:00"
+    }
+  ],
+  "Terms of Service": [
+    {
+      "fetch": "https://help.instagram.com/581066165581870",
+      "select": "#faq-page",
+      "headers": {
+        "Cookie": "locale=en_GB"
+      },
+      "validUntil": "2021-03-03T11:26:20+04:00"
+    }
+  ]
+}

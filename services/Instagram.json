@@ -3,28 +3,34 @@
   "documents": {
     "Terms of Service": {
       "fetch": "https://help.instagram.com/581066165581870",
-      "select": "#faq-page",
-      "headers": { "Cookie": "locale=en_GB" }
+      "select": ["h1", "[role='main'] > div > div > div:nth-child(2)"],
+      "executeClientScripts": true,
+      "filter": ["cleanUrls"]
     },
     "Privacy Policy": {
       "fetch": "https://help.instagram.com/519522125107875",
-      "select": "#faq-page",
-      "headers": { "Cookie": "locale=en_GB" }
+      "select": ["h1", "[role='main'] > div > div > div:nth-child(2)"],
+      "executeClientScripts": true,
+      "filter": ["cleanUrls"]
     },
     "Community Guidelines": {
       "fetch": "https://help.instagram.com/477434105621119",
-      "select": "#faq-page",
-      "headers": { "Cookie": "locale=en_GB" }
+      "select": ["h1", "[role='main'] > div > div > div:nth-child(2)"],
+      "executeClientScripts": true,
+      "filter": ["cleanUrls"]
     },
     "Law Enforcement Guidelines": {
       "fetch": "https://help.instagram.com/494561080557017",
-      "select": "#faq-page",
-      "headers": { "Cookie": "locale=en_GB" }
+      "select": ["h1", "[role='main'] > div > div > div:nth-child(2)"],
+      "executeClientScripts": true
     },
     "Developer Terms": {
-      "fetch": "https://help.instagram.com/325135857663734",
-      "select": "#faq-page",
-      "headers": { "Cookie": "locale=en_GB" }
+      "fetch": "https://developers.facebook.com/terms",
+      "select": [
+        "[role='main'] > div > div > div:nth-child(2)",
+        "[role='main'] > div > div > div em"
+      ],
+      "filter": ["cleanUrls"]
     }
   }
 }
