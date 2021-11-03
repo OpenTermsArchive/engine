@@ -1,6 +1,12 @@
 name: Test
 
-on: [push, pull_request, workflow_call]
+on:
+  push:
+    branches-ignore:
+      - master # tests will be launched by workflow_callpush:
+  pull_request:
+    types: [opened, reopened]
+  workflow_call:
 
 jobs:
   test:
