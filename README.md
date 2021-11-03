@@ -116,7 +116,7 @@ For example:
 
 ### Unsubscribe
 
-In order to not receive emails of updated services anymore, two links are included in every email received
+In order to not receive emails of updated services anymore, two links are included in every email received:
 
 - one to stop receiving all emails from bot@opentermsarchive.org
 - one to stop receiving emails of a particular document

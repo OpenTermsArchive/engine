@@ -104,7 +104,7 @@ Par exemple :
 
 ### Désabonnement
 
-Afin de ne plus recevoir d'e-mails de mise à jour des services, deux liens sont inclus dans chaque e-mail reçu
+Afin de ne plus recevoir d'e-mails de mise à jour des services, deux liens sont inclus dans chaque e-mail reçu :
 
 - un pour ne plus recevoir tous les e-mails de bot@opentermsarchive.org
 - un pour ne plus recevoir les e-mails d'un document particulier
