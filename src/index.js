@@ -1,5 +1,3 @@
-import './bootstrap.js';
-
 import scheduler from 'node-schedule';
 
 import { publishRelease } from '../scripts/release/releasedataset.js';
