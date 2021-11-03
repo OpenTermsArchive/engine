@@ -7,7 +7,7 @@ on:
   pull_request:
 
 jobs:
-  test:
+  validate_modified_services:
     runs-on: ubuntu-latest
 
     steps:
