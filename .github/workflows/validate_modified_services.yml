@@ -5,9 +5,9 @@ on:
     branches-ignore:
       - master # by definition, there are no modified services on the master branch
   pull_request:
-
+    types: [opened, reopened]
 jobs:
-  test:
+  validate_modified_services:
     runs-on: ubuntu-latest
 
     steps:

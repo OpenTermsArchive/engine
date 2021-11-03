@@ -5,7 +5,10 @@ on:
     branches: [master]
 
 jobs:
+  test:
+    uses: "ambanum/OpenTermsArchive/.github/workflows/test.yml@master"
   deploy:
+    needs: [test]
     runs-on: ubuntu-latest
 
     steps:
