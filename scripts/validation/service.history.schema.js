@@ -106,16 +106,7 @@ const schema = {
           type: 'boolean',
           description:
             'Execute client-side JavaScript loaded by the document before accessing the content, in case the DOM modifications are needed to access the content.',
-        },
-        headers: {
-          type: 'object',
-          properties: {
-            'user-agent': { type: 'string' },
-            Cookie: { type: 'string' },
-          },
-          additionalProperties: true,
-          description: 'Headers object as supported by node-fetch',
-        },
+        }
       },
     },
     cssSelector: {

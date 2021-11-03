@@ -89,13 +89,12 @@ export default class CGUs extends events.EventEmitter {
   }
 
   async trackDocumentChanges(documentDeclaration) {
-    const { location, executeClientScripts, headers } = documentDeclaration;
+    const { location, executeClientScripts } = documentDeclaration;
 
     const { mimeType, content } = await fetch({
       url: location,
       executeClientScripts,
       cssSelectors: documentDeclaration.getCssSelectors(),
-      headers,
     });
 
     if (!content) {

@@ -8,14 +8,14 @@ import { InaccessibleContentError } from '../errors.js';
 const LANGUAGE = 'en';
 const TIMEOUT = 5 * 60 * 1000; // 5 minutes in ms
 
-export default async function fetch(url, { headers = {} } = {}) {
+export default async function fetch(url) {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), TIMEOUT);
 
   const options = {
     signal: controller.signal,
     credentials: 'include',
-    headers: { 'Accept-Language': LANGUAGE, ...headers },
+    headers: { 'Accept-Language': LANGUAGE },
   };
 
   if (url.startsWith('https:') && process.env.HTTPS_PROXY) {

@@ -79,12 +79,11 @@ let servicesToValidate = args.filter(arg => !arg.startsWith('--'));
               it('has fetchable URL', async function () { // eslint-disable-line func-names
                 this.timeout(30000);
 
-                const { location, executeClientScripts, headers } = service.getDocumentDeclaration(type);
+                const { location, executeClientScripts } = service.getDocumentDeclaration(type);
                 const document = await fetch({
                   url: location,
                   executeClientScripts,
                   cssSelectors: service.getDocumentDeclaration(type).getCssSelectors(),
-                  headers,
                 });
 
                 content = document.content;
@@ -141,13 +140,11 @@ let servicesToValidate = args.filter(arg => !arg.startsWith('--'));
                   const {
                     location,
                     executeClientScripts,
-                    headers,
                   } = service.getDocumentDeclaration(type);
                   const document = await fetch({
                     url: location,
                     executeClientScripts,
                     cssSelectors: service.getDocumentDeclaration(type).getCssSelectors(),
-                    headers,
                   });
                   const secondFilteredContent = await filter({
                     content: document.content,

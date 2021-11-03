@@ -37,7 +37,6 @@ export async function load() {
       const {
         filter: filterNames,
         fetch: location,
-        headers,
         executeClientScripts,
         select: contentSelectors,
         remove: noiseSelectors,
@@ -59,7 +58,6 @@ export async function load() {
         contentSelectors,
         noiseSelectors,
         filters,
-        headers,
       });
 
       services[service.id].addDocumentDeclaration(document);

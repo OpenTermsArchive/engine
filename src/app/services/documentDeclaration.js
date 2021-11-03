@@ -5,7 +5,6 @@ export default class DocumentDeclaration {
     location,
     executeClientScripts,
     contentSelectors,
-    headers,
     noiseSelectors,
     filters,
     validUntil = null,
@@ -16,7 +15,6 @@ export default class DocumentDeclaration {
     this.executeClientScripts = executeClientScripts;
     this.contentSelectors = contentSelectors;
     this.noiseSelectors = noiseSelectors;
-    this.headers = headers;
     this.filters = filters;
     this.validUntil = validUntil;
   }
