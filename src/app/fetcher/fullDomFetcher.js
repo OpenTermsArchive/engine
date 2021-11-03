@@ -11,7 +11,7 @@ const PUPPETEER_TIMEOUT = 30 * 1000; // 30 seconds in ms
 const MAX_RETRIES = 3;
 let browser;
 
-export default async function fetch(url, cssSelectors, headers = {}, { retry } = { retry: 0 }) {
+export default async function fetch(url, cssSelectors, { retry } = { retry: 0 }) {
   let response;
   let content;
   let page;
@@ -26,7 +26,6 @@ export default async function fetch(url, cssSelectors, headers = {}, { retry } =
     page = await browser.newPage();
     await page.setUserAgent(userAgent.toString());
     await page.setDefaultNavigationTimeout(PUPPETEER_TIMEOUT);
-    await page.setExtraHTTPHeaders({ ...headers });
 
     response = await page.goto(url, { waitUntil: 'networkidle0' });
 
@@ -35,7 +34,7 @@ export default async function fetch(url, cssSelectors, headers = {}, { retry } =
         throw new InaccessibleContentError(`Response is empty when trying to fetch '${url}'`);
       }
 
-      return await fetch(url, cssSelectors, headers, { retry: retry + 1 });
+      return await fetch(url, cssSelectors, { retry: retry + 1 });
     }
 
     const statusCode = response.status();
