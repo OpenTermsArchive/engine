@@ -8,6 +8,7 @@ export const ErrorCodes = [
   'ERR_NAME_NOT_RESOLVED', // Network Error
   'ERR_TUNNEL_CONNECTION_FAILED', // Network Error
   'ETIMEDOUT', // Network Error
+  'ERR_TOO_MANY_REDIRECTS', // Server Error
   'CERT_HAS_EXPIRED', // Certificate Error
   'DEPTH_ZERO_SELF_SIGNED_CERT', // Certificate Error
   'ERR_CERT_AUTHORITY_INVALID', // Certificate Error
