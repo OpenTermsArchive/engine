@@ -6,8 +6,6 @@ import logger from '../logger/index.js';
 
 const { version } = JSON.parse(fs.readFileSync(new URL('../../package.json', import.meta.url)).toString());
 
-const GITHUB_REPO = process.env.GITHUB_REPO || '';
-
 const ISSUE_STATE_CLOSED = 'closed';
 const ISSUE_STATE_OPEN = 'open';
 
@@ -20,12 +18,12 @@ const GITHUB_REPO_URL = 'https://github.com/ambanum/OpenTermsArchive/blob/master
 const GOOGLE_URL = 'https://www.google.com/search?q=';
 
 export default class GitHub {
-  static isValidToken() {
-    return GITHUB_REPO.includes('/');
+  static isTokenValid() {
+    return (process.env.GITHUB_REPO || '').includes('/');
   }
 
   constructor() {
-    if (!GitHub.isValidToken('')) {
+    if (!GitHub.isTokenValid()) {
       throw new Error('GITHUB_REPO should be a string with <owner>/<repo>');
     }
 
@@ -129,7 +127,7 @@ export default class GitHub {
       // baseUrl should be the way to go instead of this ugly filter
       // that may not work in case there are too many issues
       // but it goes with a 404 using octokit
-      // baseUrl: `https://api.github.com/${GITHUB_REPO}`,
+      // baseUrl: `https://api.github.com/${process.env.GITHUB_REPO}`,
       return items.filter(item => item.repository_url.endsWith(`${params.owner}/${params.repo}`) && item.title === title);
     } catch (e) {
       logger.error('Could not search issue');
