@@ -6,10 +6,11 @@ import UserAgent from 'user-agents';
 import { InaccessibleContentError } from '../errors.js';
 
 puppeteer.use(StealthPlugin());
-
 const PUPPETEER_TIMEOUT = 30 * 1000; // 30 seconds in ms
 const MAX_RETRIES = 3;
 let browser;
+
+const browserCloseEvents = [ 'unhandledRejection', 'beforeExit', 'uncaughtException' ];
 
 export default async function fetch(url, cssSelectors, { retry } = { retry: 0 }) {
   let response;
@@ -20,6 +21,10 @@ export default async function fetch(url, cssSelectors, { retry } = { retry: 0 })
   try {
     if (!browser) {
       browser = await puppeteer.launch({ headless: true, args: [ '--no-sandbox', '--disable-setuid-sandbox' ] });
+      browserCloseEvents.forEach(event => process.on(event, () => {
+        console.error(event);
+        if (browser) browser.close();
+      }));
     }
     const userAgent = new UserAgent();
 
