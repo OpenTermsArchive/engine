@@ -4,10 +4,12 @@ import { ErrorCodes } from './errors.js';
 import fetchFullDom from './fullDomFetcher.js';
 import fetchHtmlOnly from './htmlOnlyFetcher.js';
 
-export default async function fetch({ url, executeClientScripts, cssSelectors }) {
+export { launchHeadlessBrowser, closeHeadlessBrowser } from './fullDomFetcher.js';
+
+export default async function fetch({ url, executeClientScripts, cssSelectors }, options) {
   try {
     if (executeClientScripts) {
-      return await fetchFullDom(url, cssSelectors);
+      return await fetchFullDom(url, cssSelectors, options);
     }
 
     return await fetchHtmlOnly(url);
