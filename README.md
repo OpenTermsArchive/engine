@@ -240,6 +240,13 @@ In order to use the default [SendInBlue](https://www.sendinblue.com)-based notif
 
 The `NODE_ENV` environment variable loads additional [configuration files](#configuration-file).
 
+##### `GITHUB_TOKEN` and `GITHUB_REPO`
+
+In order for the service to automatically create issues in Github when a service is failing, you need to provide
+- `GITHUB_TOKEN`: a token with repository privileges https://github.com/settings/tokens
+- `GITHUB_REPO`: a repo which will be used to create the issues i.e. `ambanum/test-repo`
+
+**Note**: OTA will automatically create issues with a label `fix-document`. You need to create this specific label in the corresponding repo.
 ### Running
 
 To get the latest versions of all services' terms:

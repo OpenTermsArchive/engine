@@ -63,7 +63,7 @@ const schedule = args.includes('--schedule');
     app.attach(new Notifier(app.serviceDeclarations));
   }
 
-  if (process.env.GITHUB_TOKEN_CREATE_ISSUE) {
+  if (GitHub.isValidToken()) {
     app.attach(new GitHub());
   }
 
