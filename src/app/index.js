@@ -4,7 +4,7 @@ import async from 'async';
 import config from 'config';
 
 import { InaccessibleContentError } from './errors.js';
-import fetch from './fetcher/index.js';
+import fetch, { launchHeadlessBrowser, closeHeadlessBrowser } from './fetcher/index.js';
 import filter from './filter/index.js';
 import * as history from './history/index.js';
 import * as services from './services/index.js';
@@ -81,9 +81,13 @@ export default class CGUs extends events.EventEmitter {
   }
 
   async trackChanges(servicesIds) {
+    await launchHeadlessBrowser();
+
     this._forEachDocumentOf(servicesIds, documentDeclaration => this.trackDocumentChangesQueue.push(documentDeclaration));
 
     await this.trackDocumentChangesQueue.drain();
+
+    closeHeadlessBrowser();
 
     await this.publish();
   }
@@ -95,6 +99,8 @@ export default class CGUs extends events.EventEmitter {
       url: location,
       executeClientScripts,
       cssSelectors: documentDeclaration.getCssSelectors(),
+    }, {
+      keepBrowserAlive: true
     });
 
     if (!content) {
