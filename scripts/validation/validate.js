@@ -40,7 +40,9 @@ let servicesToValidate = args.filter(arg => !arg.startsWith('--'));
     servicesToValidate = Object.keys(serviceDeclarations);
   }
 
-  describe('Services validation', async () => {
+  describe('Services validation', async function () {
+    this.timeout(30000);
+
     servicesToValidate.forEach(serviceId => {
       const service = serviceDeclarations[serviceId];
 
@@ -49,14 +51,9 @@ let servicesToValidate = args.filter(arg => !arg.startsWith('--'));
         throw new Error(`Could not find any service with id "${serviceId}"`);
       }
 
-      before(async function () {
-        this.timeout(5000);
-        await launchHeadlessBrowser();
-      });
+      before(() => launchHeadlessBrowser());
 
-      after(async () => {
-        await closeHeadlessBrowser();
-      });
+      after(() => closeHeadlessBrowser());
 
       describe(serviceId, async () => {
         it('has a valid declaration', async () => {
@@ -84,10 +81,7 @@ let servicesToValidate = args.filter(arg => !arg.startsWith('--'));
               let filteredContent;
               let mimeType;
 
-              // do not use arrow function to avoid binding to `this` and to allow `this.timeout` to work
-              it('has fetchable URL', async function () { // eslint-disable-line func-names
-                this.timeout(30000);
-
+              it('has fetchable URL', async () => {
                 const { location, executeClientScripts } = service.getDocumentDeclaration(type);
                 const document = await fetch({
                   url: location,
@@ -107,7 +101,6 @@ let servicesToValidate = args.filter(arg => !arg.startsWith('--'));
                   console.log('      (Tests skipped as url is not fetchable)');
                   this.skip();
                 }
-                this.timeout(30000);
 
                 filteredContent = await filter({
                   content,
@@ -145,8 +138,6 @@ let servicesToValidate = args.filter(arg => !arg.startsWith('--'));
                     console.log('      (Tests skipped as content cannot be filtered)');
                     this.skip();
                   }
-
-                  this.timeout(30000);
 
                   const {
                     location,
