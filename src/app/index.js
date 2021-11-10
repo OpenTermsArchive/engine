@@ -4,7 +4,7 @@ import async from 'async';
 import config from 'config';
 
 import { InaccessibleContentError } from './errors.js';
-import fetch, { launchHeadlessBrowser, closeHeadlessBrowser } from './fetcher/index.js';
+import fetch, { launchHeadlessBrowser, stopHeadlessBrowser } from './fetcher/index.js';
 import filter from './filter/index.js';
 import * as history from './history/index.js';
 import * as services from './services/index.js';
@@ -87,7 +87,7 @@ export default class CGUs extends events.EventEmitter {
 
     await this.trackDocumentChangesQueue.drain();
 
-    closeHeadlessBrowser();
+    stopHeadlessBrowser();
 
     await this.publish();
   }
@@ -99,8 +99,6 @@ export default class CGUs extends events.EventEmitter {
       url: location,
       executeClientScripts,
       cssSelectors: documentDeclaration.getCssSelectors(),
-    }, {
-      keepBrowserAlive: true
     });
 
     if (!content) {

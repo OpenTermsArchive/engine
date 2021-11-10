@@ -8,7 +8,7 @@ import chai from 'chai';
 import config from 'config';
 import jsonSourceMap from 'json-source-map';
 
-import fetch, { launchHeadlessBrowser, closeHeadlessBrowser } from '../../src/app/fetcher/index.js';
+import fetch, { launchHeadlessBrowser, stopHeadlessBrowser } from '../../src/app/fetcher/index.js';
 import filter from '../../src/app/filter/index.js';
 import * as services from '../../src/app/services/index.js';
 
@@ -51,9 +51,9 @@ let servicesToValidate = args.filter(arg => !arg.startsWith('--'));
         throw new Error(`Could not find any service with id "${serviceId}"`);
       }
 
-      before(() => launchHeadlessBrowser());
+      before(launchHeadlessBrowser);
 
-      after(() => closeHeadlessBrowser());
+      after(stopHeadlessBrowser);
 
       describe(serviceId, async () => {
         it('has a valid declaration', async () => {
@@ -87,8 +87,6 @@ let servicesToValidate = args.filter(arg => !arg.startsWith('--'));
                   url: location,
                   executeClientScripts,
                   cssSelectors: service.getDocumentDeclaration(type).getCssSelectors(),
-                }, {
-                  keepBrowserAlive: true
                 });
 
                 content = document.content;
@@ -147,8 +145,6 @@ let servicesToValidate = args.filter(arg => !arg.startsWith('--'));
                     url: location,
                     executeClientScripts,
                     cssSelectors: service.getDocumentDeclaration(type).getCssSelectors(),
-                  }, {
-                    keepBrowserAlive: true
                   });
                   const secondFilteredContent = await filter({
                     content: document.content,

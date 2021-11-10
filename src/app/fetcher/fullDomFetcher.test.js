@@ -5,7 +5,7 @@ import chaiAsPromised from 'chai-as-promised';
 
 import { InaccessibleContentError } from '../errors.js';
 
-import fetch from './fullDomFetcher.js';
+import fetch, { launchHeadlessBrowser, stopHeadlessBrowser } from './fullDomFetcher.js';
 
 const { expect } = chai;
 
@@ -18,6 +18,10 @@ describe('FullDomFetcher', function FullDomFetcher() {
 
   let termsHTML;
   let temporaryServer;
+
+  before(launchHeadlessBrowser);
+
+  after(stopHeadlessBrowser);
 
   before(done => {
     termsHTML = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>First provider TOS</title></head><body><h1>Terms of service</h1><p>Dapibus quis diam sagittis</p></body></html>';

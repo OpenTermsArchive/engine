@@ -9,21 +9,19 @@ puppeteer.use(StealthPlugin());
 
 const PUPPETEER_TIMEOUT = 30 * 1000; // 30 seconds in ms
 const MAX_RETRIES = 3;
-let sharedBrowser;
+let browser;
 
-export default async function fetch(url, cssSelectors, { retry, keepBrowserAlive } = { retry: 0 }) {
-  let browser;
+export default async function fetch(url, cssSelectors, { retry } = { retry: 0 }) {
   let page;
   let response;
   let content;
   const selectors = [].concat(cssSelectors);
 
   try {
-    if (keepBrowserAlive && !sharedBrowser) {
-      throw new Error('With the options "keepBrowserAlive", the browser should be controlled manually with "launchHeadlessBrowser" and "closeHeadlessBrowser" ');
+    if (!browser) {
+      throw new Error('The headless browser should be controlled manually with "launchHeadlessBrowser" and "stopHeadlessBrowser".');
     }
 
-    browser = keepBrowserAlive ? sharedBrowser : await puppeteer.launch({ headless: true, args: [ '--no-sandbox', '--disable-setuid-sandbox' ] });
     const userAgent = new UserAgent();
 
     page = await browser.newPage();
@@ -64,21 +62,18 @@ export default async function fetch(url, cssSelectors, { retry, keepBrowserAlive
     if (page) {
       await page.close();
     }
-
-    if (!keepBrowserAlive && browser) {
-      await browser.close();
-    }
   }
 }
 
 export async function launchHeadlessBrowser() {
-  if (!sharedBrowser) {
-    sharedBrowser = await puppeteer.launch({ headless: true, args: [ '--no-sandbox', '--disable-setuid-sandbox' ] });
+  if (!browser) {
+    browser = await puppeteer.launch({ headless: true, args: [ '--no-sandbox', '--disable-setuid-sandbox' ] });
   }
 }
 
-export async function closeHeadlessBrowser() {
-  if (sharedBrowser) {
-    return sharedBrowser.close();
+export async function stopHeadlessBrowser() {
+  if (browser) {
+    await browser.close();
+    browser = null;
   }
 }

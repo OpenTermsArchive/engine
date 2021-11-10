@@ -5,7 +5,7 @@ import chaiAsPromised from 'chai-as-promised';
 
 import { InaccessibleContentError } from '../errors.js';
 
-import fetch from './index.js';
+import fetch, { launchHeadlessBrowser, stopHeadlessBrowser } from './index.js';
 
 const { expect } = chai;
 const SERVER_PORT = 8976;
@@ -14,6 +14,10 @@ chai.use(chaiAsPromised);
 
 describe('Fetcher', function () {
   this.timeout(5000);
+
+  before(launchHeadlessBrowser);
+
+  after(stopHeadlessBrowser);
 
   describe('#fetch', () => {
     describe('Error handling', () => {
