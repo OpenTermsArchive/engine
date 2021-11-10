@@ -61,9 +61,8 @@ export default class CGUs extends events.EventEmitter {
         return;
       }
 
-      this.emit('error', error, service.id, type);
-
-      throw error;
+      this.trackDocumentChangesQueue.kill();
+      throw new Error(`${service.id} - ${type} ${error.message}`);
     };
 
     this.trackDocumentChangesQueue.error(queueErrorHandler);
