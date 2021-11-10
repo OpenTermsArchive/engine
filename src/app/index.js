@@ -112,7 +112,7 @@ export default class CGUs extends events.EventEmitter {
     }
 
     if (!content) {
-      return;
+      throw new InaccessibleContentError('Content is empty');
     }
 
     const snapshotId = await this.recordSnapshot({
