@@ -88,7 +88,7 @@ logger.onRecordsPublished = () => {
 };
 
 logger.onInaccessibleContent = (error, serviceId, type) => {
-  logger.warn({ message: `Content inaccessible: ${error.message}`, serviceId, type });
+  logger.warn({ message: `${error.message}`, serviceId, type });
 };
 
 logger.onError = (error, serviceId, type) => {
