@@ -26,7 +26,7 @@
     - setup
 
 - name: Stop OpenTermsArchive
-  command: forever stop "{{ app }}"
+  command: pm2 stop "{{ app }}"
   ignore_errors: yes
   tags:
     - restart
@@ -47,7 +47,7 @@
 
 - name: Start OpenTermsArchive
   command:
-    cmd: forever start -m 10 -a --uid "{{ app }}" -c "npm run start:scheduler:prod" ./
+    cmd: pm2 start --name "{{ app }}" --exp-backoff-restart-delay=1000 npm -- run start:scheduler:prod
     chdir: '/home/{{ ansible_user }}/{{ app }}'
   environment:
     NODE_ENV: production

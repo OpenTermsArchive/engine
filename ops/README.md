@@ -77,7 +77,7 @@ ansible-playbook ops/app.yml --tags update
 You can get logs by connecting to the target machine over SSH and obtaining logs from the process manager:
 
 ```
-ssh user@machine forever logs ota
+ssh user@machine pm2 logs cgus
 ```
 
 ### commands
