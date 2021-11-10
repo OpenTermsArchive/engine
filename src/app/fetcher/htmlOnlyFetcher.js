@@ -3,7 +3,7 @@ import HttpProxyAgent from 'http-proxy-agent';
 import HttpsProxyAgent from 'https-proxy-agent';
 import nodeFetch, { AbortError } from 'node-fetch';
 
-import { InaccessibleContentError } from '../errors.js';
+import { FetchError } from './errors.js';
 
 const LANGUAGE = 'en';
 const TIMEOUT = 5 * 60 * 1000; // 5 minutes in ms
@@ -24,26 +24,28 @@ export default async function fetch(url) {
     options.agent = new HttpProxyAgent(process.env.HTTP_PROXY);
   }
 
+  let response;
+
   try {
-    const response = await nodeFetch(url, options);
-
-    if (!response.ok) {
-      throw new InaccessibleContentError(`Received HTTP code ${response.status} when trying to fetch '${url}'`);
-    }
-
-    const mimeType = response.headers.get('content-type');
-
-    return {
-      mimeType,
-      content: await (mimeType.startsWith('text/') ? response.text() : response.buffer()),
-    };
+    response = await nodeFetch(url, options);
   } catch (error) {
     if (error instanceof AbortError) {
-      throw new InaccessibleContentError(`The request timed out after ${TIMEOUT / 1000} seconds.`);
+      throw new FetchError(`The request timed out after ${TIMEOUT / 1000} seconds.`);
     }
 
-    throw error;
+    throw new FetchError(error.message);
   } finally {
     clearTimeout(timeout);
   }
+
+  if (!response.ok) {
+    throw new FetchError(`Received HTTP code ${response.status} when trying to fetch '${url}'`);
+  }
+
+  const mimeType = response.headers.get('content-type');
+
+  return {
+    mimeType,
+    content: await (mimeType.startsWith('text/') ? response.text() : response.buffer()),
+  };
 }

@@ -4,7 +4,7 @@ import async from 'async';
 import config from 'config';
 
 import { InaccessibleContentError } from './errors.js';
-import fetch, { launchHeadlessBrowser, stopHeadlessBrowser } from './fetcher/index.js';
+import fetch, { launchHeadlessBrowser, stopHeadlessBrowser, FetchError } from './fetcher/index.js';
 import filter from './filter/index.js';
 import * as history from './history/index.js';
 import * as services from './services/index.js';
@@ -94,11 +94,22 @@ export default class CGUs extends events.EventEmitter {
   async trackDocumentChanges(documentDeclaration) {
     const { location, executeClientScripts } = documentDeclaration;
 
-    const { mimeType, content } = await fetch({
-      url: location,
-      executeClientScripts,
-      cssSelectors: documentDeclaration.getCssSelectors(),
-    });
+    let mimeType;
+    let content;
+
+    try {
+      ({ mimeType, content } = await fetch({
+        url: location,
+        executeClientScripts,
+        cssSelectors: documentDeclaration.getCssSelectors(),
+      }));
+    } catch (error) {
+      if (error instanceof FetchError) {
+        throw new InaccessibleContentError(error.message);
+      }
+
+      throw error;
+    }
 
     if (!content) {
       return;

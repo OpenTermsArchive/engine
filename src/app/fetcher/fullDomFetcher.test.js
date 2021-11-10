@@ -3,8 +3,7 @@ import http from 'http';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 
-import { InaccessibleContentError } from '../errors.js';
-
+import { FetchError } from './errors.js';
 import fetch, { launchHeadlessBrowser, stopHeadlessBrowser } from './fullDomFetcher.js';
 
 const { expect } = chai;
@@ -70,17 +69,17 @@ describe('FullDomFetcher', function FullDomFetcher() {
       });
 
       context('when expected elements are not present', () => {
-        it('throws an InaccessibleContentError error', async () => {
+        it('throws a FetchError error', async () => {
           const NOT_PRESENT_SELECTOR = 'h2';
 
-          await expect(fetch(`http://localhost:${SERVER_PORT}`, NOT_PRESENT_SELECTOR)).to.be.rejectedWith(InaccessibleContentError, /waiting for selector .* failed/);
+          await expect(fetch(`http://localhost:${SERVER_PORT}`, NOT_PRESENT_SELECTOR)).to.be.rejectedWith(FetchError, /waiting for selector .* failed/);
         });
       });
     });
 
     context('when web page is not available', () => {
-      it('throws an InaccessibleContentError error', async () => {
-        await expect(fetch(`http://localhost:${SERVER_PORT}/404`, 'body')).to.be.rejectedWith(InaccessibleContentError, /404/);
+      it('throws a FetchError error', async () => {
+        await expect(fetch(`http://localhost:${SERVER_PORT}/404`, 'body')).to.be.rejectedWith(FetchError, /404/);
       });
     });
   });
