@@ -6,9 +6,6 @@ import logger from '../logger/index.js';
 
 const { version } = JSON.parse(fs.readFileSync(new URL('../../package.json', import.meta.url)).toString());
 
-const GITHUB_OTA_OWNER = process.env.GITHUB_OTA_OWNER || '';
-const GITHUB_OTA_REPO = process.env.GITHUB_OTA_REPO || '';
-
 const ISSUE_STATE_CLOSED = 'closed';
 const ISSUE_STATE_OPEN = 'open';
 
@@ -21,15 +18,25 @@ const GITHUB_REPO_URL = 'https://github.com/ambanum/OpenTermsArchive/blob/master
 const GOOGLE_URL = 'https://www.google.com/search?q=';
 
 export default class GitHub {
+  static isTokenValid() {
+    return (process.env.GITHUB_REPO || '').includes('/');
+  }
+
   constructor() {
+    if (!GitHub.isTokenValid()) {
+      throw new Error('GITHUB_REPO should be a string with <owner>/<repo>');
+    }
+
+    const [ owner, repo ] = process.env.GITHUB_REPO.split('/');
+
     this.octokit = new Octokit({
-      auth: process.env.GITHUB_TOKEN_CREATE_ISSUE,
+      auth: process.env.GITHUB_TOKEN,
       userAgent: `opentermsarchive/${version}`,
     });
     this.cachedIssues = {};
     this.commonParams = {
-      owner: GITHUB_OTA_OWNER,
-      repo: GITHUB_OTA_REPO,
+      owner,
+      repo,
       accept: 'application/vnd.github.v3+json',
     };
   }
@@ -120,7 +127,7 @@ export default class GitHub {
       // baseUrl should be the way to go instead of this ugly filter
       // that may not work in case there are too many issues
       // but it goes with a 404 using octokit
-      // baseUrl: `https://api.github.com/${GITHUB_OTA_OWNER}/${GITHUB_OTA_REPO}`,
+      // baseUrl: `https://api.github.com/${process.env.GITHUB_REPO}`,
       return items.filter(item => item.repository_url.endsWith(`${params.owner}/${params.repo}`) && item.title === title);
     } catch (e) {
       logger.error('Could not search issue');
