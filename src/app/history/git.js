@@ -1,5 +1,3 @@
-import { execSync } from 'child_process';
-import fs from 'fs';
 import path from 'path';
 
 import config from 'config';
@@ -19,23 +17,6 @@ export default class Git {
 
   async initConfig() {
     return this.git.addConfig('core.autocrlf', false);
-  }
-
-  optimizeLogGraph() {
-    const graphLockFile = `${this.path}/.git/objects/info/commit-graph.lock`;
-
-    if (fs.existsSync(graphLockFile)) {
-      return;
-    }
-    // https://memcpy.io/speed-up-git-log-graph-18x-times.html
-    // this function is not included in simple-git
-    try {
-      execSync('git commit-graph write', {
-        cdw: this.path,
-      });
-    } catch (e) {
-      console.error(e);
-    }
   }
 
   async add(filepath) {
