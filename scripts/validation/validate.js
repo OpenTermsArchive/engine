@@ -8,7 +8,7 @@ import chai from 'chai';
 import config from 'config';
 import jsonSourceMap from 'json-source-map';
 
-import fetch from '../../src/app/fetcher/index.js';
+import fetch, { launchHeadlessBrowser, stopHeadlessBrowser } from '../../src/app/fetcher/index.js';
 import filter from '../../src/app/filter/index.js';
 import * as services from '../../src/app/services/index.js';
 
@@ -40,7 +40,9 @@ let servicesToValidate = args.filter(arg => !arg.startsWith('--'));
     servicesToValidate = Object.keys(serviceDeclarations);
   }
 
-  describe('Services validation', async () => {
+  describe('Services validation', async function () {
+    this.timeout(30000);
+
     servicesToValidate.forEach(serviceId => {
       const service = serviceDeclarations[serviceId];
 
@@ -48,6 +50,10 @@ let servicesToValidate = args.filter(arg => !arg.startsWith('--'));
         process.exitCode = 1;
         throw new Error(`Could not find any service with id "${serviceId}"`);
       }
+
+      before(launchHeadlessBrowser);
+
+      after(stopHeadlessBrowser);
 
       describe(serviceId, async () => {
         it('has a valid declaration', async () => {
@@ -75,10 +81,7 @@ let servicesToValidate = args.filter(arg => !arg.startsWith('--'));
               let filteredContent;
               let mimeType;
 
-              // do not use arrow function to avoid binding to `this` and to allow `this.timeout` to work
-              it('has fetchable URL', async function () { // eslint-disable-line func-names
-                this.timeout(30000);
-
+              it('has fetchable URL', async () => {
                 const { location, executeClientScripts } = service.getDocumentDeclaration(type);
                 const document = await fetch({
                   url: location,
@@ -96,7 +99,6 @@ let servicesToValidate = args.filter(arg => !arg.startsWith('--'));
                   console.log('      (Tests skipped as url is not fetchable)');
                   this.skip();
                 }
-                this.timeout(30000);
 
                 filteredContent = await filter({
                   content,
@@ -134,8 +136,6 @@ let servicesToValidate = args.filter(arg => !arg.startsWith('--'));
                     console.log('      (Tests skipped as content cannot be filtered)');
                     this.skip();
                   }
-
-                  this.timeout(30000);
 
                   const {
                     location,

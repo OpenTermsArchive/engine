@@ -12,15 +12,16 @@ const MAX_RETRIES = 3;
 let browser;
 
 export default async function fetch(url, cssSelectors, { retry } = { retry: 0 }) {
+  let page;
   let response;
   let content;
-  let page;
   const selectors = [].concat(cssSelectors);
 
   try {
     if (!browser) {
-      browser = await puppeteer.launch({ headless: true, args: [ '--no-sandbox', '--disable-setuid-sandbox' ] });
+      throw new Error('The headless browser should be controlled manually with "launchHeadlessBrowser" and "stopHeadlessBrowser".');
     }
+
     const userAgent = new UserAgent();
 
     page = await browser.newPage();
@@ -62,4 +63,24 @@ export default async function fetch(url, cssSelectors, { retry } = { retry: 0 })
       await page.close();
     }
   }
+}
+
+export async function launchHeadlessBrowser() {
+  if (browser) {
+    return;
+  }
+
+  browser = await puppeteer.launch({
+    headless: true,
+    args: [ '--no-sandbox', '--disable-setuid-sandbox' ]
+  });
+}
+
+export async function stopHeadlessBrowser() {
+  if (!browser) {
+    return;
+  }
+
+  await browser.close();
+  browser = null;
 }

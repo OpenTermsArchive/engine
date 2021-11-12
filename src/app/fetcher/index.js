@@ -4,6 +4,8 @@ import { ErrorCodes } from './errors.js';
 import fetchFullDom from './fullDomFetcher.js';
 import fetchHtmlOnly from './htmlOnlyFetcher.js';
 
+export { launchHeadlessBrowser, stopHeadlessBrowser } from './fullDomFetcher.js';
+
 export default async function fetch({ url, executeClientScripts, cssSelectors }) {
   try {
     if (executeClientScripts) {
