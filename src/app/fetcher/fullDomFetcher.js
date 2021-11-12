@@ -66,14 +66,18 @@ export default async function fetch(url, cssSelectors, { retry } = { retry: 0 })
 }
 
 export async function launchHeadlessBrowser() {
-  if (!browser) {
-    browser = await puppeteer.launch({ headless: true, args: [ '--no-sandbox', '--disable-setuid-sandbox' ] });
+  if (browser) {
+    return;
   }
+
+  browser = await puppeteer.launch({ headless: true, args: [ '--no-sandbox', '--disable-setuid-sandbox' ] });
 }
 
 export async function stopHeadlessBrowser() {
-  if (browser) {
-    await browser.close();
-    browser = null;
+  if (!browser) {
+    return;
   }
+
+  await browser.close();
+  browser = null;
 }
