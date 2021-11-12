@@ -26,8 +26,8 @@ export default class Notifier {
       console.log(`notifyVersionRecorded for "${serviceId}" type "${type}" and versionId "${versionId}"`);
       try {
         await this.notifyVersionRecorded(serviceId, type, versionId); // eslint-disable-line no-await-in-loop
-      } catch (e) {
-        console.error(e);
+      } catch (error) {
+        console.error(`The notification for version ${versionId} of ${serviceId} — ${type} can not be sent:`, error);
       }
     }
 
