@@ -27,9 +27,12 @@ First of all, thanks for taking the time to contribute! 🎉👍
 
 ### Contributing code
 
-- [Pull requests](#pull-requests)
-- [Peer reviews](#peer-reviews)
-- [Commit messages](#commits-naming-convention)
+- [Workflow](#workflow)
+  - [Pull requests](#pull-requests)
+  - [Peer reviews](#peer-reviews)
+  - [Commit messages](#commits-naming-convention)
+- [Practices](#practices)
+  - [Errors handling](#errors-handling)
 
 ---
 
@@ -380,19 +383,20 @@ npm run refilter [$service_id]
 
 # Contributing code
 
-## Pull requests
+## Workflow
+### Pull requests
 
 We follow the [GitHub Flow](https://guides.github.com/introduction/flow/): all code contributions are submitted via a pull request towards the `master` branch.
 
 Opening a Pull Request means you want that code to be merged. If you want to only discuss it, send a link to your branch along with your questions through whichever communication channel you prefer.
 
-### Peer reviews
+#### Peer reviews
 
 All pull requests must be reviewed by at least one person who is not their original author.
 
 To help reviewers, make sure to describe your pull request with a **clear text explanation** of your changes.
 
-## Commit messages
+### Commit messages
 
 We strive to follow this [recommendation](https://chris.beams.io/posts/git-commit) to write our commit messages, which contains the following rules:
 
@@ -407,3 +411,37 @@ We strive to follow this [recommendation](https://chris.beams.io/posts/git-commi
 We add this additional rule:
 
 - Do not rely on GitHub issue reference numbers in commit messages, as we have no guarantee the host system and its autolinking will be stable in time. Make sure the context is self-explanatory. If an external reference is given, use its full URL.
+
+## Practices
+
+### Errors handling
+
+First of all it's important to distinguish two fundamentally different kinds of errors: **operational** and **programmer** errors.
+
+- **Operational errors** represent run-time problems experienced by **correctly-written programs**. These are not bugs in the program. These are usually problems with something else: the system itself (e.g., out of memory or too many open files), the system’s configuration (e.g., no route to a remote host), the network (e.g., socket hang-up), or a remote service (e.g., a 500 error, failure to connect, or the like).
+
+- **Programmer errors** are **bugs in the program**. These are things that can always be avoided by changing the code. They can never be handled properly, since by definition the code in question is broken (e.g. tried to read property of `undefined`, or forget to `await` an asynchronous function).
+
+This distinction is very important: operational errors are part of the **normal operation of a program**. Programmer errors are **bugs**.
+
+Also noteworthy, failure to handle an operational error is itself a programmer error.
+
+#### Handling operational errors
+
+There are five ways to handle operational errors:
+- **Deal with the failure directly**. For example, create directory if it's missing.
+- **Propagate the failure**. If you don’t know how to deal with the error, the simplest thing to do is to abort whatever operation you’re trying to do, clean up whatever you’ve started, and propagate the error.
+- **Retry the operation**. For example, try to reconnect if the connection is lost.
+- **Blow up**. If the error cannot be handled and can affect data integrity.
+- **Log the error — and do nothing else**. If it's a minor error and there’s nothing you can do about, and there is no reason to stop the whole process.
+
+In our case, we consider all `fetch`-related errors as expected, so as operational errors and we handle them by logging but we do not stop the whole process. We handle errors related to the `notifier` in the same way.
+In contrast, we consider errors from the `history` module as fatal, and we crash immediately.
+
+#### Handling programmer errors
+
+**The best way to recover from programmer errors is to crash immediately.** Indeed, it is not recommended to attempt to recover from programmer errors — that is, allow the current operation to fail, but keep handling requests. Consider that a programmer error is a case that you didn’t think about when you wrote the original code. How can you be sure that the problem won’t affect the program itself and the data integrity?
+
+So, **_shut the process gracefully when a stranger comes to town_**!
+
+More info [about error handlings](https://www.joyent.com/node-js/production/design/errors).
