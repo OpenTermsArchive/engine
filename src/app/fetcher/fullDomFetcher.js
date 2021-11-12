@@ -70,7 +70,10 @@ export async function launchHeadlessBrowser() {
     return;
   }
 
-  browser = await puppeteer.launch({ headless: true, args: [ '--no-sandbox', '--disable-setuid-sandbox' ] });
+  browser = await puppeteer.launch({
+    headless: true,
+    args: [ '--no-sandbox', '--disable-setuid-sandbox' ]
+  });
 }
 
 export async function stopHeadlessBrowser() {
