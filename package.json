@@ -69,7 +69,7 @@
     "https": "^1.0.0",
     "https-proxy-agent": "^5.0.0",
     "joplin-turndown-plugin-gfm": "^1.0.12",
-    "jsdom": "^17.0.0",
+    "jsdom": "^18.1.0",
     "lodash": "^4.17.21",
     "mime": "^2.5.2",
     "node-fetch": "^3.1.0",
