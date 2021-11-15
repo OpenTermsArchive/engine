@@ -65,7 +65,7 @@
     "datauri": "^3.0.0",
     "dotenv": "^10.0.0",
     "fs-extra": "^9.1.0",
-    "http-proxy-agent": "^4.0.1",
+    "http-proxy-agent": "^5.0.0",
     "https": "^1.0.0",
     "https-proxy-agent": "^5.0.0",
     "joplin-turndown-plugin-gfm": "^1.0.12",
