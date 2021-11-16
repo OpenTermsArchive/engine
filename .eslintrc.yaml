@@ -79,3 +79,10 @@ rules:
         - const
         - let
         - var
+
+overrides:
+- files:
+  - src/**/*test.js
+  - scripts/validation/*.js
+  rules:
+    func-names: 0
