@@ -9,7 +9,7 @@ const { version } = JSON.parse(fs.readFileSync(new URL('../../package.json', imp
 const ISSUE_STATE_CLOSED = 'closed';
 const ISSUE_STATE_OPEN = 'open';
 
-const FIX_DOCUMENT_LABEL = 'fix-document';
+const UPDATE_DOCUMENT_LABEL = process.env.GITHUB_LABEL_UPDATE || 'update';
 
 const LOCAL_CONTRIBUTE_URL = 'http://localhost:3000/contribute/service';
 const CONTRIBUTE_URL = 'https://opentermsarchive.org/contribute/service';
@@ -43,7 +43,7 @@ export default class GitHub {
 
   async onVersionRecorded(serviceId, type) {
     await this.closeIssueIfExists({
-      labels: [FIX_DOCUMENT_LABEL],
+      labels: [UPDATE_DOCUMENT_LABEL],
       title: `Fix ${serviceId} - ${type}`,
       comment: '🤖 Closed automatically as data was gathered successfully',
     });
@@ -68,7 +68,7 @@ export default class GitHub {
     await this.createIssueIfNotExists({
       title,
       body,
-      labels: [FIX_DOCUMENT_LABEL],
+      labels: [UPDATE_DOCUMENT_LABEL],
       comment: '🤖 Reopened automatically as an error occured',
     });
   }
