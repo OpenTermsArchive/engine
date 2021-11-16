@@ -50,7 +50,6 @@ export async function filterHTML({ content, documentDeclaration }) {
       /* eslint-disable no-await-in-loop */
       // We want this to be made in series
       await filterFunction(webPageDOM, {
-        // eslint-disable-line no-await-in-loop
         fetch: location,
         select: contentSelectors,
         remove: noiseSelectors,
