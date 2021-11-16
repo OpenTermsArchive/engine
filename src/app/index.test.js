@@ -10,7 +10,7 @@ import { gitSnapshot, gitVersion, resetGitRepository } from '../../test/helper.j
 
 import { SNAPSHOTS_PATH, VERSIONS_PATH } from './history/index.js';
 
-import CGUs, { AVAILABLE_EVENTS } from './index.js';
+import Archivist, { AVAILABLE_EVENTS } from './index.js';
 
 const fs = fsApi.promises;
 
@@ -19,7 +19,7 @@ const __dirname = path.resolve();
 chai.use(sinonChai);
 const { expect } = chai;
 
-describe('CGUs', function () {
+describe('Archivist', function () {
   this.timeout(10000);
 
   const SERVICE_A_ID = 'service_A';
@@ -65,7 +65,7 @@ describe('CGUs', function () {
       nock('https://www.serviceb.example')
         .get('/privacy')
         .reply(200, serviceBSnapshotExpectedContent, { 'Content-Type': 'application/pdf' });
-      app = new CGUs();
+      app = new Archivist();
       await app.init();
     });
 
@@ -163,7 +163,7 @@ describe('CGUs', function () {
           nock('https://www.serviceb.example')
             .get('/privacy')
             .reply(200, serviceBSnapshotExpectedContent, { 'Content-Type': 'application/pdf' });
-          const app = new CGUs();
+          const app = new Archivist();
 
           await app.init();
           await app.trackChanges(serviceIds);
@@ -234,7 +234,7 @@ describe('CGUs', function () {
           nock('https://www.serviceb.example')
             .get('/privacy')
             .reply(200, serviceBSnapshotExpectedContent, { 'Content-Type': 'application/pdf' });
-          const app = new CGUs();
+          const app = new Archivist();
 
           await app.init();
           await app.trackChanges(serviceIds);
@@ -280,7 +280,7 @@ describe('CGUs', function () {
     }
 
     before(async () => {
-      app = new CGUs();
+      app = new Archivist();
       await app.init();
 
       AVAILABLE_EVENTS.forEach(event => {
