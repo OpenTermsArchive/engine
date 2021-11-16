@@ -24,9 +24,7 @@ export default class Git {
   }
 
   async commit(filepath, message, authorDate) {
-    const options = {
-      '--author': `${config.get('history.author').name} <${config.get('history.author').email}>`,
-    };
+    const options = { '--author': `${config.get('history.author').name} <${config.get('history.author').email}>`, };
 
     if (authorDate) {
       options['--date'] = new Date(authorDate).toISOString();

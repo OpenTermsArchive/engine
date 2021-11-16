@@ -28,9 +28,7 @@ const schema = {
   additionalProperties: false,
   title: 'Service declaration history',
   properties: documentsProperties(),
-  propertyNames: {
-    enum: AVAILABLE_TYPES_NAME,
-  },
+  propertyNames: { enum: AVAILABLE_TYPES_NAME, },
   definitions: {
     pdfDocument: {
       type: 'object',

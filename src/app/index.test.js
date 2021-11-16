@@ -168,15 +168,11 @@ describe('CGUs', function () {
           await app.init();
           await app.trackChanges(serviceIds);
 
-          const [originalSnapshotCommit] = await gitSnapshot().log({
-            file: SERVICE_A_EXPECTED_SNAPSHOT_FILE_PATH,
-          });
+          const [originalSnapshotCommit] = await gitSnapshot().log({ file: SERVICE_A_EXPECTED_SNAPSHOT_FILE_PATH, });
 
           originalSnapshotId = originalSnapshotCommit.hash;
 
-          const [firstVersionCommit] = await gitVersion().log({
-            file: SERVICE_A_EXPECTED_VERSION_FILE_PATH,
-          });
+          const [firstVersionCommit] = await gitVersion().log({ file: SERVICE_A_EXPECTED_VERSION_FILE_PATH, });
 
           firstVersionId = firstVersionCommit.hash;
 
@@ -186,9 +182,7 @@ describe('CGUs', function () {
 
           await app.refilterAndRecord([ 'service_A', 'service_B' ]);
 
-          const [refilterVersionCommit] = await gitVersion().log({
-            file: SERVICE_A_EXPECTED_VERSION_FILE_PATH,
-          });
+          const [refilterVersionCommit] = await gitVersion().log({ file: SERVICE_A_EXPECTED_VERSION_FILE_PATH, });
 
           refilterVersionId = refilterVersionCommit.hash;
           refilterVersionMessageBody = refilterVersionCommit.body;
@@ -223,9 +217,7 @@ describe('CGUs', function () {
         });
 
         it('does not generate a new id for other services', async () => {
-          const serviceBCommitsAfterRefiltering = await gitVersion().log({
-            file: SERVICE_B_EXPECTED_VERSION_FILE_PATH,
-          });
+          const serviceBCommitsAfterRefiltering = await gitVersion().log({ file: SERVICE_B_EXPECTED_VERSION_FILE_PATH, });
 
           expect(serviceBCommitsAfterRefiltering.map(commit => commit.hash)).to.deep.equal(serviceBCommits.map(commit => commit.hash));
         });
