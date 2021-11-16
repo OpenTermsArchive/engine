@@ -21,7 +21,9 @@ rules:
       singleValue: false
   eqeqeq: 0
   chai-friendly/no-unused-expressions: 2
-  comma-dangle: 0
+  comma-dangle:
+    - error
+    - always-multiline
   consistent-return: 0
   function-paren-newline:
     - error
