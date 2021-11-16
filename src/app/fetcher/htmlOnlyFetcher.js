@@ -6,7 +6,7 @@ import nodeFetch, { AbortError } from 'node-fetch';
 import { FetchDocumentError } from './errors.js';
 
 const LANGUAGE = 'en';
-const TIMEOUT = 5 * 60 * 1000; // 5 minutes in ms
+const TIMEOUT = 45 * 1000; // 45 seconds in ms
 
 export default async function fetch(url) {
   const controller = new AbortController();
