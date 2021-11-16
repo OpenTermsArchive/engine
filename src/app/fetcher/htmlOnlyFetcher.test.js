@@ -6,8 +6,7 @@ import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import nock from 'nock';
 
-import { InaccessibleContentError } from '../errors.js';
-
+import { FetchDocumentError } from './errors.js';
 import fetch from './htmlOnlyFetcher.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -56,9 +55,9 @@ describe('HtmlOnlyFetcher', () => {
         nock('https://not.available.example').get('/').reply(404);
       });
 
-      it('throws an InaccessibleContentError error', async () => {
+      it('throws a FetchDocumentError error', async () => {
         await expect(fetch('https://not.available.example')).to.be.rejectedWith(
-          InaccessibleContentError,
+          FetchDocumentError,
           /404/
         );
       });

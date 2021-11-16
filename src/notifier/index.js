@@ -1,4 +1,3 @@
-import pTimeout from '@lolpants/ptimeout';
 import config from 'config';
 import dotenv from 'dotenv';
 import sendInBlue from 'sib-api-v3-sdk';
@@ -23,17 +22,13 @@ export default class Notifier {
   }
 
   async onRecordsPublished() {
-    for (const { serviceId, type, versionId } of this.delayedVersionNotificationsParams) {
-      console.log(`notifyVersionRecorded for "${serviceId}" type "${type}" and versionId "${versionId}"`);
+    this.delayedVersionNotificationsParams.forEach(async ({ serviceId, type, versionId }) => {
       try {
-        // eslint-disable-next-line
-        await pTimeout.default(async () => {
-          await this.notifyVersionRecorded(serviceId, type, versionId); // eslint-disable-line
-        }, 2 * 60 * 1000);
-      } catch (e) {
-        console.error(e);
+        await this.notifyVersionRecorded(serviceId, type, versionId);
+      } catch (error) {
+        console.error(`The notification for version ${versionId} of ${serviceId} — ${type} can not be sent:`, error);
       }
-    }
+    });
 
     this.delayedVersionNotificationsParams = [];
   }

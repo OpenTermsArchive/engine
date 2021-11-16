@@ -3,9 +3,7 @@ import http from 'http';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 
-import { InaccessibleContentError } from '../errors.js';
-
-import fetch, { launchHeadlessBrowser, stopHeadlessBrowser } from './index.js';
+import fetch, { launchHeadlessBrowser, stopHeadlessBrowser, FetchDocumentError } from './index.js';
 
 const { expect } = chai;
 const SERVER_PORT = 8976;
@@ -45,68 +43,68 @@ describe('Fetcher', function () {
       });
 
       context('when web page is not available', () => {
-        it('throws an InaccessibleContentError error', async () => {
-          await expect(fetch({ url: `http://localhost:${SERVER_PORT}/404` })).to.be.rejectedWith(InaccessibleContentError, /404/);
+        it('throws a FetchDocumentError error', async () => {
+          await expect(fetch({ url: `http://localhost:${SERVER_PORT}/404` })).to.be.rejectedWith(FetchDocumentError, /404/);
         });
 
         context('with client script enabled', () => {
-          it('throws an InaccessibleContentError error', async () => {
+          it('throws a FetchDocumentError error', async () => {
             await expect(fetch({
               url: `http://localhost:${SERVER_PORT}/404`,
               executeClientScripts: true,
               cssSelectors: 'body'
-            })).to.be.rejectedWith(InaccessibleContentError, /404/);
+            })).to.be.rejectedWith(FetchDocumentError, /404/);
           });
         });
       });
 
       context('when server is not resolved', () => {
-        it('throws an InaccessibleContentError error', async () => {
-          await expect(fetch({ url: 'https://not.available.example' })).to.be.rejectedWith(InaccessibleContentError);
+        it('throws a FetchDocumentError error', async () => {
+          await expect(fetch({ url: 'https://not.available.example' })).to.be.rejectedWith(FetchDocumentError);
         });
 
         context('with client script enabled', () => {
-          it('throws an InaccessibleContentError error', async () => {
-            await expect(fetch({ url: 'https://not.available.example', executeClientScripts: true })).to.be.rejectedWith(InaccessibleContentError);
+          it('throws a FetchDocumentError error', async () => {
+            await expect(fetch({ url: 'https://not.available.example', executeClientScripts: true })).to.be.rejectedWith(FetchDocumentError);
           });
         });
       });
 
       describe('When there is a certificate error', () => {
         context('when website has a self signed certificate', () => {
-          it('throws an InaccessibleContentError error', async () => {
-            await expect(fetch({ url: 'https://self-signed.badssl.com/' })).to.be.rejectedWith(InaccessibleContentError);
+          it('throws a FetchDocumentError error', async () => {
+            await expect(fetch({ url: 'https://self-signed.badssl.com/' })).to.be.rejectedWith(FetchDocumentError);
           });
         });
 
         context('when website has an expired certificate', () => {
-          it('throws an InaccessibleContentError error', async () => {
-            await expect(fetch({ url: 'https://expired.badssl.com/' })).to.be.rejectedWith(InaccessibleContentError);
+          it('throws a FetchDocumentError error', async () => {
+            await expect(fetch({ url: 'https://expired.badssl.com/' })).to.be.rejectedWith(FetchDocumentError);
           });
         });
 
         context('when website has an untrusted root certificate', () => {
-          it('throws an InaccessibleContentError error', async () => {
-            await expect(fetch({ url: 'https://untrusted-root.badssl.com/' })).to.be.rejectedWith(InaccessibleContentError);
+          it('throws a FetchDocumentError error', async () => {
+            await expect(fetch({ url: 'https://untrusted-root.badssl.com/' })).to.be.rejectedWith(FetchDocumentError);
           });
         });
 
         context('with client script enabled', () => {
           context('when website has a self signed certificate', () => {
-            it('throws an InaccessibleContentError error', async () => {
-              await expect(fetch({ url: 'https://self-signed.badssl.com/', executeClientScripts: true })).to.be.rejectedWith(InaccessibleContentError);
+            it('throws a FetchDocumentError error', async () => {
+              await expect(fetch({ url: 'https://self-signed.badssl.com/', executeClientScripts: true })).to.be.rejectedWith(FetchDocumentError);
             });
           });
 
           context('when website has an expired certificate', () => {
-            it('throws an InaccessibleContentError error', async () => {
-              await expect(fetch({ url: 'https://expired.badssl.com/', executeClientScripts: true })).to.be.rejectedWith(InaccessibleContentError);
+            it('throws a FetchDocumentError error', async () => {
+              await expect(fetch({ url: 'https://expired.badssl.com/', executeClientScripts: true })).to.be.rejectedWith(FetchDocumentError);
             });
           });
 
           context('when website has an untrusted root certificate', () => {
-            it('throws an InaccessibleContentError error', async () => {
-              await expect(fetch({ url: 'https://untrusted-root.badssl.com/', executeClientScripts: true })).to.be.rejectedWith(InaccessibleContentError);
+            it('throws a FetchDocumentError error', async () => {
+              await expect(fetch({ url: 'https://untrusted-root.badssl.com/', executeClientScripts: true })).to.be.rejectedWith(FetchDocumentError);
             });
           });
         });

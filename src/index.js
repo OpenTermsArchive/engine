@@ -1,5 +1,3 @@
-import './bootstrap.js';
-
 import scheduler from 'node-schedule';
 
 import { publishRelease } from '../scripts/release/releasedataset.js';
@@ -72,11 +70,6 @@ const schedule = args.includes('--schedule');
   logger.info(`👆 Tracked changes of ${numberOfDocuments} documents from ${serviceIds.length} services.`);
 
   if (!schedule) {
-    // here, we do not want to exit as the queue errors are processed
-    // asynchronously but not awaited, due to the fact that the queue error
-    // function is not async at all
-    // So if we exited here, we would not see the errors processed
-
     return;
   }
 

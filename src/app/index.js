@@ -4,7 +4,7 @@ import async from 'async';
 import config from 'config';
 
 import { InaccessibleContentError } from './errors.js';
-import fetch, { launchHeadlessBrowser, stopHeadlessBrowser } from './fetcher/index.js';
+import fetch, { launchHeadlessBrowser, stopHeadlessBrowser, FetchDocumentError } from './fetcher/index.js';
 import filter from './filter/index.js';
 import * as history from './history/index.js';
 import * as services from './services/index.js';
@@ -34,11 +34,19 @@ export default class CGUs extends events.EventEmitter {
   }
 
   async init() {
-    if (!this.services) {
-      this.initQueues();
-      this.services = await services.load();
-      await history.init();
+    if (this.services) {
+      return this.services;
     }
+
+    this.initQueues();
+    this.services = await services.load();
+    await history.init();
+
+    this.on('error', () => {
+      this.refilterDocumentsQueue.kill();
+      this.trackDocumentChangesQueue.kill();
+      stopHeadlessBrowser();
+    });
 
     return this.services;
   }
@@ -62,8 +70,6 @@ export default class CGUs extends events.EventEmitter {
       }
 
       this.emit('error', error, service.id, type);
-
-      throw error;
     };
 
     this.trackDocumentChangesQueue.error(queueErrorHandler);
@@ -95,14 +101,25 @@ export default class CGUs extends events.EventEmitter {
   async trackDocumentChanges(documentDeclaration) {
     const { location, executeClientScripts } = documentDeclaration;
 
-    const { mimeType, content } = await fetch({
-      url: location,
-      executeClientScripts,
-      cssSelectors: documentDeclaration.getCssSelectors(),
-    });
+    let mimeType;
+    let content;
+
+    try {
+      ({ mimeType, content } = await fetch({
+        url: location,
+        executeClientScripts,
+        cssSelectors: documentDeclaration.getCssSelectors(),
+      }));
+    } catch (error) {
+      if (error instanceof FetchDocumentError) {
+        throw new InaccessibleContentError(error.message);
+      }
+
+      throw error;
+    }
 
     if (!content) {
-      return;
+      throw new InaccessibleContentError('Content is empty');
     }
 
     const snapshotId = await this.recordSnapshot({
