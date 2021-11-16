@@ -199,7 +199,7 @@ An example of a production configuration file can be found in `config/production
   "logger": {
     "sendMailOnError": {
       "to": "recipient@example.com",
-      "from": "cgu-bot@example.com"
+      "from": "ota-bot@example.com"
     }
   }
 }
@@ -243,7 +243,7 @@ The `NODE_ENV` environment variable loads additional [configuration files](#conf
 ##### `GITHUB_TOKEN` and `GITHUB_REPO`
 
 In order for the service to automatically create issues in Github when a service is failing, you need to provide:
-- `GITHUB_TOKEN`: A token with repository privileges which allow access to the [GitHub API](https://github.com/settings/tokens). 
+- `GITHUB_TOKEN`: A token with repository privileges which allow access to the [GitHub API](https://github.com/settings/tokens).
 - `GITHUB_REPO`: A repository which will be used to create the issues. For example `ambanum/OpenTermsArchive`
 - `GITHUB_LABEL_UPDATE`: The name of the label used on the repo to categorize issues corresponding to a service that does not work anymore and needs updating (default is `update`)
 
