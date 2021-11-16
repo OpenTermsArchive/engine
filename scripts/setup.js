@@ -1,4 +1,3 @@
-/* eslint-disable import/no-extraneous-dependencies */
 import fsApi from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
