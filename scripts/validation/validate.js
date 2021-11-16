@@ -66,7 +66,7 @@ let servicesToValidate = args.filter(arg => !arg.startsWith('--'));
             const declarationHistory = JSON.parse(await fs.readFile(path.join(
               rootPath,
               config.get('serviceDeclarationsPath'),
-              `${serviceId}.history.json`
+              `${serviceId}.history.json`,
             )));
 
             assertValid(serviceHistorySchema, declarationHistory);

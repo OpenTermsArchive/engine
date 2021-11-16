@@ -28,7 +28,7 @@ const schema = {
   additionalProperties: false,
   title: 'Service declaration history',
   properties: documentsProperties(),
-  propertyNames: { enum: AVAILABLE_TYPES_NAME, },
+  propertyNames: { enum: AVAILABLE_TYPES_NAME },
   definitions: {
     pdfDocument: {
       type: 'object',
@@ -104,7 +104,7 @@ const schema = {
           type: 'boolean',
           description:
             'Execute client-side JavaScript loaded by the document before accessing the content, in case the DOM modifications are needed to access the content.',
-        }
+        },
       },
     },
     cssSelector: {

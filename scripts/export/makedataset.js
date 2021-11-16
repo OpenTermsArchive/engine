@@ -139,7 +139,7 @@ async function main() {
   const finalPath = path.resolve(
     __dirname,
     '../../data/',
-    `${exportTargetFolderName}-${date}-${headCommitShortSha}`
+    `${exportTargetFolderName}-${date}-${headCommitShortSha}`,
   );
 
   console.log(`Exporting dataset to ${finalPath}`);

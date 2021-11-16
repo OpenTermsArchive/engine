@@ -16,6 +16,6 @@ const latest = new DocumentDeclaration({
   validUntil: null,
 });
 
-service._documents = { 'Terms of Service': { _latest: latest, }, };
+service._documents = { 'Terms of Service': { _latest: latest } };
 
 export default service;

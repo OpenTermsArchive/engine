@@ -48,7 +48,7 @@ describe('DocumentDeclaration', () => {
     context('With "remove" property', () => {
       context('With string selector', () => {
         it('extracts selectors', async () => {
-          const result = new DocumentDeclaration({ noiseSelectors: 'body', }).getCssSelectors();
+          const result = new DocumentDeclaration({ noiseSelectors: 'body' }).getCssSelectors();
 
           expect(result).to.deep.equal(['body']);
         });

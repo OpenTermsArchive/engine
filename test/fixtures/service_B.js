@@ -16,6 +16,6 @@ const latest = new DocumentDeclaration({
   validUntil: null,
 });
 
-service._documents = { 'Privacy Policy': { _latest: latest, }, };
+service._documents = { 'Privacy Policy': { _latest: latest } };
 
 export default service;

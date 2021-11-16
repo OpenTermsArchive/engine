@@ -14,12 +14,12 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 export const SNAPSHOTS_PATH = path.resolve(
   __dirname,
   '../../..',
-  config.get('history.snapshotsPath')
+  config.get('history.snapshotsPath'),
 );
 export const VERSIONS_PATH = path.resolve(
   __dirname,
   '../../..',
-  config.get('history.versionsPath')
+  config.get('history.versionsPath'),
 );
 
 let snapshotRecorder;

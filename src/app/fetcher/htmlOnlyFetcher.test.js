@@ -58,7 +58,7 @@ describe('HtmlOnlyFetcher', () => {
       it('throws a FetchDocumentError error', async () => {
         await expect(fetch('https://not.available.example')).to.be.rejectedWith(
           FetchDocumentError,
-          /404/
+          /404/,
         );
       });
     });

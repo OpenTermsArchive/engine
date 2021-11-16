@@ -70,7 +70,7 @@ describe('Services', () => {
       describe('Service wihout history', async () => {
         await validateServiceWithoutHistory(
           'service_without_history',
-          expectedServices.service_without_history
+          expectedServices.service_without_history,
         );
       });
     });
@@ -78,7 +78,7 @@ describe('Services', () => {
       describe('Service with declaration history', async () => {
         await validateServiceWithoutHistory(
           'service_with_declaration_history',
-          expectedServices.service_with_declaration_history
+          expectedServices.service_with_declaration_history,
         );
       });
     });
@@ -86,7 +86,7 @@ describe('Services', () => {
       describe('Service with filters history', async () => {
         await validateServiceWithoutHistory(
           'service_with_filters_history',
-          expectedServices.service_with_filters_history
+          expectedServices.service_with_filters_history,
         );
       });
     });
@@ -94,7 +94,7 @@ describe('Services', () => {
       describe('Service with history', async () => {
         await validateServiceWithoutHistory(
           'service_with_history',
-          expectedServices.service_with_history
+          expectedServices.service_with_history,
         );
       });
     });
@@ -123,7 +123,7 @@ describe('Services', () => {
                   it('has the proper number of filter functions', async () => {
                     const actualDocument = result[serviceId].getDocumentDeclaration(
                       documentType,
-                      date
+                      date,
                     );
 
                     expect(actualDocument.filters.length).to.equal(expectedDocument.filters.length);
@@ -137,7 +137,7 @@ describe('Services', () => {
                     it(`has the proper "${expectedDocument.filters[indexFilter].name}" filter function`, async () => {
                       const actualDocument = result[serviceId].getDocumentDeclaration(
                         documentType,
-                        date
+                        date,
                       );
 
                       expect(await actualDocument.filters[indexFilter]()).equal(await expectedDocument.filters[indexFilter]()); // eslint-disable-line no-await-in-loop
@@ -147,7 +147,7 @@ describe('Services', () => {
                   it('has no filters', () => {
                     const actualDocument = result[serviceId].getDocumentDeclaration(
                       documentType,
-                      date
+                      date,
                     );
 
                     expect(actualDocument.filters).to.be.undefined;
@@ -210,7 +210,7 @@ describe('Services', () => {
       describe('Service wihout history', async () => {
         await validateServiceWithHistory(
           'service_without_history',
-          expectedServices.service_without_history
+          expectedServices.service_without_history,
         );
       });
     });
@@ -218,7 +218,7 @@ describe('Services', () => {
       describe('Service with declaration history', async () => {
         await validateServiceWithHistory(
           'service_with_declaration_history',
-          expectedServices.service_with_declaration_history
+          expectedServices.service_with_declaration_history,
         );
       });
     });
@@ -226,7 +226,7 @@ describe('Services', () => {
       describe('Service with filters history', async () => {
         await validateServiceWithHistory(
           'service_with_filters_history',
-          expectedServices.service_with_filters_history
+          expectedServices.service_with_filters_history,
         );
       });
     });
@@ -234,7 +234,7 @@ describe('Services', () => {
       describe('Service with history', async () => {
         await validateServiceWithHistory(
           'service_with_history',
-          expectedServices.service_with_history
+          expectedServices.service_with_history,
         );
       });
     });

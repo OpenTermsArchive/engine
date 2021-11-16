@@ -9,7 +9,7 @@ const documentsProperties = () => {
   const result = {};
 
   AVAILABLE_TYPES_NAME.forEach(type => {
-    result[type] = { oneOf: [{ $ref: '#/definitions/document' }, { $ref: '#/definitions/pdfDocument' }], };
+    result[type] = { oneOf: [{ $ref: '#/definitions/document' }, { $ref: '#/definitions/pdfDocument' }] };
   });
 
   return result;
@@ -29,7 +29,7 @@ const schema = {
     documents: {
       type: 'object',
       properties: documentsProperties(),
-      propertyNames: { enum: AVAILABLE_TYPES_NAME, },
+      propertyNames: { enum: AVAILABLE_TYPES_NAME },
     },
     importedFrom: {
       type: 'string',
@@ -69,7 +69,7 @@ const schema = {
             { $ref: '#/definitions/range' },
             {
               type: 'array',
-              items: { oneOf: [{ $ref: '#/definitions/cssSelector' }, { $ref: '#/definitions/range' }], },
+              items: { oneOf: [{ $ref: '#/definitions/cssSelector' }, { $ref: '#/definitions/range' }] },
             },
           ],
         },
@@ -88,7 +88,7 @@ const schema = {
             { $ref: '#/definitions/range' },
             {
               type: 'array',
-              items: { oneOf: [{ $ref: '#/definitions/cssSelector' }, { $ref: '#/definitions/range' }], },
+              items: { oneOf: [{ $ref: '#/definitions/cssSelector' }, { $ref: '#/definitions/range' }] },
             },
           ],
         },
@@ -96,7 +96,7 @@ const schema = {
           type: 'boolean',
           description:
             'Execute client-side JavaScript loaded by the document before accessing the content, in case the DOM modifications are needed to access the content.',
-        }
+        },
       },
     },
     cssSelector: {

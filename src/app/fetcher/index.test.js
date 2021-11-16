@@ -52,7 +52,7 @@ describe('Fetcher', function () {
             await expect(fetch({
               url: `http://localhost:${SERVER_PORT}/404`,
               executeClientScripts: true,
-              cssSelectors: 'body'
+              cssSelectors: 'body',
             })).to.be.rejectedWith(FetchDocumentError, /404/);
           });
         });

@@ -18,7 +18,7 @@ const ROOT_PATH = path.resolve(__dirname, '../../');
 
 export const SNAPSHOTS_SOURCE_PATH = path.resolve(
   ROOT_PATH,
-  config.get('rewrite.snapshotsSourcePath')
+  config.get('rewrite.snapshotsSourcePath'),
 );
 export const VERSIONS_TARGET_PATH = path.resolve(ROOT_PATH, config.get('history.versionsPath'));
 
@@ -82,7 +82,7 @@ let history;
 
     const documentDeclaration = servicesDeclarations[serviceId].getDocumentDeclaration(
       documentType,
-      commit.date
+      commit.date,
     );
 
     if (!documentDeclaration) {
