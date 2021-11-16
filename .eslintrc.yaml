@@ -46,6 +46,9 @@ rules:
     - error
     - 2
   max-len: 0
+  object-curly-newline:
+    - error
+    - multiline: true
   no-console: 0
   no-param-reassign: 0
   no-plusplus: 0
@@ -58,7 +61,6 @@ rules:
     - error
     - argsIgnorePattern: next
   no-use-before-define: 0
-  object-curly-newline: 0
   padding-line-between-statements:
     - error
     - blankLine: always
