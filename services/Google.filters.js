@@ -27,7 +27,7 @@ export function removeCountryVersion(document) {
       throw new Error('Country version selection seems to be too large.');
     }
 
-    // Remove all the "country version" section in the CGUs
+    // Remove all the "country version" section in the terms
     countryVersionSectionContent.deleteContents();
   }
 }
