@@ -1,7 +1,7 @@
 {
   "history": {
-    "snapshotsPath": "../cgus-snapshots",
-    "versionsPath": "../cgus-versions",
+    "snapshotsPath": "../ota-snapshots",
+    "versionsPath": "../ota-versions",
     "publish": true
   },
   "logger": {
