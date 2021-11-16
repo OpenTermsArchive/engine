@@ -3,7 +3,7 @@ import puppeteer from 'puppeteer-extra';
 import StealthPlugin from 'puppeteer-extra-plugin-stealth';
 import UserAgent from 'user-agents';
 
-import { FetchError } from './errors.js';
+import { FetchDocumentError } from './errors.js';
 
 puppeteer.use(StealthPlugin());
 
@@ -30,7 +30,7 @@ export default async function fetch(url, cssSelectors, { retry } = { retry: 0 })
 
     if (!response) {
       if (retry === MAX_RETRIES) {
-        throw new FetchError(`Response is empty when trying to fetch '${url}'`);
+        throw new FetchDocumentError(`Response is empty when trying to fetch '${url}'`);
       }
 
       return await fetch(url, cssSelectors, { retry: retry + 1 });
@@ -39,7 +39,7 @@ export default async function fetch(url, cssSelectors, { retry } = { retry: 0 })
     const statusCode = response.status();
 
     if (statusCode < 200 || (statusCode >= 300 && statusCode !== 304)) {
-      throw new FetchError(`Received HTTP code ${statusCode} when trying to fetch '${url}'`);
+      throw new FetchDocumentError(`Received HTTP code ${statusCode} when trying to fetch '${url}'`);
     }
 
     await Promise.all(selectors.map(selector => page.waitForSelector(selector, { timeout: config.get('fetcher.waitForElementsTimeout') })));
@@ -51,7 +51,7 @@ export default async function fetch(url, cssSelectors, { retry } = { retry: 0 })
       content,
     };
   } catch (error) {
-    throw new FetchError(error.message);
+    throw new FetchDocumentError(error.message);
   } finally {
     if (page) {
       await page.close();

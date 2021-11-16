@@ -1,6 +1,6 @@
-export class FetchError extends Error {
+export class FetchDocumentError extends Error {
   constructor(message) {
     super(message);
-    this.name = 'FetchError';
+    this.name = 'FetchDocumentError';
   }
 }

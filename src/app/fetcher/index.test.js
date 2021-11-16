@@ -3,7 +3,7 @@ import http from 'http';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 
-import fetch, { launchHeadlessBrowser, stopHeadlessBrowser, FetchError } from './index.js';
+import fetch, { launchHeadlessBrowser, stopHeadlessBrowser, FetchDocumentError } from './index.js';
 
 const { expect } = chai;
 const SERVER_PORT = 8976;
@@ -43,68 +43,68 @@ describe('Fetcher', function () {
       });
 
       context('when web page is not available', () => {
-        it('throws a FetchError error', async () => {
-          await expect(fetch({ url: `http://localhost:${SERVER_PORT}/404` })).to.be.rejectedWith(FetchError, /404/);
+        it('throws a FetchDocumentError error', async () => {
+          await expect(fetch({ url: `http://localhost:${SERVER_PORT}/404` })).to.be.rejectedWith(FetchDocumentError, /404/);
         });
 
         context('with client script enabled', () => {
-          it('throws a FetchError error', async () => {
+          it('throws a FetchDocumentError error', async () => {
             await expect(fetch({
               url: `http://localhost:${SERVER_PORT}/404`,
               executeClientScripts: true,
               cssSelectors: 'body'
-            })).to.be.rejectedWith(FetchError, /404/);
+            })).to.be.rejectedWith(FetchDocumentError, /404/);
           });
         });
       });
 
       context('when server is not resolved', () => {
-        it('throws a FetchError error', async () => {
-          await expect(fetch({ url: 'https://not.available.example' })).to.be.rejectedWith(FetchError);
+        it('throws a FetchDocumentError error', async () => {
+          await expect(fetch({ url: 'https://not.available.example' })).to.be.rejectedWith(FetchDocumentError);
         });
 
         context('with client script enabled', () => {
-          it('throws a FetchError error', async () => {
-            await expect(fetch({ url: 'https://not.available.example', executeClientScripts: true })).to.be.rejectedWith(FetchError);
+          it('throws a FetchDocumentError error', async () => {
+            await expect(fetch({ url: 'https://not.available.example', executeClientScripts: true })).to.be.rejectedWith(FetchDocumentError);
           });
         });
       });
 
       describe('When there is a certificate error', () => {
         context('when website has a self signed certificate', () => {
-          it('throws a FetchError error', async () => {
-            await expect(fetch({ url: 'https://self-signed.badssl.com/' })).to.be.rejectedWith(FetchError);
+          it('throws a FetchDocumentError error', async () => {
+            await expect(fetch({ url: 'https://self-signed.badssl.com/' })).to.be.rejectedWith(FetchDocumentError);
           });
         });
 
         context('when website has an expired certificate', () => {
-          it('throws a FetchError error', async () => {
-            await expect(fetch({ url: 'https://expired.badssl.com/' })).to.be.rejectedWith(FetchError);
+          it('throws a FetchDocumentError error', async () => {
+            await expect(fetch({ url: 'https://expired.badssl.com/' })).to.be.rejectedWith(FetchDocumentError);
           });
         });
 
         context('when website has an untrusted root certificate', () => {
-          it('throws a FetchError error', async () => {
-            await expect(fetch({ url: 'https://untrusted-root.badssl.com/' })).to.be.rejectedWith(FetchError);
+          it('throws a FetchDocumentError error', async () => {
+            await expect(fetch({ url: 'https://untrusted-root.badssl.com/' })).to.be.rejectedWith(FetchDocumentError);
           });
         });
 
         context('with client script enabled', () => {
           context('when website has a self signed certificate', () => {
-            it('throws a FetchError error', async () => {
-              await expect(fetch({ url: 'https://self-signed.badssl.com/', executeClientScripts: true })).to.be.rejectedWith(FetchError);
+            it('throws a FetchDocumentError error', async () => {
+              await expect(fetch({ url: 'https://self-signed.badssl.com/', executeClientScripts: true })).to.be.rejectedWith(FetchDocumentError);
             });
           });
 
           context('when website has an expired certificate', () => {
-            it('throws a FetchError error', async () => {
-              await expect(fetch({ url: 'https://expired.badssl.com/', executeClientScripts: true })).to.be.rejectedWith(FetchError);
+            it('throws a FetchDocumentError error', async () => {
+              await expect(fetch({ url: 'https://expired.badssl.com/', executeClientScripts: true })).to.be.rejectedWith(FetchDocumentError);
             });
           });
 
           context('when website has an untrusted root certificate', () => {
-            it('throws a FetchError error', async () => {
-              await expect(fetch({ url: 'https://untrusted-root.badssl.com/', executeClientScripts: true })).to.be.rejectedWith(FetchError);
+            it('throws a FetchDocumentError error', async () => {
+              await expect(fetch({ url: 'https://untrusted-root.badssl.com/', executeClientScripts: true })).to.be.rejectedWith(FetchDocumentError);
             });
           });
         });
