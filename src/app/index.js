@@ -34,11 +34,13 @@ export default class CGUs extends events.EventEmitter {
   }
 
   async init() {
-    if (!this.services) {
-      this.initQueues();
-      this.services = await services.load();
-      await history.init();
+    if (this.services) {
+      return this.services;
     }
+
+    this.initQueues();
+    this.services = await services.load();
+    await history.init();
 
     this.on('error', () => {
       this.refilterDocumentsQueue.kill();
