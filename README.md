@@ -245,8 +245,9 @@ The `NODE_ENV` environment variable loads additional [configuration files](#conf
 In order for the service to automatically create issues in Github when a service is failing, you need to provide:
 - `GITHUB_TOKEN`: A token with repository privileges which allow access to the [GitHub API](https://github.com/settings/tokens). 
 - `GITHUB_REPO`: A repository which will be used to create the issues. For example `ambanum/OpenTermsArchive`
+- `GITHUB_LABEL_UPDATE`: The name of the label used on the repo to categorize issues corresponding to a service that does not work anymore and needs updating (default is `update`)
 
-**Note**: OTA will automatically create issues with a label `fix-document`. **This specific label has to exist in the corresponding repository for the automatic issue creation works.**
+**Note**: OTA will automatically create issues with a label defined by `GITHUB_LABEL_UPDATE`. **This specific label has to exist in the corresponding repository for the automatic issue creation works.**
 ### Running
 
 To get the latest versions of all services' terms:
