@@ -5,13 +5,13 @@
       "fetch": "https://www.booking.com/content/terms.en-gb.html",
       "remove": "a.print-button, .print-button + p",
       "select": "div.static_content",
-      "filter": ["removeSIDfromUrls"]
+      "filter": ["removeSIDfromUrls", "removeLabelfromUrls", "removeSigfromUrls"]
     },
     "Privacy Policy": {
       "fetch": "https://www.booking.com/content/privacy.en-gb.html",
       "remove": "a.print-button, .print-button + p",
       "select": "div.static_content",
-      "filter": ["removeSIDfromUrls"]
+      "filter": ["removeSIDfromUrls", "removeLabelfromUrls", "removeSigfromUrls"]
     }
   }
 }
