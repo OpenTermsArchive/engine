@@ -10,7 +10,7 @@ export default class Notifier {
 
     authentication.apiKey = process.env.SENDINBLUE_API_KEY;
 
-    this.apiInstance = new sendInBlue.SMTPApi();
+    this.apiInstance = new sendInBlue.TransactionalEmailsApi();
     this.contactsInstance = new sendInBlue.ContactsApi();
 
     this.serviceProviders = passedServiceProviders;
