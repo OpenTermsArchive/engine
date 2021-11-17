@@ -13,7 +13,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const SERVICE_DECLARATIONS_PATH = path.resolve(
   __dirname,
   '../../..',
-  config.get('serviceDeclarationsPath')
+  config.get('serviceDeclarationsPath'),
 );
 
 export async function load() {
@@ -150,7 +150,7 @@ async function loadServiceHistoryFiles(serviceId) {
   const serviceFiltersFileName = path.join(SERVICE_DECLARATIONS_PATH, `${serviceId}.filters.js`);
   const serviceFiltersHistoryFileName = path.join(
     SERVICE_DECLARATIONS_PATH,
-    `${serviceId}.filters.history.js`
+    `${serviceId}.filters.history.js`,
   );
 
   let serviceHistory = {};

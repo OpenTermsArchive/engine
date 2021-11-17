@@ -18,7 +18,7 @@ const alignedWithColorsAndTime = combine(
     }
 
     return `${timestamp} ${level.padEnd(15)} ${prefix.padEnd(55)} ${message}`;
-  })
+  }),
 );
 
 const consoleTransport = new winston.transports.Console();

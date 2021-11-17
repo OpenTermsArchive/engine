@@ -41,16 +41,16 @@ describe('CGUs', function () {
   before(async () => {
     serviceASnapshotExpectedContent = await fs.readFile(
       path.resolve(__dirname, 'test/fixtures/service_A_terms_snapshot.html'),
-      { encoding: 'utf8' }
+      { encoding: 'utf8' },
     );
     serviceAVersionExpectedContent = await fs.readFile(
       path.resolve(__dirname, 'test/fixtures/service_A_terms.md'),
-      { encoding: 'utf8' }
+      { encoding: 'utf8' },
     );
     serviceBSnapshotExpectedContent = await fs.readFile(path.resolve(__dirname, 'test/fixtures/terms.pdf'));
     serviceBVersionExpectedContent = await fs.readFile(
       path.resolve(__dirname, 'test/fixtures/termsFromPDF.md'),
-      { encoding: 'utf8' }
+      { encoding: 'utf8' },
     );
   });
 
@@ -77,7 +77,7 @@ describe('CGUs', function () {
       it('records no snapshot for service A', async () => {
         const resultingSnapshotTerms = await fs.readFile(
           path.resolve(__dirname, SERVICE_A_EXPECTED_SNAPSHOT_FILE_PATH),
-          { encoding: 'utf8' }
+          { encoding: 'utf8' },
         );
 
         expect(resultingSnapshotTerms).to.equal(serviceASnapshotExpectedContent);
@@ -86,7 +86,7 @@ describe('CGUs', function () {
       it('records no version for service A', async () => {
         const resultingTerms = await fs.readFile(
           path.resolve(__dirname, SERVICE_A_EXPECTED_VERSION_FILE_PATH),
-          { encoding: 'utf8' }
+          { encoding: 'utf8' },
         );
 
         expect(resultingTerms).to.equal(serviceAVersionExpectedContent);
@@ -101,7 +101,7 @@ describe('CGUs', function () {
       it('records version for service B', async () => {
         const resultingTerms = await fs.readFile(
           path.resolve(__dirname, SERVICE_B_EXPECTED_VERSION_FILE_PATH),
-          { encoding: 'utf8' }
+          { encoding: 'utf8' },
         );
 
         expect(resultingTerms).to.equal(serviceBVersionExpectedContent);
@@ -139,7 +139,7 @@ describe('CGUs', function () {
       it('still records version for service B', async () => {
         const resultingTerms = await fs.readFile(
           path.resolve(__dirname, SERVICE_B_EXPECTED_VERSION_FILE_PATH),
-          { encoding: 'utf8' }
+          { encoding: 'utf8' },
         );
 
         expect(resultingTerms).to.equal(serviceBVersionExpectedContent);
@@ -168,15 +168,11 @@ describe('CGUs', function () {
           await app.init();
           await app.trackChanges(serviceIds);
 
-          const [originalSnapshotCommit] = await gitSnapshot().log({
-            file: SERVICE_A_EXPECTED_SNAPSHOT_FILE_PATH,
-          });
+          const [originalSnapshotCommit] = await gitSnapshot().log({ file: SERVICE_A_EXPECTED_SNAPSHOT_FILE_PATH });
 
           originalSnapshotId = originalSnapshotCommit.hash;
 
-          const [firstVersionCommit] = await gitVersion().log({
-            file: SERVICE_A_EXPECTED_VERSION_FILE_PATH,
-          });
+          const [firstVersionCommit] = await gitVersion().log({ file: SERVICE_A_EXPECTED_VERSION_FILE_PATH });
 
           firstVersionId = firstVersionCommit.hash;
 
@@ -186,9 +182,7 @@ describe('CGUs', function () {
 
           await app.refilterAndRecord([ 'service_A', 'service_B' ]);
 
-          const [refilterVersionCommit] = await gitVersion().log({
-            file: SERVICE_A_EXPECTED_VERSION_FILE_PATH,
-          });
+          const [refilterVersionCommit] = await gitVersion().log({ file: SERVICE_A_EXPECTED_VERSION_FILE_PATH });
 
           refilterVersionId = refilterVersionCommit.hash;
           refilterVersionMessageBody = refilterVersionCommit.body;
@@ -199,7 +193,7 @@ describe('CGUs', function () {
         it('refilters the changed service', async () => {
           const serviceAContent = await fs.readFile(
             path.resolve(__dirname, SERVICE_A_EXPECTED_VERSION_FILE_PATH),
-            { encoding: 'utf8' }
+            { encoding: 'utf8' },
           );
 
           expect(serviceAContent).to.equal('Terms of service with UTF-8 \'çhãràčtęrs"\n========================================');
@@ -216,16 +210,14 @@ describe('CGUs', function () {
         it('does not change other services', async () => {
           const serviceBVersion = await fs.readFile(
             path.resolve(__dirname, SERVICE_B_EXPECTED_VERSION_FILE_PATH),
-            { encoding: 'utf8' }
+            { encoding: 'utf8' },
           );
 
           expect(serviceBVersion).to.equal(serviceBVersionExpectedContent);
         });
 
         it('does not generate a new id for other services', async () => {
-          const serviceBCommitsAfterRefiltering = await gitVersion().log({
-            file: SERVICE_B_EXPECTED_VERSION_FILE_PATH,
-          });
+          const serviceBCommitsAfterRefiltering = await gitVersion().log({ file: SERVICE_B_EXPECTED_VERSION_FILE_PATH });
 
           expect(serviceBCommitsAfterRefiltering.map(commit => commit.hash)).to.deep.equal(serviceBCommits.map(commit => commit.hash));
         });
@@ -318,7 +310,7 @@ describe('CGUs', function () {
         it('emits "firstSnapshotRecorded" event', async () => {
           expect(spies.onFirstSnapshotRecorded).to.have.been.calledWith(
             SERVICE_A_ID,
-            SERVICE_A_TYPE
+            SERVICE_A_TYPE,
           );
         });
 
@@ -374,7 +366,7 @@ describe('CGUs', function () {
           it('emits "snapshotNotChanged" event', async () => {
             expect(spies.onSnapshotNotChanged).to.have.been.calledWith(
               SERVICE_A_ID,
-              SERVICE_A_TYPE
+              SERVICE_A_TYPE,
             );
           });
 
@@ -401,7 +393,7 @@ describe('CGUs', function () {
         it('emits "firstVersionRecorded" event', async () => {
           expect(spies.onFirstVersionRecorded).to.have.been.calledWith(
             SERVICE_A_ID,
-            SERVICE_A_TYPE
+            SERVICE_A_TYPE,
           );
         });
 
@@ -576,21 +568,21 @@ describe('CGUs', function () {
         it('emits "snapshotNotChanged" events', async () => {
           expect(spies.onSnapshotNotChanged).to.have.been.calledOnceWith(
             SERVICE_B_ID,
-            SERVICE_B_TYPE
+            SERVICE_B_TYPE,
           );
         });
 
         it('emits "snapshotRecorded" event for service which changed', async () => {
           expect(spies.onSnapshotRecorded).to.have.been.calledOnceWith(
             SERVICE_A_ID,
-            SERVICE_A_TYPE
+            SERVICE_A_TYPE,
           );
         });
 
         it('emits "versionNotChanged" events', async () => {
           expect(spies.onVersionNotChanged).to.have.been.calledOnceWith(
             SERVICE_B_ID,
-            SERVICE_B_TYPE
+            SERVICE_B_TYPE,
           );
         });
 

@@ -486,7 +486,7 @@ describe('Filter', () => {
       pdfContent = await fs.readFile(path.resolve(__dirname, '../../../test/fixtures/terms.pdf'));
       expectedFilteredContent = await fs.readFile(
         path.resolve(__dirname, '../../../test/fixtures/termsFromPDF.md'),
-        { encoding: 'utf8' }
+        { encoding: 'utf8' },
       );
     });
 

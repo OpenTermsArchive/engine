@@ -154,7 +154,7 @@ export default class CGUs extends events.EventEmitter {
 
     const { id: snapshotId, content: snapshotContent, mimeType } = await history.getLatestSnapshot(
       service.id,
-      type
+      type,
     );
 
     if (!snapshotId) {

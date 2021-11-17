@@ -89,7 +89,7 @@ export default class Notifier {
         'lists',
         lists,
         count,
-        offset + limit
+        offset + limit,
       ),
     };
   }
@@ -110,7 +110,7 @@ export default class Notifier {
       listId,
       'contacts',
       [],
-      list.totalSubscribers
+      list.totalSubscribers,
     );
   }
 
@@ -121,7 +121,7 @@ export default class Notifier {
     accumulator,
     count,
     offset = 0,
-    paginationSize = 50
+    paginationSize = 50,
   ) {
     if (accumulator.length >= count) {
       return accumulator;
@@ -145,7 +145,7 @@ export default class Notifier {
       accumulator,
       count,
       offset + paginationSize,
-      paginationSize
+      paginationSize,
     );
   }
 }
