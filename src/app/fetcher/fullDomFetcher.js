@@ -8,13 +8,12 @@ import { FetchDocumentError } from './errors.js';
 puppeteer.use(StealthPlugin());
 
 const PUPPETEER_TIMEOUT = 30 * 1000; // 30 seconds in ms
-const MAX_RETRIES = 3;
+
 let browser;
 
-export default async function fetch(url, cssSelectors, { retry } = { retry: 0 }) {
+export default async function fetch(url, cssSelectors) {
   let page;
   let response;
-  let content;
   const selectors = [].concat(cssSelectors);
 
   if (!browser) {
@@ -29,11 +28,7 @@ export default async function fetch(url, cssSelectors, { retry } = { retry: 0 })
     response = await page.goto(url, { waitUntil: 'networkidle0' });
 
     if (!response) {
-      if (retry === MAX_RETRIES) {
-        throw new FetchDocumentError(`Response is empty when trying to fetch '${url}'`);
-      }
-
-      return await fetch(url, cssSelectors, { retry: retry + 1 });
+      throw new FetchDocumentError(`Response is empty when trying to fetch '${url}'`);
     }
 
     const statusCode = response.status();
@@ -42,13 +37,22 @@ export default async function fetch(url, cssSelectors, { retry } = { retry: 0 })
       throw new FetchDocumentError(`Received HTTP code ${statusCode} when trying to fetch '${url}'`);
     }
 
-    await Promise.all(selectors.map(selector => page.waitForSelector(selector, { timeout: config.get('fetcher.waitForElementsTimeout') })));
+    const waitForSelectorsPromises = selectors.map(selector => page.waitForSelector(selector, { timeout: config.get('fetcher.waitForElementsTimeout') }));
 
-    content = await page.content();
+    // We expect all elements to be present on the page…
+    await Promise.all(waitForSelectorsPromises).catch(error => {
+      if (error.name == 'TimeoutError') {
+        // however, if they are not, this is not considered as an error since selectors may be out of date
+        // and the whole content of the page should still be returned.
+        return;
+      }
+
+      throw error;
+    });
 
     return {
       mimeType: 'text/html',
-      content,
+      content: await page.content(),
     };
   } catch (error) {
     throw new FetchDocumentError(error.message);
