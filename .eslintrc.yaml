@@ -83,6 +83,9 @@ rules:
         - const
         - let
         - var
+  multiline-comment-style:
+    - error
+    - separate-lines
 
 overrides:
 - files:
