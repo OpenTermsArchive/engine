@@ -6,7 +6,6 @@ import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import nock from 'nock';
 
-import { FetchDocumentError } from './errors.js';
 import fetch from './htmlOnlyFetcher.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -30,39 +29,6 @@ describe('HtmlOnlyFetcher', () => {
   });
 
   describe('#fetch', () => {
-    context('when web page is available', () => {
-      let content;
-      let mimeType;
-
-      before(async () => {
-        const result = await fetch('https://domain.example/terms.html');
-
-        content = result.content;
-        mimeType = result.mimeType;
-      });
-
-      it('returns the web page content of the given URL', async () => {
-        expect(content).to.equal(termsHTML);
-      });
-
-      it('returns the mime type of the given URL', async () => {
-        expect(mimeType).to.equal('text/html');
-      });
-    });
-
-    context('when web page is not available', () => {
-      before(() => {
-        nock('https://not.available.example').get('/').reply(404);
-      });
-
-      it('throws a FetchDocumentError error', async () => {
-        await expect(fetch('https://not.available.example')).to.be.rejectedWith(
-          FetchDocumentError,
-          /404/,
-        );
-      });
-    });
-
     context('when url targets a PDF file', () => {
       let content;
       let mimeType;
