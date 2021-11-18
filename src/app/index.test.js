@@ -20,7 +20,7 @@ chai.use(sinonChai);
 const { expect } = chai;
 
 describe('CGUs', function () {
-  this.timeout(5000);
+  this.timeout(10000);
 
   const SERVICE_A_ID = 'service_A';
   const SERVICE_A_TYPE = 'Terms of Service';
