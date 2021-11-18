@@ -24,7 +24,7 @@ export const AVAILABLE_EVENTS = [
   'error',
 ];
 
-export default class CGUs extends events.EventEmitter {
+export default class Archivist extends events.EventEmitter {
   get serviceDeclarations() {
     return this.services;
   }

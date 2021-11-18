@@ -4,7 +4,7 @@
     dest: '/home/{{ ansible_user }}/{{ app }}'
     force: yes
     accept_hostkey: yes
-    key_file: '/home/{{ ansible_user }}/.ssh/cgus-bot-key'
+    key_file: '/home/{{ ansible_user }}/.ssh/ota-bot-key'
   register: git_clone_app_finished
   tags:
     - setup

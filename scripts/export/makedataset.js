@@ -10,10 +10,10 @@ import Git from '../../src/app/history/git.js';
 const fs = fsApi.promises;
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const CGUS_VERSIONS_PATH = path.resolve(__dirname, '../..', config.get('history.versionsPath'));
+const OTA_VERSIONS_PATH = path.resolve(__dirname, '../..', config.get('history.versionsPath'));
 const TEMP_WORK_FOLDER = path.resolve(__dirname, '../..', 'tmp/');
 
-const git = new Git(CGUS_VERSIONS_PATH);
+const git = new Git(OTA_VERSIONS_PATH);
 
 const serviceMap = {
   AskFM: 'ASKfm',
@@ -102,7 +102,7 @@ function makeFilename(target, filepath, date) {
 }
 
 function isValidCommit(commitMessage) {
-  // util function used for filtering CGUs commits
+  // util function used for filtering OTA commits
   const [firstVerb] = commitMessage.split(' ');
 
   return [ 'Update', 'Start', 'Refilter' ].includes(firstVerb);

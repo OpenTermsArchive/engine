@@ -2,7 +2,7 @@ import scheduler from 'node-schedule';
 
 import { publishRelease } from '../scripts/release/releasedataset.js';
 
-import CGUs from './app/index.js';
+import Archivist from './app/index.js';
 import * as services from './app/services/index.js';
 import GitHub from './github/index.js';
 import logger from './logger/index.js';
@@ -14,7 +14,7 @@ const refilterOnly = args.includes('--refilter-only');
 const schedule = args.includes('--schedule');
 
 (async () => {
-  const app = new CGUs();
+  const app = new Archivist();
 
   app.attach(logger);
   await app.init();
