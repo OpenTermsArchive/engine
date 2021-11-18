@@ -1,9 +1,14 @@
+import fs from 'fs';
 import http from 'http';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 
 import fetch, { launchHeadlessBrowser, stopHeadlessBrowser, FetchDocumentError } from './index.js';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const { expect } = chai;
 const SERVER_PORT = 8976;
@@ -21,6 +26,7 @@ describe('Fetcher', function () {
 
   describe('#fetch', () => {
     let temporaryServer;
+    let expectedPDFContent;
 
     before(done => {
       temporaryServer = http
@@ -34,6 +40,14 @@ describe('Fetcher', function () {
           if (request.url == '/404') {
             response.writeHead(404, { 'Content-Type': 'text/html' });
             response.write('<!DOCTYPE html><html><body>404</body></html>');
+
+            return response.end();
+          }
+          if (request.url == '/terms.pdf') {
+            expectedPDFContent = fs.readFileSync(path.resolve(__dirname, '../../../test/fixtures/terms.pdf'));
+
+            response.writeHead(200, { 'Content-Type': 'application/pdf' });
+            response.write(expectedPDFContent);
 
             return response.end();
           }
@@ -111,6 +125,28 @@ describe('Fetcher', function () {
               expect(mimeType).to.equal('text/html');
             });
           });
+        });
+      });
+
+      context('when url targets a PDF file', () => {
+        let content;
+        let mimeType;
+        const pdfUrl = `http://localhost:${SERVER_PORT}/terms.pdf`;
+
+        before(async () => {
+          ({ content, mimeType } = await fetch({ url: pdfUrl }));
+        });
+
+        it('returns a buffer for PDF content', async () => {
+          expect(content).to.be.an.instanceOf(Buffer);
+        });
+
+        it('returns a blob with the file type', async () => {
+          expect(mimeType).to.equal('application/pdf');
+        });
+
+        it('returns a blob with the file content', async () => {
+          expect(content.equals(expectedPDFContent)).to.be.true;
         });
       });
     });
