@@ -118,10 +118,6 @@ export default class Archivist extends events.EventEmitter {
       throw error;
     }
 
-    if (!content) {
-      throw new InaccessibleContentError('Content is empty');
-    }
-
     const snapshotId = await this.recordSnapshot({
       content,
       mimeType,
