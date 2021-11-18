@@ -10,7 +10,7 @@ import * as history from './history/index.js';
 import * as services from './services/index.js';
 
 const MAX_PARALLEL_DOCUMENTS_TRACKS = 1;
-const MAX_PARALLEL_REFILTERS = 1;
+const MAX_PARALLEL_REFILTERS = 10;
 
 export const AVAILABLE_EVENTS = [
   'snapshotRecorded',
