@@ -14,7 +14,6 @@ let browser;
 export default async function fetch(url, cssSelectors) {
   let page;
   let response;
-  let content;
   const selectors = [].concat(cssSelectors);
 
   if (!browser) {
@@ -38,13 +37,21 @@ export default async function fetch(url, cssSelectors) {
       throw new FetchDocumentError(`Received HTTP code ${statusCode} when trying to fetch '${url}'`);
     }
 
-    await Promise.all(selectors.map(selector => page.waitForSelector(selector, { timeout: config.get('fetcher.waitForElementsTimeout') })));
-
-    content = await page.content();
+    try {
+      await Promise.all(selectors.map(selector => page.waitForSelector(selector, { timeout: config.get('fetcher.waitForElementsTimeout') })));
+    } catch (error) {
+      if (error instanceof puppeteer.pptr.errors.TimeoutError) {
+        // Expected elements are not present on the web page
+        // But the fetch still is considered successfull
+        // Continue with the process
+      } else {
+        throw error;
+      }
+    }
 
     return {
       mimeType: 'text/html',
-      content,
+      content: await page.content(),
     };
   } catch (error) {
     throw new FetchDocumentError(error.message);

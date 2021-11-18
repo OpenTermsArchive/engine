@@ -69,10 +69,18 @@ describe('FullDomFetcher', function FullDomFetcher() {
       });
 
       context('when expected elements are not present', () => {
-        it('throws a FetchDocumentError error', async () => {
+        it('still returns the already gathered data', async () => {
           const NOT_PRESENT_SELECTOR = 'h2';
 
-          await expect(fetch(`http://localhost:${SERVER_PORT}`, NOT_PRESENT_SELECTOR)).to.be.rejectedWith(FetchDocumentError, /waiting for selector .* failed/);
+          ({ content, mimeType } = await fetch(`http://localhost:${SERVER_PORT}`, NOT_PRESENT_SELECTOR));
+        });
+
+        it('returns the web page content of the given URL', async () => {
+          expect(content).to.equal(termsHTML);
+        });
+
+        it('returns the mime type of the given URL', async () => {
+          expect(mimeType).to.equal('text/html');
         });
       });
     });
