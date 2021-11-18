@@ -29,30 +29,21 @@ describe('Fetcher', function () {
     let expectedPDFContent;
 
     before(done => {
-      temporaryServer = http
-        .createServer((request, response) => {
-          if (request.url === '/') {
-            response.writeHead(200, { 'Content-Type': 'text/html' });
-            response.write(termsHTML);
+      temporaryServer = http.createServer((request, response) => {
+        if (request.url === '/') {
+          response.writeHead(200, { 'Content-Type': 'text/html' }).write(termsHTML);
+        }
+        if (request.url == '/404') {
+          response.writeHead(404, { 'Content-Type': 'text/html' }).write('<!DOCTYPE html><html><body>404</body></html>');
+        }
+        if (request.url == '/terms.pdf') {
+          expectedPDFContent = fs.readFileSync(path.resolve(__dirname, '../../../test/fixtures/terms.pdf'));
 
-            return response.end();
-          }
-          if (request.url == '/404') {
-            response.writeHead(404, { 'Content-Type': 'text/html' });
-            response.write('<!DOCTYPE html><html><body>404</body></html>');
+          response.writeHead(200, { 'Content-Type': 'application/pdf' }).write(expectedPDFContent);
+        }
 
-            return response.end();
-          }
-          if (request.url == '/terms.pdf') {
-            expectedPDFContent = fs.readFileSync(path.resolve(__dirname, '../../../test/fixtures/terms.pdf'));
-
-            response.writeHead(200, { 'Content-Type': 'application/pdf' });
-            response.write(expectedPDFContent);
-
-            return response.end();
-          }
-        })
-        .listen(SERVER_PORT);
+        return response.end();
+      }).listen(SERVER_PORT);
 
       done();
     });
@@ -113,7 +104,7 @@ describe('Fetcher', function () {
           });
 
           context('with client script enabled', () => {
-            it('still returns the already gathered data', async () => {
+            before(async () => {
               ({ content, mimeType } = await fetch({ url, selectors: NOT_PRESENT_SELECTOR, executeClientScripts: true }));
             });
 
@@ -161,11 +152,7 @@ describe('Fetcher', function () {
 
         context('with client script enabled', () => {
           it('throws a FetchDocumentError error', async () => {
-            await expect(fetch({
-              url: url404,
-              executeClientScripts: true,
-              cssSelectors: 'body',
-            })).to.be.rejectedWith(FetchDocumentError, /404/);
+            await expect(fetch({ url: url404, executeClientScripts: true, cssSelectors: 'body' })).to.be.rejectedWith(FetchDocumentError, /404/);
           });
         });
       });
@@ -184,7 +171,7 @@ describe('Fetcher', function () {
         });
       });
 
-      describe('When there is a certificate error', () => {
+      describe('when there is a certificate error', () => {
         context('when website has a self signed certificate', () => {
           const selfSignedSslUrl = 'https://self-signed.badssl.com/';
 
