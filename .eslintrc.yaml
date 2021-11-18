@@ -88,14 +88,13 @@ rules:
     - separate-lines
 
 overrides:
-- files:
-  - src/**/*test.js
-  - scripts/validation/*.js
-  rules:
-    func-names: 0
-- files:
-  - scripts/**/*.js
-  rules:
-    func-names: 0
-    import/no-extraneous-dependencies: 0
-
+  - files:
+      - src/**/*test.js
+      - scripts/validation/*.js
+    rules:
+      func-names: 0
+  - files:
+      - scripts/**/*.js
+    rules:
+      func-names: 0
+      import/no-extraneous-dependencies: 0
