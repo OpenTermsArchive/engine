@@ -1,9 +1,0 @@
-{
-  "name": "TousAntiCovid",
-  "documents": {
-    "Privacy Policy": {
-      "fetch": "https://bonjour.tousanticovid.gouv.fr/privacy-en.html",
-      "select": ["div:nth-child(1)"]
-    }
-  }
-}
