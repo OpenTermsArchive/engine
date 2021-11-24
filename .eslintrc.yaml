@@ -95,6 +95,7 @@ overrides:
       func-names: 0
   - files:
       - scripts/**/*.js
+      - bin/**/*.js
     rules:
       func-names: 0
       import/no-extraneous-dependencies: 0
