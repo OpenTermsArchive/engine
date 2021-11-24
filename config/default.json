@@ -1,5 +1,8 @@
 {
-  "serviceDeclarationsPath": "./services",
+  "services": {
+    "declarationsPath": "../services-all/declarations",
+    "documentTypesPath": "../services-all/document-types.json"
+  },
   "history": {
     "snapshotsPath": "./data/snapshots",
     "versionsPath": "./data/versions",

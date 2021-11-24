@@ -1,6 +1,6 @@
 import fsApi from 'fs';
 import path from 'path';
-import { fileURLToPath, pathToFileURL } from 'url';
+import { pathToFileURL } from 'url';
 
 import config from 'config';
 import simpleGit from 'simple-git';
@@ -9,12 +9,8 @@ import DocumentDeclaration from './documentDeclaration.js';
 import Service from './service.js';
 
 const fs = fsApi.promises;
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const SERVICE_DECLARATIONS_PATH = path.resolve(
-  __dirname,
-  '../../..',
-  config.get('serviceDeclarationsPath'),
-);
+
+const SERVICE_DECLARATIONS_PATH = getServicesDeclarationsPath();
 
 export async function load() {
   const services = {};
@@ -190,6 +186,38 @@ async function loadServiceHistoryFiles(serviceId) {
     declaration: serviceHistory || {},
     filters: serviceFiltersHistory || {},
   };
+}
+
+export function getServicesDeclarationsPath() {
+  let serviceDeclarationsPath = path.resolve(
+    process.cwd(),
+    './declarations',
+  );
+
+  if (config.has('services.declarationsPath')) {
+    serviceDeclarationsPath = path.resolve(
+      process.cwd(),
+      config.get('services.declarationsPath'),
+    );
+  }
+
+  return serviceDeclarationsPath;
+}
+
+export function getDocumentTypesPath() {
+  let documentTypesPath = path.resolve(
+    process.cwd(),
+    './document-types.json',
+  );
+
+  if (config.has('services.declarationsPath')) {
+    documentTypesPath = path.resolve(
+      process.cwd(),
+      config.get('services.documentTypesPath'),
+    );
+  }
+
+  return documentTypesPath;
 }
 
 export async function getIdsOfModified() {
