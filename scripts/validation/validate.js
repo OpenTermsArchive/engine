@@ -1,10 +1,8 @@
 import fsApi from 'fs';
 import path from 'path';
-import { fileURLToPath } from 'url';
 
 import Ajv from 'ajv';
 import chai from 'chai';
-import config from 'config';
 import jsonSourceMap from 'json-source-map';
 
 import fetch, { launchHeadlessBrowser, stopHeadlessBrowser } from '../../src/archivist/fetcher/index.js';
@@ -15,22 +13,25 @@ import serviceHistorySchema from './service.history.schema.js';
 import serviceSchema from './service.schema.js';
 
 const fs = fsApi.promises;
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
 const { expect } = chai;
-const rootPath = path.join(__dirname, '../..');
+
 const MIN_DOC_LENGTH = 100;
-const filePathRelativeToRoot = path
-  .relative(rootPath, fileURLToPath(import.meta.url))
-  .split(path.sep)
-  .join('/'); // Convert possible Windows path to POSIX version from args
 
-const args = process.argv.slice(process.argv.indexOf(filePathRelativeToRoot) + 1); // Keep only args that are after the script filename
+const args = process.argv.slice(2); // Keep only args that are after the script filename
 
-const schemaOnly = args.includes('--schema-only');
+let schemaOnly = false;
+
+if (args.includes('--schema-only')) {
+  schemaOnly = true;
+  args.splice(args.indexOf('--schema-only'), 1);
+}
+
 const modifiedOnly = args.includes('--modified-only');
-let servicesToValidate = args.filter(arg => !arg.startsWith('--'));
+let servicesToValidate = args;
 
 (async () => {
+  const SERVICE_DECLARATIONS_PATH = services.getServicesDeclarationsPath();
   const serviceDeclarations = await services.loadWithHistory();
 
   if (modifiedOnly) {
@@ -56,7 +57,7 @@ let servicesToValidate = args.filter(arg => !arg.startsWith('--'));
 
       describe(serviceId, async () => {
         it('has a valid declaration', async () => {
-          const declaration = JSON.parse(await fs.readFile(path.join(rootPath, config.get('serviceDeclarationsPath'), `${serviceId}.json`)));
+          const declaration = JSON.parse(await fs.readFile(path.join(SERVICE_DECLARATIONS_PATH, `${serviceId}.json`)));
 
           assertValid(serviceSchema, declaration);
         });
@@ -64,8 +65,7 @@ let servicesToValidate = args.filter(arg => !arg.startsWith('--'));
         if (service.hasHistory()) {
           it('has a valid history declaration', async () => {
             const declarationHistory = JSON.parse(await fs.readFile(path.join(
-              rootPath,
-              config.get('serviceDeclarationsPath'),
+              SERVICE_DECLARATIONS_PATH,
               `${serviceId}.history.json`,
             )));
 

@@ -1,6 +1,0 @@
-{
-  "history": {
-    "snapshotsPath": "./test/data/snapshots",
-    "versionsPath": "./test/data/versions"
-  }
-}

@@ -21,7 +21,7 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "posttest": "npm run lint",
-    "test": "cross-env NODE_ENV=test mocha --file './test/helper.js' --recursive \"./src/**/*.test.js\" --recursive \"./services/**/*.test.js\" --exit",
+    "test": "cross-env NODE_ENV=test mocha --file './test/helper.js' --recursive \"./src/**/*.test.js\" --exit",
     "test:debug": "cross-env NODE_ENV=test mocha --file './test/helper.js' --recursive \"./src/**/*.test.js\" --inspect-brk --exit",
     "validate": "cross-env NODE_ENV=validation npx --node-arg=--unhandled-rejections=strict --node-arg=--max-http-header-size=32768 node_modules/.bin/mocha --delay --exit --file './test/helper.js' scripts/validation/validate.js",
     "validate:schema": "npm run validate -- --schema-only",
