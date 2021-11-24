@@ -11,7 +11,6 @@
     "export": "node scripts/export/makedataset.js",
     "release": "node scripts/release/build_release.js",
     "start": "node --max-http-header-size=32768 src/index.js",
-    "start:modified": "node --max-http-header-size=32768 src/index.js -- --modified-only",
     "start:prod": "cross-env NODE_ENV=production node --max-http-header-size=32768  src/index.js",
     "start:scheduler": "node --max-http-header-size=32768 src/index.js --schedule",
     "start:scheduler:prod": "cross-env NODE_ENV=production node --max-http-header-size=32768 src/index.js --schedule",
@@ -24,8 +23,7 @@
     "test": "cross-env NODE_ENV=test mocha --file './test/helper.js' --recursive \"./src/**/*.test.js\" --exit",
     "test:debug": "cross-env NODE_ENV=test mocha --file './test/helper.js' --recursive \"./src/**/*.test.js\" --inspect-brk --exit",
     "validate": "cross-env NODE_ENV=validation npx --node-arg=--unhandled-rejections=strict --node-arg=--max-http-header-size=32768 node_modules/.bin/mocha --delay --exit --file './test/helper.js' scripts/validation/validate.js",
-    "validate:schema": "npm run validate -- --schema-only",
-    "validate:modified": "npm run validate -- --modified-only"
+    "validate:schema": "npm run validate -- --schema-only"
   },
   "repository": {
     "type": "git",

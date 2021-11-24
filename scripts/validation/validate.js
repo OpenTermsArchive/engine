@@ -27,16 +27,13 @@ if (args.includes('--schema-only')) {
   args.splice(args.indexOf('--schema-only'), 1);
 }
 
-const modifiedOnly = args.includes('--modified-only');
 let servicesToValidate = args;
 
 (async () => {
   const SERVICE_DECLARATIONS_PATH = services.getServicesDeclarationsPath();
   const serviceDeclarations = await services.loadWithHistory();
 
-  if (modifiedOnly) {
-    servicesToValidate = await services.getIdsOfModified();
-  } else if (!servicesToValidate.length) {
+  if (!servicesToValidate.length) {
     servicesToValidate = Object.keys(serviceDeclarations);
   }
 

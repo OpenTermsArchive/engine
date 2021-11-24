@@ -3,7 +3,6 @@ import path from 'path';
 import { pathToFileURL } from 'url';
 
 import config from 'config';
-import simpleGit from 'simple-git';
 
 import DocumentDeclaration from './documentDeclaration.js';
 import Service from './service.js';
@@ -218,26 +217,6 @@ export function getDocumentTypesPath() {
   }
 
   return documentTypesPath;
-}
-
-export async function getIdsOfModified() {
-  const __dirname = path.dirname(new URL(import.meta.url).pathname);
-  const rootPath = path.join(__dirname, '../../../');
-
-  const git = simpleGit(rootPath, { maxConcurrentProcesses: 1 });
-  const committedFiles = await git.diff([ '--name-only', 'master...HEAD', '--', 'services/*.json' ]);
-  const status = await git.status();
-  const modifiedFiles = [
-    ...status.not_added, // Files created but not already in staged area
-    ...status.modified, // Files modified
-    ...status.created, // Files created and in the staged area
-    ...status.renamed.map(({ to }) => to), // Files renamed
-    ...committedFiles.trim().split('\n'), // Files committed
-  ];
-
-  return modifiedFiles
-    .filter(fileName => fileName.match(/services.*\.json/) && !fileName.includes('.history.json'))
-    .map(filePath => path.basename(filePath, '.json'));
 }
 
 async function fileExists(filePath) {
