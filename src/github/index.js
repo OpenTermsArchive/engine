@@ -131,12 +131,15 @@ export default class GitHub {
         this.cachedIssues[qOnRepo] = { lastUpdatedAt: new Date().getTime(), items: foundItems };
       }
       const items = this.cachedIssues[qOnRepo].items || [];
-
       // baseUrl should be the way to go instead of this ugly filter
       // that may not work in case there are too many issues
       // but it goes with a 404 using octokit
       // baseUrl: `https://api.github.com/${process.env.GITHUB_REPO}`,
-      return items.filter(item => item.repository_url.endsWith(`${params.owner}/${params.repo}`) && item.title === title);
+      const itemsFromRepo = items.filter(item => item.repository_url.endsWith(`${params.owner}/${params.repo}`) && item.title === title);
+
+      logger.info(`Found ${itemsFromRepo.length} issues with name "${qOnRepo}" (on a total of ${items.length} issues cross-repo)`);
+
+      return itemsFromRepo;
     } catch (e) {
       logger.error('Could not search issue');
       logger.error(e.toString());
@@ -165,6 +168,7 @@ export default class GitHub {
 
         if (existingIssue) {
           logger.info(`🤖 Creating Github issue for ${title}: ${existingIssue.html_url}`);
+          logger.info('Found 0 existing issues with', JSON.stringify({ ...this.commonParams, title, q: `is:issue label:${labels.join(',')}` }));
         } else {
           logger.error(`🤖 Could not create Github issue for ${title}`);
         }
