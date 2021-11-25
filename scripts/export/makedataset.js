@@ -5,7 +5,7 @@ import { fileURLToPath } from 'url';
 import config from 'config';
 import fse from 'fs-extra';
 
-import Git from '../../src/app/history/git.js';
+import Git from '../../src/archivist/history/git.js';
 
 const fs = fsApi.promises;
 

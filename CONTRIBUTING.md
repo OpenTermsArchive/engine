@@ -242,7 +242,7 @@ You can also learn more about [usual noise](https://github.com/ambanum/OpenTerms
 
 #### Document type
 
-Great, your document declaration is now almost complete! We simply need to write it under the appropriate document type in the `documents` JSON object within the service declaration. In order to distinguish between the many documents that can be associated with a service and enable cross-services comparison of similar documents, we maintain a unique list of document types. You can find the list of allowed values for the `<document type>` key in [`/src/app/types.json`](./src/app/types.json).
+Great, your document declaration is now almost complete! We simply need to write it under the appropriate document type in the `documents` JSON object within the service declaration. In order to distinguish between the many documents that can be associated with a service and enable cross-services comparison of similar documents, we maintain a unique list of document types. You can find the list of allowed values for the `<document type>` key in [`/src/archivist/types.json`](./src/archivist/types.json).
 
 The types might not always match the exact name given by the service provider. For example, some providers might call their document “Terms and Conditions” or “Terms of Use” instead of “Terms of Service”. The document type does not have to match the exact name, it only has to match the _commitment_ that is taken.
 

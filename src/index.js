@@ -2,8 +2,8 @@ import scheduler from 'node-schedule';
 
 import { publishRelease } from '../scripts/release/releasedataset.js';
 
-import Archivist from './app/index.js';
-import * as services from './app/services/index.js';
+import Archivist from './archivist/index.js';
+import * as services from './archivist/services/index.js';
 import GitHub from './github/index.js';
 import logger from './logger/index.js';
 import Notifier from './notifier/index.js';

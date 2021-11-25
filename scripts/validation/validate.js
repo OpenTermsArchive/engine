@@ -7,9 +7,9 @@ import chai from 'chai';
 import config from 'config';
 import jsonSourceMap from 'json-source-map';
 
-import fetch, { launchHeadlessBrowser, stopHeadlessBrowser } from '../../src/app/fetcher/index.js';
-import filter from '../../src/app/filter/index.js';
-import * as services from '../../src/app/services/index.js';
+import fetch, { launchHeadlessBrowser, stopHeadlessBrowser } from '../../src/archivist/fetcher/index.js';
+import filter from '../../src/archivist/filter/index.js';
+import * as services from '../../src/archivist/services/index.js';
 
 import serviceHistorySchema from './service.history.schema.js';
 import serviceSchema from './service.schema.js';

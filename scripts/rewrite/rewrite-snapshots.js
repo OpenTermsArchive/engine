@@ -3,7 +3,7 @@ import { fileURLToPath, pathToFileURL } from 'url';
 
 import config from 'config';
 
-import Git from '../../src/app/history/git.js';
+import Git from '../../src/archivist/history/git.js';
 
 import * as initializer from './initializer/index.js';
 import * as renamer from './renamer/index.js';
@@ -44,7 +44,7 @@ let history;
     await initializer.initReadmeAndLicense(targetRepo, SNAPSHOTS_TARGET_PATH, readmeCommit.date);
   }
 
-  history = await import(pathToFileURL(path.resolve(ROOT_PATH, 'src/app/history/index.js'))); // history module needs the target repo to be initiliazed. So loads it after target repo initialization.
+  history = await import(pathToFileURL(path.resolve(ROOT_PATH, 'src/archivist/history/index.js'))); // history module needs the target repo to be initiliazed. So loads it after target repo initialization.
   await history.init();
 
   const filteredCommits = commits.filter(({ message }) =>

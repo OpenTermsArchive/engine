@@ -2,7 +2,7 @@ import fsApi from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-import Git from '../../../src/app/history/git.js';
+import Git from '../../../src/archivist/history/git.js';
 import { fileExists } from '../utils.js';
 
 const fs = fsApi.promises;
