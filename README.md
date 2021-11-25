@@ -129,9 +129,10 @@ We provide a database of snapshots recorded each time there is a change in the t
 
 ## Contributing
 
+See [CONTRIBUTING](CONTRIBUTING.md).
 ### Adding a new service
 
-See [CONTRIBUTING](CONTRIBUTING.md).
+See [CONTRIBUTING](https://github.com/OpenTermsArchive/services-all/CONTRIBUTING.md) in repository [OpenTermsArchive/services-all](https://github.com/OpenTermsArchive/services-all).
 
 ## Using locally
 
