@@ -14,7 +14,7 @@ import * as services from './services/index.js';
 // - too many requests on the same endpoint yield 403
 // - sometimes when creating a commit no SHA are returned for unknown reasons
 const MAX_PARALLEL_DOCUMENTS_TRACKS = 1;
-const MAX_PARALLEL_REFILTERS = 1;
+const MAX_PARALLEL_REFILTERS = 10;
 
 export const AVAILABLE_EVENTS = [
   'snapshotRecorded',
