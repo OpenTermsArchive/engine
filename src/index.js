@@ -13,7 +13,7 @@ const modifiedOnly = args.includes('--modified-only');
 const refilterOnly = args.includes('--refilter-only');
 const schedule = args.includes('--schedule');
 
-(async () => {
+(async function OpenTermArchive() {
   const archivist = new Archivist();
 
   archivist.attach(logger);
@@ -87,4 +87,4 @@ const schedule = args.includes('--schedule');
     await publishRelease();
     logger.info(`End Release ${new Date()}`);
   });
-})();
+}());
