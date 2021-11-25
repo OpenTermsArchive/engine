@@ -25,6 +25,18 @@
   tags:
     - setup
 
+- name: Clone services declarations Repo
+  git:
+    repo: '{{ services_repository }}'
+    dest: '/home/{{ ansible_user }}/{{ services_directory }}'
+    force: yes
+    accept_hostkey: yes
+    key_file: '/home/{{ ansible_user }}/.ssh/ota-bot-key'
+  register: git_clone_app_finished
+  tags:
+    - setup
+    - update
+
 - name: Stop OpenTermsArchive
   command: pm2 stop "{{ app }}"
   ignore_errors: yes
