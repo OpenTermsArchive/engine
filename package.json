@@ -82,5 +82,8 @@
     "user-agents": "^1.0.836",
     "winston": "^3.3.3",
     "winston-mail": "^2.0.0"
+  },
+  "bin": {
+    "ota-validate": "./bin/validate.js"
   }
 }
