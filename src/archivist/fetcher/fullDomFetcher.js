@@ -8,7 +8,7 @@ import { FetchDocumentError } from './errors.js';
 puppeteer.use(StealthPlugin());
 
 const PUPPETEER_TIMEOUT = 30 * 1000; // 30 seconds in ms
-
+const WAIT_FOR_ELEMENTS_TIMEOUT = config.has('fetcher.waitForElementsTimeout') ? config.get('fetcher.waitForElementsTimeout') : 10 * 1000; // 10 seconds in ms
 let browser;
 
 export default async function fetch(url, cssSelectors) {
@@ -37,7 +37,7 @@ export default async function fetch(url, cssSelectors) {
       throw new FetchDocumentError(`Received HTTP code ${statusCode} when trying to fetch '${url}'`);
     }
 
-    const waitForSelectorsPromises = selectors.map(selector => page.waitForSelector(selector, { timeout: config.get('fetcher.waitForElementsTimeout') }));
+    const waitForSelectorsPromises = selectors.map(selector => page.waitForSelector(selector, { timeout: WAIT_FOR_ELEMENTS_TIMEOUT }));
 
     // We expect all elements to be present on the page…
     await Promise.all(waitForSelectorsPromises).catch(error => {
