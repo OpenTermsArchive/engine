@@ -150,6 +150,12 @@ cd OpenTermsArchive
 npm install
 ```
 
+Clone services declarations at the same level of OpenTermsArchive directory:
+```sh
+cd ..
+git clone https://github.com/OpenTermsArchive/services-all.git
+```
+
 ### Setting up the database
 
 Initialize the database:
