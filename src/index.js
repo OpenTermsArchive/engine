@@ -19,7 +19,7 @@ const schedule = args.includes('--schedule');
   archivist.attach(logger);
   await archivist.init();
 
-  logger.info('Starting Service');
+  logger.info('Start Open Terms Archive\n');
 
   let serviceIds = args.filter(arg => !arg.startsWith('--'));
 
