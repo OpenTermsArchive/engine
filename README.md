@@ -166,7 +166,10 @@ The default configuration can be read and changed in `config/default.json`.
 
 ```json
 {
-  "serviceDeclarationsPath": "Directory containing services declarations and associated filters.",
+  "service": {
+    "declarationsPath": "Directory containing services declarations and associated filters.",
+    "documentTypesPath": "File containing document types."
+  },
   "history": {
     "snapshotsPath": "Snapshots database directory path, relative to the root of this project",
     "versionsPath": "Versions database directory path, relative to the root of this project",
