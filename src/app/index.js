@@ -9,6 +9,10 @@ import filter from './filter/index.js';
 import * as history from './history/index.js';
 import * as services from './services/index.js';
 
+// The parallel handling feature is currently set to a parallelism of 1 on document tracking
+// because when it's higher there are two issues:
+// - too many requests on the same endpoint yield 403
+// - sometimes when creating a commit no SHA are returned for unknown reasons
 const MAX_PARALLEL_DOCUMENTS_TRACKS = 1;
 const MAX_PARALLEL_REFILTERS = 1;
 
