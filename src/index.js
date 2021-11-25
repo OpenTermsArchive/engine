@@ -14,10 +14,10 @@ const refilterOnly = args.includes('--refilter-only');
 const schedule = args.includes('--schedule');
 
 (async () => {
-  const app = new Archivist();
+  const archivist = new Archivist();
 
-  app.attach(logger);
-  await app.init();
+  archivist.attach(logger);
+  await archivist.init();
 
   logger.info('Starting Service');
 
@@ -28,7 +28,7 @@ const schedule = args.includes('--schedule');
   }
 
   serviceIds = serviceIds.filter(serviceId => {
-    const isServiceDeclared = app.serviceDeclarations[serviceId];
+    const isServiceDeclared = archivist.serviceDeclarations[serviceId];
 
     if (!isServiceDeclared) {
       logger.warn(`Service ${serviceId} does not exist and will be ignored.`);
@@ -43,14 +43,14 @@ const schedule = args.includes('--schedule');
     return;
   }
 
-  serviceIds = serviceIds.length ? serviceIds : app.serviceIds;
+  serviceIds = serviceIds.length ? serviceIds : archivist.serviceIds;
 
-  const numberOfDocuments = serviceIds.reduce((acc, serviceId) => acc + app.serviceDeclarations[serviceId].getNumberOfDocuments(), 0);
+  const numberOfDocuments = serviceIds.reduce((acc, serviceId) => acc + archivist.serviceDeclarations[serviceId].getNumberOfDocuments(), 0);
 
   serviceIds = serviceIds.sort((a, b) => a.localeCompare(b));
 
   logger.info(`👇 Refiltering ${numberOfDocuments} documents from ${serviceIds.length} services…`);
-  await app.refilterAndRecord(serviceIds);
+  await archivist.refilterAndRecord(serviceIds);
   logger.info(`👆 Refiltered ${numberOfDocuments} documents from ${serviceIds.length} services.\n`);
 
   if (refilterOnly) {
@@ -58,15 +58,15 @@ const schedule = args.includes('--schedule');
   }
 
   if (process.env.NODE_ENV === 'production') {
-    app.attach(new Notifier(app.serviceDeclarations));
+    archivist.attach(new Notifier(archivist.serviceDeclarations));
   }
 
   if (process.env.GITHUB_TOKEN) {
-    app.attach(new GitHub());
+    archivist.attach(new GitHub());
   }
 
   logger.info(`👇 Start tracking changes of ${numberOfDocuments} documents from ${serviceIds.length} services…`);
-  await app.trackChanges(serviceIds);
+  await archivist.trackChanges(serviceIds);
   logger.info(`👆 Tracked changes of ${numberOfDocuments} documents from ${serviceIds.length} services.`);
 
   if (!schedule) {
@@ -77,7 +77,7 @@ const schedule = args.includes('--schedule');
   logger.info('Documents will be tracked at minute 30 past every 6 hours.');
   scheduler.scheduleJob('30 */6 * * *', async () => {
     logger.info(`Start tracking changes of ${numberOfDocuments} documents from ${serviceIds.length} services…`);
-    await app.trackChanges(serviceIds);
+    await archivist.trackChanges(serviceIds);
     logger.info(`Tracked changes of ${numberOfDocuments} documents from ${serviceIds.length} services.`);
   });
 
