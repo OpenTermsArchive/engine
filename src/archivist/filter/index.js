@@ -17,7 +17,7 @@ export const LINKS_TO_CONVERT_SELECTOR = 'a[href]:not([href^="#"])';
 
 const { PdfTransformer } = mardownPdf;
 const { CiceroMarkTransformer } = ciceroMark;
-const pdfTransformer = new PdfTransformer();
+
 const ciceroMarkTransformer = new CiceroMarkTransformer();
 
 export default async function filter({ content, mimeType, documentDeclaration }) {
@@ -85,7 +85,7 @@ export async function filterHTML({ content, documentDeclaration }) {
 
 export async function filterPDF({ content: pdfBuffer }) {
   try {
-    const ciceroMarkdown = await pdfTransformer.toCiceroMark(pdfBuffer);
+    const ciceroMarkdown = await PdfTransformer.toCiceroMark(pdfBuffer);
 
     return ciceroMarkTransformer.toMarkdown(ciceroMarkdown);
   } catch (error) {

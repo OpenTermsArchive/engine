@@ -47,8 +47,8 @@
     "sinon-chai": "^3.7.0"
   },
   "dependencies": {
-    "@accordproject/markdown-cicero": "^0.14.0",
-    "@accordproject/markdown-pdf": "^0.12.4",
+    "@accordproject/markdown-cicero": "^0.14.1",
+    "@accordproject/markdown-pdf": "^0.14.1",
     "abort-controller": "^3.0.0",
     "ajv": "^6.12.6",
     "async": "^3.2.2",
