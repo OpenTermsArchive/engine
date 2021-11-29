@@ -13,7 +13,7 @@ const modifiedOnly = args.includes('--modified-only');
 const refilterOnly = args.includes('--refilter-only');
 const schedule = args.includes('--schedule');
 
-(async function OpenTermArchive() {
+(async function startOpenTermsArchive() {
   const archivist = new Archivist();
 
   archivist.attach(logger);
