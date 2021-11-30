@@ -25,7 +25,7 @@
   tags:
     - setup
 
-- name: Clone services declarations Repo
+- name: Install services declarations
   git:
     repo: '{{ services_repository }}'
     dest: '/home/{{ ansible_user }}/{{ services_directory }}'
