@@ -13,9 +13,9 @@ To reflect this change, if you already have this project on your local, go to th
 
 ## 2021-11-25 Externalize services declarations
 
-Services declarations as now its [own repository](https://github.com/OpenTermsArchive/services-all).
+Services declarations are now declared in their [own repository](https://github.com/OpenTermsArchive/services-all).
 
-You now have to clone this repository on your own to use all already defined services declaration on your local
+In order to use all the defined services locally, you now have to clone this repository:
 
 ```
     cd ..
