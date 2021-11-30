@@ -1,5 +1,5 @@
-import DocumentDeclaration from '../../src/app/services/documentDeclaration.js';
-import Service from '../../src/app/services/service.js';
+import DocumentDeclaration from '../../src/archivist/services/documentDeclaration.js';
+import Service from '../../src/archivist/services/service.js';
 
 const service = new Service({
   id: 'service_A',
