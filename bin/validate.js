@@ -20,7 +20,7 @@ const VALIDATE_PATH = path.resolve(__dirname, '../scripts/validation/validate.js
     .on('fail', () => { hasFailedTests = true; })
     .on('end', () => {
       if (hasFailedTests) {
-        process.exit(1);
+        process.exitCode = 1;
       }
     });
 })();
