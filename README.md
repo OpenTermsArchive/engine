@@ -20,7 +20,7 @@
   - [Unsubscribe](#unsubscribe)
 - [Analysing the snapshots history](#analysing-the-snapshots-history)
 - [Contributing](#contributing)
-  - [Adding a new service](#adding-a-new-service)
+  - [Adding a new service](#adding-or-updating-a-new-service)
 - [Using locally](#using-locally)
   - [Installing](#installing)
   - [Setting up the database](#setting-up-the-database)
@@ -130,9 +130,10 @@ We provide a database of snapshots recorded each time there is a change in the t
 ## Contributing
 
 See [CONTRIBUTING](CONTRIBUTING.md).
-### Adding a new service
 
-See [CONTRIBUTING](https://github.com/OpenTermsArchive/services-all/CONTRIBUTING.md) in repository [OpenTermsArchive/services-all](https://github.com/OpenTermsArchive/services-all).
+### Adding or updating a new service
+
+See the [CONTRIBUTING](https://github.com/OpenTermsArchive/services-all/CONTRIBUTING.md) of repository [OpenTermsArchive/services-all](https://github.com/OpenTermsArchive/services-all).
 
 ## Using locally
 
@@ -150,7 +151,7 @@ cd OpenTermsArchive
 npm install
 ```
 
-Clone services declarations at the same level of OpenTermsArchive directory:
+Clone services declarations at the same level as the OpenTermsArchive directory:
 ```sh
 cd ..
 git clone https://github.com/OpenTermsArchive/services-all.git
