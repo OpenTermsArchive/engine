@@ -98,35 +98,46 @@ export default class GitHub {
     try {
       const qOnRepo = `${q} repo:${params.owner}/${params.repo}`;
 
-      const nbPerPage = 100;
-      const request = {
-        ...params,
-        q: qOnRepo,
-        per_page: nbPerPage,
-        page: 1,
-      };
+      if (!this.cachedIssues[qOnRepo]
+        || (this.cachedIssues[qOnRepo].lastUpdated && new Date().getTime() - this.cachedIssues[qOnRepo].lastUpdated > 1000 * 60 * 30) // cache is more than 30 minutes
+      ) {
+        const nbPerPage = 100;
+        const request = {
+          ...params,
+          q: qOnRepo,
+          per_page: nbPerPage,
+          page: 1,
+        };
 
-      const { data } = await this.octokit.rest.search.issuesAndPullRequests(request);
+        const { data } = await this.octokit.rest.search.issuesAndPullRequests(request);
 
-      let foundItems = data.items;
+        let foundItems = data.items;
 
-      const nbPages = Math.ceil(data.total_count / nbPerPage);
+        // we need to do this because error being asynchronous, if we do not and wait for
+        // subsequent pages to be fetch, we could end up in a situation when
+        // a new error comes in and fetches also the first page as cache is not setup yet
+        this.cachedIssues[qOnRepo] = { lastUpdatedAt: new Date().getTime(), items: foundItems };
 
-      if (nbPages > 1) {
-        for (let page = 2; page <= nbPages; page++) {
-          const { data: paginatedData } = await this.octokit.rest.search.issuesAndPullRequests({ ...request, page }); // eslint-disable-line no-await-in-loop
+        const nbPages = Math.ceil(data.total_count / nbPerPage);
 
-          foundItems = [ ...foundItems, ...paginatedData.items ];
+        if (nbPages > 1) {
+          for (let page = 2; page <= nbPages; page++) {
+            const { data: paginatedData } = await this.octokit.rest.search.issuesAndPullRequests({ ...request, page }); // eslint-disable-line no-await-in-loop
+
+            foundItems = [ ...foundItems, ...paginatedData.items ];
+          }
         }
-      }
 
+        this.cachedIssues[qOnRepo] = { lastUpdatedAt: new Date().getTime(), items: foundItems };
+      }
+      const items = this.cachedIssues[qOnRepo].items || [];
       // baseUrl should be the way to go instead of this ugly filter
       // that may not work in case there are too many issues
       // but it goes with a 404 using octokit
       // baseUrl: `https://api.github.com/${process.env.GITHUB_REPO}`,
-      const itemsFromRepo = foundItems.filter(item => item.repository_url.endsWith(`${params.owner}/${params.repo}`) && item.title === title);
+      const itemsFromRepo = items.filter(item => item.repository_url.endsWith(`${params.owner}/${params.repo}`) && item.title === title);
 
-      logger.info(`Found ${itemsFromRepo.length} issues with title "${title}" and q "${qOnRepo}" (on a total of ${foundItems.length} issues cross-repo)`);
+      logger.info(`Found ${itemsFromRepo.length} issues with name "${qOnRepo}" (on a total of ${items.length} issues cross-repo)`);
 
       return itemsFromRepo;
     } catch (e) {
