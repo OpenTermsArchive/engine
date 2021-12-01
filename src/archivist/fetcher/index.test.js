@@ -18,7 +18,7 @@ chai.use(chaiAsPromised);
 const termsHTML = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>First provider TOS</title></head><body><h1>Terms of service</h1><p>Dapibus quis diam sagittis</p></body></html>';
 
 describe('Fetcher', function () {
-  this.timeout(5000);
+  this.timeout(10000);
 
   before(launchHeadlessBrowser);
 
