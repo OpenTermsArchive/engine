@@ -33,6 +33,11 @@ let servicesToValidate = args;
   const { SERVICE_DECLARATIONS_PATH } = services;
   const serviceDeclarations = await services.loadWithHistory();
 
+  // If services to validate are passed as a string with services id separated by a newline character
+  if (servicesToValidate.length == 1 && servicesToValidate[0].includes('\n')) {
+    servicesToValidate = servicesToValidate[0].split('\n').filter(value => value);
+  }
+
   if (!servicesToValidate.length) {
     servicesToValidate = Object.keys(serviceDeclarations);
   }
