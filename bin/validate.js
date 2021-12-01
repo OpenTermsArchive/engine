@@ -1,12 +1,27 @@
 #! /usr/bin/env node
-
+import { createRequire } from 'module';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
+import config from 'config';
 import Mocha from 'mocha';
 
-const mocha = new Mocha({});
+const require = createRequire(import.meta.url);
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+process.env.SUPPRESS_NO_CONFIG_WARNING = 'y';
+
+const defaultConfigs = require(path.resolve(__dirname, '../config/default.json')); // eslint-disable-line import/no-dynamic-require
+
+// Initialise configs to allow clients of this module to use it without requiring node-config in their own application.
+// see https://github.com/lorenwest/node-config/wiki/Sub-Module-Configuration
+config.util.setModuleDefaults('services', {
+  declarationsPath: path.resolve(process.cwd(), './declarations'),
+  documentTypesPath: path.resolve(process.cwd(), './document-types.json'),
+});
+config.util.setModuleDefaults('fetcher', defaultConfigs.fetcher);
+
+const mocha = new Mocha({});
 const VALIDATE_PATH = path.resolve(__dirname, '../scripts/validation/validate.js');
 
 (async () => {

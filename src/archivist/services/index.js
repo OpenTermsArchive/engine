@@ -1,6 +1,6 @@
 import fsApi from 'fs';
 import path from 'path';
-import { pathToFileURL } from 'url';
+import { fileURLToPath, pathToFileURL } from 'url';
 
 import config from 'config';
 
@@ -9,7 +9,10 @@ import Service from './service.js';
 
 const fs = fsApi.promises;
 
-const SERVICE_DECLARATIONS_PATH = getServicesDeclarationsPath();
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+export const SERVICE_DECLARATIONS_PATH = path.resolve(__dirname, '../../..', config.get('services.declarationsPath'));
+export const DOCUMENT_TYPES_PATH = path.resolve(__dirname, '../../..', config.get('services.documentTypesPath'));
 
 export async function load() {
   const services = {};
@@ -185,38 +188,6 @@ async function loadServiceHistoryFiles(serviceId) {
     declaration: serviceHistory || {},
     filters: serviceFiltersHistory || {},
   };
-}
-
-export function getServicesDeclarationsPath() {
-  let serviceDeclarationsPath = path.resolve(
-    process.cwd(),
-    './declarations',
-  );
-
-  if (config.has('services.declarationsPath')) {
-    serviceDeclarationsPath = path.resolve(
-      process.cwd(),
-      config.get('services.declarationsPath'),
-    );
-  }
-
-  return serviceDeclarationsPath;
-}
-
-export function getDocumentTypesPath() {
-  let documentTypesPath = path.resolve(
-    process.cwd(),
-    './document-types.json',
-  );
-
-  if (config.has('services.declarationsPath')) {
-    documentTypesPath = path.resolve(
-      process.cwd(),
-      config.get('services.documentTypesPath'),
-    );
-  }
-
-  return documentTypesPath;
 }
 
 async function fileExists(filePath) {

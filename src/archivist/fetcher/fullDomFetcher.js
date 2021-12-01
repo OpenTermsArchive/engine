@@ -8,7 +8,8 @@ import { FetchDocumentError } from './errors.js';
 puppeteer.use(StealthPlugin());
 
 const PUPPETEER_TIMEOUT = 30 * 1000; // 30 seconds in ms
-const WAIT_FOR_ELEMENTS_TIMEOUT = config.has('fetcher.waitForElementsTimeout') ? config.get('fetcher.waitForElementsTimeout') : 10 * 1000; // 10 seconds in ms
+const WAIT_FOR_ELEMENTS_TIMEOUT = config.get('fetcher.waitForElementsTimeout');
+
 let browser;
 
 export default async function fetch(url, cssSelectors) {

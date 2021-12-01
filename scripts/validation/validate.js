@@ -30,7 +30,7 @@ if (args.includes('--schema-only')) {
 let servicesToValidate = args;
 
 (async () => {
-  const SERVICE_DECLARATIONS_PATH = services.getServicesDeclarationsPath();
+  const { SERVICE_DECLARATIONS_PATH } = services;
   const serviceDeclarations = await services.loadWithHistory();
 
   if (!servicesToValidate.length) {
