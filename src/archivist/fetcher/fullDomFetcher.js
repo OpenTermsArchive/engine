@@ -7,7 +7,7 @@ import { FetchDocumentError } from './errors.js';
 
 puppeteer.use(StealthPlugin());
 
-const PUPPETEER_TIMEOUT = 30 * 1000; // 30 seconds in ms
+const NAVIGATION_TIMEOUT = config.get('fetcher.navigationTimeout');
 const WAIT_FOR_ELEMENTS_TIMEOUT = config.get('fetcher.waitForElementsTimeout');
 
 let browser;
@@ -24,7 +24,7 @@ export default async function fetch(url, cssSelectors) {
   try {
     page = await browser.newPage();
     await page.setUserAgent(new UserAgent().toString());
-    await page.setDefaultNavigationTimeout(PUPPETEER_TIMEOUT);
+    await page.setDefaultNavigationTimeout(NAVIGATION_TIMEOUT);
 
     response = await page.goto(url, { waitUntil: 'networkidle0' });
 

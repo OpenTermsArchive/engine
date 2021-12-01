@@ -16,7 +16,8 @@
     }
   },
   "fetcher": {
-    "waitForElementsTimeout": 10000
+    "waitForElementsTimeout": 10000,
+    "navigationTimeout": 45000
   },
   "logger": {
     "sendMailOnError": false
