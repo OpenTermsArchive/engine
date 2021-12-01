@@ -173,7 +173,7 @@ The default configuration can be read and changed in `config/default.json`.
 
 ```json
 {
-  "service": {
+  "services": {
     "declarationsPath": "Directory containing services declarations and associated filters.",
     "documentTypesPath": "File containing document types."
   },
