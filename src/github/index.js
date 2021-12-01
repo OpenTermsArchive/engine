@@ -49,11 +49,11 @@ export default class GitHub {
     });
   }
 
-  async onSnapshotNotChanged(serviceId, type) {
+  async onVersionNotChanged(serviceId, type) {
     await this.closeIssueIfExists({
       labels: [UPDATE_DOCUMENT_LABEL],
       title: `Fix ${serviceId} - ${type}`,
-      comment: '🤖 Closed automatically as snapshot is unchanged but data has been fetched correctly',
+      comment: '🤖 Closed automatically as version is unchanged but data has been fetched correctly',
     });
   }
 
