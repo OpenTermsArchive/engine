@@ -1,4 +1,6 @@
 #! /usr/bin/env node
+import './.env.js'; // Workaround to ensure `SUPPRESS_NO_CONFIG_WARNING` is set before config is imported
+
 import { createRequire } from 'module';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -8,8 +10,6 @@ import Mocha from 'mocha';
 
 const require = createRequire(import.meta.url);
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-
-process.env.SUPPRESS_NO_CONFIG_WARNING = 'y';
 
 const defaultConfigs = require(path.resolve(__dirname, '../config/default.json')); // eslint-disable-line import/no-dynamic-require
 
