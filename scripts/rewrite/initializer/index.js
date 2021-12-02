@@ -2,7 +2,9 @@ import fsApi from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-import Git from '../../../src/archivist/history/git.js';
+import config from 'config';
+
+import Git from '../../../src/storage-adapters/git/git.js';
 import { fileExists } from '../utils.js';
 
 const fs = fsApi.promises;
@@ -31,10 +33,9 @@ export async function initTargetRepo(targetRepoPath) {
   }
   await fs.mkdir(targetRepoPath);
 
-  const targetRepo = await new Git(targetRepoPath);
+  const targetRepo = await new Git({ path: targetRepoPath, author: config.get('recorder.versions.storage.git.author') });
 
-  await targetRepo.init();
-  await targetRepo.initConfig();
+  await targetRepo.initialize();
 
   return targetRepo;
 }

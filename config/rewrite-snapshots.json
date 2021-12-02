@@ -1,6 +1,30 @@
 {
   "recorder": {
-    "snapshotsPath": "./data/snapshots-rewritten"
+    "versions": {
+      "storage": {
+        "git": {
+          "path": "./data/versions",
+          "publish": false,
+          "snapshotsBaseUrl": "https://github.com/ambanum/OpenTermsArchive-snapshots/commit/",
+          "author": {
+            "name": "OTA Bot",
+            "email": "bot@opentermsarchive.org"
+          }
+        }
+      }
+    },
+    "snapshots": {
+      "storage": {
+        "git": {
+          "path": "./data/snapshots-rewritten",
+          "publish": false,
+          "author": {
+            "name": "OTA Bot",
+            "email": "bot@opentermsarchive.org"
+          }
+        }
+      }
+    }
   },
   "rewrite": {
     "snapshotsSourcePath": "./data/snapshots"
