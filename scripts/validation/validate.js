@@ -1,8 +1,10 @@
 import fsApi from 'fs';
 import path from 'path';
+import { fileURLToPath } from 'url';
 
 import Ajv from 'ajv';
 import chai from 'chai';
+import config from 'config';
 import jsonSourceMap from 'json-source-map';
 
 import fetch, { launchHeadlessBrowser, stopHeadlessBrowser } from '../../src/archivist/fetcher/index.js';
@@ -12,6 +14,7 @@ import * as services from '../../src/archivist/services/index.js';
 import serviceHistorySchema from './service.history.schema.js';
 import serviceSchema from './service.schema.js';
 
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const fs = fsApi.promises;
 
 const { expect } = chai;
@@ -30,7 +33,7 @@ if (args.includes('--schema-only')) {
 let servicesToValidate = args;
 
 (async () => {
-  const { SERVICE_DECLARATIONS_PATH } = services;
+  const declarationsPath = path.resolve(__dirname, '../../', config.get('services.declarationsPath'));
   const serviceDeclarations = await services.loadWithHistory();
 
   // If services to validate are passed as a string with services id separated by a newline character
@@ -59,7 +62,7 @@ let servicesToValidate = args;
 
       describe(serviceId, async () => {
         it('has a valid declaration', async () => {
-          const declaration = JSON.parse(await fs.readFile(path.join(SERVICE_DECLARATIONS_PATH, `${serviceId}.json`)));
+          const declaration = JSON.parse(await fs.readFile(path.join(declarationsPath, `${serviceId}.json`)));
 
           assertValid(serviceSchema, declaration);
         });
@@ -67,7 +70,7 @@ let servicesToValidate = args;
         if (service.hasHistory()) {
           it('has a valid history declaration', async () => {
             const declarationHistory = JSON.parse(await fs.readFile(path.join(
-              SERVICE_DECLARATIONS_PATH,
+              declarationsPath,
               `${serviceId}.history.json`,
             )));
 

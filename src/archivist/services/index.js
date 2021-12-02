@@ -8,19 +8,16 @@ import DocumentDeclaration from './documentDeclaration.js';
 import Service from './service.js';
 
 const fs = fsApi.promises;
-
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-
-export const SERVICE_DECLARATIONS_PATH = path.resolve(__dirname, '../../..', config.get('services.declarationsPath'));
-export const DOCUMENT_TYPES_PATH = path.resolve(__dirname, '../../..', config.get('services.documentTypesPath'));
+const declarationsPath = path.resolve(__dirname, '../../..', config.get('services.declarationsPath'));
 
 export async function load() {
   const services = {};
-  const fileNames = await fs.readdir(SERVICE_DECLARATIONS_PATH);
+  const fileNames = await fs.readdir(declarationsPath);
   const serviceFileNames = fileNames.filter(fileName => path.extname(fileName) == '.json' && !fileName.includes('.history.json'));
 
   await Promise.all(serviceFileNames.map(async fileName => {
-    const serviceDeclaration = JSON.parse(await fs.readFile(path.join(SERVICE_DECLARATIONS_PATH, fileName)));
+    const serviceDeclaration = JSON.parse(await fs.readFile(path.join(declarationsPath, fileName)));
     const service = new Service({
       id: path.basename(fileName, '.json'),
       name: serviceDeclaration.name,
@@ -44,7 +41,7 @@ export async function load() {
 
       if (filterNames) {
         const filterFilePath = fileName.replace('.json', '.filters.js');
-        const serviceFilters = await import(pathToFileURL(path.join(SERVICE_DECLARATIONS_PATH, filterFilePath))); // eslint-disable-line no-await-in-loop
+        const serviceFilters = await import(pathToFileURL(path.join(declarationsPath, filterFilePath))); // eslint-disable-line no-await-in-loop
 
         filters = filterNames.map(filterName => serviceFilters[filterName]);
       }
@@ -141,13 +138,13 @@ function sortHistory(history = {}) {
 }
 
 async function loadServiceHistoryFiles(serviceId) {
-  const serviceFileName = path.join(SERVICE_DECLARATIONS_PATH, `${serviceId}.json`);
+  const serviceFileName = path.join(declarationsPath, `${serviceId}.json`);
   const serviceDeclaration = JSON.parse(await fs.readFile(serviceFileName));
 
-  const serviceHistoryFileName = path.join(SERVICE_DECLARATIONS_PATH, `${serviceId}.history.json`);
-  const serviceFiltersFileName = path.join(SERVICE_DECLARATIONS_PATH, `${serviceId}.filters.js`);
+  const serviceHistoryFileName = path.join(declarationsPath, `${serviceId}.history.json`);
+  const serviceFiltersFileName = path.join(declarationsPath, `${serviceId}.filters.js`);
   const serviceFiltersHistoryFileName = path.join(
-    SERVICE_DECLARATIONS_PATH,
+    declarationsPath,
     `${serviceId}.filters.history.js`,
   );
 
