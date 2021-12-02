@@ -3,8 +3,33 @@
     "declarationsPath": "./test/services"
   },
   "history": {
-    "snapshotsPath": "./test/data/snapshots",
-    "versionsPath": "./test/data/versions"
+    "versions": {
+      "storage": {
+        "git": {
+          "path": "./test/data/versions",
+          "publish": false,
+          "publicRepository": "https://github.com/ambanum/OpenTermsArchive-versions.git",
+          "snapshotsBaseUrl": "https://github.com/ambanum/OpenTermsArchive-snapshots/commit/",
+          "author": {
+            "name": "OTA Bot",
+            "email": "bot@opentermsarchive.org"
+          }
+        }
+      }
+    },
+    "snapshots": {
+      "storage": {
+        "git": {
+          "path": "./test/data/snapshots",
+          "publish": false,
+          "publicRepository": "https://github.com/ambanum/OpenTermsArchive-snapshots.git",
+          "author": {
+            "name": "OTA Bot",
+            "email": "bot@opentermsarchive.org"
+          }
+        }
+      }
+    }
   },
   "fetcher": {
     "waitForElementsTimeout": 1000
