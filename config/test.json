@@ -1,5 +1,7 @@
 {
-  "serviceDeclarationsPath": "./test/services",
+  "services": {
+    "declarationsPath": "./test/services"
+  },
   "history": {
     "snapshotsPath": "./test/data/snapshots",
     "versionsPath": "./test/data/versions"

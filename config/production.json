@@ -1,4 +1,8 @@
 {
+  "services": {
+    "declarationsPath": "../ota-services-all/declarations",
+    "documentTypesPath": "../ota-services-all/document-types.json"
+  },
   "history": {
     "snapshotsPath": "../ota-snapshots",
     "versionsPath": "../ota-versions",

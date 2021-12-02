@@ -3,13 +3,11 @@ import scheduler from 'node-schedule';
 import { publishRelease } from '../scripts/release/releasedataset.js';
 
 import Archivist from './archivist/index.js';
-import * as services from './archivist/services/index.js';
 import GitHub from './github/index.js';
 import logger from './logger/index.js';
 import Notifier from './notifier/index.js';
 
 const args = process.argv.slice(2);
-const modifiedOnly = args.includes('--modified-only');
 const refilterOnly = args.includes('--refilter-only');
 const schedule = args.includes('--schedule');
 
@@ -23,10 +21,6 @@ const schedule = args.includes('--schedule');
 
   let serviceIds = args.filter(arg => !arg.startsWith('--'));
 
-  if (modifiedOnly) {
-    serviceIds = await services.getIdsOfModified();
-  }
-
   serviceIds = serviceIds.filter(serviceId => {
     const isServiceDeclared = archivist.serviceDeclarations[serviceId];
 
@@ -36,12 +30,6 @@ const schedule = args.includes('--schedule');
 
     return isServiceDeclared;
   });
-
-  if (modifiedOnly && !serviceIds.length) {
-    logger.warn('No services have been modified');
-
-    return;
-  }
 
   serviceIds = serviceIds.length ? serviceIds : archivist.serviceIds;
 

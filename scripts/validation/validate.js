@@ -14,28 +14,34 @@ import * as services from '../../src/archivist/services/index.js';
 import serviceHistorySchema from './service.history.schema.js';
 import serviceSchema from './service.schema.js';
 
-const fs = fsApi.promises;
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const fs = fsApi.promises;
+
 const { expect } = chai;
-const rootPath = path.join(__dirname, '../..');
+
 const MIN_DOC_LENGTH = 100;
-const filePathRelativeToRoot = path
-  .relative(rootPath, fileURLToPath(import.meta.url))
-  .split(path.sep)
-  .join('/'); // Convert possible Windows path to POSIX version from args
 
-const args = process.argv.slice(process.argv.indexOf(filePathRelativeToRoot) + 1); // Keep only args that are after the script filename
+const args = process.argv.slice(2); // Keep only args that are after the script filename
 
-const schemaOnly = args.includes('--schema-only');
-const modifiedOnly = args.includes('--modified-only');
-let servicesToValidate = args.filter(arg => !arg.startsWith('--'));
+let schemaOnly = false;
+
+if (args.includes('--schema-only')) {
+  schemaOnly = true;
+  args.splice(args.indexOf('--schema-only'), 1);
+}
+
+let servicesToValidate = args;
 
 (async () => {
+  const declarationsPath = path.resolve(__dirname, '../../', config.get('services.declarationsPath'));
   const serviceDeclarations = await services.loadWithHistory();
 
-  if (modifiedOnly) {
-    servicesToValidate = await services.getIdsOfModified();
-  } else if (!servicesToValidate.length) {
+  // If services to validate are passed as a string with services id separated by a newline character
+  if (servicesToValidate.length == 1 && servicesToValidate[0].includes('\n')) {
+    servicesToValidate = servicesToValidate[0].split('\n').filter(value => value);
+  }
+
+  if (!servicesToValidate.length) {
     servicesToValidate = Object.keys(serviceDeclarations);
   }
 
@@ -56,7 +62,7 @@ let servicesToValidate = args.filter(arg => !arg.startsWith('--'));
 
       describe(serviceId, async () => {
         it('has a valid declaration', async () => {
-          const declaration = JSON.parse(await fs.readFile(path.join(rootPath, config.get('serviceDeclarationsPath'), `${serviceId}.json`)));
+          const declaration = JSON.parse(await fs.readFile(path.join(declarationsPath, `${serviceId}.json`)));
 
           assertValid(serviceSchema, declaration);
         });
@@ -64,8 +70,7 @@ let servicesToValidate = args.filter(arg => !arg.startsWith('--'));
         if (service.hasHistory()) {
           it('has a valid history declaration', async () => {
             const declarationHistory = JSON.parse(await fs.readFile(path.join(
-              rootPath,
-              config.get('serviceDeclarationsPath'),
+              declarationsPath,
               `${serviceId}.history.json`,
             )));
 

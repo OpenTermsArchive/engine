@@ -1,4 +1,5 @@
 import AbortController from 'abort-controller';
+import config from 'config';
 import HttpProxyAgent from 'http-proxy-agent';
 import HttpsProxyAgent from 'https-proxy-agent';
 import nodeFetch, { AbortError } from 'node-fetch';
@@ -6,11 +7,11 @@ import nodeFetch, { AbortError } from 'node-fetch';
 import { FetchDocumentError } from './errors.js';
 
 const LANGUAGE = 'en';
-const TIMEOUT = 45 * 1000; // 45 seconds in ms
+const NAVIGATION_TIMEOUT = config.get('fetcher.navigationTimeout');
 
 export default async function fetch(url) {
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), TIMEOUT);
+  const timeout = setTimeout(() => controller.abort(), NAVIGATION_TIMEOUT);
 
   const options = {
     signal: controller.signal,
@@ -41,7 +42,7 @@ export default async function fetch(url) {
     };
   } catch (error) {
     if (error instanceof AbortError) {
-      throw new FetchDocumentError(`The request timed out after ${TIMEOUT / 1000} seconds.`);
+      throw new FetchDocumentError(`The request timed out after ${NAVIGATION_TIMEOUT / 1000} seconds.`);
     }
 
     throw new FetchDocumentError(error.message);

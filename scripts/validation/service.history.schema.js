@@ -1,7 +1,12 @@
 import { createRequire } from 'module';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+import config from 'config';
 
 const require = createRequire(import.meta.url);
-const TYPES = require('../../src/archivist/types.json');
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const TYPES = require(path.resolve(__dirname, '../../', config.get('services.documentTypesPath'))); // eslint-disable-line import/no-dynamic-require
 
 const AVAILABLE_TYPES_NAME = Object.keys(TYPES);
 

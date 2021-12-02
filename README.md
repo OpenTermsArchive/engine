@@ -20,7 +20,7 @@
   - [Unsubscribe](#unsubscribe)
 - [Analysing the snapshots history](#analysing-the-snapshots-history)
 - [Contributing](#contributing)
-  - [Adding a new service](#adding-a-new-service)
+  - [Adding a new service](#adding-or-updating-a-new-service)
 - [Using locally](#using-locally)
   - [Installing](#installing)
   - [Setting up the database](#setting-up-the-database)
@@ -129,9 +129,11 @@ We provide a database of snapshots recorded each time there is a change in the t
 
 ## Contributing
 
-### Adding a new service
-
 See [CONTRIBUTING](CONTRIBUTING.md).
+
+### Adding or updating a new service
+
+See the [CONTRIBUTING](https://github.com/OpenTermsArchive/services-all/CONTRIBUTING.md) of repository [OpenTermsArchive/services-all](https://github.com/OpenTermsArchive/services-all).
 
 ## Using locally
 
@@ -147,6 +149,12 @@ Clone the repository and install dependencies:
 git clone https://github.com/ambanum/OpenTermsArchive.git
 cd OpenTermsArchive
 npm install
+```
+
+Clone services declarations at the same level as the OpenTermsArchive directory:
+```sh
+cd ..
+git clone https://github.com/OpenTermsArchive/services-all.git
 ```
 
 ### Setting up the database
@@ -165,7 +173,10 @@ The default configuration can be read and changed in `config/default.json`.
 
 ```json
 {
-  "serviceDeclarationsPath": "Directory containing services declarations and associated filters.",
+  "services": {
+    "declarationsPath": "Directory containing services declarations and associated filters.",
+    "documentTypesPath": "File containing document types."
+  },
   "history": {
     "snapshotsPath": "Snapshots database directory path, relative to the root of this project",
     "versionsPath": "Versions database directory path, relative to the root of this project",
