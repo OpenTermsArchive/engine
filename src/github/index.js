@@ -96,15 +96,13 @@ export default class GitHub {
 
   async searchIssues({ title, q, ...params }) {
     try {
-      const qOnRepo = `${q} repo:${params.owner}/${params.repo}`;
-
-      if (!this.cachedIssues[qOnRepo]
-        || (this.cachedIssues[qOnRepo].lastUpdated && new Date().getTime() - this.cachedIssues[qOnRepo].lastUpdated > 1000 * 60 * 30) // cache is more than 30 minutes
+      if (!this.cachedIssues[q]
+        || (this.cachedIssues[q].lastUpdated && new Date().getTime() - this.cachedIssues[q].lastUpdated > 1000 * 60 * 30) // cache is more than 30 minutes
       ) {
         const nbPerPage = 100;
         const request = {
           ...params,
-          q: qOnRepo,
+          q,
           per_page: nbPerPage,
           page: 1,
         };
@@ -116,7 +114,7 @@ export default class GitHub {
         // we need to do this because error being asynchronous, if we do not and wait for
         // subsequent pages to be fetch, we could end up in a situation when
         // a new error comes in and fetches also the first page as cache is not setup yet
-        this.cachedIssues[qOnRepo] = { lastUpdatedAt: new Date().getTime(), items: foundItems };
+        this.cachedIssues[q] = { lastUpdatedAt: new Date().getTime(), items: foundItems };
 
         const nbPages = Math.ceil(data.total_count / nbPerPage);
 
@@ -128,16 +126,16 @@ export default class GitHub {
           }
         }
 
-        this.cachedIssues[qOnRepo] = { lastUpdatedAt: new Date().getTime(), items: foundItems };
+        this.cachedIssues[q] = { lastUpdatedAt: new Date().getTime(), items: foundItems };
       }
-      const items = this.cachedIssues[qOnRepo].items || [];
+      const items = this.cachedIssues[q].items || [];
       // baseUrl should be the way to go instead of this ugly filter
       // that may not work in case there are too many issues
       // but it goes with a 404 using octokit
       // baseUrl: `https://api.github.com/${process.env.GITHUB_REPO}`,
       const itemsFromRepo = items.filter(item => item.repository_url.endsWith(`${params.owner}/${params.repo}`) && item.title === title);
 
-      logger.info(`Found ${itemsFromRepo.length} issues with name "${qOnRepo}" (on a total of ${items.length} issues cross-repo)`);
+      logger.info(`Found ${itemsFromRepo.length} issues with title "${title}" and q "${q}" (on a total of ${items.length} issues cross-repo)`);
 
       return itemsFromRepo;
     } catch (e) {
@@ -161,7 +159,8 @@ export default class GitHub {
 
   async createIssueIfNotExists({ title, body, labels, comment }) {
     try {
-      const existingIssues = await this.searchIssues({ ...this.commonParams, title, q: `is:issue label:${labels.join(',')}` });
+      const q = `is:issue label:${labels.join(',')} repo:${this.commonParams.owner}/${this.commonParams.repo}`;
+      const existingIssues = await this.searchIssues({ ...this.commonParams, title, q });
 
       if (!existingIssues.length) {
         const existingIssue = await this.createIssue({ ...this.commonParams, title, body, labels });
@@ -169,6 +168,7 @@ export default class GitHub {
         if (existingIssue) {
           logger.info(`🤖 Creating Github issue for ${title}: ${existingIssue.html_url}`);
           logger.info('Found 0 existing issues with', JSON.stringify({ ...this.commonParams, title, q: `is:issue label:${labels.join(',')}` }));
+          this.cachedIssues[q].items.push(existingIssue);
         } else {
           logger.error(`🤖 Could not create Github issue for ${title}`);
         }
@@ -195,7 +195,7 @@ export default class GitHub {
   }
 
   async closeIssueIfExists({ title, comment, labels }) {
-    const existingIssues = await this.searchIssues({ ...this.commonParams, title, q: `is:issue is:${ISSUE_STATE_OPEN} label:${labels.join(',')}` });
+    const existingIssues = await this.searchIssues({ ...this.commonParams, title, q: `is:issue is:${ISSUE_STATE_OPEN} label:${labels.join(',')} repo:${this.commonParams.owner}/${this.commonParams.repo}` });
 
     if (existingIssues) {
       for (const existingIssue of existingIssues) {
