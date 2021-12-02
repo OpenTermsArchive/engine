@@ -1,12 +1,11 @@
 import events from 'events';
 
 import async from 'async';
-import config from 'config';
 
 import { InaccessibleContentError } from './errors.js';
 import fetch, { launchHeadlessBrowser, stopHeadlessBrowser, FetchDocumentError } from './fetcher/index.js';
 import filter from './filter/index.js';
-import * as history from './history/index.js';
+import Recorder from './recorder/index.js';
 import * as services from './services/index.js';
 
 // The parallel handling feature is currently set to a parallelism of 1 on document tracking
@@ -37,20 +36,25 @@ export default class Archivist extends events.EventEmitter {
     return Object.keys(this.services);
   }
 
+  constructor({ storage: { versions, snapshots } }) {
+    super();
+    this.recorder = new Recorder({ versionsStorageAdapter: versions, snapshotsStorageAdapter: snapshots });
+  }
+
   async init() {
     if (this.services) {
       return this.services;
     }
 
+    await this.recorder.initialize();
     this.initQueues();
     this.services = await services.load();
-    await history.init();
 
     this.on('error', async () => {
       this.refilterDocumentsQueue.kill();
       this.trackDocumentChangesQueue.kill();
       stopHeadlessBrowser();
-      await this.recorder.terminate();
+      await this.recorder.finalize();
     });
 
     return this.services;
@@ -154,7 +158,7 @@ export default class Archivist extends events.EventEmitter {
   async refilterAndRecordDocument(documentDeclaration) {
     const { type, service } = documentDeclaration;
 
-    const { id: snapshotId, content: snapshotContent, mimeType } = await history.getLatestSnapshot(
+    const { id: snapshotId, content: snapshotContent, mimeType } = await this.recorder.getLatestSnapshot(
       service.id,
       type,
     );
@@ -181,7 +185,7 @@ export default class Archivist extends events.EventEmitter {
   }
 
   async recordSnapshot({ content, mimeType, documentDeclaration: { service, type } }) {
-    const { id: snapshotId, isFirstRecord } = await history.recordSnapshot({
+    const { id: snapshotId, isFirstRecord } = await this.recorder.recordSnapshot({
       serviceId: service.id,
       documentType: type,
       content,
@@ -207,7 +211,7 @@ export default class Archivist extends events.EventEmitter {
 
     const recordFunction = !isRefiltering ? 'recordVersion' : 'recordRefilter';
 
-    const { id: versionId, isFirstRecord } = await history[recordFunction]({
+    const { id: versionId, isFirstRecord } = await this.recorder[recordFunction]({
       serviceId: service.id,
       content,
       documentType: type,
@@ -222,11 +226,11 @@ export default class Archivist extends events.EventEmitter {
   }
 
   async publish() {
-    if (!config.get('history.publish')) {
+    if (!this.recorder.needsPublication()) {
       return;
     }
 
-    await history.publish();
+    await this.recorder.publish();
     this.emit('recordsPublished');
   }
 }

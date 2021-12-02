@@ -20,8 +20,8 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "posttest": "npm run lint",
-    "test": "cross-env NODE_ENV=test mocha --file './test/helper.js' --recursive \"./src/**/*.test.js\" --exit",
-    "test:debug": "cross-env NODE_ENV=test mocha --file './test/helper.js' --recursive \"./src/**/*.test.js\" --inspect-brk --exit",
+    "test": "cross-env NODE_ENV=test mocha --recursive \"./src/**/*.test.js\" --exit",
+    "test:debug": "cross-env NODE_ENV=test mocha --recursive \"./src/**/*.test.js\" --inspect-brk --exit",
     "validate": "node ./bin/validate.js",
     "validate:schema": "npm run validate -- --schema-only"
   },
