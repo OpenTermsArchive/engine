@@ -10,7 +10,7 @@
     - setup
     - update
 
-- name: Install NPM packages
+- name: Install dependencies
   command:
     cmd: npm i --production --unsafe-perm=true --production=true
     chdir: '/home/{{ ansible_user }}/{{ app }}'
@@ -33,6 +33,14 @@
     accept_hostkey: yes
     key_file: '/home/{{ ansible_user }}/.ssh/ota-bot-key'
   register: git_clone_app_finished
+  tags:
+    - setup
+    - update
+
+- name: Install services declarations dependencies
+  command:
+    cmd: npm i --production --production=true
+    chdir: '/home/{{ ansible_user }}/{{ services_directory }}'
   tags:
     - setup
     - update
