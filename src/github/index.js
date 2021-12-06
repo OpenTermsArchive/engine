@@ -8,6 +8,7 @@ const { version } = JSON.parse(fs.readFileSync(new URL('../../package.json', imp
 
 const ISSUE_STATE_CLOSED = 'closed';
 const ISSUE_STATE_OPEN = 'open';
+const ISSUE_STATE_ALL = 'all';
 
 const UPDATE_DOCUMENT_LABEL = process.env.GITHUB_LABEL_UPDATE || 'update';
 
@@ -94,41 +95,22 @@ export default class GitHub {
     }
   }
 
-  async searchIssues({ title, q, ...params }) {
+  async searchIssues({ title, ...searchParams }) {
     try {
-      const qOnRepo = `${q} repo:${params.owner}/${params.repo}`;
-
-      const nbPerPage = 100;
       const request = {
-        ...params,
-        q: qOnRepo,
-        per_page: nbPerPage,
-        page: 1,
+        per_page: 100,
+        ...searchParams,
       };
 
-      const { data } = await this.octokit.rest.search.issuesAndPullRequests(request);
+      const issues = await this.octokit.paginate(
+        this.octokit.rest.issues.listForRepo,
+        request,
+        response => response.data,
+      );
 
-      let foundItems = data.items;
+      const issuesWithSameTitle = issues.filter(item => item.title === title);
 
-      const nbPages = Math.ceil(data.total_count / nbPerPage);
-
-      if (nbPages > 1) {
-        for (let page = 2; page <= nbPages; page++) {
-          const { data: paginatedData } = await this.octokit.rest.search.issuesAndPullRequests({ ...request, page }); // eslint-disable-line no-await-in-loop
-
-          foundItems = [ ...foundItems, ...paginatedData.items ];
-        }
-      }
-
-      // baseUrl should be the way to go instead of this ugly filter
-      // that may not work in case there are too many issues
-      // but it goes with a 404 using octokit
-      // baseUrl: `https://api.github.com/${process.env.GITHUB_REPO}`,
-      const itemsFromRepo = foundItems.filter(item => item.repository_url.endsWith(`${params.owner}/${params.repo}`) && item.title === title);
-
-      logger.info(`Found ${itemsFromRepo.length} issues with title "${title}" and q "${qOnRepo}" (on a total of ${foundItems.length} issues cross-repo)`);
-
-      return itemsFromRepo;
+      return issuesWithSameTitle;
     } catch (e) {
       logger.error('Could not search issue');
       logger.error(e.toString());
@@ -150,14 +132,13 @@ export default class GitHub {
 
   async createIssueIfNotExists({ title, body, labels, comment }) {
     try {
-      const existingIssues = await this.searchIssues({ ...this.commonParams, title, q: `is:issue label:${labels.join(',')}` });
+      const existingIssues = await this.searchIssues({ ...this.commonParams, title, labels, state: ISSUE_STATE_ALL });
 
       if (!existingIssues.length) {
         const existingIssue = await this.createIssue({ ...this.commonParams, title, body, labels });
 
         if (existingIssue) {
           logger.info(`🤖 Creating Github issue for ${title}: ${existingIssue.html_url}`);
-          logger.info('Found 0 existing issues with', JSON.stringify({ ...this.commonParams, title, q: `is:issue label:${labels.join(',')}` }));
         } else {
           logger.error(`🤖 Could not create Github issue for ${title}`);
         }
@@ -184,17 +165,17 @@ export default class GitHub {
   }
 
   async closeIssueIfExists({ title, comment, labels }) {
-    const existingIssues = await this.searchIssues({ ...this.commonParams, title, q: `is:issue is:${ISSUE_STATE_OPEN} label:${labels.join(',')}` });
+    const openedIssues = await this.searchIssues({ ...this.commonParams, title, labels, state: ISSUE_STATE_OPEN });
 
-    if (existingIssues) {
-      for (const existingIssue of existingIssues) {
-        await this.octokit.rest.issues.update({ ...this.commonParams, issue_number: existingIssue.number, state: ISSUE_STATE_CLOSED }); // eslint-disable-line no-await-in-loop
-        await this.addCommentToIssue({ ...this.commonParams, issue_number: existingIssue.number, body: comment }); // eslint-disable-line no-await-in-loop
-        logger.info(`🤖 Github issue closed for ${title}: ${existingIssue.html_url}`);
+    if (openedIssues) {
+      for (const openedIssue of openedIssues) {
+        await this.octokit.rest.issues.update({ ...this.commonParams, issue_number: openedIssue.number, state: ISSUE_STATE_CLOSED }); // eslint-disable-line no-await-in-loop
+        await this.addCommentToIssue({ ...this.commonParams, issue_number: openedIssue.number, body: comment }); // eslint-disable-line no-await-in-loop
+        logger.info(`🤖 Github issue closed for ${title}: ${openedIssue.html_url}`);
       }
     }
 
-    return existingIssues;
+    return openedIssues;
   }
 
   static formatIssueTitleAndBody(messageOrObject) {
