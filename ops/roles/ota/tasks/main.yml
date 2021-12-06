@@ -48,13 +48,20 @@
     - update-declarations
 
 - name: Stop OpenTermsArchive
-  command: pm2 stop "{{ app }}"
+  command: pm2 --silent stop "{{ app }}"
   ignore_errors: yes
   tags:
     - restart
     - stop
     - update
     - update-declarations
+
+- name: Remove OpenTermsArchive app
+  command: pm2 --silent delete "{{ app }}"
+  ignore_errors: yes
+  tags:
+    - restart
+    - update
 
 - include_tasks: database.yml
   vars:
