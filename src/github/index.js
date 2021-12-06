@@ -167,15 +167,15 @@ export default class GitHub {
   async closeIssueIfExists({ title, comment, labels }) {
     const openedIssues = await this.searchIssues({ ...this.commonParams, title, labels, state: ISSUE_STATE_OPEN });
 
-    if (openedIssues) {
-      for (const openedIssue of openedIssues) {
-        await this.octokit.rest.issues.update({ ...this.commonParams, issue_number: openedIssue.number, state: ISSUE_STATE_CLOSED }); // eslint-disable-line no-await-in-loop
-        await this.addCommentToIssue({ ...this.commonParams, issue_number: openedIssue.number, body: comment }); // eslint-disable-line no-await-in-loop
-        logger.info(`🤖 Github issue closed for ${title}: ${openedIssue.html_url}`);
-      }
+    if (!openedIssues) {
+      return;
     }
 
-    return openedIssues;
+    for (const openedIssue of openedIssues) {
+      await this.octokit.rest.issues.update({ ...this.commonParams, issue_number: openedIssue.number, state: ISSUE_STATE_CLOSED }); // eslint-disable-line no-await-in-loop
+      await this.addCommentToIssue({ ...this.commonParams, issue_number: openedIssue.number, body: comment }); // eslint-disable-line no-await-in-loop
+      logger.info(`🤖 Github issue closed for ${title}: ${openedIssue.html_url}`);
+    }
   }
 
   static formatIssueTitleAndBody(messageOrObject) {
