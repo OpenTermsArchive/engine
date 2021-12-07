@@ -16,6 +16,7 @@ import MongoAdapter from './storage-adapters/mongo/index.js';
 const args = process.argv.slice(2);
 const refilterOnly = args.includes('--refilter-only');
 const schedule = args.includes('--schedule');
+const extraArgs = args.filter(arg => !arg.startsWith('--'));
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -30,31 +31,26 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
   });
 
   archivist.attach(logger);
+
   await archivist.init();
 
   logger.info('Start Open Terms Archive\n');
 
-  let serviceIds = args.filter(arg => !arg.startsWith('--'));
+  let serviceIds;
 
-  serviceIds = serviceIds.filter(serviceId => {
-    const isServiceDeclared = archivist.serviceDeclarations[serviceId];
+  if (extraArgs.length) {
+    serviceIds = extraArgs.filter(serviceId => {
+      const isServiceDeclared = archivist.serviceDeclarations[serviceId];
 
-    if (!isServiceDeclared) {
-      logger.warn(`Service ${serviceId} does not exist and will be ignored.`);
-    }
+      if (!isServiceDeclared) {
+        logger.warn(`Service ${serviceId} does not exist and will be ignored.`);
+      }
 
-    return isServiceDeclared;
-  });
+      return isServiceDeclared;
+    });
+  }
 
-  serviceIds = serviceIds.length ? serviceIds : archivist.serviceIds;
-
-  const numberOfDocuments = serviceIds.reduce((acc, serviceId) => acc + archivist.serviceDeclarations[serviceId].getNumberOfDocuments(), 0);
-
-  serviceIds = serviceIds.sort((a, b) => a.localeCompare(b));
-
-  logger.info(`👇 Refiltering ${numberOfDocuments} documents from ${serviceIds.length} services…`);
   await archivist.refilterAndRecord(serviceIds);
-  logger.info(`👆 Refiltered ${numberOfDocuments} documents from ${serviceIds.length} services.\n`);
 
   if (refilterOnly) {
     return;
@@ -68,9 +64,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
     archivist.attach(new GitHub());
   }
 
-  logger.info(`👇 Start tracking changes of ${numberOfDocuments} documents from ${serviceIds.length} services…`);
   await archivist.trackChanges(serviceIds);
-  logger.info(`👆 Tracked changes of ${numberOfDocuments} documents from ${serviceIds.length} services.`);
 
   if (!schedule) {
     return;
@@ -79,9 +73,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
   logger.info('The scheduler is running…');
   logger.info('Documents will be tracked at minute 30 past every 6 hours.');
   scheduler.scheduleJob('30 */6 * * *', async () => {
-    logger.info(`Start tracking changes of ${numberOfDocuments} documents from ${serviceIds.length} services…`);
     await archivist.trackChanges(serviceIds);
-    logger.info(`Tracked changes of ${numberOfDocuments} documents from ${serviceIds.length} services.`);
   });
 
   logger.info('Release will be created if needed every night at 4:15am');

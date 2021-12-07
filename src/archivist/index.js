@@ -22,7 +22,10 @@ export const AVAILABLE_EVENTS = [
   'versionRecorded',
   'firstVersionRecorded',
   'versionNotChanged',
-  'recordsPublished',
+  'startRefilterRun',
+  'refilterRunCompleted',
+  'startTrackingChangesRun',
+  'trackingChangesRunCompleted',
   'inaccessibleContent',
   'error',
 ];
@@ -95,17 +98,22 @@ export default class Archivist extends events.EventEmitter {
     });
   }
 
-  async trackChanges(servicesIds) {
+  async trackChanges(servicesIds = this.serviceIds) {
+    servicesIds.sort((a, b) => a.localeCompare(b)); // Sort service ids by lowercase name to have more intuitive logs
+
+    this.emit('startTrackingChangesRun', servicesIds.length, this.getNumberOfDocuments(servicesIds));
+
     await launchHeadlessBrowser();
+    await this.recorder.initialize();
 
     this._forEachDocumentOf(servicesIds, documentDeclaration => this.trackDocumentChangesQueue.push(documentDeclaration));
 
     await this.trackDocumentChangesQueue.drain();
 
     stopHeadlessBrowser();
+    await this.recorder.finalize();
 
-    await this.recorder.terminate();
-    await this.publish();
+    this.emit('trackingChangesRunCompleted', servicesIds.length, this.getNumberOfDocuments(servicesIds));
   }
 
   async trackDocumentChanges(documentDeclaration) {
@@ -148,11 +156,19 @@ export default class Archivist extends events.EventEmitter {
     return recordedVersion;
   }
 
-  async refilterAndRecord(servicesIds) {
+  async refilterAndRecord(servicesIds = this.serviceIds) {
+    servicesIds.sort((a, b) => a.localeCompare(b)); // Sort service ids by lowercase name to have more intuitive logs
+
+    this.emit('startRefilterRun', servicesIds.length, this.getNumberOfDocuments(servicesIds));
+
+    await this.recorder.initialize();
+
     this._forEachDocumentOf(servicesIds, documentDeclaration => this.refilterDocumentsQueue.push(documentDeclaration));
 
     await this.refilterDocumentsQueue.drain();
-    await this.publish();
+    await this.recorder.finalize();
+
+    this.emit('refilterRunCompleted', servicesIds.length, this.getNumberOfDocuments(servicesIds));
   }
 
   async refilterAndRecordDocument(documentDeclaration) {
@@ -225,12 +241,7 @@ export default class Archivist extends events.EventEmitter {
     this.emit(isFirstRecord ? 'firstVersionRecorded' : 'versionRecorded', service.id, type, versionId);
   }
 
-  async publish() {
-    if (!this.recorder.needsPublication()) {
-      return;
-    }
-
-    await this.recorder.publish();
-    this.emit('recordsPublished');
+  getNumberOfDocuments(serviceIds = this.serviceIds) {
+    return serviceIds.reduce((acc, serviceId) => acc + this.services[serviceId].getNumberOfDocuments(), 0);
   }
 }
