@@ -16,6 +16,10 @@ export const VERSIONS_PATH = path.resolve(__dirname, '../../../', config.get('re
 
 const { expect } = chai;
 
+const MIME_TYPE = 'text/html';
+const FETCH_DATE = new Date('2000-01-01T12:00:00.000Z');
+const FETCH_DATE_LATER = new Date('2000-01-02T12:00:00.000Z');
+
 describe('Recorder', () => {
   const SERVICE_ID = 'test_service';
   const TYPE = 'Terms of Service';
@@ -43,7 +47,6 @@ describe('Recorder', () => {
     describe(adapterName, () => {
       describe('#recordSnapshot', () => {
         const CONTENT = '<html><h1>ToS fixture data with UTF-8 çhãràčtęrs</h1></html>';
-        const MIME_TYPE = 'text/html';
         let recorder;
         let id;
         let isFirstRecord;
@@ -54,11 +57,50 @@ describe('Recorder', () => {
             versionsStorageAdapter: adapters.versions,
             snapshotsStorageAdapter: adapters.snapshots,
           });
-          await recorder.init();
+          await recorder.initialize();
         });
 
         after(async () => {
           await adapters.snapshots._removeAllRecords();
+          await recorder.finalize();
+        });
+
+        context('when a required param is missing', () => {
+          after(async () => adapters.snapshots._removeAllRecords());
+
+          const validParams = {
+            serviceId: SERVICE_ID,
+            documentType: TYPE,
+            content: CONTENT,
+            fetchDate: FETCH_DATE,
+            mimeType: MIME_TYPE,
+          };
+
+          const paramsNameToExpectedTextInError = {
+            serviceId: 'service ID',
+            documentType: 'document type',
+            fetchDate: 'fetch date',
+            content: 'content',
+            mimeType: 'mime type',
+          };
+
+          Object.entries(validParams).forEach(([testedRequiredParam]) => {
+            context(`when "${testedRequiredParam}" is missing`, () => {
+              it('throws an error', async () => {
+                try {
+                  const validParamsExceptTheOneTested = Object.fromEntries(Object.entries(validParams).filter(([paramName]) => paramName != testedRequiredParam));
+
+                  await recorder.recordSnapshot(validParamsExceptTheOneTested);
+                } catch (e) {
+                  expect(e).to.be.an('error');
+                  expect(e.message).to.contain(paramsNameToExpectedTextInError[testedRequiredParam]);
+
+                  return;
+                }
+                expect.fail('No error was thrown');
+              });
+            });
+          });
         });
 
         context('when it is the first record', () => {
@@ -68,10 +110,13 @@ describe('Recorder', () => {
               documentType: TYPE,
               content: CONTENT,
               mimeType: MIME_TYPE,
+              fetchDate: FETCH_DATE,
             }));
 
             (record = await adapters.snapshots.getLatestRecord(SERVICE_ID, TYPE));
           });
+
+          after(async () => adapters.snapshots._removeAllRecords());
 
           it('records the document with the proper content', async () => {
             expect(record.content).to.equal(CONTENT);
@@ -95,6 +140,7 @@ describe('Recorder', () => {
               documentType: TYPE,
               content: CONTENT,
               mimeType: MIME_TYPE,
+              fetchDate: FETCH_DATE,
             });
 
             ({ id, isFirstRecord } = await recorder.recordSnapshot({
@@ -102,10 +148,13 @@ describe('Recorder', () => {
               documentType: TYPE,
               content: UPDATED_CONTENT,
               mimeType: MIME_TYPE,
+              fetchDate: FETCH_DATE_LATER,
             }));
 
             (record = await adapters.snapshots.getLatestRecord(SERVICE_ID, TYPE));
           });
+
+          after(async () => adapters.snapshots._removeAllRecords());
 
           it('records the document with the proper content', async () => {
             expect(record.content).to.equal(UPDATED_CONTENT);
@@ -127,6 +176,7 @@ describe('Recorder', () => {
               documentType: TYPE,
               content: CONTENT,
               mimeType: MIME_TYPE,
+              fetchDate: FETCH_DATE,
             });
 
             ({ id, isFirstRecord } = await recorder.recordSnapshot({
@@ -134,10 +184,13 @@ describe('Recorder', () => {
               documentType: TYPE,
               content: CONTENT,
               mimeType: MIME_TYPE,
+              fetchDate: FETCH_DATE_LATER,
             }));
 
             (record = await adapters.snapshots.getLatestRecord(SERVICE_ID, TYPE));
           });
+
+          after(async () => adapters.snapshots._removeAllRecords());
 
           it('does not record the document', async () => {
             expect(id).to.equal(null);
@@ -158,11 +211,49 @@ describe('Recorder', () => {
             versionsStorageAdapter: adapters.versions,
             snapshotsStorageAdapter: adapters.snapshots,
           });
-          await recorder.init();
+          await recorder.initialize();
         });
 
         after(async () => {
-          await adapters.versions._removeAllRecords();
+          await recorder.finalize();
+        });
+
+        context('when a required param is missing', () => {
+          after(async () => adapters.versions._removeAllRecords());
+
+          const validParams = {
+            serviceId: SERVICE_ID,
+            documentType: TYPE,
+            content: CONTENT,
+            snapshotId: SNAPSHOT_ID,
+            fetchDate: FETCH_DATE,
+          };
+
+          const paramsNameToExpectedTextInError = {
+            serviceId: 'service ID',
+            documentType: 'document type',
+            snapshotId: 'snapshot ID',
+            fetchDate: 'fetch date',
+            content: 'content',
+          };
+
+          Object.entries(validParams).forEach(([testedRequiredParam]) => {
+            context(`when "${testedRequiredParam}" is missing`, () => {
+              it('throws an error', async () => {
+                try {
+                  const validParamsExceptTheOneTested = Object.fromEntries(Object.entries(validParams).filter(([paramName]) => paramName != testedRequiredParam));
+
+                  await recorder.recordVersion(validParamsExceptTheOneTested);
+                } catch (e) {
+                  expect(e).to.be.an('error');
+                  expect(e.message).to.contain(paramsNameToExpectedTextInError[testedRequiredParam]);
+
+                  return;
+                }
+                expect.fail('No error was thrown');
+              });
+            });
+          });
         });
 
         context('when it is the first record', () => {
@@ -172,10 +263,13 @@ describe('Recorder', () => {
               documentType: TYPE,
               content: CONTENT,
               snapshotId: SNAPSHOT_ID,
+              fetchDate: FETCH_DATE,
             }));
 
             (record = await adapters.versions.getLatestRecord(SERVICE_ID, TYPE));
           });
+
+          after(async () => adapters.versions._removeAllRecords());
 
           it('records the document with the proper content', async () => {
             expect(record.content).to.equal(CONTENT);
@@ -199,6 +293,7 @@ describe('Recorder', () => {
               documentType: TYPE,
               content: CONTENT,
               snapshotId: SNAPSHOT_ID,
+              fetchDate: FETCH_DATE,
             });
 
             ({ id, isFirstRecord } = await recorder.recordVersion({
@@ -206,10 +301,13 @@ describe('Recorder', () => {
               documentType: TYPE,
               content: UPDATED_CONTENT,
               snapshotId: SNAPSHOT_ID,
+              fetchDate: FETCH_DATE_LATER,
             }));
 
             (record = await adapters.versions.getLatestRecord(SERVICE_ID, TYPE));
           });
+
+          after(async () => adapters.versions._removeAllRecords());
 
           it('records the document with the proper content', async () => {
             expect(record.content).to.equal(UPDATED_CONTENT);
@@ -231,6 +329,7 @@ describe('Recorder', () => {
               documentType: TYPE,
               content: CONTENT,
               snapshotId: SNAPSHOT_ID,
+              fetchDate: FETCH_DATE,
             });
 
             ({ id, isFirstRecord } = await recorder.recordVersion({
@@ -238,27 +337,16 @@ describe('Recorder', () => {
               documentType: TYPE,
               content: CONTENT,
               snapshotId: SNAPSHOT_ID,
+              fetchDate: FETCH_DATE_LATER,
             }));
 
             (record = await adapters.versions.getLatestRecord(SERVICE_ID, TYPE));
           });
 
+          after(async () => adapters.versions._removeAllRecords());
+
           it('does not record the document', async () => {
             expect(id).to.equal(null);
-          });
-        });
-
-        context('when snapshot ID is not provided', () => {
-          it('throws an error', async () => {
-            try {
-              await recorder.recordVersion({ serviceId: SERVICE_ID, documentType: TYPE, content: CONTENT });
-            } catch (e) {
-              expect(e).to.be.an('error');
-              expect(e.message).to.contain('snapshot ID');
-
-              return;
-            }
-            expect.fail('No error was thrown');
           });
         });
       });
@@ -276,11 +364,50 @@ describe('Recorder', () => {
             versionsStorageAdapter: adapters.versions,
             snapshotsStorageAdapter: adapters.snapshots,
           });
-          await recorder.init();
+          await recorder.initialize();
         });
 
         after(async () => {
           await adapters.versions._removeAllRecords();
+          await recorder.finalize();
+        });
+
+        context('when a required param is missing', () => {
+          after(async () => adapters.versions._removeAllRecords());
+
+          const validParams = {
+            serviceId: SERVICE_ID,
+            documentType: TYPE,
+            content: CONTENT,
+            snapshotId: SNAPSHOT_ID,
+            fetchDate: FETCH_DATE,
+          };
+
+          const paramsNameToExpectedTextInError = {
+            serviceId: 'service ID',
+            documentType: 'document type',
+            snapshotId: 'snapshot ID',
+            fetchDate: 'fetch date',
+            content: 'content',
+          };
+
+          Object.entries(validParams).forEach(([testedRequiredParam]) => {
+            context(`when "${testedRequiredParam}" is missing`, () => {
+              it('throws an error', async () => {
+                try {
+                  const validParamsExceptTheOneTested = Object.fromEntries(Object.entries(validParams).filter(([paramName]) => paramName != testedRequiredParam));
+
+                  await recorder.recordRefilter(validParamsExceptTheOneTested);
+                } catch (e) {
+                  expect(e).to.be.an('error');
+                  expect(e.message).to.contain(paramsNameToExpectedTextInError[testedRequiredParam]);
+
+                  return;
+                }
+                expect.fail('No error was thrown');
+              });
+            });
+          });
         });
 
         context('when it is the first record', () => {
@@ -290,10 +417,13 @@ describe('Recorder', () => {
               documentType: TYPE,
               content: CONTENT,
               snapshotId: SNAPSHOT_ID,
+              fetchDate: FETCH_DATE,
             }));
 
             (record = await adapters.versions.getLatestRecord(SERVICE_ID, TYPE));
           });
+
+          after(async () => adapters.versions._removeAllRecords()); after(async () => adapters.versions._removeAllRecords());
 
           it('records the document with the proper content', async () => {
             expect(record.content).to.equal(CONTENT);
@@ -317,6 +447,7 @@ describe('Recorder', () => {
               documentType: TYPE,
               content: CONTENT,
               snapshotId: SNAPSHOT_ID,
+              fetchDate: FETCH_DATE,
             });
 
             ({ id, isFirstRecord } = await recorder.recordRefilter({
@@ -324,10 +455,13 @@ describe('Recorder', () => {
               documentType: TYPE,
               content: UPDATED_CONTENT,
               snapshotId: SNAPSHOT_ID,
+              fetchDate: FETCH_DATE_LATER,
             }));
 
             (record = await adapters.versions.getLatestRecord(SERVICE_ID, TYPE));
           });
+
+          after(async () => adapters.versions._removeAllRecords());
 
           it('records the document with the proper content', async () => {
             expect(record.content).to.equal(UPDATED_CONTENT);
@@ -349,6 +483,7 @@ describe('Recorder', () => {
               documentType: TYPE,
               content: CONTENT,
               snapshotId: SNAPSHOT_ID,
+              fetchDate: FETCH_DATE,
             });
 
             ({ id, isFirstRecord } = await recorder.recordRefilter({
@@ -356,27 +491,16 @@ describe('Recorder', () => {
               documentType: TYPE,
               content: CONTENT,
               snapshotId: SNAPSHOT_ID,
+              fetchDate: FETCH_DATE_LATER,
             }));
 
             (record = await adapters.versions.getLatestRecord(SERVICE_ID, TYPE));
           });
 
+          after(async () => adapters.versions._removeAllRecords());
+
           it('does not record the document', async () => {
             expect(id).to.equal(null);
-          });
-        });
-
-        context('when snapshot ID is not provided', () => {
-          it('throws an error', async () => {
-            try {
-              await recorder.recordRefilter({ serviceId: SERVICE_ID, documentType: TYPE, content: CONTENT });
-            } catch (e) {
-              expect(e).to.be.an('error');
-              expect(e.message).to.contain('snapshot ID');
-
-              return;
-            }
-            expect.fail('No error was thrown');
           });
         });
       });

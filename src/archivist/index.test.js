@@ -24,6 +24,9 @@ const ROOT_PATH = path.resolve(__dirname, '../../');
 const SNAPSHOTS_PATH = path.resolve(ROOT_PATH, config.get('recorder.snapshots.storage.git.path'));
 const VERSIONS_PATH = path.resolve(ROOT_PATH, config.get('recorder.versions.storage.git.path'));
 
+const MIME_TYPE = 'text/html';
+const FETCH_DATE = new Date('2000-01-02T12:00:00.000Z');
+
 let snapshotsStorageAdapter;
 let versionsStorageAdapter;
 
@@ -279,7 +282,12 @@ describe('Archivist', function () {
 
     describe('#recordSnapshot', () => {
       context('when it is the first record', () => {
-        before(async () => app.recordSnapshot({ content: 'document content', documentDeclaration: documentADeclaration }));
+        before(async () => app.recordSnapshot({
+          content: 'document content',
+          documentDeclaration: documentADeclaration,
+          mimeType: MIME_TYPE,
+          fetchDate: FETCH_DATE,
+        }));
 
         after(() => {
           resetSpiesHistory();
@@ -297,9 +305,19 @@ describe('Archivist', function () {
       context('when it is not the first record', () => {
         context('when there are changes', () => {
           before(async () => {
-            await app.recordSnapshot({ content: 'document content', documentDeclaration: documentADeclaration });
+            await app.recordSnapshot({
+              content: 'document content',
+              mimeType: MIME_TYPE,
+              fetchDate: FETCH_DATE,
+              documentDeclaration: documentADeclaration,
+            });
             resetSpiesHistory();
-            await app.recordSnapshot({ content: 'document content modified', documentDeclaration: documentADeclaration });
+            await app.recordSnapshot({
+              content: 'document content modified',
+              mimeType: MIME_TYPE,
+              fetchDate: FETCH_DATE,
+              documentDeclaration: documentADeclaration,
+            });
           });
 
           after(() => {
@@ -317,9 +335,19 @@ describe('Archivist', function () {
 
         context('when there are no changes', () => {
           before(async () => {
-            await app.recordSnapshot({ content: 'document content', documentDeclaration: documentADeclaration });
+            await app.recordSnapshot({
+              content: 'document content',
+              mimeType: MIME_TYPE,
+              fetchDate: FETCH_DATE,
+              documentDeclaration: documentADeclaration,
+            });
             resetSpiesHistory();
-            await app.recordSnapshot({ content: 'document content', documentDeclaration: documentADeclaration });
+            await app.recordSnapshot({
+              content: 'document content',
+              mimeType: MIME_TYPE,
+              fetchDate: FETCH_DATE,
+              documentDeclaration: documentADeclaration,
+            });
           });
 
           after(() => {
@@ -340,7 +368,13 @@ describe('Archivist', function () {
     describe('#recordVersion', () => {
       context('when it is the first record', () => {
         before(async () =>
-          app.recordVersion({ snapshotContent: serviceASnapshotExpectedContent, snapshotId: 'sha', documentDeclaration: documentADeclaration }));
+          app.recordVersion({
+            snapshotContent: serviceASnapshotExpectedContent,
+            snapshotId: 'sha',
+            mimeType: MIME_TYPE,
+            fetchDate: FETCH_DATE,
+            documentDeclaration: documentADeclaration,
+          }));
 
         after(() => {
           resetSpiesHistory();
@@ -358,9 +392,21 @@ describe('Archivist', function () {
       context('when it is not the first record', () => {
         context('when there are changes', () => {
           before(async () => {
-            await app.recordVersion({ snapshotContent: serviceASnapshotExpectedContent, snapshotId: 'sha', documentDeclaration: documentADeclaration });
+            await app.recordVersion({
+              snapshotContent: serviceASnapshotExpectedContent,
+              mimeType: MIME_TYPE,
+              fetchDate: FETCH_DATE,
+              snapshotId: 'sha',
+              documentDeclaration: documentADeclaration,
+            });
             resetSpiesHistory();
-            await app.recordVersion({ snapshotContent: serviceBSnapshotExpectedContent, snapshotId: 'sha', documentDeclaration: documentADeclaration });
+            await app.recordVersion({
+              snapshotContent: serviceBSnapshotExpectedContent,
+              mimeType: MIME_TYPE,
+              fetchDate: FETCH_DATE,
+              snapshotId: 'sha',
+              documentDeclaration: documentADeclaration,
+            });
           });
 
           after(() => {
@@ -378,9 +424,21 @@ describe('Archivist', function () {
 
         context('when there are no changes', () => {
           before(async () => {
-            await app.recordVersion({ snapshotContent: serviceASnapshotExpectedContent, snapshotId: 'sha', documentDeclaration: documentADeclaration });
+            await app.recordVersion({
+              snapshotContent: serviceASnapshotExpectedContent,
+              snapshotId: 'sha',
+              mimeType: MIME_TYPE,
+              fetchDate: FETCH_DATE,
+              documentDeclaration: documentADeclaration,
+            });
             resetSpiesHistory();
-            await app.recordVersion({ snapshotContent: serviceASnapshotExpectedContent, snapshotId: 'sha', documentDeclaration: documentADeclaration });
+            await app.recordVersion({
+              snapshotContent: serviceASnapshotExpectedContent,
+              snapshotId: 'sha',
+              mimeType: MIME_TYPE,
+              fetchDate: FETCH_DATE,
+              documentDeclaration: documentADeclaration,
+            });
           });
 
           after(() => {
@@ -412,6 +470,10 @@ describe('Archivist', function () {
         return resetGitRepositories();
       });
 
+      it('emits "startTrackingChangesRun" event', async () => {
+        expect(spies.onStartTrackingChangesRun).to.have.been.calledOnce;
+      });
+
       it('emits "firstSnapshotRecorded" events', async () => {
         expect(spies.onFirstSnapshotRecorded).to.have.been.calledTwice;
       });
@@ -424,7 +486,17 @@ describe('Archivist', function () {
         expect(spies.onFirstVersionRecorded).to.have.been.calledAfter(spies.onFirstSnapshotRecorded);
       });
 
-      emitsOnly([ 'firstSnapshotRecorded', 'onFirstSnapshotRecorded', 'firstVersionRecorded' ]);
+      it('emits "trackingChangesRunCompleted" event', async () => {
+        expect(spies.onTrackingChangesRunCompleted).to.have.been.calledAfter(spies.onStartTrackingChangesRun);
+      });
+
+      emitsOnly([
+        'firstSnapshotRecorded',
+        'onFirstSnapshotRecorded',
+        'firstVersionRecorded',
+        'startTrackingChangesRun',
+        'trackingChangesRunCompleted',
+      ]);
     });
 
     context('when tracking changes on already tracked services', () => {
@@ -449,6 +521,10 @@ describe('Archivist', function () {
           return resetGitRepositories();
         });
 
+        it('emits "startTrackingChangesRun" event', async () => {
+          expect(spies.onStartTrackingChangesRun).to.have.been.calledOnce;
+        });
+
         it('emits "snapshotNotChanged" events', async () => {
           expect(spies.onSnapshotNotChanged).to.have.been.calledTwice;
         });
@@ -461,7 +537,17 @@ describe('Archivist', function () {
           expect(spies.onVersionNotChanged).to.have.been.calledAfter(spies.onSnapshotNotChanged);
         });
 
-        emitsOnly([ 'snapshotNotChanged', 'versionNotChanged', 'snapshotRecorded' ]);
+        it('emits "trackingChangesRunCompleted" event', async () => {
+          expect(spies.onTrackingChangesRunCompleted).to.have.been.calledAfter(spies.onStartTrackingChangesRun);
+        });
+
+        emitsOnly([
+          'snapshotNotChanged',
+          'versionNotChanged',
+          'snapshotRecorded',
+          'startTrackingChangesRun',
+          'trackingChangesRunCompleted',
+        ]);
       });
 
       context('when a service changed', () => {
@@ -484,6 +570,10 @@ describe('Archivist', function () {
           return resetGitRepositories();
         });
 
+        it('emits "startTrackingChangesRun" event', async () => {
+          expect(spies.onStartTrackingChangesRun).to.have.been.calledOnce;
+        });
+
         it('emits "snapshotNotChanged" events', async () => {
           expect(spies.onSnapshotNotChanged).to.have.been.calledOnceWith(SERVICE_B_ID, SERVICE_B_TYPE);
         });
@@ -504,11 +594,17 @@ describe('Archivist', function () {
           expect(spies.onVersionRecorded).to.have.been.calledAfter(spies.onSnapshotRecorded);
         });
 
+        it('emits "trackingChangesRunCompleted" event', async () => {
+          expect(spies.onTrackingChangesRunCompleted).to.have.been.calledAfter(spies.onStartTrackingChangesRun);
+        });
+
         emitsOnly([
           'snapshotNotChanged',
           'snapshotRecorded',
           'versionNotChanged',
           'versionRecorded',
+          'startTrackingChangesRun',
+          'trackingChangesRunCompleted',
         ]);
       });
     });

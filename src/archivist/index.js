@@ -136,10 +136,12 @@ export default class Archivist extends events.EventEmitter {
       throw error;
     }
 
+    const fetchDate = new Date();
     const snapshotId = await this.recordSnapshot({
       content,
       mimeType,
       documentDeclaration,
+      fetchDate,
     });
 
     if (!snapshotId) {
@@ -151,6 +153,7 @@ export default class Archivist extends events.EventEmitter {
       mimeType,
       snapshotId,
       documentDeclaration,
+      fetchDate,
     });
 
     return recordedVersion;
@@ -174,7 +177,7 @@ export default class Archivist extends events.EventEmitter {
   async refilterAndRecordDocument(documentDeclaration) {
     const { type, service } = documentDeclaration;
 
-    const { id: snapshotId, content: snapshotContent, mimeType } = await this.recorder.getLatestSnapshot(
+    const { id: snapshotId, content: snapshotContent, mimeType, fetchDate } = await this.recorder.getLatestSnapshot(
       service.id,
       type,
     );
@@ -189,6 +192,7 @@ export default class Archivist extends events.EventEmitter {
       snapshotId,
       documentDeclaration,
       isRefiltering: true,
+      fetchDate,
     });
   }
 
@@ -200,12 +204,13 @@ export default class Archivist extends events.EventEmitter {
     });
   }
 
-  async recordSnapshot({ content, mimeType, documentDeclaration: { service, type } }) {
+  async recordSnapshot({ content, mimeType, fetchDate, documentDeclaration: { service, type } }) {
     const { id: snapshotId, isFirstRecord } = await this.recorder.recordSnapshot({
       serviceId: service.id,
       documentType: type,
       content,
       mimeType,
+      fetchDate,
     });
 
     if (!snapshotId) {
@@ -217,7 +222,7 @@ export default class Archivist extends events.EventEmitter {
     return snapshotId;
   }
 
-  async recordVersion({ snapshotContent, mimeType, snapshotId, documentDeclaration, isRefiltering }) {
+  async recordVersion({ snapshotContent, mimeType, fetchDate, snapshotId, documentDeclaration, isRefiltering }) {
     const { service, type } = documentDeclaration;
     const content = await filter({
       content: snapshotContent,
@@ -232,6 +237,7 @@ export default class Archivist extends events.EventEmitter {
       content,
       documentType: type,
       snapshotId,
+      fetchDate,
     });
 
     if (!versionId) {

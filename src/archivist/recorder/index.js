@@ -32,23 +32,55 @@ export default class Recorder {
     return this.snapshotsStorageAdapter.getLatestRecord(serviceId, documentType);
   }
 
-  async recordSnapshot(options) {
-    return this.snapshotsStorageAdapter.record(options);
+  async recordSnapshot({ serviceId, documentType, fetchDate, mimeType, content }) {
+    if (!serviceId) {
+      throw new Error('A service ID is required');
+    }
+
+    if (!documentType) {
+      throw new Error('A document type is required');
+    }
+
+    if (!fetchDate) {
+      throw new Error('The fetch date of the snapshot is required to ensure data consistency');
+    }
+
+    if (!content) {
+      throw new Error('A document content is required');
+    }
+
+    if (!mimeType) {
+      throw new Error('A document mime type is required to ensure data consistency');
+    }
+
+    return this.snapshotsStorageAdapter.record({ serviceId, documentType, fetchDate, mimeType, content });
   }
 
-  async recordVersion({ snapshotId, serviceId, documentType, ...options }) {
+  async recordVersion({ serviceId, documentType, snapshotId, fetchDate, content }) {
+    if (!serviceId) {
+      throw new Error('A service ID is required');
+    }
+
+    if (!documentType) {
+      throw new Error('A document type is required');
+    }
+
     if (!snapshotId) {
       throw new Error(`A snapshot ID is required to ensure data consistency for ${serviceId}'s ${documentType}`);
     }
 
-    return this.versionsStorageAdapter.record({ snapshotId, serviceId, documentType, ...options });
-  }
-
-  async recordRefilter({ snapshotId, serviceId, documentType, ...options }) {
-    if (!snapshotId) {
-      throw new Error(`A snapshot ID is required to ensure data consistency for ${serviceId}'s ${documentType}`);
+    if (!fetchDate) {
+      throw new Error('The fetch date of the snapshot is required to ensure data consistency');
     }
 
-    return this.versionsStorageAdapter.record({ snapshotId, serviceId, documentType, isRefilter: true, ...options });
+    if (!content) {
+      throw new Error('A document content is required');
+    }
+
+    return this.versionsStorageAdapter.record({ serviceId, documentType, snapshotId, fetchDate, content });
+  }
+
+  async recordRefilter(params) {
+    return this.recordVersion({ isRefilter: true, ...params });
   }
 }
