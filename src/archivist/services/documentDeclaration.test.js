@@ -6,8 +6,8 @@ const { expect } = chai;
 
 describe('DocumentDeclaration', () => {
   describe('#extractCssSelectors', () => {
-    context('With "select" property', () => {
-      context('With string selector', () => {
+    context('with "select" property', () => {
+      context('with string selector', () => {
         it('extracts selectors', async () => {
           const result = new DocumentDeclaration({ contentSelectors: 'body' }).getCssSelectors();
 
@@ -15,7 +15,7 @@ describe('DocumentDeclaration', () => {
         });
       });
 
-      context('With range selector', () => {
+      context('with range selector', () => {
         it('extracts selectors', async () => {
           const result = new DocumentDeclaration({
             contentSelectors: {
@@ -28,7 +28,7 @@ describe('DocumentDeclaration', () => {
         });
       });
 
-      context('With an array of mixed selectors', () => {
+      context('with an array of mixed selectors', () => {
         it('extracts selectors', async () => {
           const result = new DocumentDeclaration({
             contentSelectors: [
@@ -45,8 +45,8 @@ describe('DocumentDeclaration', () => {
       });
     });
 
-    context('With "remove" property', () => {
-      context('With string selector', () => {
+    context('with "remove" property', () => {
+      context('with string selector', () => {
         it('extracts selectors', async () => {
           const result = new DocumentDeclaration({ noiseSelectors: 'body' }).getCssSelectors();
 
@@ -54,7 +54,7 @@ describe('DocumentDeclaration', () => {
         });
       });
 
-      context('With range selector', () => {
+      context('with range selector', () => {
         it('extracts selectors', async () => {
           const result = new DocumentDeclaration({
             noiseSelectors: {
@@ -67,7 +67,7 @@ describe('DocumentDeclaration', () => {
         });
       });
 
-      context('With an array of mixed selectors', () => {
+      context('with an array of mixed selectors', () => {
         it('extracts selectors', async () => {
           const result = new DocumentDeclaration({
             noiseSelectors: [
@@ -84,8 +84,8 @@ describe('DocumentDeclaration', () => {
       });
     });
 
-    context('With both "select" and "remove" property', () => {
-      context('With string selector', () => {
+    context('with both "select" and "remove" property', () => {
+      context('with string selector', () => {
         it('extracts selectors', async () => {
           const result = new DocumentDeclaration({
             contentSelectors: 'body',
@@ -96,7 +96,7 @@ describe('DocumentDeclaration', () => {
         });
       });
 
-      context('With range selector', () => {
+      context('with range selector', () => {
         it('extracts selectors', async () => {
           const result = new DocumentDeclaration({
             contentSelectors: {
@@ -118,7 +118,7 @@ describe('DocumentDeclaration', () => {
         });
       });
 
-      context('With an array of mixed selectors', () => {
+      context('with an array of mixed selectors', () => {
         it('extracts selectors', async () => {
           const result = new DocumentDeclaration({
             contentSelectors: [

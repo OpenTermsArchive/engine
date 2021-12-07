@@ -128,13 +128,13 @@ describe('GitAdapter', () => {
   });
 
   describe('#_getPathFor', () => {
-    context('Without provided extension', () => {
+    context('without provided extension', () => {
       it('returns the file path with default extension for the given service provider’s document type', async () => {
         expect(subject._getPathFor(SERVICE_PROVIDER_ID, DOCUMENT_TYPE)).to.equal(EXPECTED_FILE_PATH);
       });
     });
 
-    context('With provided extension', () => {
+    context('with provided extension', () => {
       it('returns the file path with given extension for the given service provider’s document type', async () => {
         expect(subject._getPathFor(SERVICE_PROVIDER_ID, DOCUMENT_TYPE, 'pdf')).to.equal(EXPECTED_PDF_FILE_PATH);
       });

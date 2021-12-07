@@ -119,7 +119,7 @@ describe('Filter', () => {
   });
 
   describe('#filterHTML', () => {
-    context('With string selector', () => {
+    context('with string selector', () => {
       it('filters the given HTML content with common changing items', async () => {
         const result = await filterHTML({
           content: rawHTMLWithCommonChangingItems,
@@ -144,7 +144,7 @@ describe('Filter', () => {
         expect(result).to.equal(expectedFiltered);
       });
 
-      context('With no match for the given selector', () => {
+      context('with no match for the given selector', () => {
         it('throws an InaccessibleContentError error', async () => {
           await expect(filterHTML({
             content: rawHTML,
@@ -156,7 +156,7 @@ describe('Filter', () => {
         });
       });
 
-      context('With an additional filter', () => {
+      context('with an additional filter', () => {
         it('filters the given HTML content also with given additional filter', async () => {
           const result = await filterHTML({
             content: rawHTML,
@@ -171,7 +171,7 @@ describe('Filter', () => {
         });
       });
 
-      context('With an additional async filter', () => {
+      context('with an additional async filter', () => {
         it('filters the given HTML content also with given additional filter', async () => {
           const result = await filterHTML({
             content: rawHTML,
@@ -186,7 +186,7 @@ describe('Filter', () => {
         });
       });
 
-      context('With multiple selectors in one string', () => {
+      context('with multiple selectors in one string', () => {
         it('filters the given HTML content', async () => {
           const result = await filterHTML({
             content: rawHTML,
@@ -201,7 +201,7 @@ describe('Filter', () => {
       });
     });
 
-    context('With an array of selectors', () => {
+    context('with an array of selectors', () => {
       it('filters the given HTML content', async () => {
         const result = await filterHTML({
           content: rawHTML,
@@ -215,8 +215,8 @@ describe('Filter', () => {
       });
     });
 
-    context('With range selector', () => {
-      context('With startBefore and endBefore', () => {
+    context('with range selector', () => {
+      context('with startBefore and endBefore', () => {
         it('filters the given HTML content', async () => {
           const result = await filterHTML({
             content: rawHTML,
@@ -232,7 +232,7 @@ describe('Filter', () => {
           expect(result).to.equal('[link 1](https://exemple.com/relative/link)');
         });
       });
-      context('With startBefore and endAfter', () => {
+      context('with startBefore and endAfter', () => {
         it('filters the given HTML content', async () => {
           const result = await filterHTML({
             content: rawHTML,
@@ -248,7 +248,7 @@ describe('Filter', () => {
           expect(result).to.equal('[link 2](#anchor)');
         });
       });
-      context('With startAfter and endBefore', () => {
+      context('with startAfter and endBefore', () => {
         it('filters the given HTML content', async () => {
           const result = await filterHTML({
             content: rawHTML,
@@ -264,7 +264,7 @@ describe('Filter', () => {
           expect(result).to.equal('[link 2](#anchor)');
         });
       });
-      context('With startAfter and endAfter', () => {
+      context('with startAfter and endAfter', () => {
         it('filters the given HTML content', async () => {
           const result = await filterHTML({
             content: rawHTML,
@@ -280,7 +280,7 @@ describe('Filter', () => {
           expect(result).to.equal('[link 3](http://absolute.url/link)');
         });
       });
-      context('With a "start" selector that has no match', () => {
+      context('with a "start" selector that has no match', () => {
         it('throws an InaccessibleContentError error', async () => {
           await expect(filterHTML({
             content: rawHTML,
@@ -294,7 +294,7 @@ describe('Filter', () => {
           })).to.be.rejectedWith(InaccessibleContentError, /"start" selector has no match/);
         });
       });
-      context('With an "end" selector that has no match', () => {
+      context('with an "end" selector that has no match', () => {
         it('throws an InaccessibleContentError error', async () => {
           await expect(filterHTML({
             content: rawHTML,
@@ -310,7 +310,7 @@ describe('Filter', () => {
       });
     });
 
-    context('With an array of range selectors', () => {
+    context('with an array of range selectors', () => {
       it('filters the given HTML content', async () => {
         const result = await filterHTML({
           content: rawHTML,
@@ -333,7 +333,7 @@ describe('Filter', () => {
       });
     });
 
-    context('With an array of mixed string selectors and range selectors', () => {
+    context('with an array of mixed string selectors and range selectors', () => {
       it('filters the given HTML content', async () => {
         const result = await filterHTML({
           content: rawHTML,
@@ -354,7 +354,7 @@ describe('Filter', () => {
     });
 
     describe('Remove elements', () => {
-      context('With a simple selector', () => {
+      context('with a simple selector', () => {
         it('removes the specified elements', async () => {
           const result = await filterHTML({
             content: rawHTML,
@@ -369,7 +369,7 @@ describe('Filter', () => {
         });
       });
 
-      context('With an array of string selectors', () => {
+      context('with an array of string selectors', () => {
         it('removes the specified elements', async () => {
           const result = await filterHTML({
             content: rawHTML,
@@ -384,7 +384,7 @@ describe('Filter', () => {
         });
       });
 
-      context('With a simple range selector', () => {
+      context('with a simple range selector', () => {
         it('removes the specified elements', async () => {
           const result = await filterHTML({
             content: rawHTML,
@@ -400,7 +400,7 @@ describe('Filter', () => {
 
           expect(result).to.equal('Title\n=====');
         });
-        context('With a "start" selector that has no match', () => {
+        context('with a "start" selector that has no match', () => {
           it('throws an InaccessibleContentError error', async () => {
             await expect(filterHTML({
               content: rawHTML,
@@ -415,7 +415,7 @@ describe('Filter', () => {
             })).to.be.rejectedWith(InaccessibleContentError, /"start" selector has no match/);
           });
         });
-        context('With an "end" selector that has no match', () => {
+        context('with an "end" selector that has no match', () => {
           it('throws an InaccessibleContentError error', async () => {
             await expect(filterHTML({
               content: rawHTML,
@@ -431,7 +431,7 @@ describe('Filter', () => {
           });
         });
       });
-      context('With an array of range selectors', () => {
+      context('with an array of range selectors', () => {
         it('removes all the selections', async () => {
           const result = await filterHTML({
             content: rawHTML,
@@ -455,7 +455,7 @@ describe('Filter', () => {
         });
       });
 
-      context('With an array of mixed selectors and range selectors', () => {
+      context('with an array of mixed selectors and range selectors', () => {
         it('removes all the selections', async () => {
           const result = await filterHTML({
             content: rawHTML,
