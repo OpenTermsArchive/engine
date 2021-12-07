@@ -46,10 +46,11 @@ export default class Archivist extends events.EventEmitter {
     this.services = await services.load();
     await history.init();
 
-    this.on('error', () => {
+    this.on('error', async () => {
       this.refilterDocumentsQueue.kill();
       this.trackDocumentChangesQueue.kill();
       stopHeadlessBrowser();
+      await this.recorder.terminate();
     });
 
     return this.services;
@@ -99,6 +100,7 @@ export default class Archivist extends events.EventEmitter {
 
     stopHeadlessBrowser();
 
+    await this.recorder.terminate();
     await this.publish();
   }
 

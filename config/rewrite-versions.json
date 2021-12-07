@@ -1,5 +1,5 @@
 {
-  "history": {
+  "recorder": {
     "versionsPath": "./data/versions-rewritten"
   },
   "rewrite": {

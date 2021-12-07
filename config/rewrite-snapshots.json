@@ -1,5 +1,5 @@
 {
-  "history": {
+  "recorder": {
     "snapshotsPath": "./data/snapshots-rewritten"
   },
   "rewrite": {

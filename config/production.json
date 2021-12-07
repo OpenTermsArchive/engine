@@ -3,7 +3,7 @@
     "declarationsPath": "../ota-services-all/declarations",
     "documentTypesPath": "../ota-services-all/document-types.json"
   },
-  "history": {
+  "recorder": {
     "snapshotsPath": "../ota-snapshots",
     "versionsPath": "../ota-versions",
     "publish": true

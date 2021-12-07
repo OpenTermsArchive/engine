@@ -2,7 +2,7 @@
   "services": {
     "declarationsPath": "./test/services"
   },
-  "history": {
+  "recorder": {
     "versions": {
       "storage": {
         "git": {
@@ -14,6 +14,11 @@
             "name": "OTA Bot",
             "email": "bot@opentermsarchive.org"
           }
+        },
+        "mongo": {
+          "connectionURI": "mongodb://localhost:27017",
+          "database": "open-terms-archive-test",
+          "collection": "versions"
         }
       }
     },
@@ -27,6 +32,11 @@
             "name": "OTA Bot",
             "email": "bot@opentermsarchive.org"
           }
+        },
+        "mongo": {
+          "connectionURI": "mongodb://localhost:27017",
+          "database": "open-terms-archive-test",
+          "collection": "snapshots"
         }
       }
     }
