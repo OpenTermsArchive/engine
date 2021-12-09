@@ -27,6 +27,16 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: 14.x
+      - name: Install and Start MongoDB
+        if: matrix.operating_system == 'ubuntu-latest'
+        uses: supercharge/mongodb-github-action@1.7.0
+        with:
+          mongodb-version: 4.4
+      - name: Install and Start MongoDB
+        if: matrix.operating_system == 'windows-2019'
+        uses: crazy-max/ghaction-chocolatey@v1.6.0
+        with:
+          args: install mongodb
       - run: npm ci
       - run: npm run validate:schema
       - run: npm test
