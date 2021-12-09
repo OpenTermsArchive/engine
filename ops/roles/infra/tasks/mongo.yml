@@ -1,0 +1,17 @@
+---
+- name: Import the MongoDB public key used by the package management system
+  shell: wget -qO - https://www.mongodb.org/static/pgp/server-4.2.asc | apt-key add -
+
+- name: Create a apt list file for MongoDB
+  shell: echo "deb http://repo.mongodb.org/apt/debian buster/mongodb-org/4.2 main" | tee /etc/apt/sources.list.d/mongodb-org-4.2.list
+
+- name: Install MongoDB
+  apt:
+    name: mongodb-org
+    update_cache: yes
+    state: latest
+
+- name: Start MongoDB service
+  service:
+    name: mongod
+    state: restarted
