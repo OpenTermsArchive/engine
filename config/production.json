@@ -10,8 +10,8 @@
   },
   "logger": {
     "sendMailOnError": {
-      "to": "admin@disinfo.beta.gouv.fr",
-      "from": "admin.ambassadeur-numerique@diplomatie.gouv.fr",
+      "to": "admin@opentermsarchive.org",
+      "from": "noreply@opentermsarchive.org",
       "sendWarnings": false
     }
   },
