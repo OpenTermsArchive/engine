@@ -1,7 +1,5 @@
 ### Exporting a dataset
 
-_NB: The content of a versions repo `OpenTermsArchive-versions` must be in `./data/versions`._
-
 Export data:
 
 ```sh
