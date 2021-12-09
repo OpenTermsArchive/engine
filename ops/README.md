@@ -65,6 +65,7 @@ Some tags are available to refine what will happen, use them with `--tags`:
 - `stop`: to stop the app
 - `restart`: to restart the app
 - `update`: to update the app (pull code, install dependencies and restart app)
+- `update-declarations`: to update services declarations (pull declarations, install dependencies and restart app)
 
 For example, you can update `OpenTermsArchive` by running:
 
