@@ -9,7 +9,6 @@
         "git": {
           "path": "./data/versions",
           "publish": false,
-          "publicRepository": "https://github.com/ambanum/OpenTermsArchive-versions.git",
           "snapshotsBaseUrl": "https://github.com/ambanum/OpenTermsArchive-snapshots/commit/",
           "author": {
             "name": "OTA Bot",
@@ -23,7 +22,6 @@
         "git": {
           "path": "./data/snapshots",
           "publish": false,
-          "publicRepository": "https://github.com/ambanum/OpenTermsArchive-snapshots.git",
           "author": {
             "name": "OTA Bot",
             "email": "bot@opentermsarchive.org"
