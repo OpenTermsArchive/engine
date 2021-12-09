@@ -10,9 +10,9 @@
     - setup
     - update
 
-- name: Install NPM packages
+- name: Install dependencies
   command:
-    cmd: npm i --production --unsafe-perm=true --production=true
+    cmd: npm i --production --unsafe-perm=true
     chdir: '/home/{{ ansible_user }}/{{ app }}'
   tags:
     - setup
@@ -36,6 +36,16 @@
   tags:
     - setup
     - update
+    - update-declarations
+
+- name: Install services declarations dependencies
+  command:
+    cmd: npm i --production
+    chdir: '/home/{{ ansible_user }}/{{ services_directory }}'
+  tags:
+    - setup
+    - update
+    - update-declarations
 
 - name: Stop OpenTermsArchive
   command: pm2 stop "{{ app }}"
@@ -44,6 +54,7 @@
     - restart
     - stop
     - update
+    - update-declarations
 
 - include_tasks: database.yml
   vars:
@@ -67,3 +78,4 @@
     - restart
     - start
     - update
+    - update-declarations
