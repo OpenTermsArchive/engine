@@ -12,7 +12,7 @@
 
 - name: Install dependencies
   command:
-    cmd: npm i --production --unsafe-perm=true --production=true
+    cmd: npm i --production --unsafe-perm=true
     chdir: '/home/{{ ansible_user }}/{{ app }}'
   tags:
     - setup
@@ -40,7 +40,7 @@
 
 - name: Install services declarations dependencies
   command:
-    cmd: npm i --production --production=true
+    cmd: npm i --production
     chdir: '/home/{{ ansible_user }}/{{ services_directory }}'
   tags:
     - setup
