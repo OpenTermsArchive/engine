@@ -63,7 +63,7 @@ There are five ways to handle operational errors:
 - **Crash immediately**. If the error cannot be handled and can affect data integrity.
 
 In our case, we consider all `fetch`-related errors as expected, so as operational errors and we handle them by logging but we do not stop the whole process. We handle errors related to the `notifier` in the same way.
-In contrast, we consider errors from the `history` module as fatal, and we crash immediately.
+In contrast, we consider errors from the `recorder` module as fatal, and we crash immediately.
 
 #### Handling programmer errors
 
