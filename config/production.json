@@ -4,9 +4,31 @@
     "documentTypesPath": "../ota-services-all/document-types.json"
   },
   "recorder": {
-    "snapshotsPath": "../ota-snapshots",
-    "versionsPath": "../ota-versions",
-    "publish": true
+    "versions": {
+      "storage": {
+        "git": {
+          "path": "../ota-versions",
+          "publish": true,
+          "prefixMessageToSnapshotId": "This version was recorded after filtering snapshot https://github.com/ambanum/OpenTermsArchive-snapshots/commit/",
+          "author": {
+            "name": "OTA Bot",
+            "email": "bot@opentermsarchive.org"
+          }
+        }
+      }
+    },
+    "snapshots": {
+      "storage": {
+        "git": {
+          "path": "../ota-snapshots",
+          "publish": true,
+          "author": {
+            "name": "OTA Bot",
+            "email": "bot@opentermsarchive.org"
+          }
+        }
+      }
+    }
   },
   "logger": {
     "sendMailOnError": {
