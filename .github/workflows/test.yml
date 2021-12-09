@@ -23,6 +23,10 @@ jobs:
           git config --global user.email 'bot@opentermsarchive.org'
           git config --global core.autocrlf false
       - uses: actions/checkout@v2
+      - uses: actions/checkout@v2
+        with:
+          repository: OpenTermsArchive/services-all
+          path: ./services-all
       - name: Use Node.js
         uses: actions/setup-node@v1
         with:
@@ -38,5 +42,5 @@ jobs:
         with:
           args: install mongodb
       - run: npm ci
-      - run: npm run validate:schema
+      - run: ./node_modules/.bin/cross-env NODE_ENV=ci npm run validate:schema
       - run: npm test
