@@ -9,7 +9,7 @@
         "git": {
           "path": "./data/versions",
           "publish": false,
-          "snapshotsBaseUrl": "https://github.com/ambanum/OpenTermsArchive-snapshots/commit/",
+          "prefixMessageToSnapshotId": "This version was recorded after filtering snapshot in repository ./data/snapshots with commit ",
           "author": {
             "name": "OTA Bot",
             "email": "bot@opentermsarchive.org"

@@ -13,12 +13,12 @@ import Git from './git.js';
 const fs = fsApi.promises;
 
 export default class GitAdapter {
-  constructor({ path, fileExtension, author, publish, snapshotsBaseUrl }) {
+  constructor({ path, fileExtension, author, publish, prefixMessageToSnapshotId }) {
     this.path = path;
     this.author = author;
     this.fileExtension = fileExtension;
     this.needsPublication = publish;
-    this.snapshotsBaseUrl = snapshotsBaseUrl;
+    this.prefixMessageToSnapshotId = prefixMessageToSnapshotId;
   }
 
   async initialize() {
@@ -122,9 +122,7 @@ export default class GitAdapter {
     let message = `${prefix} ${serviceId} ${documentType}`;
 
     if (snapshotId) {
-      const snapshotUrl = `${this.publish ? this.snapshotsBaseUrl : ''}${snapshotId}`;
-
-      message = `${message}\n\nThis version was recorded after filtering snapshot ${snapshotUrl}`;
+      message = `${message}\n\n${this.prefixMessageToSnapshotId}${snapshotId}`;
     }
 
     return message;
