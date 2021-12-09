@@ -157,14 +157,6 @@ cd ..
 git clone https://github.com/OpenTermsArchive/services-all.git
 ```
 
-### Setting up the database
-
-Initialize the database:
-
-```sh
-npm run setup
-```
-
 ### Configuring
 
 #### Configuration file
