@@ -36,6 +36,7 @@
   tags:
     - setup
     - update
+    - update-declarations
 
 - name: Install services declarations dependencies
   command:
@@ -44,6 +45,7 @@
   tags:
     - setup
     - update
+    - update-declarations
 
 - name: Stop OpenTermsArchive
   command: pm2 stop "{{ app }}"
@@ -52,6 +54,7 @@
     - restart
     - stop
     - update
+    - update-declarations
 
 - include_tasks: database.yml
   vars:
@@ -75,3 +78,4 @@
     - restart
     - start
     - update
+    - update-declarations
