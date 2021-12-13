@@ -7,7 +7,7 @@
           "publish": false,
           "prefixMessageToSnapshotId": "This version was recorded after filtering snapshot https://github.com/ambanum/OpenTermsArchive-snapshots/commit/",
           "author": {
-            "name": "OTA Bot",
+            "name": "Open Terms Archive Bot",
             "email": "bot@opentermsarchive.org"
           }
         }
@@ -19,7 +19,7 @@
           "path": "./data/snapshots",
           "publish": false,
           "author": {
-            "name": "OTA Bot",
+            "name": "Open Terms Archive Bot",
             "email": "bot@opentermsarchive.org"
           }
         }
