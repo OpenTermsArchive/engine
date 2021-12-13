@@ -10,7 +10,7 @@ When re-writting versions, filters are re-applied on snapshots, so services decl
 
 ### Configuring
 
-You can change the **source** and **target** repository in `config/rewrite-snapshots.json`. We use `recorder` module to write in the **target** repository, so to configure **target** repo change the `recorder.snapshots.storage.git.path` value:
+You can change the **source** and **target** repository in `config/rewrite-snapshots.json`. We use the `recorder` module to write to the **target** repository, so to configure the **target** repo, change the `recorder.snapshots.storage.git.path` value:
 
 ```json
 {
@@ -31,7 +31,7 @@ You can change the **source** and **target** repository in `config/rewrite-snaps
 }
 ```
 
-Other configuration are inherited from default `recorder` config.
+Other configuration elements are inherited from the default `recorder` config.
 
 ### Running
 
@@ -59,7 +59,7 @@ The resulting rewritten history can be found in the configured target repository
 
 ### Configuring
 
-You can change the **source** and **target** repository in `config/rewrite-versions.json`. We use `recorder` module to write in the **target** repository, so to configure **target** repo change the `recorder.versions.storage.git.path` value:
+You can change the **source** and **target** repository in `config/rewrite-versions.json`. We use the `recorder` module to write to the **target** repository, so to configure the **target** repo, change the `recorder.versions.storage.git.path` value:
 
 ```json
 {
@@ -80,7 +80,7 @@ You can change the **source** and **target** repository in `config/rewrite-versi
 }
 ```
 
-Other configuration are inherited from default `recorder` config.
+Other configuration elements are inherited from the default `recorder` config.
 
 ### Running
 
