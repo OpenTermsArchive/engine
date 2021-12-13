@@ -151,8 +151,18 @@ export default class GitHub {
 
       for (const existingIssue of existingIssues) {
         if (hasNoneOpened) {
-          await this.octokit.rest.issues.update({ ...this.commonParams, issue_number: existingIssue.number, state: ISSUE_STATE_OPEN }); // eslint-disable-line no-await-in-loop
-          await this.addCommentToIssue({ ...this.commonParams, issue_number: existingIssue.number, body: comment }); // eslint-disable-line no-await-in-loop
+          /* eslint-disable no-await-in-loop */
+          await this.octokit.rest.issues.update({
+            ...this.commonParams,
+            issue_number: existingIssue.number,
+            state: ISSUE_STATE_OPEN,
+          });
+          await this.addCommentToIssue({
+            ...this.commonParams,
+            issue_number: existingIssue.number,
+            body: `${comment}\n${body}`,
+          });
+          /* eslint-enable no-await-in-loop */
           logger.info(`🤖 Reopened automatically as an error occured for ${title}: ${existingIssue.html_url}`);
           break;
         }
