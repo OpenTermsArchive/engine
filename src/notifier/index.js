@@ -21,7 +21,7 @@ export default class Notifier {
     this.delayedVersionNotificationsParams.push({ serviceId, type, versionId });
   }
 
-  async onTrackingChangesRunCompleted() {
+  async onTrackingCompleted() {
     this.delayedVersionNotificationsParams.forEach(async ({ serviceId, type, versionId }) => {
       try {
         await this.notifyVersionRecorded(serviceId, type, versionId);

@@ -470,8 +470,8 @@ describe('Archivist', function () {
         return resetGitRepositories();
       });
 
-      it('emits "startTrackingChangesRun" event', async () => {
-        expect(spies.onStartTrackingChangesRun).to.have.been.calledOnce;
+      it('emits "trackingStarted" event', async () => {
+        expect(spies.onTrackingStarted).to.have.been.calledOnce;
       });
 
       it('emits "firstSnapshotRecorded" events', async () => {
@@ -486,16 +486,16 @@ describe('Archivist', function () {
         expect(spies.onFirstVersionRecorded).to.have.been.calledAfter(spies.onFirstSnapshotRecorded);
       });
 
-      it('emits "trackingChangesRunCompleted" event', async () => {
-        expect(spies.onTrackingChangesRunCompleted).to.have.been.calledAfter(spies.onStartTrackingChangesRun);
+      it('emits "trackingCompleted" event', async () => {
+        expect(spies.onTrackingCompleted).to.have.been.calledAfter(spies.onTrackingStarted);
       });
 
       emitsOnly([
         'firstSnapshotRecorded',
         'onFirstSnapshotRecorded',
         'firstVersionRecorded',
-        'startTrackingChangesRun',
-        'trackingChangesRunCompleted',
+        'trackingStarted',
+        'trackingCompleted',
       ]);
     });
 
@@ -521,8 +521,8 @@ describe('Archivist', function () {
           return resetGitRepositories();
         });
 
-        it('emits "startTrackingChangesRun" event', async () => {
-          expect(spies.onStartTrackingChangesRun).to.have.been.calledOnce;
+        it('emits "trackingStarted" event', async () => {
+          expect(spies.onTrackingStarted).to.have.been.calledOnce;
         });
 
         it('emits "snapshotNotChanged" events', async () => {
@@ -537,16 +537,16 @@ describe('Archivist', function () {
           expect(spies.onVersionNotChanged).to.have.been.calledAfter(spies.onSnapshotNotChanged);
         });
 
-        it('emits "trackingChangesRunCompleted" event', async () => {
-          expect(spies.onTrackingChangesRunCompleted).to.have.been.calledAfter(spies.onStartTrackingChangesRun);
+        it('emits "trackingCompleted" event', async () => {
+          expect(spies.onTrackingCompleted).to.have.been.calledAfter(spies.onTrackingStarted);
         });
 
         emitsOnly([
           'snapshotNotChanged',
           'versionNotChanged',
           'snapshotRecorded',
-          'startTrackingChangesRun',
-          'trackingChangesRunCompleted',
+          'trackingStarted',
+          'trackingCompleted',
         ]);
       });
 
@@ -570,8 +570,8 @@ describe('Archivist', function () {
           return resetGitRepositories();
         });
 
-        it('emits "startTrackingChangesRun" event', async () => {
-          expect(spies.onStartTrackingChangesRun).to.have.been.calledOnce;
+        it('emits "trackingStarted" event', async () => {
+          expect(spies.onTrackingStarted).to.have.been.calledOnce;
         });
 
         it('emits "snapshotNotChanged" events', async () => {
@@ -594,8 +594,8 @@ describe('Archivist', function () {
           expect(spies.onVersionRecorded).to.have.been.calledAfter(spies.onSnapshotRecorded);
         });
 
-        it('emits "trackingChangesRunCompleted" event', async () => {
-          expect(spies.onTrackingChangesRunCompleted).to.have.been.calledAfter(spies.onStartTrackingChangesRun);
+        it('emits "trackingCompleted" event', async () => {
+          expect(spies.onTrackingCompleted).to.have.been.calledAfter(spies.onTrackingStarted);
         });
 
         emitsOnly([
@@ -603,8 +603,8 @@ describe('Archivist', function () {
           'snapshotRecorded',
           'versionNotChanged',
           'versionRecorded',
-          'startTrackingChangesRun',
-          'trackingChangesRunCompleted',
+          'trackingStarted',
+          'trackingCompleted',
         ]);
       });
     });

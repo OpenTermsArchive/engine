@@ -22,10 +22,10 @@ export const AVAILABLE_EVENTS = [
   'versionRecorded',
   'firstVersionRecorded',
   'versionNotChanged',
-  'startRefilterRun',
-  'refilterRunCompleted',
-  'startTrackingChangesRun',
-  'trackingChangesRunCompleted',
+  'refilteringStarted',
+  'refilteringCompleted',
+  'trackingStarted',
+  'trackingCompleted',
   'inaccessibleContent',
   'error',
 ];
@@ -101,7 +101,7 @@ export default class Archivist extends events.EventEmitter {
   async trackChanges(servicesIds = this.serviceIds) {
     servicesIds.sort((a, b) => a.localeCompare(b)); // Sort service ids by lowercase name to have more intuitive logs
 
-    this.emit('startTrackingChangesRun', servicesIds.length, this.getNumberOfDocuments(servicesIds));
+    this.emit('trackingStarted', servicesIds.length, this.getNumberOfDocuments(servicesIds));
 
     await launchHeadlessBrowser();
     await this.recorder.initialize();
@@ -113,7 +113,7 @@ export default class Archivist extends events.EventEmitter {
     stopHeadlessBrowser();
     await this.recorder.finalize();
 
-    this.emit('trackingChangesRunCompleted', servicesIds.length, this.getNumberOfDocuments(servicesIds));
+    this.emit('trackingCompleted', servicesIds.length, this.getNumberOfDocuments(servicesIds));
   }
 
   async trackDocumentChanges(documentDeclaration) {
@@ -162,7 +162,7 @@ export default class Archivist extends events.EventEmitter {
   async refilterAndRecord(servicesIds = this.serviceIds) {
     servicesIds.sort((a, b) => a.localeCompare(b)); // Sort service ids by lowercase name to have more intuitive logs
 
-    this.emit('startRefilterRun', servicesIds.length, this.getNumberOfDocuments(servicesIds));
+    this.emit('refilteringStarted', servicesIds.length, this.getNumberOfDocuments(servicesIds));
 
     await this.recorder.initialize();
 
@@ -171,7 +171,7 @@ export default class Archivist extends events.EventEmitter {
     await this.refilterDocumentsQueue.drain();
     await this.recorder.finalize();
 
-    this.emit('refilterRunCompleted', servicesIds.length, this.getNumberOfDocuments(servicesIds));
+    this.emit('refilteringCompleted', servicesIds.length, this.getNumberOfDocuments(servicesIds));
   }
 
   async refilterAndRecordDocument(documentDeclaration) {
