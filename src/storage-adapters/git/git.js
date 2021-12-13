@@ -14,7 +14,7 @@ export default class Git {
   }
 
   async initialize() {
-    if (!await fileExists(this.path)) {
+    if (!fsApi.existsSync(this.path)) {
       await fs.mkdir(this.path, { recursive: true });
     }
 
@@ -102,17 +102,5 @@ export default class Git {
   relativePath(absolutePath) {
     // Git needs a path relative to the .git directory, not an absolute one
     return path.relative(this.path, absolutePath);
-  }
-}
-
-async function fileExists(filePath) {
-  try {
-    await fs.access(filePath);
-
-    return true;
-  } catch (error) {
-    if (error.code === 'ENOENT') {
-      return false;
-    }
   }
 }
