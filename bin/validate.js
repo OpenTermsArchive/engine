@@ -41,6 +41,6 @@ const VALIDATE_PATH = path.resolve(__dirname, '../scripts/validation/validate.js
       });
   } catch (error) {
     console.error(error);
-    process.exitCode = 1;
+    process.exitCode = 2;
   }
 })();
