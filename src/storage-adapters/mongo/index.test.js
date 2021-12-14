@@ -168,36 +168,6 @@ describe('MongoAdapter', () => {
       it('returns a boolean to know if it is the first record', () => {
         expect(record.isFirstRecord).to.be.false;
       });
-
-      it('stores the service id', () => {
-        expect(mongoDocument.serviceId).to.include(SERVICE_PROVIDER_ID);
-      });
-
-      it('stores the document type', () => {
-        expect(mongoDocument.documentType).to.include(DOCUMENT_TYPE);
-      });
-
-      it('does not store information that it is the first record for this specific document', () => {
-        expect(mongoDocument.isFirstRecord).to.be.undefined;
-      });
-
-      it('stores the proper content', () => {
-        expect(mongoDocument.content).to.equal(UPDATED_CONTENT);
-      });
-
-      context('when provided', () => {
-        it('stores the fetch date', () => {
-          expect(new Date(mongoDocument.fetchDate).getTime()).to.equal(FETCH_DATE.getTime());
-        });
-
-        it('stores the mime type', () => {
-          expect(mongoDocument.mimeType).to.equal(MIME_TYPE);
-        });
-
-        it('stores the snapshot ID', () => {
-          expect(mongoDocument.snapshotId.toString()).to.include(SNAPSHOT_ID);
-        });
-      });
     });
 
     context('when the content has not changed', () => {
@@ -286,38 +256,8 @@ describe('MongoAdapter', () => {
         expect(mongoDocument._id.toString()).to.equal(record.id);
       });
 
-      it('returns a boolean to know if it is the first record', () => {
-        expect(record.isFirstRecord).to.be.false;
-      });
-
-      it('stores the service id', () => {
-        expect(mongoDocument.serviceId).to.include(SERVICE_PROVIDER_ID);
-      });
-
-      it('stores the document type', () => {
-        expect(mongoDocument.documentType).to.include(DOCUMENT_TYPE);
-      });
-
       it('stores information that it is a refilter of this specific document', () => {
         expect(mongoDocument.isRefilter).to.be.true;
-      });
-
-      it('stores the proper content', () => {
-        expect(mongoDocument.content).to.equal(REFILTERED_CONTENT);
-      });
-
-      context('when provided', () => {
-        it('stores the fetch date', () => {
-          expect(new Date(mongoDocument.fetchDate).getTime()).to.equal(FETCH_DATE.getTime());
-        });
-
-        it('stores the mime type', () => {
-          expect(mongoDocument.mimeType).to.equal(MIME_TYPE);
-        });
-
-        it('stores the snapshot ID', () => {
-          expect(mongoDocument.snapshotId.toString()).to.include(SNAPSHOT_ID);
-        });
       });
     });
 
@@ -360,38 +300,12 @@ describe('MongoAdapter', () => {
         expect(mongoDocument._id.toString()).to.equal(record.id);
       });
 
-      it('returns a boolean to know if it is the first record', () => {
-        expect(record.isFirstRecord).to.be.true;
-      });
-
-      it('stores the service id', () => {
-        expect(mongoDocument.serviceId).to.include(SERVICE_PROVIDER_ID);
-      });
-
-      it('stores the document type', () => {
-        expect(mongoDocument.documentType).to.include(DOCUMENT_TYPE);
-      });
-
-      it('stores information that it is the first record for this specific document', () => {
-        expect(mongoDocument.isFirstRecord).to.be.true;
-      });
-
       it('stores the proper content', () => {
         expect(mongoDocument.content).to.equal(PDF_CONTENT);
       });
 
-      context('when provided', () => {
-        it('stores the fetch date', () => {
-          expect(new Date(mongoDocument.fetchDate).getTime()).to.equal(FETCH_DATE.getTime());
-        });
-
-        it('stores the mime type', () => {
-          expect(mongoDocument.mimeType).to.equal(PDF_MIME_TYPE);
-        });
-
-        it('stores the snapshot ID', () => {
-          expect(mongoDocument.snapshotId.toString()).to.include(SNAPSHOT_ID);
-        });
+      it('stores the mime type', () => {
+        expect(mongoDocument.mimeType).to.equal(PDF_MIME_TYPE);
       });
     });
   });

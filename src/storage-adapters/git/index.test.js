@@ -274,36 +274,6 @@ describe('GitAdapter', () => {
       it('returns a boolean to know if it is the first record', () => {
         expect(isFirstRecord).to.be.false;
       });
-
-      it('stores the service id', () => {
-        expect(commit.message).to.include(SERVICE_PROVIDER_ID);
-      });
-
-      it('stores the document type', () => {
-        expect(commit.message).to.include(DOCUMENT_TYPE);
-      });
-
-      it('stores information that it is not the first record for this specific document', () => {
-        expect(commit.message).to.include('Update');
-      });
-
-      it('stores the proper content', () => {
-        expect(fs.readFileSync(EXPECTED_FILE_PATH, { encoding: 'utf8' })).to.equal(UPDATED_CONTENT);
-      });
-
-      context('when provided', () => {
-        it('stores the fetch date', () => {
-          expect(new Date(commit.date).getTime()).to.equal(FETCH_DATE.getTime());
-        });
-
-        it('stores the mime type', () => {
-          expect(mime.getType(EXPECTED_FILE_PATH)).to.equal(MIME_TYPE);
-        });
-
-        it('stores the snapshot ID', () => {
-          expect(commit.body).to.include(SNAPSHOT_ID);
-        });
-      });
     });
 
     context('when the content has not changed', () => {
@@ -373,38 +343,8 @@ describe('GitAdapter', () => {
         expect(commit.hash).to.include(id);
       });
 
-      it('returns a boolean to know if it is the first record', () => {
-        expect(isFirstRecord).to.be.false;
-      });
-
-      it('stores the service id', () => {
-        expect(commit.message).to.include(SERVICE_PROVIDER_ID);
-      });
-
-      it('stores the document type', () => {
-        expect(commit.message).to.include(DOCUMENT_TYPE);
-      });
-
       it('stores information that it is a refilter of this specific document', () => {
         expect(commit.message).to.include('Refilter');
-      });
-
-      it('stores the proper content', () => {
-        expect(fs.readFileSync(EXPECTED_FILE_PATH, { encoding: 'utf8' })).to.equal(REFILTERED_CONTENT);
-      });
-
-      context('when provided', () => {
-        it('stores the fetch date', () => {
-          expect(new Date(commit.date).getTime()).to.equal(FETCH_DATE.getTime());
-        });
-
-        it('stores the mime type', () => {
-          expect(mime.getType(EXPECTED_FILE_PATH)).to.equal(MIME_TYPE);
-        });
-
-        it('stores the snapshot ID', () => {
-          expect(commit.body).to.include(SNAPSHOT_ID);
-        });
       });
     });
 
@@ -436,38 +376,12 @@ describe('GitAdapter', () => {
         expect(commit.hash).to.include(id);
       });
 
-      it('returns a boolean to know if it is the first record', () => {
-        expect(isFirstRecord).to.be.true;
-      });
-
-      it('stores the service id', () => {
-        expect(commit.message).to.include(SERVICE_PROVIDER_ID);
-      });
-
-      it('stores the document type', () => {
-        expect(commit.message).to.include(DOCUMENT_TYPE);
-      });
-
-      it('stores information that it is the first record for this specific document', () => {
-        expect(commit.message).to.include('Start tracking');
-      });
-
       it('stores the proper content', () => {
         expect(fs.readFileSync(EXPECTED_PDF_FILE_PATH, { encoding: 'utf8' })).to.equal(PDF_CONTENT);
       });
 
-      context('when provided', () => {
-        it('stores the fetch date', () => {
-          expect(new Date(commit.date).getTime()).to.equal(FETCH_DATE.getTime());
-        });
-
-        it('stores the mime type', () => {
-          expect(mime.getType(EXPECTED_PDF_FILE_PATH)).to.equal(PDF_MIME_TYPE);
-        });
-
-        it('stores the snapshot ID', () => {
-          expect(commit.body).to.include(SNAPSHOT_ID);
-        });
+      it('stores the mime type', () => {
+        expect(mime.getType(EXPECTED_PDF_FILE_PATH)).to.equal(PDF_MIME_TYPE);
       });
     });
   });
@@ -476,36 +390,39 @@ describe('GitAdapter', () => {
     context('when there are records for the given service', () => {
       let lastSnapshotId;
       let latestRecord;
-      const UPDATED_FILE_CONTENT = `${CONTENT} (with additional content to trigger a record)`;
 
-      before(async () => {
-        await subject.record({
-          serviceId: SERVICE_PROVIDER_ID,
-          documentType: DOCUMENT_TYPE,
-          content: CONTENT,
+      context('with HTML document', () => {
+        const UPDATED_FILE_CONTENT = `${CONTENT} (with additional content to trigger a record)`;
+
+        before(async () => {
+          await subject.record({
+            serviceId: SERVICE_PROVIDER_ID,
+            documentType: DOCUMENT_TYPE,
+            content: CONTENT,
+          });
+
+          ({ id: lastSnapshotId } = await subject.record({
+            serviceId: SERVICE_PROVIDER_ID,
+            documentType: DOCUMENT_TYPE,
+            content: UPDATED_FILE_CONTENT,
+          }));
+
+          latestRecord = await subject.getLatestRecord(SERVICE_PROVIDER_ID, DOCUMENT_TYPE);
         });
 
-        ({ id: lastSnapshotId } = await subject.record({
-          serviceId: SERVICE_PROVIDER_ID,
-          documentType: DOCUMENT_TYPE,
-          content: UPDATED_FILE_CONTENT,
-        }));
+        after(async () => subject._removeAllRecords());
 
-        latestRecord = await subject.getLatestRecord(SERVICE_PROVIDER_ID, DOCUMENT_TYPE);
-      });
+        it('returns the latest record id', () => {
+          expect(latestRecord.id).to.include(lastSnapshotId);
+        });
 
-      after(async () => subject._removeAllRecords());
+        it('returns the latest record content', () => {
+          expect(latestRecord.content.toString('utf8')).to.equal(UPDATED_FILE_CONTENT);
+        });
 
-      it('returns the latest record id', () => {
-        expect(latestRecord.id).to.include(lastSnapshotId);
-      });
-
-      it('returns the latest record content', () => {
-        expect(latestRecord.content.toString('utf8')).to.equal(UPDATED_FILE_CONTENT);
-      });
-
-      it('returns the latest record mime type', () => {
-        expect(latestRecord.mimeType).to.equal(MIME_TYPE);
+        it('returns the latest record mime type', () => {
+          expect(latestRecord.mimeType).to.equal(MIME_TYPE);
+        });
       });
 
       context('with PDF document', () => {
