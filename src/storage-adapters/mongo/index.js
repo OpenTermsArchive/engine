@@ -52,7 +52,9 @@ export default class MongoAdapter {
 
     const isFirstRecord = !await this.collection.findOne({ serviceId, documentType });
 
-    recordProperties.snapshotId = new ObjectId(snapshotId);
+    if (snapshotId) {
+      recordProperties.snapshotId = new ObjectId(snapshotId);
+    }
 
     if (isFirstRecord) {
       recordProperties.isFirstRecord = isFirstRecord;
