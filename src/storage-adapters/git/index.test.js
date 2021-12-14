@@ -100,7 +100,7 @@ describe('GitAdapter', () => {
   });
 
   describe('#_commit', () => {
-    const commitMessage = 'Message to check if the commit message is properly saved';
+    const COMMIT_MESSAGE = 'Message to check if the commit message is properly saved';
     let id;
     let commit;
 
@@ -111,7 +111,7 @@ describe('GitAdapter', () => {
         content: CONTENT,
       });
 
-      id = await subject._commit(EXPECTED_FILE_PATH, commitMessage);
+      id = await subject._commit(EXPECTED_FILE_PATH, COMMIT_MESSAGE);
 
       ([commit] = await git.log());
     });
@@ -123,7 +123,7 @@ describe('GitAdapter', () => {
     });
 
     it('properly saves the commit message', () => {
-      expect(commit.message).to.equal(commitMessage);
+      expect(commit.message).to.equal(COMMIT_MESSAGE);
     });
   });
 
