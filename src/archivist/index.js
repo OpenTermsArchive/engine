@@ -103,15 +103,13 @@ export default class Archivist extends events.EventEmitter {
 
     this.emit('trackingStarted', servicesIds.length, this.getNumberOfDocuments(servicesIds));
 
-    await launchHeadlessBrowser();
-    await this.recorder.initialize();
+    await Promise.all([ launchHeadlessBrowser(), this.recorder.initialize() ]);
 
     this._forEachDocumentOf(servicesIds, documentDeclaration => this.trackDocumentChangesQueue.push(documentDeclaration));
 
     await this.trackDocumentChangesQueue.drain();
 
-    stopHeadlessBrowser();
-    await this.recorder.finalize();
+    await Promise.all([ stopHeadlessBrowser(), this.recorder.finalize() ]);
 
     this.emit('trackingCompleted', servicesIds.length, this.getNumberOfDocuments(servicesIds));
   }
