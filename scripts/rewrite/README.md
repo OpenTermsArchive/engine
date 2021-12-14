@@ -6,6 +6,8 @@ The script works by reading commits from a **source** repository, applying chang
 
 When re-writting versions, filters are re-applied on snapshots, so services declarations and history are required.
 
+:warning: Currently, history rewriting only works with Git storage.
+
 ## Rewrite snapshots
 
 ### Configuring

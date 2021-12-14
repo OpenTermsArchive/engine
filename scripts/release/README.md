@@ -7,3 +7,5 @@ npm run release
 ```
 
 The resulting zipped dataset that will be uploaded to GitHub can be found in `data/dataset-YYYY-MM-DD-SHORT_SHA.zip`.
+
+:warning: Currently, releasing a dataset only works with Git storage.
