@@ -65,19 +65,27 @@
   ignore_errors: yes
   tags:
     - restart
+    - stop
     - update
+    - update-declarations
 
 - include_tasks: database.yml
   vars:
     name: OpenTermsArchive-Snapshots
     repository: '{{ snapshots_repository }}'
     directory: '{{ snapshots_directory }}'
+  tags:
+    - setup
+    - update
 
 - include_tasks: database.yml
   vars:
     name: OpenTermsArchive-Versions
     repository: '{{ versions_repository }}'
     directory: '{{ versions_directory }}'
+  tags:
+    - setup
+    - update
 
 - name: Start OpenTermsArchive
   command:
