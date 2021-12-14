@@ -177,7 +177,7 @@ describe('MongoAdapter', () => {
         expect(mongoDocument.documentType).to.include(DOCUMENT_TYPE);
       });
 
-      it('stores information that it is the first record for this specific document', () => {
+      it('does not store information that it is the first record for this specific document', () => {
         expect(mongoDocument.isFirstRecord).to.be.undefined;
       });
 

@@ -52,7 +52,7 @@ describe('GitAdapter', () => {
   });
 
   describe('#_save', () => {
-    context('when service’s directory already exist', () => {
+    context('when service’s directory already exists', () => {
       before(async () => subject._save({
         serviceId: SERVICE_PROVIDER_ID,
         documentType: DOCUMENT_TYPE,
