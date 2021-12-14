@@ -41,5 +41,7 @@ const VALIDATE_PATH = path.resolve(__dirname, '../scripts/validation/validate.js
       if (hasFailedTests) {
         process.exit(1);
       }
+
+      process.exit(0);
     });
 })();
