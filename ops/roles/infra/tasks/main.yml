@@ -61,3 +61,5 @@
     - gh
   tags:
     - setup
+
+- include_tasks: mongo.yml

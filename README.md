@@ -26,6 +26,7 @@
   - [Setting up the database](#setting-up-the-database)
   - [Configuring](#configuring)
     - [Configuration file](#configuration-file)
+      - [Specific storage adapters configuration](#storage-adapters-configuration)
     - [Environment variables](#environment-variables)
       - [SMTP_HOST and SMTP_USERNAME](#smtp_host-and-smtp_username)
       - [HTTP_PROXY and HTTPS_PROXY](#http_proxy-and-https_proxy)
@@ -157,14 +158,6 @@ cd ..
 git clone https://github.com/OpenTermsArchive/services-all.git
 ```
 
-### Setting up the database
-
-Initialize the database:
-
-```sh
-npm run setup
-```
-
 ### Configuring
 
 #### Configuration file
@@ -177,13 +170,16 @@ The default configuration can be read and changed in `config/default.json`.
     "declarationsPath": "Directory containing services declarations and associated filters.",
     "documentTypesPath": "File containing document types."
   },
-  "history": {
-    "snapshotsPath": "Snapshots database directory path, relative to the root of this project",
-    "versionsPath": "Versions database directory path, relative to the root of this project",
-    "publish": "Boolean. Set to true to publish changes to the shared, global database. Should be true only in production.",
-    "author": {
-      "name": "Name to which changes in tracked documents will be credited",
-      "email": "Email to which changes in tracked documents will be credited"
+  "recorder": {
+    "versions": {
+      "storage": {
+        "<storage-adapter>": "Object. Storage adapter configuration. See below."
+      }
+    },
+    "snapshots": {
+      "storage": {
+        "<storage-adapter>": "Object. Storage adapter configuration. See below."
+      }
     }
   },
   "fetcher": {
@@ -216,15 +212,42 @@ An example of a production configuration file can be found in `config/production
 }
 ```
 
-- Public URLs to the snapshots and versions repositories, used to automate the initial database setup (`publicSnapshotsRepository` and `publicVersionsRepository` which are used by `npm setup`) and for the links in notifications (`snapshotsBaseUrl`):
+##### Storage adapters configuration
+
+Two storage adapters are currently supported: Git and MongoDB. Each one can be used independently for versions and snapshots.
+
+###### Git configuration
 
 ```json
 {
-  "history": {
-    "publicSnapshotsRepository": "https://github.com/ambanum/OpenTermsArchive-snapshots.git",
-    "publicVersionsRepository": "https://github.com/ambanum/OpenTermsArchive-versions.git",
-    "snapshotsBaseUrl": "https://github.com/ambanum/OpenTermsArchive-snapshots/commit/"
+  …
+  "storage": {
+    "git": {
+      "path": "Versions database directory path, relative to the root of this project",
+      "publish": "Boolean. Set to true to push changes to the origin of the cloned repository at the end of every run. Recommended for production only.",
+      "prefixMessageToSnapshotId": "Text. Prefix used to explicit where to find the referenced snapshot id. Only useful for versions",
+      "author": {
+        "name": "Name to which changes in tracked documents will be credited",
+        "email": "Email to which changes in tracked documents will be credited"
+      }
+    }
   }
+  …
+}
+```
+###### MongoDB configuration
+
+```json
+{
+    …
+  "storage": {
+    "mongo": {
+      "connectionURI": "URI for defining connection to the MongoDB instance. See https://docs.mongodb.com/manual/reference/connection-string/",
+      "database": "Database name",
+      "collection": "Collection name"
+    }
+  }
+  …
 }
 ```
 

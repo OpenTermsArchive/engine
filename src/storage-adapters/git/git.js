@@ -1,21 +1,26 @@
+import fsApi from 'fs';
 import path from 'path';
 
-import config from 'config';
 import simpleGit from 'simple-git';
 
 process.env.LC_ALL = 'en_GB'; // Ensure git messages will be in English as some errors are handled by analysing the message content
 
+const fs = fsApi.promises;
+
 export default class Git {
-  constructor(repositoryPath) {
+  constructor({ path: repositoryPath, author }) {
     this.path = repositoryPath;
-    this.git = simpleGit(repositoryPath, { maxConcurrentProcesses: 1 });
+    this.author = author;
   }
 
-  async init() {
-    return this.git.init();
-  }
+  async initialize() {
+    if (!fsApi.existsSync(this.path)) {
+      await fs.mkdir(this.path, { recursive: true });
+    }
 
-  async initConfig() {
+    this.git = simpleGit(this.path, { maxConcurrentProcesses: 1 });
+    await this.git.init();
+
     return this.git.addConfig('core.autocrlf', false);
   }
 
@@ -24,11 +29,12 @@ export default class Git {
   }
 
   async commit(filepath, message, authorDate) {
-    const options = { '--author': `${config.get('history.author').name} <${config.get('history.author').email}>` };
+    const options = { '--author': `${this.author.name} <${this.author.email}>` };
 
     if (authorDate) {
       options['--date'] = new Date(authorDate).toISOString();
     }
+
     let summary;
 
     if (filepath) {

@@ -83,8 +83,20 @@ logger.onVersionNotChanged = (serviceId, type) => {
   logger.info({ message: 'No changes after filtering, did not record version.', serviceId, type });
 };
 
-logger.onRecordsPublished = () => {
-  logger.info({ message: 'Records published.' });
+logger.onRefilteringStarted = (numberOfServices, numberOfDocuments) => {
+  logger.info(`👇  Refiltering ${numberOfDocuments} documents from ${numberOfServices} services…`);
+};
+
+logger.onRefilteringCompleted = (numberOfServices, numberOfDocuments) => {
+  logger.info(`👆  Refiltered ${numberOfDocuments} documents from ${numberOfServices} services.\n`);
+};
+
+logger.onTrackingStarted = (numberOfServices, numberOfDocuments) => {
+  logger.info(`👇  Start tracking changes of ${numberOfDocuments} documents from ${numberOfServices} services…`);
+};
+
+logger.onTrackingCompleted = (numberOfServices, numberOfDocuments) => {
+  logger.info(`👆  Tracked changes of ${numberOfDocuments} documents from ${numberOfServices} services.\n`);
 };
 
 logger.onInaccessibleContent = ({ message }, serviceId, type) => {

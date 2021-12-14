@@ -3,10 +3,32 @@
     "declarationsPath": "../ota-services-all/declarations",
     "documentTypesPath": "../ota-services-all/document-types.json"
   },
-  "history": {
-    "snapshotsPath": "../ota-snapshots",
-    "versionsPath": "../ota-versions",
-    "publish": true
+  "recorder": {
+    "versions": {
+      "storage": {
+        "git": {
+          "path": "../ota-versions",
+          "publish": true,
+          "prefixMessageToSnapshotId": "This version was recorded after filtering snapshot https://github.com/ambanum/OpenTermsArchive-snapshots/commit/",
+          "author": {
+            "name": "Open Terms Archive Bot",
+            "email": "bot@opentermsarchive.org"
+          }
+        }
+      }
+    },
+    "snapshots": {
+      "storage": {
+        "git": {
+          "path": "../ota-snapshots",
+          "publish": true,
+          "author": {
+            "name": "Open Terms Archive Bot",
+            "email": "bot@opentermsarchive.org"
+          }
+        }
+      }
+    }
   },
   "logger": {
     "sendMailOnError": {

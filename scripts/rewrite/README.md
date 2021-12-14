@@ -6,16 +6,26 @@ The script works by reading commits from a **source** repository, applying chang
 
 When re-writting versions, filters are re-applied on snapshots, so services declarations and history are required.
 
+:warning: Currently, history rewriting only works with Git storage.
+
 ## Rewrite snapshots
 
 ### Configuring
 
-You can change the **source** and **target** repository in `config/rewrite-snapshots.json`. We use `history` module to write in the **target** repository, so to configure **target** repo change the `history.snapshotPath` value:
+You can change the **source** and **target** repository in `config/rewrite-snapshots.json`. We use the `recorder` module to write to the **target** repository, so to configure the **target** repo, change the `recorder.snapshots.storage.git.path` value:
 
 ```json
 {
-  "history": {
-    "snapshotsPath": "<Target repository>"
+  …
+  "recorder": {
+    "snapshots": {
+      "storage": {
+        "git": {
+          "path": "<Target repository>"
+          …
+        }
+      }
+    }
   },
   "rewrite": {
     "snapshotsSourcePath": "<Source repository>"
@@ -23,7 +33,7 @@ You can change the **source** and **target** repository in `config/rewrite-snaps
 }
 ```
 
-Other configuration are inherited from default `history` config.
+Other configuration elements are inherited from the default `recorder` config.
 
 ### Running
 
@@ -51,12 +61,20 @@ The resulting rewritten history can be found in the configured target repository
 
 ### Configuring
 
-You can change the **source** and **target** repository in `config/rewrite-versions.json`. We use `history` module to write in the **target** repository, so to configure **target** repo change the `history.versionsPath` value:
+You can change the **source** and **target** repository in `config/rewrite-versions.json`. We use the `recorder` module to write to the **target** repository, so to configure the **target** repo, change the `recorder.versions.storage.git.path` value:
 
 ```json
 {
-  "history": {
-    "versionsPath": "<Target repository>"
+  …
+  "recorder": {
+    "versions": {
+      "storage": {
+        "git": {
+          "path": "<Target repository>"
+          …
+        }
+      }
+    }
   },
   "rewrite": {
     "snapshotsSourcePath": "<Source repository>"
@@ -64,7 +82,7 @@ You can change the **source** and **target** repository in `config/rewrite-versi
 }
 ```
 
-Other configuration are inherited from default `history` config.
+Other configuration elements are inherited from the default `recorder` config.
 
 ### Running
 

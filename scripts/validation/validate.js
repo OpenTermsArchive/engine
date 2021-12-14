@@ -128,7 +128,7 @@ let servicesToValidate = args;
                 expect(filteredContent.length).to.be.greaterThan(MIN_DOC_LENGTH);
               });
 
-              context('When fetched and filtered twice in a row', () => {
+              context('when fetched and filtered twice in a row', () => {
                 // do not use arrow function to avoid binding to `this` and to allow `this.skip` to work
                 it('has consistent filtered content', async function () { // eslint-disable-line func-names
                   if (!content) {

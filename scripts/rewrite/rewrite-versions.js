@@ -1,12 +1,14 @@
 import path from 'path';
-import { fileURLToPath, pathToFileURL } from 'url';
+import { fileURLToPath } from 'url';
 
 import config from 'config';
 
 import { InaccessibleContentError } from '../../src/archivist/errors.js';
 import filter from '../../src/archivist/filter/index.js';
-import Git from '../../src/archivist/history/git.js';
+import Recorder from '../../src/archivist/recorder/index.js';
 import * as services from '../../src/archivist/services/index.js';
+import Git from '../../src/storage-adapters/git/git.js';
+import GitAdapter from '../../src/storage-adapters/git/index.js';
 
 import * as initializer from './initializer/index.js';
 import * as renamer from './renamer/index.js';
@@ -20,7 +22,7 @@ export const SNAPSHOTS_SOURCE_PATH = path.resolve(
   ROOT_PATH,
   config.get('rewrite.snapshotsSourcePath'),
 );
-export const VERSIONS_TARGET_PATH = path.resolve(ROOT_PATH, config.get('history.versionsPath'));
+export const VERSIONS_TARGET_PATH = path.resolve(ROOT_PATH, config.get('recorder.versions.storage.git.path'));
 
 const initialize = process.argv.includes('--init');
 
@@ -31,7 +33,7 @@ const COUNTERS = {
   skippedUnknownError: 0,
 };
 
-let history;
+let recorder;
 
 (async () => {
   console.time('Total time');
@@ -39,7 +41,9 @@ let history;
 
   await renamer.loadRules();
   const servicesDeclarations = await services.loadWithHistory();
-  const sourceRepo = new Git(SNAPSHOTS_SOURCE_PATH);
+  const sourceRepo = new Git({ path: SNAPSHOTS_SOURCE_PATH, author: config.get('recorder.snapshots.storage.git.author') });
+
+  await sourceRepo.initialize();
 
   console.log('Waiting for git log… (this can take a while)');
   const commits = (await sourceRepo.log(['--stat=4096'])).sort((a, b) => new Date(a.date) - new Date(b.date));
@@ -53,8 +57,20 @@ let history;
     await initializer.initReadmeAndLicense(targetRepo, VERSIONS_TARGET_PATH, readmeCommit.date);
   }
 
-  history = await import(pathToFileURL(path.resolve(ROOT_PATH, 'src/archivist/history/index.js'))); // history module needs the target repo to be initiliazed. So loads it after target repo initialization.
-  await history.init();
+  recorder = new Recorder({
+    versionsStorageAdapter: new GitAdapter({
+      ...config.get('recorder.versions.storage.git'),
+      path: VERSIONS_TARGET_PATH,
+      fileExtension: 'md',
+    }),
+    snapshotsStorageAdapter: new GitAdapter({
+      ...config.get('recorder.snapshots.storage.git'),
+      path: SNAPSHOTS_SOURCE_PATH,
+      fileExtension: 'html',
+    }),
+  });
+
+  await recorder.initialize();
 
   const filteredCommits = commits.filter(({ message }) =>
     message.match(/^(Start tracking|Update)/));
@@ -101,11 +117,11 @@ let history;
         documentDeclaration,
       });
 
-      const { id: versionId } = await history.recordVersion({
+      const { id: versionId } = await recorder.recordVersion({
         serviceId,
         documentType,
         content: document,
-        authorDate: commit.date,
+        fetchDate: commit.date,
         snapshotId: commit.hash,
       });
 

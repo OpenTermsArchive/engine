@@ -5,15 +5,18 @@ import { fileURLToPath } from 'url';
 import config from 'config';
 import fse from 'fs-extra';
 
-import Git from '../../src/archivist/history/git.js';
+import Git from '../../src/storage-adapters/git/git.js';
 
 const fs = fsApi.promises;
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const OTA_VERSIONS_PATH = path.resolve(__dirname, '../..', config.get('history.versionsPath'));
+const OTA_VERSIONS_PATH = path.resolve(__dirname, '../..', config.get('recorder.versions.storage.git.path'));
 const TEMP_WORK_FOLDER = path.resolve(__dirname, '../..', 'tmp/');
 
-const git = new Git(OTA_VERSIONS_PATH);
+const git = new Git({
+  path: OTA_VERSIONS_PATH,
+  author: config.get('recorder.versions.storage.git.author'),
+});
 
 const serviceMap = {
   AskFM: 'ASKfm',
@@ -159,5 +162,6 @@ async function main() {
 }
 
 (async () => {
+  await git.initialize();
   await main();
 })();

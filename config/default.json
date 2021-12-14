@@ -3,16 +3,31 @@
     "declarationsPath": "../services-all/declarations",
     "documentTypesPath": "../services-all/document-types.json"
   },
-  "history": {
-    "snapshotsPath": "./data/snapshots",
-    "versionsPath": "./data/versions",
-    "publish": false,
-    "publicSnapshotsRepository": "https://github.com/ambanum/OpenTermsArchive-snapshots.git",
-    "publicVersionsRepository": "https://github.com/ambanum/OpenTermsArchive-versions.git",
-    "snapshotsBaseUrl": "https://github.com/ambanum/OpenTermsArchive-snapshots/commit/",
-    "author": {
-      "name": "OTA Bot",
-      "email": "bot@opentermsarchive.org"
+  "recorder": {
+    "versions": {
+      "storage": {
+        "git": {
+          "path": "./data/versions",
+          "publish": false,
+          "prefixMessageToSnapshotId": "This version was recorded after filtering snapshot in repository ./data/snapshots with commit ",
+          "author": {
+            "name": "OTA Bot",
+            "email": "bot@opentermsarchive.org"
+          }
+        }
+      }
+    },
+    "snapshots": {
+      "storage": {
+        "git": {
+          "path": "./data/snapshots",
+          "publish": false,
+          "author": {
+            "name": "OTA Bot",
+            "email": "bot@opentermsarchive.org"
+          }
+        }
+      }
     }
   },
   "fetcher": {

@@ -2,9 +2,42 @@
   "services": {
     "declarationsPath": "./test/services"
   },
-  "history": {
-    "snapshotsPath": "./test/data/snapshots",
-    "versionsPath": "./test/data/versions"
+  "recorder": {
+    "versions": {
+      "storage": {
+        "git": {
+          "path": "./test/data/versions",
+          "publish": false,
+          "prefixMessageToSnapshotId": "This version was recorded after filtering snapshot https://github.com/ambanum/OpenTermsArchive-snapshots/commit/",
+          "author": {
+            "name": "Open Terms Archive Testing Bot",
+            "email": "bot@opentermsarchive.org"
+          }
+        },
+        "mongo": {
+          "connectionURI": "mongodb://localhost:27017",
+          "database": "open-terms-archive-test",
+          "collection": "versions"
+        }
+      }
+    },
+    "snapshots": {
+      "storage": {
+        "git": {
+          "path": "./test/data/snapshots",
+          "publish": false,
+          "author": {
+            "name": "Open Terms Archive Testing Bot",
+            "email": "bot@opentermsarchive.org"
+          }
+        },
+        "mongo": {
+          "connectionURI": "mongodb://localhost:27017",
+          "database": "open-terms-archive-test",
+          "collection": "snapshots"
+        }
+      }
+    }
   },
   "fetcher": {
     "waitForElementsTimeout": 1000

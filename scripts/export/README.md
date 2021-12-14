@@ -1,7 +1,5 @@
 ### Exporting a dataset
 
-_NB: The content of a versions repo `OpenTermsArchive-versions` must be in `./data/versions`._
-
 Export data:
 
 ```sh
@@ -15,3 +13,5 @@ Export data to any folder (path is relative to the root of this repo)
 ```sh
 npm run export -- --folder-name=/target/dir
 ```
+
+:warning: Currently, exporting a dataset only works with Git storage.

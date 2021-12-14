@@ -1,12 +1,11 @@
 import events from 'events';
 
 import async from 'async';
-import config from 'config';
 
 import { InaccessibleContentError } from './errors.js';
 import fetch, { launchHeadlessBrowser, stopHeadlessBrowser, FetchDocumentError } from './fetcher/index.js';
 import filter from './filter/index.js';
-import * as history from './history/index.js';
+import Recorder from './recorder/index.js';
 import * as services from './services/index.js';
 
 // The parallel handling feature is currently set to a parallelism of 1 on document tracking
@@ -23,7 +22,10 @@ export const AVAILABLE_EVENTS = [
   'versionRecorded',
   'firstVersionRecorded',
   'versionNotChanged',
-  'recordsPublished',
+  'refilteringStarted',
+  'refilteringCompleted',
+  'trackingStarted',
+  'trackingCompleted',
   'inaccessibleContent',
   'error',
 ];
@@ -37,22 +39,26 @@ export default class Archivist extends events.EventEmitter {
     return Object.keys(this.services);
   }
 
-  async init() {
+  constructor({ storage: { versions, snapshots } }) {
+    super();
+    this.recorder = new Recorder({ versionsStorageAdapter: versions, snapshotsStorageAdapter: snapshots });
+  }
+
+  async initialize() {
     if (this.services) {
-      return this.services;
+      return;
     }
 
+    await this.recorder.initialize();
     this.initQueues();
     this.services = await services.load();
-    await history.init();
 
-    this.on('error', () => {
+    this.on('error', async () => {
       this.refilterDocumentsQueue.kill();
       this.trackDocumentChangesQueue.kill();
       stopHeadlessBrowser();
+      await this.recorder.finalize();
     });
-
-    return this.services;
   }
 
   initQueues() {
@@ -90,16 +96,20 @@ export default class Archivist extends events.EventEmitter {
     });
   }
 
-  async trackChanges(servicesIds) {
-    await launchHeadlessBrowser();
+  async trackChanges(servicesIds = this.serviceIds) {
+    servicesIds.sort((a, b) => a.localeCompare(b)); // Sort service ids by lowercase name to have more intuitive logs
+
+    this.emit('trackingStarted', servicesIds.length, this.getNumberOfDocuments(servicesIds));
+
+    await Promise.all([ launchHeadlessBrowser(), this.recorder.initialize() ]);
 
     this._forEachDocumentOf(servicesIds, documentDeclaration => this.trackDocumentChangesQueue.push(documentDeclaration));
 
     await this.trackDocumentChangesQueue.drain();
 
-    stopHeadlessBrowser();
+    await Promise.all([ stopHeadlessBrowser(), this.recorder.finalize() ]);
 
-    await this.publish();
+    this.emit('trackingCompleted', servicesIds.length, this.getNumberOfDocuments(servicesIds));
   }
 
   async trackDocumentChanges(documentDeclaration) {
@@ -122,10 +132,12 @@ export default class Archivist extends events.EventEmitter {
       throw error;
     }
 
+    const fetchDate = new Date();
     const snapshotId = await this.recordSnapshot({
       content,
       mimeType,
       documentDeclaration,
+      fetchDate,
     });
 
     if (!snapshotId) {
@@ -137,22 +149,31 @@ export default class Archivist extends events.EventEmitter {
       mimeType,
       snapshotId,
       documentDeclaration,
+      fetchDate,
     });
 
     return recordedVersion;
   }
 
-  async refilterAndRecord(servicesIds) {
+  async refilterAndRecord(servicesIds = this.serviceIds) {
+    servicesIds.sort((a, b) => a.localeCompare(b)); // Sort service ids by lowercase name to have more intuitive logs
+
+    this.emit('refilteringStarted', servicesIds.length, this.getNumberOfDocuments(servicesIds));
+
+    await this.recorder.initialize();
+
     this._forEachDocumentOf(servicesIds, documentDeclaration => this.refilterDocumentsQueue.push(documentDeclaration));
 
     await this.refilterDocumentsQueue.drain();
-    await this.publish();
+    await this.recorder.finalize();
+
+    this.emit('refilteringCompleted', servicesIds.length, this.getNumberOfDocuments(servicesIds));
   }
 
   async refilterAndRecordDocument(documentDeclaration) {
     const { type, service } = documentDeclaration;
 
-    const { id: snapshotId, content: snapshotContent, mimeType } = await history.getLatestSnapshot(
+    const { id: snapshotId, content: snapshotContent, mimeType, fetchDate } = await this.recorder.getLatestSnapshot(
       service.id,
       type,
     );
@@ -167,6 +188,7 @@ export default class Archivist extends events.EventEmitter {
       snapshotId,
       documentDeclaration,
       isRefiltering: true,
+      fetchDate,
     });
   }
 
@@ -178,12 +200,13 @@ export default class Archivist extends events.EventEmitter {
     });
   }
 
-  async recordSnapshot({ content, mimeType, documentDeclaration: { service, type } }) {
-    const { id: snapshotId, isFirstRecord } = await history.recordSnapshot({
+  async recordSnapshot({ content, mimeType, fetchDate, documentDeclaration: { service, type } }) {
+    const { id: snapshotId, isFirstRecord } = await this.recorder.recordSnapshot({
       serviceId: service.id,
       documentType: type,
       content,
       mimeType,
+      fetchDate,
     });
 
     if (!snapshotId) {
@@ -195,7 +218,7 @@ export default class Archivist extends events.EventEmitter {
     return snapshotId;
   }
 
-  async recordVersion({ snapshotContent, mimeType, snapshotId, documentDeclaration, isRefiltering }) {
+  async recordVersion({ snapshotContent, mimeType, fetchDate, snapshotId, documentDeclaration, isRefiltering }) {
     const { service, type } = documentDeclaration;
     const content = await filter({
       content: snapshotContent,
@@ -205,11 +228,12 @@ export default class Archivist extends events.EventEmitter {
 
     const recordFunction = !isRefiltering ? 'recordVersion' : 'recordRefilter';
 
-    const { id: versionId, isFirstRecord } = await history[recordFunction]({
+    const { id: versionId, isFirstRecord } = await this.recorder[recordFunction]({
       serviceId: service.id,
       content,
       documentType: type,
       snapshotId,
+      fetchDate,
     });
 
     if (!versionId) {
@@ -219,12 +243,7 @@ export default class Archivist extends events.EventEmitter {
     this.emit(isFirstRecord ? 'firstVersionRecorded' : 'versionRecorded', service.id, type, versionId);
   }
 
-  async publish() {
-    if (!config.get('history.publish')) {
-      return;
-    }
-
-    await history.publish();
-    this.emit('recordsPublished');
+  getNumberOfDocuments(serviceIds = this.serviceIds) {
+    return serviceIds.reduce((acc, serviceId) => acc + this.services[serviceId].getNumberOfDocuments(), 0);
   }
 }
