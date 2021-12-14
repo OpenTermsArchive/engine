@@ -224,7 +224,7 @@ Two storage adapters are currently supported: Git and MongoDB. Each one can be u
   "storage": {
     "git": {
       "path": "Versions database directory path, relative to the root of this project",
-      "publish": "Boolean. Set to true to publish changes to the shared, global database. Should be true only in production.",
+      "publish": "Boolean. Set to true to push changes to the origin of the cloned repository at the end of every run. Recommended for production only.",
       "prefixMessageToSnapshotId": "Text. Prefix used to explicit where to find the referenced snapshot id. Only useful for versions",
       "author": {
         "name": "Name to which changes in tracked documents will be credited",
