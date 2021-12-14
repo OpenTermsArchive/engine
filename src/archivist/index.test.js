@@ -88,7 +88,7 @@ describe('Archivist', function () {
       nock('https://www.servicea.example').get('/tos').reply(200, serviceASnapshotExpectedContent, { 'Content-Type': 'text/html' });
       nock('https://www.serviceb.example').get('/privacy').reply(200, serviceBSnapshotExpectedContent, { 'Content-Type': 'application/pdf' });
       app = new Archivist({ storage: { versions: versionsStorageAdapter, snapshots: snapshotsStorageAdapter } });
-      await app.init();
+      await app.initialize();
     });
 
     context('when everything works fine', () => {
@@ -167,7 +167,7 @@ describe('Archivist', function () {
           nock('https://www.serviceb.example').get('/privacy').reply(200, serviceBSnapshotExpectedContent, { 'Content-Type': 'application/pdf' });
           const app = new Archivist({ storage: { versions: versionsStorageAdapter, snapshots: snapshotsStorageAdapter } });
 
-          await app.init();
+          await app.initialize();
           await app.trackChanges(serviceIds);
 
           ({ id: originalSnapshotId } = await snapshotsStorageAdapter.getLatestRecord(SERVICE_A_ID, SERVICE_A_TYPE));
@@ -223,7 +223,7 @@ describe('Archivist', function () {
           nock('https://www.serviceb.example').get('/privacy').reply(200, serviceBSnapshotExpectedContent, { 'Content-Type': 'application/pdf' });
           const app = new Archivist({ storage: { versions: versionsStorageAdapter, snapshots: snapshotsStorageAdapter } });
 
-          await app.init();
+          await app.initialize();
           await app.trackChanges(serviceIds);
 
           app.serviceDeclarations[SERVICE_A_ID].getDocumentDeclaration(SERVICE_A_TYPE).contentSelectors = 'inexistant-selector';
@@ -268,7 +268,7 @@ describe('Archivist', function () {
 
     before(async () => {
       app = new Archivist({ storage: { versions: versionsStorageAdapter, snapshots: snapshotsStorageAdapter } });
-      await app.init();
+      await app.initialize();
 
       AVAILABLE_EVENTS.forEach(event => {
         const handlerName = `on${event[0].toUpperCase()}${event.substr(1)}`;

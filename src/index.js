@@ -32,7 +32,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
   archivist.attach(logger);
 
-  await archivist.init();
+  await archivist.initialize();
 
   logger.info('Start Open Terms Archive\n');
 

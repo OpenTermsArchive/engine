@@ -44,7 +44,7 @@ export default class Archivist extends events.EventEmitter {
     this.recorder = new Recorder({ versionsStorageAdapter: versions, snapshotsStorageAdapter: snapshots });
   }
 
-  async init() {
+  async initialize() {
     if (this.services) {
       return this.services;
     }
