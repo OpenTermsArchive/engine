@@ -34,9 +34,9 @@ describe('MongoAdapter', () => {
     subject = new MongoAdapter(config.get('recorder.snapshots.storage.mongo'));
     await subject.initialize();
     await client.connect();
-    const db = client.db(config.get('recorder.snapshots.storage.mongo').database);
+    const db = client.db(config.get('recorder.snapshots.storage.mongo.database'));
 
-    collection = db.collection(config.get('recorder.snapshots.storage.mongo').collection);
+    collection = db.collection(config.get('recorder.snapshots.storage.mongo.collection'));
   });
 
   describe('#record', () => {
