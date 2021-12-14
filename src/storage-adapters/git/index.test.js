@@ -52,7 +52,7 @@ describe('GitAdapter', () => {
   });
 
   describe('#_save', () => {
-    context('when service’s directory already exists', () => {
+    context('when service directory already exists', () => {
       before(async () => subject._save({
         serviceId: SERVICE_PROVIDER_ID,
         documentType: DOCUMENT_TYPE,
@@ -85,7 +85,7 @@ describe('GitAdapter', () => {
       });
     });
 
-    context('when service’s directory does not already exist', () => {
+    context('when service directory does not already exist', () => {
       const NEW_SERVICE_ID = 'test_not_existing_service';
       const NEW_SERVICE_EXPECTED_FILE_PATH = `${RECORDER_PATH}/${NEW_SERVICE_ID}/${DOCUMENT_TYPE}.html`;
 
