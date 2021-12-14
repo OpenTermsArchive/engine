@@ -43,7 +43,7 @@ describe('Recorder', () => {
     },
   };
 
-  for (const [ adapterName, adapters ] of Object.entries(adaptersTypes)) {
+  for (const [ adapterName, { versions: versionsAdapter, snapshots: snapshotsAdapter }] of Object.entries(adaptersTypes)) {
     describe(adapterName, () => {
       describe('#recordSnapshot', () => {
         const CONTENT = '<html><h1>ToS fixture data with UTF-8 çhãràčtęrs</h1></html>';
@@ -54,19 +54,19 @@ describe('Recorder', () => {
 
         before(async () => {
           recorder = new Recorder({
-            versionsStorageAdapter: adapters.versions,
-            snapshotsStorageAdapter: adapters.snapshots,
+            versionsStorageAdapter: versionsAdapter,
+            snapshotsStorageAdapter: snapshotsAdapter,
           });
           await recorder.initialize();
         });
 
         after(async () => {
-          await adapters.snapshots._removeAllRecords();
+          await snapshotsAdapter._removeAllRecords();
           await recorder.finalize();
         });
 
         context('when a required param is missing', () => {
-          after(async () => adapters.snapshots._removeAllRecords());
+          after(async () => snapshotsAdapter._removeAllRecords());
 
           const validParams = {
             serviceId: SERVICE_ID,
@@ -113,10 +113,10 @@ describe('Recorder', () => {
               fetchDate: FETCH_DATE,
             }));
 
-            (record = await adapters.snapshots.getLatestRecord(SERVICE_ID, TYPE));
+            record = await snapshotsAdapter.getLatestRecord(SERVICE_ID, TYPE);
           });
 
-          after(async () => adapters.snapshots._removeAllRecords());
+          after(async () => snapshotsAdapter._removeAllRecords());
 
           it('records the document with the proper content', async () => {
             expect(record.content).to.equal(CONTENT);
@@ -151,10 +151,10 @@ describe('Recorder', () => {
               fetchDate: FETCH_DATE_LATER,
             }));
 
-            (record = await adapters.snapshots.getLatestRecord(SERVICE_ID, TYPE));
+            record = await snapshotsAdapter.getLatestRecord(SERVICE_ID, TYPE);
           });
 
-          after(async () => adapters.snapshots._removeAllRecords());
+          after(async () => snapshotsAdapter._removeAllRecords());
 
           it('records the document with the proper content', async () => {
             expect(record.content).to.equal(UPDATED_CONTENT);
@@ -187,10 +187,10 @@ describe('Recorder', () => {
               fetchDate: FETCH_DATE_LATER,
             }));
 
-            (record = await adapters.snapshots.getLatestRecord(SERVICE_ID, TYPE));
+            record = await snapshotsAdapter.getLatestRecord(SERVICE_ID, TYPE);
           });
 
-          after(async () => adapters.snapshots._removeAllRecords());
+          after(async () => snapshotsAdapter._removeAllRecords());
 
           it('does not record the document', async () => {
             expect(id).to.not.be.ok;
@@ -208,8 +208,8 @@ describe('Recorder', () => {
 
         before(async () => {
           recorder = new Recorder({
-            versionsStorageAdapter: adapters.versions,
-            snapshotsStorageAdapter: adapters.snapshots,
+            versionsStorageAdapter: versionsAdapter,
+            snapshotsStorageAdapter: snapshotsAdapter,
           });
           await recorder.initialize();
         });
@@ -219,7 +219,7 @@ describe('Recorder', () => {
         });
 
         context('when a required param is missing', () => {
-          after(async () => adapters.versions._removeAllRecords());
+          after(async () => versionsAdapter._removeAllRecords());
 
           const validParams = {
             serviceId: SERVICE_ID,
@@ -266,10 +266,10 @@ describe('Recorder', () => {
               fetchDate: FETCH_DATE,
             }));
 
-            (record = await adapters.versions.getLatestRecord(SERVICE_ID, TYPE));
+            record = await versionsAdapter.getLatestRecord(SERVICE_ID, TYPE);
           });
 
-          after(async () => adapters.versions._removeAllRecords());
+          after(async () => versionsAdapter._removeAllRecords());
 
           it('records the document with the proper content', async () => {
             expect(record.content).to.equal(CONTENT);
@@ -304,10 +304,10 @@ describe('Recorder', () => {
               fetchDate: FETCH_DATE_LATER,
             }));
 
-            (record = await adapters.versions.getLatestRecord(SERVICE_ID, TYPE));
+            record = await versionsAdapter.getLatestRecord(SERVICE_ID, TYPE);
           });
 
-          after(async () => adapters.versions._removeAllRecords());
+          after(async () => versionsAdapter._removeAllRecords());
 
           it('records the document with the proper content', async () => {
             expect(record.content).to.equal(UPDATED_CONTENT);
@@ -340,10 +340,10 @@ describe('Recorder', () => {
               fetchDate: FETCH_DATE_LATER,
             }));
 
-            (record = await adapters.versions.getLatestRecord(SERVICE_ID, TYPE));
+            record = await versionsAdapter.getLatestRecord(SERVICE_ID, TYPE);
           });
 
-          after(async () => adapters.versions._removeAllRecords());
+          after(async () => versionsAdapter._removeAllRecords());
 
           it('does not record the document', async () => {
             expect(id).to.not.be.ok;
@@ -361,19 +361,19 @@ describe('Recorder', () => {
 
         before(async () => {
           recorder = new Recorder({
-            versionsStorageAdapter: adapters.versions,
-            snapshotsStorageAdapter: adapters.snapshots,
+            versionsStorageAdapter: versionsAdapter,
+            snapshotsStorageAdapter: snapshotsAdapter,
           });
           await recorder.initialize();
         });
 
         after(async () => {
-          await adapters.versions._removeAllRecords();
+          await versionsAdapter._removeAllRecords();
           await recorder.finalize();
         });
 
         context('when a required param is missing', () => {
-          after(async () => adapters.versions._removeAllRecords());
+          after(async () => versionsAdapter._removeAllRecords());
 
           const validParams = {
             serviceId: SERVICE_ID,
@@ -420,10 +420,10 @@ describe('Recorder', () => {
               fetchDate: FETCH_DATE,
             }));
 
-            (record = await adapters.versions.getLatestRecord(SERVICE_ID, TYPE));
+            record = await versionsAdapter.getLatestRecord(SERVICE_ID, TYPE);
           });
 
-          after(async () => adapters.versions._removeAllRecords()); after(async () => adapters.versions._removeAllRecords());
+          after(async () => versionsAdapter._removeAllRecords()); after(async () => versionsAdapter._removeAllRecords());
 
           it('records the document with the proper content', async () => {
             expect(record.content).to.equal(CONTENT);
@@ -458,10 +458,10 @@ describe('Recorder', () => {
               fetchDate: FETCH_DATE_LATER,
             }));
 
-            (record = await adapters.versions.getLatestRecord(SERVICE_ID, TYPE));
+            record = await versionsAdapter.getLatestRecord(SERVICE_ID, TYPE);
           });
 
-          after(async () => adapters.versions._removeAllRecords());
+          after(async () => versionsAdapter._removeAllRecords());
 
           it('records the document with the proper content', async () => {
             expect(record.content).to.equal(UPDATED_CONTENT);
@@ -494,10 +494,10 @@ describe('Recorder', () => {
               fetchDate: FETCH_DATE_LATER,
             }));
 
-            (record = await adapters.versions.getLatestRecord(SERVICE_ID, TYPE));
+            record = await versionsAdapter.getLatestRecord(SERVICE_ID, TYPE);
           });
 
-          after(async () => adapters.versions._removeAllRecords());
+          after(async () => versionsAdapter._removeAllRecords());
 
           it('does not record the document', async () => {
             expect(id).to.not.be.ok;
