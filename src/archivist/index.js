@@ -46,7 +46,7 @@ export default class Archivist extends events.EventEmitter {
 
   async initialize() {
     if (this.services) {
-      return this.services;
+      return;
     }
 
     await this.recorder.initialize();
@@ -59,8 +59,6 @@ export default class Archivist extends events.EventEmitter {
       stopHeadlessBrowser();
       await this.recorder.finalize();
     });
-
-    return this.services;
   }
 
   initQueues() {
