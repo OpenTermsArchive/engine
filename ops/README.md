@@ -81,14 +81,6 @@ You can get logs by connecting to the target machine over SSH and obtaining logs
 ssh user@machine pm2 logs ota
 ```
 
-### commands
-
-```
-deploy:local:ota       ansible-playbook ops/site.yml -i ops/inventories/dev-fix.yml
-
-deploy:ota:update       ansible-playbook ops/app.yml --tags update -i ops/inventories/production.yml --check --diff
-```
-
 ### Troubleshooting
 
 If you have the following error:
@@ -126,5 +118,3 @@ all:
           ansible_ssh_port: 2200
           […]
 ```
-
-Or alternatively you can use the dev-fix config by appending `-i ops/inventories/dev-fix.yml`
