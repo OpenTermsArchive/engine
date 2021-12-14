@@ -61,7 +61,7 @@ describe('GitAdapter', () => {
 
       after(async () => subject._removeAllRecords());
 
-      it('creates a file for the given service', async () => {
+      it('creates a file for the given service', () => {
         expect(fs.readFileSync(EXPECTED_FILE_PATH, { encoding: 'utf8' })).to.equal(CONTENT);
       });
 
@@ -79,7 +79,7 @@ describe('GitAdapter', () => {
 
         after(async () => subject._removeAllRecords());
 
-        it('creates a file for the given service with the given extension', async () => {
+        it('creates a file for the given service with the given extension', () => {
           expect(savedFilePath).to.equal(EXPECTED_PDF_FILE_PATH);
         });
       });
@@ -118,24 +118,24 @@ describe('GitAdapter', () => {
 
     after(async () => subject._removeAllRecords());
 
-    it('returns the id of the commit', async () => {
+    it('returns the id of the commit', () => {
       expect(commit.hash).to.include(id);
     });
 
-    it('properly saves the commit message', async () => {
+    it('properly saves the commit message', () => {
       expect(commit.message).to.equal(commitMessage);
     });
   });
 
   describe('#_getPathFor', () => {
     context('without provided extension', () => {
-      it('returns the file path with default extension for the given service provider’s document type', async () => {
+      it('returns the file path with default extension for the given service provider’s document type', () => {
         expect(subject._getPathFor(SERVICE_PROVIDER_ID, DOCUMENT_TYPE)).to.equal(EXPECTED_FILE_PATH);
       });
     });
 
     context('with provided extension', () => {
-      it('returns the file path with given extension for the given service provider’s document type', async () => {
+      it('returns the file path with given extension for the given service provider’s document type', () => {
         expect(subject._getPathFor(SERVICE_PROVIDER_ID, DOCUMENT_TYPE, 'pdf')).to.equal(EXPECTED_PDF_FILE_PATH);
       });
     });
@@ -327,11 +327,11 @@ describe('GitAdapter', () => {
 
       after(async () => subject._removeAllRecords());
 
-      it('does not save the record', async () => {
+      it('does not save the record', () => {
         expect(numberOfRecordsAfter).to.equal(numberOfRecordsBefore);
       });
 
-      it('returns an id null', async () => {
+      it('returns a null id', () => {
         expect(id).to.equal(null);
       });
     });
@@ -496,15 +496,15 @@ describe('GitAdapter', () => {
 
       after(async () => subject._removeAllRecords());
 
-      it('returns the latest record id', async () => {
+      it('returns the latest record id', () => {
         expect(latestRecord.id).to.include(lastSnapshotId);
       });
 
-      it('returns the latest record content', async () => {
+      it('returns the latest record content', () => {
         expect(latestRecord.content.toString('utf8')).to.equal(UPDATED_FILE_CONTENT);
       });
 
-      it('returns the latest record mime type', async () => {
+      it('returns the latest record mime type', () => {
         expect(latestRecord.mimeType).to.equal(MIME_TYPE);
       });
 
@@ -522,15 +522,15 @@ describe('GitAdapter', () => {
 
         after(async () => subject._removeAllRecords());
 
-        it('returns the latest record id', async () => {
+        it('returns the latest record id', () => {
           expect(latestRecord.id).to.include(lastSnapshotId);
         });
 
-        it('returns the latest record content', async () => {
+        it('returns the latest record content', () => {
           expect(latestRecord.content.toString('utf8')).to.equal(PDF_CONTENT);
         });
 
-        it('returns the latest record mime type', async () => {
+        it('returns the latest record mime type', () => {
           expect(latestRecord.mimeType).to.equal(PDF_MIME_TYPE);
         });
       });
@@ -543,15 +543,15 @@ describe('GitAdapter', () => {
         latestRecord = await subject.getLatestRecord(SERVICE_PROVIDER_ID, DOCUMENT_TYPE);
       });
 
-      it('returns no id', async () => {
+      it('returns no id', () => {
         expect(latestRecord.id).to.be.null;
       });
 
-      it('returns no content', async () => {
+      it('returns no content', () => {
         expect(latestRecord.content).to.be.null;
       });
 
-      it('returns no mime type', async () => {
+      it('returns no mime type', () => {
         expect(latestRecord.mimeType).to.be.null;
       });
     });

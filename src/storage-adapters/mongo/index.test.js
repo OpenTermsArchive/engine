@@ -231,11 +231,11 @@ describe('MongoAdapter', () => {
 
       after(() => collection.drop());
 
-      it('does not save the record', async () => {
+      it('does not save the record', () => {
         expect(numberOfRecordsAfter).to.equal(numberOfRecordsBefore);
       });
 
-      it('returns an id null', async () => {
+      it('returns a null id', () => {
         expect(record.id).to.equal(null);
       });
     });
@@ -428,15 +428,15 @@ describe('MongoAdapter', () => {
 
         after(() => collection.drop());
 
-        it('returns the latest record id', async () => {
+        it('returns the latest record id', () => {
           expect(latestRecord.id).to.include(lastSnapshotId);
         });
 
-        it('returns the latest record content', async () => {
+        it('returns the latest record content', () => {
           expect(latestRecord.content.toString('utf8')).to.equal(UPDATED_CONTENT);
         });
 
-        it('returns the latest record mime type', async () => {
+        it('returns the latest record mime type', () => {
           expect(latestRecord.mimeType).to.equal(MIME_TYPE);
         });
       });
@@ -464,15 +464,15 @@ describe('MongoAdapter', () => {
 
         after(() => collection.drop());
 
-        it('returns the latest record id', async () => {
+        it('returns the latest record id', () => {
           expect(latestRecord.id).to.include(lastSnapshotId);
         });
 
-        it('returns the latest record content', async () => {
+        it('returns the latest record content', () => {
           expect(latestRecord.content).to.equal(UPDATED_PDF_CONTENT);
         });
 
-        it('returns the latest record mime type', async () => {
+        it('returns the latest record mime type', () => {
           expect(latestRecord.mimeType).to.equal(PDF_MIME_TYPE);
         });
       });
@@ -485,15 +485,15 @@ describe('MongoAdapter', () => {
         latestRecord = await subject.getLatestRecord(SERVICE_PROVIDER_ID, DOCUMENT_TYPE);
       });
 
-      it('returns no id', async () => {
+      it('returns no id', () => {
         expect(latestRecord.id).to.be.null;
       });
 
-      it('returns no content', async () => {
+      it('returns no content', () => {
         expect(latestRecord.content).to.be.null;
       });
 
-      it('returns no mime type', async () => {
+      it('returns no mime type', () => {
         expect(latestRecord.mimeType).to.be.null;
       });
     });
