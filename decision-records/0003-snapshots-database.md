@@ -66,7 +66,7 @@ Thus, we need a database management system meeting the following requirements:
 
 ### Solutions considered
 
-#### 1. Keeping the system under git
+#### 1. Keep the system under git
 
 ##### Splitting into sub-repos
 
@@ -94,7 +94,7 @@ We still have to order the blocks between them (note, it is possible to have to 
 
 These chronologically ordered commit blocks, without overlap, can then be used with the previous approach (it may be necessary to re-split these blocks so that they have a reasonable size).
 
-#### 2. Passing snapshots to a DB
+#### 2. Move snapshots to a document-oriented database
 
 The idea of this solution is to keep the `versions` under git in order to continue to enjoy the benefits that GitHub provides in terms of browsing and viewing diffs, but to save the snapshots in a database, since we don't really need to browse the snapshots via a graphical interface nor to see the diff between two snapshots, which would allow us to be able to access the content more efficiently.
 
