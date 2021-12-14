@@ -9,11 +9,11 @@ export default class Recorder {
   }
 
   async initialize() {
-    return Promise.all([ this.versionsStorageAdapter, this.snapshotsStorageAdapter ].map(storageAdapter => storageAdapter.initialize()));
+    return Promise.all([ this.versionsStorageAdapter.initialize(), this.snapshotsStorageAdapter.initialize() ]);
   }
 
   async finalize() {
-    return Promise.all([ this.versionsStorageAdapter, this.snapshotsStorageAdapter ].map(storageAdapter => storageAdapter.finalize()));
+    return Promise.all([ this.versionsStorageAdapter.finalize(), this.snapshotsStorageAdapter.finalize() ]);
   }
 
   async getLatestSnapshot(serviceId, documentType) {
