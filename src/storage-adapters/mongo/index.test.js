@@ -41,7 +41,7 @@ describe('MongoAdapter', () => {
 
   describe('#record', () => {
     let record;
-    let mongoRecord;
+    let mongoDocument;
     let numberOfRecordsBefore;
     let numberOfRecordsAfter;
 
@@ -66,7 +66,7 @@ describe('MongoAdapter', () => {
           documentType: DOCUMENT_TYPE,
         }).count();
 
-        (mongoRecord = await collection.findOne({
+        (mongoDocument = await collection.findOne({
           serviceId: SERVICE_PROVIDER_ID,
           documentType: DOCUMENT_TYPE,
         }));
@@ -79,7 +79,7 @@ describe('MongoAdapter', () => {
       });
 
       it('returns the record id', () => {
-        expect(mongoRecord._id.toString()).to.equal(record.id);
+        expect(mongoDocument._id.toString()).to.equal(record.id);
       });
 
       it('returns a boolean to know if it is the first record', () => {
@@ -87,32 +87,32 @@ describe('MongoAdapter', () => {
       });
 
       it('stores the service id', () => {
-        expect(mongoRecord.serviceId).to.include(SERVICE_PROVIDER_ID);
+        expect(mongoDocument.serviceId).to.include(SERVICE_PROVIDER_ID);
       });
 
       it('stores the document type', () => {
-        expect(mongoRecord.documentType).to.include(DOCUMENT_TYPE);
+        expect(mongoDocument.documentType).to.include(DOCUMENT_TYPE);
       });
 
       it('stores information that it is the first record for this specific document', () => {
-        expect(mongoRecord.isFirstRecord).to.be.true;
+        expect(mongoDocument.isFirstRecord).to.be.true;
       });
 
       it('stores the proper content', () => {
-        expect(mongoRecord.content).to.equal(CONTENT);
+        expect(mongoDocument.content).to.equal(CONTENT);
       });
 
       context('when provided', () => {
         it('stores the fetch date', () => {
-          expect(new Date(mongoRecord.fetchDate).getTime()).to.equal(FETCH_DATE.getTime());
+          expect(new Date(mongoDocument.fetchDate).getTime()).to.equal(FETCH_DATE.getTime());
         });
 
         it('stores the mime type', () => {
-          expect(mongoRecord.mimeType).to.equal(MIME_TYPE);
+          expect(mongoDocument.mimeType).to.equal(MIME_TYPE);
         });
 
         it('stores the snapshot ID', () => {
-          expect(mongoRecord.snapshotId.toString()).to.include(SNAPSHOT_ID);
+          expect(mongoDocument.snapshotId.toString()).to.include(SNAPSHOT_ID);
         });
       });
     });
@@ -149,7 +149,7 @@ describe('MongoAdapter', () => {
           documentType: DOCUMENT_TYPE,
         }).count();
 
-        ([mongoRecord] = await collection.find({
+        ([mongoDocument] = await collection.find({
           serviceId: SERVICE_PROVIDER_ID,
           documentType: DOCUMENT_TYPE,
         }).limit(1).sort({ created_at: -1 }).toArray());
@@ -162,7 +162,7 @@ describe('MongoAdapter', () => {
       });
 
       it('returns the record id', () => {
-        expect(mongoRecord._id.toString()).to.equal(record.id);
+        expect(mongoDocument._id.toString()).to.equal(record.id);
       });
 
       it('returns a boolean to know if it is the first record', () => {
@@ -170,32 +170,32 @@ describe('MongoAdapter', () => {
       });
 
       it('stores the service id', () => {
-        expect(mongoRecord.serviceId).to.include(SERVICE_PROVIDER_ID);
+        expect(mongoDocument.serviceId).to.include(SERVICE_PROVIDER_ID);
       });
 
       it('stores the document type', () => {
-        expect(mongoRecord.documentType).to.include(DOCUMENT_TYPE);
+        expect(mongoDocument.documentType).to.include(DOCUMENT_TYPE);
       });
 
       it('stores information that it is the first record for this specific document', () => {
-        expect(mongoRecord.isFirstRecord).to.be.undefined;
+        expect(mongoDocument.isFirstRecord).to.be.undefined;
       });
 
       it('stores the proper content', () => {
-        expect(mongoRecord.content).to.equal(UPDATED_CONTENT);
+        expect(mongoDocument.content).to.equal(UPDATED_CONTENT);
       });
 
       context('when provided', () => {
         it('stores the fetch date', () => {
-          expect(new Date(mongoRecord.fetchDate).getTime()).to.equal(FETCH_DATE.getTime());
+          expect(new Date(mongoDocument.fetchDate).getTime()).to.equal(FETCH_DATE.getTime());
         });
 
         it('stores the mime type', () => {
-          expect(mongoRecord.mimeType).to.equal(MIME_TYPE);
+          expect(mongoDocument.mimeType).to.equal(MIME_TYPE);
         });
 
         it('stores the snapshot ID', () => {
-          expect(mongoRecord.snapshotId.toString()).to.include(SNAPSHOT_ID);
+          expect(mongoDocument.snapshotId.toString()).to.include(SNAPSHOT_ID);
         });
       });
     });
@@ -270,7 +270,7 @@ describe('MongoAdapter', () => {
           documentType: DOCUMENT_TYPE,
         }).count();
 
-        ([mongoRecord] = await collection.find({
+        ([mongoDocument] = await collection.find({
           serviceId: SERVICE_PROVIDER_ID,
           documentType: DOCUMENT_TYPE,
         }).limit(1).sort({ created_at: -1 }).toArray());
@@ -283,7 +283,7 @@ describe('MongoAdapter', () => {
       });
 
       it('returns the record id', () => {
-        expect(mongoRecord._id.toString()).to.equal(record.id);
+        expect(mongoDocument._id.toString()).to.equal(record.id);
       });
 
       it('returns a boolean to know if it is the first record', () => {
@@ -291,32 +291,32 @@ describe('MongoAdapter', () => {
       });
 
       it('stores the service id', () => {
-        expect(mongoRecord.serviceId).to.include(SERVICE_PROVIDER_ID);
+        expect(mongoDocument.serviceId).to.include(SERVICE_PROVIDER_ID);
       });
 
       it('stores the document type', () => {
-        expect(mongoRecord.documentType).to.include(DOCUMENT_TYPE);
+        expect(mongoDocument.documentType).to.include(DOCUMENT_TYPE);
       });
 
       it('stores information that it is a refilter of this specific document', () => {
-        expect(mongoRecord.isRefilter).to.be.true;
+        expect(mongoDocument.isRefilter).to.be.true;
       });
 
       it('stores the proper content', () => {
-        expect(mongoRecord.content).to.equal(REFILTERED_CONTENT);
+        expect(mongoDocument.content).to.equal(REFILTERED_CONTENT);
       });
 
       context('when provided', () => {
         it('stores the fetch date', () => {
-          expect(new Date(mongoRecord.fetchDate).getTime()).to.equal(FETCH_DATE.getTime());
+          expect(new Date(mongoDocument.fetchDate).getTime()).to.equal(FETCH_DATE.getTime());
         });
 
         it('stores the mime type', () => {
-          expect(mongoRecord.mimeType).to.equal(MIME_TYPE);
+          expect(mongoDocument.mimeType).to.equal(MIME_TYPE);
         });
 
         it('stores the snapshot ID', () => {
-          expect(mongoRecord.snapshotId.toString()).to.include(SNAPSHOT_ID);
+          expect(mongoDocument.snapshotId.toString()).to.include(SNAPSHOT_ID);
         });
       });
     });
@@ -344,7 +344,7 @@ describe('MongoAdapter', () => {
           documentType: DOCUMENT_TYPE,
         }).count();
 
-        (mongoRecord = await collection.findOne({
+        (mongoDocument = await collection.findOne({
           serviceId: SERVICE_PROVIDER_ID,
           documentType: DOCUMENT_TYPE,
         }));
@@ -357,7 +357,7 @@ describe('MongoAdapter', () => {
       });
 
       it('returns the record id', () => {
-        expect(mongoRecord._id.toString()).to.equal(record.id);
+        expect(mongoDocument._id.toString()).to.equal(record.id);
       });
 
       it('returns a boolean to know if it is the first record', () => {
@@ -365,32 +365,32 @@ describe('MongoAdapter', () => {
       });
 
       it('stores the service id', () => {
-        expect(mongoRecord.serviceId).to.include(SERVICE_PROVIDER_ID);
+        expect(mongoDocument.serviceId).to.include(SERVICE_PROVIDER_ID);
       });
 
       it('stores the document type', () => {
-        expect(mongoRecord.documentType).to.include(DOCUMENT_TYPE);
+        expect(mongoDocument.documentType).to.include(DOCUMENT_TYPE);
       });
 
       it('stores information that it is the first record for this specific document', () => {
-        expect(mongoRecord.isFirstRecord).to.be.true;
+        expect(mongoDocument.isFirstRecord).to.be.true;
       });
 
       it('stores the proper content', () => {
-        expect(mongoRecord.content).to.equal(PDF_CONTENT);
+        expect(mongoDocument.content).to.equal(PDF_CONTENT);
       });
 
       context('when provided', () => {
         it('stores the fetch date', () => {
-          expect(new Date(mongoRecord.fetchDate).getTime()).to.equal(FETCH_DATE.getTime());
+          expect(new Date(mongoDocument.fetchDate).getTime()).to.equal(FETCH_DATE.getTime());
         });
 
         it('stores the mime type', () => {
-          expect(mongoRecord.mimeType).to.equal(PDF_MIME_TYPE);
+          expect(mongoDocument.mimeType).to.equal(PDF_MIME_TYPE);
         });
 
         it('stores the snapshot ID', () => {
-          expect(mongoRecord.snapshotId.toString()).to.include(SNAPSHOT_ID);
+          expect(mongoDocument.snapshotId.toString()).to.include(SNAPSHOT_ID);
         });
       });
     });
