@@ -25,6 +25,10 @@
   tags:
     - setup
 
+- include_tasks: github.yml
+  tags:
+    - setup
+
 - name: Install services declarations
   git:
     repo: '{{ services_repository }}'
