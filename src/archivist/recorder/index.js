@@ -1,7 +1,7 @@
 export default class Recorder {
   constructor({ versionsStorageAdapter, snapshotsStorageAdapter }) {
-    if (!versionsStorageAdapter && !snapshotsStorageAdapter) {
-      throw new RangeError('storage adapters should be defined both for versions and snapshots');
+    if (!versionsStorageAdapter || !snapshotsStorageAdapter) {
+      throw new RangeError('Storage adapters should be defined both for versions and snapshots');
     }
 
     this.versionsStorageAdapter = versionsStorageAdapter;
