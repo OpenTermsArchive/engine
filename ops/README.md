@@ -15,15 +15,19 @@ To test the changes without impacting the production server, a Vagrantfile is pr
 - Install [VirtualBox](https://www.vagrantup.com/docs/installation/)
 - Install [Vagrant](https://www.vagrantup.com/docs/installation/)
 
-**:warning: VirtualBox does not currently support Apple Silicon architecture**, so it's not possible to use Vagrant to test changes locally with theses machines.
+#### On a Mac with an Apple Silicon processor
+
+VirtualBox is not compatible with Apple Silicon (M1…) processors. You will thus need to use the Docker provider.
+
+To that end, install Docker Desktop through a [manual install](https://hub.docker.com/editions/community/docker-ce-desktop-mac) or with `brew install homebrew/cask/docker`.
 
 ## Usage
 
-To avoid making changes on the production server by mistake, by default all commands will only affect the Vagrant development virtual machine (VM). Note that the VM needs to be started before with `vagrant up`.\
+To avoid making changes on the production server by mistake, by default all commands will only affect the Vagrant development virtual machine (VM). Note that the VM needs to be started before with `vagrant up`.  If you’re on an Apple Silicon machine or want to use Docker instead of VirtualBox, type `vagrant up --provider=docker`.
 
-To execute commands on the production servers you should specify it by adding the option `--inventory ops/inventories/production.yml` to the following commands:
+To execute commands on the production server you should specify it by adding the option `--inventory ops/inventories/production.yml` to the following commands:
 
-- To setup a full [(phoenix)](https://martinfowler.com/bliki/PhoenixServer.html) server:
+- To set up a full [(phoenix)](https://martinfowler.com/bliki/PhoenixServer.html) server:
 
 ```
 ansible-playbook ops/site.yml
