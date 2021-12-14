@@ -72,7 +72,7 @@ describe('MongoAdapter', () => {
         }));
       });
 
-      after(() => collection.drop());
+      after(async () => subject._removeAllRecords());
 
       it('saves the record', () => {
         expect(numberOfRecordsAfter).to.equal(numberOfRecordsBefore + 1);
@@ -155,7 +155,7 @@ describe('MongoAdapter', () => {
         }).limit(1).sort({ created_at: -1 }).toArray());
       });
 
-      after(() => collection.drop());
+      after(async () => subject._removeAllRecords());
 
       it('saves the record', () => {
         expect(numberOfRecordsAfter).to.equal(numberOfRecordsBefore + 1);
@@ -199,7 +199,7 @@ describe('MongoAdapter', () => {
         }).count();
       });
 
-      after(() => collection.drop());
+      after(async () => subject._removeAllRecords());
 
       it('does not save the record', () => {
         expect(numberOfRecordsAfter).to.equal(numberOfRecordsBefore);
@@ -246,7 +246,7 @@ describe('MongoAdapter', () => {
         }).limit(1).sort({ created_at: -1 }).toArray());
       });
 
-      after(() => collection.drop());
+      after(async () => subject._removeAllRecords());
 
       it('saves the record', () => {
         expect(numberOfRecordsAfter).to.equal(numberOfRecordsBefore + 1);
@@ -290,7 +290,7 @@ describe('MongoAdapter', () => {
         }));
       });
 
-      after(() => collection.drop());
+      after(async () => subject._removeAllRecords());
 
       it('saves the record', () => {
         expect(numberOfRecordsAfter).to.equal(numberOfRecordsBefore + 1);
@@ -340,7 +340,7 @@ describe('MongoAdapter', () => {
           );
         });
 
-        after(() => collection.drop());
+        after(async () => subject._removeAllRecords());
 
         it('returns the latest record id', () => {
           expect(latestRecord.id).to.include(lastSnapshotId);
@@ -376,7 +376,7 @@ describe('MongoAdapter', () => {
           latestRecord = await subject.getLatestRecord(SERVICE_PROVIDER_ID, DOCUMENT_TYPE);
         });
 
-        after(() => collection.drop());
+        after(async () => subject._removeAllRecords());
 
         it('returns the latest record id', () => {
           expect(latestRecord.id).to.include(lastSnapshotId);
