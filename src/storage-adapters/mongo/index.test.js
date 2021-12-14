@@ -235,8 +235,8 @@ describe('MongoAdapter', () => {
         expect(numberOfRecordsAfter).to.equal(numberOfRecordsBefore);
       });
 
-      it('returns a null id', () => {
-        expect(record.id).to.equal(null);
+      it('returns no id', () => {
+        expect(record.id).to.equal(undefined);
       });
     });
 
@@ -486,15 +486,15 @@ describe('MongoAdapter', () => {
       });
 
       it('returns no id', () => {
-        expect(latestRecord.id).to.be.null;
+        expect(latestRecord.id).to.be.undefined;
       });
 
       it('returns no content', () => {
-        expect(latestRecord.content).to.be.null;
+        expect(latestRecord.content).to.be.undefined;
       });
 
       it('returns no mime type', () => {
-        expect(latestRecord.mimeType).to.be.null;
+        expect(latestRecord.mimeType).to.be.undefined;
       });
     });
   });

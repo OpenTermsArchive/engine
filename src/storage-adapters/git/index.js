@@ -34,8 +34,12 @@ export default class GitAdapter {
     const filePath = await this._save({ serviceId, documentType, content, fileExtension });
     const sha = await this._commit(filePath, message, fetchDate);
 
+    if (!sha) {
+      return {};
+    }
+
     return {
-      id: sha || null,
+      id: sha,
       isFirstRecord,
     };
   }
@@ -54,11 +58,7 @@ export default class GitAdapter {
     const recordFilePath = `${this.path}/${filePath}`;
 
     if (!commit || !filePath || !fsApi.existsSync(recordFilePath)) {
-      return {
-        id: null,
-        content: null,
-        mimeType: null,
-      };
+      return {};
     }
 
     const mimeType = mime.getType(filePath);

@@ -31,11 +31,8 @@ export default class MongoAdapter {
 
     const previousRecord = await this.getLatestRecord(serviceId, documentType);
 
-    if (previousRecord.id && previousRecord.content == content) {
-      return {
-        id: null,
-        isFirstRecord: false,
-      };
+    if (previousRecord && previousRecord.content == content) {
+      return {};
     }
 
     const recordProperties = Object.fromEntries(Object.entries({
@@ -68,11 +65,7 @@ export default class MongoAdapter {
     const [record] = await this.collection.find({ serviceId, documentType }).limit(1).sort({ fetchDate: -1 }).toArray();
 
     if (!record) {
-      return {
-        id: null,
-        content: null,
-        mimeType: null,
-      };
+      return {};
     }
 
     const { _id, content, mimeType, fetchDate } = record;
