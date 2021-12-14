@@ -79,7 +79,7 @@ export default class GitAdapter {
   async _save({ serviceId, documentType, content, fileExtension }) {
     const directory = `${this.path}/${serviceId}`;
 
-    if (!(await fileExists(directory))) {
+    if (!fsApi.existsSync(directory)) {
       await fs.mkdir(directory, { recursive: true });
     }
 
@@ -143,17 +143,5 @@ export default class GitAdapter {
     await Promise.all(promises);
 
     return this.initialize();
-  }
-}
-
-async function fileExists(filePath) {
-  try {
-    await fs.access(filePath);
-
-    return true;
-  } catch (error) {
-    if (error.code === 'ENOENT') {
-      return false;
-    }
   }
 }
