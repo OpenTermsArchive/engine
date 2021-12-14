@@ -25,6 +25,8 @@ To test the changes without impacting the production server, a Vagrantfile is pr
 - Install [VirtualBox](https://www.vagrantup.com/docs/installation/)
 - Install [Vagrant](https://www.vagrantup.com/docs/installation/)
 
+**:warning: VirtualBox does not currently support Apple Silicon architecture**, so it's not possible to use Vagrant to test changes locally with theses machines.
+
 ## Usage
 
 To avoid making changes on the production server by mistake, by default all commands will only affect the Vagrant development virtual machine (VM). Note that the VM needs to be started before with `vagrant up`.\
