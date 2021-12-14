@@ -193,7 +193,7 @@ describe('Recorder', () => {
           after(async () => adapters.snapshots._removeAllRecords());
 
           it('does not record the document', async () => {
-            expect(id).to.equal(undefined);
+            expect(id).to.not.be.ok;
           });
         });
       });
@@ -346,7 +346,7 @@ describe('Recorder', () => {
           after(async () => adapters.versions._removeAllRecords());
 
           it('does not record the document', async () => {
-            expect(id).to.equal(undefined);
+            expect(id).to.not.be.ok;
           });
         });
       });
@@ -500,7 +500,7 @@ describe('Recorder', () => {
           after(async () => adapters.versions._removeAllRecords());
 
           it('does not record the document', async () => {
-            expect(id).to.equal(undefined);
+            expect(id).to.not.be.ok;
           });
         });
       });

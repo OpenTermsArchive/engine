@@ -400,15 +400,15 @@ describe('MongoAdapter', () => {
       });
 
       it('returns no id', () => {
-        expect(latestRecord.id).to.be.undefined;
+        expect(latestRecord.id).to.not.be.ok;
       });
 
       it('returns no content', () => {
-        expect(latestRecord.content).to.be.undefined;
+        expect(latestRecord.content).to.not.be.ok;
       });
 
       it('returns no mime type', () => {
-        expect(latestRecord.mimeType).to.be.undefined;
+        expect(latestRecord.mimeType).to.not.be.ok;
       });
     });
   });
