@@ -1,3 +1,8 @@
+/**
+ * This file is the boundary beyond which the usage of MongoDB is abstracted.
+ * Object IDs are used as opaque unique IDs.
+ */
+
 import { MongoClient, ObjectId } from 'mongodb';
 
 const PDF_MIME_TYPE = 'application/pdf';
