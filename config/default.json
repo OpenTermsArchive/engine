@@ -11,7 +11,7 @@
           "publish": false,
           "prefixMessageToSnapshotId": "This version was recorded after filtering snapshot in repository ./data/snapshots with commit ",
           "author": {
-            "name": "Open Terms Archive Bot",
+            "name": "OTA Bot",
             "email": "bot@opentermsarchive.org"
           }
         }
@@ -23,7 +23,7 @@
           "path": "./data/snapshots",
           "publish": false,
           "author": {
-            "name": "Open Terms Archive Bot",
+            "name": "OTA Bot",
             "email": "bot@opentermsarchive.org"
           }
         }
