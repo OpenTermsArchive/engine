@@ -18,10 +18,10 @@
     "refilter": "node src/index.js --refilter-only",
     "setup": "node scripts/setup.js",
     "lint": "eslint src test scripts bin",
-    "lint:fix": "eslint src test scripts bin --fix",
+    "lint:fix": "npm run lint -- --fix",
     "posttest": "npm run lint",
     "test": "cross-env NODE_ENV=test mocha --recursive \"./src/**/*.test.js\" --exit",
-    "test:debug": "cross-env NODE_ENV=test mocha --recursive \"./src/**/*.test.js\" --inspect-brk --exit",
+    "test:debug": "npm run test -- --inspect-brk --exit",
     "validate": "node ./bin/validate.js",
     "validate:schema": "npm run validate -- --schema-only"
   },
