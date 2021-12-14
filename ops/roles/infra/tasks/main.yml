@@ -8,6 +8,11 @@
     update_cache: yes
     state: latest
 
+- name: Add global Git Config
+  copy:
+    src: .gitconfig
+    dest: '/home/{{ ansible_user }}/.gitconfig'
+
 - name: Add the NodeSource repository to the system
   shell: curl -sL https://deb.nodesource.com/setup_14.x | sudo bash -
 
