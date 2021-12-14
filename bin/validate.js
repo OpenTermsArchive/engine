@@ -36,11 +36,11 @@ const VALIDATE_PATH = path.resolve(__dirname, '../scripts/validation/validate.js
       .on('fail', () => { hasFailedTests = true; })
       .on('end', () => {
         if (hasFailedTests) {
-          process.exitCode = 1;
+          process.exit(1);
         }
       });
   } catch (error) {
     console.error(error);
-    process.exitCode = 2;
+    process.exit(2);
   }
 })();
