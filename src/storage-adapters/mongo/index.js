@@ -19,7 +19,7 @@ export default class MongoAdapter {
   }
 
   async finalize() {
-    await this.client.close();
+    return this.client.close();
   }
 
   async record({ serviceId, documentType, content: passedContent, mimeType, fetchDate, isRefilter, snapshotId }) {
