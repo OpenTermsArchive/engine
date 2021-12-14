@@ -30,7 +30,7 @@ const VALIDATE_PATH = path.resolve(__dirname, '../scripts/validation/validate.js
   await mocha.loadFilesAsync() // Load files previously added to the Mocha cache with `addFile`.
     .catch(error => {
       console.error(error);
-      process.exitCode = 2;
+      process.exit(2);
     });
 
   let hasFailedTests = false;
@@ -39,7 +39,7 @@ const VALIDATE_PATH = path.resolve(__dirname, '../scripts/validation/validate.js
     .on('fail', () => { hasFailedTests = true; })
     .on('end', () => {
       if (hasFailedTests) {
-        process.exitCode = 1;
+        process.exit(1);
       }
     });
 })();
