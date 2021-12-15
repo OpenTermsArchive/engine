@@ -5,8 +5,14 @@
       - curl
       - build-essential
       - git
+      - zip
     update_cache: yes
     state: latest
+
+- name: Add global Git Config
+  copy:
+    src: .gitconfig
+    dest: '/home/{{ ansible_user }}/.gitconfig'
 
 - name: Add the NodeSource repository to the system
   shell: curl -sL https://deb.nodesource.com/setup_14.x | sudo bash -
@@ -49,17 +55,5 @@
   # See https://github.com/puppeteer/puppeteer/blob/main/docs/troubleshooting.md#recommended-enable-user-namespace-cloning
 - name: Enable user namespace cloning to allow running Chromium in a sandbox
   command: sysctl -w kernel.unprivileged_userns_clone=1
-
-- name: install utilities
-  become: yes
-  apt:
-    name: '{{item}}'
-    state: latest
-    update_cache: yes
-  loop:
-    - zip
-    - gh
-  tags:
-    - setup
 
 - include_tasks: mongo.yml

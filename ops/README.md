@@ -25,6 +25,8 @@ To test the changes without impacting the production server, a Vagrantfile is pr
 - Install [VirtualBox](https://www.vagrantup.com/docs/installation/)
 - Install [Vagrant](https://www.vagrantup.com/docs/installation/)
 
+**:warning: VirtualBox does not currently support Apple Silicon architecture**, so it's not possible to use Vagrant to test changes locally with theses machines.
+
 ## Usage
 
 To avoid making changes on the production server by mistake, by default all commands will only affect the Vagrant development virtual machine (VM). Note that the VM needs to be started before with `vagrant up`.\
@@ -81,14 +83,6 @@ You can get logs by connecting to the target machine over SSH and obtaining logs
 ssh user@machine pm2 logs ota
 ```
 
-### commands
-
-```
-deploy:local:ota       ansible-playbook ops/site.yml -i ops/inventories/dev-fix.yml
-
-deploy:ota:update       ansible-playbook ops/app.yml --tags update -i ops/inventories/production.yml --check --diff
-```
-
 ### Troubleshooting
 
 If you have the following error:
@@ -126,5 +120,3 @@ all:
           ansible_ssh_port: 2200
           […]
 ```
-
-Or alternatively you can use the dev-fix config by appending `-i ops/inventories/dev-fix.yml`

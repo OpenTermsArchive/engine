@@ -11,6 +11,7 @@
     - restart
     - start
     - update
+    - setup
 
 - name: Obtain {{ name }} initial data from the public instance
   git:
@@ -40,6 +41,7 @@
     - restart
     - start
     - update
+    - setup
 
 - name: Clean {{ name }} repository
   command:
@@ -49,6 +51,7 @@
     - restart
     - start
     - update
+    - setup
 
 - name: Ensure {{ name }} is on the main branch
   command:
@@ -58,6 +61,7 @@
     - restart
     - start
     - update
+    - setup
 
 - name: Drop all uncommitted changes on {{ name }}
   command:
