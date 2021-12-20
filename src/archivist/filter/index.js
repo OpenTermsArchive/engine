@@ -57,7 +57,7 @@ export async function filterHTML({ content, documentDeclaration }) {
       });
       /* eslint-enable no-await-in-loop */
     } catch (error) {
-      throw new InaccessibleContentError(`The filter function ${filterFunction} failed: ${error}`);
+      throw new InaccessibleContentError(`The filter function "${filterFunction.name}" failed: ${error}`);
     }
   }
 
