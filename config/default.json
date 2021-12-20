@@ -32,7 +32,7 @@
   },
   "fetcher": {
     "waitForElementsTimeout": 10000,
-    "navigationTimeout": 45000
+    "navigationTimeout": 30000
   },
   "logger": {
     "sendMailOnError": false
