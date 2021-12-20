@@ -21,7 +21,9 @@ config.util.setModuleDefaults('services', {
 });
 config.util.setModuleDefaults('fetcher', defaultConfigs.fetcher);
 
-const mocha = new Mocha({});
+const mocha = new Mocha({
+  failZero: true, // consider that being called with no service to validate is a failure
+});
 const VALIDATE_PATH = path.resolve(__dirname, '../scripts/validation/validate.js');
 
 (async () => {
