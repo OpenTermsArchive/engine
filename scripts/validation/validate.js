@@ -20,6 +20,7 @@ const fs = fsApi.promises;
 const { expect } = chai;
 
 const MIN_DOC_LENGTH = 100;
+const SLOW_DOCUMENT_THRESHOLD = 10 * 1000; // number of milliseconds after which a document fetch is considered slow
 
 const args = process.argv.slice(2); // Keep only args that are after the script filename
 
@@ -47,6 +48,7 @@ let servicesToValidate = args;
 
   describe('Service declarations validation', async function () {
     this.timeout(30000);
+    this.slow(SLOW_DOCUMENT_THRESHOLD);
 
     servicesToValidate.forEach(serviceId => {
       const service = serviceDeclarations[serviceId];
@@ -126,6 +128,8 @@ let servicesToValidate = args;
               });
 
               it('content is consistent when fetched and filtered twice in a row', async function checkContentConsistency() {
+                this.slow(SLOW_DOCUMENT_THRESHOLD * 2);
+
                 if (!content) {
                   console.log('      (Tests skipped as url is not fetchable)');
                   this.skip();
