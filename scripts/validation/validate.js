@@ -126,35 +126,33 @@ let servicesToValidate = args;
                 expect(filteredContent.length).to.be.greaterThan(MIN_DOC_LENGTH);
               });
 
-              context('when fetched and filtered twice in a row', () => {
-                it('has consistent filtered content', async function checkContentConsistency() {
-                  if (!content) {
-                    console.log('      (Tests skipped as url is not fetchable)');
-                    this.skip();
-                  }
+              it('has consistent content when fetched and filtered twice in a row', async function checkContentConsistency() {
+                if (!content) {
+                  console.log('      (Tests skipped as url is not fetchable)');
+                  this.skip();
+                }
 
-                  if (!filteredContent) {
-                    console.log('      (Tests skipped as content cannot be filtered)');
-                    this.skip();
-                  }
+                if (!filteredContent) {
+                  console.log('      (Tests skipped as content cannot be filtered)');
+                  this.skip();
+                }
 
-                  const {
-                    location,
-                    executeClientScripts,
-                  } = service.getDocumentDeclaration(type);
-                  const document = await fetch({
-                    url: location,
-                    executeClientScripts,
-                    cssSelectors: service.getDocumentDeclaration(type).getCssSelectors(),
-                  });
-                  const secondFilteredContent = await filter({
-                    content: document.content,
-                    documentDeclaration: service.getDocumentDeclaration(type),
-                    mimeType: document.mimeType,
-                  });
-
-                  expect(secondFilteredContent).to.equal(filteredContent);
+                const {
+                  location,
+                  executeClientScripts,
+                } = service.getDocumentDeclaration(type);
+                const document = await fetch({
+                  url: location,
+                  executeClientScripts,
+                  cssSelectors: service.getDocumentDeclaration(type).getCssSelectors(),
                 });
+                const secondFilteredContent = await filter({
+                  content: document.content,
+                  documentDeclaration: service.getDocumentDeclaration(type),
+                  mimeType: document.mimeType,
+                });
+
+                expect(secondFilteredContent).to.equal(filteredContent);
               });
             });
           });
