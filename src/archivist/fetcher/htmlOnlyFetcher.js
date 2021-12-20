@@ -50,7 +50,7 @@ export default async function fetch(url) {
     };
   } catch (error) {
     if (error instanceof AbortError) {
-      throw new FetchDocumentError(`The request timed out after ${NAVIGATION_TIMEOUT / 1000} seconds`);
+      throw new FetchDocumentError(`Timed out after ${NAVIGATION_TIMEOUT / 1000} seconds when trying to fetch '${url}'`);
     }
 
     throw new FetchDocumentError(error.message);
