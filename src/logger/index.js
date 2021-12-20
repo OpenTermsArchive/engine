@@ -60,27 +60,27 @@ const logger = winston.createLogger({
 });
 
 logger.onFirstSnapshotRecorded = (serviceId, type, snapshotId) => {
-  logger.info({ message: `Recorded first snapshot with id ${snapshotId}.`, serviceId, type });
+  logger.info({ message: `Recorded first snapshot with id ${snapshotId}`, serviceId, type });
 };
 
 logger.onSnapshotRecorded = (serviceId, type, snapshotId) => {
-  logger.info({ message: `Recorded snapshot with id ${snapshotId}.`, serviceId, type });
+  logger.info({ message: `Recorded snapshot with id ${snapshotId}`, serviceId, type });
 };
 
 logger.onSnapshotNotChanged = (serviceId, type) => {
-  logger.info({ message: 'No changes, did not record snapshot.', serviceId, type });
+  logger.info({ message: 'No changes, did not record snapshot', serviceId, type });
 };
 
 logger.onFirstVersionRecorded = (serviceId, type, versionId) => {
-  logger.info({ message: `Recorded first version with id ${versionId}.`, serviceId, type });
+  logger.info({ message: `Recorded first version with id ${versionId}`, serviceId, type });
 };
 
 logger.onVersionRecorded = (serviceId, type, versionId) => {
-  logger.info({ message: `Recorded version with id ${versionId}.`, serviceId, type });
+  logger.info({ message: `Recorded version with id ${versionId}`, serviceId, type });
 };
 
 logger.onVersionNotChanged = (serviceId, type) => {
-  logger.info({ message: 'No changes after filtering, did not record version.', serviceId, type });
+  logger.info({ message: 'No changes after filtering, did not record version', serviceId, type });
 };
 
 logger.onRefilteringStarted = (numberOfServices, numberOfDocuments) => {

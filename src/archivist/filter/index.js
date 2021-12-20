@@ -66,7 +66,7 @@ export async function filterHTML({ content, documentDeclaration }) {
   const domFragment = select(webPageDOM, contentSelectors);
 
   if (!domFragment.children.length) {
-    throw new InaccessibleContentError(`The provided selector "${contentSelectors}" has no match in the web page ${location}.`);
+    throw new InaccessibleContentError(`The provided selector "${contentSelectors}" has no match in the web page at '${location}'`);
   }
 
   convertRelativeURLsToAbsolute(domFragment, location);
