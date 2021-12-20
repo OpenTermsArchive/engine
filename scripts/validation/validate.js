@@ -114,7 +114,7 @@ let servicesToValidate = args;
               });
 
               // do not use arrow function to avoid binding to `this` and to allow `this.skip` to work
-              it(`has a resulting filtered content with at least ${MIN_DOC_LENGTH}`, async function () { // eslint-disable-line func-names
+              it(`has a resulting filtered content with at least ${MIN_DOC_LENGTH} characters`, async function () { // eslint-disable-line func-names
                 if (!content) {
                   console.log('      (Tests skipped as url is not fetchable)');
                   this.skip();
