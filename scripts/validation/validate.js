@@ -61,14 +61,14 @@ let servicesToValidate = args;
       after(stopHeadlessBrowser);
 
       describe(serviceId, async () => {
-        it('has a valid declaration', async () => {
+        it('valid declaration', async () => {
           const declaration = JSON.parse(await fs.readFile(path.join(declarationsPath, `${serviceId}.json`)));
 
           assertValid(serviceSchema, declaration);
         });
 
         if (service.hasHistory()) {
-          it('has a valid history declaration', async () => {
+          it('valid history declaration', async () => {
             const declarationHistory = JSON.parse(await fs.readFile(path.join(
               declarationsPath,
               `${serviceId}.history.json`,
@@ -85,7 +85,7 @@ let servicesToValidate = args;
               let filteredContent;
               let mimeType;
 
-              it('has fetchable URL', async () => {
+              it('fetchable URL', async () => {
                 const { location, executeClientScripts } = service.getDocumentDeclaration(type);
                 const document = await fetch({
                   url: location,
@@ -97,7 +97,7 @@ let servicesToValidate = args;
                 mimeType = document.mimeType;
               });
 
-              it('has a selector that matches an element in the web page', async function checkSelector() {
+              it('selector matches an element in the web page', async function checkSelector() {
                 if (!content) {
                   console.log('      (Tests skipped as url is not fetchable)');
                   this.skip();
@@ -112,7 +112,7 @@ let servicesToValidate = args;
                 expect(filteredContent).to.not.be.empty;
               });
 
-              it(`has a resulting filtered content with at least ${MIN_DOC_LENGTH} characters`, async function checkContentLength() {
+              it(`filtered content has at least ${MIN_DOC_LENGTH} characters`, async function checkContentLength() {
                 if (!content) {
                   console.log('      (Tests skipped as url is not fetchable)');
                   this.skip();
@@ -126,7 +126,7 @@ let servicesToValidate = args;
                 expect(filteredContent.length).to.be.greaterThan(MIN_DOC_LENGTH);
               });
 
-              it('has consistent content when fetched and filtered twice in a row', async function checkContentConsistency() {
+              it('content is consistent when fetched and filtered twice in a row', async function checkContentConsistency() {
                 if (!content) {
                   console.log('      (Tests skipped as url is not fetchable)');
                   this.skip();
