@@ -11,7 +11,7 @@
     "export": "node scripts/export/makedataset.js",
     "release": "node scripts/release/build_release.js",
     "start": "node --max-http-header-size=32768 src/index.js",
-    "start:prod": "cross-env NODE_ENV=production node --max-http-header-size=32768  src/index.js",
+    "start:prod": "cross-env NODE_ENV=production node --max-http-header-size=32768 src/index.js",
     "start:scheduler": "node --max-http-header-size=32768 src/index.js --schedule",
     "start:scheduler:prod": "cross-env NODE_ENV=production node --max-http-header-size=32768 src/index.js --schedule",
     "sync-git": "cd data/versions && git fetch && git reset --hard origin/master && cd ../snapshots && git fetch && git reset --hard origin/master",
