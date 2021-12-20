@@ -97,8 +97,7 @@ let servicesToValidate = args;
                 mimeType = document.mimeType;
               });
 
-              // do not use arrow function to avoid binding to `this` and to allow `this.skip` to work
-              it('has a selector that matches an element in the web page', async function () { // eslint-disable-line func-names
+              it('has a selector that matches an element in the web page', async function checkSelector() {
                 if (!content) {
                   console.log('      (Tests skipped as url is not fetchable)');
                   this.skip();
@@ -113,8 +112,7 @@ let servicesToValidate = args;
                 expect(filteredContent).to.not.be.empty;
               });
 
-              // do not use arrow function to avoid binding to `this` and to allow `this.skip` to work
-              it(`has a resulting filtered content with at least ${MIN_DOC_LENGTH} characters`, async function () { // eslint-disable-line func-names
+              it(`has a resulting filtered content with at least ${MIN_DOC_LENGTH} characters`, async function checkContentLength() {
                 if (!content) {
                   console.log('      (Tests skipped as url is not fetchable)');
                   this.skip();
@@ -129,8 +127,7 @@ let servicesToValidate = args;
               });
 
               context('when fetched and filtered twice in a row', () => {
-                // do not use arrow function to avoid binding to `this` and to allow `this.skip` to work
-                it('has consistent filtered content', async function () { // eslint-disable-line func-names
+                it('has consistent filtered content', async function checkContentConsistency() {
                   if (!content) {
                     console.log('      (Tests skipped as url is not fetchable)');
                     this.skip();
