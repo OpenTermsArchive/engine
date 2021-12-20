@@ -52,7 +52,7 @@ let servicesToValidate = args;
       const service = serviceDeclarations[serviceId];
 
       if (!service) {
-        process.exitCode = 1;
+        process.exitCode = 2;
         throw new Error(`Could not find any service with id "${serviceId}"`);
       }
 
