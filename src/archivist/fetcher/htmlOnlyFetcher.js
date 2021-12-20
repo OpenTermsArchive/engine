@@ -36,9 +36,17 @@ export default async function fetch(url) {
 
     const mimeType = response.headers.get('content-type');
 
+    let content;
+
+    if (mimeType.startsWith('text/')) {
+      content = await response.text();
+    } else {
+      content = Buffer.from(await response.arrayBuffer());
+    }
+
     return {
       mimeType,
-      content: await (mimeType.startsWith('text/') ? response.text() : response.buffer()),
+      content,
     };
   } catch (error) {
     if (error instanceof AbortError) {
