@@ -88,7 +88,7 @@ logger.onRefilteringStarted = (numberOfServices, numberOfDocuments) => {
 };
 
 logger.onRefilteringCompleted = (numberOfServices, numberOfDocuments) => {
-  logger.info(`👆  Refiltered ${numberOfDocuments} documents from ${numberOfServices} services.\n`);
+  logger.info(`👆  Examined ${numberOfDocuments} documents from ${numberOfServices} services for refiltering.\n`);
 };
 
 logger.onTrackingStarted = (numberOfServices, numberOfDocuments) => {
