@@ -45,7 +45,7 @@ let servicesToValidate = args;
     servicesToValidate = Object.keys(serviceDeclarations);
   }
 
-  describe('Services validation', async function () {
+  describe('Service declarations validation', async function () {
     this.timeout(30000);
 
     servicesToValidate.forEach(serviceId => {
