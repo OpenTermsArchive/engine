@@ -92,7 +92,7 @@ logger.onRefilteringCompleted = (numberOfServices, numberOfDocuments) => {
 };
 
 logger.onTrackingStarted = (numberOfServices, numberOfDocuments) => {
-  logger.info(`👇  Start tracking changes of ${numberOfDocuments} documents from ${numberOfServices} services…`);
+  logger.info(`👇  Tracking changes of ${numberOfDocuments} documents from ${numberOfServices} services…`);
 };
 
 logger.onTrackingCompleted = (numberOfServices, numberOfDocuments) => {
