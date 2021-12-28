@@ -18,7 +18,7 @@ npm version <patch|minor|major>
 
 - Install [Ansible](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html)
 
-### [For developement only] Additional dependencies
+### [For development only] Additional dependencies
 
 To test the changes without impacting the production server, a Vagrantfile is provided to test the changes locally in a virtual machine. VirtualBox and Vagrant are therefore required.
 

@@ -4,7 +4,7 @@ As some document types or service names can change over time or as we need to im
 
 The script works by reading commits from a **source** repository, applying changes and then committing the result in another, empty or not, **target** repository. So a source repository with commits is required.
 
-When re-writting versions, filters are re-applied on snapshots, so services declarations and history are required.
+When re-writing versions, filters are re-applied on snapshots, so services declarations and history are required.
 
 :warning: Currently, history rewriting only works with Git storage.
 
@@ -148,7 +148,7 @@ To rename a document type only for a specific service, add a rule in `renamer/ru
 }
 ```
 
-### Currently handled cases:
+### Currently handled cases
 
 Currently, the script will:
 
