@@ -7,7 +7,7 @@
   tags:
     - setup
 
-- name: Ensures /home/{{ ansible_user }}/.config/gh/ dir exists
+- name: Ensure /home/{{ ansible_user }}/.config/gh/ dir exists
   file:
     path: '/home/{{ ansible_user }}/.config/gh/'
     state: directory

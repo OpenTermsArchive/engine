@@ -1,4 +1,4 @@
-- name: Clone Repo
+- name: Clone Open Terms Archive engine
   git:
     repo: '{{ repository }}'
     dest: '/home/{{ ansible_user }}/{{ app }}'
@@ -51,7 +51,7 @@
     - update
     - update-declarations
 
-- name: Stop OpenTermsArchive
+- name: Stop Open Terms Archive process
   command: pm2 --silent stop "{{ app }}"
   ignore_errors: yes
   tags:
@@ -60,7 +60,7 @@
     - update
     - update-declarations
 
-- name: Remove OpenTermsArchive app
+- name: Unregister Open Terms Archive from process manager
   command: pm2 --silent delete "{{ app }}"
   ignore_errors: yes
   tags:
@@ -71,7 +71,7 @@
 
 - include_tasks: database.yml
   vars:
-    name: OpenTermsArchive-Snapshots
+    name: snapshots
     repository: '{{ snapshots_repository }}'
     directory: '{{ snapshots_directory }}'
   tags:
@@ -80,14 +80,14 @@
 
 - include_tasks: database.yml
   vars:
-    name: OpenTermsArchive-Versions
+    name: versions
     repository: '{{ versions_repository }}'
     directory: '{{ versions_directory }}'
   tags:
     - setup
     - update
 
-- name: Start OpenTermsArchive
+- name: Start Open Terms Archive
   command:
     cmd: pm2 start --name "{{ app }}" --exp-backoff-restart-delay=1000 npm -- run start:scheduler:prod
     chdir: '/home/{{ ansible_user }}/{{ app }}'

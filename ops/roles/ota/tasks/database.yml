@@ -1,4 +1,4 @@
-- name: Define if {{ name }} base data has been obtained from the public instance
+- name: Define if {{ name }} base data has been obtained from {{ repository }}
   git:
     repo: '{{ repository }}'
     dest: '/home/{{ ansible_user }}/{{ directory }}'
@@ -13,7 +13,7 @@
     - update
     - setup
 
-- name: Obtain {{ name }} initial data from the public instance
+- name: Obtain {{ name }} initial data from {{ repository }}
   git:
     repo: '{{ repository }}'
     dest: '/home/{{ ansible_user }}/{{ directory }}'
@@ -33,7 +33,7 @@
     - start
     - update
 
-- name: Get latest data from public instance of {{ name }}
+- name: Get latest data from {{ repository }}
   command:
     cmd: git fetch origin
     chdir: '/home/{{ ansible_user }}/{{ directory }}'
@@ -43,7 +43,7 @@
     - update
     - setup
 
-- name: Clean {{ name }} repository
+- name: Clean {{ name }} local copy
   command:
     cmd: git reset --hard origin/master
     chdir: '/home/{{ ansible_user }}/{{ directory }}'
