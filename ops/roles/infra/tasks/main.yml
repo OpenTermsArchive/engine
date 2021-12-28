@@ -2,8 +2,8 @@
 - name: Install common required packages
   apt:
     pkg:
-      - curl
       - build-essential
+      - curl
       - git
       - zip
     update_cache: yes
