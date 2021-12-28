@@ -1,6 +1,7 @@
 - name: Define if {{ name }} base data has been obtained from {{ repository }}
   git:
     repo: '{{ repository }}'
+    version: '{{ branch }}'
     dest: '/home/{{ ansible_user }}/{{ directory }}'
     clone: no
     update: no
@@ -16,6 +17,7 @@
 - name: Obtain {{ name }} initial data from branch {{ branch }} of {{ repository }}
   git:
     repo: '{{ repository }}'
+    version: '{{ branch }}'
     dest: '/home/{{ ansible_user }}/{{ directory }}'
     depth: 1
     accept_hostkey: yes
@@ -45,7 +47,7 @@
 
 - name: Clean {{ name }} local copy
   command:
-    cmd: git reset --hard origin/master
+    cmd: git reset --hard origin/{{ branch }}
     chdir: '/home/{{ ansible_user }}/{{ directory }}'
   tags:
     - restart
@@ -53,9 +55,9 @@
     - update
     - setup
 
-- name: Ensure {{ name }} is on the main branch
+- name: Ensure {{ name }} is on branch {{ branch }}
   command:
-    cmd: git checkout master
+    cmd: git checkout {{ branch }}
     chdir: '/home/{{ ansible_user }}/{{ directory }}'
   tags:
     - restart

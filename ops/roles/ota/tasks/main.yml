@@ -75,6 +75,7 @@
   vars:
     name: snapshots
     repository: '{{ snapshots_repository }}'
+    branch: '{{ snapshots_branch }}'
     directory: '{{ snapshots_directory }}'
   tags:
     - setup
@@ -84,6 +85,7 @@
   vars:
     name: versions
     repository: '{{ versions_repository }}'
+    branch: '{{ versions_branch }}'
     directory: '{{ versions_directory }}'
   tags:
     - setup
