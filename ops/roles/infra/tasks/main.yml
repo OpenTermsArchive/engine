@@ -9,7 +9,7 @@
     update_cache: yes
     state: latest
 
-- name: Add global Git Config
+- name: Add global git config
   copy:
     src: .gitconfig
     dest: '/home/{{ ansible_user }}/.gitconfig'
@@ -17,13 +17,13 @@
 - name: Add the NodeSource repository to the system
   shell: curl -sL https://deb.nodesource.com/setup_14.x | sudo bash -
 
-- name: Install NodeJS and Npm
+- name: Install NodeJS and NPM
   apt:
     name: nodejs
     update_cache: yes
     state: latest
 
-- name: Update Npm to latest version
+- name: Update NPM to latest version
   command: npm install -g npm
 
 - name: Install pm2
