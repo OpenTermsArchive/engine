@@ -9,9 +9,7 @@
   },
   "scripts": {
     "start": "node --max-http-header-size=32768 src/index.js",
-    "start:prod": "cross-env NODE_ENV=production node --max-http-header-size=32768 src/index.js",
     "start:scheduler": "node --max-http-header-size=32768 src/index.js --schedule",
-    "start:scheduler:prod": "cross-env NODE_ENV=production node --max-http-header-size=32768 src/index.js --schedule",
     "test": "cross-env NODE_ENV=test mocha --recursive \"./src/**/*.test.js\" --exit",
     "test:debug": "npm run test -- --inspect-brk --exit",
     "posttest": "npm run lint",
