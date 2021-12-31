@@ -8,21 +8,21 @@
     "node": ">=14.0.0"
   },
   "scripts": {
-    "export": "node scripts/export/makedataset.js",
-    "release": "node scripts/release/build_release.js",
     "start": "node --max-http-header-size=32768 src/index.js",
     "start:prod": "cross-env NODE_ENV=production node --max-http-header-size=32768 src/index.js",
     "start:scheduler": "node --max-http-header-size=32768 src/index.js --schedule",
     "start:scheduler:prod": "cross-env NODE_ENV=production node --max-http-header-size=32768 src/index.js --schedule",
-    "sync-git": "cd data/versions && git fetch && git reset --hard origin/master && cd ../snapshots && git fetch && git reset --hard origin/master",
-    "refilter": "node src/index.js --refilter-only",
-    "lint": "eslint src test scripts bin",
-    "lint:fix": "npm run lint -- --fix",
-    "posttest": "npm run lint",
     "test": "cross-env NODE_ENV=test mocha --recursive \"./src/**/*.test.js\" --exit",
     "test:debug": "npm run test -- --inspect-brk --exit",
+    "posttest": "npm run lint",
+    "lint": "eslint src test scripts bin",
+    "lint:fix": "npm run lint -- --fix",
     "validate": "node ./bin/validate.js",
-    "validate:schema": "npm run validate -- --schema-only"
+    "validate:schema": "npm run validate -- --schema-only",
+    "export": "node scripts/export/makedataset.js",
+    "release": "node scripts/release/build_release.js",
+    "refilter": "node src/index.js --refilter-only",
+    "sync-git": "cd data/versions && git fetch && git reset --hard origin/master && cd ../snapshots && git fetch && git reset --hard origin/master"
   },
   "repository": {
     "type": "git",
