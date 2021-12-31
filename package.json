@@ -21,8 +21,7 @@
     "validate:schema": "npm run validate -- --schema-only",
     "export": "node scripts/export/makedataset.js",
     "release": "node scripts/release/build_release.js",
-    "refilter": "node src/index.js --refilter-only",
-    "sync-git": "cd data/versions && git fetch && git reset --hard origin/master && cd ../snapshots && git fetch && git reset --hard origin/master"
+    "refilter": "node src/index.js --refilter-only"
   },
   "repository": {
     "type": "git",
