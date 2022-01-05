@@ -5,14 +5,14 @@ on:
     branches-ignore:
       - master # tests will be launched by workflow_call push:
   pull_request:
-    types: [opened, reopened]
+    types: [ opened, reopened ]
   workflow_call:
 
 jobs:
   test:
     strategy:
       matrix:
-        operating_system: [ubuntu-latest, windows-2019]
+        operating_system: [ ubuntu-latest, windows-2019 ]
       fail-fast: false # run tests on other operating systems even if one fails
 
     runs-on: ${{ matrix.operating_system }}
