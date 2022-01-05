@@ -13,7 +13,7 @@
     - update
     - setup
 
-- name: Obtain {{ name }} initial data from {{ repository }}
+- name: Obtain {{ name }} initial data from branch {{ branch }} of {{ repository }}
   git:
     repo: '{{ repository }}'
     dest: '/home/{{ ansible_user }}/{{ directory }}'
