@@ -20,5 +20,5 @@ jobs:
           known_hosts: ${{ secrets.KNOWN_HOSTS }}
       - run: echo "${{ secrets.ANSIBLE_VAULT_PASSWORD }}" > vault.key
       - run: pip install --upgrade setuptools
-      - run: pip install ansible==2.9.11
+      - run: pip install 'ansible ~= 2.9'
       - run: ansible-playbook ops/site.yml --inventory ops/inventories/production.yml
