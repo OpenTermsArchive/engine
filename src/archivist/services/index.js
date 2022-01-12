@@ -1,4 +1,5 @@
 import fsApi from 'fs';
+import { createRequire } from 'module';
 import path from 'path';
 import { fileURLToPath, pathToFileURL } from 'url';
 
@@ -10,6 +11,10 @@ import Service from './service.js';
 const fs = fsApi.promises;
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const declarationsPath = path.resolve(__dirname, '../../..', config.get('services.declarationsPath'));
+
+const require = createRequire(import.meta.url);
+
+export const DOCUMENT_TYPES = require(path.resolve(__dirname, './documentTypes.json')); // eslint-disable-line import/no-dynamic-require
 
 export async function load() {
   const services = {};
