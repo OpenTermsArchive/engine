@@ -1,17 +1,16 @@
 #! /usr/bin/env node
 import './.env.js'; // Workaround to ensure `SUPPRESS_NO_CONFIG_WARNING` is set before config is imported
 
-import { createRequire } from 'module';
+import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
 import config from 'config';
 import Mocha from 'mocha';
 
-const require = createRequire(import.meta.url);
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-const defaultConfigs = require(path.resolve(__dirname, '../config/default.json')); // eslint-disable-line import/no-dynamic-require
+const defaultConfigs = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../config/default.json')));
 
 // Initialise configs to allow clients of this module to use it without requiring node-config in their own application.
 // see https://github.com/lorenwest/node-config/wiki/Sub-Module-Configuration
