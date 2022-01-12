@@ -1,6 +1,5 @@
 {
   "services": {
-    "declarationsPath": "./services-all/declarations",
-    "documentTypesPath": "./services-all/document-types.json"
+    "declarationsPath": "./services-all/declarations"
   }
 }
