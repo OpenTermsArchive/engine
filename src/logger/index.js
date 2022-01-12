@@ -91,7 +91,7 @@ logger.onVersionNotChanged = (serviceId, type) => {
 };
 
 logger.onRefilteringStarted = (numberOfServices, numberOfDocuments) => {
-  logger.info(`👇  Refiltering ${numberOfDocuments} documents from ${numberOfServices} services…`);
+  logger.info(`👇  Examining ${numberOfDocuments} documents from ${numberOfServices} services for refiltering…`);
   recordedVersionsCount = 0;
 };
 
