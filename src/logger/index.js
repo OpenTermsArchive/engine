@@ -91,24 +91,24 @@ logger.onVersionNotChanged = (serviceId, type) => {
 };
 
 logger.onRefilteringStarted = (numberOfServices, numberOfDocuments) => {
-  logger.info(`👇  Examining ${numberOfDocuments} documents from ${numberOfServices} services for refiltering…`);
+  logger.info(`Examining ${numberOfDocuments} documents from ${numberOfServices} services for refiltering…`);
   recordedVersionsCount = 0;
 };
 
 logger.onRefilteringCompleted = (numberOfServices, numberOfDocuments) => {
-  logger.info(`👆  Examined ${numberOfDocuments} documents from ${numberOfServices} services for refiltering.`);
-  logger.info(`    Recorded ${recordedVersionsCount} new versions.`);
+  logger.info(`Examined ${numberOfDocuments} documents from ${numberOfServices} services for refiltering.`);
+  logger.info(`Recorded ${recordedVersionsCount} new versions.\n`);
 };
 
 logger.onTrackingStarted = (numberOfServices, numberOfDocuments) => {
-  logger.info(`👇  Tracking changes of ${numberOfDocuments} documents from ${numberOfServices} services…`);
+  logger.info(`Tracking changes of ${numberOfDocuments} documents from ${numberOfServices} services…`);
   recordedSnapshotsCount = 0;
   recordedVersionsCount = 0;
 };
 
 logger.onTrackingCompleted = (numberOfServices, numberOfDocuments) => {
-  logger.info(`👆  Tracked changes of ${numberOfDocuments} documents from ${numberOfServices} services.`);
-  logger.info(`    Recorded ${recordedSnapshotsCount} new snapshots and ${recordedVersionsCount} new versions.`);
+  logger.info(`Tracked changes of ${numberOfDocuments} documents from ${numberOfServices} services.`);
+  logger.info(`Recorded ${recordedSnapshotsCount} new snapshots and ${recordedVersionsCount} new versions.\n`);
 };
 
 logger.onInaccessibleContent = ({ message }, serviceId, type) => {
