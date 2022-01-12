@@ -13,19 +13,12 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-          ref: ${{ github.event.pull_request.head.sha }}
-      - run: git checkout HEAD
       - name: Install SSH key
         uses: shimataro/ssh-key-action@v2
         with:
-          key: ${{ secrets.SSH_KEY }}
-          known_hosts: ${{ secrets.KNOWN_HOSTS }}
-      - run: echo "${{ secrets.ANSIBLE_VAULT_PASSWORD }}" > vault.key
-      - run: |
-          git config --global user.name 'Open Terms Archive Bot'
-          git config --global user.email 'bot@opentermsarchive.org'
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          known_hosts: ${{ secrets.SERVER_FINGERPRINT }}
+      - run: echo "${{ secrets.ANSIBLE_VAULT_KEY }}" > vault.key
       - run: pip install --upgrade setuptools
-      - run: pip install ansible==2.9.11
+      - run: pip install 'ansible ~= 2.9'
       - run: ansible-playbook ops/site.yml --inventory ops/inventories/production.yml

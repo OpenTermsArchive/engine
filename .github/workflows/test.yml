@@ -23,14 +23,9 @@ jobs:
           git config --global user.email 'bot@opentermsarchive.org'
           git config --global core.autocrlf false
       - uses: actions/checkout@v2
-      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
         with:
-          repository: OpenTermsArchive/services-all
-          path: ./services-all
-      - name: Use Node.js
-        uses: actions/setup-node@v1
-        with:
-          node-version: 14.x
+          node-version: 14
       - name: Install and Start MongoDB (ubuntu)
         if: matrix.operating_system == 'ubuntu-latest'
         uses: supercharge/mongodb-github-action@1.7.0
@@ -42,5 +37,24 @@ jobs:
         with:
           args: install mongodb
       - run: npm ci
-      - run: ./node_modules/.bin/cross-env NODE_ENV=ci npm run validate:schema
       - run: npm test
+
+  validate_declarations:
+    strategy:
+      matrix:
+        operating_system: [ubuntu-latest, windows-2019]
+      fail-fast: false # run tests on other operating systems even if one fails
+
+    runs-on: ${{ matrix.operating_system }}
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/checkout@v2
+        with:
+          repository: OpenTermsArchive/services-all
+          path: ./services-all
+      - uses: actions/setup-node@v2
+        with:
+          node-version: 14.x
+      - run: npm ci
+      - run: ./node_modules/.bin/cross-env NODE_ENV=ci npm run validate:schema
