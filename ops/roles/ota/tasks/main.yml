@@ -1,10 +1,11 @@
-- name: Clone Repo
+- name: Clone Open Terms Archive engine
   git:
     repo: '{{ repository }}'
     dest: '/home/{{ ansible_user }}/{{ app }}'
     force: yes
     accept_hostkey: yes
     key_file: '/home/{{ ansible_user }}/.ssh/ota-bot-key'
+    depth: 1
   register: git_clone_app_finished
   tags:
     - setup
@@ -12,7 +13,7 @@
 
 - name: Install dependencies
   command:
-    cmd: npm i --production --unsafe-perm=true
+    cmd: npm ci --production --unsafe-perm=true
     chdir: '/home/{{ ansible_user }}/{{ app }}'
   tags:
     - setup
@@ -36,6 +37,7 @@
     force: yes
     accept_hostkey: yes
     key_file: '/home/{{ ansible_user }}/.ssh/ota-bot-key'
+    depth: 1
   register: git_clone_app_finished
   tags:
     - setup
@@ -44,14 +46,14 @@
 
 - name: Install services declarations dependencies
   command:
-    cmd: npm i --production
+    cmd: npm ci --production
     chdir: '/home/{{ ansible_user }}/{{ services_directory }}'
   tags:
     - setup
     - update
     - update-declarations
 
-- name: Stop OpenTermsArchive
+- name: Stop Open Terms Archive process
   command: pm2 --silent stop "{{ app }}"
   ignore_errors: yes
   tags:
@@ -60,7 +62,7 @@
     - update
     - update-declarations
 
-- name: Remove OpenTermsArchive app
+- name: Unregister Open Terms Archive from process manager
   command: pm2 --silent delete "{{ app }}"
   ignore_errors: yes
   tags:
@@ -71,8 +73,9 @@
 
 - include_tasks: database.yml
   vars:
-    name: OpenTermsArchive-Snapshots
+    name: snapshots
     repository: '{{ snapshots_repository }}'
+    branch: '{{ snapshots_branch }}'
     directory: '{{ snapshots_directory }}'
   tags:
     - setup
@@ -80,16 +83,17 @@
 
 - include_tasks: database.yml
   vars:
-    name: OpenTermsArchive-Versions
+    name: versions
     repository: '{{ versions_repository }}'
+    branch: '{{ versions_branch }}'
     directory: '{{ versions_directory }}'
   tags:
     - setup
     - update
 
-- name: Start OpenTermsArchive
+- name: Start Open Terms Archive
   command:
-    cmd: pm2 start --name "{{ app }}" --exp-backoff-restart-delay=1000 npm -- run start:scheduler:prod
+    cmd: pm2 start --name "{{ app }}" --exp-backoff-restart-delay=1000 npm -- run start:scheduler
     chdir: '/home/{{ ansible_user }}/{{ app }}'
   environment:
     NODE_ENV: production
