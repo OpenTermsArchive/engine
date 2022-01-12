@@ -11,6 +11,8 @@ const fs = fsApi.promises;
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const declarationsPath = path.resolve(__dirname, '../../..', config.get('services.declarationsPath'));
 
+export const DOCUMENT_TYPES = JSON.parse(fsApi.readFileSync(path.resolve(__dirname, './documentTypes.json')));
+
 export async function load() {
   const services = {};
   const fileNames = await fs.readdir(declarationsPath);
