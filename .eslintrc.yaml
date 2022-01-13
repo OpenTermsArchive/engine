@@ -86,7 +86,10 @@ rules:
   multiline-comment-style:
     - error
     - separate-lines
-
+  eol-last: 
+    - error
+    - always
+    
 overrides:
   - files:
       - src/**/*test.js
