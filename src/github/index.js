@@ -12,8 +12,8 @@ const ISSUE_STATE_ALL = 'all';
 
 const UPDATE_DOCUMENT_LABEL = process.env.GITHUB_LABEL_UPDATE || 'update';
 
-const LOCAL_CONTRIBUTE_URL = 'http://localhost:3000/contribute/service';
-const CONTRIBUTE_URL = 'https://opentermsarchive.org/en/contribute/service';
+const LOCAL_CONTRIBUTE_URL = 'http://localhost:3000/en/service';
+const CONTRIBUTE_URL = 'https://contribute.opentermsarchive.org/en/service';
 const GITHUB_VERSIONS_URL = 'https://github.com/ambanum/OpenTermsArchive-versions/blob/master';
 const GITHUB_REPO_URL = `https://github.com/${process.env.GITHUB_REPO}/blob/master/declarations`;
 const GOOGLE_URL = 'https://www.google.com/search?q=';
@@ -214,8 +214,9 @@ export default class GitHub {
     const encodedName = encodeURIComponent(name);
     const encodedType = encodeURIComponent(documentType);
     const encodedUrl = encodeURIComponent(url);
+    const encodedDestination = encodeURIComponent(process.env.GITHUB_REPO);
 
-    const urlQueryParams = `step=2&url=${encodedUrl}&name=${encodedName}&documentType=${encodedType}${noiseSelectorsQueryString}${contentSelectorsQueryString}&expertMode=true`;
+    const urlQueryParams = `destination=${encodedDestination}&step=2&url=${encodedUrl}&name=${encodedName}&documentType=${encodedType}${noiseSelectorsQueryString}${contentSelectorsQueryString}&expertMode=true`;
 
     const message404 = message.includes('404') ? `- Search Google to get the new url: ${GOOGLE_URL}%22${encodedName}%22+%22${encodedType}%22` : '';
 
