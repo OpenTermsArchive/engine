@@ -1,0 +1,11 @@
+{
+  "import": {
+    "sourcePath": "./data/snapshots",
+    "githubRepository": "ambanum/OpenTermsArchive-snapshots",
+    "mongo": {
+      "connectionURI": "mongodb://localhost:27017",
+      "database": "open-terms-archive-import",
+      "collection": "snapshots"
+    }
+  }
+}
