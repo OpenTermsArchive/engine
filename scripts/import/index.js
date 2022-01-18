@@ -10,7 +10,7 @@ import nodeFetch from 'node-fetch';
 
 import logger from '../../src/logger/index.js';
 import Git from '../../src/storage-adapters/git/git.js';
-import * as renamer from '../rewrite/renamer/index.js';
+import * as renamer from '../renamer/index.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
