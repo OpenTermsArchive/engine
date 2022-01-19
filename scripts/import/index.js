@@ -123,8 +123,8 @@ async function getCommitContent({ sha, serviceId, documentType, extension }) {
   const response = await nodeFetch(url);
   const end = performance.now();
 
-  if (response.status == 404) {
-    throw new Error(`Cannot find commit on Github: ${url}`);
+  if (response.status !== 200) {
+    throw new Error(`Cannot get commit content on Github ${url}. Get HTTP Code ${response.status} and response ${await response.text()}`);
   }
 
   logger.info({ message: `Fetched in ${Number(end - start).toFixed(2)} ms`, serviceId, type: documentType, sha });
