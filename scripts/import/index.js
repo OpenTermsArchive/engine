@@ -154,7 +154,7 @@ async function handleCommit(commit) {
   const alreadyExistsRecord = await collection.findOne({ '_importMetadata.commitSHA': commit.hash });
 
   if (alreadyExistsRecord) {
-    logger.info({ message: `Skipped, entry already exist with this fetchDate: ${commit.date}`, serviceId, type: documentType });
+    logger.info({ message: `Skipped ${commit.hash} as entry already exist for this commit`, serviceId, type: documentType });
     COUNTERS.skippedNoChanges++;
 
     return;
