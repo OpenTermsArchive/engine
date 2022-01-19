@@ -111,13 +111,7 @@ async function initialize() {
 
   collection = db.collection(config.get('import.mongo.collection'));
 
-  sourceRepository = new Git({
-    path: path.resolve(ROOT_PATH, config.get('import.sourcePath')),
-    author: {
-      name: 'Open Terms Archive Bot',
-      email: 'bot@opentermsarchive.org',
-    },
-  });
+  sourceRepository = new Git({ path: path.resolve(ROOT_PATH, config.get('import.sourcePath')) });
 
   await sourceRepository.initialize();
   await renamer.loadRules();
