@@ -47,7 +47,7 @@ let client;
   const numberOfFilteredCommits = commits.length - filteredCommits.length;
 
   if (numberOfFilteredCommits) {
-    logger.info({ message: `Skip ${numberOfFilteredCommits} commits that do not need to be imported (Readme, licence, …) .` });
+    logger.info({ message: `Skip ${numberOfFilteredCommits} commits that do not need to be imported (Readme, licence, …).` });
   }
 
   const queue = async.queue(queueWorker, MAX_PARALLEL);
