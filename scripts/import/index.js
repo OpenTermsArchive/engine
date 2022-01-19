@@ -15,7 +15,7 @@ import * as renamer from '../renamer/index.js';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const ROOT_PATH = path.resolve(__dirname, '../../');
-const MAX_PARALLEL = 20;
+const MAX_PARALLEL = 10;
 const MAX_RETRY = 5;
 const PDF_MIME_TYPE = 'application/pdf';
 const COUNTERS = {
