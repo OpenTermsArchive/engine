@@ -1,6 +1,6 @@
 {
   "import": {
-    "sourcePath": "./data/snapshots",
+    "sourcePath": "../ota-snapshots",
     "githubRepository": "ambanum/OpenTermsArchive-snapshots",
     "mongo": {
       "connectionURI": "mongodb://localhost:27017",
