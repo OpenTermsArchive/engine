@@ -8,9 +8,10 @@ import mime from 'mime';
 import { MongoClient } from 'mongodb';
 import nodeFetch from 'node-fetch';
 
-import logger from '../../src/logger/index.js';
 import Git from '../../src/storage-adapters/git/git.js';
 import * as renamer from '../renamer/index.js';
+
+import logger from './logger.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -44,10 +45,10 @@ let client;
   logger.info({ message: `Load git log in ${Number((end - start) / 1000).toFixed(2)} s` });
   logger.info({ message: `Source repo contains ${commits.length} commits.` });
 
-  const numberOfFilteredCommits = commits.length - filteredCommits.length;
+  const numberOfSkippedCommits = commits.length - filteredCommits.length;
 
-  if (numberOfFilteredCommits) {
-    logger.info({ message: `Skip ${numberOfFilteredCommits} commits that do not need to be imported (Readme, licence, …).` });
+  if (numberOfSkippedCommits) {
+    logger.info({ message: `Skip ${numberOfSkippedCommits} commits that do not need to be imported (Readme, licence, …).` });
   }
 
   const queue = async.queue(queueWorker, MAX_PARALLEL);
@@ -55,12 +56,12 @@ let client;
   queue.error(queueErrorHandler);
   queue.drain(queueDrainHandler(filteredCommits));
 
-  filteredCommits.forEach(async commit => queue.push(commit));
+  filteredCommits.forEach(async (commit, index) => queue.push({ commit, index, total: filteredCommits.length }));
 }());
 
-async function queueWorker(commit) {
+async function queueWorker({ commit, index, total }) {
   return async.retry(MAX_RETRY, callback => {
-    handleCommit(commit).then(() => {
+    handleCommit(commit, index, total).then(() => {
       callback();
     }).catch(error => {
       callback(error);
@@ -68,7 +69,7 @@ async function queueWorker(commit) {
   });
 }
 
-function queueErrorHandler(error, commit) {
+function queueErrorHandler(error, { commit }) {
   const [{ file: relativeFilePath }] = commit.diff.files;
 
   const serviceId = path.dirname(relativeFilePath);
@@ -76,7 +77,7 @@ function queueErrorHandler(error, commit) {
   const documentType = path.basename(relativeFilePath, extension);
 
   commitsNotImported.push(commit.hash);
-  logger.error({ message: `${error}\nCommit details: ${JSON.stringify(commit, null, 2)}`, serviceId, type: documentType });
+  logger.error({ message: `${error}\nCommit details: ${JSON.stringify(commit, null, 2)}`, serviceId, type: documentType, sha: commit.hash });
   COUNTERS.errors++;
 }
 
@@ -138,19 +139,31 @@ async function getCommitContent({ sha, serviceId, documentType, extension }) {
   return response.text();
 }
 
-async function handleCommit(commit) {
+async function handleCommit(commit, index, total) {
   const [{ file: relativeFilePath }] = commit.diff.files;
 
   let serviceId = path.dirname(relativeFilePath);
   const extension = path.extname(relativeFilePath);
   let documentType = path.basename(relativeFilePath, extension);
 
-  logger.info({ message: `Start to handle commit ${commit.hash}`, serviceId, type: documentType });
+  logger.info({
+    message: 'Start to handle commit',
+    serviceId,
+    type: documentType,
+    sha: commit.hash,
+    current: index + 1,
+    total,
+  });
 
   const alreadyExistsRecord = await collection.findOne({ '_importMetadata.commitSHA': commit.hash });
 
   if (alreadyExistsRecord) {
-    logger.info({ message: `Skipped ${commit.hash} as entry already exist for this commit`, serviceId, type: documentType });
+    logger.info({
+      message: 'Skipped commit as entry already exist for this commit',
+      serviceId,
+      type: documentType,
+      sha: commit.hash,
+    });
     COUNTERS.skippedNoChanges++;
 
     return;
