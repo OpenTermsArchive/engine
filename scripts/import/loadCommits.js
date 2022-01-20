@@ -1,0 +1,66 @@
+import path from 'path';
+import { performance } from 'perf_hooks';
+import { fileURLToPath } from 'url';
+
+import config from 'config';
+import { MongoClient } from 'mongodb';
+
+import Git from '../../src/storage-adapters/git/git.js';
+
+import logger from './logger/index.js';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+const ROOT_PATH = path.resolve(__dirname, '../../');
+
+let sourceRepository;
+let collection;
+let client;
+
+(async function main() {
+  console.time('Total time');
+  logger.info({ message: 'Start importing commits…' });
+
+  await initialize();
+
+  logger.info({ message: 'Waiting for git log… (this can take a while)' });
+  const start = performance.now();
+  const commits = (await sourceRepository.log(['--stat=4096'])).sort((a, b) => new Date(a.date) - new Date(b.date));
+  const end = performance.now();
+  const filteredCommits = commits.filter(({ message }) => message.match(/^(Start tracking|Update)/));
+
+  logger.info({ message: `Load git log in ${Number((end - start) / 1000).toFixed(2)} s` });
+  logger.info({ message: `Source repo contains ${commits.length} commits.` });
+
+  const totalCommitToLoad = filteredCommits.length;
+  const numberOfSkippedCommits = commits.length - totalCommitToLoad;
+
+  if (numberOfSkippedCommits) {
+    logger.info({ message: `Skip ${numberOfSkippedCommits} commits that do not need to be imported (Readme, licence, …).` });
+  }
+
+  let counter = 1;
+
+  for (const commit of filteredCommits.reverse()) { // reverse array to insert most recent commits first
+    await collection.updateOne({ hash: commit.hash }, { $set: { ...commit } }, { upsert: true }); // eslint-disable-line no-await-in-loop
+
+    if (counter % 1000 == 0) {
+      logger.info({ message: ' ', current: counter, total: totalCommitToLoad });
+    }
+    counter++;
+  }
+
+  await client.close();
+}());
+
+async function initialize() {
+  client = new MongoClient(config.get('import.mongo.connectionURI'));
+
+  await client.connect();
+  const db = client.db(config.get('import.mongo.database'));
+
+  collection = db.collection(config.get('import.mongo.commitsCollection'));
+  sourceRepository = new Git({ path: path.resolve(ROOT_PATH, config.get('import.sourcePath')) });
+
+  await sourceRepository.initialize();
+}
