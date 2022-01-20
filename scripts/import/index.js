@@ -11,7 +11,7 @@ import nodeFetch from 'node-fetch';
 import Git from '../../src/storage-adapters/git/git.js';
 import * as renamer from '../renamer/index.js';
 
-import logger from './logger.js';
+import logger from './logger/index.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
