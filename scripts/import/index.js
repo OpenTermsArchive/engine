@@ -82,7 +82,7 @@ function queueErrorHandler(error, { commit }) {
   const documentType = path.basename(relativeFilePath, extension);
 
   commitsNotImported.push(commit.hash);
-  logger.error({ message: `${error}\nCommit details: ${JSON.stringify(commit, null, 2)}`, serviceId, type: documentType, sha: commit.hash });
+  logger.error({ message: `${error.stack}\nCommit details: ${JSON.stringify(commit, null, 2)}`, serviceId, type: documentType, sha: commit.hash });
   COUNTERS.errors++;
 }
 
