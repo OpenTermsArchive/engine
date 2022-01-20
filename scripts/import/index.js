@@ -129,19 +129,27 @@ async function getCommitContent({ sha, serviceId, documentType, extension }) {
   const response = await nodeFetch(url);
   const end = performance.now();
 
-  if (response.status !== 200) {
-    throw new Error(`Cannot get commit content on Github ${url}. Get HTTP Code ${response.status} and response ${await response.text()}`);
-  }
-
-  logger.info({ message: `Fetched in ${Number(end - start).toFixed(2)} ms`, serviceId, type: documentType, sha });
+  let content;
 
   const mimeType = mime.getType(extension);
 
   if (mimeType == PDF_MIME_TYPE) {
-    return Buffer.from(await response.arrayBuffer());
+    content = Buffer.from(await response.arrayBuffer());
+  } else {
+    content = await response.text();
   }
 
-  return response.text();
+  if (response.status !== 200) {
+    throw new Error(`Cannot get commit content on Github ${url}. Get HTTP Code ${response.status} and response ${content}`);
+  }
+
+  if (content == '429: Too Many Requests') {
+    throw new TooManyRequestsError(`Cannot get commit content on Github ${url}. 429: Too Many Requests`);
+  }
+
+  logger.info({ message: `Fetched in ${Number(end - start).toFixed(2)} ms`, serviceId, type: documentType, sha });
+
+  return content;
 }
 
 async function handleCommit(commit, index, total) {
@@ -211,5 +219,12 @@ async function handleCommit(commit, index, total) {
     logger.error({ message: `Not saved: ${commit.date} ${error.stack}`, serviceId, type: documentType });
     commitsNotImported.push(commit.hash);
     COUNTERS.errors++;
+  }
+}
+
+export class TooManyRequestsError extends Error {
+  constructor(message) {
+    super(message);
+    this.name = 'TooManyRequestsError';
   }
 }
