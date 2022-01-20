@@ -5,7 +5,7 @@
     "mongo": {
       "connectionURI": "mongodb://localhost:27017",
       "database": "open-terms-archive-import-retry",
-      "collection": "snapshots",
+      "snapshotsCollection": "snapshots",
       "commitsCollection": "commits"
     }
   }

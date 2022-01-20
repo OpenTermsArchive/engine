@@ -27,7 +27,8 @@ const COUNTERS = {
 const commitsNotImported = [];
 
 let sourceRepository;
-let collection;
+let snapshotsCollection;
+let commitsCollection;
 let client;
 
 (async function main() {
@@ -36,28 +37,35 @@ let client;
 
   await initialize();
 
-  logger.info({ message: 'Waiting for git log… (this can take a while)' });
-  const start = performance.now();
-  const commits = (await sourceRepository.log(['--stat=4096'])).sort((a, b) => new Date(a.date) - new Date(b.date));
-  const end = performance.now();
-  const filteredCommits = commits.filter(({ message }) => message.match(/^(Start tracking|Update)/));
-
-  logger.info({ message: `Load git log in ${Number((end - start) / 1000).toFixed(2)} s` });
-  logger.info({ message: `Source repo contains ${commits.length} commits.` });
-
-  const numberOfSkippedCommits = commits.length - filteredCommits.length;
-
-  if (numberOfSkippedCommits) {
-    logger.info({ message: `Skip ${numberOfSkippedCommits} commits that do not need to be imported (Readme, licence, …).` });
-  }
+  const totalToTreat = await commitsCollection.find().count();
 
   const queue = async.queue(queueWorker, MAX_PARALLEL);
 
   queue.error(queueErrorHandler);
-  queue.drain(queueDrainHandler(filteredCommits));
+  queue.drain(queueDrainHandler(totalToTreat));
 
-  filteredCommits.forEach(async (commit, index) => queue.push({ commit, index, total: filteredCommits.length }));
+  let counter = 1;
+
+  await commitsCollection.find().forEach(commit => {
+    queue.push({ commit, index: counter, total: totalToTreat });
+    counter++;
+  });
 }());
+
+async function initialize() {
+  client = new MongoClient(config.get('import.mongo.connectionURI'));
+
+  await client.connect();
+  const db = client.db(config.get('import.mongo.database'));
+
+  snapshotsCollection = db.collection(config.get('import.mongo.snapshotsCollection'));
+  commitsCollection = db.collection(config.get('import.mongo.commitsCollection'));
+
+  sourceRepository = new Git({ path: path.resolve(ROOT_PATH, config.get('import.sourcePath')) });
+
+  await sourceRepository.initialize();
+  await renamer.loadRules();
+}
 
 async function queueWorker({ commit, index, total }) {
   return async.retry({
@@ -86,17 +94,17 @@ function queueErrorHandler(error, { commit }) {
   COUNTERS.errors++;
 }
 
-function queueDrainHandler(filteredCommits) {
+function queueDrainHandler(totalToTreat) {
   return () => {
     const totalTreatedCommits = Object.values(COUNTERS).reduce((acc, value) => acc + value, 0);
 
-    console.log(`\nEntries treated: ${totalTreatedCommits} on ${filteredCommits.length}`);
+    console.log(`\nEntries treated: ${totalTreatedCommits} on ${totalToTreat}`);
     console.log(`⌙ Entries imported: ${COUNTERS.imported}`);
     console.log(`⌙ Entries skipped (already on the database): ${COUNTERS.skippedNoChanges}`);
     console.log(`⌙ Entries with errors: ${COUNTERS.errors}`);
     console.timeEnd('Total time');
 
-    if (totalTreatedCommits != filteredCommits.length) {
+    if (totalTreatedCommits != totalToTreat) {
       console.error('\n⚠ WARNING: Total treated entries does not match the total number of entries to be treated! ⚠');
     }
 
@@ -107,20 +115,6 @@ function queueDrainHandler(filteredCommits) {
 
     client.close();
   };
-}
-
-async function initialize() {
-  client = new MongoClient(config.get('import.mongo.connectionURI'));
-
-  await client.connect();
-  const db = client.db(config.get('import.mongo.database'));
-
-  collection = db.collection(config.get('import.mongo.collection'));
-
-  sourceRepository = new Git({ path: path.resolve(ROOT_PATH, config.get('import.sourcePath')) });
-
-  await sourceRepository.initialize();
-  await renamer.loadRules();
 }
 
 async function getCommitContent({ sha, serviceId, documentType, extension }) {
@@ -168,7 +162,7 @@ async function handleCommit(commit, index, total) {
     total,
   });
 
-  const alreadyExistsRecord = await collection.findOne({ '_importMetadata.commitSHA': commit.hash });
+  const alreadyExistsRecord = await snapshotsCollection.findOne({ '_importMetadata.commitSHA': commit.hash });
 
   if (alreadyExistsRecord) {
     logger.info({
@@ -202,7 +196,7 @@ async function handleCommit(commit, index, total) {
 
     const start = performance.now();
 
-    await collection.insertOne({
+    await snapshotsCollection.insertOne({
       serviceId,
       documentType,
       content,
