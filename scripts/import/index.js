@@ -147,10 +147,6 @@ async function handleCommit(commit) {
 
   logger.info({ message: `Start to handle commit ${commit.hash}`, serviceId, type: documentType });
 
-  let content = await getCommitContent({ sha: commit.hash, serviceId, documentType, extension: extension.replace('.', '') });
-
-  ({ serviceId, documentType } = renamer.applyRules(serviceId, documentType));
-
   const alreadyExistsRecord = await collection.findOne({ '_importMetadata.commitSHA': commit.hash });
 
   if (alreadyExistsRecord) {
@@ -159,6 +155,10 @@ async function handleCommit(commit) {
 
     return;
   }
+
+  let content = await getCommitContent({ sha: commit.hash, serviceId, documentType, extension: extension.replace('.', '') });
+
+  ({ serviceId, documentType } = renamer.applyRules(serviceId, documentType));
 
   const mimeType = mime.getType(extension);
 
