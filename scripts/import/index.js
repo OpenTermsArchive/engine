@@ -60,7 +60,12 @@ let client;
 }());
 
 async function queueWorker({ commit, index, total }) {
-  return async.retry(MAX_RETRY, callback => {
+  return async.retry({
+    times: MAX_RETRY,
+    interval(retryCount) {
+      return 1000 * 2 ** retryCount;
+    },
+  }, callback => {
     handleCommit(commit, index, total).then(() => {
       callback();
     }).catch(error => {
