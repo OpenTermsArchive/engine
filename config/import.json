@@ -4,7 +4,7 @@
     "githubRepository": "ambanum/OpenTermsArchive-snapshots",
     "mongo": {
       "connectionURI": "mongodb://localhost:27017",
-      "database": "open-terms-archive-import",
+      "database": "open-terms-archive-import-retry",
       "collection": "snapshots"
     }
   }
