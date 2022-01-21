@@ -17,12 +17,12 @@
     src: mongod.conf
     dest: '/etc/mongod.conf'
 
-- name: Creates data directory
+- name: Create data directory
   file:
     path: /mnt/disk/mongodb
     state: directory
 
-- name: Change file ownership, group and permissions
+- name: Set database files permissions
   ansible.builtin.file:
     path: /mnt/disk/mongodb
     owner: mongodb
