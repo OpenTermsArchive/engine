@@ -28,12 +28,16 @@ See [renamer module documentation](../renamer/README.md).
 
 ### Running
 
-Run the script by running:
+Before importing commits you have to load them in the database:
+```sh
+NODE_ENV=import node scripts/import/loadCommits.js
+```
+
+Then import snapshots from commits:
 
 ```sh
 NODE_ENV=import node scripts/import/index.js
 ```
-
 ### Important notes
 
 - Your source repository will be read as is, so checkout the proper branch of commit before running the script.
