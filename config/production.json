@@ -8,7 +8,7 @@
         "git": {
           "path": "../ota-versions",
           "publish": true,
-          "prefixMessageToSnapshotId": "This version was recorded after filtering snapshot https://github.com/ambanum/OpenTermsArchive-snapshots/commit/",
+          "prefixMessageToSnapshotId": "This version was recorded after filtering snapshot with Mongo ID",
           "author": {
             "name": "Open Terms Archive Bot",
             "email": "bot@opentermsarchive.org"
@@ -18,13 +18,10 @@
     },
     "snapshots": {
       "storage": {
-        "git": {
-          "path": "../ota-snapshots",
-          "publish": true,
-          "author": {
-            "name": "Open Terms Archive Bot",
-            "email": "bot@opentermsarchive.org"
-          }
+        "mongo": {
+          "connectionURI": "mongodb://localhost:27017",
+          "database": "open-terms-archive",
+          "collection": "snapshots"
         }
       }
     }

@@ -18,7 +18,6 @@
   - [By RSS](#by-rss)
     - [Recap of available RSS feeds](#recap-of-available-rss-feeds)
   - [Unsubscribe](#unsubscribe)
-- [Analysing the snapshots history](#analysing-the-snapshots-history)
 - [Contributing](#contributing)
   - [Adding a new service](#adding-or-updating-a-new-service)
 - [Using locally](#using-locally)
@@ -123,11 +122,6 @@ In order to not receive emails of updated services anymore, two links are includ
 - one to stop receiving emails of a particular document
 
 The latter consists in sending an email to contact@opentermsarchive.org to be manually removed from the corresponding list.
-
-## Analysing the snapshots history
-
-We provide a database of snapshots recorded each time there is a change in the terms of service and other contractual documents of tracked services: [OpenTermsArchive-Snapshots](https://github.com/ambanum/OpenTermsArchive-snapshots).
-
 ## Contributing
 
 See [CONTRIBUTING](CONTRIBUTING.md).

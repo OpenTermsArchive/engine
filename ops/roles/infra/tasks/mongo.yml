@@ -12,6 +12,24 @@
     update_cache: yes
     state: latest
 
+- name: Add mongod.conf
+  copy:
+    src: mongod.conf
+    dest: '/etc/mongod.conf'
+
+- name: Create data directory
+  file:
+    path: /mnt/disk/mongodb
+    state: directory
+
+- name: Set database files permissions
+  ansible.builtin.file:
+    path: /mnt/disk/mongodb
+    owner: mongodb
+    group: mongodb
+    recurse: yes
+
+
 - name: Start MongoDB service
   service:
     name: mongod

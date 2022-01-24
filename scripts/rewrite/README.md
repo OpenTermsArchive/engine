@@ -1,3 +1,5 @@
+__:warning: These scripts are no longer up-to-date with the codebase and are not guaranteed to work.__
+
 # Rewrite history
 
 As some document types or service names can change over time or as we need to import history from other tools, provided they have an history with the same structure as Open Terms Archive, we need a way to rewrite, reorder and apply changes to the snapshots or versions history.
