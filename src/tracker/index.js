@@ -16,7 +16,7 @@ const UPDATE_DOCUMENT_LABEL = config.get('tracker.githubIssues.label') || 'updat
 const LOCAL_CONTRIBUTE_URL = 'http://localhost:3000/en/service';
 const CONTRIBUTE_URL = 'https://contribute.opentermsarchive.org/en/service';
 const GITHUB_VERSIONS_URL = 'https://github.com/ambanum/OpenTermsArchive-versions/blob/master';
-const GITHUB_REPO_URL = `https://github.com/${config.get('tracker.githubIssues.repository')}/blob/master/declarations`;
+const GITHUB_REPO_URL = `https://github.com/${config.get('tracker.githubIssues.repository')}/blob/main/declarations`;
 const GOOGLE_URL = 'https://www.google.com/search?q=';
 
 export default class Tracker {
