@@ -18,13 +18,13 @@ const GITHUB_VERSIONS_URL = 'https://github.com/ambanum/OpenTermsArchive-version
 const GITHUB_REPO_URL = `https://github.com/${process.env.GITHUB_REPO}/blob/master/declarations`;
 const GOOGLE_URL = 'https://www.google.com/search?q=';
 
-export default class GitHub {
+export default class Tracker {
   static isTokenValid() {
     return (process.env.GITHUB_REPO || '').includes('/');
   }
 
   constructor() {
-    if (!GitHub.isTokenValid()) {
+    if (!Tracker.isTokenValid()) {
       throw new Error('GITHUB_REPO should be a string with <owner>/<repo>');
     }
 
@@ -65,7 +65,7 @@ export default class GitHub {
   async onInaccessibleContent(error, serviceId, type, documentDeclaration) {
     const { location, contentSelectors, noiseSelectors } = documentDeclaration;
 
-    const { title, body } = GitHub.formatIssueTitleAndBody({
+    const { title, body } = Tracker.formatIssueTitleAndBody({
       contentSelectors,
       noiseSelectors,
       url: location,

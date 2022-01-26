@@ -7,11 +7,11 @@ import scheduler from 'node-schedule';
 import { publishRelease } from '../scripts/release/releasedataset.js';
 
 import Archivist from './archivist/index.js';
-import GitHub from './github/index.js';
 import logger from './logger/index.js';
 import Notifier from './notifier/index.js';
 import GitAdapter from './storage-adapters/git/index.js';
 import MongoAdapter from './storage-adapters/mongo/index.js';
+import Tracker from './tracker/index.js';
 
 const args = process.argv.slice(2);
 const refilterOnly = args.includes('--refilter-only');
@@ -61,7 +61,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
   }
 
   if (process.env.GITHUB_TOKEN) {
-    archivist.attach(new GitHub());
+    archivist.attach(new Tracker());
   }
 
   await archivist.trackChanges(serviceIds);
