@@ -1,10 +1,2 @@
 app: ota
 repository: https://github.com/ambanum/OpenTermsArchive.git
-services_directory: ota-services-all
-services_repository: https://github.com/OpenTermsArchive/services-all.git
-snapshots_directory: ota-snapshots
-snapshots_repository: git@github.com:ambanum/OpenTermsArchive-snapshots.git
-snapshots_branch: master
-versions_directory: ota-versions
-versions_repository: git@github.com:ambanum/OpenTermsArchive-versions.git
-versions_branch: master
