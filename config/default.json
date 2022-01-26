@@ -33,7 +33,7 @@
   "logger": {
     "smtp": {
       "host": "smtp-relay.sendinblue.com",
-      "username": "pariscall-tech.dgp-asd-asc@diplomatie.gouv.fr"
+      "username": "sib@disinfo.beta.gouv.fr"
     },
     "sendMailOnError": false
   },

@@ -27,10 +27,6 @@
     }
   },
   "logger": {
-    "smtp": {
-      "host": "smtp-relay.sendinblue.com",
-      "username": "sib@disinfo.beta.gouv.fr"
-    },
     "sendMailOnError": {
       "to": "admin@opentermsarchive.org",
       "from": "noreply@opentermsarchive.org",
@@ -45,8 +41,7 @@
   },
   "tracker": {
     "githubIssues": {
-      "repository": "OpenTermsArchive/services-all",
-      "label": "update"
+      "repository": "OpenTermsArchive/services-all"
     }
   }
 }
