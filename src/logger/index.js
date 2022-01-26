@@ -29,8 +29,8 @@ if (config.get('logger.sendMailOnError')) {
   const mailerOptions = {
     to: config.get('logger.sendMailOnError.to'),
     from: config.get('logger.sendMailOnError.from'),
-    host: process.env.SMTP_HOST,
-    username: process.env.SMTP_USERNAME,
+    host: config.get('logger.smtp.host'),
+    username: config.get('logger.smtp.username'),
     password: process.env.SMTP_PASSWORD,
     ssl: true,
     timeout: 30 * 1000,

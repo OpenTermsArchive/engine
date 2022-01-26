@@ -31,6 +31,10 @@
     "navigationTimeout": 30000
   },
   "logger": {
+    "smtp": {
+      "host": "smtp-relay.sendinblue.com",
+      "username": "pariscall-tech.dgp-asd-asc@diplomatie.gouv.fr"
+    },
     "sendMailOnError": false
   },
   "notifier": {
