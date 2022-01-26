@@ -39,5 +39,11 @@
       "updatesListId": 195,
       "updateTemplateId": 21
     }
+  },
+  "tracker": {
+    "githubIssues": {
+      "repository": "ambanum/test-repo",
+      "label": "update"
+    }
   }
 }
