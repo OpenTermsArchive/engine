@@ -76,12 +76,14 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
     await archivist.trackChanges(serviceIds);
   });
 
-  logger.info('Release will be created if needed every night at 4:15am');
-  scheduler.scheduleJob('15 4 * * *', async () => {
-    logger.info(`Start Release ${new Date()}`);
-    await publishRelease();
-    logger.info(`End Release ${new Date()}`);
-  });
+  if (config.get('dataset.publish')) {
+    logger.info('Release will be created if needed every night at 4:15am');
+    scheduler.scheduleJob('15 4 * * *', async () => {
+      logger.info(`Start Release ${new Date()}`);
+      await publishRelease();
+      logger.info(`End Release ${new Date()}`);
+    });
+  }
 }());
 
 function initStorageAdapters() {

@@ -43,5 +43,8 @@
     "githubIssues": {
       "repository": "OpenTermsArchive/services-all"
     }
+  },
+  "dataset": {
+    "publish": true
   }
 }

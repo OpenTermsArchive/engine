@@ -49,5 +49,8 @@
       "repository": "ambanum/test-repo",
       "label": "update"
     }
+  },
+  "dataset": {
+    "publish": false
   }
 }
