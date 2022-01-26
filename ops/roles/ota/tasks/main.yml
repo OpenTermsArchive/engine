@@ -1,7 +1,7 @@
 - name: Clone Open Terms Archive engine
   git:
-    repo: '{{ repository }}'
-    dest: '/home/{{ ansible_user }}/{{ app }}'
+    repo: '{{ ota_repository }}'
+    dest: '/home/{{ ansible_user }}/{{ ota_app_name }}'
     force: yes
     accept_hostkey: yes
     key_file: '/home/{{ ansible_user }}/.ssh/ota-bot-key'
@@ -14,7 +14,7 @@
 - name: Install dependencies
   command:
     cmd: npm ci --production --unsafe-perm=true
-    chdir: '/home/{{ ansible_user }}/{{ app }}'
+    chdir: '/home/{{ ansible_user }}/{{ ota_app_name }}'
   tags:
     - setup
     - update
@@ -22,7 +22,7 @@
 - name: Add .env file
   copy:
     src: .env
-    dest: '/home/{{ ansible_user }}/{{ app }}/.env'
+    dest: '/home/{{ ansible_user }}/{{ ota_app_name }}/.env'
   tags:
     - setup
 
@@ -54,7 +54,7 @@
     - update-declarations
 
 - name: Stop Open Terms Archive process
-  command: pm2 --silent stop "{{ app }}"
+  command: pm2 --silent stop "{{ ota_app_name }}"
   ignore_errors: yes
   tags:
     - restart
@@ -63,7 +63,7 @@
     - update-declarations
 
 - name: Unregister Open Terms Archive from process manager
-  command: pm2 --silent delete "{{ app }}"
+  command: pm2 --silent delete "{{ ota_app_name }}"
   ignore_errors: yes
   tags:
     - restart
@@ -93,8 +93,8 @@
 
 - name: Start Open Terms Archive
   command:
-    cmd: pm2 start --name "{{ app }}" --exp-backoff-restart-delay=1000 npm -- run start:scheduler
-    chdir: '/home/{{ ansible_user }}/{{ app }}'
+    cmd: pm2 start --name "{{ ota_app_name }}" --exp-backoff-restart-delay=1000 npm -- run start:scheduler
+    chdir: '/home/{{ ansible_user }}/{{ ota_app_name }}'
   environment:
     NODE_ENV: production
   tags:
