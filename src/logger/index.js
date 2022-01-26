@@ -1,5 +1,7 @@
 import 'winston-mail';
 
+import os from 'os';
+
 import config from 'config';
 import dotenv from 'dotenv';
 import winston from 'winston';
@@ -41,14 +43,14 @@ if (config.get('logger.sendMailOnError')) {
   transports.push(new winston.transports.Mail({
     ...mailerOptions,
     level: 'error',
-    subject: '[OTA] Error Report',
+    subject: `[OTA] Error Report — ${os.hostname()}`,
   }));
 
   if (config.get('logger.sendMailOnError.sendWarnings')) {
     transports.push(new winston.transports.Mail({
       ...mailerOptions,
       level: 'warn',
-      subject: '[OTA] Inaccessible content',
+      subject: `[OTA] Inaccessible content — ${os.hostname()}`,
     }));
   }
 }
