@@ -166,7 +166,7 @@ async function handleCommit(commit, index, total) {
 
   if (alreadyExistsRecord) {
     logger.info({
-      message: 'Skipped commit as entry already exist for this commit',
+      message: 'Skipped commit as an entry already exists for this commit',
       serviceId,
       type: documentType,
       sha: commit.hash,

@@ -2,7 +2,7 @@
 
 Import snapshots history from git to MongoDB.
 
-The script works by reading snapshots commits from a source repository and insert them in a MongoDB database.
+The script works by reading snapshots commits from a source repository and inserting them in a MongoDB database.
 
 ### Configuring
 
@@ -24,7 +24,7 @@ You can change the configuration in `config/import.json`.
 
 ## Adding renaming rules
 
-See [renamer module documentation](../renamer/README.md).
+See the [renamer module documentation](../renamer/README.md).
 
 ### Running
 
@@ -41,12 +41,12 @@ NODE_ENV=import node scripts/import/index.js
 ### Important notes
 
 - Your source repository will be read as is, so checkout the proper branch of commit before running the script.
-- If you kill the script during its run, your source repository will probably be on a commit in the middle of the history, you need to manually checkout to the proper wanted commit of branche before re-running it.
+- If you kill the script during its run, your source repository will probably be on a commit in the middle of the history. You will need to manually check out to the proper wanted commit of branch before re-running it.
 
-### Currently handled cases
+### Edge cases
 
-Currently, the script will:
+The script will:
 
-- Ignore commits which are not a document snapshot (like renaming or documentation commits)
-- Rename document types according to declared rules. See [renamer module documentation](../renamer/README.md)
-- Rename services according to declared rules. See [renamer module documentation](../renamer/README.md)
+- Ignore commits which are not a document snapshot (like renaming or documentation commits).
+- Rename document types according to declared rules. See the [renamer module documentation](../renamer/README.md).
+- Rename services according to declared rules. See the [renamer module documentation](../renamer/README.md).

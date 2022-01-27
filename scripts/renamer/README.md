@@ -4,7 +4,7 @@ This module is used to apply renaming rules to service IDs and document types.
 
 ## Usage
 
-You can use it in your others scripts like this:
+You can use it in your other scripts like this:
 
 ```
 await renamer.loadRules();

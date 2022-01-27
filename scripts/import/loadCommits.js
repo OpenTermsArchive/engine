@@ -29,14 +29,14 @@ let client;
   const end = performance.now();
   const filteredCommits = commits.filter(({ message }) => message.match(/^(Start tracking|Update)/));
 
-  logger.info({ message: `Load git log in ${Number((end - start) / 1000).toFixed(2)} s` });
-  logger.info({ message: `Source repo contains ${commits.length} commits.` });
+  logger.info({ message: `Loaded git log in ${Number((end - start) / 1000).toFixed(2)} s` });
+  logger.info({ message: `Source repo contains ${commits.length} commits` });
 
   const totalCommitToLoad = filteredCommits.length;
   const numberOfSkippedCommits = commits.length - totalCommitToLoad;
 
   if (numberOfSkippedCommits) {
-    logger.info({ message: `Skip ${numberOfSkippedCommits} commits that do not need to be imported (Readme, licence, …).` });
+    logger.info({ message: `Skipped ${numberOfSkippedCommits} commits that do not need to be imported (README, LICENCE…).` });
   }
 
   let counter = 1;

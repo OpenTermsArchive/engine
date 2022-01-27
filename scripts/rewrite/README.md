@@ -113,7 +113,7 @@ The resulting rewritten history can be found in the configured target repository
 
 ## Adding renaming rules
 
-See [renamer module documentation](../renamer/README.md).
+See the [renamer module documentation](../renamer/README.md).
 
 ### Currently handled cases
 
