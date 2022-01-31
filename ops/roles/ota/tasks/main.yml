@@ -28,7 +28,7 @@
 
 - name: Install dependencies
   command:
-    cmd: npm ci --production --unsafe-perm=true
+    cmd: npm ci --production
     chdir: '/home/{{ ansible_user }}/{{ ota_app_name }}'
   tags:
     - setup
