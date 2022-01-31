@@ -1,4 +1,4 @@
-- name: Define if {{ name }} base data has been obtained from {{ repository }}
+- name: Check if {{ name }} base data has already been obtained from {{ repository }}
   git:
     repo: '{{ repository }}'
     version: '{{ branch }}'
@@ -7,7 +7,7 @@
     update: no
     accept_hostkey: yes
     key_file: '/home/{{ ansible_user }}/.ssh/ota-bot-key'
-  register: existing_repository # the `return` property of the return value can tell us if the repository has been cloned already or not, see <https://docs.ansible.com/ansible/latest/collections/ansible/builtin/git_module.html#return-values>
+  register: existing_repository # the `before` property of the return value can tell us if the repository has been cloned already or not, see <https://docs.ansible.com/ansible/latest/collections/ansible/builtin/git_module.html#return-values>
   tags:
     - restart
     - start
@@ -22,7 +22,7 @@
     depth: 1
     accept_hostkey: yes
     key_file: '/home/{{ ansible_user }}/.ssh/ota-bot-key'
-  when: existing_repository.before is defined and not existing_repository.before # if existing_repository.before is null, then the repository already is new
+  when: existing_repository.before is defined and not existing_repository.before # if existing_repository.before is null, then the repository is new
   tags:
     - setup
 
