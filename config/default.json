@@ -46,7 +46,7 @@
   },
   "tracker": {
     "githubIssues": {
-      "repository": "ambanum/test-repo",
+      "repository": "OpenTermsArchive/sandbox",
       "label": "update"
     }
   },
