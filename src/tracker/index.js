@@ -11,7 +11,7 @@ const ISSUE_STATE_CLOSED = 'closed';
 const ISSUE_STATE_OPEN = 'open';
 const ISSUE_STATE_ALL = 'all';
 
-const UPDATE_DOCUMENT_LABEL = config.get('tracker.githubIssues.label') || 'update';
+const UPDATE_DOCUMENT_LABEL = config.get('tracker.githubIssues.label');
 
 const LOCAL_CONTRIBUTE_URL = 'http://localhost:3000/en/service';
 const CONTRIBUTE_URL = 'https://contribute.opentermsarchive.org/en/service';
