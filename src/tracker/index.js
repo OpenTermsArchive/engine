@@ -26,7 +26,7 @@ export default class Tracker {
 
   constructor() {
     if (!Tracker.isTokenValid()) {
-      throw new Error('GITHUB_REPO should be a string with <owner>/<repo>');
+      throw new Error('tracker.githubIssues.repository should be a string with <owner>/<repo>');
     }
 
     const [ owner, repo ] = config.get('tracker.githubIssues.repository').split('/');
