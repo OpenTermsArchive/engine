@@ -20,7 +20,8 @@ To test the changes without impacting the production server, a Vagrantfile is pr
 ## Usage
 
 To avoid making changes on the production server by mistake, by default all commands will only affect the Vagrant development virtual machine (VM). Note that the VM needs to be started before with `vagrant up`.\
-To execute commands on the production server you should specify it by adding the option `--inventory ops/inventories/production.yml` to the following commands:
+
+To execute commands on the production servers you should specify it by adding the option `--inventory ops/inventories/production.yml` to the following commands:
 
 - To setup a full [(phoenix)](https://martinfowler.com/bliki/PhoenixServer.html) server:
 
@@ -34,19 +35,23 @@ ansible-playbook ops/site.yml
 ansible-playbook ops/infra.yml
 ```
 
-Setting up the production infrastructure for publishing on the shared versions repository entails decrypting a private key managed with [Ansible Vault](https://docs.ansible.com/ansible/latest/user_guide/vault.html). It is decrypted with a password that we keep safe. You do not need to decrypt this specific private key on your own production server.
-
 - To setup `OpenTermsArchive` app only:
 
 ```
 ansible-playbook ops/app.yml
 ```
 
-Some useful options can be used to:
+Setting up the production infrastructure for publishing on the shared versions repository entails decrypting a private key managed with [Ansible Vault](https://docs.ansible.com/ansible/latest/user_guide/vault.html). It is decrypted with a password that we keep safe. You do not need to decrypt this specific private key on your own production server.
 
-- see what changed with `--diff`
-- simulate execution with `--check`
-- see what will be changed with `--check --diff`
+**Note that executing playbook on production inventory will affect all production servers.**
+
+If you want to execute a playbook on a specific server you have to add the `--limit` option to your command with the `hostname` as parameter:
+
+```
+ansible-playbook --inventory ops/inventories/production.yml ops/site.yml --limit <hostname>
+```
+
+The hostname is the one defined in the `ops/inventories/production.yml` inventory file.
 
 ### Tags
 
@@ -110,3 +115,38 @@ all:
           ansible_ssh_port: 2200
           […]
 ```
+
+## Process
+
+To avoid breaking the production when making changes you can follow this process:
+- Start by applying your changes on your Vagrant virtual machine
+  `ansible-playbook ops/site.yml`.
+- Connect through ssh to the virtual machine and check everything is OK
+  `vagrant ssh`, `pm2 logs`…
+- **As you will test the PRODUCTION environnement, stop the OTA application server to avoid sending mail to our users**
+  `ansible-playbook ops/app.yml -t stop`
+- If everything works, destroy that machine and re-run the entire installation on a clean machine to ensure that your changes are not based on something pre-existing
+  `vagrant destroy && vagrant up && ansible-playbook ops/site.yml`
+- Re check everything is OK
+  `vagrant ssh`, `pm2 logs`…
+- Then you can now deploy changes on production
+  `ansible-playbook -i ops/inventories/production.yml ops/site.yml`.
+
+## Initialize new instance
+
+### Provision a server
+
+If you use [OVH Horizon](https://horizon.cloud.ovh.net/project/instances/), click on `Launch Instance` button. Then fill, at least, following fields:
+  - `Instance name`
+  - `Source`. Suggested: `Debian 11`
+  - `Flavor`. Suggested: `b2-30-flex`
+  - `Key pair`. Suggested: Your own personnal SSH key, to allow you to connect on the freshly created server
+### Add host configuration
+
+Add entry to the production inventory file `ops/inventories/production.yml` for the created host with the server address and proper variables.
+### Create repositories
+
+Create the snapshot and version repositories, with :
+- A master branch
+- The master branch should be the default branch
+- At least one commit on this branch with some content (README.md template preferred, it would be nice to put a LICENSE too)
