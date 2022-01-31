@@ -39,7 +39,7 @@ Other configuration elements are inherited from the default `recorder` config.
 
 ### Running
 
-__Note: You should execute commands from this directory to ensure config is properly loaded.__
+**Note: You should execute commands from the `scripts/rewrite` directory to ensure config is properly loaded.**
 
 Run every command by setting `NODE_ENV` to `rewrite-snapshots`.
 
@@ -90,7 +90,7 @@ Other configuration elements are inherited from the default `recorder` config.
 
 ### Running
 
-__Note: You should execute commands from this directory to ensure config is properly loaded.__
+**Note: You should execute commands from the `scripts/rewrite` directory to ensure config is properly loaded.**
 
 Run every command by setting `NODE_ENV` to `rewrite-versions`.
 

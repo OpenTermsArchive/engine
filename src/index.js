@@ -77,11 +77,11 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
   });
 
   if (config.get('dataset.publish')) {
-    logger.info('Release will be created if needed every night at 4:15am');
+    logger.info('Release will be created every 24 hours at 04h15');
     scheduler.scheduleJob('15 4 * * *', async () => {
-      logger.info(`Start Release ${new Date()}`);
+      logger.info('Start creating the release…');
       await publishRelease();
-      logger.info(`End Release ${new Date()}`);
+      logger.info('Release published');
     });
   }
 }());
