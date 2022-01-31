@@ -158,7 +158,7 @@ git clone https://github.com/OpenTermsArchive/services-all.git
 
 The default configuration can be read and changed in `config/default.json`.
 
-```json
+```js
 {
   "services": {
     "declarationsPath": "Directory containing services declarations and associated filters.",
