@@ -2,9 +2,11 @@
 
 Import snapshots history from git to MongoDB.
 
-The script works by reading snapshots commits from a source repository and inserting them in a MongoDB database.
+## How it works
 
-### Configuring
+The import process is split into two scripts for performance reasons (reading commits from a huge git repository takes a long time). The first script `loadCommits.js` reads commits from a source repository and inserts them as is (without file contents) into a MongoDB database.
+The second script, `index.js`, reads the commits from the MongoDB database, retrieves the contents from GitHub, applies renaming rules if necessary, and then inserts them into another collection in the database with a format compatible with the OpenTermsArchive application.
+## Configuring
 
 You can change the configuration in `config/import.json`.
 
@@ -26,7 +28,7 @@ You can change the configuration in `config/import.json`.
 
 See the [renamer module documentation](../renamer/README.md).
 
-### Running
+## Running
 
 **You should execute commands from the `scripts/import` directory to ensure config is properly loaded:**
 
@@ -40,14 +42,12 @@ NODE_ENV=import node scripts/import/loadCommits.js
 ```
 
 Then import snapshots from commits:
-
 ```sh
 NODE_ENV=import node scripts/import/index.js
 ```
-### Important notes
+## Important notes
 
 - Your source repository will be read as is, so checkout the proper branch of commit before running the script.
-- If you kill the script during its run, your source repository will probably be on a commit in the middle of the history. You will need to manually check out to the proper wanted commit of branch before re-running it.
 
 ### Edge cases
 
@@ -56,3 +56,4 @@ The script will:
 - Ignore commits which are not a document snapshot (like renaming or documentation commits).
 - Rename document types according to declared rules. See the [renamer module documentation](../renamer/README.md).
 - Rename services according to declared rules. See the [renamer module documentation](../renamer/README.md).
+- Handle duplicates, so you can run it twice without worrying about duplicate entries in the database.
