@@ -117,3 +117,7 @@ As downside, joining documents in MongoDB is no easy task and pulling data from 
 ## Decision Outcome
 
 As MongoDB meets the requirements it is retained as a solution.
+
+### Benchmark
+
+With MongoDB implementation, refilter takes around ~3m where it took around ~1h20 with the Git version.
