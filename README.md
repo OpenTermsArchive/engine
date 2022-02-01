@@ -211,6 +211,8 @@ The default configuration can be read and changed in `config/default.json`.
 
 The default configuration is merged with (and overridden by) environment-specific configuration that can be specified at startup with the [`NODE_ENV` environment variable](#node-env).
 
+If you want to change your local configuration, we suggest you create a `config/development.json` file with overridden values.
+
 An example of a production configuration file can be found in `config/production.json`.
 
 ##### Storage adapters configuration

@@ -70,6 +70,43 @@ For example, you can update `OpenTermsArchive` by running:
 ansible-playbook ops/app.yml --tags update
 ```
 
+### Commands examples
+
+- Deploy OpenTermsArchive application on all servers declared in `ops/inventories/production.yml` inventory file:
+  ```
+  ansible-playbook --inventory ops/inventories/production.yml ops/app.yml
+  ```
+
+- Check deployment without applying changes for `services-all`:
+  ```
+  ansible-playbook --inventory ops/inventories/production.yml ops/app.yml --limit services-all --check --diff
+  ```
+
+- Deploy OpenTermsArchive application only on `services-all` server and without applying changes in the infrastructure:
+  ```
+  ansible-playbook --inventory ops/inventories/production.yml ops/app.yml --limit services-all
+  ```
+
+- Update and restart OpenTermsArchive application only on `services-all` server:
+  ```
+  ansible-playbook --inventory ops/inventories/production.yml ops/app.yml --limit services-all --tag update
+  ```
+
+- Update services declarations only on `services-dating` server:
+  ```
+  ansible-playbook -i ops/inventories/production.yml ops/app.yml -l services-dating -t update-declarations
+  ```
+
+- Stop OpenTermsArchive application only on `services-dating` server:
+  ```
+  ansible-playbook -i ops/inventories/production.yml ops/app.yml -l services-dating -t stop
+  ```
+
+- Deploy infrastructure and OpenTermsArchive application on all servers:
+  ```
+  ansible-playbook -i ops/inventories/production.yml ops/site.yml
+  ```
+
 ### Logs
 
 You can get logs by connecting to the target machine over SSH and obtaining logs from the process manager:

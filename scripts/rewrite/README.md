@@ -46,6 +46,7 @@ Run every command by setting `NODE_ENV` to `rewrite-snapshots`.
 Run the script by running:
 
 ```sh
+cd scripts/rewrite
 NODE_ENV=rewrite-snapshots node rewrite-snapshots.js
 ```
 
@@ -97,6 +98,7 @@ Run every command by setting `NODE_ENV` to `rewrite-versions`.
 Run the script by running:
 
 ```sh
+cd scripts/rewrite
 NODE_ENV=rewrite-versions node rewrite-versions.js
 ```
 
