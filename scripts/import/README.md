@@ -28,6 +28,12 @@ See the [renamer module documentation](../renamer/README.md).
 
 ### Running
 
+**You should execute commands from the `scripts/import` directory to ensure config is properly loaded:**
+
+```
+cd scripts/import
+```
+
 Before importing commits you have to load them in the database:
 ```sh
 NODE_ENV=import node scripts/import/loadCommits.js
