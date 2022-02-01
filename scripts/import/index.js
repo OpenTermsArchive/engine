@@ -9,7 +9,7 @@ import { MongoClient } from 'mongodb';
 import nodeFetch from 'node-fetch';
 
 import Git from '../../src/storage-adapters/git/git.js';
-import * as renamer from '../renamer/index.js';
+import * as renamer from '../utils/renamer/index.js';
 
 import logger from './logger/index.js';
 

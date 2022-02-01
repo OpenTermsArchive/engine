@@ -6,7 +6,7 @@ import config from 'config';
 import Recorder from '../../src/archivist/recorder/index.js';
 import Git from '../../src/storage-adapters/git/git.js';
 import GitAdapter from '../../src/storage-adapters/git/index.js';
-import * as renamer from '../renamer/index.js';
+import * as renamer from '../utils/renamer/index.js';
 
 import * as initializer from './initializer/index.js';
 import { loadFile } from './utils.js';
