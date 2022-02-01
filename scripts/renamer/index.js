@@ -11,7 +11,7 @@ export async function loadRules() {
   renamingRules = {
     services: JSON.parse(await fs.readFile(path.resolve(__dirname, './rules/services.json'))),
     documentTypes: JSON.parse(await fs.readFile(path.resolve(__dirname, './rules/documentTypes.json'))),
-    servicesDocumentTypes: JSON.parse(await fs.readFile(path.resolve(__dirname, './rules/servicesDocumentTypes.json'))),
+    documentTypesByService: JSON.parse(await fs.readFile(path.resolve(__dirname, './rules/documentTypesByService.json'))),
   };
 }
 
@@ -30,8 +30,8 @@ export function applyRules(serviceId, documentType) {
     documentType = renamedDocumentType;
   }
 
-  const renamedServiceDocumentType = renamingRules.servicesDocumentTypes[serviceId]
-    && renamingRules.servicesDocumentTypes[serviceId][documentType];
+  const renamedServiceDocumentType = renamingRules.documentTypesByService[serviceId]
+    && renamingRules.documentTypesByService[serviceId][documentType];
 
   if (renamedServiceDocumentType) {
     console.log(`⌙ Specific rename document type "${documentType}" to "${renamedServiceDocumentType}" of "${serviceId}" service`);
