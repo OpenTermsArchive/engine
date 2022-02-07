@@ -45,6 +45,7 @@
     }
   },
   "dataset": {
-    "publish": true
+    "servicesRepositoryName": "services-all",
+    "versionsRepositoryURL": "https://github.com/ambanum/OpenTermsArchive-versions"
   }
 }

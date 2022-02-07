@@ -41,5 +41,9 @@
   },
   "fetcher": {
     "waitForElementsTimeout": 1000
+  },
+  "dataset": {
+    "servicesRepositoryName": "services-all",
+    "versionsRepositoryURL": "https://github.com/ambanum/OpenTermsArchive-versions"
   }
 }

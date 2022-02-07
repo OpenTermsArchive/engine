@@ -46,5 +46,9 @@
     "githubIssues": {
       "repository": "OpenTermsArchive/services-dating"
     }
+  },
+  "dataset": {
+    "servicesRepositoryName": "services-dating",
+    "versionsRepositoryURL": "https://github.com/OpenTermsArchive/versions-dating"
   }
 }
