@@ -473,4 +473,47 @@ describe('GitAdapter', () => {
       });
     });
   });
+
+  describe('#iterate', () => {
+    before(async () => {
+      await subject.record({
+        serviceId: SERVICE_PROVIDER_ID,
+        documentType: DOCUMENT_TYPE,
+        content: CONTENT,
+        fetchDate: FETCH_DATE,
+        snapshotId: SNAPSHOT_ID,
+        mimeType: MIME_TYPE,
+      });
+
+      await subject.record({
+        serviceId: SERVICE_PROVIDER_ID,
+        documentType: DOCUMENT_TYPE,
+        content: `${CONTENT} - updated`,
+        fetchDate: FETCH_DATE,
+        snapshotId: SNAPSHOT_ID,
+        mimeType: MIME_TYPE,
+      });
+
+      await subject.record({
+        serviceId: SERVICE_PROVIDER_ID,
+        documentType: DOCUMENT_TYPE,
+        content: `${CONTENT} - updated 2`,
+        fetchDate: FETCH_DATE,
+        snapshotId: SNAPSHOT_ID,
+        mimeType: MIME_TYPE,
+      });
+    });
+
+    after(async () => subject._removeAllRecords());
+
+    it('iterates through all records', async () => {
+      let numberOfRecordCovered = 0;
+
+      for await (const record of subject.iterate()) { // eslint-disable-line no-unused-vars
+        numberOfRecordCovered++;
+      }
+
+      expect(numberOfRecordCovered).to.equal(3);
+    });
+  });
 });

@@ -77,6 +77,45 @@ export default class GitAdapter {
     };
   }
 
+  async* iterate() {
+    const initialCommitHash = (await this.git.raw([ 'rev-list', '--max-parents=0', 'HEAD' ])).trim();
+    const currentBranchName = (await this.git.raw([ 'rev-parse', '--abbrev-ref', 'HEAD' ])).trim();
+
+    try {
+      let previousCommitHash;
+
+      /* eslint-disable no-await-in-loop */
+      while (previousCommitHash != initialCommitHash) {
+        const [{ hash, date, message, diff: { files: [{ file: relativeFilePath }] } }] = await this.git.log([ '-1', '--stat=4096' ]); // Get current commit informations
+
+        if (message.match(/^(Start tracking|Update|Refilter)/)) { // Skip commits which are not a document versions (initial README or LICENSE commits for example)
+          const absoluteFilePath = `${this.path}/${relativeFilePath}`;
+
+          const serviceId = path.dirname(relativeFilePath);
+          const extension = path.extname(relativeFilePath);
+          const documentType = path.basename(relativeFilePath, extension);
+
+          yield {
+            id: hash,
+            serviceId,
+            documentType,
+            content: await fs.readFile(absoluteFilePath, { encoding: 'utf8' }),
+            fetchDate: new Date(date),
+          };
+        }
+
+        previousCommitHash = hash;
+
+        if (initialCommitHash != hash) {
+          await this.git.checkout(['HEAD~1']); // Checkout to the parent commit
+        }
+      }
+      /* eslint-enable no-await-in-loop */
+    } finally {
+      await this.git.checkout([currentBranchName]); // Checkout back to the top of the branch
+    }
+  }
+
   async _save({ serviceId, documentType, content, fileExtension }) {
     const directory = `${this.path}/${serviceId}`;
 
