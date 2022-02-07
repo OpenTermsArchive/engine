@@ -101,6 +101,10 @@ export default class Git {
     return this.git.checkout(options);
   }
 
+  async raw(options) {
+    return this.git.raw(options);
+  }
+
   relativePath(absolutePath) {
     // Git needs a path relative to the .git directory, not an absolute one
     return path.relative(this.path, absolutePath);
