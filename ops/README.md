@@ -191,3 +191,9 @@ Create the `snapshot` and `version` repositories, with:
 - A `main` branch.
 - The `main` branch should be the default branch.
 - At least one commit on this branch with some content (`README.md` and `LICENSE`).
+
+### Set up permissions
+
+The @OTA-Bot GitHub user should have write access to all three (declarations, snapshots, versions) repositories, so it can publish data, create issues, and publish dataset releases.
+
+Each instance should have a responsible entity, which we currently model as a [“team” in the @OpenTermsArchive](https://github.com/orgs/OpenTermsArchive/teams) GitHub organisation. Each team has write access to the three repositories, and @OTA-Bot should be added to that team along with the human maintainers.
