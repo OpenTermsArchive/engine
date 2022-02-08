@@ -1,5 +1,3 @@
-import scheduler from 'node-schedule';
-
 import logger from './logger/index.js';
 
 import { release } from './index.js';
@@ -20,7 +18,13 @@ import { release } from './index.js';
     return release({ publicationEnabled, removeLocalCopyEnabled, fileName });
   }
 
-  logger.info('Release will be created every Monday at 03h30');
+  const RELEASE_HOURS_INTERVAL = 24 * 7;
 
-  scheduler.scheduleJob({ hour: 3, minute: 30, dayOfWeek: 1 }, async () => release({ publicationEnabled, removeLocalCopyEnabled, fileName }));
+  logger.info(`A release will be published every ${RELEASE_HOURS_INTERVAL} hours\n`);
+
+  setInterval(async () => {
+    logger.info('Start creating the release…');
+    await release({ publicationEnabled, removeLocalCopyEnabled, fileName })();
+    logger.info('Release published');
+  }, RELEASE_HOURS_INTERVAL * 60 * 60 * 1000);
 })();

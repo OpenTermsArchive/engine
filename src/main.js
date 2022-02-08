@@ -1,29 +1,22 @@
-import path from 'path';
-import { fileURLToPath } from 'url';
-
-import config from 'config';
-
 import Archivist from './archivist/index.js';
 import logger from './logger/index.js';
 import Notifier from './notifier/index.js';
-import GitAdapter from './storage-adapters/git/index.js';
-import MongoAdapter from './storage-adapters/mongo/index.js';
 import Tracker from './tracker/index.js';
+
+import { instantiateVersionsStorageAdapter, instantiateSnapshotsStorageAdapter } from './index.js';
 
 const args = process.argv.slice(2);
 const refilterOnly = args.includes('--refilter-only');
 const schedule = args.includes('--schedule');
 const extraArgs = args.filter(arg => !arg.startsWith('--'));
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const TRACK_CHANGES_HOURS_INTERVAL = 24;
 
 (async function startOpenTermsArchive() {
-  const { versionsStorageAdapter, snapshotsStorageAdapter } = initStorageAdapters();
-
   const archivist = new Archivist({
     storage: {
-      versions: versionsStorageAdapter,
-      snapshots: snapshotsStorageAdapter,
+      versions: instantiateVersionsStorageAdapter(),
+      snapshots: instantiateSnapshotsStorageAdapter(),
     },
   });
 
@@ -69,45 +62,8 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
   logger.info('The scheduler is running…');
 
-  const TRACK_CHANGES_HOURS_INTERVAL = 24;
-
   logger.info(`Documents will be tracked every ${TRACK_CHANGES_HOURS_INTERVAL} hours\n`);
   setInterval(async () => {
     await archivist.trackChanges(serviceIds);
-  });
+  }, TRACK_CHANGES_HOURS_INTERVAL * 60 * 60 * 1000);
 }());
-
-function initStorageAdapters() {
-  let versionsStorageAdapter;
-
-  if (config.has('recorder.versions.storage.git')) {
-    versionsStorageAdapter = new GitAdapter({
-      ...config.get('recorder.versions.storage.git'),
-      path: path.resolve(__dirname, '../', config.get('recorder.versions.storage.git.path')),
-      fileExtension: 'md',
-    });
-  }
-
-  if (config.has('recorder.versions.storage.mongo')) {
-    versionsStorageAdapter = new MongoAdapter(config.get('recorder.versions.storage.mongo'));
-  }
-
-  let snapshotsStorageAdapter;
-
-  if (config.has('recorder.snapshots.storage.git')) {
-    snapshotsStorageAdapter = new GitAdapter({
-      ...config.get('recorder.snapshots.storage.git'),
-      path: path.resolve(__dirname, '../', config.get('recorder.snapshots.storage.git.path')),
-      fileExtension: 'html',
-    });
-  }
-
-  if (config.has('recorder.snapshots.storage.mongo')) {
-    snapshotsStorageAdapter = new MongoAdapter(config.get('recorder.snapshots.storage.mongo'));
-  }
-
-  return {
-    versionsStorageAdapter,
-    snapshotsStorageAdapter,
-  };
-}
