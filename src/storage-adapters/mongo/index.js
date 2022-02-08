@@ -86,6 +86,12 @@ export default class MongoAdapter {
     };
   }
 
+  /* eslint-disable */
+  async* iterate() {
+    throw new Error('`iterate` function is not yet implemented for MongoDB storage adapter');
+  }
+  /* eslint-enable */
+
   async _removeAllRecords() {
     return this.collection.deleteMany({});
   }
