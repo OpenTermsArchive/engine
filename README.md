@@ -200,7 +200,7 @@ The default configuration can be read and changed in `config/default.json`.
   "tracker": { // Tracking mechanism to create GitHub issues when document content is inaccessible
     "githubIssues": {
       "repository": "GitHub repository where to create isssues",
-      "label": "GitHub issues label to attach to a newly created issue. This specific label has to exist in the corresponding repository"
+      "label": "GitHub issues label to attach to a newly created issue. This specific label has to exist in the repository"
     }
   },
   "dataset": { // Release mechanism to create dataset periodically
@@ -260,7 +260,7 @@ Environment variables can be provided in a `.env` file at the root of the reposi
 
 - `SMTP_PASSWORD`: Password for server authentication
 - `SENDINBLUE_API_KEY`: SendInBlue API key
-- `GITHUB_TOKEN`: A token with repository privileges which allow access to the [GitHub API](https://github.com/settings/tokens)
+- `GITHUB_TOKEN`: a token with repository privileges to access to the [GitHub API](https://github.com/settings/tokens)
 
 If your infrastructure requires using an outgoing HTTP/HTTPS proxy to access Internet, you can provide it through the `HTTP_PROXY` and `HTTPS_PROXY` environment variable.
 

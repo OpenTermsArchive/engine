@@ -43,7 +43,9 @@ We add this additional rule:
 
 ## Continuous delivery
 
-GitHub Actions is used to deploy the application every time there is a commit or a merge on master branch.
+GitHub Actions is used to deploy the application on every merge to the main branch.
+
+Branch protection is active, meaning that a merge to the main branch can only take place once all tests pass in CI, and that at least one human reviewer approved the changes.
 ## Practices
 
 ### Errors handling

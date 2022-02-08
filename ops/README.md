@@ -43,9 +43,9 @@ ansible-playbook ops/app.yml
 
 Setting up the production infrastructure for publishing on the shared versions repository entails decrypting a private key managed with [Ansible Vault](https://docs.ansible.com/ansible/latest/user_guide/vault.html). It is decrypted with a password that we keep safe. You do not need to decrypt this specific private key on your own production server.
 
-**Note that executing playbook on production inventory will affect all production servers.**
+Note that executing the playbook on the `production` inventory will affect **all** production servers.
 
-If you want to execute a playbook on a specific server you have to add the `--limit` option to your command with the `hostname` as parameter:
+If you want to execute a playbook on a specific server only, add the `--limit` option with the `hostname` as parameter:
 
 ```
 ansible-playbook --inventory ops/inventories/production.yml ops/site.yml --limit <hostname>
