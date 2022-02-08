@@ -39,8 +39,6 @@ Other configuration elements are inherited from the default `recorder` config.
 
 ### Running
 
-**Note: You should execute commands from the `scripts/rewrite` directory to ensure config is properly loaded.**
-
 Run every command by setting `NODE_ENV` to `rewrite-snapshots`.
 
 Run the script by running:
@@ -90,8 +88,6 @@ You can change the **source** and **target** repository in `config/rewrite-versi
 Other configuration elements are inherited from the default `recorder` config.
 
 ### Running
-
-**Note: You should execute commands from the `scripts/rewrite` directory to ensure config is properly loaded.**
 
 Run every command by setting `NODE_ENV` to `rewrite-versions`.
 

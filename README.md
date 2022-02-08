@@ -180,7 +180,7 @@ The default configuration can be read and changed in `config/default.json`.
     "waitForElementsTimeout": "Maximum time (in milliseconds) to wait for elements to be present in the page when fetching document in a headless browser"
   },
   "notifier": { // Notify specified mailing lists when new versions are recorded
-    "sendInBlue": { // SendInBlue API Key is defined in environment variables, see below
+    "sendInBlue": { // SendInBlue API Key is defined in environment variables, see see the “Environment variables” section below
       "administratorsListId": "SendInBlue contacts list ID of administrators",
       "updatesListId": "SendInBlue contacts list ID of persons to notify on document updates",
       "updateTemplateId": "SendInBlue email template ID used for updates notifications"
@@ -189,7 +189,7 @@ The default configuration can be read and changed in `config/default.json`.
   "logger": { // Logging mechanism to be notified upon error
     "smtp": {
       "host": "SMTP server hostname",
-      "username": "User for server authentication" // Password for server authentication is defined in environment variables, see below
+      "username": "User for server authentication" // Password for server authentication is defined in environment variables, see the “Environment variables” section below
     },
     "sendMailOnError": { // Can be set to `false` if you do not want to send email on error
       "to": "The address to send the email to in case of an error",
@@ -258,8 +258,8 @@ Two storage adapters are currently supported: Git and MongoDB. Each one can be u
 
 Environment variables can be provided in a `.env` file at the root of the repository. See `.env.example` for an example of such a file.
 
-- `SMTP_PASSWORD`: Password for server authentication
-- `SENDINBLUE_API_KEY`: SendInBlue API key
+- `SMTP_PASSWORD`: a password for email server authentication, in order to send email notifications
+- `SENDINBLUE_API_KEY`: a SendInBlue API key, in order to send email notifications
 - `GITHUB_TOKEN`: a token with repository privileges to access to the [GitHub API](https://github.com/settings/tokens)
 
 If your infrastructure requires using an outgoing HTTP/HTTPS proxy to access Internet, you can provide it through the `HTTP_PROXY` and `HTTPS_PROXY` environment variable.

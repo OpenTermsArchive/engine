@@ -48,7 +48,7 @@ Note that executing the playbook on the `production` inventory will affect **all
 If you want to execute a playbook on a specific server only, add the `--limit` option with the `hostname` as parameter:
 
 ```
-ansible-playbook --inventory ops/inventories/production.yml ops/site.yml --limit <hostname>
+ansible-playbook --inventory ops/inventories/production.yml ops/site.yml --limit $hostname
 ```
 
 The hostname is the one defined in the `ops/inventories/production.yml` inventory file.
@@ -188,6 +188,6 @@ Add an entry to the production inventory file `ops/inventories/production.yml` f
 
 Create the `snapshot` and `version` repositories, with:
 
-- A `master` branch.
-- The `master` branch should be the default branch.
+- A `main` branch.
+- The `main` branch should be the default branch.
 - At least one commit on this branch with some content (`README.md` and `LICENSE`).
