@@ -156,34 +156,38 @@ all:
 ## Process
 
 To avoid breaking the production when making changes you can follow this process:
+
 - Start by applying your changes on your Vagrant virtual machine
   `ansible-playbook ops/site.yml`.
-- Connect through ssh to the virtual machine and check everything is OK
+- Connect through SSH to the virtual machine and check that everything is ok
   `vagrant ssh`, `pm2 logs`…
-- **As you will test the PRODUCTION environnement, stop the OTA application server to avoid sending mail to our users**
+- **As you will test the PRODUCTION environnement, stop the OTA application server to avoid sending emails to our users**
   `ansible-playbook ops/app.yml -t stop`
-- If everything works, destroy that machine and re-run the entire installation on a clean machine to ensure that your changes are not based on something pre-existing
+- If everything works, destroy that machine and re-run the entire installation on a clean machine to ensure that your changes do not work by coincidence
   `vagrant destroy && vagrant up && ansible-playbook ops/site.yml`
-- Re check everything is OK
+- Re-check that everything is ok
   `vagrant ssh`, `pm2 logs`…
-- Then you can now deploy changes on production
+- Then you can now deploy the changes in production
   `ansible-playbook -i ops/inventories/production.yml ops/site.yml`.
 
 ## Initialize a new instance
 
 ### Provision a server
 
-If you use [OVH Horizon](https://horizon.cloud.ovh.net/project/instances/), click on `Launch Instance` button. Then fill, at least, following fields:
-  - `Instance name`
-  - `Source`. Suggested: `Debian 11`
-  - `Flavor`. Suggested: `b2-30-flex`
-  - `Key pair`. Suggested: Your own personnal SSH key, to allow you to connect on the freshly created server
+If you use [OVH Horizon](https://horizon.cloud.ovh.net/project/instances/), click on the `Launch Instance` button. Then fill, at least, the following fields:
+  - `Instance name`.
+  - `Source`. Suggested: `Debian 11`.
+  - `Flavor`. Suggested: `b2-30-flex`.
+  - `Key pair`. Suggested: Your own personal SSH key, to allow you to connect to the freshly created server.
+
 ### Add host configuration
 
-Add entry to the production inventory file `ops/inventories/production.yml` for the created host with the server address and proper variables.
+Add an entry to the production inventory file `ops/inventories/production.yml` for the created host with the server address and proper variables.
+
 ### Create repositories
 
-Create the snapshot and version repositories, with :
-- A master branch
-- The master branch should be the default branch
-- At least one commit on this branch with some content (README.md template preferred, it would be nice to put a LICENSE too)
+Create the `snapshot` and `version` repositories, with:
+
+- A `master` branch.
+- The `master` branch should be the default branch.
+- At least one commit on this branch with some content (`README.md` and `LICENSE`).
