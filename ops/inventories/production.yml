@@ -26,3 +26,12 @@ all:
               snapshots_repository: git@github.com:OpenTermsArchive/snapshots-dating.git
               versions_directory: ota-versions-dating
               versions_repository: git@github.com:OpenTermsArchive/versions-dating.git
+        services-france:
+          hosts:
+            198.244.142.9:
+              services_directory: ota-services-france
+              services_repository: https://github.com/OpenTermsArchive/declarations-france.git
+              snapshots_directory: ota-snapshots-france
+              snapshots_repository: git@github.com:OpenTermsArchive/snapshots-france.git
+              versions_directory: ota-versions-france
+              versions_repository: git@github.com:OpenTermsArchive/versions-france.git
