@@ -77,29 +77,29 @@ ansible-playbook ops/app.yml --tags update
   ansible-playbook --inventory ops/inventories/production.yml ops/app.yml
   ```
 
-- Check deployment without applying changes for `services-all`:
+- Check deployment without applying changes for the `dating` instance:
   ```
-  ansible-playbook --inventory ops/inventories/production.yml ops/app.yml --limit services-all --check --diff
-  ```
-
-- Deploy Open Terms Archive application only on the `services-all` server and without applying changes to the infrastructure:
-  ```
-  ansible-playbook --inventory ops/inventories/production.yml ops/app.yml --limit services-all
+  ansible-playbook --inventory ops/inventories/production.yml ops/app.yml --limit dating --check --diff
   ```
 
-- Update and restart the Open Terms Archive application only on `services-all` server:
+- Deploy Open Terms Archive application only on the `dating` instance and without applying changes to the infrastructure:
   ```
-  ansible-playbook --inventory ops/inventories/production.yml ops/app.yml --limit services-all --tag update
-  ```
-
-- Update services declarations only on the `services-dating` server:
-  ```
-  ansible-playbook -i ops/inventories/production.yml ops/app.yml -l services-dating -t update-declarations
+  ansible-playbook --inventory ops/inventories/production.yml ops/app.yml --limit dating
   ```
 
-- Stop the Open Terms Archive application only on the `services-dating` server:
+- Update and restart the Open Terms Archive application only on `dating` instance:
   ```
-  ansible-playbook -i ops/inventories/production.yml ops/app.yml -l services-dating -t stop
+  ansible-playbook --inventory ops/inventories/production.yml ops/app.yml --limit dating --tag update
+  ```
+
+- Update services declarations only on the `france` instance:
+  ```
+  ansible-playbook -i ops/inventories/production.yml ops/app.yml -l france -t update-declarations
+  ```
+
+- Stop the Open Terms Archive application only on the `france` instance:
+  ```
+  ansible-playbook -i ops/inventories/production.yml ops/app.yml -l france -t stop
   ```
 
 - Deploy the infrastructure and the Open Terms Archive application on all servers:

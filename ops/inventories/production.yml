@@ -6,7 +6,7 @@ all:
   children:
     production:
       children:
-        services-all:
+        services_all:
           hosts:
             51.89.227.206:
               services_directory: ota-services-all
@@ -17,7 +17,7 @@ all:
               versions_directory: ota-versions
               versions_repository: git@github.com:ambanum/OpenTermsArchive-versions.git
               versions_branch: master
-        services-dating:
+        dating:
           hosts:
             vps-99ae1d89.vps.ovh.net:
               services_directory: ota-services-dating
@@ -26,7 +26,7 @@ all:
               snapshots_repository: git@github.com:OpenTermsArchive/snapshots-dating.git
               versions_directory: ota-versions-dating
               versions_repository: git@github.com:OpenTermsArchive/versions-dating.git
-        services-france:
+        france:
           hosts:
             198.244.142.9:
               services_directory: ota-services-france
