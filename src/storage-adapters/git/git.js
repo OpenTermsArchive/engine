@@ -21,7 +21,9 @@ export default class Git {
     this.git = simpleGit(this.path, { maxConcurrentProcesses: 1 });
     await this.git.init();
 
-    return this.git.addConfig('core.autocrlf', false);
+    return this.git
+      .addConfig('core.autocrlf', false)
+      .addConfig('push.default', 'current');
   }
 
   async add(filepath) {
@@ -47,7 +49,7 @@ export default class Git {
   }
 
   async pushChanges() {
-    return this.git.push('origin', 'master');
+    return this.git.push();
   }
 
   async log(options = {}) {

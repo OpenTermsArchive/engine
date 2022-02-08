@@ -158,7 +158,7 @@ git clone https://github.com/OpenTermsArchive/services-all.git
 
 The default configuration can be read and changed in `config/default.json`.
 
-```json
+```js
 {
   "services": {
     "declarationsPath": "Directory containing services declarations and associated filters.",
@@ -179,32 +179,41 @@ The default configuration can be read and changed in `config/default.json`.
   "fetcher": {
     "waitForElementsTimeout": "Maximum time (in milliseconds) to wait for elements to be present in the page when fetching document in a headless browser"
   },
-  "notifier": {
-    "sendInBlue": {
+  "notifier": { // Notify specified mailing lists when new versions are recorded
+    "sendInBlue": { // SendInBlue API Key is defined in environment variables, see see the “Environment variables” section below
       "administratorsListId": "SendInBlue contacts list ID of administrators",
       "updatesListId": "SendInBlue contacts list ID of persons to notify on document updates",
       "updateTemplateId": "SendInBlue email template ID used for updates notifications"
     }
+  },
+  "logger": { // Logging mechanism to be notified upon error
+    "smtp": {
+      "host": "SMTP server hostname",
+      "username": "User for server authentication" // Password for server authentication is defined in environment variables, see the “Environment variables” section below
+    },
+    "sendMailOnError": { // Can be set to `false` if you do not want to send email on error
+      "to": "The address to send the email to in case of an error",
+      "from": "The address from which to send the email",
+      "sendWarnings": "Boolean. Set to true to also send email in case of warning",
+    }
+  },
+  "tracker": { // Tracking mechanism to create GitHub issues when document content is inaccessible
+    "githubIssues": {
+      "repository": "GitHub repository where to create isssues",
+      "label": "GitHub issues label to attach to a newly created issue. This specific label has to exist in the repository"
+    }
+  },
+  "dataset": { // Release mechanism to create dataset periodically
+    "publish": "Boolean. Set to true to enable dataset creation"
   }
 }
 ```
 
 The default configuration is merged with (and overridden by) environment-specific configuration that can be specified at startup with the [`NODE_ENV` environment variable](#node-env).
 
-An example of a production configuration file can be found in `config/production.json`. It includes the extra configuration for:
+If you want to change your local configuration, we suggest you create a `config/development.json` file with overridden values.
 
-- A logging mechanism, to be notified upon error (this requires a valid SMTP configuration, see [environment variables](#environment-variables) below):
-
-```json
-{
-  "logger": {
-    "sendMailOnError": {
-      "to": "recipient@example.com",
-      "from": "ota-bot@example.com"
-    }
-  }
-}
-```
+An example of a production configuration file can be found in `config/production.json`.
 
 ##### Storage adapters configuration
 
@@ -247,35 +256,14 @@ Two storage adapters are currently supported: Git and MongoDB. Each one can be u
 
 #### Environment variables
 
-These environment variables can be provided in a `.env` file at the root of the repository. See `.env.example` for an example of such a file.
+Environment variables can be provided in a `.env` file at the root of the repository. See `.env.example` for an example of such a file.
 
-##### `SMTP_HOST` and `SMTP_USERNAME`
-
-In order to be notified for errors over email, a valid SMTP configuration should be provided through the following environment variables:
-
-- `SMTP_HOST` for the SMTP server hostname.
-- `SMTP_USERNAME` / `SMTP_PASSWORD` for the credentials.
-
-##### `HTTP_PROXY` and `HTTPS_PROXY`
+- `SMTP_PASSWORD`: a password for email server authentication, in order to send email notifications
+- `SENDINBLUE_API_KEY`: a SendInBlue API key, in order to send email notifications
+- `GITHUB_TOKEN`: a token with repository privileges to access to the [GitHub API](https://github.com/settings/tokens)
 
 If your infrastructure requires using an outgoing HTTP/HTTPS proxy to access Internet, you can provide it through the `HTTP_PROXY` and `HTTPS_PROXY` environment variable.
 
-##### `SENDINBLUE_API_KEY`
-
-In order to use the default [SendInBlue](https://www.sendinblue.com)-based notification mechanism, a valid API key should be provided through the `SENDINBLUE_API_KEY` environment variable.
-
-##### `NODE_ENV`
-
-The `NODE_ENV` environment variable loads additional [configuration files](#configuration-file).
-
-##### `GITHUB_TOKEN` and `GITHUB_REPO`
-
-In order for the service to automatically create issues in Github when a service is failing, you need to provide:
-- `GITHUB_TOKEN`: A token with repository privileges which allow access to the [GitHub API](https://github.com/settings/tokens).
-- `GITHUB_REPO`: A repository which will be used to create the issues. For example `ambanum/OpenTermsArchive`
-- `GITHUB_LABEL_UPDATE`: The name of the label used on the repo to categorize issues corresponding to a service that does not work anymore and needs updating (default is `update`)
-
-**Note**: OTA will automatically create issues with a label defined by `GITHUB_LABEL_UPDATE`. **This specific label has to exist in the corresponding repository for the automatic issue creation works.**
 ### Running
 
 To get the latest versions of all services' terms:

@@ -1,20 +1,35 @@
+- name: Check if Open Terms Archive has already been cloned
+  git:
+    repo: '{{ ota_repository }}'
+    dest: '/home/{{ ansible_user }}/{{ ota_app_name }}'
+    clone: no
+    update: no
+    accept_hostkey: yes
+    key_file: '/home/{{ ansible_user }}/.ssh/ota-bot-key'
+  register: git_clone_ota # the `before` property of the return value can tell us if the repository has been cloned already or not, see <https://docs.ansible.com/ansible/latest/collections/ansible/builtin/git_module.html#return-values>
+  tags:
+    - restart
+    - start
+    - update
+    - setup
+    - stop
+
 - name: Clone Open Terms Archive engine
   git:
-    repo: '{{ repository }}'
-    dest: '/home/{{ ansible_user }}/{{ app }}'
+    repo: '{{ ota_repository }}'
+    dest: '/home/{{ ansible_user }}/{{ ota_app_name }}'
     force: yes
     accept_hostkey: yes
     key_file: '/home/{{ ansible_user }}/.ssh/ota-bot-key'
     depth: 1
-  register: git_clone_app_finished
   tags:
     - setup
     - update
 
 - name: Install dependencies
   command:
-    cmd: npm ci --production --unsafe-perm=true
-    chdir: '/home/{{ ansible_user }}/{{ app }}'
+    cmd: npm ci --production
+    chdir: '/home/{{ ansible_user }}/{{ ota_app_name }}'
   tags:
     - setup
     - update
@@ -22,7 +37,7 @@
 - name: Add .env file
   copy:
     src: .env
-    dest: '/home/{{ ansible_user }}/{{ app }}/.env'
+    dest: '/home/{{ ansible_user }}/{{ ota_app_name }}/.env'
   tags:
     - setup
 
@@ -38,7 +53,6 @@
     accept_hostkey: yes
     key_file: '/home/{{ ansible_user }}/.ssh/ota-bot-key'
     depth: 1
-  register: git_clone_app_finished
   tags:
     - setup
     - update
@@ -54,8 +68,9 @@
     - update-declarations
 
 - name: Stop Open Terms Archive process
-  command: pm2 --silent stop "{{ app }}"
+  command: pm2 --silent stop "{{ ota_app_name }}"
   ignore_errors: yes
+  when: git_clone_ota.before is defined and git_clone_ota.before # if git_clone_ota.before is not null, then the repository is not new
   tags:
     - restart
     - stop
@@ -63,8 +78,9 @@
     - update-declarations
 
 - name: Unregister Open Terms Archive from process manager
-  command: pm2 --silent delete "{{ app }}"
+  command: pm2 --silent delete "{{ ota_app_name }}"
   ignore_errors: yes
+  when: git_clone_ota.before is defined and git_clone_ota.before # if git_clone_ota.before is not null, then the repository is not new
   tags:
     - restart
     - stop
@@ -93,8 +109,8 @@
 
 - name: Start Open Terms Archive
   command:
-    cmd: pm2 start --name "{{ app }}" --exp-backoff-restart-delay=1000 npm -- run start:scheduler
-    chdir: '/home/{{ ansible_user }}/{{ app }}'
+    cmd: pm2 start --name "{{ ota_app_name }}" --exp-backoff-restart-delay=1000 npm -- run start:scheduler
+    chdir: '/home/{{ ansible_user }}/{{ ota_app_name }}'
   environment:
     NODE_ENV: production
   tags:

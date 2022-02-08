@@ -6,6 +6,7 @@ First of all, thanks for taking the time to contribute! 🎉👍
   - [Pull requests](#pull-requests)
   - [Peer reviews](#peer-reviews)
   - [Commit messages](#commits-naming-convention)
+- [Continuous delivery](#continuous-delivery)
 - [Practices](#practices)
   - [Errors handling](#errors-handling)
 
@@ -39,6 +40,12 @@ We add this additional rule:
 
 - Do not rely on GitHub issue reference numbers in commit messages, as we have no guarantee the host system and its autolinking will be stable in time. Make sure the context is self-explanatory. If an external reference is given, use its full URL.
 
+
+## Continuous delivery
+
+GitHub Actions is used to deploy the application on every merge to the main branch.
+
+Branch protection is active, meaning that a merge to the main branch can only take place once all tests pass in CI, and that at least one human reviewer approved the changes.
 ## Practices
 
 ### Errors handling

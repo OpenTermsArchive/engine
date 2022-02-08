@@ -1,14 +1,14 @@
 {
   "services": {
-    "declarationsPath": "../ota-services-all/declarations"
+    "declarationsPath": "../ota-services-france/declarations"
   },
   "recorder": {
     "versions": {
       "storage": {
         "git": {
-          "path": "../ota-versions",
+          "path": "../ota-versions-france",
           "publish": true,
-          "prefixMessageToSnapshotId": "This version was recorded after filtering snapshot with Mongo ID",
+          "prefixMessageToSnapshotId": "This version was recorded after filtering snapshot https://github.com/OpenTermsArchive/snapshots-france/commit/",
           "author": {
             "name": "Open Terms Archive Bot",
             "email": "bot@opentermsarchive.org"
@@ -18,10 +18,13 @@
     },
     "snapshots": {
       "storage": {
-        "mongo": {
-          "connectionURI": "mongodb://localhost:27017",
-          "database": "open-terms-archive",
-          "collection": "snapshots"
+        "git": {
+          "path": "../ota-snapshots-france",
+          "publish": true,
+          "author": {
+            "name": "Open Terms Archive Bot",
+            "email": "bot@opentermsarchive.org"
+          }
         }
       }
     }
@@ -37,6 +40,11 @@
     "sendInBlue": {
       "administratorsListId": 9,
       "updatesListId": 191
+    }
+  },
+  "tracker": {
+    "githubIssues": {
+      "repository": "OpenTermsArchive/declarations-france"
     }
   }
 }

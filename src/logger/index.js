@@ -1,5 +1,7 @@
 import 'winston-mail';
 
+import os from 'os';
+
 import config from 'config';
 import dotenv from 'dotenv';
 import winston from 'winston';
@@ -29,8 +31,8 @@ if (config.get('logger.sendMailOnError')) {
   const mailerOptions = {
     to: config.get('logger.sendMailOnError.to'),
     from: config.get('logger.sendMailOnError.from'),
-    host: process.env.SMTP_HOST,
-    username: process.env.SMTP_USERNAME,
+    host: config.get('logger.smtp.host'),
+    username: config.get('logger.smtp.username'),
     password: process.env.SMTP_PASSWORD,
     ssl: true,
     timeout: 30 * 1000,
@@ -41,14 +43,14 @@ if (config.get('logger.sendMailOnError')) {
   transports.push(new winston.transports.Mail({
     ...mailerOptions,
     level: 'error',
-    subject: '[OTA] Error Report',
+    subject: `[OTA] Error Report — ${os.hostname()}`,
   }));
 
   if (config.get('logger.sendMailOnError.sendWarnings')) {
     transports.push(new winston.transports.Mail({
       ...mailerOptions,
       level: 'warn',
-      subject: '[OTA] Inaccessible content',
+      subject: `[OTA] Inaccessible content — ${os.hostname()}`,
     }));
   }
 }

@@ -1,5 +1,6 @@
 import fs from 'fs';
 
+import config from 'config';
 import { Octokit } from 'octokit';
 
 import logger from '../logger/index.js';
@@ -10,25 +11,25 @@ const ISSUE_STATE_CLOSED = 'closed';
 const ISSUE_STATE_OPEN = 'open';
 const ISSUE_STATE_ALL = 'all';
 
-const UPDATE_DOCUMENT_LABEL = process.env.GITHUB_LABEL_UPDATE || 'update';
+const UPDATE_DOCUMENT_LABEL = config.get('tracker.githubIssues.label');
 
 const LOCAL_CONTRIBUTE_URL = 'http://localhost:3000/en/service';
 const CONTRIBUTE_URL = 'https://contribute.opentermsarchive.org/en/service';
 const GITHUB_VERSIONS_URL = 'https://github.com/ambanum/OpenTermsArchive-versions/blob/master';
-const GITHUB_REPO_URL = `https://github.com/${process.env.GITHUB_REPO}/blob/master/declarations`;
+const GITHUB_REPO_URL = `https://github.com/${config.get('tracker.githubIssues.repository')}/blob/main/declarations`;
 const GOOGLE_URL = 'https://www.google.com/search?q=';
 
-export default class GitHub {
+export default class Tracker {
   static isTokenValid() {
-    return (process.env.GITHUB_REPO || '').includes('/');
+    return (config.get('tracker.githubIssues.repository') || '').includes('/');
   }
 
   constructor() {
-    if (!GitHub.isTokenValid()) {
-      throw new Error('GITHUB_REPO should be a string with <owner>/<repo>');
+    if (!Tracker.isTokenValid()) {
+      throw new Error('tracker.githubIssues.repository should be a string with <owner>/<repo>');
     }
 
-    const [ owner, repo ] = process.env.GITHUB_REPO.split('/');
+    const [ owner, repo ] = config.get('tracker.githubIssues.repository').split('/');
 
     this.octokit = new Octokit({
       auth: process.env.GITHUB_TOKEN,
@@ -65,7 +66,7 @@ export default class GitHub {
   async onInaccessibleContent(error, serviceId, type, documentDeclaration) {
     const { location, contentSelectors, noiseSelectors } = documentDeclaration;
 
-    const { title, body } = GitHub.formatIssueTitleAndBody({
+    const { title, body } = Tracker.formatIssueTitleAndBody({
       contentSelectors,
       noiseSelectors,
       url: location,
@@ -214,7 +215,7 @@ export default class GitHub {
     const encodedName = encodeURIComponent(name);
     const encodedType = encodeURIComponent(documentType);
     const encodedUrl = encodeURIComponent(url);
-    const encodedDestination = encodeURIComponent(process.env.GITHUB_REPO);
+    const encodedDestination = encodeURIComponent(config.get('tracker.githubIssues.repository'));
 
     const urlQueryParams = `destination=${encodedDestination}&step=2&url=${encodedUrl}&name=${encodedName}&documentType=${encodedType}${noiseSelectorsQueryString}${contentSelectorsQueryString}&expertMode=true`;
 

@@ -4,16 +4,6 @@ Recipes to set up the infrastructure for the Open Terms Archive app and deploy i
 
 > Recettes pour mettre en place l'infrastructure et déployer l'application Open Terms Archive
 
-## Automatic build and deploy from Github
-
-Although the following docs will show you how to deploy from your local machine, a CI process will deploy a new version of the app everytime a tag is created.
-
-So if you want to benefit from this, create a new tag on the `master` branch with
-
-```
-npm version <patch|minor|major>
-```
-
 ## Requirements
 
 - Install [Ansible](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html)
@@ -30,7 +20,8 @@ To test the changes without impacting the production server, a Vagrantfile is pr
 ## Usage
 
 To avoid making changes on the production server by mistake, by default all commands will only affect the Vagrant development virtual machine (VM). Note that the VM needs to be started before with `vagrant up`.\
-To execute commands on the production server you should specify it by adding the option `--inventory ops/inventories/production.yml` to the following commands:
+
+To execute commands on the production servers you should specify it by adding the option `--inventory ops/inventories/production.yml` to the following commands:
 
 - To setup a full [(phoenix)](https://martinfowler.com/bliki/PhoenixServer.html) server:
 
@@ -38,25 +29,29 @@ To execute commands on the production server you should specify it by adding the
 ansible-playbook ops/site.yml
 ```
 
-- To setup infrastructure only:
+- To setup the infrastructure only:
 
 ```
 ansible-playbook ops/infra.yml
 ```
 
-Setting up the production infrastructure for publishing on the shared versions repository entails decrypting a private key managed with [Ansible Vault](https://docs.ansible.com/ansible/latest/user_guide/vault.html). It is decrypted with a password that we keep safe. You do not need to decrypt this specific private key on your own production server.
-
-- To setup `OpenTermsArchive` app only:
+- To setup the `Open Terms Archive` app only:
 
 ```
 ansible-playbook ops/app.yml
 ```
 
-Some useful options can be used to:
+Setting up the production infrastructure for publishing on the shared versions repository entails decrypting a private key managed with [Ansible Vault](https://docs.ansible.com/ansible/latest/user_guide/vault.html). It is decrypted with a password that we keep safe. You do not need to decrypt this specific private key on your own production server.
 
-- see what changed with `--diff`
-- simulate execution with `--check`
-- see what will be changed with `--check --diff`
+Note that executing the playbook on the `production` inventory will affect **all** production servers.
+
+If you want to execute a playbook on a specific server only, add the `--limit` option with the `hostname` as parameter:
+
+```
+ansible-playbook --inventory ops/inventories/production.yml ops/site.yml --limit $hostname
+```
+
+The hostname is the one defined in the `ops/inventories/production.yml` inventory file.
 
 ### Tags
 
@@ -69,11 +64,48 @@ Some tags are available to refine what will happen, use them with `--tags`:
 - `update`: to update the app (pull code, install dependencies and restart app)
 - `update-declarations`: to update services declarations (pull declarations, install dependencies and restart app)
 
-For example, you can update `OpenTermsArchive` by running:
+For example, you can update `Open Terms Archive` by running:
 
 ```
 ansible-playbook ops/app.yml --tags update
 ```
+
+### Commands examples
+
+- Deploy Open Terms Archive application on all servers declared in the `ops/inventories/production.yml` inventory file:
+  ```
+  ansible-playbook --inventory ops/inventories/production.yml ops/app.yml
+  ```
+
+- Check deployment without applying changes for the `dating` instance:
+  ```
+  ansible-playbook --inventory ops/inventories/production.yml ops/app.yml --limit dating --check --diff
+  ```
+
+- Deploy Open Terms Archive application only on the `dating` instance and without applying changes to the infrastructure:
+  ```
+  ansible-playbook --inventory ops/inventories/production.yml ops/app.yml --limit dating
+  ```
+
+- Update and restart the Open Terms Archive application only on `dating` instance:
+  ```
+  ansible-playbook --inventory ops/inventories/production.yml ops/app.yml --limit dating --tag update
+  ```
+
+- Update services declarations only on the `france` instance:
+  ```
+  ansible-playbook -i ops/inventories/production.yml ops/app.yml -l france -t update-declarations
+  ```
+
+- Stop the Open Terms Archive application only on the `france` instance:
+  ```
+  ansible-playbook -i ops/inventories/production.yml ops/app.yml -l france -t stop
+  ```
+
+- Deploy the infrastructure and the Open Terms Archive application on all servers:
+  ```
+  ansible-playbook -i ops/inventories/production.yml ops/site.yml
+  ```
 
 ### Logs
 
@@ -120,3 +152,48 @@ all:
           ansible_ssh_port: 2200
           […]
 ```
+
+## Process
+
+To avoid breaking the production when making changes you can follow this process:
+
+- Start by applying your changes on your Vagrant virtual machine
+  `ansible-playbook ops/site.yml`.
+- Connect through SSH to the virtual machine and check that everything is ok
+  `vagrant ssh`, `pm2 logs`…
+- **As you will test the PRODUCTION environnement, stop the OTA application server to avoid sending emails to our users**
+  `ansible-playbook ops/app.yml -t stop`
+- If everything works, destroy that machine and re-run the entire installation on a clean machine to ensure that your changes do not work by coincidence
+  `vagrant destroy && vagrant up && ansible-playbook ops/site.yml`
+- Re-check that everything is ok
+  `vagrant ssh`, `pm2 logs`…
+- Then you can now deploy the changes in production
+  `ansible-playbook -i ops/inventories/production.yml ops/site.yml`.
+
+## Initialize a new instance
+
+### Provision a server
+
+If you use [OVH Horizon](https://horizon.cloud.ovh.net/project/instances/), click on the `Launch Instance` button. Then fill, at least, the following fields:
+  - `Instance name`.
+  - `Source`. Suggested: `Debian 11`.
+  - `Flavor`. Suggested: `b2-30-flex`.
+  - `Key pair`. Suggested: Your own personal SSH key, to allow you to connect to the freshly created server.
+
+### Add host configuration
+
+Add an entry to the production inventory file `ops/inventories/production.yml` for the created host with the server address and proper variables.
+
+### Create repositories
+
+Create the `snapshot` and `version` repositories, with:
+
+- A `main` branch.
+- The `main` branch should be the default branch.
+- At least one commit on this branch with some content (`README.md` and `LICENSE`).
+
+### Set up permissions
+
+The @OTA-Bot GitHub user should have write access to all three (declarations, snapshots, versions) repositories, so it can publish data, create issues, and publish dataset releases.
+
+Each instance should have a responsible entity, which we currently model as a [“team” in the @OpenTermsArchive](https://github.com/orgs/OpenTermsArchive/teams) GitHub organisation. Each team has write access to the three repositories, and @OTA-Bot should be added to that team along with the human maintainers.

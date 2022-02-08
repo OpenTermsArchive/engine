@@ -31,6 +31,10 @@
     "navigationTimeout": 30000
   },
   "logger": {
+    "smtp": {
+      "host": "smtp-relay.sendinblue.com",
+      "username": "sib@disinfo.beta.gouv.fr"
+    },
     "sendMailOnError": false
   },
   "notifier": {
@@ -39,5 +43,14 @@
       "updatesListId": 195,
       "updateTemplateId": 21
     }
+  },
+  "tracker": {
+    "githubIssues": {
+      "repository": "OpenTermsArchive/sandbox",
+      "label": "update"
+    }
+  },
+  "dataset": {
+    "publish": false
   }
 }

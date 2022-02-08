@@ -44,13 +44,14 @@ Run every command by setting `NODE_ENV` to `rewrite-snapshots`.
 Run the script by running:
 
 ```sh
-NODE_ENV=rewrite-snapshots node scripts/rewrite/rewrite-snapshots.js
+cd scripts/rewrite
+NODE_ENV=rewrite-snapshots node rewrite-snapshots.js
 ```
 
 You can write in an empty target repository and initialize it by passing the options `--init`:
 
 ```sh
-NODE_ENV=rewrite-snapshots node scripts/rewrite/rewrite-snapshots.js --init
+NODE_ENV=rewrite-snapshots node rewrite-snapshots.js --init
 ```
 
 This option will create the repository if it does not exists.
@@ -93,13 +94,14 @@ Run every command by setting `NODE_ENV` to `rewrite-versions`.
 Run the script by running:
 
 ```sh
-NODE_ENV=rewrite-versions node scripts/rewrite/rewrite-versions.js
+cd scripts/rewrite
+NODE_ENV=rewrite-versions node rewrite-versions.js
 ```
 
 You can write in an empty target repository and initialize it by passing the options `--init`:
 
 ```sh
-NODE_ENV=rewrite-versions node scripts/rewrite/rewrite-versions.js --init
+NODE_ENV=rewrite-versions node rewrite-versions.js --init
 ```
 
 This option will create the repository if it does not exists.
