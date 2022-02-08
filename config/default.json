@@ -49,9 +49,5 @@
       "repository": "OpenTermsArchive/sandbox",
       "label": "update"
     }
-  },
-  "dataset": {
-    "servicesRepositoryName": "services-all",
-    "versionsRepositoryURL": "https://github.com/ambanum/OpenTermsArchive-versions"
   }
 }
