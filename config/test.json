@@ -43,7 +43,7 @@
     "waitForElementsTimeout": 1000
   },
   "dataset": {
-    "servicesRepositoryName": "services-all",
-    "versionsRepositoryURL": "https://github.com/ambanum/OpenTermsArchive-versions"
+    "servicesRepositoryName": "test-repo",
+    "versionsRepositoryURL": "https://github.com/ambanum/test-repo"
   }
 }

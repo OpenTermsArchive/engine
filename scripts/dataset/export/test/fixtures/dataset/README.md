@@ -1,8 +1,8 @@
-# Open Terms Archive — services-all — January 1, 2022 dataset
+# Open Terms Archive — test-repo — January 1, 2022 dataset
 
 This dataset consolidates the contractual documents of 2 service providers, in all their versions that were accessible online between January 1, 2021 and January 6, 2022.
 
-This dataset is tailored for datascientists and other analysts. You can also explore all these versions interactively on [https://github.com/ambanum/OpenTermsArchive-versions](https://github.com/ambanum/OpenTermsArchive-versions).
+This dataset is tailored for datascientists and other analysts. You can also explore all these versions interactively on [https://github.com/ambanum/test-repo](https://github.com/ambanum/test-repo).
 
 ### Dataset format
 
