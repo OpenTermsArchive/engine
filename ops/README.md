@@ -29,13 +29,13 @@ To execute commands on the production servers you should specify it by adding th
 ansible-playbook ops/site.yml
 ```
 
-- To setup infrastructure only:
+- To setup the infrastructure only:
 
 ```
 ansible-playbook ops/infra.yml
 ```
 
-- To setup `OpenTermsArchive` app only:
+- To setup the `Open Terms Archive` app only:
 
 ```
 ansible-playbook ops/app.yml
@@ -64,7 +64,7 @@ Some tags are available to refine what will happen, use them with `--tags`:
 - `update`: to update the app (pull code, install dependencies and restart app)
 - `update-declarations`: to update services declarations (pull declarations, install dependencies and restart app)
 
-For example, you can update `OpenTermsArchive` by running:
+For example, you can update `Open Terms Archive` by running:
 
 ```
 ansible-playbook ops/app.yml --tags update
@@ -72,7 +72,7 @@ ansible-playbook ops/app.yml --tags update
 
 ### Commands examples
 
-- Deploy OpenTermsArchive application on all servers declared in `ops/inventories/production.yml` inventory file:
+- Deploy Open Terms Archive application on all servers declared in the `ops/inventories/production.yml` inventory file:
   ```
   ansible-playbook --inventory ops/inventories/production.yml ops/app.yml
   ```
@@ -82,27 +82,27 @@ ansible-playbook ops/app.yml --tags update
   ansible-playbook --inventory ops/inventories/production.yml ops/app.yml --limit services-all --check --diff
   ```
 
-- Deploy OpenTermsArchive application only on `services-all` server and without applying changes in the infrastructure:
+- Deploy Open Terms Archive application only on the `services-all` server and without applying changes to the infrastructure:
   ```
   ansible-playbook --inventory ops/inventories/production.yml ops/app.yml --limit services-all
   ```
 
-- Update and restart OpenTermsArchive application only on `services-all` server:
+- Update and restart the Open Terms Archive application only on `services-all` server:
   ```
   ansible-playbook --inventory ops/inventories/production.yml ops/app.yml --limit services-all --tag update
   ```
 
-- Update services declarations only on `services-dating` server:
+- Update services declarations only on the `services-dating` server:
   ```
   ansible-playbook -i ops/inventories/production.yml ops/app.yml -l services-dating -t update-declarations
   ```
 
-- Stop OpenTermsArchive application only on `services-dating` server:
+- Stop the Open Terms Archive application only on the `services-dating` server:
   ```
   ansible-playbook -i ops/inventories/production.yml ops/app.yml -l services-dating -t stop
   ```
 
-- Deploy infrastructure and OpenTermsArchive application on all servers:
+- Deploy the infrastructure and the Open Terms Archive application on all servers:
   ```
   ansible-playbook -i ops/inventories/production.yml ops/site.yml
   ```
@@ -169,7 +169,7 @@ To avoid breaking the production when making changes you can follow this process
 - Then you can now deploy changes on production
   `ansible-playbook -i ops/inventories/production.yml ops/site.yml`.
 
-## Initialize new instance
+## Initialize a new instance
 
 ### Provision a server
 
