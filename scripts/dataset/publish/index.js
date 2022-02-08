@@ -11,7 +11,7 @@ import * as readme from '../assets/README.template.js';
 dotenv.config();
 
 const locale = 'en-EN';
-const dateOptions = { year: 'numeric', month: '2-digit', day: '2-digit' };
+const dateOptions = { year: 'numeric', month: 'long', day: 'numeric' };
 
 export default async function publish({ archivePath, releaseDate, servicesCount, firstCommitDate, lastCommitDate }) {
   const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });

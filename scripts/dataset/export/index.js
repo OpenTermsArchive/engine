@@ -12,7 +12,7 @@ import readme from '../assets/README.template.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const locale = 'en-EN';
-const dateOptions = { year: 'numeric', month: '2-digit', day: '2-digit' };
+const dateOptions = { year: 'numeric', month: 'long', day: 'numeric' };
 
 export default async function generateArchive({ archivePath, releaseDate }) {
   const versionsStorageAdapter = await initVersionsStorageAdapter();
