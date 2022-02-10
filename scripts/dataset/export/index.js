@@ -3,122 +3,95 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 
 import archiver from 'archiver';
-import config from 'config';
 
-import GitAdapter from '../../../src/storage-adapters/git/index.js';
-import MongoAdapter from '../../../src/storage-adapters/mongo/index.js';
+import { instantiateVersionsStorageAdapter } from '../../../src/index.js';
 import * as renamer from '../../utils/renamer/index.js';
 import readme from '../assets/README.template.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const locale = 'en-EN';
-const dateOptions = { year: 'numeric', month: 'long', day: 'numeric' };
 
-export default async function generateArchive({ archivePath, releaseDate }) {
-  const versionsStorageAdapter = await initVersionsStorageAdapter();
-  const { archive, archiveName, archiveWrittenPromise } = await initializeArchive(archivePath);
+const fs = fsApi.promises;
+
+const ARCHIVE_FORMAT = 'zip'; // for supported formats, see https://www.archiverjs.com/docs/archive-formats
+
+export default async function generate({ archivePath, releaseDate }) {
+  const versionsStorageAdapter = await (instantiateVersionsStorageAdapter()).initialize();
+
+  const archive = await initializeArchive(archivePath);
 
   await renamer.loadRules();
 
-  const periodDates = { first: null, last: null };
   const services = new Set();
+  let firstVersionDate = new Date();
+  let lastVersionDate = new Date(0);
 
-  for await (const record of versionsStorageAdapter.iterate()) {
-    const { serviceId, documentType, ...othersRecordAttributes } = record;
-    const { serviceId: renamedServiceId, documentType: renamedDocumentType } = renamer.applyRules(serviceId, documentType);
+  for await (const version of versionsStorageAdapter.iterate()) {
+    const { content, fetchDate } = version;
+    const { serviceId, documentType } = renamer.applyRules(version.serviceId, version.documentType);
 
-    addRecordToArchive({
-      record: { serviceId: renamedServiceId, documentType: renamedDocumentType, ...othersRecordAttributes },
-      periodDates,
-      services,
-      archive,
-      archiveName,
-    });
+    if (firstVersionDate > fetchDate) {
+      firstVersionDate = fetchDate;
+    }
+
+    if (fetchDate > lastVersionDate) {
+      lastVersionDate = fetchDate;
+    }
+
+    services.add(serviceId);
+
+    archive.stream.append(
+      content,
+      { name: `${archive.basename}/${generateVersionPath({ serviceId, documentType, fetchDate })}` },
+    );
   }
 
-  addReadmeAndLicenseToArchive({ releaseDate, periodDates, services, archive, archiveName });
+  archive.stream.append(
+    readme({
+      servicesCount: services.size,
+      releaseDate,
+      firstVersionDate,
+      lastVersionDate,
+    }),
+    { name: `${archive.basename}/README.md` },
+  );
+  archive.stream.append(
+    fsApi.readFileSync(path.resolve(__dirname, '../assets/LICENSE')),
+    { name: `${archive.basename}/LICENSE` },
+  );
 
-  archive.finalize();
+  archive.stream.finalize();
 
-  await archiveWrittenPromise;
+  await archive.done;
+  await versionsStorageAdapter.finalize();
 
   return {
     servicesCount: services.size,
-    firstCommitDate: periodDates.first.toLocaleDateString(locale, dateOptions),
-    lastCommitDate: periodDates.last.toLocaleDateString(locale, dateOptions),
+    firstVersionDate,
+    lastVersionDate,
   };
 }
 
-async function initVersionsStorageAdapter() {
-  let versionsStorageAdapter;
+async function initializeArchive(targetPath) {
+  await fs.mkdir(path.dirname(targetPath), { recursive: true });
 
-  if (config.has('recorder.versions.storage.git')) {
-    versionsStorageAdapter = new GitAdapter({
-      ...config.get('recorder.versions.storage.git'),
-      path: path.resolve(__dirname, '../../../', config.get('recorder.versions.storage.git.path')),
-      fileExtension: 'md',
-    });
-  } else if (config.has('recorder.versions.storage.mongo')) {
-    versionsStorageAdapter = new MongoAdapter(config.get('recorder.versions.storage.mongo'));
-  }
+  const basename = path.basename(targetPath, path.extname(targetPath));
 
-  await versionsStorageAdapter.initialize();
+  const output = fsApi.createWriteStream(targetPath);
+  const stream = archiver(ARCHIVE_FORMAT, { zlib: { level: 9 } }); // set compression to max level
 
-  return versionsStorageAdapter;
-}
-
-async function initializeArchive(archivePath) {
-  fsApi.mkdirSync(path.dirname(archivePath), { recursive: true });
-
-  const archiveExtension = path.extname(archivePath);
-  const archiveName = path.basename(archivePath, archiveExtension);
-
-  const output = fsApi.createWriteStream(archivePath);
-  const archive = archiver('zip', { zlib: { level: 9 } });
-
-  const archiveWrittenPromise = new Promise(resolve => {
-    output.on('close', () => resolve());
+  const done = new Promise(resolve => {
+    output.on('close', resolve);
   });
 
-  archive.pipe(output);
+  stream.pipe(output);
 
-  return { archive, archiveName, archiveWrittenPromise };
+  return { basename, stream, done };
 }
 
-function addRecordToArchive({ record, periodDates, services, archive, archiveName }) {
-  const { serviceId, documentType, content, fetchDate } = record;
+function generateVersionPath({ serviceId, documentType, fetchDate }) {
+  const fsCompliantDate = fetchDate.toISOString()
+    .replace(/\.\d{3}/, '') // remove milliseconds
+    .replace(/:|\./g, '-'); // replace `:` and `.` by `-` to be compliant with the file system
 
-  if (!periodDates.last || new Date(fetchDate) > new Date(periodDates.last)) {
-    periodDates.last = fetchDate;
-  }
-
-  if (!periodDates.first || new Date(fetchDate) < new Date(periodDates.first)) {
-    periodDates.first = fetchDate;
-  }
-
-  services.add(serviceId);
-
-  const fileName = fetchDate.toISOString()
-    .replace(/\.\d{3}/, '') // Remove milliseconds
-    .replace(/:|\./g, '-'); // Replace `:` and `.` by `-` to be compliant with the file system
-
-  archive.append(content, { name: `${archiveName}/${serviceId}/${documentType}/${fileName}.md` });
-}
-
-function addReadmeAndLicenseToArchive({ releaseDate, periodDates, services, archive, archiveName }) {
-  archive.append(
-    readme({
-      servicesRepositoryName: config.get('dataset.servicesRepositoryName'),
-      releaseDate: releaseDate.toLocaleDateString(locale, dateOptions),
-      servicesCount: services.size,
-      firstCommitDate: periodDates.first.toLocaleDateString(locale, dateOptions),
-      lastCommitDate: periodDates.last.toLocaleDateString(locale, dateOptions),
-      versionsRepositoryURL: config.get('dataset.versionsRepositoryURL'),
-    }),
-    { name: `${archiveName}/README.md` },
-  );
-  archive.append(
-    fsApi.readFileSync(path.resolve(__dirname, '../assets/LICENSE')),
-    { name: `${archiveName}/LICENSE` },
-  );
+  return `${serviceId}/${documentType}/${fsCompliantDate}.md`;
 }

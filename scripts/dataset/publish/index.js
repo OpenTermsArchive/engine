@@ -10,10 +10,7 @@ import * as readme from '../assets/README.template.js';
 
 dotenv.config();
 
-const locale = 'en-EN';
-const dateOptions = { year: 'numeric', month: 'long', day: 'numeric' };
-
-export default async function publish({ archivePath, releaseDate, servicesCount, firstCommitDate, lastCommitDate }) {
+export default async function publish({ archivePath, releaseDate, stats }) {
   const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
 
   const [ owner, repo ] = url.parse(config.get('dataset.versionsRepositoryURL')).pathname.split('/').filter(component => component);
@@ -24,16 +21,8 @@ export default async function publish({ archivePath, releaseDate, servicesCount,
     owner,
     repo,
     tag_name: tagName,
-    name: readme.title({
-      servicesRepositoryName: config.get('dataset.servicesRepositoryName'),
-      releaseDate: releaseDate.toLocaleDateString(locale, dateOptions),
-    }),
-    body: readme.body({
-      servicesCount,
-      firstCommitDate,
-      lastCommitDate,
-      versionsRepositoryURL: config.get('dataset.versionsRepositoryURL'),
-    }),
+    name: readme.title({ releaseDate }),
+    body: readme.body(stats),
   });
 
   await octokit.rest.repos.uploadReleaseAsset({
@@ -46,5 +35,5 @@ export default async function publish({ archivePath, releaseDate, servicesCount,
     url: uploadUrl,
   });
 
-  return { releaseUrl };
+  return releaseUrl;
 }

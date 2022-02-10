@@ -8,44 +8,32 @@ import publishRelease from './publish/index.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-export async function release({ publicationEnabled, removeLocalCopyEnabled, fileName }) {
+export async function release({ shouldPublish, shouldRemoveLocalCopy, fileName }) {
   const releaseDate = new Date();
-  const archiveName = fileName || `dataset-${releaseDate.toISOString().replace(/T.*Z/, '')}`;
+  const archiveName = fileName || `dataset-${releaseDate.toISOString().replace(/T.*/, '')}`;
   const archivePath = `${__dirname}/${path.basename(archiveName, '.zip')}.zip`; // Allow to pass both `filename` and `filename.zip` as args without having duplicated extension
 
-  const { servicesCount, firstCommitDate, lastCommitDate } = await generate({ archivePath, releaseDate });
-
-  if (!publicationEnabled) {
-    return;
-  }
-
-  return publish({ archivePath, releaseDate, servicesCount, firstCommitDate, lastCommitDate, publicationEnabled, removeLocalCopyEnabled });
-}
-
-export async function generate({ archivePath, releaseDate }) {
   logger.info('Start exporting dataset…');
 
-  const { servicesCount, firstCommitDate, lastCommitDate } = await generateRelease({ archivePath, releaseDate });
+  const stats = await generateRelease({ archivePath, releaseDate });
 
   logger.info(`Dataset exported in ${archivePath}`);
 
-  return { servicesCount, firstCommitDate, lastCommitDate };
-}
+  if (!shouldPublish) {
+    return;
+  }
 
-export async function publish({ archivePath, releaseDate, servicesCount, firstCommitDate, lastCommitDate, removeLocalCopyEnabled }) {
   logger.info('Start publishing dataset…');
 
-  const { releaseUrl } = await publishRelease({
+  const releaseUrl = await publishRelease({
     archivePath,
     releaseDate,
-    servicesCount,
-    firstCommitDate,
-    lastCommitDate,
+    stats,
   });
 
   logger.info(`Dataset published to ${releaseUrl}`);
 
-  if (!removeLocalCopyEnabled) {
+  if (!shouldRemoveLocalCopy) {
     return;
   }
 

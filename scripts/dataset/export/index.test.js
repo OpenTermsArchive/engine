@@ -75,7 +75,8 @@ describe('Export', () => {
     const archiveName = 'test-dataset';
     const archivePath = path.resolve(__dirname, `./tmp/${archiveName}.zip`);
     const tmpPath = path.resolve(__dirname, './tmp');
-    const datasetFixturesPath = path.resolve(__dirname, './test/fixtures/dataset');
+    const EXPECTED_DATASET_PATH = path.resolve(__dirname, './test/fixtures/dataset');
+
     let zip;
 
     before(async function () {
@@ -125,7 +126,7 @@ describe('Export', () => {
         releaseDate: new Date(RELEASE_DATE),
       });
 
-      zip = new StreamZip.async({ file: archivePath }); // eslint-disable-line new-cap
+      zip = new StreamZip.async({ file: archivePath });
       await zip.extract('', tmpPath);
       await zip.close();
     });
@@ -138,11 +139,11 @@ describe('Export', () => {
     it('is an archive', () => {
       const mimeType = mime.getType(archivePath);
 
-      expect(mimeType).to.be.equal('application/zip');
+      expect(mimeType).to.equal('application/zip');
     });
 
     it('has the proper contents', () => {
-      expect(`${tmpPath}/${archiveName}`).to.have.sameContentAs(datasetFixturesPath);
+      expect(`${tmpPath}/${archiveName}`).to.have.sameContentAs(EXPECTED_DATASET_PATH);
     });
   });
 });

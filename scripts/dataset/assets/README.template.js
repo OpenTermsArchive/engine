@@ -1,15 +1,29 @@
-export default function readme({ servicesRepositoryName, releaseDate, servicesCount, firstCommitDate, lastCommitDate, versionsRepositoryURL }) {
-  return `# ${title({ servicesRepositoryName, releaseDate })}
+import config from 'config';
 
-${body({ servicesCount, firstCommitDate, lastCommitDate, versionsRepositoryURL })}`;
+const LOCALE = 'en-EN';
+const DATE_OPTIONS = { year: 'numeric', month: 'long', day: 'numeric' };
+
+export default function readme({ releaseDate, servicesCount, firstVersionDate, lastVersionDate }) {
+  return `# ${title({ releaseDate })}
+
+${body({ servicesCount, firstVersionDate, lastVersionDate })}`;
 }
 
-export function title({ servicesRepositoryName, releaseDate }) {
+export function title({ releaseDate }) {
+  releaseDate = releaseDate.toLocaleDateString(LOCALE, DATE_OPTIONS);
+
+  const servicesRepositoryName = config.get('dataset.servicesRepositoryName');
+
   return `Open Terms Archive — ${servicesRepositoryName} — ${releaseDate} dataset`;
 }
 
-export function body({ servicesCount, firstCommitDate, lastCommitDate, versionsRepositoryURL }) {
-  return `This dataset consolidates the contractual documents of ${servicesCount} service providers, in all their versions that were accessible online between ${firstCommitDate} and ${lastCommitDate}.
+export function body({ servicesCount, firstVersionDate, lastVersionDate }) {
+  firstVersionDate = firstVersionDate.toLocaleDateString(LOCALE, DATE_OPTIONS);
+  lastVersionDate = lastVersionDate.toLocaleDateString(LOCALE, DATE_OPTIONS);
+
+  const versionsRepositoryURL = config.get('dataset.versionsRepositoryURL');
+
+  return `This dataset consolidates the contractual documents of ${servicesCount} service providers, in all their versions that were accessible online between ${firstVersionDate} and ${lastVersionDate}.
 
 This dataset is tailored for datascientists and other analysts. You can also explore all these versions interactively on [${versionsRepositoryURL}](${versionsRepositoryURL}).
 
