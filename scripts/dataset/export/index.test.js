@@ -54,14 +54,14 @@ chai.use(chai => {
     function generateFailureMessage(result) {
       let message = `expected ${givenContentPath} to have the same content as ${expectedContentPath}
 
-     Statistics - equal entries: ${result.equal}, distinct entries: ${result.distinct}, left only entries: ${result.left}, right only entries: ${result.right}, differences: ${result.differences}\n`;
+     There are ${result.differences} differences:\n`;
 
       result.diffSet.forEach(diff => {
         if (diff.state == 'equal') {
           return;
         }
 
-        message += `     Reason: ${diff.reason}: File - name1: ${diff.name1}, type1: ${diff.type1}, name2: ${diff.name2}, type2: ${diff.type2}\n`;
+        message += `     ${diff.reason} on file ${diff.name1} | ${diff.name2}\n`;
       });
 
       return message;
