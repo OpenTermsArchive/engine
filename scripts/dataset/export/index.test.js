@@ -115,7 +115,7 @@ describe('Export', () => {
       await storageAdapter.record({
         serviceId: SECOND_SERVICE_PROVIDER_ID,
         documentType: SECOND_DOCUMENT_TYPE,
-        content: SECOND_CONTENT,
+        content: FIRST_CONTENT,
         fetchDate: FOURTH_FETCH_DATE,
         snapshotId: SNAPSHOT_ID,
       });
