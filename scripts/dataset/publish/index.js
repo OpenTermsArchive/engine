@@ -16,7 +16,7 @@ const dateOptions = { year: 'numeric', month: 'long', day: 'numeric' };
 export default async function publish({ archivePath, releaseDate, servicesCount, firstCommitDate, lastCommitDate }) {
   const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
 
-  const [ owner, repo ] = url.parse(config.get('dataset.versionsRepositoryURL')).pathname.split('/').filter(element => element !== '');
+  const [ owner, repo ] = url.parse(config.get('dataset.versionsRepositoryURL')).pathname.split('/').filter(component => component);
 
   const tagName = `${path.basename(archivePath, path.extname(archivePath))}`; // use archive filename as Git tag
 
