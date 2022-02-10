@@ -24,7 +24,9 @@ export default class GitAdapter {
   async initialize() {
     this.git = new Git({ path: this.path, author: this.author });
 
-    return this.git.initialize();
+    await this.git.initialize();
+
+    return this;
   }
 
   async record({ serviceId, documentType, content, mimeType, fetchDate, isRefilter, snapshotId }) {

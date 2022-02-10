@@ -21,6 +21,8 @@ export default class MongoAdapter {
     const db = this.client.db(this.databaseName);
 
     this.collection = db.collection(this.collectionName);
+
+    return this;
   }
 
   async finalize() {
