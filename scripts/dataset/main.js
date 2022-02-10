@@ -10,10 +10,6 @@ import { release } from './index.js';
   const argsWithoutOptions = args.filter(arg => !arg.startsWith('--'));
   const [fileName] = argsWithoutOptions;
 
-  if (removeLocalCopyEnabled && !publicationEnabled) {
-    logger.warn('--remove-local-copy is only available with --publish option');
-  }
-
   if (!scheduleEnable) {
     return release({ publicationEnabled, removeLocalCopyEnabled, fileName });
   }
