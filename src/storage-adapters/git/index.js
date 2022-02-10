@@ -88,7 +88,7 @@ export default class GitAdapter {
 
       /* eslint-disable no-await-in-loop */
       while (previousCommitHash != initialCommitHash) {
-        const [{ hash, date, message, diff: { files: [{ file: relativeFilePath }] } }] = await this.git.log([ '-1', '--stat=4096' ]); // Get current commit informations
+        const [{ hash, date, message, diff: { files: [{ file: relativeFilePath }] } }] = await this.git.log([ '-1', '--stat=4096' ]); // get current commit information
 
         if (message.match(/^(Start tracking|Update|Refilter)/)) { // Skip commits which are not a document versions (initial README or LICENSE commits for example)
           const absoluteFilePath = `${this.path}/${relativeFilePath}`;
@@ -109,12 +109,12 @@ export default class GitAdapter {
         previousCommitHash = hash;
 
         if (initialCommitHash != hash) {
-          await this.git.checkout(['HEAD~1']); // Checkout to the parent commit
+          await this.git.checkout(['HEAD~1']); // checkout the parent commit
         }
       }
       /* eslint-enable no-await-in-loop */
     } finally {
-      await this.git.checkout([currentBranchName]); // Checkout back to the top of the branch
+      await this.git.checkout([currentBranchName]);
     }
   }
 
