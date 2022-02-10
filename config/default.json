@@ -49,5 +49,9 @@
       "repository": "OpenTermsArchive/sandbox",
       "label": "update"
     }
+  },
+  "dataset": {
+    "servicesRepositoryName": "sandbox",
+    "versionsRepositoryURL": "https://github.com/OpenTermsArchive/sandbox"
   }
 }
