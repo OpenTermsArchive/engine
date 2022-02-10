@@ -507,13 +507,13 @@ describe('GitAdapter', () => {
     after(async () => subject._removeAllRecords());
 
     it('iterates through all records', async () => {
-      let numberOfRecordCovered = 0;
+      const result = [];
 
-      for await (const record of subject.iterate()) { // eslint-disable-line no-unused-vars
-        numberOfRecordCovered++;
+      for await (const record of subject.iterate()) {
+        result.push(record.content);
       }
 
-      expect(numberOfRecordCovered).to.equal(3);
+      expect(result).to.deep.equal([ `${CONTENT} - updated 2`, `${CONTENT} - updated`, CONTENT ]);
     });
   });
 });
