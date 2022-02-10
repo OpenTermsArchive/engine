@@ -88,7 +88,7 @@ export default class MongoAdapter {
 
   /* eslint-disable */
   async* iterate() {
-    throw new Error('`iterate` function is not yet implemented for MongoDB storage adapter');
+    throw new Error('#iterate is not yet implemented in the MongoDB storage adapter');
   }
   /* eslint-enable */
 
