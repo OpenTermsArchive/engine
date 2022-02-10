@@ -109,7 +109,7 @@ export default class GitAdapter {
         previousCommitHash = hash;
 
         if (initialCommitHash != hash) {
-          await this.git.checkout(['HEAD~1']); // checkout the parent commit
+          await this.git.checkout(['HEAD^']); // checkout the parent commit
         }
       }
       /* eslint-enable no-await-in-loop */
