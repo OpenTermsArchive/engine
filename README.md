@@ -128,7 +128,7 @@ See [CONTRIBUTING](CONTRIBUTING.md).
 
 ### Adding or updating a new service
 
-See the [CONTRIBUTING](https://github.com/OpenTermsArchive/services-all/CONTRIBUTING.md) of repository [OpenTermsArchive/services-all](https://github.com/OpenTermsArchive/services-all).
+See the [CONTRIBUTING](CONTRIBUTING.md) of repository [OpenTermsArchive/services-all](https://github.com/OpenTermsArchive/services-all).
 
 ## Using locally
 
