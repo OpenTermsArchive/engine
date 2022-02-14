@@ -1,3 +1,5 @@
+import { InaccessibleContentError } from '../errors.js';
+
 export default class Recorder {
   constructor({ versionsStorageAdapter, snapshotsStorageAdapter }) {
     if (!versionsStorageAdapter || !snapshotsStorageAdapter) {
@@ -34,7 +36,7 @@ export default class Recorder {
     }
 
     if (!content) {
-      throw new Error('A document content is required');
+      throw new InaccessibleContentError('A document content is required');
     }
 
     if (!mimeType) {
@@ -62,7 +64,7 @@ export default class Recorder {
     }
 
     if (!content) {
-      throw new Error('A document content is required');
+      throw new InaccessibleContentError('A document content is required');
     }
 
     return this.versionsStorageAdapter.record({ serviceId, documentType, snapshotId, fetchDate, content });
