@@ -42,7 +42,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
       const isServiceDeclared = archivist.serviceDeclarations[serviceId];
 
       if (!isServiceDeclared) {
-        logger.warn(`Parameter "${serviceId}" was interpreted as a service ID to update, but no matching declaration was found. It will be ignored.`);
+        logger.warn(`Parameter "${serviceId}" was interpreted as a service ID to update, but no matching declaration was found. It will be ignored`);
       }
 
       return isServiceDeclared;

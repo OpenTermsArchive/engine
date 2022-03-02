@@ -98,8 +98,8 @@ logger.onRefilteringStarted = (numberOfServices, numberOfDocuments) => {
 };
 
 logger.onRefilteringCompleted = (numberOfServices, numberOfDocuments) => {
-  logger.info(`Examined ${numberOfDocuments} documents from ${numberOfServices} services for refiltering.`);
-  logger.info(`Recorded ${recordedVersionsCount} new versions.\n`);
+  logger.info(`Examined ${numberOfDocuments} documents from ${numberOfServices} services for refiltering`);
+  logger.info(`Recorded ${recordedVersionsCount} new versions\n`);
 };
 
 logger.onTrackingStarted = (numberOfServices, numberOfDocuments) => {
@@ -109,8 +109,8 @@ logger.onTrackingStarted = (numberOfServices, numberOfDocuments) => {
 };
 
 logger.onTrackingCompleted = (numberOfServices, numberOfDocuments) => {
-  logger.info(`Tracked changes of ${numberOfDocuments} documents from ${numberOfServices} services.`);
-  logger.info(`Recorded ${recordedSnapshotsCount} new snapshots and ${recordedVersionsCount} new versions.\n`);
+  logger.info(`Tracked changes of ${numberOfDocuments} documents from ${numberOfServices} services`);
+  logger.info(`Recorded ${recordedSnapshotsCount} new snapshots and ${recordedVersionsCount} new versions\n`);
 };
 
 logger.onInaccessibleContent = ({ message }, serviceId, type) => {
