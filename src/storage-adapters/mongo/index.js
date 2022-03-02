@@ -75,13 +75,14 @@ export default class MongoAdapter {
       return {};
     }
 
-    const { _id, content, mimeType, fetchDate } = record;
+    const { _id, content, mimeType, fetchDate, isRefilter } = record;
 
     return {
       id: _id.toString(),
       content,
       mimeType,
       fetchDate: new Date(fetchDate),
+      isRefilter: !!isRefilter,
     };
   }
 

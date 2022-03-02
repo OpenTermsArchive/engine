@@ -313,6 +313,10 @@ describe('Recorder', () => {
             expect(record.content).to.equal(UPDATED_CONTENT);
           });
 
+          it('records in the document that it is not a refilter', async () => {
+            expect(record.isRefilter).to.equal(false);
+          });
+
           it('returns the record id', async () => {
             expect(record.id).to.include(id);
           });
@@ -465,6 +469,10 @@ describe('Recorder', () => {
 
           it('records the document with the proper content', async () => {
             expect(record.content).to.equal(UPDATED_CONTENT);
+          });
+
+          it('records in the document that it is a refilter', async () => {
+            expect(record.isRefilter).to.equal(true);
           });
 
           it('returns the record id', async () => {
