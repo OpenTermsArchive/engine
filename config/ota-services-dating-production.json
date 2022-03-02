@@ -38,7 +38,8 @@
   },
   "notifier": {
     "sendInBlue": {
-      "updatesListId": 191
+      "updatesListId": 396,
+      "updateTemplateId": 61
     }
   },
   "tracker": {
