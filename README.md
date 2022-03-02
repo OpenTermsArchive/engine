@@ -181,7 +181,6 @@ The default configuration can be read and changed in `config/default.json`.
   },
   "notifier": { // Notify specified mailing lists when new versions are recorded
     "sendInBlue": { // SendInBlue API Key is defined in environment variables, see see the “Environment variables” section below
-      "administratorsListId": "SendInBlue contacts list ID of administrators",
       "updatesListId": "SendInBlue contacts list ID of persons to notify on document updates",
       "updateTemplateId": "SendInBlue email template ID used for updates notifications"
     }

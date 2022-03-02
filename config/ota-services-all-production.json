@@ -35,7 +35,6 @@
   },
   "notifier": {
     "sendInBlue": {
-      "administratorsListId": 9,
       "updatesListId": 191
     }
   },
