@@ -28,7 +28,8 @@
   },
   "fetcher": {
     "waitForElementsTimeout": 10000,
-    "navigationTimeout": 30000
+    "navigationTimeout": 30000,
+    "language": "en"
   },
   "logger": {
     "smtp": {

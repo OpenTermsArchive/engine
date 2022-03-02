@@ -29,6 +29,9 @@
       }
     }
   },
+  "fetcher": {
+    "language": "fr"
+  },
   "logger": {
     "sendMailOnError": {
       "to": "admin@opentermsarchive.org",

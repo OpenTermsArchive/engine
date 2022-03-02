@@ -9,6 +9,7 @@ puppeteer.use(StealthPlugin());
 
 const NAVIGATION_TIMEOUT = config.get('fetcher.navigationTimeout');
 const WAIT_FOR_ELEMENTS_TIMEOUT = config.get('fetcher.waitForElementsTimeout');
+const LANGUAGE = config.get('fetcher.language');
 
 let browser;
 
@@ -23,8 +24,10 @@ export default async function fetch(url, cssSelectors) {
 
   try {
     page = await browser.newPage();
+
     await page.setUserAgent(new UserAgent().toString());
     await page.setDefaultNavigationTimeout(NAVIGATION_TIMEOUT);
+    await page.setExtraHTTPHeaders({ 'Accept-Language': LANGUAGE });
 
     response = await page.goto(url, { waitUntil: 'networkidle0' });
 
