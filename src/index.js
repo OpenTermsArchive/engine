@@ -2,7 +2,6 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 
 import config from 'config';
-import scheduler from 'node-schedule';
 
 import { publishRelease } from '../scripts/release/releasedataset.js';
 
@@ -71,18 +70,23 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
   }
 
   logger.info('The scheduler is running…');
-  logger.info('Documents will be tracked at minute 30 past every 6 hours.');
-  scheduler.scheduleJob('30 */6 * * *', async () => {
+
+  const TRACK_CHANGES_HOURS_INTERVAL = 2;
+  const RELEASE_HOURS_INTERVAL = 24;
+
+  logger.info(`Documents will be tracked every ${TRACK_CHANGES_HOURS_INTERVAL} hours\n`);
+  setInterval(async () => {
     await archivist.trackChanges(serviceIds);
-  });
+  }, TRACK_CHANGES_HOURS_INTERVAL * 60 * 60 * 1000);
 
   if (config.get('dataset.publish')) {
-    logger.info('Release will be created every 24 hours at 04h15');
-    scheduler.scheduleJob('15 4 * * *', async () => {
+    logger.info(`Release will be created every ${RELEASE_HOURS_INTERVAL} hours\n`);
+
+    setInterval(async () => {
       logger.info('Start creating the release…');
       await publishRelease();
       logger.info('Release published');
-    });
+    }, RELEASE_HOURS_INTERVAL * 60 * 60 * 1000);
   }
 }());
 
