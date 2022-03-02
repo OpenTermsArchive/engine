@@ -6,6 +6,7 @@ vault.key
 data
 yarn.lock
 tmp
+scripts/dataset/*.zip
 
 # local config file
 config/development.json
