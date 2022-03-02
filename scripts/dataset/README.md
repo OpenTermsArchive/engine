@@ -10,7 +10,7 @@ You can change the configuration in the appropriate config file in `config` fold
 {
   "dataset": {
     "servicesRepositoryName": "Name of the services declarations repository",
-    "versionsRepositoryURL": "URL of the versions repository where dataset will be published"
+    "versionsRepositoryURL": "GitHub versions repository where dataset will be published"
   }
 }
 ```
