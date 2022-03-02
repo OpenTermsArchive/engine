@@ -88,7 +88,7 @@ export default class GitAdapter {
 
       /* eslint-disable no-await-in-loop */
       while (previousCommitHash != initialCommitHash) {
-        const [{ hash, date, message, diff: { files: [{ file: relativeFilePath }] } }] = await this.git.log([ '-1', '--stat=4096' ]); // get current commit information
+        const [{ hash, date, message, diff: { files: [{ file: relativeFilePath }] } }] = await this.git.log([ '-1', '--stat=4096', '--no-merges' ]); // get current commit information
 
         if (message.match(/^(Start tracking|Update|Refilter)/)) { // Skip commits which are not a document versions (initial README or LICENSE commits for example)
           const absoluteFilePath = `${this.path}/${relativeFilePath}`;
