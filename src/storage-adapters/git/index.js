@@ -73,6 +73,7 @@ export default class GitAdapter {
       content: await fs.readFile(recordFilePath, readFileOptions),
       mimeType,
       fetchDate: new Date(commit.date),
+      isRefilter: commit.message.startsWith('Refilter'),
     };
   }
 
