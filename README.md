@@ -291,9 +291,26 @@ npm start $service_id
 
 See [Ops Readme](ops/README.md).
 
-### Exporting a dataset
+### Dataset
 
-See [`export` script Readme](scripts/export/README.md).
+To generate a dataset:
+
+```
+npm run dataset:generate
+```
+
+To release a dataset:
+
+```
+npm run dataset:release
+```
+
+
+To weekly release a dataset:
+
+```
+npm run dataset:scheduler
+```
 
 ---
 
