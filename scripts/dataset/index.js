@@ -8,7 +8,7 @@ import publishRelease from './publish/index.js';
 export async function release({ shouldPublish, shouldRemoveLocalCopy, fileName }) {
   const releaseDate = new Date();
   const archiveName = fileName || `dataset-${releaseDate.toISOString().replace(/T.*/, '')}`;
-  const archivePath = `${path.basename(archiveName, '.zip')}.zip`; // Allow to pass both `filename` and `filename.zip` as args without having duplicated extension
+  const archivePath = `${path.basename(archiveName, '.zip')}.zip`; // allow to pass filename or filename.zip as the archive name and have filename.zip as the result name
 
   logger.info('Start exporting dataset…');
 
