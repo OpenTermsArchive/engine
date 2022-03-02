@@ -7,6 +7,7 @@ import archiver from 'archiver';
 import { instantiateVersionsStorageAdapter } from '../../../src/index.js';
 import * as renamer from '../../utils/renamer/index.js';
 import readme from '../assets/README.template.js';
+import logger from '../logger/index.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -25,6 +26,8 @@ export default async function generate({ archivePath, releaseDate }) {
   let firstVersionDate = new Date();
   let lastVersionDate = new Date(0);
 
+  let index = 1;
+
   for await (const version of versionsStorageAdapter.iterate()) {
     const { content, fetchDate } = version;
     const { serviceId, documentType } = renamer.applyRules(version.serviceId, version.documentType);
@@ -39,10 +42,15 @@ export default async function generate({ archivePath, releaseDate }) {
 
     services.add(serviceId);
 
+    const versionPath = generateVersionPath({ serviceId, documentType, fetchDate });
+
+    logger.info({ message: versionPath, counter: index, hash: version.id });
+
     archive.stream.append(
       content,
-      { name: `${archive.basename}/${generateVersionPath({ serviceId, documentType, fetchDate })}` },
+      { name: `${archive.basename}/${versionPath}` },
     );
+    index++;
   }
 
   archive.stream.append(

@@ -12,7 +12,15 @@ const { combine, timestamp, printf, colorize } = winston.format;
 const alignedWithColorsAndTime = combine(
   colorize(),
   timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
-  printf(({ level, message, timestamp }) => `${timestamp} ${level.padEnd(15)} ${message}`),
+  printf(({ level, message, counter, hash, timestamp }) => {
+    let prefix = '';
+
+    if (counter && hash) {
+      prefix = `${counter.toString().padEnd(6)} ${hash.padEnd(40)}`;
+    }
+
+    return `${timestamp} ${level.padEnd(15)} ${prefix.padEnd(50)} ${message}`;
+  }),
 );
 
 const consoleTransport = new winston.transports.Console();
