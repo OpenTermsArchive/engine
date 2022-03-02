@@ -6,8 +6,8 @@ import nodeFetch, { AbortError } from 'node-fetch';
 
 import { FetchDocumentError } from './errors.js';
 
-const LANGUAGE = 'en';
 const NAVIGATION_TIMEOUT = config.get('fetcher.navigationTimeout');
+const LANGUAGE = config.get('fetcher.language');
 
 export default async function fetch(url) {
   const controller = new AbortController();
