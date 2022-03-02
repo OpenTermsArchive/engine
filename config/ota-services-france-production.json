@@ -49,5 +49,9 @@
     "githubIssues": {
       "repository": "OpenTermsArchive/declarations-france"
     }
+  },
+  "dataset": {
+    "servicesRepositoryName": "declarations-france",
+    "versionsRepositoryURL": "https://github.com/OpenTermsArchive/versions-france"
   }
 }
