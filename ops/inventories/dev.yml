@@ -5,6 +5,15 @@ all:
         '127.0.0.1':
           ansible_ssh_port: 2222
           ansible_user: vagrant
-          ansible_python_interpreter: /usr/bin/python3
-          ansible_ssh_private_key_file: .vagrant/machines/default/virtualbox/private_key
+          ansible_ssh_private_key_file: .vagrant/machines/default/docker/private_key
           ansible_ssh_extra_args: -o StrictHostKeyChecking=no -o IdentitiesOnly=yes
+          ansible_python_interpreter: /usr/bin/python3
+          services_directory: ota-services-all
+          services_repository: https://github.com/OpenTermsArchive/services-all.git
+          snapshots_directory: ota-snapshots
+          snapshots_repository: git@github.com:ambanum/OpenTermsArchive-snapshots.git
+          snapshots_branch: master
+          versions_directory: ota-versions
+          versions_repository: git@github.com:ambanum/OpenTermsArchive-versions.git
+          versions_branch: master
+
