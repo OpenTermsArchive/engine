@@ -29,7 +29,6 @@
     group: mongodb
     recurse: yes
 
-
 - name: Start MongoDB service
   service:
     name: mongod
