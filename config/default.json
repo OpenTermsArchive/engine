@@ -5,6 +5,7 @@
   "recorder": {
     "versions": {
       "storage": {
+        "type": "git",
         "git": {
           "path": "./data/versions",
           "publish": false,
@@ -18,10 +19,14 @@
     },
     "snapshots": {
       "storage": {
-        "mongo": {
-          "connectionURI": "mongodb://localhost:27017",
-          "database": "open-terms-archive",
-          "collection": "snapshots"
+        "type": "git",
+        "git": {
+          "path": "./data/snapshots",
+          "publish": false,
+          "author": {
+            "name": "Open Terms Archive Bot",
+            "email": "bot@opentermsarchive.org"
+          }
         }
       }
     }

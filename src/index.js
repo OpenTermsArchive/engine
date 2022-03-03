@@ -9,37 +9,30 @@ import MongoAdapter from './storage-adapters/mongo/index.js';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export function instantiateVersionsStorageAdapter() {
-  let versionsStorageAdapter;
-
-  if (config.has('recorder.versions.storage.mongo')) {
-    versionsStorageAdapter = new MongoAdapter(config.get('recorder.versions.storage.mongo'));
-  } else if (config.has('recorder.versions.storage.git')) {
-    versionsStorageAdapter = new GitAdapter({
-      ...config.get('recorder.versions.storage.git'),
-      path: path.resolve(__dirname, '../', config.get('recorder.versions.storage.git.path')),
-      fileExtension: 'md',
-    });
-  } else {
-    throw new Error('No config were found for versions storage adapter');
-  }
-
-  return versionsStorageAdapter;
+  return instantiateStorageAdapter('versions', 'md');
 }
 
 export function instantiateSnapshotsStorageAdapter() {
-  let snapshotsStorageAdapter;
+  return instantiateStorageAdapter('snapshots', 'html');
+}
 
-  if (config.has('recorder.snapshots.storage.mongo')) {
-    snapshotsStorageAdapter = new MongoAdapter(config.get('recorder.snapshots.storage.mongo'));
-  } else if (config.has('recorder.snapshots.storage.git')) {
-    snapshotsStorageAdapter = new GitAdapter({
-      ...config.get('recorder.snapshots.storage.git'),
-      path: path.resolve(__dirname, '../', config.get('recorder.snapshots.storage.git.path')),
-      fileExtension: 'html',
+function instantiateStorageAdapter(recordType, fileExtension) {
+  let storageAdapter;
+
+  switch (config.get(`recorder.${recordType}.storage.type`)) {
+  case 'git':
+    storageAdapter = new GitAdapter({
+      ...config.get(`recorder.${recordType}.storage.git`),
+      path: path.resolve(__dirname, '../', config.get(`recorder.${recordType}.storage.git.path`)),
+      fileExtension,
     });
-  } else {
+    break;
+  case 'mongo':
+    storageAdapter = new MongoAdapter(config.get(`recorder.${recordType}.storage.mongo`));
+    break;
+  default:
     throw new Error('No config were found for snapshots storage adapter');
   }
 
-  return snapshotsStorageAdapter;
+  return storageAdapter;
 }
