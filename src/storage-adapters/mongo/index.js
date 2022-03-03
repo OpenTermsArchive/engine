@@ -82,7 +82,7 @@ export default class MongoAdapter {
       content,
       mimeType,
       fetchDate: new Date(fetchDate),
-      isRefilter: !!isRefilter,
+      isRefilter: Boolean(isRefilter),
     };
   }
 

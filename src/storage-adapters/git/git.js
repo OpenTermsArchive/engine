@@ -75,7 +75,7 @@ export default class Git {
   async isTracked(filepath) {
     const result = await this.git.raw('ls-files', this.relativePath(filepath));
 
-    return !!result;
+    return Boolean(result);
   }
 
   async findUnique(glob) {
