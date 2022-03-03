@@ -29,6 +29,7 @@ const rawHTML = `
     <p><a id="link2" href="#anchor">link 2</a></p>
     <p><a id="link3" href="http://absolute.url/link">link 3</a></p>
     <div id="empty"></div>
+    <div id="whitespaceOnly"> </div>
   </body>
 </html>`;
 
@@ -164,6 +165,18 @@ describe('Filter', () => {
             documentDeclaration: new DocumentDeclaration({
               location: virtualLocation,
               contentSelectors: '#empty',
+            }),
+          })).to.be.rejectedWith(InaccessibleContentError, /empty content/);
+        });
+      });
+
+      context('with a whitespace only content for the corresponding given selector', () => {
+        it('throws an InaccessibleContentError error', async () => {
+          await expect(filterHTML({
+            content: rawHTML,
+            documentDeclaration: new DocumentDeclaration({
+              location: virtualLocation,
+              contentSelectors: '#whitespaceOnly',
             }),
           })).to.be.rejectedWith(InaccessibleContentError, /empty content/);
         });
