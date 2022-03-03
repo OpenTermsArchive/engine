@@ -40,7 +40,6 @@
   },
   "notifier": {
     "sendInBlue": {
-      "administratorsListId": 194,
       "updatesListId": 195,
       "updateTemplateId": 21
     }

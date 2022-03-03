@@ -44,7 +44,6 @@ export default class Notifier {
     };
 
     const lists = [
-      config.get('notifier.sendInBlue.administratorsListId'),
       config.get('notifier.sendInBlue.updatesListId'),
     ];
 
