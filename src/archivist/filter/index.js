@@ -80,7 +80,13 @@ export async function filterHTML({ content, documentDeclaration }) {
     }
   });
 
-  return transform(domFragment);
+  const markdownContent = transform(domFragment);
+
+  if (!markdownContent) {
+    throw new InaccessibleContentError(`The provided selector "${contentSelectors}" matches an empty content in the web page at '${location}'`);
+  }
+
+  return markdownContent;
 }
 
 export async function filterPDF({ content: pdfBuffer }) {
