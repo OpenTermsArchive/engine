@@ -21,6 +21,37 @@ VirtualBox is not compatible with Apple Silicon (M1…) processors. You will thu
 
 To that end, install Docker Desktop through a [manual install](https://hub.docker.com/editions/community/docker-ce-desktop-mac) or with `brew install homebrew/cask/docker`.
 
+**Setup**
+
+```
+vagrant plugin install docker
+```
+
+**Launch**
+
+```
+vagrant up --provider=docker
+```
+
+You can then deploy the code to the running machine with
+
+```
+ansible-playbook ops/site.yml --inventory ops/inventories/dev-docker.yml --skip-tags skipAppleSilicon
+```
+
+**CAUTION** skipping mongodb and chromium sandbox with `--skip-tags skipAppleSilicon` is mandatory as installing it does not work (See https://github.com/ambanum/OpenTermsArchive/issues/743 for more info)
+
+**Connect to the running machine**
+```
+vagrant ssh
+```
+
+**Stop**
+
+```
+vagrant halt # stop machine
+```
+
 ## Usage
 
 To avoid making changes on the production server by mistake, by default all commands will only affect the Vagrant development virtual machine (VM). Note that the VM needs to be started before with `vagrant up`.  If you’re on an Apple Silicon machine or want to use Docker instead of VirtualBox, type `vagrant up --provider=docker`.

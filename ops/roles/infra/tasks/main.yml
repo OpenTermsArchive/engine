@@ -55,5 +55,7 @@
   # See https://github.com/puppeteer/puppeteer/blob/main/docs/troubleshooting.md#recommended-enable-user-namespace-cloning
 - name: Enable user namespace cloning to allow running Chromium in a sandbox
   command: sysctl -w kernel.unprivileged_userns_clone=1
+  tags: [skipAppleSilicon]
 
 - include_tasks: mongo.yml
+  tags: [skipAppleSilicon]
