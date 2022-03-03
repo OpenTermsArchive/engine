@@ -71,8 +71,8 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
   logger.info('The scheduler is running…');
 
-  const TRACK_CHANGES_HOURS_INTERVAL = 2;
-  const RELEASE_HOURS_INTERVAL = 24;
+  const TRACK_CHANGES_HOURS_INTERVAL = 24;
+  const RELEASE_HOURS_INTERVAL = 24 * 7;
 
   logger.info(`Documents will be tracked every ${TRACK_CHANGES_HOURS_INTERVAL} hours\n`);
   setInterval(async () => {
