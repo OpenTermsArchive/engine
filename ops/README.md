@@ -197,3 +197,28 @@ Create the `snapshot` and `version` repositories, with:
 The @OTA-Bot GitHub user should have write access to all three (declarations, snapshots, versions) repositories, so it can publish data, create issues, and publish dataset releases.
 
 Each instance should have a responsible entity, which we currently model as a [“team” in the @OpenTermsArchive](https://github.com/orgs/OpenTermsArchive/teams) GitHub organisation. Each team has write access to the three repositories, and @OTA-Bot should be added to that team along with the human maintainers.
+
+## Optimise performance
+
+### MongoDB
+
+If you use MongoDB as storage, hosting the database on an XFS-formatted volume significantly improves performance.
+
+The following instructions assume [OVH Horizon](https://horizon.cloud.ovh.net/project/instances/) for volume creation, but can be adapted for any cloud provider.
+
+#### Mounting
+
+- Create a volume with the highest speed possible.
+- Attach the volume to the server that runs your Open Terms Archive instance.
+- On the machine, check what is your volume with `lsblk` (it should be one with no partition).
+- Then use `sudo fdisk /dev/sdX` and answer `n`, `p`, `1`, `w`.
+- Format the disk to XFS: `sudo mkfs.xfs -f /dev/sdX1`/
+- Finally, create a folder (for example in `/mnt`) and mount the volume in it: `sudo mount -t auto /dev/sdX1 /mnt/mongodb`.
+
+#### Unmounting
+
+To remove a volume:
+
+- Unmount it with `sudo umount /mnt/mongodb`.
+- Unattach it from the Horizon console.
+- Remove the volume from the Horizon console.
