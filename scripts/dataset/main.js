@@ -2,7 +2,7 @@ import logger from './logger/index.js';
 
 import { release } from './index.js';
 
-const RELEASE_HOURS_INTERVAL = 24 * 7;
+const RELEASE_HOURS_INTERVAL = 24;
 
 (() => {
   const args = process.argv.slice(2);
