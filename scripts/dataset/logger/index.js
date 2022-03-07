@@ -1,9 +1,9 @@
-import 'winston-mail';
 import os from 'os';
 
 import config from 'config';
 import dotenv from 'dotenv';
 import winston from 'winston';
+import 'winston-mail';
 
 dotenv.config();
 
