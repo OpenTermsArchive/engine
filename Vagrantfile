@@ -27,6 +27,7 @@ Vagrant.configure("2") do |config|
     # and depoying result in  /bin/sh: 1: /usr/bin/python: not found
     # use a provision to fix that
     # only with debian, no need with ubuntu
-    config.vm.provision "shell", inline: $installPython3
+    # Also need to name the provisioner, so that it runs only once https://github.com/hashicorp/vagrant/issues/7685#issuecomment-308281283
+    config.vm.provision "install_python3", type: "shell", inline: $installPython3
   end
 end
