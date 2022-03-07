@@ -34,41 +34,6 @@ const SNAPSHOT_ID = '721ce4a63ad399ecbdb548a66d6d327e7bc97876';
 
 const RELEASE_DATE = '2022-01-01T18:21:00.000Z';
 
-chai.use(chai => {
-  const { Assertion } = chai;
-
-  Assertion.addMethod('sameContentAs', function (expectedContentPath) {
-    const givenContentPath = this._obj;
-
-    const result = dircompare.compareSync(givenContentPath, expectedContentPath, {
-      excludeFilter: '.DS_Store',
-      compareContent: true,
-    });
-
-    this.assert(
-      result.same,
-      generateFailureMessage(result),
-      `expected ${givenContentPath} to have a different content as ${expectedContentPath}`,
-    );
-
-    function generateFailureMessage(result) {
-      let message = `expected ${givenContentPath} to have the same content as ${expectedContentPath}
-
-     There are ${result.differences} differences:\n`;
-
-      result.diffSet.forEach(diff => {
-        if (diff.state == 'equal') {
-          return;
-        }
-
-        message += `     ${diff.reason} on file ${diff.name1} | ${diff.name2}\n`;
-      });
-
-      return message;
-    }
-  });
-});
-
 describe('Export', () => {
   describe('#generateArchive', () => {
     let storageAdapter;
@@ -144,6 +109,40 @@ describe('Export', () => {
 
     it('has the proper contents', () => {
       expect(`${tmpPath}/${archiveName}`).to.have.sameContentAs(EXPECTED_DATASET_PATH);
+  });
+});
+
+chai.use(chai => {
+  const { Assertion } = chai;
+
+  Assertion.addMethod('sameContentAs', function (expectedContentPath) {
+    const givenContentPath = this._obj;
+
+    const result = dircompare.compareSync(givenContentPath, expectedContentPath, {
+      excludeFilter: '.DS_Store',
+      compareContent: true,
     });
+
+    this.assert(
+      result.same,
+      generateFailureMessage(result),
+      `expected ${givenContentPath} to have a different content as ${expectedContentPath}`,
+    );
+
+    function generateFailureMessage(result) {
+      let message = `expected ${givenContentPath} to have the same content as ${expectedContentPath}
+
+     There are ${result.differences} differences:\n`;
+
+      result.diffSet.forEach(diff => {
+        if (diff.state == 'equal') {
+          return;
+        }
+
+        message += `     ${diff.reason} on file ${diff.name1} | ${diff.name2}\n`;
+      });
+
+      return message;
+    }
   });
 });
