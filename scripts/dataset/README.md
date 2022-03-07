@@ -23,6 +23,12 @@ To export dataset:
 node scripts/dataset/main.js
 ```
 
+To export dataset and specify the target archive filename:
+
+```sh
+node scripts/dataset/main.js $filename
+```
+
 To export and publish dataset:
 
 ```sh
