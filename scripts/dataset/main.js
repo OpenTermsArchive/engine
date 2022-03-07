@@ -2,9 +2,9 @@ import logger from './logger/index.js';
 
 import { release } from './index.js';
 
-(async () => {
 const RELEASE_HOURS_INTERVAL = 24 * 7;
 
+(() => {
   const args = process.argv.slice(2);
   const shouldPublish = args.includes('--publish');
   const shouldRemoveLocalCopy = args.includes('--remove-local-copy');
