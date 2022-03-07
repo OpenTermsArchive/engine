@@ -36,12 +36,12 @@ const RELEASE_DATE = '2022-01-01T18:21:00.000Z';
 
 describe('Export', () => {
   describe('#generateArchive', () => {
-    let storageAdapter;
     const ARCHIVE_NAME = 'test-dataset';
     const ARCHIVE_PATH = path.resolve(__dirname, `./tmp/${ARCHIVE_NAME}.zip`);
     const TMP_PATH = path.resolve(__dirname, './tmp');
     const EXPECTED_DATASET_PATH = path.resolve(__dirname, './test/fixtures/dataset');
 
+    let storageAdapter;
     let zip;
 
     before(async function () {
