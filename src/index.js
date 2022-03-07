@@ -17,22 +17,22 @@ export function instantiateSnapshotsStorageAdapter() {
 }
 
 function instantiateStorageAdapter(recordType, fileExtension) {
-  let storageAdapter;
+  let result;
 
   switch (config.get(`recorder.${recordType}.storage.type`)) {
   case 'git':
-    storageAdapter = new GitAdapter({
+    result = new GitAdapter({
       ...config.get(`recorder.${recordType}.storage.git`),
       path: path.resolve(__dirname, '../', config.get(`recorder.${recordType}.storage.git.path`)),
       fileExtension,
     });
     break;
   case 'mongo':
-    storageAdapter = new MongoAdapter(config.get(`recorder.${recordType}.storage.mongo`));
+    result = new MongoAdapter(config.get(`recorder.${recordType}.storage.mongo`));
     break;
   default:
     throw new Error('No config were found for snapshots storage adapter');
   }
 
-  return storageAdapter;
+  return result;
 }
