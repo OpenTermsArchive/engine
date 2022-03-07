@@ -23,6 +23,8 @@ To that end, install Docker Desktop through a [manual install](https://hub.docke
 
 **Setup**
 
+Install the `docker` plugin
+
 ```
 vagrant plugin install docker
 ```
@@ -39,17 +41,18 @@ You can then deploy the code to the running machine with
 ansible-playbook ops/site.yml --inventory ops/inventories/dev-docker.yml --skip-tags skipAppleSilicon
 ```
 
-**CAUTION** skipping mongodb and chromium sandbox with `--skip-tags skipAppleSilicon` is mandatory as installing it does not work (See https://github.com/ambanum/OpenTermsArchive/issues/743 for more info)
+**CAUTION** skipping mongodb and chromium sandbox with `--skip-tags skipAppleSilicon` is mandatory as installing those programs does not work (See https://github.com/ambanum/OpenTermsArchive/issues/743 for more info)
 
 **Connect to the running machine**
 ```
 vagrant ssh
 ```
 
-**Stop**
+**Stop and destroy**
 
 ```
 vagrant halt # stop machine
+vagrant destroy -f # remove machine
 ```
 
 ## Usage
