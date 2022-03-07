@@ -8,8 +8,8 @@
     "node": ">=14.0.0"
   },
   "scripts": {
-    "start": "node --max-http-header-size=32768 src/index.js",
-    "start:scheduler": "node --max-http-header-size=32768 src/index.js --schedule",
+    "start": "node --max-http-header-size=32768 src/main.js",
+    "start:scheduler": "node --max-http-header-size=32768 src/main.js --schedule",
     "test": "cross-env NODE_ENV=test mocha --recursive \"./src/**/*.test.js\" \"./scripts/**/*.test.js\" --exit",
     "test:debug": "npm run test -- --inspect-brk --exit",
     "posttest": "npm run lint",
@@ -20,7 +20,7 @@
     "dataset:generate": "node scripts/dataset/main.js",
     "dataset:release": "node scripts/dataset/main.js --publish --remove-local-copy",
     "dataset:scheduler": "npm run dataset:release -- --schedule",
-    "refilter": "node src/index.js --refilter-only"
+    "refilter": "node src/main.js --refilter-only"
   },
   "repository": {
     "type": "git",
