@@ -31,7 +31,7 @@ function instantiateStorageAdapter(recordType, fileExtension) {
     result = new MongoAdapter(config.get(`recorder.${recordType}.storage.mongo`));
     break;
   default:
-    throw new Error('No config were found for snapshots storage adapter');
+    throw new Error(`No configuration found for ${recordType} storage adapter`);
   }
 
   return result;
