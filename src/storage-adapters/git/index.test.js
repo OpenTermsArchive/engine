@@ -498,6 +498,7 @@ describe('GitAdapter', () => {
         serviceId: SERVICE_PROVIDER_ID,
         documentType: DOCUMENT_TYPE,
         content: `${CONTENT} - updated 2`,
+        isRefilter: true,
         fetchDate: FETCH_DATE,
         snapshotId: SNAPSHOT_ID,
         mimeType: MIME_TYPE,
