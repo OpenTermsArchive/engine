@@ -37,9 +37,9 @@ const RELEASE_DATE = '2022-01-01T18:21:00.000Z';
 describe('Export', () => {
   describe('#generateArchive', () => {
     let storageAdapter;
-    const archiveName = 'test-dataset';
-    const archivePath = path.resolve(__dirname, `./tmp/${archiveName}.zip`);
-    const tmpPath = path.resolve(__dirname, './tmp');
+    const ARCHIVE_NAME = 'test-dataset';
+    const ARCHIVE_PATH = path.resolve(__dirname, `./tmp/${ARCHIVE_NAME}.zip`);
+    const TMP_PATH = path.resolve(__dirname, './tmp');
     const EXPECTED_DATASET_PATH = path.resolve(__dirname, './test/fixtures/dataset');
 
     let zip;
@@ -87,28 +87,29 @@ describe('Export', () => {
       });
 
       await generateArchive({
-        archivePath,
+        archivePath: ARCHIVE_PATH,
         releaseDate: new Date(RELEASE_DATE),
       });
 
-      zip = new StreamZip.async({ file: archivePath });
-      await zip.extract('', tmpPath);
+      zip = new StreamZip.async({ file: ARCHIVE_PATH });
+      await zip.extract('', TMP_PATH);
       await zip.close();
     });
 
     after(async () => {
-      await fs.rm(tmpPath, { recursive: true });
+      await fs.rm(TMP_PATH, { recursive: true });
       await storageAdapter._removeAllRecords();
     });
 
     it('is an archive', () => {
-      const mimeType = mime.getType(archivePath);
+      const mimeType = mime.getType(ARCHIVE_PATH);
 
       expect(mimeType).to.equal('application/zip');
     });
 
     it('has the proper contents', () => {
-      expect(`${tmpPath}/${archiveName}`).to.have.sameContentAs(EXPECTED_DATASET_PATH);
+      expect(`${TMP_PATH}/${ARCHIVE_NAME}`).to.have.sameContentAs(EXPECTED_DATASET_PATH);
+    });
   });
 });
 
