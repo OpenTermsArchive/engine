@@ -8,67 +8,11 @@ Recipes to set up the infrastructure for the Open Terms Archive app and deploy i
 
 - Install [Ansible](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html)
 
-### [For development only] Additional dependencies
-
-To test the changes without impacting the production server, a Vagrantfile is provided to test the changes locally in a virtual machine. VirtualBox and Vagrant are therefore required.
-
-- Install [VirtualBox](https://www.vagrantup.com/docs/installation/)
-- Install [Vagrant](https://www.vagrantup.com/docs/installation/)
-
-### [For development only] SSH with vagrant
-
-In order to be able to connect to vagrant through SSH, and deploy with ansible, you need to create a custom ssh file by using
-
-```
-ssh-keygen -t rsa -f ~/.ssh/ota-vagrant -q -N ""
-```
-
-#### [For development only] On a Mac with an Apple Silicon processor
-
-VirtualBox is not compatible with Apple Silicon (M1…) processors. You will thus need to use the Docker provider.
-
-To that end, install Docker Desktop through a [manual install](https://hub.docker.com/editions/community/docker-ce-desktop-mac) or with `brew install homebrew/cask/docker`.
-
-**Setup**
-
-Install the `docker` plugin
-
-```
-vagrant plugin install docker
-```
-
-**Launch**
-
-```
-vagrant up --provider=docker
-```
-
-You can then deploy the code to the running machine with
-
-```
-ansible-playbook ops/site.yml --inventory ops/inventories/dev.yml
-```
-
-**CAUTION** when deploying on architecture `aarch64`, as mongodb and chromium install does not work, they are removed from the deploy (See https://github.com/ambanum/OpenTermsArchive/issues/743 for more info)
-This means you CANNOT test mongodb storage with vagrant on M1 
-
-**Connect to the running machine**
-```
-vagrant ssh
-```
-
-**Stop and destroy**
-
-```
-vagrant halt # stop machine
-vagrant destroy -f # remove machine
-```
-
 ## Usage
 
-To avoid making changes on the production server by mistake, by default all commands will only affect the Vagrant development virtual machine (VM). Note that the VM needs to be started before with `vagrant up`.  If you’re on an Apple Silicon machine or want to use Docker instead of VirtualBox, type `vagrant up --provider=docker`.
+_To avoid making changes on the production server by mistake, by default all commands will only affect the Vagrant development virtual machine (VM), see [Development section](#development) for more details._
 
-To execute commands on the production server you should specify it by adding the option `--inventory ops/inventories/production.yml` to the following commands:
+_To execute commands on the production server you should specify it by adding the option `--inventory ops/inventories/production.yml` to the following commands:_
 
 - To set up a full [(phoenix)](https://martinfowler.com/bliki/PhoenixServer.html) server:
 
@@ -244,3 +188,64 @@ Create the `snapshot` and `version` repositories, with:
 The @OTA-Bot GitHub user should have write access to all three (declarations, snapshots, versions) repositories, so it can publish data, create issues, and publish dataset releases.
 
 Each instance should have a responsible entity, which we currently model as a [“team” in the @OpenTermsArchive](https://github.com/orgs/OpenTermsArchive/teams) GitHub organisation. Each team has write access to the three repositories, and @OTA-Bot should be added to that team along with the human maintainers.
+
+## Development
+
+Note that the VM needs to be started before running any commands with `vagrant up`.
+
+If you’re on an Apple Silicon machine or want to use Docker instead of VirtualBox, type `vagrant up --provider=docker`.
+### Additional dependencies
+
+To test the changes without impacting the production server, a Vagrantfile is provided to test the changes locally in a virtual machine. VirtualBox and Vagrant are therefore required.
+
+- Install [VirtualBox](https://www.vagrantup.com/docs/installation/)
+- Install [Vagrant](https://www.vagrantup.com/docs/installation/)
+
+### SSH with vagrant
+
+In order to be able to connect to vagrant through SSH, and deploy with ansible, you need to create a custom ssh file by using
+
+```
+ssh-keygen -t rsa -f ~/.ssh/ota-vagrant -q -N ""
+```
+
+#### On a Mac with an Apple Silicon processor
+
+VirtualBox is not compatible with Apple Silicon (M1…) processors. You will thus need to use the Docker provider.
+
+To that end, install Docker Desktop through a [manual install](https://hub.docker.com/editions/community/docker-ce-desktop-mac) or with `brew install homebrew/cask/docker`.
+
+**Setup**
+
+Install the `docker` plugin
+
+```
+vagrant plugin install docker
+```
+
+**Launch**
+
+```
+vagrant up --provider=docker
+```
+
+You can then deploy the code to the running machine with
+
+```
+ansible-playbook ops/site.yml --inventory ops/inventories/dev.yml
+```
+
+**CAUTION** when deploying on architecture `aarch64`, as mongodb and chromium install does not work, they are removed from the deploy (See https://github.com/ambanum/OpenTermsArchive/issues/743 for more info)
+This means you CANNOT test mongodb storage with vagrant on M1
+
+**Connect to the running machine**
+```
+vagrant ssh
+```
+
+**Stop and destroy**
+
+```
+vagrant halt # stop machine
+vagrant destroy -f # remove machine
+```
