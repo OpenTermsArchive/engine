@@ -13,6 +13,10 @@ Vagrant.configure("2") do |config|
 
   config.vm.box = "debian/bullseye64" # Unable to locate package mongodb-org
 
+  # create file with `ssh-keygen -t rsa -f ~/.ssh/ota-vagrant -q -N ""`
+  # CAUTION: use of `~` in path causes problems with ssh
+  config.vm.provision "file", source: File.join(ENV['HOME'], ".ssh", "ota-vagrant.pub"), destination: "/home/vagrant/.ssh/authorized_keys"
+
   # based on https://github.com/rofrano/vagrant-docker-provider#example-vagrantfile
   config.vm.provider :docker do |docker, override|
     override.vm.box = nil

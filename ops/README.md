@@ -15,7 +15,15 @@ To test the changes without impacting the production server, a Vagrantfile is pr
 - Install [VirtualBox](https://www.vagrantup.com/docs/installation/)
 - Install [Vagrant](https://www.vagrantup.com/docs/installation/)
 
-#### On a Mac with an Apple Silicon processor
+### [For development only] SSH with vagrant
+
+In order to be able to connect to vagrant through SSH, and deploy with ansible, you need to create a custom ssh file by using
+
+```
+ssh-keygen -t rsa -f ~/.ssh/ota-vagrant -q -N ""
+```
+
+#### [For development only] On a Mac with an Apple Silicon processor
 
 VirtualBox is not compatible with Apple Silicon (M1…) processors. You will thus need to use the Docker provider.
 
@@ -38,10 +46,11 @@ vagrant up --provider=docker
 You can then deploy the code to the running machine with
 
 ```
-ansible-playbook ops/site.yml --inventory ops/inventories/dev-docker.yml --skip-tags skipAppleSilicon
+ansible-playbook ops/site.yml --inventory ops/inventories/dev.yml
 ```
 
-**CAUTION** skipping mongodb and chromium sandbox with `--skip-tags skipAppleSilicon` is mandatory as installing those programs does not work (See https://github.com/ambanum/OpenTermsArchive/issues/743 for more info)
+**CAUTION** when deploying on architecture `aarch64`, as mongodb and chromium install does not work, they are removed from the deploy (See https://github.com/ambanum/OpenTermsArchive/issues/743 for more info)
+This means you CANNOT test mongodb storage with vagrant on M1 
 
 **Connect to the running machine**
 ```
