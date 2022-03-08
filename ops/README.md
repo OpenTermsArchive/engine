@@ -211,7 +211,7 @@ The following instructions assume [OVH Horizon](https://horizon.cloud.ovh.net/pr
 - Create a volume with the highest speed possible.
 - Attach the volume to the server that runs your Open Terms Archive instance.
 - On the machine, check what is your volume with `lsblk` (it should be one with no partition).
-- Then use `sudo fdisk /dev/sdX` and answer `n`, `p`, `1`, `w`.
+- Then use `sudo fdisk /dev/sd$N` (where `$N` is the identifier of the volume) and answer `n`, `p`, `1`, `w`.
 - Format the disk to XFS: `sudo mkfs.xfs -f /dev/sdX1`/
 - Finally, create a folder (for example in `/mnt`) and mount the volume in it: `sudo mount -t auto /dev/sdX1 /mnt/mongodb`.
 
