@@ -187,5 +187,10 @@
       "audience": "anyone",
       "object": "how generic complaints will be handled"
     }
+  },
+  "Conditions of Carriage": {
+    "writer": "transportation operator (airline, railway, bus…)",
+    "audience": "passenger",
+    "object": "benefits and limitations associated with the transportation being provided"
   }
 }
