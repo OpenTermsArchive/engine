@@ -8,12 +8,12 @@ import MongoAdapter from './storage-adapters/mongo/index.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-export function instantiateVersionsStorageAdapter() {
-  return instantiateStorageAdapter('versions', 'md');
+export function instantiateVersionsStorageAdapter({ fileExtension = 'md' } = {}) {
+  return instantiateStorageAdapter('versions', fileExtension);
 }
 
-export function instantiateSnapshotsStorageAdapter() {
-  return instantiateStorageAdapter('snapshots', 'html');
+export function instantiateSnapshotsStorageAdapter({ fileExtension = 'html' } = {}) {
+  return instantiateStorageAdapter('snapshots', fileExtension);
 }
 
 function instantiateStorageAdapter(recordType, fileExtension) {
