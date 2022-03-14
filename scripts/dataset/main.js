@@ -1,5 +1,3 @@
-import logger from './logger/index.js';
-
 import { release } from './index.js';
 
 const RELEASE_HOURS_INTERVAL = 24;
