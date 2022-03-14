@@ -8,11 +8,7 @@
         "git": {
           "path": "../ota-versions-dating",
           "publish": true,
-          "prefixMessageToSnapshotId": "This version was recorded after filtering snapshot https://github.com/OpenTermsArchive/snapshots-dating/commit/",
-          "author": {
-            "name": "Open Terms Archive Bot",
-            "email": "bot@opentermsarchive.org"
-          }
+          "prefixMessageToSnapshotId": "This version was recorded after filtering snapshot https://github.com/OpenTermsArchive/snapshots-dating/commit/"
         }
       }
     },
@@ -20,11 +16,7 @@
       "storage": {
         "git": {
           "path": "../ota-snapshots-dating",
-          "publish": true,
-          "author": {
-            "name": "Open Terms Archive Bot",
-            "email": "bot@opentermsarchive.org"
-          }
+          "publish": true
         }
       }
     }
@@ -46,5 +38,9 @@
     "githubIssues": {
       "repository": "OpenTermsArchive/services-dating"
     }
+  },
+  "dataset": {
+    "servicesRepositoryName": "services-dating",
+    "versionsRepositoryURL": "https://github.com/OpenTermsArchive/versions-dating"
   }
 }

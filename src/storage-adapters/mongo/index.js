@@ -21,6 +21,8 @@ export default class MongoAdapter {
     const db = this.client.db(this.databaseName);
 
     this.collection = db.collection(this.collectionName);
+
+    return this;
   }
 
   async finalize() {
@@ -85,6 +87,12 @@ export default class MongoAdapter {
       isRefilter: Boolean(isRefilter),
     };
   }
+
+  /* eslint-disable */
+  async* iterate() {
+    throw new Error('#iterate is not yet implemented in the MongoDB storage adapter');
+  }
+  /* eslint-enable */
 
   async _removeAllRecords() {
     return this.collection.deleteMany({});

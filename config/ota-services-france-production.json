@@ -8,24 +8,13 @@
         "git": {
           "path": "../ota-versions-france",
           "publish": true,
-          "prefixMessageToSnapshotId": "This version was recorded after filtering snapshot https://github.com/OpenTermsArchive/snapshots-france/commit/",
-          "author": {
-            "name": "Open Terms Archive Bot",
-            "email": "bot@opentermsarchive.org"
-          }
+          "prefixMessageToSnapshotId": "This version was recorded after filtering snapshot with Mongo ID "
         }
       }
     },
     "snapshots": {
       "storage": {
-        "git": {
-          "path": "../ota-snapshots-france",
-          "publish": true,
-          "author": {
-            "name": "Open Terms Archive Bot",
-            "email": "bot@opentermsarchive.org"
-          }
-        }
+        "type": "mongo"
       }
     }
   },
@@ -49,5 +38,9 @@
     "githubIssues": {
       "repository": "OpenTermsArchive/declarations-france"
     }
+  },
+  "dataset": {
+    "servicesRepositoryName": "declarations-france",
+    "versionsRepositoryURL": "https://github.com/OpenTermsArchive/versions-france"
   }
 }

@@ -473,4 +473,48 @@ describe('GitAdapter', () => {
       });
     });
   });
+
+  describe('#iterate', () => {
+    before(async () => {
+      await subject.record({
+        serviceId: SERVICE_PROVIDER_ID,
+        documentType: DOCUMENT_TYPE,
+        content: CONTENT,
+        fetchDate: FETCH_DATE,
+        snapshotId: SNAPSHOT_ID,
+        mimeType: MIME_TYPE,
+      });
+
+      await subject.record({
+        serviceId: SERVICE_PROVIDER_ID,
+        documentType: DOCUMENT_TYPE,
+        content: `${CONTENT} - updated`,
+        fetchDate: FETCH_DATE,
+        snapshotId: SNAPSHOT_ID,
+        mimeType: MIME_TYPE,
+      });
+
+      await subject.record({
+        serviceId: SERVICE_PROVIDER_ID,
+        documentType: DOCUMENT_TYPE,
+        content: `${CONTENT} - updated 2`,
+        isRefilter: true,
+        fetchDate: FETCH_DATE,
+        snapshotId: SNAPSHOT_ID,
+        mimeType: MIME_TYPE,
+      });
+    });
+
+    after(async () => subject._removeAllRecords());
+
+    it('iterates through all records', async () => {
+      const result = [];
+
+      for await (const record of subject.iterate()) {
+        result.push(record.content);
+      }
+
+      expect(result).to.deep.equal([ `${CONTENT} - updated 2`, `${CONTENT} - updated`, CONTENT ]);
+    });
+  });
 });

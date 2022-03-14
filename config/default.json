@@ -5,6 +5,7 @@
   "recorder": {
     "versions": {
       "storage": {
+        "type": "git",
         "git": {
           "path": "./data/versions",
           "publish": false,
@@ -18,6 +19,15 @@
     },
     "snapshots": {
       "storage": {
+        "type": "git",
+        "git": {
+          "path": "./data/snapshots",
+          "publish": false,
+          "author": {
+            "name": "Open Terms Archive Bot",
+            "email": "bot@opentermsarchive.org"
+          }
+        },
         "mongo": {
           "connectionURI": "mongodb://localhost:27017",
           "database": "open-terms-archive",
@@ -51,6 +61,7 @@
     }
   },
   "dataset": {
-    "publish": false
+    "servicesRepositoryName": "sandbox",
+    "versionsRepositoryURL": "https://github.com/OpenTermsArchive/sandbox"
   }
 }

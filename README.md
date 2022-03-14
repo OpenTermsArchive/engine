@@ -203,7 +203,8 @@ The default configuration can be read and changed in `config/default.json`.
     }
   },
   "dataset": { // Release mechanism to create dataset periodically
-    "publish": "Boolean. Set to true to enable dataset creation"
+    "servicesRepositoryName": "Name of the services declarations repository",
+    "versionsRepositoryURL": "GitHub versions repository where dataset will be published"
   }
 }
 ```
@@ -291,9 +292,26 @@ npm start $service_id
 
 See [Ops Readme](ops/README.md).
 
-### Exporting a dataset
+### Dataset
 
-See [`export` script Readme](scripts/export/README.md).
+To generate a dataset:
+
+```
+npm run dataset:generate
+```
+
+To release a dataset:
+
+```
+npm run dataset:release
+```
+
+
+To weekly release a dataset:
+
+```
+npm run dataset:scheduler
+```
 
 ---
 

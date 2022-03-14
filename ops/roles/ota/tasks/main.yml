@@ -41,10 +41,6 @@
   tags:
     - setup
 
-- include_tasks: github.yml
-  tags:
-    - setup
-
 - name: Install services declarations
   git:
     repo: '{{ services_repository }}'
@@ -87,6 +83,26 @@
     - update
     - update-declarations
 
+- name: Stop Open Terms Archive release process
+  command: pm2 --silent stop "{{ ota_app_name }}-release"
+  ignore_errors: yes
+  when: git_clone_ota.before is defined and git_clone_ota.before # if git_clone_ota.before is not null, then the repository is not new
+  tags:
+    - restart
+    - stop
+    - update
+    - update-declarations
+
+- name: Unregister Open Terms Archive release from process manager
+  command: pm2 --silent delete "{{ ota_app_name }}-release"
+  ignore_errors: yes
+  when: git_clone_ota.before is defined and git_clone_ota.before # if git_clone_ota.before is not null, then the repository is not new
+  tags:
+    - restart
+    - stop
+    - update
+    - update-declarations
+
 - include_tasks: database.yml
   vars:
     name: snapshots
@@ -110,6 +126,18 @@
 - name: Start Open Terms Archive
   command:
     cmd: pm2 start --name "{{ ota_app_name }}" --exp-backoff-restart-delay=1000 npm -- run start:scheduler
+    chdir: '/home/{{ ansible_user }}/{{ ota_app_name }}'
+  environment:
+    NODE_ENV: production
+  tags:
+    - restart
+    - start
+    - update
+    - update-declarations
+
+- name: Schedule Open Terms Archive release
+  command:
+    cmd: pm2 start --name "{{ ota_app_name }}-release" --exp-backoff-restart-delay=1000 npm -- run dataset:scheduler
     chdir: '/home/{{ ansible_user }}/{{ ota_app_name }}'
   environment:
     NODE_ENV: production
