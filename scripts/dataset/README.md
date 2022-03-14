@@ -20,13 +20,7 @@ You can change the configuration in the appropriate config file in `config` fold
 To export dataset:
 
 ```sh
-node scripts/dataset/main.js
-```
-
-To export dataset and specify the target archive filename:
-
-```sh
-node scripts/dataset/main.js $filename
+node scripts/dataset/main.js [$filename]
 ```
 
 To export and publish dataset:
