@@ -249,3 +249,32 @@ and use `vagrant` as password
 vagrant halt # stop machine
 vagrant destroy -f # remove machine
 ```
+
+### TroubleShooting
+
+#### REMOTE HOST IDENTIFICATION HAS CHANGED
+
+In case you get that kind of error
+
+```
+fatal: [127.0.0.1]: UNREACHABLE! => changed=false
+  msg: |-
+    Failed to connect to the host via ssh: @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+    @    WARNING: REMOTE HOST IDENTIFICATION HAS CHANGED!     @
+    @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+    IT IS POSSIBLE THAT SOMEONE IS DOING SOMETHING NASTY!
+    Someone could be eavesdropping on you right now (man-in-the-middle attack)!
+    It is also possible that a host key has just been changed.
+    The fingerprint for the ECDSA key sent by the remote host is
+    SHA256:Az7QjapOgHYhMtk5JbeOKPK+UdxAyrYd8DWno7vJtB0.
+    Please contact your system administrator.
+    Add correct host key in /Users/martin/.ssh/known_hosts to get rid of this message.
+    Offending ECDSA key in /Users/martin/.ssh/known_hosts:43
+    Host key for [127.0.0.1]:2222 has changed and you have requested strict checking.
+    Host key verification failed.
+  unreachable: true
+```
+
+It may be because you already have a `known_host` registered with the same IP:PORT entry
+
+To solve this, remove it from the entries using `ssh-keygen -R [127.0.0.1]:2222`
