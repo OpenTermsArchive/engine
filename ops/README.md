@@ -194,9 +194,11 @@ Each instance should have a responsible entity, which we currently model as a [â
 Note that the VM needs to be started before running any commands with `vagrant up`.
 
 If youâ€™re on an Apple Silicon machine or want to use Docker instead of VirtualBox, type `vagrant up --provider=docker`.
+
 ### Additional dependencies
 
-To test the changes without impacting the production server, a Vagrantfile is provided to test the changes locally in a virtual machine. <br />[Vagrant](https://www.vagrantup.com/docs/installation/) and [VirtualBox](https://www.vagrantup.com/docs/installation/) or [Docker](https://docs.docker.com/get-docker/) are therefore required.
+To test the changes without impacting the production server, a Vagrantfile is provided to test the changes locally in a virtual machine. 
+[Vagrant](https://www.vagrantup.com/docs/installation/) and [VirtualBox](https://www.virtualbox.org/wiki/Downloads) or [Docker](https://docs.docker.com/get-docker/) are therefore required.
 
 ### SSH with vagrant
 
@@ -230,12 +232,16 @@ You can then deploy the code to the running machine with
 ansible-playbook ops/site.yml
 ```
 
-:warning: When deploying on architecture `aarch64`, [as MongoDB and Chromium install does not work](https://github.com/ambanum/OpenTermsArchive/issues/743), they are skipped in infrastructure installation process. This means you cannot test MongoDB storage with Vagrant on ARM architecture.
+:warning: Since [MongoDB and Chromium cannot be installed on ARM](https://github.com/ambanum/OpenTermsArchive/issues/743), they are skipped in infrastructure installation process. This means you cannot test MongoDB storage with Vagrant on ARM architecture.
 
 **Connect to the running machine**
+
 ```
 vagrant ssh
 ```
+
+and use `vagrant` as password
+
 
 **Stop and destroy**
 

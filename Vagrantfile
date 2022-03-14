@@ -1,13 +1,6 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-$installPython3 = <<-SCRIPT
-echo Updating apt...
-sudo apt-get update --fix-missing # Needed to fix "No package matching 'chromium' is available"
-echo Installing python...
-sudo apt-get install python3 python3-pip -y
-SCRIPT
-
 Vagrant.configure("2") do |config|
   config.vm.hostname = "vagrant"
 
@@ -35,3 +28,10 @@ Vagrant.configure("2") do |config|
     config.vm.provision "install_python3", type: "shell", inline: $installPython3
   end
 end
+
+$installPython3 = <<-SCRIPT
+echo Updating apt...
+sudo apt-get update --fix-missing # Needed to fix "No package matching 'chromium' is available"
+echo Installing python...
+sudo apt-get install python3 python3-pip -y
+SCRIPT
