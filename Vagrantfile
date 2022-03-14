@@ -34,5 +34,5 @@ $installPython3 = <<-SCRIPT
 echo Updating apt...
 sudo apt-get update --fix-missing # Needed to fix "No package matching 'chromium' is available"
 echo Installing python...
-sudo apt-get install python3 python3-pip -y
+sudo apt-get --assume-yes install python3 python3-pip
 SCRIPT
