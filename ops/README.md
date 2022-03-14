@@ -1,8 +1,6 @@
 # Open Terms Archive Ops
 
-Recipes to set up the infrastructure for the Open Terms Archive app and deploy it.
-
-> Recettes pour mettre en place l'infrastructure et déployer l'application Open Terms Archive
+Recipes to set up the infrastructure of and deploy Open Terms Archive.
 
 ## Requirements
 
