@@ -228,7 +228,7 @@ You can then deploy the code to the running machine with:
 ansible-playbook ops/site.yml
 ```
 
-:warning: Since [MongoDB and Chromium cannot be installed on ARM](https://github.com/ambanum/OpenTermsArchive/issues/743), they are skipped in infrastructure installation process. This means you cannot test MongoDB storage with Vagrant on ARM architecture.
+:warning: Since [MongoDB cannot be installed on ARM](https://github.com/ambanum/OpenTermsArchive/issues/743), it is skipped in the infrastructure installation process. This means you cannot test MongoDB storage with Vagrant on ARM architecture.
 
 ##### Connect to the running machine
 
