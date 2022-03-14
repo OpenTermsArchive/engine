@@ -35,7 +35,7 @@ To export, publish dataset and remove local copy:
 node scripts/dataset/main.js --publish --remove-local-copy
 ```
 
-To schedule export, publication and local copy removal:
+To schedule export, publishing and local copy removal:
 
 ```sh
 node scripts/dataset/main.js --schedule --publish --remove-local-copy
