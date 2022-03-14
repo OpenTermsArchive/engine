@@ -203,9 +203,9 @@ In order to automatically set up a virtual machine:
 
 ### Launch
 
-```
-vagrant up  # if you’re on an Apple Silicon processor or want to use Docker instead of VirtualBox, add ` --provider=docker`
-```
+If you’re on an Apple Silicon processor or want to use Docker instead of VirtualBox, use `vagrant up --provider=docker`.
+
+In all other cases, use `vagrant up` 🙂
 
 You can then deploy the code to the running machine with `ansible-playbook ops/site.yml` and all the options described above.
 
