@@ -16,8 +16,6 @@ const RELEASE_HOURS_INTERVAL = 24;
     return release({ shouldPublish, shouldRemoveLocalCopy, fileName });
   }
 
-  logger.info(`A release will be published every ${RELEASE_HOURS_INTERVAL} hours\n`);
-
   setInterval(async () => {
     await release({ shouldPublish, shouldRemoveLocalCopy, fileName });
   }, RELEASE_HOURS_INTERVAL * 60 * 60 * 1000);
