@@ -104,44 +104,6 @@ You can get logs by connecting to the target machine over SSH and obtaining logs
 ssh user@machine pm2 logs ota
 ```
 
-### Troubleshooting
-
-If you have the following error:
-
-```
-Failed to connect to the host via ssh: ssh: connect to host 127.0.0.1 port 2222: Connection refused
-```
-
-You may have a collision on the default port `2222` used by vagrant to forward ssh commands.
-Run the following command to know which ports are forwarded for the virtual machine:
-
-```
-vagrant port
-```
-
-It should display something like that:
-
-```
-The forwarded ports for the machine are listed below. Please note that
-these values may differ from values configured in the Vagrantfile if the
-provider supports automatic port collision detection and resolution.
-
-    22 (guest) => 2200 (host)
-```
-
-Modify ansible ssh options to the `ops/inventories/dev.yml` file with the proper `ansible_ssh_port`:
-
-```
-all:
-  children:
-    dev:
-      hosts:
-        '127.0.0.1':
-          […]
-          ansible_ssh_port: 2200
-          […]
-```
-
 ## Process
 
 To avoid breaking the production when making changes you can follow this process:
@@ -242,3 +204,41 @@ fatal: [127.0.0.1]: UNREACHABLE! => changed=false
 ```
 
 It may be because you already have a `known_host` registered with the same IP and port. To solve this, remove it from the entries using `ssh-keygen -R [127.0.0.1]:2222`.
+
+#### Troubleshooting: Connection refused
+
+If you have the following error:
+
+```
+Failed to connect to the host via ssh: ssh: connect to host 127.0.0.1 port 2222: Connection refused
+```
+
+You may have a collision on the default port `2222` used by Vagrant to forward SSH commands.
+Run the following command to know which ports are forwarded for the virtual machine:
+
+```
+vagrant port
+```
+
+It should display something like that:
+
+```
+The forwarded ports for the machine are listed below. Please note that
+these values may differ from values configured in the Vagrantfile if the
+provider supports automatic port collision detection and resolution.
+
+    22 (guest) => 2200 (host)
+```
+
+Modify the Ansible SSH options to the `ops/inventories/dev.yml` file with the proper `ansible_ssh_port`:
+
+```
+all:
+  children:
+    dev:
+      hosts:
+        '127.0.0.1':
+          […]
+          ansible_ssh_port: 2200
+          […]
+```
