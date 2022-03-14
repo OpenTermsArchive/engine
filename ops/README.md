@@ -200,9 +200,9 @@ If you’re on an Apple Silicon machine or want to use Docker instead of Virtual
 To test the changes without impacting the production server, a Vagrantfile is provided to test the changes locally in a virtual machine. 
 [Vagrant](https://www.vagrantup.com/docs/installation/) and [VirtualBox](https://www.virtualbox.org/wiki/Downloads) or [Docker](https://docs.docker.com/get-docker/) are therefore required.
 
-### SSH with vagrant
+### SSH with Vagrant
 
-In order to be able to connect to vagrant through SSH, and deploy with ansible, you need to create a custom SSH key by using:
+In order to deploy with Ansible in Vagrant, you need to create a custom SSH key with no password by using:
 
 ```
 ssh-keygen -t rsa -f ~/.ssh/ota-vagrant -q -N ""
@@ -212,21 +212,17 @@ ssh-keygen -t rsa -f ~/.ssh/ota-vagrant -q -N ""
 
 VirtualBox is not compatible with Apple Silicon (M1…) processors. You will thus need to use the Docker provider.
 
-**Setup**
+##### Setup
 
-Install the `docker` plugin
+Install Docker Desktop with the [official installer](https://docs.docker.com/get-docker/) or with `brew install docker`.
 
-```
-vagrant plugin install docker
-```
-
-**Launch**
+##### Launch
 
 ```
 vagrant up --provider=docker
 ```
 
-You can then deploy the code to the running machine with
+You can then deploy the code to the running machine with:
 
 ```
 ansible-playbook ops/site.yml
@@ -234,7 +230,7 @@ ansible-playbook ops/site.yml
 
 :warning: Since [MongoDB and Chromium cannot be installed on ARM](https://github.com/ambanum/OpenTermsArchive/issues/743), they are skipped in infrastructure installation process. This means you cannot test MongoDB storage with Vagrant on ARM architecture.
 
-**Connect to the running machine**
+##### Connect to the running machine
 
 ```
 vagrant ssh
@@ -242,8 +238,7 @@ vagrant ssh
 
 and use `vagrant` as password
 
-
-**Stop and destroy**
+##### Stop and destroy
 
 ```
 vagrant halt # stop machine

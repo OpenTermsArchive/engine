@@ -21,7 +21,7 @@ Vagrant.configure("2") do |config|
     docker.create_args = ["--cgroupns=host"]
 
     # python is not installed by default in the vagrant-provider image
-    # and depoying result in  /bin/sh: 1: /usr/bin/python: not found
+    # and deploying results in  /bin/sh: 1: /usr/bin/python: not found
     # use a provision to fix that
     # only with debian, no need with ubuntu
     # Also need to name the provisioner, so that it runs only once https://github.com/hashicorp/vagrant/issues/7685#issuecomment-308281283
