@@ -205,7 +205,7 @@ To test the changes without impacting the production server, a Vagrantfile is pr
 In order to deploy with Ansible in Vagrant, you need to create a custom SSH key with no password by using:
 
 ```
-ssh-keygen -t rsa -f ~/.ssh/ota-vagrant -q -N ""
+ssh-keygen -f ~/.ssh/ota-vagrant -q -N ""
 ```
 
 #### On a Mac with an Apple Silicon processor
