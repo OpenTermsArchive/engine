@@ -189,65 +189,46 @@ Each instance should have a responsible entity, which we currently model as a [�
 
 ## Development
 
-Note that the VM needs to be started before running any commands with `vagrant up`.
+In order to try out the infrastructure setup, we use virtual machines. We use [Vagrant](https://www.vagrantup.com) to describe and spawn these virtual machines with a simple `vagrant up` command.
 
-If you’re on an Apple Silicon machine or want to use Docker instead of VirtualBox, type `vagrant up --provider=docker`.
+### Dependencies
 
-### Additional dependencies
+In order to automatically set up a virtual machine:
 
-To test the changes without impacting the production server, a Vagrantfile is provided to test the changes locally in a virtual machine. 
-[Vagrant](https://www.vagrantup.com/docs/installation/) and [VirtualBox](https://www.virtualbox.org/wiki/Downloads) or [Docker](https://docs.docker.com/get-docker/) are therefore required.
+1. Install [Vagrant](https://www.vagrantup.com/docs/installation/).
+2. Install [VirtualBox](https://www.virtualbox.org/wiki/Downloads) to manage virtual machines. If you prefer Docker, or have an Apple Silicon machine, install [Docker](https://docs.docker.com/get-docker/) instead.
+3. Create a dedicated SSH key with no password: `ssh-keygen -f ~/.ssh/ota-vagrant -q -N ""`. This key will be automatically used by Vagrant.
 
-### SSH with Vagrant
+> VirtualBox is not compatible with Apple Silicon (M1…) processors. If you have such a machine, you will need to use the Docker provider. Since MongoDB cannot be installed on ARM, it is skipped in the infrastructure installation process. This means you cannot test the MongoDB storage adapter with Vagrant with an Apple Silicon processor.
 
-In order to deploy with Ansible in Vagrant, you need to create a custom SSH key with no password by using:
-
-```
-ssh-keygen -f ~/.ssh/ota-vagrant -q -N ""
-```
-
-#### On a Mac with an Apple Silicon processor
-
-VirtualBox is not compatible with Apple Silicon (M1…) processors. You will thus need to use the Docker provider.
-
-##### Setup
-
-Install Docker Desktop with the [official installer](https://docs.docker.com/get-docker/) or with `brew install docker`.
-
-##### Launch
+### Launch
 
 ```
-vagrant up --provider=docker
+vagrant up  # if you’re on an Apple Silicon processor or want to use Docker instead of VirtualBox, add ` --provider=docker`
 ```
 
-You can then deploy the code to the running machine with:
+You can then deploy the code to the running machine with `ansible-playbook ops/site.yml` and all the options described above.
+
+### Vagrant quick reference
+
+#### Connect to the virtual machine
 
 ```
-ansible-playbook ops/site.yml
+vagrant up
+vagrant ssh  # use "vagrant" as password
 ```
 
-:warning: Since [MongoDB cannot be installed on ARM](https://github.com/ambanum/OpenTermsArchive/issues/743), it is skipped in the infrastructure installation process. This means you cannot test MongoDB storage with Vagrant on ARM architecture.
-
-##### Connect to the running machine
+#### Start again with a clean virtual machine
 
 ```
-vagrant ssh
+vagrant halt  # stop machine
+vagrant destroy  # remove machine
+vagrant up
 ```
 
-and use `vagrant` as password
+#### Troubleshooting: Remote host identification has changed
 
-##### Stop and destroy
-
-```
-vagrant halt # stop machine
-vagrant destroy -f # remove machine
-```
-
-### TroubleShooting
-
-#### REMOTE HOST IDENTIFICATION HAS CHANGED
-
-In case you get that kind of error
+In case you get that kind of error:
 
 ```
 fatal: [127.0.0.1]: UNREACHABLE! => changed=false
@@ -256,18 +237,8 @@ fatal: [127.0.0.1]: UNREACHABLE! => changed=false
     @    WARNING: REMOTE HOST IDENTIFICATION HAS CHANGED!     @
     @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
     IT IS POSSIBLE THAT SOMEONE IS DOING SOMETHING NASTY!
-    Someone could be eavesdropping on you right now (man-in-the-middle attack)!
-    It is also possible that a host key has just been changed.
-    The fingerprint for the ECDSA key sent by the remote host is
-    SHA256:Az7QjapOgHYhMtk5JbeOKPK+UdxAyrYd8DWno7vJtB0.
-    Please contact your system administrator.
-    Add correct host key in /Users/martin/.ssh/known_hosts to get rid of this message.
-    Offending ECDSA key in /Users/martin/.ssh/known_hosts:43
-    Host key for [127.0.0.1]:2222 has changed and you have requested strict checking.
-    Host key verification failed.
+    …
   unreachable: true
 ```
 
-It may be because you already have a `known_host` registered with the same IP:PORT entry
-
-To solve this, remove it from the entries using `ssh-keygen -R [127.0.0.1]:2222`
+It may be because you already have a `known_host` registered with the same IP and port. To solve this, remove it from the entries using `ssh-keygen -R [127.0.0.1]:2222`.
