@@ -104,44 +104,6 @@ You can get logs by connecting to the target machine over SSH and obtaining logs
 ssh user@machine pm2 logs ota
 ```
 
-### Troubleshooting
-
-If you have the following error:
-
-```
-Failed to connect to the host via ssh: ssh: connect to host 127.0.0.1 port 2222: Connection refused
-```
-
-You may have a collision on the default port `2222` used by vagrant to forward ssh commands.
-Run the following command to know which ports are forwarded for the virtual machine:
-
-```
-vagrant port
-```
-
-It should display something like that:
-
-```
-The forwarded ports for the machine are listed below. Please note that
-these values may differ from values configured in the Vagrantfile if the
-provider supports automatic port collision detection and resolution.
-
-    22 (guest) => 2200 (host)
-```
-
-Modify ansible ssh options to the `ops/inventories/dev.yml` file with the proper `ansible_ssh_port`:
-
-```
-all:
-  children:
-    dev:
-      hosts:
-        '127.0.0.1':
-          […]
-          ansible_ssh_port: 2200
-          […]
-```
-
 ## Process
 
 To avoid breaking the production when making changes you can follow this process:
@@ -189,65 +151,46 @@ Each instance should have a responsible entity, which we currently model as a [�
 
 ## Development
 
-Note that the VM needs to be started before running any commands with `vagrant up`.
+In order to try out the infrastructure setup, we use virtual machines. We use [Vagrant](https://www.vagrantup.com) to describe and spawn these virtual machines with a simple `vagrant up` command.
 
-If you’re on an Apple Silicon machine or want to use Docker instead of VirtualBox, type `vagrant up --provider=docker`.
+### Dependencies
 
-### Additional dependencies
+In order to automatically set up a virtual machine:
 
-To test the changes without impacting the production server, a Vagrantfile is provided to test the changes locally in a virtual machine. 
-[Vagrant](https://www.vagrantup.com/docs/installation/) and [VirtualBox](https://www.virtualbox.org/wiki/Downloads) or [Docker](https://docs.docker.com/get-docker/) are therefore required.
+1. Install [Vagrant](https://www.vagrantup.com/docs/installation/).
+2. Install [VirtualBox](https://www.virtualbox.org/wiki/Downloads) to manage virtual machines. If you prefer Docker, or have an Apple Silicon machine, install [Docker](https://docs.docker.com/get-docker/) instead.
+3. Create a dedicated SSH key with no password: `ssh-keygen -f ~/.ssh/ota-vagrant -q -N ""`. This key will be automatically used by Vagrant.
 
-### SSH with Vagrant
+> VirtualBox is not compatible with Apple Silicon (M1…) processors. If you have such a machine, you will need to use the Docker provider. Since MongoDB cannot be installed on ARM, it is skipped in the infrastructure installation process. This means you cannot test the MongoDB storage adapter with Vagrant with an Apple Silicon processor.
 
-In order to deploy with Ansible in Vagrant, you need to create a custom SSH key with no password by using:
+### Launch
 
-```
-ssh-keygen -f ~/.ssh/ota-vagrant -q -N ""
-```
+If you’re on an Apple Silicon processor or want to use Docker instead of VirtualBox, use `vagrant up --provider=docker`.
 
-#### On a Mac with an Apple Silicon processor
+In all other cases, use `vagrant up` 🙂
 
-VirtualBox is not compatible with Apple Silicon (M1…) processors. You will thus need to use the Docker provider.
+You can then deploy the code to the running machine with `ansible-playbook ops/site.yml` and all the options described above.
 
-##### Setup
+### Vagrant quick reference
 
-Install Docker Desktop with the [official installer](https://docs.docker.com/get-docker/) or with `brew install docker`.
-
-##### Launch
+#### Connect to the virtual machine
 
 ```
-vagrant up --provider=docker
+vagrant up
+vagrant ssh  # use "vagrant" as password
 ```
 
-You can then deploy the code to the running machine with:
+#### Start again with a clean virtual machine
 
 ```
-ansible-playbook ops/site.yml
+vagrant halt  # stop machine
+vagrant destroy  # remove machine
+vagrant up
 ```
 
-:warning: Since [MongoDB cannot be installed on ARM](https://github.com/ambanum/OpenTermsArchive/issues/743), it is skipped in the infrastructure installation process. This means you cannot test MongoDB storage with Vagrant on ARM architecture.
+#### Troubleshooting: Remote host identification has changed
 
-##### Connect to the running machine
-
-```
-vagrant ssh
-```
-
-and use `vagrant` as password
-
-##### Stop and destroy
-
-```
-vagrant halt # stop machine
-vagrant destroy -f # remove machine
-```
-
-### TroubleShooting
-
-#### REMOTE HOST IDENTIFICATION HAS CHANGED
-
-In case you get that kind of error
+In case you get that kind of error:
 
 ```
 fatal: [127.0.0.1]: UNREACHABLE! => changed=false
@@ -256,18 +199,46 @@ fatal: [127.0.0.1]: UNREACHABLE! => changed=false
     @    WARNING: REMOTE HOST IDENTIFICATION HAS CHANGED!     @
     @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
     IT IS POSSIBLE THAT SOMEONE IS DOING SOMETHING NASTY!
-    Someone could be eavesdropping on you right now (man-in-the-middle attack)!
-    It is also possible that a host key has just been changed.
-    The fingerprint for the ECDSA key sent by the remote host is
-    SHA256:Az7QjapOgHYhMtk5JbeOKPK+UdxAyrYd8DWno7vJtB0.
-    Please contact your system administrator.
-    Add correct host key in /Users/martin/.ssh/known_hosts to get rid of this message.
-    Offending ECDSA key in /Users/martin/.ssh/known_hosts:43
-    Host key for [127.0.0.1]:2222 has changed and you have requested strict checking.
-    Host key verification failed.
+    …
   unreachable: true
 ```
 
-It may be because you already have a `known_host` registered with the same IP:PORT entry
+It may be because you already have a `known_host` registered with the same IP and port. To solve this, remove it from the entries using `ssh-keygen -R [127.0.0.1]:2222`.
 
-To solve this, remove it from the entries using `ssh-keygen -R [127.0.0.1]:2222`
+#### Troubleshooting: Connection refused
+
+If you have the following error:
+
+```
+Failed to connect to the host via ssh: ssh: connect to host 127.0.0.1 port 2222: Connection refused
+```
+
+You may have a collision on the default port `2222` used by Vagrant to forward SSH commands.
+Run the following command to know which ports are forwarded for the virtual machine:
+
+```
+vagrant port
+```
+
+It should display something like that:
+
+```
+The forwarded ports for the machine are listed below. Please note that
+these values may differ from values configured in the Vagrantfile if the
+provider supports automatic port collision detection and resolution.
+
+    22 (guest) => 2200 (host)
+```
+
+Modify the Ansible SSH options to the `ops/inventories/dev.yml` file with the proper `ansible_ssh_port`:
+
+```
+all:
+  children:
+    dev:
+      hosts:
+        '127.0.0.1':
+          […]
+          ansible_ssh_port: 2200
+          […]
+```
