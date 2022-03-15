@@ -1,29 +1,18 @@
 # Open Terms Archive Ops
 
-Recipes to set up the infrastructure for the Open Terms Archive app and deploy it.
-
-> Recettes pour mettre en place l'infrastructure et déployer l'application Open Terms Archive
+Recipes to set up the infrastructure of and deploy Open Terms Archive.
 
 ## Requirements
 
 - Install [Ansible](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html)
 
-### [For development only] Additional dependencies
-
-To test the changes without impacting the production server, a Vagrantfile is provided to test the changes locally in a virtual machine. VirtualBox and Vagrant are therefore required.
-
-- Install [VirtualBox](https://www.vagrantup.com/docs/installation/)
-- Install [Vagrant](https://www.vagrantup.com/docs/installation/)
-
-**:warning: VirtualBox does not currently support Apple Silicon architecture**, so it's not possible to use Vagrant to test changes locally with theses machines.
-
 ## Usage
 
-To avoid making changes on the production server by mistake, by default all commands will only affect the Vagrant development virtual machine (VM). Note that the VM needs to be started before with `vagrant up`.\
+_To avoid making changes on the production server by mistake, by default all commands will only affect the Vagrant development virtual machine (VM), see [Development section](#development) for more details._
 
-To execute commands on the production servers you should specify it by adding the option `--inventory ops/inventories/production.yml` to the following commands:
+_To execute commands on the production server you should specify it by adding the option `--inventory ops/inventories/production.yml` to the following commands:_
 
-- To setup a full [(phoenix)](https://martinfowler.com/bliki/PhoenixServer.html) server:
+- To set up a full [(phoenix)](https://martinfowler.com/bliki/PhoenixServer.html) server:
 
 ```
 ansible-playbook ops/site.yml
@@ -115,44 +104,6 @@ You can get logs by connecting to the target machine over SSH and obtaining logs
 ssh user@machine pm2 logs ota
 ```
 
-### Troubleshooting
-
-If you have the following error:
-
-```
-Failed to connect to the host via ssh: ssh: connect to host 127.0.0.1 port 2222: Connection refused
-```
-
-You may have a collision on the default port `2222` used by vagrant to forward ssh commands.
-Run the following command to know which ports are forwarded for the virtual machine:
-
-```
-vagrant port
-```
-
-It should display something like that:
-
-```
-The forwarded ports for the machine are listed below. Please note that
-these values may differ from values configured in the Vagrantfile if the
-provider supports automatic port collision detection and resolution.
-
-    22 (guest) => 2200 (host)
-```
-
-Modify ansible ssh options to the `ops/inventories/dev.yml` file with the proper `ansible_ssh_port`:
-
-```
-all:
-  children:
-    dev:
-      hosts:
-        '127.0.0.1':
-          […]
-          ansible_ssh_port: 2200
-          […]
-```
-
 ## Process
 
 To avoid breaking the production when making changes you can follow this process:
@@ -197,6 +148,100 @@ Create the `snapshot` and `version` repositories, with:
 The @OTA-Bot GitHub user should have write access to all three (declarations, snapshots, versions) repositories, so it can publish data, create issues, and publish dataset releases.
 
 Each instance should have a responsible entity, which we currently model as a [“team” in the @OpenTermsArchive](https://github.com/orgs/OpenTermsArchive/teams) GitHub organisation. Each team has write access to the three repositories, and @OTA-Bot should be added to that team along with the human maintainers.
+
+## Development
+
+In order to try out the infrastructure setup, we use virtual machines. We use [Vagrant](https://www.vagrantup.com) to describe and spawn these virtual machines with a simple `vagrant up` command.
+
+### Dependencies
+
+In order to automatically set up a virtual machine:
+
+1. Install [Vagrant](https://www.vagrantup.com/docs/installation/).
+2. Install [VirtualBox](https://www.virtualbox.org/wiki/Downloads) to manage virtual machines. If you prefer Docker, or have an Apple Silicon machine, install [Docker](https://docs.docker.com/get-docker/) instead.
+3. Create a dedicated SSH key with no password: `ssh-keygen -f ~/.ssh/ota-vagrant -q -N ""`. This key will be automatically used by Vagrant.
+
+> VirtualBox is not compatible with Apple Silicon (M1…) processors. If you have such a machine, you will need to use the Docker provider. Since MongoDB cannot be installed on ARM, it is skipped in the infrastructure installation process. This means you cannot test the MongoDB storage adapter with Vagrant with an Apple Silicon processor.
+
+### Launch
+
+If you’re on an Apple Silicon processor or want to use Docker instead of VirtualBox, use `vagrant up --provider=docker`.
+
+In all other cases, use `vagrant up` 🙂
+
+You can then deploy the code to the running machine with `ansible-playbook ops/site.yml` and all the options described above.
+
+### Vagrant quick reference
+
+#### Connect to the virtual machine
+
+```
+vagrant up
+vagrant ssh  # use "vagrant" as password
+```
+
+#### Start again with a clean virtual machine
+
+```
+vagrant halt  # stop machine
+vagrant destroy  # remove machine
+vagrant up
+```
+
+#### Troubleshooting: Remote host identification has changed
+
+In case you get that kind of error:
+
+```
+fatal: [127.0.0.1]: UNREACHABLE! => changed=false
+  msg: |-
+    Failed to connect to the host via ssh: @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+    @    WARNING: REMOTE HOST IDENTIFICATION HAS CHANGED!     @
+    @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+    IT IS POSSIBLE THAT SOMEONE IS DOING SOMETHING NASTY!
+    …
+  unreachable: true
+```
+
+It may be because you already have a `known_host` registered with the same IP and port. To solve this, remove it from the entries using `ssh-keygen -R [127.0.0.1]:2222`.
+
+#### Troubleshooting: Connection refused
+
+If you have the following error:
+
+```
+Failed to connect to the host via ssh: ssh: connect to host 127.0.0.1 port 2222: Connection refused
+```
+
+You may have a collision on the default port `2222` used by Vagrant to forward SSH commands.
+Run the following command to know which ports are forwarded for the virtual machine:
+
+```
+vagrant port
+```
+
+It should display something like that:
+
+```
+The forwarded ports for the machine are listed below. Please note that
+these values may differ from values configured in the Vagrantfile if the
+provider supports automatic port collision detection and resolution.
+
+    22 (guest) => 2200 (host)
+```
+
+Modify the Ansible SSH options to the `ops/inventories/dev.yml` file with the proper `ansible_ssh_port`:
+
+```
+all:
+  children:
+    dev:
+      hosts:
+        '127.0.0.1':
+          […]
+          ansible_ssh_port: 2200
+          […]
+```
 
 ## Optimise performance
 
