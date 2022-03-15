@@ -6,14 +6,17 @@
     "versions": {
       "storage": {
         "git": {
-          "path": "../ota-versions-france-elections"
+          "path": "../ota-versions-france-elections",
+          "prefixMessageToSnapshotId": "This version was recorded after filtering snapshot https://github.com/OpenTermsArchive/snapshots-france-elections/commit/",
+          "publish": true
         }
       }
     },
     "snapshots": {
       "storage": {
         "git": {
-          "path": "../ota-snapshots-france-elections"
+          "path": "../ota-snapshots-france-elections",
+          "publish": true
         }
       }
     }
