@@ -1,0 +1,40 @@
+{
+  "services": {
+    "declarationsPath": "../ota-declarations-france-elections/declarations"
+  },
+  "recorder": {
+    "versions": {
+      "storage": {
+        "git": {
+          "path": "../ota-versions-france-elections"
+        }
+      }
+    },
+    "snapshots": {
+      "storage": {
+        "git": {
+          "path": "../ota-snapshots-france-elections"
+        }
+      }
+    }
+  },
+  "fetcher": {
+    "language": "fr"
+  },
+  "logger": {
+    "sendMailOnError": {
+      "to": "admin@opentermsarchive.org",
+      "from": "noreply@opentermsarchive.org",
+      "sendWarnings": false
+    }
+  },
+  "tracker": {
+    "githubIssues": {
+      "repository": "OpenTermsArchive/declarations-france-elections"
+    }
+  },
+  "dataset": {
+    "servicesRepositoryName": "declarations-france-elections",
+    "versionsRepositoryURL": "https://github.com/OpenTermsArchive/versions-france-elections"
+  }
+}
