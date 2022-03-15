@@ -51,92 +51,92 @@
   "Community Guidelines - Self-harm": {
     "commitment": {
       "writer": "service provider",
-      "audience": "end user",
-      "object": ""
+      "audience": "content-publishing user",
+      "object": "content depicting, encouraging or glorifying suicide, eating disorders, self-harm"
     }
   },
   "Community Guidelines - Hate Speech": {
     "commitment": {
       "writer": "service provider",
-      "audience": "end user",
-      "object": ""
+      "audience": "content-publishing user",
+      "object": "content or behavior that threatens, incites violence against, dehumanizes an individual or a group on the basis of protected attributes such as race, ethnicity, gender, sexual orientation…"
     }
   },
   "Community Guidelines - Child Sexual Exploitation": {
     "commitment": {
       "writer": "service provider",
-      "audience": "end user",
-      "object": ""
+      "audience": "content-publishing user",
+      "object": "material that features or promotes the sexual exploitation of minors"
     }
   },
   "Community Guidelines - Violence Incitement": {
     "commitment": {
       "writer": "service provider",
-      "audience": "end user",
-      "object": ""
+      "audience": "content-publishing user",
+      "object": "content threatening, inciting or facilitating offline violence"
     }
   },
   "Community Guidelines - Violent Organizations": {
     "commitment": {
       "writer": "service provider",
       "audience": "end user",
-      "object": ""
+      "object": "accounts for individuals or groups that engage in or promote offline violence or organized criminal activity"
     }
   },
   "Community Guidelines - Spam": {
     "commitment": {
       "writer": "service provider",
-      "audience": "end user",
-      "object": ""
+      "audience": "content-publishing user",
+      "object": "untargeted, irrelevant, obviously unwanted, unauthorized commercial or promotional content"
+    }
+  },
+  "Community Guidelines - Inauthentic Behaviour and Platform Manipulation": {
+    "commitment": {
+      "writer": "service provider",
+      "audience": "everyone",
+      "object": "behaviour aimed at artificially amplifying or suppressing content visibility"
     }
   },
   "Community Guidelines - Regulated Goods": {
     "commitment": {
       "writer": "service provider",
-      "audience": "end user",
-      "object": ""
+      "audience": "everyone",
+      "object": "selling, buying, or facilitating transactions in illegal or regulated goods or services (drugs, medication, weapons…)"
     }
   },
   "Community Guidelines - Harassment": {
     "commitment": {
       "writer": "service provider",
-      "audience": "end user",
-      "object": ""
+      "audience": "content-publishing user",
+      "object": "content containing or engaging others to use abusive language, doxxing, intimidation against an individual"
+    }
+  },
+  "Community Guidelines - Privacy Violations": {
+    "commitment": {
+      "writer": "service provider",
+      "audience": "content-publishing user",
+      "object": "content containing or inciting sharing people's private information or media without their permission"
     }
   },
   "Community Guidelines - Misinformation": {
     "commitment": {
       "writer": "service provider",
-      "audience": "end user",
-      "object": ""
+      "audience": "content-publishing user",
+      "object": "demonstrably false or misleading information which may lead to physical harm, electoral processes disruption or other systemic harms"
     }
   },
   "Community Guidelines - Adult Nudity": {
     "commitment": {
       "writer": "service provider",
-      "audience": "end user",
-      "object": ""
+      "audience": "content-publishing user",
+      "object": "consensually produced and distributed media containing adult genitalia or nipples"
     }
   },
   "Community Guidelines - Sexual Solicitation": {
     "commitment": {
       "writer": "service provider",
       "audience": "end user",
-      "object": ""
-    }
-  },
-  "Community Guidelines - Inauthentic Behaviour and Platform Manipulation": {
-    "commitment": {
-      "writer": "service provider",
-      "audience": "end user",
-      "object": ""
-    }
-  },
-  "Community Guidelines - Privacy Violations": {
-    "commitment": {
-      "writer": "service provider",
-      "audience": "end user",
-      "object": ""
+      "object": "expressions of desire, requests for a romantic or sexual relationship"
     }
   },
   "Deceased Users": {
