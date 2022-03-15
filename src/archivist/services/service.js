@@ -50,6 +50,6 @@ export default class Service {
 
   hasHistory() {
     // If service is loaded without its history it could return false even if an history declaration file exists.
-    return !!Object.keys(this._documents).find(documentType => this._documents[documentType]._history);
+    return Boolean(Object.keys(this._documents).find(documentType => this._documents[documentType]._history));
   }
 }

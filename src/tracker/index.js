@@ -15,7 +15,6 @@ const UPDATE_DOCUMENT_LABEL = config.get('tracker.githubIssues.label');
 
 const LOCAL_CONTRIBUTE_URL = 'http://localhost:3000/en/service';
 const CONTRIBUTE_URL = 'https://contribute.opentermsarchive.org/en/service';
-const GITHUB_VERSIONS_URL = 'https://github.com/ambanum/OpenTermsArchive-versions/blob/master';
 const GITHUB_REPO_URL = `https://github.com/${config.get('tracker.githubIssues.repository')}/blob/main/declarations`;
 const GOOGLE_URL = 'https://www.google.com/search?q=';
 
@@ -235,7 +234,6 @@ export default class Tracker {
   ${message404}
 
   And some info about what has already been tracked
-  - See all versions tracked here: ${GITHUB_VERSIONS_URL}/${encodedName}/${encodedType}.md
   - See original JSON file: ${GITHUB_REPO_URL}/${encodedName}.json
 
   Thanks

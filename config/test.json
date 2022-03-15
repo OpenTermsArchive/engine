@@ -41,5 +41,9 @@
   },
   "fetcher": {
     "waitForElementsTimeout": 1000
+  },
+  "dataset": {
+    "servicesRepositoryName": "test-repo",
+    "versionsRepositoryURL": "https://github.com/ambanum/test-repo"
   }
 }

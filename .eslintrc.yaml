@@ -86,10 +86,13 @@ rules:
   multiline-comment-style:
     - error
     - separate-lines
-  eol-last: 
+  eol-last:
     - error
     - always
-    
+  new-cap:
+    - error
+    - properties: false
+
 overrides:
   - files:
       - src/**/*test.js

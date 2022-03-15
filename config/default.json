@@ -5,6 +5,7 @@
   "recorder": {
     "versions": {
       "storage": {
+        "type": "git",
         "git": {
           "path": "./data/versions",
           "publish": false,
@@ -18,6 +19,7 @@
     },
     "snapshots": {
       "storage": {
+        "type": "git",
         "git": {
           "path": "./data/snapshots",
           "publish": false,
@@ -43,7 +45,6 @@
   },
   "notifier": {
     "sendInBlue": {
-      "administratorsListId": 194,
       "updatesListId": 195,
       "updateTemplateId": 21
     }
@@ -55,6 +56,7 @@
     }
   },
   "dataset": {
-    "publish": false
+    "servicesRepositoryName": "sandbox",
+    "versionsRepositoryURL": "https://github.com/OpenTermsArchive/sandbox"
   }
 }

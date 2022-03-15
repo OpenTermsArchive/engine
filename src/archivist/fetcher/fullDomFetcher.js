@@ -1,11 +1,11 @@
 import config from 'config';
 import puppeteer from 'puppeteer-extra';
-import StealthPlugin from 'puppeteer-extra-plugin-stealth';
+import stealthPlugin from 'puppeteer-extra-plugin-stealth';
 import UserAgent from 'user-agents';
 
 import { FetchDocumentError } from './errors.js';
 
-puppeteer.use(StealthPlugin());
+puppeteer.use(stealthPlugin());
 
 const NAVIGATION_TIMEOUT = config.get('fetcher.navigationTimeout');
 const WAIT_FOR_ELEMENTS_TIMEOUT = config.get('fetcher.waitForElementsTimeout');
