@@ -139,6 +139,13 @@
       "object": "expressions of desire, requests for a romantic or sexual relationship"
     }
   },
+    "Community Guidelines - Intellectual Property": {
+    "commitment": {
+      "writer": "service provider",
+      "audience": "content-publishing user",
+      "object": "content containing copyrighted works"
+    }
+  },
   "Deceased Users": {
     "commitment": {
       "writer": "service provider",
