@@ -62,11 +62,11 @@
       "object": "content or behavior that threatens, incites violence against, dehumanizes an individual or a group on the basis of protected attributes such as race, ethnicity, gender, sexual orientation…"
     }
   },
-  "Community Guidelines - Child Sexual Exploitation": {
+  "Community Guidelines - Child Exploitation": {
     "commitment": {
       "writer": "service provider",
       "audience": "content-publishing user",
-      "object": "material that features or promotes the sexual exploitation of minors"
+      "object": "material that features or promotes the exploitation of minors (sexual, emotional…)"
     }
   },
   "Community Guidelines - Violence Incitement": {
@@ -90,11 +90,11 @@
       "object": "untargeted, irrelevant, obviously unwanted, unauthorized commercial or promotional content"
     }
   },
-  "Community Guidelines - Inauthentic Behaviour and Platform Manipulation": {
+  "Community Guidelines - Platform Manipulation": {
     "commitment": {
       "writer": "service provider",
       "audience": "everyone",
-      "object": "behaviour aimed at artificially amplifying or suppressing content visibility"
+      "object": "behaviour aimed at artificially amplifying or suppressing content visibility (fake engagement, inauthentic behaviour…)"
     }
   },
   "Community Guidelines - Regulated Goods": {
@@ -177,7 +177,7 @@
   "Copyright Claims Policy": {
     "commitment": {
       "writer": "service provider",
-      "audience": "anyone",
+      "audience": "copyrighted works rights holders",
       "object": "how copyright complaints (DMCA…) will be handled"
     }
   },
