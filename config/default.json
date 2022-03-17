@@ -27,6 +27,11 @@
             "name": "Open Terms Archive Bot",
             "email": "bot@opentermsarchive.org"
           }
+        },
+        "mongo": {
+          "connectionURI": "mongodb://localhost:27017",
+          "database": "open-terms-archive",
+          "collection": "snapshots"
         }
       }
     }
