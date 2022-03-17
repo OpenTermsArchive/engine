@@ -44,6 +44,10 @@ export default async function fetch(url) {
       content = Buffer.from(await response.arrayBuffer());
     }
 
+    if (!content) {
+      throw new FetchDocumentError(`Received an empty content when fetching '${url}'`);
+    }
+
     return {
       mimeType,
       content,
