@@ -13,6 +13,7 @@
     - update
     - setup
     - stop
+    - update-declarations
 
 - name: Clone Open Terms Archive engine
   git:
