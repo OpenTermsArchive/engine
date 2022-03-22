@@ -1,3 +1,5 @@
+import cron from 'croner';
+
 import Archivist from './archivist/index.js';
 import logger from './logger/index.js';
 import Notifier from './notifier/index.js';
@@ -9,8 +11,6 @@ const args = process.argv.slice(2);
 const refilterOnly = args.includes('--refilter-only');
 const schedule = args.includes('--schedule');
 const extraArgs = args.filter(arg => !arg.startsWith('--'));
-
-const TRACK_CHANGES_HOURS_INTERVAL = 24;
 
 (async function startOpenTermsArchive() {
   const archivist = new Archivist({
@@ -61,9 +61,9 @@ const TRACK_CHANGES_HOURS_INTERVAL = 24;
   }
 
   logger.info('The scheduler is running…');
+  logger.info('Documents will be tracked at minute 30 past hour 03, 09, 15, and 21 every day');
 
-  logger.info(`Documents will be tracked every ${TRACK_CHANGES_HOURS_INTERVAL} hours\n`);
-  setInterval(async () => {
+  cron('30 3,9,15,21 * * *', async () => {
     await archivist.trackChanges(serviceIds);
-  }, TRACK_CHANGES_HOURS_INTERVAL * 60 * 60 * 1000);
+  });
 }());
