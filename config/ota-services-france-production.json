@@ -14,7 +14,8 @@
     },
     "snapshots": {
       "storage": {
-        "type": "mongo"
+        "path": "../ota-snapshots-france",
+        "publish": true
       }
     }
   },
