@@ -12,6 +12,13 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const defaultConfigs = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../config/default.json')));
 
+process.on('unhandledRejection', reason => {
+  // Mocha disables unhandledRejection throw
+  // See https://github.com/mochajs/mocha/blob/master/lib/runner.js#L198
+  // So we re-enable it here
+  throw new Error(reason);
+});
+
 // Initialise configs to allow clients of this module to use it without requiring node-config in their own application.
 // see https://github.com/lorenwest/node-config/wiki/Sub-Module-Configuration
 config.util.setModuleDefaults('services', {
