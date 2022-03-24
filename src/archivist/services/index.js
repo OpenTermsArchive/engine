@@ -25,7 +25,7 @@ export async function load() {
     try {
       serviceDeclaration = JSON.parse(await fs.readFile(jsonDeclarationFilePath));
     } catch (e) {
-      throw new Error(`JSON for document ${jsonDeclarationFilePath} could not be parsed`);
+      throw new Error(`The "${path.basename(fileName, '.json')}" service declaration is malformed and cannot be parsed in ${jsonDeclarationFilePath}`);
     }
     const service = new Service({
       id: path.basename(fileName, '.json'),
@@ -154,7 +154,7 @@ async function loadServiceHistoryFiles(serviceId) {
   try {
     serviceDeclaration = JSON.parse(jsonDeclarationFilePath);
   } catch (e) {
-    throw new Error(`JSON for document ${jsonDeclarationFilePath} could not be parsed`);
+    throw new Error(`The "${path.basename(jsonDeclarationFilePath, '.json')}" service declaration is malformed and cannot be parsed in ${jsonDeclarationFilePath}`);
   }
 
   const serviceHistoryFileName = path.join(declarationsPath, `${serviceId}.history.json`);
@@ -172,7 +172,7 @@ async function loadServiceHistoryFiles(serviceId) {
     try {
       serviceHistory = JSON.parse(await fs.readFile(serviceHistoryFileName));
     } catch (e) {
-      throw new Error(`JSON for document ${serviceHistoryFileName} could not be parsed`);
+      throw new Error(`The "${path.basename(serviceHistoryFileName, '.json')}" service declaration is malformed and cannot be parsed in ${serviceHistoryFileName}`);
     }
   }
 
