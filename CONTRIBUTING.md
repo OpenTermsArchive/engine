@@ -2,6 +2,7 @@ First of all, thanks for taking the time to contribute! 🎉👍
 
 ## Table of Contents
 
+- [New instance naming](#new-instance-naming)
 - [Workflow](#workflow)
   - [Pull requests](#pull-requests)
   - [Peer reviews](#peer-reviews)
@@ -11,6 +12,21 @@ First of all, thanks for taking the time to contribute! 🎉👍
   - [Errors handling](#errors-handling)
 
 ---
+
+## New instance naming
+
+In case you want to create a new instance on the `OpenTermsArchive` organization, please choose an instance name as descriptive as possible.
+
+Here are some examples of existing instances and the kind of declaration files they contain:
+- `contrib`: for any service with no guarantee of quality nor maintenance
+- `france`: for services in french, maintained by UFC Que Choisir and AmbNum
+- `france_elections`: for services in french, maintained during the 2022 French elections
+
+Once you have chosen a understandable instance name, create the corresponding git repositories
+- `{instanceName}-declarations`
+- `{instanceName}-snapshots`
+- `{instanceName}-versions`
+
 ## Workflow
 ### Pull requests
 
