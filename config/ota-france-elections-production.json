@@ -31,6 +31,12 @@
       "sendWarnings": false
     }
   },
+  "notifier": {
+    "sendInBlue": {
+      "updatesListId": 466,
+      "updateTemplateId": 62
+    }
+  },
   "tracker": {
     "githubIssues": {
       "repository": "OpenTermsArchive/declarations-france-elections"
