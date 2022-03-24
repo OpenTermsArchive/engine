@@ -1,6 +1,8 @@
-import { release } from './index.js';
+import cron from 'croner';
 
-const RELEASE_HOURS_INTERVAL = 24;
+import logger from './logger/index.js';
+
+import { release } from './index.js';
 
 const args = process.argv.slice(2);
 const argsWithoutOptions = args.filter(arg => !arg.startsWith('--'));
@@ -16,5 +18,8 @@ const options = {
 if (!shouldSchedule) {
   release(options);
 } else {
-  setInterval(release, RELEASE_HOURS_INTERVAL * 60 * 60 * 1000, options);
+  logger.info('The scheduler is running…');
+  logger.info('Dataset will be published at 08:30 on every Monday');
+
+  cron('30 8 * * MON', () => release(options));
 }
