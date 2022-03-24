@@ -38,6 +38,6 @@
   },
   "dataset": {
     "servicesRepositoryName": "contrib-declarations",
-    "versionsRepositoryURL": "https://github.com/ambanum/OpenTermsArchive-versions"
+    "versionsRepositoryURL": "https://github.com/OpenTermsArchive/contrib-versions"
   }
 }
