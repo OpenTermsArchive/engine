@@ -1,13 +1,13 @@
 {
   "services": {
-    "declarationsPath": "../ota-declarations-france-elections/declarations"
+    "declarationsPath": "../ota-france-elections-declarations/declarations"
   },
   "recorder": {
     "versions": {
       "storage": {
         "git": {
-          "path": "../ota-versions-france-elections",
-          "prefixMessageToSnapshotId": "This version was recorded after filtering snapshot https://github.com/OpenTermsArchive/snapshots-france-elections/commit/",
+          "path": "../ota-france-elections-versions",
+          "prefixMessageToSnapshotId": "This version was recorded after filtering snapshot https://github.com/OpenTermsArchive/france-elections-snapshots/commit/",
           "publish": true
         }
       }
@@ -15,7 +15,7 @@
     "snapshots": {
       "storage": {
         "git": {
-          "path": "../ota-snapshots-france-elections",
+          "path": "../ota-france-elections-snapshots",
           "publish": true
         }
       }
@@ -39,11 +39,11 @@
   },
   "tracker": {
     "githubIssues": {
-      "repository": "OpenTermsArchive/declarations-france-elections"
+      "repository": "OpenTermsArchive/france-elections-declarations"
     }
   },
   "dataset": {
-    "servicesRepositoryName": "declarations-france-elections",
-    "versionsRepositoryURL": "https://github.com/OpenTermsArchive/versions-france-elections"
+    "servicesRepositoryName": "france-elections-declarations",
+    "versionsRepositoryURL": "https://github.com/OpenTermsArchive/france-elections-versions"
   }
 }

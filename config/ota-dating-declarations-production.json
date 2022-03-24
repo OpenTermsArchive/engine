@@ -1,0 +1,46 @@
+{
+  "services": {
+    "declarationsPath": "../ota-dating-declarations/declarations"
+  },
+  "recorder": {
+    "versions": {
+      "storage": {
+        "git": {
+          "path": "../ota-dating-versions",
+          "publish": true,
+          "prefixMessageToSnapshotId": "This version was recorded after filtering snapshot https://github.com/OpenTermsArchive/snapshots-dating/commit/"
+        }
+      }
+    },
+    "snapshots": {
+      "storage": {
+        "git": {
+          "path": "../ota-dating-snapshots",
+          "publish": true
+        }
+      }
+    }
+  },
+  "logger": {
+    "sendMailOnError": {
+      "to": "admin@opentermsarchive.org",
+      "from": "noreply@opentermsarchive.org",
+      "sendWarnings": false
+    }
+  },
+  "notifier": {
+    "sendInBlue": {
+      "updatesListId": 396,
+      "updateTemplateId": 61
+    }
+  },
+  "tracker": {
+    "githubIssues": {
+      "repository": "OpenTermsArchive/dating-declarations"
+    }
+  },
+  "dataset": {
+    "servicesRepositoryName": "dating-declarations",
+    "versionsRepositoryURL": "https://github.com/OpenTermsArchive/dating-versions"
+  }
+}
