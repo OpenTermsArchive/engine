@@ -19,7 +19,6 @@
     repo: '{{ repository }}'
     version: '{{ branch }}'
     dest: '/home/{{ ansible_user }}/{{ directory }}'
-    depth: 1
     accept_hostkey: yes
     key_file: '/home/{{ ansible_user }}/.ssh/ota-bot-key'
   when: existing_repository.before is defined and not existing_repository.before # if existing_repository.before is null, then the repository is new
