@@ -38,11 +38,11 @@ all:
         france_elections:
           hosts:
             198.244.140.194:
-              services_directory: ota-declarations-france-elections
-              services_repository: https://github.com/OpenTermsArchive/declarations-france-elections.git
-              snapshots_directory: ota-snapshots-france-elections
-              snapshots_repository: git@github.com:OpenTermsArchive/snapshots-france-elections.git
+              services_directory: ota-france-elections-declarations
+              services_repository: https://github.com/OpenTermsArchive/france-elections-declarations.git
+              snapshots_directory: ota-france-elections-snapshots
+              snapshots_repository: git@github.com:OpenTermsArchive/france-elections-snapshots.git
               snapshots_branch: main
-              versions_directory: ota-versions-france-elections
-              versions_repository: git@github.com:OpenTermsArchive/versions-france-elections.git
+              versions_directory: ota-france-elections-versions
+              versions_repository: git@github.com:OpenTermsArchive/france-elections-versions.git
               versions_branch: main
