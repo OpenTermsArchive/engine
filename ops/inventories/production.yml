@@ -29,12 +29,12 @@ all:
         france:
           hosts:
             198.244.142.9:
-              services_directory: ota-services-france
-              services_repository: https://github.com/OpenTermsArchive/declarations-france.git
-              snapshots_directory: ota-snapshots-france
-              snapshots_repository: git@github.com:OpenTermsArchive/snapshots-france.git
-              versions_directory: ota-versions-france
-              versions_repository: git@github.com:OpenTermsArchive/versions-france.git
+              services_directory: ota-france-declarations
+              services_repository: https://github.com/OpenTermsArchive/france-declarations.git
+              snapshots_directory: ota-france-snapshots
+              snapshots_repository: git@github.com:OpenTermsArchive/france-snapshots.git
+              versions_directory: ota-france-versions
+              versions_repository: git@github.com:OpenTermsArchive/france-versions.git
         france_elections:
           hosts:
             198.244.140.194:
