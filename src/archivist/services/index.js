@@ -19,7 +19,14 @@ export async function load() {
   const serviceFileNames = fileNames.filter(fileName => path.extname(fileName) == '.json' && !fileName.includes('.history.json'));
 
   await Promise.all(serviceFileNames.map(async fileName => {
-    const serviceDeclaration = JSON.parse(await fs.readFile(path.join(declarationsPath, fileName)));
+    const jsonDeclarationFilePath = path.join(declarationsPath, fileName);
+    let serviceDeclaration;
+
+    try {
+      serviceDeclaration = JSON.parse(await fs.readFile(jsonDeclarationFilePath));
+    } catch (e) {
+      throw new Error(`The "${path.basename(fileName, '.json')}" service declaration is malformed and cannot be parsed in ${jsonDeclarationFilePath}`);
+    }
     const service = new Service({
       id: path.basename(fileName, '.json'),
       name: serviceDeclaration.name,
@@ -141,7 +148,14 @@ function sortHistory(history = {}) {
 
 async function loadServiceHistoryFiles(serviceId) {
   const serviceFileName = path.join(declarationsPath, `${serviceId}.json`);
-  const serviceDeclaration = JSON.parse(await fs.readFile(serviceFileName));
+  const jsonDeclarationFilePath = await fs.readFile(serviceFileName);
+  let serviceDeclaration;
+
+  try {
+    serviceDeclaration = JSON.parse(jsonDeclarationFilePath);
+  } catch (e) {
+    throw new Error(`The "${path.basename(jsonDeclarationFilePath, '.json')}" service declaration is malformed and cannot be parsed in ${jsonDeclarationFilePath}`);
+  }
 
   const serviceHistoryFileName = path.join(declarationsPath, `${serviceId}.history.json`);
   const serviceFiltersFileName = path.join(declarationsPath, `${serviceId}.filters.js`);
@@ -155,7 +169,11 @@ async function loadServiceHistoryFiles(serviceId) {
   let serviceFiltersHistoryModule;
 
   if (await fileExists(serviceHistoryFileName)) {
-    serviceHistory = JSON.parse(await fs.readFile(serviceHistoryFileName));
+    try {
+      serviceHistory = JSON.parse(await fs.readFile(serviceHistoryFileName));
+    } catch (e) {
+      throw new Error(`The "${path.basename(serviceHistoryFileName, '.json')}" service declaration is malformed and cannot be parsed in ${serviceHistoryFileName}`);
+    }
   }
 
   Object.keys(serviceDeclaration.documents).forEach(documentType => {
