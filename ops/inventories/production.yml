@@ -20,12 +20,12 @@ all:
         dating:
           hosts:
             vps-99ae1d89.vps.ovh.net:
-              services_directory: ota-services-dating
-              services_repository: https://github.com/OpenTermsArchive/services-dating.git
-              snapshots_directory: ota-snapshots-dating
-              snapshots_repository: git@github.com:OpenTermsArchive/snapshots-dating.git
-              versions_directory: ota-versions-dating
-              versions_repository: git@github.com:OpenTermsArchive/versions-dating.git
+              services_directory: ota-dating-declarations
+              services_repository: https://github.com/OpenTermsArchive/dating-declarations.git
+              snapshots_directory: ota-dating-snapshots
+              snapshots_repository: git@github.com:OpenTermsArchive/dating-snapshots.git
+              versions_directory: ota-dating-versions
+              versions_repository: git@github.com:OpenTermsArchive/dating-versions.git
         france:
           hosts:
             198.244.142.9:
