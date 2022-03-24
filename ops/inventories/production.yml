@@ -42,7 +42,5 @@ all:
               services_repository: https://github.com/OpenTermsArchive/france-elections-declarations.git
               snapshots_directory: ota-france-elections-snapshots
               snapshots_repository: git@github.com:OpenTermsArchive/france-elections-snapshots.git
-              snapshots_branch: main
               versions_directory: ota-france-elections-versions
               versions_repository: git@github.com:OpenTermsArchive/france-elections-versions.git
-              versions_branch: main
