@@ -1,0 +1,49 @@
+{
+  "services": {
+    "declarationsPath": "../ota-france-declarations/declarations"
+  },
+  "recorder": {
+    "versions": {
+      "storage": {
+        "git": {
+          "path": "../ota-versions-france",
+          "publish": true,
+          "prefixMessageToSnapshotId": "This version was recorded after filtering snapshot https://github.com/OpenTermsArchive/france-snapshots/commit/"
+        }
+      }
+    },
+    "snapshots": {
+      "storage": {
+        "git": {
+          "path": "../ota-snapshots-france",
+          "publish": true
+        }
+      }
+    }
+  },
+  "fetcher": {
+    "language": "fr"
+  },
+  "logger": {
+    "sendMailOnError": {
+      "to": "admin@opentermsarchive.org",
+      "from": "noreply@opentermsarchive.org",
+      "sendWarnings": false
+    }
+  },
+  "notifier": {
+    "sendInBlue": {
+      "updatesListId": 395,
+      "updateTemplateId": 60
+    }
+  },
+  "tracker": {
+    "githubIssues": {
+      "repository": "OpenTermsArchive/france-declarations"
+    }
+  },
+  "dataset": {
+    "servicesRepositoryName": "france-declarations",
+    "versionsRepositoryURL": "https://github.com/OpenTermsArchive/france-versions"
+  }
+}
