@@ -126,7 +126,7 @@
 
 - name: Start Open Terms Archive
   command:
-    cmd: pm2 start --name "{{ ota_app_name }}" --exp-backoff-restart-delay=1000 npm -- run start:scheduler
+    cmd: pm2 start --name "{{ ota_app_name }}" --no-autorestart npm -- run start:scheduler
     chdir: '/home/{{ ansible_user }}/{{ ota_app_name }}'
   environment:
     NODE_ENV: production
@@ -138,7 +138,7 @@
 
 - name: Schedule Open Terms Archive release
   command:
-    cmd: pm2 start --name "{{ ota_app_name }}-release" --exp-backoff-restart-delay=1000 npm -- run dataset:scheduler
+    cmd: pm2 start --name "{{ ota_app_name }}-release" --no-autorestart npm -- run dataset:scheduler
     chdir: '/home/{{ ansible_user }}/{{ ota_app_name }}'
   environment:
     NODE_ENV: production
