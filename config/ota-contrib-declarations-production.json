@@ -1,12 +1,12 @@
 {
   "services": {
-    "declarationsPath": "../ota-services-all/declarations"
+    "declarationsPath": "../ota-contrib-declarations/declarations"
   },
   "recorder": {
     "versions": {
       "storage": {
         "git": {
-          "path": "../ota-versions",
+          "path": "../ota-contrib-versions",
           "publish": true,
           "prefixMessageToSnapshotId": "This version was recorded after filtering snapshot with Mongo ID "
         }
@@ -33,11 +33,11 @@
   },
   "tracker": {
     "githubIssues": {
-      "repository": "OpenTermsArchive/services-all"
+      "repository": "OpenTermsArchive/contrib-declarations"
     }
   },
   "dataset": {
-    "servicesRepositoryName": "services-all",
+    "servicesRepositoryName": "contrib-declarations",
     "versionsRepositoryURL": "https://github.com/ambanum/OpenTermsArchive-versions"
   }
 }

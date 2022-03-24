@@ -9,13 +9,13 @@ all:
         services_all:
           hosts:
             51.89.227.206:
-              services_directory: ota-services-all
-              services_repository: https://github.com/OpenTermsArchive/services-all.git
-              snapshots_directory: ota-snapshots
-              snapshots_repository: git@github.com:ambanum/OpenTermsArchive-snapshots.git
+              services_directory: ota-contrib-declarations
+              services_repository: https://github.com/OpenTermsArchive/contrib-declarations.git
+              snapshots_directory: ota-contrib-snapshots
+              snapshots_repository: git@github.com:OpenTermsArchive/contrib-snapshots.git
               snapshots_branch: master
-              versions_directory: ota-versions
-              versions_repository: git@github.com:ambanum/OpenTermsArchive-versions.git
+              versions_directory: ota-contrib-versions
+              versions_repository: git@github.com:OpenTermsArchive/contrib-versions.git
               versions_branch: master
         dating:
           hosts:

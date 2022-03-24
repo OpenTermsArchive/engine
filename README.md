@@ -128,7 +128,7 @@ See [CONTRIBUTING](CONTRIBUTING.md).
 
 ### Adding or updating a new service
 
-See the [CONTRIBUTING](https://github.com/OpenTermsArchive/services-all/blob/main/CONTRIBUTING.md) of repository [OpenTermsArchive/services-all](https://github.com/OpenTermsArchive/services-all).
+See the [CONTRIBUTING](https://github.com/OpenTermsArchive/contrib-declarations/blob/main/CONTRIBUTING.md) of repository [OpenTermsArchive/contrib-declarations](https://github.com/OpenTermsArchive/contrib-declarations).
 
 ## Using locally
 
@@ -149,7 +149,7 @@ npm install
 Clone services declarations at the same level as the OpenTermsArchive directory:
 ```sh
 cd ..
-git clone https://github.com/OpenTermsArchive/services-all.git
+git clone https://github.com/OpenTermsArchive/contrib-declarations.git
 ```
 
 ### Configuring
