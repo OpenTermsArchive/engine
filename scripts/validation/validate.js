@@ -85,13 +85,21 @@ let servicesToValidate = args;
               let content;
               let filteredContent;
               let mimeType;
+              const documentDeclaration = service.getDocumentDeclaration(type);
+
+              before(async function () {
+                if (!documentDeclaration) {
+                  console.log('      (Tests skipped as declaration has been archived)');
+                  this.skip();
+                }
+              });
 
               it('fetchable URL', async () => {
-                const { location, executeClientScripts } = service.getDocumentDeclaration(type);
+                const { location, executeClientScripts } = documentDeclaration;
                 const document = await fetch({
                   url: location,
                   executeClientScripts,
-                  cssSelectors: service.getDocumentDeclaration(type).getCssSelectors(),
+                  cssSelectors: documentDeclaration.getCssSelectors(),
                 });
 
                 content = document.content;
@@ -106,7 +114,7 @@ let servicesToValidate = args;
 
                 filteredContent = await filter({
                   content,
-                  documentDeclaration: service.getDocumentDeclaration(type),
+                  documentDeclaration,
                   mimeType,
                 });
 
@@ -143,15 +151,15 @@ let servicesToValidate = args;
                 const {
                   location,
                   executeClientScripts,
-                } = service.getDocumentDeclaration(type);
+                } = documentDeclaration;
                 const document = await fetch({
                   url: location,
                   executeClientScripts,
-                  cssSelectors: service.getDocumentDeclaration(type).getCssSelectors(),
+                  cssSelectors: documentDeclaration.getCssSelectors(),
                 });
                 const secondFilteredContent = await filter({
                   content: document.content,
-                  documentDeclaration: service.getDocumentDeclaration(type),
+                  documentDeclaration,
                   mimeType: document.mimeType,
                 });
 
