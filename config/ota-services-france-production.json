@@ -14,8 +14,10 @@
     },
     "snapshots": {
       "storage": {
-        "path": "../ota-snapshots-france",
-        "publish": true
+        "git": {
+          "path": "../ota-snapshots-france",
+          "publish": true
+        }
       }
     }
   },
