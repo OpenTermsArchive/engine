@@ -21,7 +21,5 @@ if (!shouldSchedule) {
   logger.info('The scheduler is running…');
   logger.info('Dataset will be published at 08:30 on every Monday');
 
-  cron('30 8 * * MON', async () => {
-    release(options);
-  });
+  cron('30 8 * * MON', () => release(options));
 }

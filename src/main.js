@@ -63,7 +63,5 @@ const extraArgs = args.filter(arg => !arg.startsWith('--'));
   logger.info('The scheduler is running…');
   logger.info('Documents will be tracked every six hours starting at half past midnight');
 
-  cron('30 */6 * * *', async () => {
-    await archivist.trackChanges(serviceIds);
-  });
+  cron('30 */6 * * *', () => archivist.trackChanges(serviceIds));
 }());
