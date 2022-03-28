@@ -1,4 +1,10 @@
 all:
+  vars:
+    snapshots_branch: main
+    versions_branch: main
+    snapshots_directory: snapshots
+    versions_directory: version
+    services_directory: declarations
   children:
     dev:
       hosts:
@@ -7,12 +13,9 @@ all:
           ansible_user: vagrant
           ansible_python_interpreter: /usr/bin/python3
           ansible_ssh_private_key_file: ~/.ssh/ota-vagrant
-          services_directory: ota-contrib-declarations
           services_repository: https://github.com/OpenTermsArchive/contrib-declarations.git
-          snapshots_directory: ota-snapshots
           snapshots_repository: git@github.com:OpenTermsArchive/contrib-snapshots.git
           snapshots_branch: master
-          versions_directory: ota-versions
           versions_repository: git@github.com:OpenTermsArchive/contrib-versions.git
           versions_branch: master
 
