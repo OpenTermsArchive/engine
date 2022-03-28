@@ -33,27 +33,27 @@ This dataset represents each version of a document as a separate [Markdown](http
 
 \`\`\`
 ├ README.md
-├┬ Service provider 1 (e.g. “Facebook”)
-│├┬ Document type 1 (e.g. “Terms of Service”)
-││├ YYYY-DD-MMTHH-MM-SSZ.md (e.g. “2021-08-01T01-03-12Z.md)
+├┬ Service provider 1 (e.g. Facebook)
+│├┬ Document type 1 (e.g. Terms of Service)
+││├ YYYY-DD-MMTHH-MM-SSZ.md (e.g. 2021-08-01T01-03-12Z.md)
 ┆┆┆
-││└ YYYY-DD-MMTHH-MM-SSZ.md (e.g. “2021-10-03T08-12-25Z.md)
+││└ YYYY-DD-MMTHH-MM-SSZ.md (e.g. 2021-10-03T08-12-25Z.md)
 ┆┆
-│└┬ Document type X (e.g. “Privacy Policy”)
-│ ├ YYYY-DD-MMTHH-MM-SSZ.md (e.g. “2021-05-02T03-02-15Z.md)
+│└┬ Document type X (e.g. Privacy Policy)
+│ ├ YYYY-DD-MMTHH-MM-SSZ.md (e.g. 2021-05-02T03-02-15Z.md)
 ┆ ┆
-│ └ YYYY-DD-MMTHH-MM-SSZ.md (e.g. “2021-11-14T12-36-45Z.md)
+│ └ YYYY-DD-MMTHH-MM-SSZ.md (e.g. 2021-11-14T12-36-45Z.md)
 ┆
-└┬ Service provider Y (e.g. Google”)
- ├┬ Document type 1 (e.g. “Developer Terms”)
- │├ YYYY-DD-MMTHH-MM-SSZ.md (e.g. “2019-03-12T04-18-22Z.md)
+└┬ Service provider Y (e.g. Google)
+ ├┬ Document type 1 (e.g. Developer Terms)
+ │├ YYYY-DD-MMTHH-MM-SSZ.md (e.g. 2019-03-12T04-18-22Z.md)
  ┆┆
- │└ YYYY-DD-MMTHH-MM-SSZ.md (e.g. “2021-12-04T22-47-05Z.md)
- └┬ Document type Z (e.g. “Privacy Policy”)
+ │└ YYYY-DD-MMTHH-MM-SSZ.md (e.g. 2021-12-04T22-47-05Z.md)
+ └┬ Document type Z (e.g. Privacy Policy)
   ┆
-  ├ YYYY-DD-MMTHH-MM-SSZ.md (e.g. “2021-05-02T03-02-15Z.md)
+  ├ YYYY-DD-MMTHH-MM-SSZ.md (e.g. 2021-05-02T03-02-15Z.md)
   ┆
-  └ YYYY-DD-MMTHH-MM-SSZ.md (e.g. “2021-11-14T12-36-45Z.md)
+  └ YYYY-DD-MMTHH-MM-SSZ.md (e.g. 2021-11-14T12-36-45Z.md)
 \`\`\`
 
 ### License
