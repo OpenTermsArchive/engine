@@ -4,7 +4,7 @@ all:
     versions_branch: main
     snapshots_directory: snapshots
     versions_directory: version
-    services_directory: declarations
+    declarations_directory: declarations
   children:
     dev:
       hosts:
