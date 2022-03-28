@@ -6,6 +6,7 @@ all:
     snapshots_directory: snapshots
     versions_directory: version
     declarations_directory: declarations
+    app_directory: ota
     ota_app_name: ota
     ota_repository: https://github.com/ambanum/OpenTermsArchive.git
   children:
