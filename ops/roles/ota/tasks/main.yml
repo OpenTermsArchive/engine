@@ -1,7 +1,7 @@
 - name: Check if Open Terms Archive has already been cloned
   git:
     repo: '{{ ota_repository }}'
-    dest: '/home/{{ ansible_user }}/{{ ota_app_name }}'
+    dest: '/home/{{ ansible_user }}/{{ app_directory }}'
     clone: no
     update: no
     accept_hostkey: yes
@@ -18,7 +18,7 @@
 - name: Clone Open Terms Archive engine
   git:
     repo: '{{ ota_repository }}'
-    dest: '/home/{{ ansible_user }}/{{ ota_app_name }}'
+    dest: '/home/{{ ansible_user }}/{{ app_directory }}'
     force: yes
     accept_hostkey: yes
     key_file: '/home/{{ ansible_user }}/.ssh/ota-bot-key'
@@ -30,7 +30,7 @@
 - name: Install dependencies
   command:
     cmd: npm ci --production
-    chdir: '/home/{{ ansible_user }}/{{ ota_app_name }}'
+    chdir: '/home/{{ ansible_user }}/{{ app_directory }}'
   tags:
     - setup
     - update
@@ -38,7 +38,7 @@
 - name: Add .env file
   copy:
     src: .env
-    dest: '/home/{{ ansible_user }}/{{ ota_app_name }}/.env'
+    dest: '/home/{{ ansible_user }}/{{ app_directory }}/.env'
   tags:
     - setup
 
@@ -127,7 +127,7 @@
 - name: Start Open Terms Archive
   command:
     cmd: pm2 start --name "{{ ota_app_name }}" --no-autorestart npm -- run start:scheduler
-    chdir: '/home/{{ ansible_user }}/{{ ota_app_name }}'
+    chdir: '/home/{{ ansible_user }}/{{ app_directory }}'
   environment:
     NODE_ENV: production
   tags:
@@ -139,7 +139,7 @@
 - name: Schedule Open Terms Archive release
   command:
     cmd: pm2 start --name "{{ ota_app_name }}-release" --no-autorestart npm -- run dataset:scheduler
-    chdir: '/home/{{ ansible_user }}/{{ ota_app_name }}'
+    chdir: '/home/{{ ansible_user }}/{{ app_directory }}'
   environment:
     NODE_ENV: production
   tags:
