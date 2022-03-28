@@ -2,32 +2,19 @@ First of all, thanks for taking the time to contribute! 🎉👍
 
 ## Table of Contents
 
-- [New instance naming](#new-instance-naming)
 - [Workflow](#workflow)
   - [Pull requests](#pull-requests)
   - [Peer reviews](#peer-reviews)
   - [Commit messages](#commits-naming-convention)
 - [Continuous delivery](#continuous-delivery)
+- [Instances and repositories names](#instances-and-repositories-names)
 - [Practices](#practices)
   - [Errors handling](#errors-handling)
 
 ---
 
-## New instance naming
-
-In case you want to create a new instance on the `OpenTermsArchive` organization, please choose an instance name as descriptive as possible.
-
-Here are some examples of existing instances and the kind of declaration files they contain:
-- `contrib`: for any service with no guarantee of quality nor maintenance
-- `france`: for services in french, maintained by UFC Que Choisir and AmbNum
-- `france_elections`: for services in french, maintained during the 2022 French elections
-
-Once you have chosen a understandable instance name, create the corresponding git repositories
-- `{instanceName}-declarations`
-- `{instanceName}-snapshots`
-- `{instanceName}-versions`
-
 ## Workflow
+
 ### Pull requests
 
 We follow the [GitHub Flow](https://guides.github.com/introduction/flow/): all code contributions are submitted via a pull request towards the `master` branch.
@@ -56,12 +43,28 @@ We add this additional rule:
 
 - Do not rely on GitHub issue reference numbers in commit messages, as we have no guarantee the host system and its autolinking will be stable in time. Make sure the context is self-explanatory. If an external reference is given, use its full URL.
 
-
 ## Continuous delivery
 
 GitHub Actions is used to deploy the application on every merge to the main branch.
 
 Branch protection is active, meaning that a merge to the main branch can only take place once all tests pass in CI, and that at least one human reviewer approved the changes.
+
+## Instances and repositories names
+
+An “instance” of Open Terms Archive is comprised of a server running Open Terms Archive and up to three repositories. An instance has a _name_ describing the scope of services it aims at tracking. This scope is defined by one or several dimensions: jurisdiction, language, industry…
+
+> For example, the `france` instance tracks documents in the French jurisdiction and French language, while the `dating` instance tracks services from the dating industry.
+
+The instance name is written in lowercase and is made of one word for each dimension it focuses on, separated by dashes.
+
+> For example, the `france-elections` instance tracks services in the French jurisdiction and French language that could impact the French electoral processes.
+
+This name is used consistently in all communication, written references, and in the inventory of instances that are managed automatically. It is also used as the base for naming the database repositories, by suffixing it with each type:
+
+- The repository containing the declarations of services to be tracked is named `$instance_name-declarations`.
+- The repository containing the snapshots of the tracked documents (unless the instance is storing them in an alternative database) is named `$instance_name-snapshots`.
+- The repository containing the versions of the tracked documents (unless the instance is storing them in an alternative database) is named `$instance_name-versions`.
+
 ## Practices
 
 ### Errors handling
