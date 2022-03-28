@@ -45,7 +45,7 @@
 - name: Install services declarations
   git:
     repo: '{{ services_repository }}'
-    dest: '/home/{{ ansible_user }}/{{ services_directory }}'
+    dest: '/home/{{ ansible_user }}/{{ declarations_directory }}'
     force: yes
     accept_hostkey: yes
     key_file: '/home/{{ ansible_user }}/.ssh/ota-bot-key'
@@ -58,7 +58,7 @@
 - name: Install services declarations dependencies
   command:
     cmd: npm install --production
-    chdir: '/home/{{ ansible_user }}/{{ services_directory }}'
+    chdir: '/home/{{ ansible_user }}/{{ declarations_directory }}'
   tags:
     - setup
     - update
