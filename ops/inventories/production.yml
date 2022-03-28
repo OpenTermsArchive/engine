@@ -11,7 +11,7 @@ all:
   children:
     production:
       children:
-        services_all:
+        contrib:
           hosts:
             51.89.227.206:
               services_repository: https://github.com/OpenTermsArchive/contrib-declarations.git
