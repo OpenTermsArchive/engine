@@ -42,6 +42,19 @@
   tags:
     - setup
 
+- name: "Check if path exists"
+  when: config_file_name is defined
+  stat:
+    path: '/home/{{ ansible_user }}/{{ app_directory }}/config/{{ config_file_name }}.json'
+  register: custom_config_file
+
+- name: Create a symbolic link
+  when: config_file_name is defined and custom_config_file.stat.exists
+  ansible.builtin.file:
+    src: '/home/{{ ansible_user }}/{{ app_directory }}/config/{{ config_file_name }}.json'
+    dest: '/home/{{ ansible_user }}/{{ app_directory }}/config/local.json'
+    state: link
+
 - name: Install services declarations
   git:
     repo: '{{ services_repository }}'

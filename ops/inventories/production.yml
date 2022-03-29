@@ -15,6 +15,7 @@ all:
         contrib:
           hosts:
             51.89.227.206:
+              config_file_name: contrib
               services_repository: https://github.com/OpenTermsArchive/contrib-declarations.git
               snapshots_repository: git@github.com:OpenTermsArchive/contrib-snapshots.git
               snapshots_branch: master
@@ -23,18 +24,21 @@ all:
         dating:
           hosts:
             vps-99ae1d89.vps.ovh.net:
+              config_file_name: dating
               services_repository: https://github.com/OpenTermsArchive/dating-declarations.git
               snapshots_repository: git@github.com:OpenTermsArchive/dating-snapshots.git
               versions_repository: git@github.com:OpenTermsArchive/dating-versions.git
         france:
           hosts:
             198.244.142.9:
+              config_file_name: france
               services_repository: https://github.com/OpenTermsArchive/france-declarations.git
               snapshots_repository: git@github.com:OpenTermsArchive/france-snapshots.git
               versions_repository: git@github.com:OpenTermsArchive/france-versions.git
         france_elections:
           hosts:
             198.244.140.194:
+              config_file_name: france-elections
               services_repository: https://github.com/OpenTermsArchive/france-elections-declarations.git
               snapshots_repository: git@github.com:OpenTermsArchive/france-elections-snapshots.git
               versions_repository: git@github.com:OpenTermsArchive/france-elections-versions.git
