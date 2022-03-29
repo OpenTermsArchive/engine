@@ -5,6 +5,7 @@ import HttpsProxyAgent from 'https-proxy-agent';
 import nodeFetch, { AbortError } from 'node-fetch';
 
 import { FetchDocumentError } from './errors.js';
+import USER_AGENT from './userAgent.js';
 
 const NAVIGATION_TIMEOUT = config.get('fetcher.navigationTimeout');
 const LANGUAGE = config.get('fetcher.language');
@@ -16,7 +17,10 @@ export default async function fetch(url) {
   const options = {
     signal: controller.signal,
     credentials: 'include',
-    headers: { 'Accept-Language': LANGUAGE },
+    headers: {
+      'Accept-Language': LANGUAGE,
+      'User-Agent': USER_AGENT,
+    },
   };
 
   if (url.startsWith('https:') && process.env.HTTPS_PROXY) {

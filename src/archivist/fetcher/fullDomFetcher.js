@@ -3,6 +3,7 @@ import puppeteer from 'puppeteer-extra';
 import stealthPlugin from 'puppeteer-extra-plugin-stealth';
 
 import { FetchDocumentError } from './errors.js';
+import USER_AGENT from './userAgent.js';
 
 puppeteer.use(stealthPlugin());
 
@@ -24,6 +25,7 @@ export default async function fetch(url, cssSelectors) {
   try {
     page = await browser.newPage();
 
+    await page.setUserAgent(USER_AGENT);
     await page.setDefaultNavigationTimeout(NAVIGATION_TIMEOUT);
     await page.setExtraHTTPHeaders({ 'Accept-Language': LANGUAGE });
 
