@@ -1,21 +1,21 @@
 {
   "services": {
-    "declarationsPath": "../ota-dating-declarations/declarations"
+    "declarationsPath": "../declarations/declarations"
   },
   "recorder": {
     "versions": {
       "storage": {
         "git": {
-          "path": "../ota-dating-versions",
+          "path": "../versions",
           "publish": true,
-          "prefixMessageToSnapshotId": "This version was recorded after filtering snapshot https://github.com/OpenTermsArchive/snapshots-dating/commit/"
+          "prefixMessageToSnapshotId": "This version was recorded after filtering snapshot https://github.com/OpenTermsArchive/dating-snapshots/commit/"
         }
       }
     },
     "snapshots": {
       "storage": {
         "git": {
-          "path": "../ota-dating-snapshots",
+          "path": "../snapshots",
           "publish": true
         }
       }

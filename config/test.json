@@ -43,7 +43,7 @@
     "waitForElementsTimeout": 1000
   },
   "dataset": {
-    "servicesRepositoryName": "test-repo",
-    "versionsRepositoryURL": "https://github.com/ambanum/test-repo"
+    "servicesRepositoryName": "sandbox",
+    "versionsRepositoryURL": "https://github.com/OpenTermsArchive/sandbox"
   }
 }

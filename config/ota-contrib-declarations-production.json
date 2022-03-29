@@ -1,12 +1,12 @@
 {
   "services": {
-    "declarationsPath": "../ota-contrib-declarations/declarations"
+    "declarationsPath": "../declarations/declarations"
   },
   "recorder": {
     "versions": {
       "storage": {
         "git": {
-          "path": "../ota-contrib-versions",
+          "path": "../versions",
           "publish": true,
           "prefixMessageToSnapshotId": "This version was recorded after filtering snapshot with Mongo ID "
         }

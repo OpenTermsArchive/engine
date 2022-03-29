@@ -1,12 +1,12 @@
 {
   "services": {
-    "declarationsPath": "../ota-france-declarations/declarations"
+    "declarationsPath": "../declarations/declarations"
   },
   "recorder": {
     "versions": {
       "storage": {
         "git": {
-          "path": "../ota-versions-france",
+          "path": "../versions",
           "publish": true,
           "prefixMessageToSnapshotId": "This version was recorded after filtering snapshot https://github.com/OpenTermsArchive/france-snapshots/commit/"
         }
@@ -15,7 +15,7 @@
     "snapshots": {
       "storage": {
         "git": {
-          "path": "../ota-snapshots-france",
+          "path": "../snapshots",
           "publish": true
         }
       }
