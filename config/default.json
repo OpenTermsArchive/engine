@@ -1,6 +1,6 @@
 {
   "services": {
-    "declarationsPath": "../contrib-declarations/declarations"
+    "declarationsPath": "../declarations/declarations"
   },
   "recorder": {
     "versions": {

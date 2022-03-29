@@ -1,35 +1,15 @@
 {
-  "services": {
-    "declarationsPath": "../declarations/declarations"
-  },
   "recorder": {
     "versions": {
       "storage": {
         "git": {
-          "path": "../versions",
           "prefixMessageToSnapshotId": "This version was recorded after filtering snapshot https://github.com/OpenTermsArchive/france-elections-snapshots/commit/",
-          "publish": true
-        }
-      }
-    },
-    "snapshots": {
-      "storage": {
-        "git": {
-          "path": "../snapshots",
-          "publish": true
         }
       }
     }
   },
   "fetcher": {
     "language": "fr"
-  },
-  "logger": {
-    "sendMailOnError": {
-      "to": "admin@opentermsarchive.org",
-      "from": "noreply@opentermsarchive.org",
-      "sendWarnings": false
-    }
   },
   "notifier": {
     "sendInBlue": {
