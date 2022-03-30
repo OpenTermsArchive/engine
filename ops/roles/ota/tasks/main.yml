@@ -57,7 +57,7 @@
 
 - name: Install services declarations dependencies
   command:
-    cmd: npm ci --production
+    cmd: npm install --production
     chdir: '/home/{{ ansible_user }}/{{ services_directory }}'
   tags:
     - setup
