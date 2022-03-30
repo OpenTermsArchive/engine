@@ -79,7 +79,6 @@
     "sib-api-v3-sdk": "^8.2.1",
     "simple-git": "^2.47.0",
     "turndown": "^7.0.0",
-    "user-agents": "^1.0.836",
     "winston": "^3.3.3",
     "winston-mail": "^2.0.0"
   },

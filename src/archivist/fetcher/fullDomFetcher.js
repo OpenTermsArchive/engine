@@ -1,7 +1,6 @@
 import config from 'config';
 import puppeteer from 'puppeteer-extra';
 import stealthPlugin from 'puppeteer-extra-plugin-stealth';
-import UserAgent from 'user-agents';
 
 import { FetchDocumentError } from './errors.js';
 
@@ -25,7 +24,6 @@ export default async function fetch(url, cssSelectors) {
   try {
     page = await browser.newPage();
 
-    await page.setUserAgent(new UserAgent().toString());
     await page.setDefaultNavigationTimeout(NAVIGATION_TIMEOUT);
     await page.setExtraHTTPHeaders({ 'Accept-Language': LANGUAGE });
 
