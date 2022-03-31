@@ -1,0 +1,26 @@
+{
+  "recorder": {
+    "versions": {
+      "storage": {
+        "git": {
+          "prefixMessageToSnapshotId": "This version was recorded after filtering snapshot https://github.com/OpenTermsArchive/dating-snapshots/commit/"
+        }
+      }
+    }
+  },
+  "notifier": {
+    "sendInBlue": {
+      "updatesListId": 396,
+      "updateTemplateId": 61
+    }
+  },
+  "tracker": {
+    "githubIssues": {
+      "repository": "OpenTermsArchive/dating-declarations"
+    }
+  },
+  "dataset": {
+    "servicesRepositoryName": "dating-declarations",
+    "versionsRepositoryURL": "https://github.com/OpenTermsArchive/dating-versions"
+  }
+}

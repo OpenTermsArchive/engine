@@ -1,18 +1,24 @@
 all:
+  vars:
+    ansible_user: vagrant
+    snapshots_branch: main
+    versions_branch: main
+    snapshots_directory: snapshots
+    versions_directory: version
+    declarations_directory: declarations
+    app_directory: ota
+    ota_app_name: ota
+    ota_repository: https://github.com/ambanum/OpenTermsArchive.git
   children:
     dev:
       hosts:
         '127.0.0.1':
           ansible_ssh_port: 2222
-          ansible_user: vagrant
           ansible_python_interpreter: /usr/bin/python3
           ansible_ssh_private_key_file: ~/.ssh/ota-vagrant
-          services_directory: ota-services-all
-          services_repository: https://github.com/OpenTermsArchive/services-all.git
-          snapshots_directory: ota-snapshots
-          snapshots_repository: git@github.com:ambanum/OpenTermsArchive-snapshots.git
+          services_repository: https://github.com/OpenTermsArchive/contrib-declarations.git
+          snapshots_repository: git@github.com:OpenTermsArchive/contrib-snapshots.git
           snapshots_branch: master
-          versions_directory: ota-versions
-          versions_repository: git@github.com:ambanum/OpenTermsArchive-versions.git
+          versions_repository: git@github.com:OpenTermsArchive/contrib-versions.git
           versions_branch: master
 

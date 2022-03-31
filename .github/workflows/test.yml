@@ -51,8 +51,8 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/checkout@v2
         with:
-          repository: OpenTermsArchive/services-all
-          path: ./services-all
+          repository: OpenTermsArchive/contrib-declarations
+          path: ./contrib-declarations
       - uses: actions/setup-node@v2
         with:
           node-version: 14.x

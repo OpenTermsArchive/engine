@@ -1,0 +1,29 @@
+{
+  "recorder": {
+    "versions": {
+      "storage": {
+        "git": {
+          "prefixMessageToSnapshotId": "This version was recorded after filtering snapshot https://github.com/OpenTermsArchive/france-snapshots/commit/"
+        }
+      }
+    }
+  },
+  "fetcher": {
+    "language": "fr"
+  },
+  "notifier": {
+    "sendInBlue": {
+      "updatesListId": 395,
+      "updateTemplateId": 60
+    }
+  },
+  "tracker": {
+    "githubIssues": {
+      "repository": "OpenTermsArchive/france-declarations"
+    }
+  },
+  "dataset": {
+    "servicesRepositoryName": "france-declarations",
+    "versionsRepositoryURL": "https://github.com/OpenTermsArchive/france-versions"
+  }
+}

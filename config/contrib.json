@@ -1,0 +1,31 @@
+{
+  "recorder": {
+    "versions": {
+      "storage": {
+        "git": {
+          "prefixMessageToSnapshotId": "This version was recorded after filtering snapshot with Mongo ID "
+        }
+      }
+    },
+    "snapshots": {
+      "storage": {
+        "type": "mongo"
+      }
+    }
+  },
+  "notifier": {
+    "sendInBlue": {
+      "updatesListId": 191,
+      "updateTemplateId": 21
+    }
+  },
+  "tracker": {
+    "githubIssues": {
+      "repository": "OpenTermsArchive/contrib-declarations"
+    }
+  },
+  "dataset": {
+    "servicesRepositoryName": "contrib-declarations",
+    "versionsRepositoryURL": "https://github.com/OpenTermsArchive/contrib-versions"
+  }
+}

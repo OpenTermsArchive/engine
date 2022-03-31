@@ -3,46 +3,42 @@ all:
     ansible_user: debian
     snapshots_branch: main
     versions_branch: main
+    snapshots_directory: snapshots
+    versions_directory: version
+    declarations_directory: declarations
+    app_directory: ota
+    ota_app_name: ota
+    ota_repository: https://github.com/ambanum/OpenTermsArchive.git
   children:
     production:
       children:
-        services_all:
+        contrib:
           hosts:
             51.89.227.206:
-              services_directory: ota-services-all
-              services_repository: https://github.com/OpenTermsArchive/services-all.git
-              snapshots_directory: ota-snapshots
-              snapshots_repository: git@github.com:ambanum/OpenTermsArchive-snapshots.git
+              config_file_name: contrib
+              services_repository: https://github.com/OpenTermsArchive/contrib-declarations.git
+              snapshots_repository: git@github.com:OpenTermsArchive/contrib-snapshots.git
               snapshots_branch: master
-              versions_directory: ota-versions
-              versions_repository: git@github.com:ambanum/OpenTermsArchive-versions.git
+              versions_repository: git@github.com:OpenTermsArchive/contrib-versions.git
               versions_branch: master
         dating:
           hosts:
             vps-99ae1d89.vps.ovh.net:
-              services_directory: ota-services-dating
-              services_repository: https://github.com/OpenTermsArchive/services-dating.git
-              snapshots_directory: ota-snapshots-dating
-              snapshots_repository: git@github.com:OpenTermsArchive/snapshots-dating.git
-              versions_directory: ota-versions-dating
-              versions_repository: git@github.com:OpenTermsArchive/versions-dating.git
+              config_file_name: dating
+              services_repository: https://github.com/OpenTermsArchive/dating-declarations.git
+              snapshots_repository: git@github.com:OpenTermsArchive/dating-snapshots.git
+              versions_repository: git@github.com:OpenTermsArchive/dating-versions.git
         france:
           hosts:
             198.244.142.9:
-              services_directory: ota-services-france
-              services_repository: https://github.com/OpenTermsArchive/declarations-france.git
-              snapshots_directory: ota-snapshots-france
-              snapshots_repository: git@github.com:OpenTermsArchive/snapshots-france.git
-              versions_directory: ota-versions-france
-              versions_repository: git@github.com:OpenTermsArchive/versions-france.git
+              config_file_name: france
+              services_repository: https://github.com/OpenTermsArchive/france-declarations.git
+              snapshots_repository: git@github.com:OpenTermsArchive/france-snapshots.git
+              versions_repository: git@github.com:OpenTermsArchive/france-versions.git
         france_elections:
           hosts:
             198.244.140.194:
-              services_directory: ota-declarations-france-elections
-              services_repository: https://github.com/OpenTermsArchive/declarations-france-elections.git
-              snapshots_directory: ota-snapshots-france-elections
-              snapshots_repository: git@github.com:OpenTermsArchive/snapshots-france-elections.git
-              snapshots_branch: main
-              versions_directory: ota-versions-france-elections
-              versions_repository: git@github.com:OpenTermsArchive/versions-france-elections.git
-              versions_branch: main
+              config_file_name: france-elections
+              services_repository: https://github.com/OpenTermsArchive/france-elections-declarations.git
+              snapshots_repository: git@github.com:OpenTermsArchive/france-elections-snapshots.git
+              versions_repository: git@github.com:OpenTermsArchive/france-elections-versions.git
