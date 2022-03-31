@@ -4,7 +4,7 @@ all:
     snapshots_branch: main
     versions_branch: main
     snapshots_directory: snapshots
-    versions_directory: version
+    versions_directory: versions
     declarations_directory: declarations
     app_directory: ota
     ota_app_name: ota
