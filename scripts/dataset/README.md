@@ -9,7 +9,7 @@ You can change the configuration in the appropriate config file in the `config` 
 ```json
 {
   "dataset": {
-    "servicesRepositoryName": "Name of the services declarations repository",
+    "declarationsRepositoryName": "Name of the services declarations repository",
     "versionsRepositoryURL": "GitHub repository where the dataset will be published as a release; recommended to be the versions repository for discoverability and tagging purposes"
   }
 }
