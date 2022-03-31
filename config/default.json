@@ -61,7 +61,7 @@
     }
   },
   "dataset": {
-    "servicesRepositoryName": "sandbox",
+    "declarationsRepositoryName": "sandbox",
     "versionsRepositoryURL": "https://github.com/OpenTermsArchive/sandbox"
   }
 }

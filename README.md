@@ -203,7 +203,7 @@ The default configuration can be read and changed in `config/default.json`.
     }
   },
   "dataset": { // Release mechanism to create dataset periodically
-    "servicesRepositoryName": "Name of the services declarations repository",
+    "declarationsRepositoryName": "Name of the services declarations repository",
     "versionsRepositoryURL": "GitHub versions repository where dataset will be published"
   }
 }
