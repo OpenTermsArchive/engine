@@ -1,20 +1,3 @@
-- name: Check if Open Terms Archive has already been cloned
-  git:
-    repo: '{{ ota_repository }}'
-    dest: '/home/{{ ansible_user }}/{{ app_directory }}'
-    clone: no
-    update: no
-    accept_hostkey: yes
-    key_file: '/home/{{ ansible_user }}/.ssh/ota-bot-key'
-  register: git_clone_ota # the `before` property of the return value can tell us if the repository has been cloned already or not, see <https://docs.ansible.com/ansible/latest/collections/ansible/builtin/git_module.html#return-values>
-  tags:
-    - restart
-    - start
-    - update
-    - setup
-    - stop
-    - update-declarations
-
 - name: Clone Open Terms Archive engine
   git:
     repo: '{{ ota_repository }}'
@@ -77,42 +60,11 @@
     - update
     - update-declarations
 
-- name: Stop Open Terms Archive process
-  command: pm2 --silent stop "{{ ota_app_name }}"
-  ignore_errors: yes
-  when: git_clone_ota.before is defined and git_clone_ota.before # if git_clone_ota.before is not null, then the repository is not new
+- name: Stop Open Terms Archive schedulers processes
+  command:
+    cmd: pm2 stop pm2.config.cjs
+    chdir: '/home/{{ ansible_user }}/{{ app_directory }}'
   tags:
-    - restart
-    - stop
-    - update
-    - update-declarations
-
-- name: Unregister Open Terms Archive from process manager
-  command: pm2 --silent delete "{{ ota_app_name }}"
-  ignore_errors: yes
-  when: git_clone_ota.before is defined and git_clone_ota.before # if git_clone_ota.before is not null, then the repository is not new
-  tags:
-    - restart
-    - stop
-    - update
-    - update-declarations
-
-- name: Stop Open Terms Archive release process
-  command: pm2 --silent stop "{{ ota_app_name }}-release"
-  ignore_errors: yes
-  when: git_clone_ota.before is defined and git_clone_ota.before # if git_clone_ota.before is not null, then the repository is not new
-  tags:
-    - restart
-    - stop
-    - update
-    - update-declarations
-
-- name: Unregister Open Terms Archive release from process manager
-  command: pm2 --silent delete "{{ ota_app_name }}-release"
-  ignore_errors: yes
-  when: git_clone_ota.before is defined and git_clone_ota.before # if git_clone_ota.before is not null, then the repository is not new
-  tags:
-    - restart
     - stop
     - update
     - update-declarations
@@ -137,21 +89,9 @@
     - setup
     - update
 
-- name: Start Open Terms Archive
+- name: Start Open Terms Archive schedulers
   command:
-    cmd: pm2 start --name "{{ ota_app_name }}" --no-autorestart npm -- run start:scheduler
-    chdir: '/home/{{ ansible_user }}/{{ app_directory }}'
-  environment:
-    NODE_ENV: production
-  tags:
-    - restart
-    - start
-    - update
-    - update-declarations
-
-- name: Schedule Open Terms Archive release
-  command:
-    cmd: pm2 start --name "{{ ota_app_name }}-release" --no-autorestart npm -- run dataset:scheduler
+    cmd: pm2 startOrRestart pm2.config.cjs
     chdir: '/home/{{ ansible_user }}/{{ app_directory }}'
   environment:
     NODE_ENV: production
