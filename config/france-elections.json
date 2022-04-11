@@ -23,7 +23,7 @@
     }
   },
   "dataset": {
-    "declarationsRepositoryName": "france-elections-declarations",
+    "title": "france-elections-declarations",
     "versionsRepositoryURL": "https://github.com/OpenTermsArchive/france-elections-versions"
   }
 }

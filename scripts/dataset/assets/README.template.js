@@ -12,9 +12,9 @@ ${body({ servicesCount, firstVersionDate, lastVersionDate })}`;
 export function title({ releaseDate }) {
   releaseDate = releaseDate.toLocaleDateString(LOCALE, DATE_OPTIONS);
 
-  const declarationsRepositoryName = config.get('dataset.declarationsRepositoryName');
+  const title = config.get('dataset.title');
 
-  return `Open Terms Archive — ${declarationsRepositoryName} — ${releaseDate} dataset`;
+  return `Open Terms Archive — ${title} — ${releaseDate} dataset`;
 }
 
 export function body({ servicesCount, firstVersionDate, lastVersionDate }) {

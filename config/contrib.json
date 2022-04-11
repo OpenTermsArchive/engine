@@ -25,7 +25,7 @@
     }
   },
   "dataset": {
-    "declarationsRepositoryName": "contrib-declarations",
+    "title": "contrib-declarations",
     "versionsRepositoryURL": "https://github.com/OpenTermsArchive/contrib-versions"
   }
 }
