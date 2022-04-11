@@ -27,6 +27,8 @@ export function body({ servicesCount, firstVersionDate, lastVersionDate }) {
 
 This dataset is tailored for datascientists and other analysts. You can also explore all these versions interactively on [${versionsRepositoryURL}](${versionsRepositoryURL}).
 
+It has been generated thanks to [Open Terms Archive](https://opentermsarchive.org).
+
 ### Dataset format
 
 This dataset represents each version of a document as a separate [Markdown](https://spec.commonmark.org/0.30/) file, nested in a directory with the name of the service provider and in a directory with the name of the document type. The filesystem layout will look like below.
