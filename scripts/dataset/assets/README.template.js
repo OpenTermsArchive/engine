@@ -4,7 +4,7 @@ const LOCALE = 'en-EN';
 const DATE_OPTIONS = { year: 'numeric', month: 'long', day: 'numeric' };
 
 export default function readme({ releaseDate, servicesCount, firstVersionDate, lastVersionDate }) {
-  return `# ${title({ releaseDate })}
+  return `# Open Terms Archive — ${title({ releaseDate })}
 
 ${body({ servicesCount, firstVersionDate, lastVersionDate })}`;
 }
@@ -14,7 +14,7 @@ export function title({ releaseDate }) {
 
   const title = config.get('dataset.title');
 
-  return `Open Terms Archive — ${title} — ${releaseDate} dataset`;
+  return `${title} — ${releaseDate} dataset`;
 }
 
 export function body({ servicesCount, firstVersionDate, lastVersionDate }) {
