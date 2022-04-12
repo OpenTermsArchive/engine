@@ -4,7 +4,7 @@ This dataset consolidates the contractual documents of 2 service providers, in a
 
 This dataset is tailored for datascientists and other analysts. You can also explore all these versions interactively on [https://github.com/OpenTermsArchive/sandbox](https://github.com/OpenTermsArchive/sandbox).
 
-It has been generated thanks to [Open Terms Archive](https://opentermsarchive.org).
+It has been generated with [Open Terms Archive](https://opentermsarchive.org).
 
 ### Dataset format
 

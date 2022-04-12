@@ -27,7 +27,7 @@ export function body({ servicesCount, firstVersionDate, lastVersionDate }) {
 
 This dataset is tailored for datascientists and other analysts. You can also explore all these versions interactively on [${versionsRepositoryURL}](${versionsRepositoryURL}).
 
-It has been generated thanks to [Open Terms Archive](https://opentermsarchive.org).
+It has been generated with [Open Terms Archive](https://opentermsarchive.org).
 
 ### Dataset format
 
