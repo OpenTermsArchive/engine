@@ -156,7 +156,7 @@ git clone https://github.com/OpenTermsArchive/contrib-declarations.git
 
 #### Configuration file
 
-The default configuration can be read and changed in `config/default.json`.
+The default configuration can be found in `config/default.json`.
 
 ```js
 {
@@ -204,7 +204,7 @@ The default configuration can be read and changed in `config/default.json`.
   },
   "dataset": { // Release mechanism to create dataset periodically
     "title": "Title of the dataset; recommended to be the name of the instance that generated it",
-    "versionsRepositoryURL": "GitHub versions repository where dataset will be published"
+    "versionsRepositoryURL": "GitHub repository where the dataset will be published as a release; recommended to be the versions repository for discoverability and tagging purposes"
   }
 }
 ```

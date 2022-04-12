@@ -4,16 +4,7 @@ Export the versions dataset into a ZIP file and publish it to GitHub releases.
 
 ## Configuring
 
-You can change the configuration in the appropriate config file in the `config` folder.
-
-```json
-{
-  "dataset": {
-    "title": "Name of the services declarations repository",
-    "versionsRepositoryURL": "GitHub repository where the dataset will be published as a release; recommended to be the versions repository for discoverability and tagging purposes"
-  }
-}
-```
+You can change the configuration in the appropriate config file in the `config` folder. See the [main README](https://github.com/ambanum/OpenTermsArchive#configuring) for documentation on using the configuration file.
 
 ## Running
 
