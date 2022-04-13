@@ -4,7 +4,7 @@ const LOCALE = 'en-EN';
 const DATE_OPTIONS = { year: 'numeric', month: 'long', day: 'numeric' };
 
 export default function readme({ releaseDate, servicesCount, firstVersionDate, lastVersionDate }) {
-  return `# ${title({ releaseDate })}
+  return `# Open Terms Archive — ${title({ releaseDate })}
 
 ${body({ servicesCount, firstVersionDate, lastVersionDate })}`;
 }
@@ -12,9 +12,9 @@ ${body({ servicesCount, firstVersionDate, lastVersionDate })}`;
 export function title({ releaseDate }) {
   releaseDate = releaseDate.toLocaleDateString(LOCALE, DATE_OPTIONS);
 
-  const declarationsRepositoryName = config.get('dataset.declarationsRepositoryName');
+  const title = config.get('dataset.title');
 
-  return `Open Terms Archive — ${declarationsRepositoryName} — ${releaseDate} dataset`;
+  return `${title} — ${releaseDate} dataset`;
 }
 
 export function body({ servicesCount, firstVersionDate, lastVersionDate }) {
@@ -26,6 +26,8 @@ export function body({ servicesCount, firstVersionDate, lastVersionDate }) {
   return `This dataset consolidates the contractual documents of ${servicesCount} service providers, in all their versions that were accessible online between ${firstVersionDate} and ${lastVersionDate}.
 
 This dataset is tailored for datascientists and other analysts. You can also explore all these versions interactively on [${versionsRepositoryURL}](${versionsRepositoryURL}).
+
+It has been generated with [Open Terms Archive](https://opentermsarchive.org).
 
 ### Dataset format
 

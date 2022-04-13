@@ -4,6 +4,8 @@ This dataset consolidates the contractual documents of 2 service providers, in a
 
 This dataset is tailored for datascientists and other analysts. You can also explore all these versions interactively on [https://github.com/OpenTermsArchive/sandbox](https://github.com/OpenTermsArchive/sandbox).
 
+It has been generated with [Open Terms Archive](https://opentermsarchive.org).
+
 ### Dataset format
 
 This dataset represents each version of a document as a separate [Markdown](https://spec.commonmark.org/0.30/) file, nested in a directory with the name of the service provider and in a directory with the name of the document type. The filesystem layout will look like below.

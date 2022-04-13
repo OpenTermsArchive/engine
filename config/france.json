@@ -23,7 +23,7 @@
     }
   },
   "dataset": {
-    "declarationsRepositoryName": "france-declarations",
+    "title": "france",
     "versionsRepositoryURL": "https://github.com/OpenTermsArchive/france-versions"
   }
 }

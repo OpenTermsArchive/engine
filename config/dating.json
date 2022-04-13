@@ -20,7 +20,7 @@
     }
   },
   "dataset": {
-    "declarationsRepositoryName": "dating-declarations",
+    "title": "dating",
     "versionsRepositoryURL": "https://github.com/OpenTermsArchive/dating-versions"
   }
 }
