@@ -44,7 +44,7 @@
   "logger": {
     "smtp": {
       "host": "smtp-relay.sendinblue.com",
-      "username": "sib@disinfo.beta.gouv.fr"
+      "username": "admin@opentermsarchive.org"
     },
     "sendMailOnError": false
   },
