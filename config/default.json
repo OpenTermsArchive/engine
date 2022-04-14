@@ -44,14 +44,14 @@
   "logger": {
     "smtp": {
       "host": "smtp-relay.sendinblue.com",
-      "username": "sib@disinfo.beta.gouv.fr"
+      "username": "admin@opentermsarchive.org"
     },
     "sendMailOnError": false
   },
   "notifier": {
     "sendInBlue": {
-      "updatesListId": 195,
-      "updateTemplateId": 21
+      "updatesListId": 850,
+      "updateTemplateId": 7
     }
   },
   "tracker": {

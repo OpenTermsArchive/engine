@@ -27,7 +27,6 @@
     - [Configuration file](#configuration-file)
       - [Specific storage adapters configuration](#storage-adapters-configuration)
     - [Environment variables](#environment-variables)
-      - [SMTP_HOST and SMTP_USERNAME](#smtp_host-and-smtp_username)
       - [HTTP_PROXY and HTTPS_PROXY](#http_proxy-and-https_proxy)
       - [SENDINBLUE_API_KEY](#sendinblue_api_key)
       - [NODE_ENV](#node_env)
