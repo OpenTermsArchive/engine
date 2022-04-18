@@ -13,6 +13,13 @@
       "object": "end user’s personal data"
     }
   },
+  "Imprint": {
+    "commitment": {
+      "writer": "service provider",
+      "audience": "everyone",
+      "object": "identification of content author and hosting service for official inquiries"
+    }
+  },
   "Trackers Policy": {
     "commitment": {
       "writer": "service provider",
