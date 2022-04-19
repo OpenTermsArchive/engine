@@ -141,17 +141,17 @@ See the [CONTRIBUTING](https://github.com/OpenTermsArchive/contrib-declarations/
 ### Installing
 
 - This module is built with [Node](https://nodejs.org/en/). You will need to [install Node >= v14.x](https://nodejs.org/en/download/) to run it.
-- When refering to the root folder, it means the folder where you will be `git pull`ing everything.
+- When refering to the base folder, it means the folder where you will be `git pull`ing everything.
 
 #### Declarations repository
 
-1. Locally clone your declaration repository, e.g., `git@github.com:OpenTermsArchive/contrib-declarations.git`.
+1. Locally clone your declarations repository, e.g., `git@github.com:OpenTermsArchive/contrib-declarations.git`.
 2. Go into your folder and initialize it, e.g., `cd contrib-declarations; npm install`.
 3. You can now modify your declarations in the `./declarations/` folder, following [these instructions](https://github.com/OpenTermsArchive/contrib-declarations/blob/main/CONTRIBUTING.md).
 4. When you want to test:
     - If you want to test every declaration, run `npm test`.
-    - If you want to test a specific declaration, run `npm test <name of the service>`, e.g., `npm test HER`.
-    - If you want to only test the integrity of a specific declaration, run `npm test -- --schema-only <name of the service>`, e.g., `npm test -- --schema-only HER`.
+    - If you want to test a specific declaration, run `npm test $serviceId`, e.g., `npm test HER`.
+    - If you want to have faster feedback on the structure of a specific declaration, run `npm test -- --schema-only $serviceId`, e.g., `npm test -- --schema-only HER`.
 5. Once you have done that, if you have any error, it will be prompted and detailed at the end of the test.
     - E.g., `InaccessibleContentError`: Your selector is wrong and should be fixed.
     - E.g., `TypeError`: The file declaration is invalid.
@@ -159,26 +159,18 @@ See the [CONTRIBUTING](https://github.com/OpenTermsArchive/contrib-declarations/
 
 ##### Note: Testing
 
-Testing works with multiple tests:
-
-- Checking the validity of the file.
-- URL is correct.
-- The content is correctly gathered.
-- Quick diff between two "same" contents, to check for noise.
-- At least 100 chars.
-- Etc.
-
-As it may take a bit of time, that's why you may want to `--schema-only`.
+Testing works with multiple tests (e.g., checking the validity of the file, that the URL is correct and reachable, that the content is correctly gathered, etc.); as it may take a bit of time, that's why you may want to `--schema-only`.
 
 #### Core tool
 
 1. If not done already, follow the previous part with the repo of your choice.
-2. In the root folder of the previous step (i.e., not _in_ the previous folder, but _where the previous folder is_), clone the core engine: `git clone git@github.com:ambanum/OpenTermsArchive.git`.
-3. Go into your folder and initialize it, e.g., `cd OpenTermsArchive; npm install`.
+2. In the base folder of the previous step (i.e., not _in_ the previous folder, but _where the previous folder is_), clone the core engine: `git clone git@github.com:ambanum/OpenTermsArchive.git`.
+3.  Go into the cloned folder and install dependencies: `cd contrib-declarations; npm install`.
 4. If you are using the main repo, you are done, go to step 6.
 5. If you are using a special repo instance (e.g., `dating-declarations`), create a new [config file](#configuring), `config/development.json`, and add:
     ```json
     {
+   
       "services": {
         "declarationsPath": "../<name of the repo>/declarations"
       }
@@ -192,7 +184,7 @@ As it may take a bit of time, that's why you may want to `--schema-only`.
       }
     }
     ```
-6. In the root folder of the repo (i.e., `OpenTermsArchive`), use `npm start`.
+6. In the folder of the repo (i.e., `OpenTermsArchive`), use `npm start`.
     - It will first do a refiltering to check whenever everything works properly.
     - You will then start to see everything being downloaded under `data/`.
     - More details in [Running](#running).
