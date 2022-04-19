@@ -294,13 +294,17 @@
     }
   },
   "Conditions of Carriage": {
-    "writer": "transportation operator (airline, railway, bus…)",
-    "audience": "passenger",
-    "object": "benefits and limitations associated with the transportation being provided"
+    "commitment": {
+      "writer": "transportation operator (airline, railway, bus…)",
+      "audience": "passenger",
+      "object": "benefits and limitations associated with the transportation being provided"
+    }
   },
   "General Conditions of Sale": {
-    "writer": "paid-for goods or service provider",
-    "audience": "buyer",
-    "object": "warranty, delivery, return of goods or services bought through a monetary transaction"
+    "commitment": {
+      "writer": "paid-for goods or service provider",
+      "audience": "buyer",
+      "object": "warranty, delivery, return of goods or services bought through a monetary transaction"
+    }
   }
 }
