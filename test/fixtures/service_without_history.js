@@ -3,7 +3,7 @@ import Service from '../../src/archivist/services/service.js';
 
 const service = new Service({
   id: 'service_without_history',
-  name: 'Service wihout history',
+  name: 'Service without history',
 });
 
 const filters = [
@@ -18,7 +18,7 @@ const filters = [
 const latest = new DocumentDeclaration({
   service,
   type: 'Terms of Service',
-  location: 'https://www.service-wihout-history.example/tos',
+  location: 'https://www.service-without-history.example/tos',
   contentSelectors: 'body',
   noiseSelectors: undefined,
   filters,

@@ -1,8 +1,8 @@
 {
-  "name": "Service wihout history",
+  "name": "Service without history",
   "documents": {
     "Terms of Service": {
-      "fetch": "https://www.service-wihout-history.example/tos",
+      "fetch": "https://www.service-without-history.example/tos",
       "select": "body",
       "filter": ["removeSharesButton", "removePrintButton"]
     }
