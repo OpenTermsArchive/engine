@@ -60,7 +60,7 @@
     - update
     - update-declarations
 
-- name: Stop Open Terms Archive schedulers processes
+- name: Stop Open Terms Archive schedulers
   command:
     cmd: pm2 stop pm2.config.cjs
     chdir: '/home/{{ ansible_user }}/{{ app_directory }}'
