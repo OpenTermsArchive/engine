@@ -98,6 +98,16 @@ describe('Services', () => {
         );
       });
     });
+
+    context('when specifying services to load', async () => {
+      before(async () => {
+        result = await services.load([ 'service_A', 'service_B' ]);
+      });
+
+      it('loads only the given services', async () => {
+        expect(result).to.have.all.keys('service_A', 'service_B');
+      });
+    });
   });
 
   describe('#loadWithHistory', () => {
@@ -236,6 +246,16 @@ describe('Services', () => {
           'service_with_history',
           expectedServices.service_with_history,
         );
+      });
+    });
+
+    context('when specifying services to load', async () => {
+      before(async () => {
+        result = await services.loadWithHistory([ 'service_A', 'service_B' ]);
+      });
+
+      it('loads only the given services', async () => {
+        expect(result).to.have.all.keys('service_A', 'service_B');
       });
     });
   });
