@@ -74,7 +74,7 @@ describe('Services', () => {
         );
       });
     });
-    context('when a service has only delcarations history', async () => {
+    context('when a service has only declarations history', async () => {
       describe('Service with declaration history', async () => {
         await validateServiceWithoutHistory(
           'service_with_declaration_history',
@@ -90,7 +90,7 @@ describe('Services', () => {
         );
       });
     });
-    context('when a service has both filters and delcarations histories', async () => {
+    context('when a service has both filters and declarations histories', async () => {
       describe('Service with history', async () => {
         await validateServiceWithoutHistory(
           'service_with_history',
@@ -224,7 +224,7 @@ describe('Services', () => {
         );
       });
     });
-    context('when a service has only delcarations history', async () => {
+    context('when a service has only declarations history', async () => {
       describe('Service with declaration history', async () => {
         await validateServiceWithHistory(
           'service_with_declaration_history',
@@ -240,7 +240,7 @@ describe('Services', () => {
         );
       });
     });
-    context('when a service has both filters and delcarations histories', async () => {
+    context('when a service has both filters and declarations histories', async () => {
       describe('Service with history', async () => {
         await validateServiceWithHistory(
           'service_with_history',
