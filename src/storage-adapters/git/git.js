@@ -33,7 +33,7 @@ export default class Git {
   }
 
   async commit(filepath, message, authorDate) {
-    const options = { '--author': `${this.author.name} <${this.author.email}>` };
+    const options = {};
 
     if (authorDate) {
       options['--date'] = new Date(authorDate).toISOString();
