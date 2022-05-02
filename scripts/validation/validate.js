@@ -35,12 +35,13 @@ let servicesToValidate = args;
 
 (async () => {
   const declarationsPath = path.resolve(__dirname, '../../', config.get('services.declarationsPath'));
-  const serviceDeclarations = await services.loadWithHistory();
 
   // If services to validate are passed as a string with services id separated by a newline character
   if (servicesToValidate.length == 1 && servicesToValidate[0].includes('\n')) {
     servicesToValidate = servicesToValidate[0].split('\n').filter(value => value);
   }
+
+  const serviceDeclarations = await services.loadWithHistory(servicesToValidate);
 
   if (!servicesToValidate.length) {
     servicesToValidate = Object.keys(serviceDeclarations);

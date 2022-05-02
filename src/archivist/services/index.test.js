@@ -74,7 +74,7 @@ describe('Services', () => {
         );
       });
     });
-    context('when a service has only delcarations history', async () => {
+    context('when a service has only declarations history', async () => {
       describe('Service with declaration history', async () => {
         await validateServiceWithoutHistory(
           'service_with_declaration_history',
@@ -90,12 +90,22 @@ describe('Services', () => {
         );
       });
     });
-    context('when a service has both filters and delcarations histories', async () => {
+    context('when a service has both filters and declarations histories', async () => {
       describe('Service with history', async () => {
         await validateServiceWithoutHistory(
           'service_with_history',
           expectedServices.service_with_history,
         );
+      });
+    });
+
+    context('when specifying services to load', async () => {
+      before(async () => {
+        result = await services.load([ 'service_A', 'service_B' ]);
+      });
+
+      it('loads only the given services', async () => {
+        expect(result).to.have.all.keys('service_A', 'service_B');
       });
     });
   });
@@ -214,7 +224,7 @@ describe('Services', () => {
         );
       });
     });
-    context('when a service has only delcarations history', async () => {
+    context('when a service has only declarations history', async () => {
       describe('Service with declaration history', async () => {
         await validateServiceWithHistory(
           'service_with_declaration_history',
@@ -230,12 +240,22 @@ describe('Services', () => {
         );
       });
     });
-    context('when a service has both filters and delcarations histories', async () => {
+    context('when a service has both filters and declarations histories', async () => {
       describe('Service with history', async () => {
         await validateServiceWithHistory(
           'service_with_history',
           expectedServices.service_with_history,
         );
+      });
+    });
+
+    context('when specifying services to load', async () => {
+      before(async () => {
+        result = await services.loadWithHistory([ 'service_A', 'service_B' ]);
+      });
+
+      it('loads only the given services', async () => {
+        expect(result).to.have.all.keys('service_A', 'service_B');
       });
     });
   });

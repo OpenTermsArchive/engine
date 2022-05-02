@@ -13,10 +13,14 @@ const declarationsPath = path.resolve(__dirname, '../../..', config.get('service
 
 export const DOCUMENT_TYPES = JSON.parse(fsApi.readFileSync(path.resolve(__dirname, './documentTypes.json')));
 
-export async function load() {
+export async function load(servicesIds = []) {
   const services = {};
   const fileNames = await fs.readdir(declarationsPath);
-  const serviceFileNames = fileNames.filter(fileName => path.extname(fileName) == '.json' && !fileName.includes('.history.json'));
+  let serviceFileNames = fileNames.filter(fileName => path.extname(fileName) == '.json' && !fileName.includes('.history.json'));
+
+  if (servicesIds.length) {
+    serviceFileNames = serviceFileNames.filter(fileName => path.basename(fileName, '.json').match(new RegExp(`^${servicesIds.join('|')}$`, 'g')));
+  }
 
   await Promise.all(serviceFileNames.map(async fileName => {
     const jsonDeclarationFilePath = path.join(declarationsPath, fileName);
@@ -71,8 +75,8 @@ export async function load() {
   return services;
 }
 
-export async function loadWithHistory() {
-  const services = await load();
+export async function loadWithHistory(servicesIds = []) {
+  const services = await load(servicesIds);
 
   for (const serviceId of Object.keys(services)) {
     const { declaration, filters } = await loadServiceHistoryFiles(serviceId); // eslint-disable-line no-await-in-loop
