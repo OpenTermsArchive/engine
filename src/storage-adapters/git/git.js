@@ -23,7 +23,9 @@ export default class Git {
 
     return this.git
       .addConfig('core.autocrlf', false)
-      .addConfig('push.default', 'current');
+      .addConfig('push.default', 'current')
+      .addConfig('user.name', this.author.name)
+      .addConfig('user.email', this.author.email);
   }
 
   async add(filepath) {
@@ -31,7 +33,7 @@ export default class Git {
   }
 
   async commit(filepath, message, authorDate) {
-    const options = { '--author': `${this.author.name} <${this.author.email}>` };
+    const options = {};
 
     if (authorDate) {
       options['--date'] = new Date(authorDate).toISOString();
