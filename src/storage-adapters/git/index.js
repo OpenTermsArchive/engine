@@ -20,6 +20,8 @@ const COMMIT_MESSAGE_PREFIX = {
   update: 'Update',
 };
 
+const PDF_MIME_TYPE = 'application/pdf';
+
 export default class GitAdapter {
   constructor({ path, author, publish, prefixMessageToSnapshotId }) {
     this.path = path;
@@ -70,59 +72,21 @@ export default class GitAdapter {
       return {};
     }
 
-    const mimeType = mime.getType(filePath);
-    const readFileOptions = {};
-
-    if (mimeType.startsWith('text/')) {
-      readFileOptions.encoding = 'utf8';
-    }
-
-    return {
-      id: commit.hash,
-      content: await fs.readFile(recordFilePath, readFileOptions),
-      mimeType,
-      fetchDate: new Date(commit.date),
-      isRefilter: commit.message.startsWith('Refilter'),
-    };
+    return this._getRecordFromCommitMetadata(commit);
   }
 
   async* iterate() {
-    const initialCommitHash = (await this.git.raw([ 'rev-list', '--max-parents=0', 'HEAD' ])).trim();
-    const currentBranchName = (await this.git.raw([ 'rev-parse', '--abbrev-ref', 'HEAD' ])).trim();
+    const commits = await this._getMeaningfulCommitsAscending();
 
-    try {
-      let previousCommitHash;
-
-      /* eslint-disable no-await-in-loop */
-      while (previousCommitHash != initialCommitHash) {
-        const [{ hash, date, message, diff: { files: [{ file: relativeFilePath }] } }] = await this.git.log([ '-1', '--stat=4096', '--no-merges' ]); // get current commit information
-
-        if (message.match(/^(Start tracking|Update|Refilter)/)) { // Skip commits which are not a document versions (initial README or LICENSE commits for example)
-          const absoluteFilePath = `${this.path}/${relativeFilePath}`;
-
-          const serviceId = path.dirname(relativeFilePath);
-          const extension = path.extname(relativeFilePath);
-          const documentType = path.basename(relativeFilePath, extension);
-
-          yield {
-            id: hash,
-            serviceId,
-            documentType,
-            content: await fs.readFile(absoluteFilePath, { encoding: 'utf8' }),
-            fetchDate: new Date(date),
-          };
-        }
-
-        previousCommitHash = hash;
-
-        if (initialCommitHash != hash) {
-          await this.git.checkout(['HEAD^']); // checkout the parent commit
-        }
-      }
-      /* eslint-enable no-await-in-loop */
-    } finally {
-      await this.git.checkout([currentBranchName]);
+    for (const commit of commits) {
+      yield this._getRecordFromCommitMetadata(commit);
     }
+  }
+
+  async _getMeaningfulCommitsAscending() {
+    return (await this.git.log([ '--reverse', '--no-merges' ]))
+      .filter(({ message }) => message.match(/^(Start tracking|Update|Refilter)/)) // Skip commits which are not a document record (README, LICENSE, …)
+      .sort((commitA, commitB) => new Date(commitA.date) - new Date(commitB.date)); // Make sure that the commits are sorted in ascending order
   }
 
   async _save({ serviceId, documentType, content, fileExtension }) {
@@ -175,6 +139,54 @@ export default class GitAdapter {
     }
 
     return message;
+  }
+
+  async _getRecordFromCommitMetadata(commit) {
+    const { hash, date, message, body, diff } = commit;
+
+    let relativeFilePath;
+
+    if (diff) {
+      ({ files: [{ file: relativeFilePath }] } = diff);
+    }
+
+    if (!relativeFilePath) {
+      relativeFilePath = (await this.git.show([ '--name-only', '--pretty=', hash ])).trim();
+    }
+
+    const snapshotIdMatch = body.match(/\b[0-9a-f]{5,40}\b/g);
+    const adapter = this;
+
+    return {
+      id: hash,
+      serviceId: path.dirname(relativeFilePath),
+      documentType: path.basename(relativeFilePath, path.extname(relativeFilePath)),
+      mimeType: mime.getType(relativeFilePath),
+      fetchDate: new Date(date),
+      isFirstRecord: message.startsWith(COMMIT_MESSAGE_PREFIX.startTracking),
+      isRefilter: message.startsWith(COMMIT_MESSAGE_PREFIX.refilter),
+      snapshotId: snapshotIdMatch && snapshotIdMatch[0],
+      get content() { // In this scope, `this` is the `result` object, not the adapter
+        return (async () => {
+          if (this.mimeType != PDF_MIME_TYPE) {
+            return adapter.git.show(`${hash}:${relativeFilePath}`);
+          }
+
+          // In case of PDF, `git show` cannot be used as it converts PDF binary into string which not retain the original binary representation
+          // It is impossible to restore the original binary data from the resulting string
+          let pdfBuffer;
+
+          try {
+            await adapter.git.raw([ 'restore', '-s', hash, '--', relativeFilePath ]); // So, temporarily restore the PDF file to a specific commit
+            pdfBuffer = await fs.readFile(`${adapter.path}/${relativeFilePath}`); // …read the content
+          } finally {
+            await adapter.git.raw([ 'restore', '-s', 'HEAD', '--', relativeFilePath ]); // …and finally restore the file to its last state.
+          }
+
+          return pdfBuffer;
+        })();
+      },
+    };
   }
 
   async _removeAllRecords() {
