@@ -40,6 +40,10 @@ export default class Tracker {
       repo,
       accept: 'application/vnd.github.v3+json',
     };
+
+    this.createLabel({
+      name: config.get('tracker.githubIssues.label'),
+    });
   }
 
   async onVersionRecorded(serviceId, type) {
@@ -80,6 +84,18 @@ export default class Tracker {
       labels: [UPDATE_DOCUMENT_LABEL],
       comment: '🤖 Reopened automatically as an error occured',
     });
+  }
+
+  async createLabel(params) {
+    try {
+      await this.octokit.rest.issues.createLabel({ ...this.commonParams, ...params });
+    } catch (e) {
+      if (!e.toString().includes('"code":"already_exists"')) {
+        // log error when error is unknown
+        logger.error(`Could not create label ${params.name}`);
+        logger.error(e.toString());
+      }
+    }
   }
 
   async createIssue(params) {
