@@ -30,10 +30,17 @@ export default class GitAdapter {
     mime.define({ 'text/markdown': ['md'] }, true); // ensure extension for markdown files is `.md` and not `.markdown`
   }
 
-  async initialize() {
+  async initialize(options = {}) {
     this.git = new Git({ path: this.path, author: this.author });
 
     await this.git.initialize();
+
+    const readmeFilePath = `${this.path}/README.md`;
+
+    if (options.readme) {
+      await fs.writeFile(readmeFilePath, options.readme);
+      await this._commit(readmeFilePath, 'Add README');
+    }
 
     return this;
   }
