@@ -14,6 +14,12 @@ const fs = fsApi.promises;
 
 mime.define({ 'text/markdown': ['md'] }, true); // ensure extension for markdown files is `.md` and not `.markdown`
 
+const COMMIT_MESSAGE_PREFIX = {
+  startTracking: 'Start tracking',
+  refilter: 'Refilter',
+  update: 'Update',
+};
+
 export default class GitAdapter {
   constructor({ path, author, publish, prefixMessageToSnapshotId }) {
     this.path = path;
@@ -158,9 +164,9 @@ export default class GitAdapter {
   }
 
   _generateCommitMessage({ serviceId, documentType, isRefilter, snapshotId, isFirstRecord }) {
-    let prefix = isRefilter ? 'Refilter' : 'Update';
+    let prefix = isRefilter ? COMMIT_MESSAGE_PREFIX.refilter : COMMIT_MESSAGE_PREFIX.update;
 
-    prefix = isFirstRecord ? 'Start tracking' : prefix;
+    prefix = isFirstRecord ? COMMIT_MESSAGE_PREFIX.startTracking : prefix;
 
     let message = `${prefix} ${serviceId} ${documentType}`;
 
