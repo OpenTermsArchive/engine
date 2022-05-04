@@ -49,7 +49,6 @@ describe('Export', () => {
       storageAdapter = new GitAdapter({
         ...config.get('recorder.versions.storage.git'),
         path: path.resolve(__dirname, '../../../', config.get('recorder.versions.storage.git.path')),
-        fileExtension: 'md',
       });
 
       await storageAdapter.initialize();

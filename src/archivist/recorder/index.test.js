@@ -29,12 +29,10 @@ describe('Recorder', () => {
       snapshots: new GitAdapter({
         ...config.get('recorder.snapshots.storage.git'),
         path: SNAPSHOTS_PATH,
-        fileExtension: 'html',
       }),
       versions: new GitAdapter({
         ...config.get('recorder.versions.storage.git'),
         path: VERSIONS_PATH,
-        fileExtension: 'md',
       }),
     },
     mongo: {

@@ -30,6 +30,8 @@ export const AVAILABLE_EVENTS = [
   'error',
 ];
 
+const MARKDOWN_MIME_TYPE = 'text/markdown';
+
 export default class Archivist extends events.EventEmitter {
   get serviceDeclarations() {
     return this.services;
@@ -230,10 +232,11 @@ export default class Archivist extends events.EventEmitter {
 
     const { id: versionId, isFirstRecord } = await this.recorder[recordFunction]({
       serviceId: service.id,
-      content,
       documentType: type,
-      snapshotId,
+      content,
+      mimeType: MARKDOWN_MIME_TYPE, // The result of the `filter` function is always in markdown format
       fetchDate,
+      snapshotId,
     });
 
     if (!versionId) {
