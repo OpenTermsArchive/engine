@@ -39,6 +39,9 @@ export default class GitAdapter {
   }
 
   async record({ serviceId, documentType, content, mimeType, fetchDate, isRefilter, snapshotId }) {
+    if (content instanceof Promise) {
+      content = await content;
+    }
     const isFirstRecord = await this._isFirstRecord(serviceId, documentType);
     const message = this._generateCommitMessage({ serviceId, documentType, isRefilter, snapshotId, isFirstRecord });
     const fileExtension = mime.getExtension(mimeType);
