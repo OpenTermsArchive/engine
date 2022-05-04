@@ -43,6 +43,8 @@ export default class Tracker {
 
     this.createLabel({
       name: config.get('tracker.githubIssues.label'),
+      color: config.get('tracker.githubIssues.color'),
+      description: config.get('tracker.githubIssues.description'),
     });
   }
 
