@@ -29,12 +29,10 @@ describe('Recorder', () => {
       snapshots: new GitAdapter({
         ...config.get('recorder.snapshots.storage.git'),
         path: SNAPSHOTS_PATH,
-        fileExtension: 'html',
       }),
       versions: new GitAdapter({
         ...config.get('recorder.versions.storage.git'),
         path: VERSIONS_PATH,
-        fileExtension: 'md',
       }),
     },
     mongo: {
@@ -225,6 +223,7 @@ describe('Recorder', () => {
             serviceId: SERVICE_ID,
             documentType: TYPE,
             content: CONTENT,
+            mimeType: MIME_TYPE,
             snapshotId: SNAPSHOT_ID,
             fetchDate: FETCH_DATE,
           };
@@ -235,6 +234,7 @@ describe('Recorder', () => {
             snapshotId: 'snapshot ID',
             fetchDate: 'fetch date',
             content: 'content',
+            mimeType: 'mime type',
           };
 
           Object.entries(validParams).forEach(([testedRequiredParam]) => {
@@ -262,6 +262,7 @@ describe('Recorder', () => {
               serviceId: SERVICE_ID,
               documentType: TYPE,
               content: CONTENT,
+              mimeType: MIME_TYPE,
               snapshotId: SNAPSHOT_ID,
               fetchDate: FETCH_DATE,
             }));
@@ -292,6 +293,7 @@ describe('Recorder', () => {
               serviceId: SERVICE_ID,
               documentType: TYPE,
               content: CONTENT,
+              mimeType: MIME_TYPE,
               snapshotId: SNAPSHOT_ID,
               fetchDate: FETCH_DATE,
             });
@@ -300,6 +302,7 @@ describe('Recorder', () => {
               serviceId: SERVICE_ID,
               documentType: TYPE,
               content: UPDATED_CONTENT,
+              mimeType: MIME_TYPE,
               snapshotId: SNAPSHOT_ID,
               fetchDate: FETCH_DATE_LATER,
             }));
@@ -332,6 +335,7 @@ describe('Recorder', () => {
               serviceId: SERVICE_ID,
               documentType: TYPE,
               content: CONTENT,
+              mimeType: MIME_TYPE,
               snapshotId: SNAPSHOT_ID,
               fetchDate: FETCH_DATE,
             });
@@ -340,6 +344,7 @@ describe('Recorder', () => {
               serviceId: SERVICE_ID,
               documentType: TYPE,
               content: CONTENT,
+              mimeType: MIME_TYPE,
               snapshotId: SNAPSHOT_ID,
               fetchDate: FETCH_DATE_LATER,
             }));
@@ -383,6 +388,7 @@ describe('Recorder', () => {
             serviceId: SERVICE_ID,
             documentType: TYPE,
             content: CONTENT,
+            mimeType: MIME_TYPE,
             snapshotId: SNAPSHOT_ID,
             fetchDate: FETCH_DATE,
           };
@@ -393,6 +399,7 @@ describe('Recorder', () => {
             snapshotId: 'snapshot ID',
             fetchDate: 'fetch date',
             content: 'content',
+            mimeType: 'mime type',
           };
 
           Object.entries(validParams).forEach(([testedRequiredParam]) => {
@@ -420,6 +427,7 @@ describe('Recorder', () => {
               serviceId: SERVICE_ID,
               documentType: TYPE,
               content: CONTENT,
+              mimeType: MIME_TYPE,
               snapshotId: SNAPSHOT_ID,
               fetchDate: FETCH_DATE,
             }));
@@ -450,6 +458,7 @@ describe('Recorder', () => {
               serviceId: SERVICE_ID,
               documentType: TYPE,
               content: CONTENT,
+              mimeType: MIME_TYPE,
               snapshotId: SNAPSHOT_ID,
               fetchDate: FETCH_DATE,
             });
@@ -458,6 +467,7 @@ describe('Recorder', () => {
               serviceId: SERVICE_ID,
               documentType: TYPE,
               content: UPDATED_CONTENT,
+              mimeType: MIME_TYPE,
               snapshotId: SNAPSHOT_ID,
               fetchDate: FETCH_DATE_LATER,
             }));
@@ -490,6 +500,7 @@ describe('Recorder', () => {
               serviceId: SERVICE_ID,
               documentType: TYPE,
               content: CONTENT,
+              mimeType: MIME_TYPE,
               snapshotId: SNAPSHOT_ID,
               fetchDate: FETCH_DATE,
             });
@@ -498,6 +509,7 @@ describe('Recorder', () => {
               serviceId: SERVICE_ID,
               documentType: TYPE,
               content: CONTENT,
+              mimeType: MIME_TYPE,
               snapshotId: SNAPSHOT_ID,
               fetchDate: FETCH_DATE_LATER,
             }));

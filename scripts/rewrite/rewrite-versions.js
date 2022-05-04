@@ -17,6 +17,7 @@ import { loadFile } from './utils.js';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const ROOT_PATH = path.resolve(__dirname, '../../');
+const MARKDOWN_MIME_TYPE = 'text/markdown';
 
 export const SNAPSHOTS_SOURCE_PATH = path.resolve(
   ROOT_PATH,
@@ -61,12 +62,10 @@ let recorder;
     versionsStorageAdapter: new GitAdapter({
       ...config.get('recorder.versions.storage.git'),
       path: VERSIONS_TARGET_PATH,
-      fileExtension: 'md',
     }),
     snapshotsStorageAdapter: new GitAdapter({
       ...config.get('recorder.snapshots.storage.git'),
       path: SNAPSHOTS_SOURCE_PATH,
-      fileExtension: 'html',
     }),
   });
 
@@ -121,6 +120,7 @@ let recorder;
         serviceId,
         documentType,
         content: document,
+        mimeType: MARKDOWN_MIME_TYPE, // The result of the `filter` function is always in markdown format
         fetchDate: commit.date,
         snapshotId: commit.hash,
       });

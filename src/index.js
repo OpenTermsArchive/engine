@@ -8,15 +8,15 @@ import MongoAdapter from './storage-adapters/mongo/index.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-export function instantiateVersionsStorageAdapter({ fileExtension = 'md' } = {}) {
-  return instantiateStorageAdapter('versions', fileExtension);
+export function instantiateVersionsStorageAdapter() {
+  return instantiateStorageAdapter('versions');
 }
 
-export function instantiateSnapshotsStorageAdapter({ fileExtension = 'html' } = {}) {
-  return instantiateStorageAdapter('snapshots', fileExtension);
+export function instantiateSnapshotsStorageAdapter() {
+  return instantiateStorageAdapter('snapshots');
 }
 
-function instantiateStorageAdapter(recordType, fileExtension) {
+function instantiateStorageAdapter(recordType) {
   let result;
 
   switch (config.get(`recorder.${recordType}.storage.type`)) {
@@ -24,7 +24,6 @@ function instantiateStorageAdapter(recordType, fileExtension) {
     result = new GitAdapter({
       ...config.get(`recorder.${recordType}.storage.git`),
       path: path.resolve(__dirname, '../', config.get(`recorder.${recordType}.storage.git.path`)),
-      fileExtension,
     });
     break;
   case 'mongo':

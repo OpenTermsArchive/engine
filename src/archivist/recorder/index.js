@@ -44,7 +44,7 @@ export default class Recorder {
     return this.snapshotsStorageAdapter.record({ serviceId, documentType, fetchDate, mimeType, content });
   }
 
-  async recordVersion({ serviceId, documentType, snapshotId, fetchDate, content, isRefilter }) {
+  async recordVersion({ serviceId, documentType, snapshotId, fetchDate, mimeType, content, isRefilter }) {
     if (!serviceId) {
       throw new Error('A service ID is required');
     }
@@ -65,7 +65,11 @@ export default class Recorder {
       throw new Error('A document content is required');
     }
 
-    return this.versionsStorageAdapter.record({ serviceId, documentType, snapshotId, fetchDate, content, isRefilter });
+    if (!mimeType) {
+      throw new Error('A document mime type is required to ensure data consistency');
+    }
+
+    return this.versionsStorageAdapter.record({ serviceId, documentType, snapshotId, fetchDate, mimeType, content, isRefilter });
   }
 
   async recordRefilter(params) {

@@ -72,12 +72,10 @@ describe('Archivist', function () {
     snapshotsStorageAdapter = new GitAdapter({
       ...config.get('recorder.snapshots.storage.git'),
       path: SNAPSHOTS_PATH,
-      fileExtension: 'html',
     });
     versionsStorageAdapter = new GitAdapter({
       ...config.get('recorder.versions.storage.git'),
       path: VERSIONS_PATH,
-      fileExtension: 'md',
     });
   });
 
