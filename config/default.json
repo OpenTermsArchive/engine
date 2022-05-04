@@ -57,7 +57,7 @@
   "tracker": {
     "githubIssues": {
       "repository": "OpenTermsArchive/sandbox",
-      "label": "update"
+      "label": "bot-report",
     }
   },
   "dataset": {
