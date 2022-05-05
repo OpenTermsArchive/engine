@@ -5,6 +5,7 @@ import { fileURLToPath } from 'url';
 import Ajv from 'ajv';
 import chai from 'chai';
 import config from 'config';
+import { ESLint } from 'eslint';
 import jsonSourceMap from 'json-source-map';
 
 import fetch, { launchHeadlessBrowser, stopHeadlessBrowser } from '../../src/archivist/fetcher/index.js';
@@ -20,6 +21,9 @@ const fs = fsApi.promises;
 const { expect } = chai;
 
 const projectFolder = path.resolve(__dirname, '../../');
+
+const eslint = new ESLint({ overrideConfigFile: path.join(projectFolder, '.eslintrc.yaml') });
+
 const MIN_DOC_LENGTH = 100;
 const SLOW_DOCUMENT_THRESHOLD = 10 * 1000; // number of milliseconds after which a document fetch is considered slow
 
@@ -70,6 +74,21 @@ let servicesToValidate = args;
           const declaration = JSON.parse(await fs.readFile(filePath));
 
           assertValid(serviceSchema, declaration);
+        });
+
+        it('linted json', async () => {
+          const results = await eslint.lintFiles(filePath);
+
+          const errors = results[0].messages.map(({ line, message }) => `on line ${line} ${message}`);
+          const errorMessage = [
+            `${filePath} is not indented correctly`,
+            '', // use empty string to add new lines and make error more readable
+            ...errors,
+            '',
+            '',
+          ].join('\n');
+
+          expect(errors, errorMessage).to.be.empty;
         });
 
         if (service.hasHistory()) {
