@@ -79,7 +79,8 @@ let servicesToValidate = args;
         it('linted json', async () => {
           const results = await eslint.lintFiles(filePath);
 
-          const errors = results[0].messages.map(({ line, message }) => `on line ${line} ${message}`);
+          // padStart and padEnd are here to make message more readable when displayed in the terminal
+          const errors = results[0].messages.map(({ ruleId, line, column, message }) => `${`${line}:${column}`.padStart(6, ' ')}   ${message.padEnd(50, ' ')}   ${ruleId}`);
           const errorMessage = [
             `${filePath} is not indented correctly`,
             '', // use empty string to add new lines and make error more readable
