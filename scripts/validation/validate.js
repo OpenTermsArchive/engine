@@ -19,6 +19,7 @@ const fs = fsApi.promises;
 
 const { expect } = chai;
 
+const projectFolder = path.resolve(__dirname, '../../');
 const MIN_DOC_LENGTH = 100;
 const SLOW_DOCUMENT_THRESHOLD = 10 * 1000; // number of milliseconds after which a document fetch is considered slow
 
@@ -34,7 +35,7 @@ if (args.includes('--schema-only')) {
 let servicesToValidate = args;
 
 (async () => {
-  const declarationsPath = path.resolve(__dirname, '../../', config.get('services.declarationsPath'));
+  const declarationsPath = path.resolve(projectFolder, config.get('services.declarationsPath'));
 
   // If services to validate are passed as a string with services id separated by a newline character
   if (servicesToValidate.length == 1 && servicesToValidate[0].includes('\n')) {
@@ -53,6 +54,8 @@ let servicesToValidate = args;
 
     servicesToValidate.forEach(serviceId => {
       const service = serviceDeclarations[serviceId];
+      const filePath = path.join(declarationsPath, `${serviceId}.json`);
+      const historyFilePath = path.join(declarationsPath, `${serviceId}.history.json`);
 
       if (!service) {
         throw new Error(`Could not find any service with id "${serviceId}"`);
@@ -64,17 +67,14 @@ let servicesToValidate = args;
 
       describe(serviceId, async () => {
         it('valid declaration', async () => {
-          const declaration = JSON.parse(await fs.readFile(path.join(declarationsPath, `${serviceId}.json`)));
+          const declaration = JSON.parse(await fs.readFile(filePath));
 
           assertValid(serviceSchema, declaration);
         });
 
         if (service.hasHistory()) {
           it('valid history declaration', async () => {
-            const declarationHistory = JSON.parse(await fs.readFile(path.join(
-              declarationsPath,
-              `${serviceId}.history.json`,
-            )));
+            const declarationHistory = JSON.parse(await fs.readFile(historyFilePath));
 
             assertValid(serviceHistorySchema, declarationHistory);
           });
