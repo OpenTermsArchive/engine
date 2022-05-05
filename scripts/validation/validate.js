@@ -22,7 +22,8 @@ const { expect } = chai;
 
 const projectFolder = path.resolve(__dirname, '../../');
 
-const eslint = new ESLint({ overrideConfigFile: path.join(projectFolder, '.eslintrc.yaml') });
+const eslintConfigPath = path.join(projectFolder, '.eslintrc.yaml');
+const eslint = new ESLint({ overrideConfigFile: eslintConfigPath });
 
 const MIN_DOC_LENGTH = 100;
 const SLOW_DOCUMENT_THRESHOLD = 10 * 1000; // number of milliseconds after which a document fetch is considered slow
@@ -99,6 +100,8 @@ let servicesToValidate = args;
               '', // use empty string to add new lines and make error more readable
               ...errors,
               '',
+              'Fix it by launching',
+              `npx eslint -c ${eslintConfigPath} ${existingServiceFilePath} --fix`,
               '',
             ].join('\n');
 
