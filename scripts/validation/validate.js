@@ -76,22 +76,6 @@ let servicesToValidate = args;
           assertValid(serviceSchema, declaration);
         });
 
-        it('linted json', async () => {
-          const results = await eslint.lintFiles(filePath);
-
-          // padStart and padEnd are here to make message more readable when displayed in the terminal
-          const errors = results[0].messages.map(({ ruleId, line, column, message }) => `${`${line}:${column}`.padStart(6, ' ')}   ${message.padEnd(50, ' ')}   ${ruleId}`);
-          const errorMessage = [
-            `${filePath} is not indented correctly`,
-            '', // use empty string to add new lines and make error more readable
-            ...errors,
-            '',
-            '',
-          ].join('\n');
-
-          expect(errors, errorMessage).to.be.empty;
-        });
-
         if (service.hasHistory()) {
           it('valid history declaration', async () => {
             const declarationHistory = JSON.parse(await fs.readFile(historyFilePath));
@@ -99,6 +83,28 @@ let servicesToValidate = args;
             assertValid(serviceHistorySchema, declarationHistory);
           });
         }
+
+        const existingServiceFilePaths = [ '.json', '.history.json', '.filters.js', '.filters.history.js' ]
+          .map(ext => path.join(declarationsPath, `${serviceId}${ext}`))
+          .filter(filePath => fsApi.existsSync(filePath));
+
+        existingServiceFilePaths.forEach(existingServiceFilePath => {
+          it(`linted ${path.basename(existingServiceFilePath)}`, async () => {
+            const results = await eslint.lintFiles(existingServiceFilePath);
+
+            // padStart and padEnd are here to make message more readable when displayed in the terminal
+            const errors = results[0].messages.map(({ ruleId, line, column, message }) => `${`${line}:${column}`.padStart(6, ' ')}   ${message.padEnd(50, ' ')}   ${ruleId}`);
+            const errorMessage = [
+              `${existingServiceFilePath} is incorrectly formatted`,
+              '', // use empty string to add new lines and make error more readable
+              ...errors,
+              '',
+              '',
+            ].join('\n');
+
+            expect(errors, errorMessage).to.be.empty;
+          });
+        });
 
         if (!schemaOnly) {
           service.getDocumentTypes().forEach(type => {
