@@ -3,7 +3,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 
 import Ajv from 'ajv';
-import chai from 'chai';
+import { expect } from 'chai';
 import config from 'config';
 import { ESLint } from 'eslint';
 import jsonSourceMap from 'json-source-map';
@@ -15,15 +15,11 @@ import * as services from '../../src/archivist/services/index.js';
 import serviceHistorySchema from './service.history.schema.js';
 import serviceSchema from './service.schema.js';
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const fs = fsApi.promises;
 
-const { expect } = chai;
-
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT_PATH = path.resolve(__dirname, '../../');
-
-const eslintConfigPath = path.join(ROOT_PATH, '.eslintrc.yaml');
-const eslint = new ESLint({ overrideConfigFile: eslintConfigPath });
+const ESLINT_CONFIG_PATH = path.join(ROOT_PATH, '.eslintrc.yaml');
 
 const MIN_DOC_LENGTH = 100;
 const SLOW_DOCUMENT_THRESHOLD = 10 * 1000; // number of milliseconds after which a document fetch is considered slow
@@ -71,43 +67,43 @@ let servicesToValidate = args;
       after(stopHeadlessBrowser);
 
       describe(serviceId, async () => {
-        it('valid declaration', async () => {
+        it('valid declaration schema', async () => {
           const declaration = JSON.parse(await fs.readFile(filePath));
 
           assertValid(serviceSchema, declaration);
         });
 
+        it('valid declaration file format', async () => {
+          await lintFile(filePath);
+        });
+
         if (service.hasHistory()) {
-          it('valid history declaration', async () => {
+          it('valid history declaration schema', async () => {
             const declarationHistory = JSON.parse(await fs.readFile(historyFilePath));
 
             assertValid(serviceHistorySchema, declarationHistory);
           });
+
+          it('valid history declaration file format', async () => {
+            await lintFile(path.join(declarationsPath, `${serviceId}.history.json`));
+          });
         }
 
-        const existingServiceFilePaths = [ '.json', '.history.json', '.filters.js', '.filters.history.js' ]
-          .map(ext => path.join(declarationsPath, `${serviceId}${ext}`))
-          .filter(filePath => fsApi.existsSync(filePath));
+        const filtersFilePath = path.join(declarationsPath, `${serviceId}.filters.js`);
 
-        existingServiceFilePaths.forEach(existingServiceFilePath => {
-          it(`linted ${path.basename(existingServiceFilePath)}`, async () => {
-            const results = await eslint.lintFiles(existingServiceFilePath);
-
-            // padStart and padEnd are here to make message more readable when displayed in the terminal
-            const errors = results[0].messages.map(({ ruleId, line, column, message }) => `${`${line}:${column}`.padStart(6, ' ')}   ${message.padEnd(50, ' ')}   ${ruleId}`);
-            const errorMessage = [
-              `${existingServiceFilePath} is incorrectly formatted`,
-              '', // use empty string to add new lines and make error more readable
-              ...errors,
-              '',
-              'Fix it by launching',
-              `npx eslint -c ${eslintConfigPath} ${existingServiceFilePath} --fix`,
-              '',
-            ].join('\n');
-
-            expect(errors, errorMessage).to.be.empty;
+        if (fsApi.existsSync(filtersFilePath)) {
+          it('valid filters file format', async () => {
+            await lintFile(filtersFilePath);
           });
-        });
+        }
+
+        const filtersHistoryFilePath = path.join(declarationsPath, `${serviceId}.filters.history.js`);
+
+        if (fsApi.existsSync(filtersHistoryFilePath)) {
+          it('valid filters history file format', async () => {
+            await lintFile(filtersHistoryFilePath);
+          });
+        }
 
         if (!schemaOnly) {
           service.getDocumentTypes().forEach(type => {
@@ -237,4 +233,22 @@ function assertValid(schema, subject) {
 
     throw new Error(errorMessage);
   }
+}
+
+async function lintFile(filePath) {
+  const [lintResult] = await new ESLint({ overrideConfigFile: ESLINT_CONFIG_PATH, fix: false }).lintFiles(filePath);
+
+  if (!lintResult.errorCount) {
+    return;
+  }
+
+  // Create a new instance of linter with option `fix` set to true to get a fixed output.
+  // It is not possible to use only a linter with this option enabled because when this option is set, if it can fix errors, it considers that there are no errors and returns `0` for the `errorCount`.
+  // So use two linters to have access both to `errorCount` and fix `output` variables.
+  const [lintResultFixed] = await new ESLint({ overrideConfigFile: ESLINT_CONFIG_PATH, fix: true }).lintFiles(filePath);
+
+  const errorMessage = `${path.basename(filePath)} is incorrectly formatted`;
+  const suggestionMessage = `May be auto fixed with "npm run fix ./declarations/${path.basename(filePath)}" from the root of your declarations repository`;
+
+  expect(lintResult.source).to.equal(lintResultFixed.output, `${errorMessage}. ${suggestionMessage}\n`);
 }
