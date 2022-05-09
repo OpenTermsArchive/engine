@@ -20,9 +20,9 @@ const fs = fsApi.promises;
 
 const { expect } = chai;
 
-const projectFolder = path.resolve(__dirname, '../../');
+const ROOT_PATH = path.resolve(__dirname, '../../');
 
-const eslintConfigPath = path.join(projectFolder, '.eslintrc.yaml');
+const eslintConfigPath = path.join(ROOT_PATH, '.eslintrc.yaml');
 const eslint = new ESLint({ overrideConfigFile: eslintConfigPath });
 
 const MIN_DOC_LENGTH = 100;
@@ -40,7 +40,7 @@ if (args.includes('--schema-only')) {
 let servicesToValidate = args;
 
 (async () => {
-  const declarationsPath = path.resolve(projectFolder, config.get('services.declarationsPath'));
+  const declarationsPath = path.resolve(ROOT_PATH, config.get('services.declarationsPath'));
 
   // If services to validate are passed as a string with services id separated by a newline character
   if (servicesToValidate.length == 1 && servicesToValidate[0].includes('\n')) {
