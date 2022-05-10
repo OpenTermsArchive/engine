@@ -91,6 +91,11 @@ export default class GitAdapter {
     return this._getRecordFromCommitMetadata(commit);
   }
 
+  async getRecords() {
+    return Promise.all((await this._getMeaningfulCommitsAscending())
+      .map(this._getRecordFromCommitMetadata.bind(this)));
+  }
+
   async* iterate() {
     const commits = await this._getMeaningfulCommitsAscending();
 
