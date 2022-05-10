@@ -347,8 +347,8 @@ describe('MongoAdapter', () => {
           expect(latestRecord.id).to.include(lastSnapshotId);
         });
 
-        it('returns the latest record content', () => {
-          expect(latestRecord.content.toString('utf8')).to.equal(UPDATED_CONTENT);
+        it('returns the latest record content', async () => {
+          expect((await latestRecord.content).toString('utf8')).to.equal(UPDATED_CONTENT);
         });
 
         it('returns the latest record mime type', () => {
@@ -383,8 +383,8 @@ describe('MongoAdapter', () => {
           expect(latestRecord.id).to.include(lastSnapshotId);
         });
 
-        it('returns the latest record content', () => {
-          expect(latestRecord.content).to.equal(UPDATED_PDF_CONTENT);
+        it('returns the latest record content', async () => {
+          expect(await latestRecord.content).to.equal(UPDATED_PDF_CONTENT);
         });
 
         it('returns the latest record mime type', () => {

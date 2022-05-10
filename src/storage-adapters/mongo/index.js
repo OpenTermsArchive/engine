@@ -5,8 +5,6 @@
 
 import { Binary, MongoClient, ObjectId } from 'mongodb';
 
-const PDF_MIME_TYPE = 'application/pdf';
-
 export default class MongoAdapter {
   constructor({ database: databaseName, collection: collectionName, connectionURI }) {
     const client = new MongoClient(connectionURI);
@@ -29,23 +27,21 @@ export default class MongoAdapter {
     return this.client.close();
   }
 
-  async record({ serviceId, documentType, content: passedContent, mimeType, fetchDate, isRefilter, snapshotId }) {
-    let content = passedContent;
-
-    if (mimeType == PDF_MIME_TYPE) {
-      content = passedContent.toString('utf-8'); // Serialize PDF
+  async record({ serviceId, documentType, content, mimeType, fetchDate, isRefilter, snapshotId }) {
+    if (content instanceof Promise) {
+      content = await content;
     }
 
     const previousRecord = await this.getLatestRecord(serviceId, documentType);
 
-    if (previousRecord && previousRecord.content == content) {
+    if (previousRecord && await previousRecord.content == content) {
       return {};
     }
 
     const recordProperties = Object.fromEntries(Object.entries({
       serviceId,
       documentType,
-      content: passedContent,
+      content,
       mimeType,
       fetchDate,
       isRefilter,
@@ -77,15 +73,9 @@ export default class MongoAdapter {
       return {};
     }
 
-    const { _id, content, mimeType, fetchDate, isRefilter } = record;
+    return this.getRecordFromMongoMetadata(record);
+  }
 
-    return {
-      id: _id.toString(),
-      content,
-      mimeType,
-      fetchDate: new Date(fetchDate),
-      isRefilter: Boolean(isRefilter),
-    };
   }
 
   async* iterate() {
