@@ -1,4 +1,3 @@
-import config from 'config';
 import puppeteer from 'puppeteer-extra';
 import stealthPlugin from 'puppeteer-extra-plugin-stealth';
 
@@ -6,13 +5,12 @@ import { FetchDocumentError } from './errors.js';
 
 puppeteer.use(stealthPlugin());
 
-const NAVIGATION_TIMEOUT = config.get('fetcher.navigationTimeout');
-const WAIT_FOR_ELEMENTS_TIMEOUT = config.get('fetcher.waitForElementsTimeout');
-const LANGUAGE = config.get('fetcher.language');
-
 let browser;
 
-export default async function fetch(url, cssSelectors) {
+const defaultOptions = { navigationTimeout: 5000, language: 'en', waitForElementsTimeout: 5000 };
+
+export default async function fetch(url, cssSelectors, fetchOptions = {}) {
+  const options = { ...defaultOptions, ...fetchOptions };
   let page;
   let response;
   const selectors = [].concat(cssSelectors);
@@ -24,8 +22,8 @@ export default async function fetch(url, cssSelectors) {
   try {
     page = await browser.newPage();
 
-    await page.setDefaultNavigationTimeout(NAVIGATION_TIMEOUT);
-    await page.setExtraHTTPHeaders({ 'Accept-Language': LANGUAGE });
+    await page.setDefaultNavigationTimeout(options.navigationTimeout);
+    await page.setExtraHTTPHeaders({ 'Accept-Language': options.language });
 
     response = await page.goto(url, { waitUntil: 'networkidle0' });
 
@@ -39,7 +37,7 @@ export default async function fetch(url, cssSelectors) {
       throw new FetchDocumentError(`Received HTTP code ${statusCode} when trying to fetch '${url}'`);
     }
 
-    const waitForSelectorsPromises = selectors.map(selector => page.waitForSelector(selector, { timeout: WAIT_FOR_ELEMENTS_TIMEOUT }));
+    const waitForSelectorsPromises = selectors.map(selector => page.waitForSelector(selector, { timeout: options.waitForElementsTimeout }));
 
     // We expect all elements to be present on the page…
     await Promise.all(waitForSelectorsPromises).catch(error => {
