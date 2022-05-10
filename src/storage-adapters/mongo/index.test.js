@@ -22,8 +22,8 @@ const FETCH_DATE = new Date('2000-01-01T12:00:00.000Z');
 const FETCH_DATE_LATER = new Date('2000-01-02T12:00:00.000Z');
 const FETCH_DATE_EARLIER = new Date('2000-01-01T06:00:00.000Z');
 const SNAPSHOT_ID = '61af86dc5ff5caa74ae926ad';
-const PDF_CONTENT = fs.readFileSync(path.resolve(__dirname, '../../../test/fixtures/terms.pdf'), { encoding: 'utf8' });
-const UPDATED_PDF_CONTENT = fs.readFileSync(path.resolve(__dirname, '../../../test/fixtures/termsModified.pdf'), { encoding: 'utf8' });
+const PDF_CONTENT = fs.readFileSync(path.resolve(__dirname, '../../../test/fixtures/terms.pdf'));
+const UPDATED_PDF_CONTENT = fs.readFileSync(path.resolve(__dirname, '../../../test/fixtures/termsModified.pdf'));
 const PDF_MIME_TYPE = 'application/pdf';
 
 let collection;
@@ -301,8 +301,10 @@ describe('MongoAdapter', () => {
         expect(mongoDocument._id.toString()).to.equal(record.id);
       });
 
-      it('stores the proper content', () => {
-        expect(mongoDocument.content).to.equal(PDF_CONTENT);
+      it('stores the proper content', async () => {
+        const isSameContent = Buffer.compare(mongoDocument.content.buffer, PDF_CONTENT) == 0;
+
+        expect(isSameContent).to.be.true;
       });
 
       it('stores the mime type', () => {
@@ -495,7 +497,9 @@ describe('MongoAdapter', () => {
         });
 
         it('returns the latest record content', async () => {
-          expect(await latestRecord.content).to.equal(UPDATED_PDF_CONTENT);
+          const isSameContent = Buffer.compare(await latestRecord.content, UPDATED_PDF_CONTENT) == 0;
+
+          expect(isSameContent).to.be.true;
         });
 
         it('returns the latest record mime type', () => {
