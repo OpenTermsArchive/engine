@@ -47,7 +47,7 @@ export default async function generate({ archivePath, releaseDate }) {
     logger.info({ message: versionPath, counter: index, hash: version.id });
 
     archive.stream.append(
-      content,
+      await content,
       { name: `${archive.basename}/${versionPath}` },
     );
     index++;

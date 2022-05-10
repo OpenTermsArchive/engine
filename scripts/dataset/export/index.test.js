@@ -30,6 +30,8 @@ const FOURTH_FETCH_DATE = '2022-01-01T12:12:24.000Z';
 const FIRST_CONTENT = 'First Content';
 const SECOND_CONTENT = 'Second Content';
 
+const MIME_TYPE = 'text/markdown';
+
 const SNAPSHOT_ID = '721ce4a63ad399ecbdb548a66d6d327e7bc97876';
 
 const RELEASE_DATE = '2022-01-01T18:21:00.000Z';
@@ -57,6 +59,7 @@ describe('Export', () => {
         serviceId: FIRST_SERVICE_PROVIDER_ID,
         documentType: FIRST_DOCUMENT_TYPE,
         content: FIRST_CONTENT,
+        mimeType: MIME_TYPE,
         fetchDate: FIRST_FETCH_DATE,
         snapshotId: SNAPSHOT_ID,
       });
@@ -65,6 +68,7 @@ describe('Export', () => {
         serviceId: FIRST_SERVICE_PROVIDER_ID,
         documentType: FIRST_DOCUMENT_TYPE,
         content: SECOND_CONTENT,
+        mimeType: MIME_TYPE,
         fetchDate: SECOND_FETCH_DATE,
         snapshotId: SNAPSHOT_ID,
       });
@@ -73,6 +77,7 @@ describe('Export', () => {
         serviceId: SECOND_SERVICE_PROVIDER_ID,
         documentType: FIRST_DOCUMENT_TYPE,
         content: FIRST_CONTENT,
+        mimeType: MIME_TYPE,
         fetchDate: THIRD_FETCH_DATE,
         snapshotId: SNAPSHOT_ID,
       });
@@ -81,6 +86,7 @@ describe('Export', () => {
         serviceId: SECOND_SERVICE_PROVIDER_ID,
         documentType: SECOND_DOCUMENT_TYPE,
         content: FIRST_CONTENT,
+        mimeType: MIME_TYPE,
         fetchDate: FOURTH_FETCH_DATE,
         snapshotId: SNAPSHOT_ID,
       });
