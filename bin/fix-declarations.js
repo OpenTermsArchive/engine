@@ -1,0 +1,34 @@
+#! /usr/bin/env node
+import './.env.js'; // Workaround to ensure `SUPPRESS_NO_CONFIG_WARNING` is set before config is imported
+
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+import config from 'config';
+import { ESLint } from 'eslint';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const ROOT_PATH = path.resolve(__dirname, '../');
+const ESLINT_CONFIG_PATH = path.join(ROOT_PATH, '.eslintrc.yaml');
+
+// Initialise configs to allow clients of this module to use it without requiring node-config in their own application.
+// see https://github.com/lorenwest/node-config/wiki/Sub-Module-Configuration
+config.util.setModuleDefaults('services', { declarationsPath: path.resolve(process.cwd(), './declarations') });
+
+let servicesToValidate = process.argv.slice(2); // Keep only args that are after the script filename
+
+(async () => {
+  const declarationsPath = path.resolve(ROOT_PATH, config.get('services.declarationsPath'));
+
+  if (!servicesToValidate.length) {
+    servicesToValidate = ['*'];
+  }
+
+  for (const service of servicesToValidate) {
+    /* eslint-disable no-await-in-loop */
+    const lintResults = await new ESLint({ overrideConfigFile: ESLINT_CONFIG_PATH, fix: true }).lintFiles(path.join(declarationsPath, `${service}.*`));
+
+    await ESLint.outputFixes(lintResults);
+    /* eslint-enable no-await-in-loop */
+  }
+})();

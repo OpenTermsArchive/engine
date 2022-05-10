@@ -247,8 +247,5 @@ async function lintFile(filePath) {
   // So use two linters to have access both to `errorCount` and fix `output` variables.
   const [lintResultFixed] = await new ESLint({ overrideConfigFile: ESLINT_CONFIG_PATH, fix: true }).lintFiles(filePath);
 
-  const errorMessage = `${path.basename(filePath)} is incorrectly formatted`;
-  const suggestionMessage = `May be auto fixed with "npm run fix ./declarations/${path.basename(filePath)}" from the root of your declarations repository`;
-
-  expect(lintResult.source).to.equal(lintResultFixed.output, `${errorMessage}. ${suggestionMessage}\n`);
+  expect(lintResult.source).to.equal(lintResultFixed.output, `${path.basename(filePath)} is not properly formatted.\n`);
 }
