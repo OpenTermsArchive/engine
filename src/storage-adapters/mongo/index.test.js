@@ -313,6 +313,58 @@ describe('MongoAdapter', () => {
     });
   });
 
+  describe('#getRecord', () => {
+    let record;
+    let id;
+
+    before(async () => {
+      ({ id } = await subject.record({
+        serviceId: SERVICE_PROVIDER_ID,
+        documentType: DOCUMENT_TYPE,
+        content: CONTENT,
+        fetchDate: FETCH_DATE,
+        snapshotId: SNAPSHOT_ID,
+        mimeType: MIME_TYPE,
+      }));
+
+      (record = await subject.getRecord(id));
+    });
+
+    after(async () => subject._removeAllRecords());
+
+    it('returns the record id', () => {
+      expect(record.id).to.include(id);
+    });
+
+    it('returns a boolean to know if it is the first record', () => {
+      expect(record.isFirstRecord).to.be.true;
+    });
+
+    it('returns the service id', () => {
+      expect(record.serviceId).to.equal(SERVICE_PROVIDER_ID);
+    });
+
+    it('returns the document type', () => {
+      expect(record.documentType).to.equal(DOCUMENT_TYPE);
+    });
+
+    it('returns a asynchronous content getter', async () => {
+      expect(await record.content).to.equal(CONTENT);
+    });
+
+    it('stores the fetch date', () => {
+      expect(new Date(record.fetchDate).getTime()).to.equal(FETCH_DATE.getTime());
+    });
+
+    it('stores the mime type', () => {
+      expect(record.mimeType).to.equal(MIME_TYPE);
+    });
+
+    it('stores the snapshot ID', () => {
+      expect(record.snapshotId).to.equal(SNAPSHOT_ID);
+    });
+  });
+
   describe('#getLatestRecord', () => {
     context('when there are records for the given service', () => {
       let lastSnapshotId;

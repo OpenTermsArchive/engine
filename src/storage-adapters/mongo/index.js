@@ -76,6 +76,16 @@ export default class MongoAdapter {
     return this.getRecordFromMongoMetadata(record);
   }
 
+  async getRecord(recordId) {
+    const record = await this.collection.findOne({ _id: new ObjectId(recordId) });
+
+    if (!record) {
+      return {};
+    }
+
+    return this.getRecordFromMongoMetadata(record);
+  }
+
   }
 
   async* iterate() {
