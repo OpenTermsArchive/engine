@@ -86,6 +86,9 @@ export default class MongoAdapter {
     return this.getRecordFromMongoMetadata(record);
   }
 
+  async getRecords() {
+    return (await this.collection.find().project({ content: 0 }).sort({ fetchDate: 1 }).toArray())
+      .map(record => this.getRecordFromMongoMetadata(record));
   }
 
   async* iterate() {

@@ -363,6 +363,65 @@ describe('MongoAdapter', () => {
     });
   });
 
+  describe('#getRecords', () => {
+    let records;
+    const expectedIds = [];
+
+    before(async () => {
+      const { id: id1 } = await subject.record({
+        serviceId: SERVICE_PROVIDER_ID,
+        documentType: DOCUMENT_TYPE,
+        content: CONTENT,
+        fetchDate: FETCH_DATE,
+        // snapshotId: SNAPSHOT_ID,
+        mimeType: MIME_TYPE,
+      });
+
+      expectedIds.push(id1);
+
+      const { id: id2 } = await subject.record({
+        serviceId: SERVICE_PROVIDER_ID,
+        documentType: DOCUMENT_TYPE,
+        content: `${CONTENT} - updated`,
+        fetchDate: FETCH_DATE_LATER,
+        snapshotId: SNAPSHOT_ID,
+        mimeType: MIME_TYPE,
+      });
+
+      expectedIds.push(id2);
+
+      const { id: id3 } = await subject.record({
+        serviceId: SERVICE_PROVIDER_ID,
+        documentType: DOCUMENT_TYPE,
+        content: `${CONTENT} - updated 2`,
+        isRefilter: true,
+        fetchDate: FETCH_DATE_EARLIER,
+        snapshotId: SNAPSHOT_ID,
+        mimeType: MIME_TYPE,
+      });
+
+      expectedIds.push(id3);
+
+      (records = await subject.getRecords());
+    });
+
+    after(async () => subject._removeAllRecords());
+
+    it('returns all records', () => {
+      expect(records.length).to.equal(3);
+    });
+
+    it('returns records with proper keys', () => {
+      for (const record of records) {
+        expect(record).to.have.keys([ 'id', 'serviceId', 'documentType', 'mimeType', 'fetchDate', 'content', 'isFirstRecord', 'isRefilter', 'snapshotId' ]);
+      }
+    });
+
+    it('returns records in ascending order', async () => {
+      expect(records.map(record => record.fetchDate)).to.deep.equal([ FETCH_DATE_EARLIER, FETCH_DATE, FETCH_DATE_LATER ]);
+    });
+  });
+
   describe('#getLatestRecord', () => {
     context('when there are records for the given service', () => {
       let lastSnapshotId;
