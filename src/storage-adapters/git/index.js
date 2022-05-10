@@ -90,6 +90,10 @@ export default class GitAdapter {
       .map(this._getRecordFromCommitMetadata.bind(this)));
   }
 
+  async count() {
+    return Number((await this.git.raw([ 'rev-list', '--count', 'HEAD' ])).trim());
+  }
+
   async* iterate() {
     const commits = await this._getMeaningfulCommitsAscending();
 

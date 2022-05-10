@@ -480,6 +480,46 @@ describe('GitAdapter', () => {
     });
   });
 
+  describe('#count', () => {
+    let count;
+
+    before(async () => {
+      await subject.record({
+        serviceId: SERVICE_PROVIDER_ID,
+        documentType: DOCUMENT_TYPE,
+        content: CONTENT,
+        fetchDate: FETCH_DATE,
+        snapshotId: SNAPSHOT_ID,
+        mimeType: MIME_TYPE,
+      });
+      await subject.record({
+        serviceId: SERVICE_PROVIDER_ID,
+        documentType: DOCUMENT_TYPE,
+        content: `${CONTENT} - updated`,
+        fetchDate: FETCH_DATE_LATER,
+        snapshotId: SNAPSHOT_ID,
+        mimeType: MIME_TYPE,
+      });
+      await subject.record({
+        serviceId: SERVICE_PROVIDER_ID,
+        documentType: DOCUMENT_TYPE,
+        content: `${CONTENT} - updated 2`,
+        isRefilter: true,
+        fetchDate: FETCH_DATE_EARLIER,
+        snapshotId: SNAPSHOT_ID,
+        mimeType: MIME_TYPE,
+      });
+
+      (count = await subject.count());
+    });
+
+    after(async () => subject._removeAllRecords());
+
+    it('returns the proper count', async () => {
+      expect(count).to.equal(3);
+    });
+  });
+
   describe('#getLatestRecord', () => {
     context('when there are records for the given service', () => {
       let lastSnapshotId;
