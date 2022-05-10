@@ -2,43 +2,35 @@
   "name": "open-terms-archive",
   "version": "0.15.0",
   "description": "Tracks and makes visible all changes to the Terms Of Service of online service providers.",
-  "main": "index.js",
-  "type": "module",
-  "engines": {
-    "node": ">=16.0.0"
-  },
-  "scripts": {
-    "start": "node --max-http-header-size=32768 src/main.js",
-    "start:scheduler": "node --max-http-header-size=32768 src/main.js --schedule",
-    "test": "cross-env NODE_ENV=test mocha --recursive \"./src/**/*.test.js\" \"./scripts/**/*.test.js\" --exit",
-    "test:debug": "npm run test -- --inspect-brk --exit",
-    "posttest": "npm run lint",
-    "lint": "eslint src test scripts bin",
-    "lint:fix": "npm run lint -- --fix",
-    "validate": "node ./bin/validate.js",
-    "validate:schema": "npm run validate -- --schema-only",
-    "dataset:generate": "node scripts/dataset/main.js",
-    "dataset:release": "node scripts/dataset/main.js --publish --remove-local-copy",
-    "dataset:scheduler": "npm run dataset:release -- --schedule",
-    "refilter": "node src/main.js --refilter-only"
+  "homepage": "https://github.com/ambanum/OpenTermsArchive#readme",
+  "bugs": {
+    "url": "https://github.com/ambanum/OpenTermsArchive/issues"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/ambanum/OpenTermsArchive.git"
   },
-  "author": "ambanum",
   "license": "EUPL-1.2",
-  "bugs": {
-    "url": "https://github.com/ambanum/OpenTermsArchive/issues"
+  "author": "ambanum",
+  "type": "module",
+  "main": "index.js",
+  "bin": {
+    "ota-validate": "./bin/validate.js"
   },
-  "homepage": "https://github.com/ambanum/OpenTermsArchive#readme",
-  "devDependencies": {
-    "dir-compare": "^4.0.0",
-    "nock": "^13.2.1",
-    "node-stream-zip": "^1.15.0",
-    "prettier": "^2.2.1",
-    "sinon": "^12.0.1",
-    "sinon-chai": "^3.7.0"
+  "scripts": {
+    "dataset:generate": "node scripts/dataset/main.js",
+    "dataset:release": "node scripts/dataset/main.js --publish --remove-local-copy",
+    "dataset:scheduler": "npm run dataset:release -- --schedule",
+    "lint": "eslint src test scripts bin",
+    "lint:fix": "npm run lint -- --fix",
+    "refilter": "node src/main.js --refilter-only",
+    "start": "node --max-http-header-size=32768 src/main.js",
+    "start:scheduler": "node --max-http-header-size=32768 src/main.js --schedule",
+    "test": "cross-env NODE_ENV=test mocha --recursive \"./src/**/*.test.js\" \"./scripts/**/*.test.js\" --exit",
+    "posttest": "npm run lint",
+    "test:debug": "npm run test -- --inspect-brk --exit",
+    "validate": "node ./bin/validate.js",
+    "validate:schema": "npm run validate -- --schema-only"
   },
   "dependencies": {
     "@accordproject/markdown-cicero": "^0.15.2",
@@ -83,7 +75,15 @@
     "winston": "^3.3.3",
     "winston-mail": "^2.0.0"
   },
-  "bin": {
-    "ota-validate": "./bin/validate.js"
+  "devDependencies": {
+    "dir-compare": "^4.0.0",
+    "nock": "^13.2.1",
+    "node-stream-zip": "^1.15.0",
+    "prettier": "^2.2.1",
+    "sinon": "^12.0.1",
+    "sinon-chai": "^3.7.0"
+  },
+  "engines": {
+    "node": ">=16.0.0"
   }
 }
