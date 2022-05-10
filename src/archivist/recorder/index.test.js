@@ -117,7 +117,7 @@ describe('Recorder', () => {
           after(async () => snapshotsAdapter._removeAllRecords());
 
           it('records the document with the proper content', async () => {
-            expect(record.content).to.equal(CONTENT);
+            expect(await record.content).to.equal(CONTENT);
           });
 
           it('returns the record id', async () => {
@@ -155,7 +155,7 @@ describe('Recorder', () => {
           after(async () => snapshotsAdapter._removeAllRecords());
 
           it('records the document with the proper content', async () => {
-            expect(record.content).to.equal(UPDATED_CONTENT);
+            expect(await record.content).to.equal(UPDATED_CONTENT);
           });
 
           it('returns the record id', async () => {
@@ -223,6 +223,7 @@ describe('Recorder', () => {
             serviceId: SERVICE_ID,
             documentType: TYPE,
             content: CONTENT,
+            mimeType: MIME_TYPE,
             snapshotId: SNAPSHOT_ID,
             fetchDate: FETCH_DATE,
           };
@@ -233,6 +234,7 @@ describe('Recorder', () => {
             snapshotId: 'snapshot ID',
             fetchDate: 'fetch date',
             content: 'content',
+            mimeType: 'mime type',
           };
 
           Object.entries(validParams).forEach(([testedRequiredParam]) => {
@@ -260,6 +262,7 @@ describe('Recorder', () => {
               serviceId: SERVICE_ID,
               documentType: TYPE,
               content: CONTENT,
+              mimeType: MIME_TYPE,
               snapshotId: SNAPSHOT_ID,
               fetchDate: FETCH_DATE,
             }));
@@ -270,7 +273,7 @@ describe('Recorder', () => {
           after(async () => versionsAdapter._removeAllRecords());
 
           it('records the document with the proper content', async () => {
-            expect(record.content).to.equal(CONTENT);
+            expect(await record.content).to.equal(CONTENT);
           });
 
           it('returns the record id', async () => {
@@ -290,6 +293,7 @@ describe('Recorder', () => {
               serviceId: SERVICE_ID,
               documentType: TYPE,
               content: CONTENT,
+              mimeType: MIME_TYPE,
               snapshotId: SNAPSHOT_ID,
               fetchDate: FETCH_DATE,
             });
@@ -298,6 +302,7 @@ describe('Recorder', () => {
               serviceId: SERVICE_ID,
               documentType: TYPE,
               content: UPDATED_CONTENT,
+              mimeType: MIME_TYPE,
               snapshotId: SNAPSHOT_ID,
               fetchDate: FETCH_DATE_LATER,
             }));
@@ -308,7 +313,7 @@ describe('Recorder', () => {
           after(async () => versionsAdapter._removeAllRecords());
 
           it('records the document with the proper content', async () => {
-            expect(record.content).to.equal(UPDATED_CONTENT);
+            expect(await record.content).to.equal(UPDATED_CONTENT);
           });
 
           it('records in the document that it is not a refilter', async () => {
@@ -330,6 +335,7 @@ describe('Recorder', () => {
               serviceId: SERVICE_ID,
               documentType: TYPE,
               content: CONTENT,
+              mimeType: MIME_TYPE,
               snapshotId: SNAPSHOT_ID,
               fetchDate: FETCH_DATE,
             });
@@ -338,6 +344,7 @@ describe('Recorder', () => {
               serviceId: SERVICE_ID,
               documentType: TYPE,
               content: CONTENT,
+              mimeType: MIME_TYPE,
               snapshotId: SNAPSHOT_ID,
               fetchDate: FETCH_DATE_LATER,
             }));
@@ -381,6 +388,7 @@ describe('Recorder', () => {
             serviceId: SERVICE_ID,
             documentType: TYPE,
             content: CONTENT,
+            mimeType: MIME_TYPE,
             snapshotId: SNAPSHOT_ID,
             fetchDate: FETCH_DATE,
           };
@@ -391,6 +399,7 @@ describe('Recorder', () => {
             snapshotId: 'snapshot ID',
             fetchDate: 'fetch date',
             content: 'content',
+            mimeType: 'mime type',
           };
 
           Object.entries(validParams).forEach(([testedRequiredParam]) => {
@@ -418,6 +427,7 @@ describe('Recorder', () => {
               serviceId: SERVICE_ID,
               documentType: TYPE,
               content: CONTENT,
+              mimeType: MIME_TYPE,
               snapshotId: SNAPSHOT_ID,
               fetchDate: FETCH_DATE,
             }));
@@ -428,7 +438,7 @@ describe('Recorder', () => {
           after(async () => versionsAdapter._removeAllRecords()); after(async () => versionsAdapter._removeAllRecords());
 
           it('records the document with the proper content', async () => {
-            expect(record.content).to.equal(CONTENT);
+            expect(await record.content).to.equal(CONTENT);
           });
 
           it('returns the record id', async () => {
@@ -448,6 +458,7 @@ describe('Recorder', () => {
               serviceId: SERVICE_ID,
               documentType: TYPE,
               content: CONTENT,
+              mimeType: MIME_TYPE,
               snapshotId: SNAPSHOT_ID,
               fetchDate: FETCH_DATE,
             });
@@ -456,6 +467,7 @@ describe('Recorder', () => {
               serviceId: SERVICE_ID,
               documentType: TYPE,
               content: UPDATED_CONTENT,
+              mimeType: MIME_TYPE,
               snapshotId: SNAPSHOT_ID,
               fetchDate: FETCH_DATE_LATER,
             }));
@@ -466,7 +478,7 @@ describe('Recorder', () => {
           after(async () => versionsAdapter._removeAllRecords());
 
           it('records the document with the proper content', async () => {
-            expect(record.content).to.equal(UPDATED_CONTENT);
+            expect(await record.content).to.equal(UPDATED_CONTENT);
           });
 
           it('records in the document that it is a refilter', async () => {
@@ -488,6 +500,7 @@ describe('Recorder', () => {
               serviceId: SERVICE_ID,
               documentType: TYPE,
               content: CONTENT,
+              mimeType: MIME_TYPE,
               snapshotId: SNAPSHOT_ID,
               fetchDate: FETCH_DATE,
             });
@@ -496,6 +509,7 @@ describe('Recorder', () => {
               serviceId: SERVICE_ID,
               documentType: TYPE,
               content: CONTENT,
+              mimeType: MIME_TYPE,
               snapshotId: SNAPSHOT_ID,
               fetchDate: FETCH_DATE_LATER,
             }));
