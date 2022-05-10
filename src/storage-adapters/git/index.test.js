@@ -21,6 +21,8 @@ const CONTENT = 'ToS fixture data with UTF-8 çhãràčtęrs';
 const EXPECTED_FILE_PATH = `${RECORDER_PATH}/${SERVICE_PROVIDER_ID}/${DOCUMENT_TYPE}.html`;
 const EXPECTED_PDF_FILE_PATH = EXPECTED_FILE_PATH.replace('html', 'pdf');
 const FETCH_DATE = new Date('2000-01-01T12:00:00.000Z');
+const FETCH_DATE_LATER = new Date('2000-01-02T12:00:00.000Z');
+const FETCH_DATE_EARLIER = new Date('2000-01-01T06:00:00.000Z');
 const SNAPSHOT_ID = '513fadb2ae415c87747047e33287805d59e2dd55';
 const MIME_TYPE = 'text/html';
 const PDF_CONTENT = fs.readFileSync(path.resolve(__dirname, '../../../test/fixtures/terms.pdf'), { encoding: 'utf8' });
@@ -261,6 +263,7 @@ describe('GitAdapter', () => {
           serviceId: SERVICE_PROVIDER_ID,
           documentType: DOCUMENT_TYPE,
           content: CONTENT,
+          mimeType: MIME_TYPE,
         });
 
         numberOfRecordsBefore = (await git.log()).length;
@@ -269,6 +272,7 @@ describe('GitAdapter', () => {
           serviceId: SERVICE_PROVIDER_ID,
           documentType: DOCUMENT_TYPE,
           content: CONTENT,
+          mimeType: MIME_TYPE,
         }));
 
         numberOfRecordsAfter = (await git.log()).length;
@@ -508,8 +512,8 @@ describe('GitAdapter', () => {
           expect(latestRecord.id).to.include(lastSnapshotId);
         });
 
-        it('returns the latest record content', () => {
-          expect(latestRecord.content.toString('utf8')).to.equal(UPDATED_FILE_CONTENT);
+        it('returns the latest record content', async () => {
+          expect((await latestRecord.content).toString('utf8')).to.equal(UPDATED_FILE_CONTENT);
         });
 
         it('returns the latest record mime type', () => {
@@ -535,8 +539,8 @@ describe('GitAdapter', () => {
           expect(latestRecord.id).to.include(lastSnapshotId);
         });
 
-        it('returns the latest record content', () => {
-          expect(latestRecord.content.toString('utf8')).to.equal(PDF_CONTENT);
+        it('returns the latest record content', async () => {
+          expect((await latestRecord.content).toString('utf8')).to.equal(PDF_CONTENT);
         });
 
         it('returns the latest record mime type', () => {
@@ -567,8 +571,12 @@ describe('GitAdapter', () => {
   });
 
   describe('#iterate', () => {
+    const expectedIds = [];
+    const ids = [];
+    const fetchDates = [];
+
     before(async () => {
-      await subject.record({
+      const { id: id1 } = await subject.record({
         serviceId: SERVICE_PROVIDER_ID,
         documentType: DOCUMENT_TYPE,
         content: CONTENT,
@@ -577,36 +585,45 @@ describe('GitAdapter', () => {
         mimeType: MIME_TYPE,
       });
 
-      await subject.record({
+      expectedIds.push(id1);
+
+      const { id: id2 } = await subject.record({
         serviceId: SERVICE_PROVIDER_ID,
         documentType: DOCUMENT_TYPE,
         content: `${CONTENT} - updated`,
-        fetchDate: FETCH_DATE,
+        fetchDate: FETCH_DATE_LATER,
         snapshotId: SNAPSHOT_ID,
         mimeType: MIME_TYPE,
       });
 
-      await subject.record({
+      expectedIds.push(id2);
+
+      const { id: id3 } = await subject.record({
         serviceId: SERVICE_PROVIDER_ID,
         documentType: DOCUMENT_TYPE,
         content: `${CONTENT} - updated 2`,
         isRefilter: true,
-        fetchDate: FETCH_DATE,
+        fetchDate: FETCH_DATE_EARLIER,
         snapshotId: SNAPSHOT_ID,
         mimeType: MIME_TYPE,
       });
+
+      expectedIds.push(id3);
+
+      for await (const record of subject.iterate()) {
+        ids.push(record.id);
+        fetchDates.push(record.fetchDate);
+      }
     });
 
     after(async () => subject._removeAllRecords());
 
     it('iterates through all records', async () => {
-      const result = [];
+      expect(ids).to.have.members(expectedIds);
+    });
 
-      for await (const record of subject.iterate()) {
-        result.push(record.content);
-      }
-
-      expect(result).to.deep.equal([ `${CONTENT} - updated 2`, `${CONTENT} - updated`, CONTENT ]);
+    it('iterates in ascending order', async () => {
+      expect(fetchDates).to.deep.equal([ FETCH_DATE_EARLIER, FETCH_DATE, FETCH_DATE_LATER ]);
     });
   });
 });
