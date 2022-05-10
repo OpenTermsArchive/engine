@@ -85,6 +85,12 @@ export default class GitAdapter {
     return this._getRecordFromCommitMetadata(commit);
   }
 
+  async getRecord(recordId) {
+    const [commit] = await this.git.log([ '-1', recordId ]);
+
+    return this._getRecordFromCommitMetadata(commit);
+  }
+
   async* iterate() {
     const commits = await this._getMeaningfulCommitsAscending();
 

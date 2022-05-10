@@ -13,7 +13,7 @@ import GitAdapter from './index.js';
 const { expect } = chai;
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const RECORDER_PATH = path.resolve(__dirname, '../../../', config.get('recorder.snapshots.storage.git.path'));
+const RECORDER_PATH = path.resolve(__dirname, '../../../', config.get('recorder.versions.storage.git.path'));
 
 const SERVICE_PROVIDER_ID = 'test_service';
 const DOCUMENT_TYPE = 'Terms of Service';
@@ -21,7 +21,7 @@ const CONTENT = 'ToS fixture data with UTF-8 çhãràčtęrs';
 const EXPECTED_FILE_PATH = `${RECORDER_PATH}/${SERVICE_PROVIDER_ID}/${DOCUMENT_TYPE}.html`;
 const EXPECTED_PDF_FILE_PATH = EXPECTED_FILE_PATH.replace('html', 'pdf');
 const FETCH_DATE = new Date('2000-01-01T12:00:00.000Z');
-const SNAPSHOT_ID = 'snapshot_id';
+const SNAPSHOT_ID = '513fadb2ae415c87747047e33287805d59e2dd55';
 const MIME_TYPE = 'text/html';
 const PDF_CONTENT = fs.readFileSync(path.resolve(__dirname, '../../../test/fixtures/terms.pdf'), { encoding: 'utf8' });
 const PDF_MIME_TYPE = 'application/pdf';
@@ -35,15 +35,15 @@ describe('GitAdapter', () => {
     git = new Git({
       path: RECORDER_PATH,
       author: {
-        name: config.get('recorder.snapshots.storage.git.author.name'),
-        email: config.get('recorder.snapshots.storage.git.author.email'),
+        name: config.get('recorder.versions.storage.git.author.name'),
+        email: config.get('recorder.versions.storage.git.author.email'),
       },
     });
 
     await git.initialize();
 
     subject = new GitAdapter({
-      ...config.get('recorder.snapshots.storage.git'),
+      ...config.get('recorder.versions.storage.git'),
       path: RECORDER_PATH,
     });
 
@@ -362,6 +362,58 @@ describe('GitAdapter', () => {
       it('stores the mime type', () => {
         expect(mime.getType(EXPECTED_PDF_FILE_PATH)).to.equal(PDF_MIME_TYPE);
       });
+    });
+  });
+
+  describe('#getRecord', () => {
+    let record;
+    let id;
+
+    before(async () => {
+      ({ id } = await subject.record({
+        serviceId: SERVICE_PROVIDER_ID,
+        documentType: DOCUMENT_TYPE,
+        content: CONTENT,
+        fetchDate: FETCH_DATE,
+        snapshotId: SNAPSHOT_ID,
+        mimeType: MIME_TYPE,
+      }));
+
+      (record = await subject.getRecord(id));
+    });
+
+    after(async () => subject._removeAllRecords());
+
+    it('returns the record id', () => {
+      expect(record.id).to.include(id);
+    });
+
+    it('returns a boolean to know if it is the first record', () => {
+      expect(record.isFirstRecord).to.be.true;
+    });
+
+    it('returns the service id', () => {
+      expect(record.serviceId).to.equal(SERVICE_PROVIDER_ID);
+    });
+
+    it('returns the document type', () => {
+      expect(record.documentType).to.equal(DOCUMENT_TYPE);
+    });
+
+    it('returns a asynchronous content getter', async () => {
+      expect(await record.content).to.equal(CONTENT);
+    });
+
+    it('stores the fetch date', () => {
+      expect(new Date(record.fetchDate).getTime()).to.equal(FETCH_DATE.getTime());
+    });
+
+    it('stores the mime type', () => {
+      expect(record.mimeType).to.equal(MIME_TYPE);
+    });
+
+    it('stores the snapshot ID', () => {
+      expect(record.snapshotId).to.equal(SNAPSHOT_ID);
     });
   });
 
