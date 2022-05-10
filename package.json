@@ -15,12 +15,14 @@
   "type": "module",
   "main": "index.js",
   "bin": {
+    "ota-fix-declarations": "./bin/fix-declarations.js",
     "ota-validate": "./bin/validate.js"
   },
   "scripts": {
     "dataset:generate": "node scripts/dataset/main.js",
     "dataset:release": "node scripts/dataset/main.js --publish --remove-local-copy",
     "dataset:scheduler": "npm run dataset:release -- --schedule",
+    "declarations:fix": "node ./bin/fix-declarations.js",
     "lint": "eslint src test scripts bin",
     "lint:fix": "npm run lint -- --fix",
     "refilter": "node src/main.js --refilter-only",
