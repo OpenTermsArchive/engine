@@ -20,6 +20,7 @@ const CONTENT = 'ToS fixture data with UTF-8 çhãràčtęrs';
 const MIME_TYPE = 'text/html';
 const FETCH_DATE = new Date('2000-01-01T12:00:00.000Z');
 const FETCH_DATE_LATER = new Date('2000-01-02T12:00:00.000Z');
+const FETCH_DATE_EARLIER = new Date('2000-01-01T06:00:00.000Z');
 const SNAPSHOT_ID = '61af86dc5ff5caa74ae926ad';
 const PDF_CONTENT = fs.readFileSync(path.resolve(__dirname, '../../../test/fixtures/terms.pdf'), { encoding: 'utf8' });
 const UPDATED_PDF_CONTENT = fs.readFileSync(path.resolve(__dirname, '../../../test/fixtures/termsModified.pdf'), { encoding: 'utf8' });
@@ -410,6 +411,63 @@ describe('MongoAdapter', () => {
       it('returns no mime type', () => {
         expect(latestRecord.mimeType).to.not.be.ok;
       });
+    });
+  });
+
+  describe('#iterate', () => {
+    const expectedIds = [];
+    const ids = [];
+    const fetchDates = [];
+
+    before(async () => {
+      const { id: id1 } = await subject.record({
+        serviceId: SERVICE_PROVIDER_ID,
+        documentType: DOCUMENT_TYPE,
+        content: CONTENT,
+        fetchDate: FETCH_DATE,
+        snapshotId: SNAPSHOT_ID,
+        mimeType: MIME_TYPE,
+      });
+
+      expectedIds.push(id1);
+
+      const { id: id2 } = await subject.record({
+        serviceId: SERVICE_PROVIDER_ID,
+        documentType: DOCUMENT_TYPE,
+        content: `${CONTENT} - updated`,
+        fetchDate: FETCH_DATE_LATER,
+        snapshotId: SNAPSHOT_ID,
+        mimeType: MIME_TYPE,
+      });
+
+      expectedIds.push(id2);
+
+      const { id: id3 } = await subject.record({
+        serviceId: SERVICE_PROVIDER_ID,
+        documentType: DOCUMENT_TYPE,
+        content: `${CONTENT} - updated 2`,
+        isRefilter: true,
+        fetchDate: FETCH_DATE_EARLIER,
+        snapshotId: SNAPSHOT_ID,
+        mimeType: MIME_TYPE,
+      });
+
+      expectedIds.push(id3);
+
+      for await (const record of subject.iterate()) {
+        ids.push(record.id);
+        fetchDates.push(record.fetchDate);
+      }
+    });
+
+    after(async () => subject._removeAllRecords());
+
+    it('iterates through all records', async () => {
+      expect(ids).to.have.members(expectedIds);
+    });
+
+    it('iterates in ascending order', async () => {
+      expect(fetchDates).to.deep.equal([ FETCH_DATE_EARLIER, FETCH_DATE, FETCH_DATE_LATER ]);
     });
   });
 });
