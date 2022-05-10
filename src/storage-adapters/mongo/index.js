@@ -3,7 +3,7 @@
  * Object IDs are used as opaque unique IDs.
  */
 
-import { MongoClient, ObjectId } from 'mongodb';
+import { Binary, MongoClient, ObjectId } from 'mongodb';
 
 const PDF_MIME_TYPE = 'application/pdf';
 
@@ -88,13 +88,42 @@ export default class MongoAdapter {
     };
   }
 
-  /* eslint-disable */
   async* iterate() {
-    throw new Error('#iterate is not yet implemented in the MongoDB storage adapter');
+    const cursor = this.collection.find().sort({ fetchDate: 1 });
+
+    /* eslint-disable no-await-in-loop */
+    while (await cursor.hasNext()) {
+      const record = await cursor.next();
+
+      yield this.getRecordFromMongoMetadata(record);
+    }
+    /* eslint-enable no-await-in-loop */
   }
-  /* eslint-enable */
 
   async _removeAllRecords() {
-    return this.collection.deleteMany({});
+    return this.collection.deleteMany();
+  }
+
+  getRecordFromMongoMetadata({ _id, serviceId, documentType, fetchDate, mimeType, isRefilter, isFirstRecord, snapshotId }) {
+    const { collection } = this;
+    const result = {
+      id: _id.toString(),
+      serviceId,
+      documentType,
+      mimeType,
+      fetchDate: new Date(fetchDate),
+      isFirstRecord: Boolean(isFirstRecord),
+      isRefilter: Boolean(isRefilter),
+      snapshotId: snapshotId && snapshotId.toString(),
+      get content() {
+        return (async () => {
+          const { content } = await collection.findOne({ _id }, { projection: { content: 1 } });
+
+          return content instanceof Binary ? content.buffer : content;
+        })();
+      },
+    };
+
+    return result;
   }
 }
