@@ -91,6 +91,10 @@ export default class MongoAdapter {
       .map(record => this.getRecordFromMongoMetadata(record));
   }
 
+  async count() {
+    return this.collection.find().count();
+  }
+
   async* iterate() {
     const cursor = this.collection.find().sort({ fetchDate: 1 });
 
