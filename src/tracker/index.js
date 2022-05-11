@@ -93,15 +93,13 @@ export default class Tracker {
   }
 
   async createLabel(params) {
-    try {
-      await this.octokit.rest.issues.createLabel({ ...this.commonParams, ...params });
-    } catch (e) {
-      if (!e.toString().includes('"code":"already_exists"')) {
-        // log error when error is unknown
-        logger.error(`Could not create label ${params.name}`);
-        logger.error(e.toString());
-      }
-    }
+    return this.octokit.rest.issues.createLabel({ ...this.commonParams, ...params })
+      .catch(error => {
+        if (error.toString().includes('"code":"already_exists"')) {
+          return;
+        }
+        logger.error(`Could not create label "${params.name}": ${error.toString()}`);
+      });
   }
 
   async createIssue(params) {
