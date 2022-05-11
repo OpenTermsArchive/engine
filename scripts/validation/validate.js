@@ -28,6 +28,9 @@ const args = process.argv.slice(2); // Keep only args that are after the script 
 
 let schemaOnly = false;
 
+const eslint = new ESLint({ overrideConfigFile: ESLINT_CONFIG_PATH, fix: false });
+const eslintWithFix = new ESLint({ overrideConfigFile: ESLINT_CONFIG_PATH, fix: true });
+
 if (args.includes('--schema-only')) {
   schemaOnly = true;
   args.splice(args.indexOf('--schema-only'), 1);
@@ -236,7 +239,7 @@ function assertValid(schema, subject) {
 }
 
 async function lintFile(filePath) {
-  const [lintResult] = await new ESLint({ overrideConfigFile: ESLINT_CONFIG_PATH, fix: false }).lintFiles(filePath);
+  const [lintResult] = await eslint.lintFiles(filePath);
 
   if (!lintResult.errorCount) {
     return;
@@ -245,7 +248,7 @@ async function lintFile(filePath) {
   // Create a new instance of linter with option `fix` set to true to get a fixed output.
   // It is not possible to use only a linter with this option enabled because when this option is set, if it can fix errors, it considers that there are no errors and returns `0` for the `errorCount`.
   // So use two linters to have access both to `errorCount` and fix `output` variables.
-  const [lintResultFixed] = await new ESLint({ overrideConfigFile: ESLINT_CONFIG_PATH, fix: true }).lintFiles(filePath);
+  const [lintResultFixed] = await eslintWithFix.lintFiles(filePath);
 
   expect(lintResult.source).to.equal(lintResultFixed.output, `${path.basename(filePath)} is not properly formatted.\n`);
 }
