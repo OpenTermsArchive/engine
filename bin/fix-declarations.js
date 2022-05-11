@@ -1,11 +1,12 @@
 #! /usr/bin/env node
 import './.env.js'; // Workaround to ensure `SUPPRESS_NO_CONFIG_WARNING` is set before config is imported
 
-// This tool makes it possible to lint files using the command line either
+// This tool makes it possible to lint files using the command line either:
 // - from OpenTermsArchive core folder, using the existing config
 // - from any declaration repository, using a package.json script
 // Using this tool also makes it easy to lint all files relative to one service ID, which would have been
-// more difficult to achieve using an eslint based command directly defined in the package.json
+// more difficult to achieve using an eslint based command directly defined in the package.json.
+// It also ensures that the same version of eslint is used in the OpenTermsArchive core and declarations repositories.
 
 import path from 'path';
 import { fileURLToPath } from 'url';
