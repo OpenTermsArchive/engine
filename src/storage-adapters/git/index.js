@@ -82,7 +82,7 @@ export default class GitAdapter {
   async get(recordId) {
     const [commit] = await this.git.log([ '-1', recordId ]);
 
-    return this._getRecordFromCommitMetadata(commit);
+    return this._convertCommitToRecord(commit);
   }
 
   async getAll() {
@@ -160,9 +160,12 @@ export default class GitAdapter {
   }
 
   async _convertCommitToRecord(commit) {
-    const { hash, date, message, body, diff } = commit;
+    if (!commit || !commit.hash) {
+      return {};
+    }
 
     let relativeFilePath;
+    const { hash, date, message, body } = commit;
 
     if (diff) {
       ({ files: [{ file: relativeFilePath }] } = diff);
