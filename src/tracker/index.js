@@ -41,7 +41,11 @@ export default class Tracker {
       accept: 'application/vnd.github.v3+json',
     };
 
-    this.createLabel({
+    this.initialize();
+  }
+
+  async initialize() {
+    await this.createLabel({
       name: config.get('tracker.githubIssues.label'),
       color: config.get('tracker.githubIssues.color'),
       description: config.get('tracker.githubIssues.description'),
