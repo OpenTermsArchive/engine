@@ -28,6 +28,7 @@ let servicesToValidate = process.argv.slice(2); // Keep only args that are after
     /* eslint-disable no-await-in-loop */
     const lintResults = await new ESLint({ overrideConfigFile: ESLINT_CONFIG_PATH, fix: true }).lintFiles(path.join(declarationsPath, `${service}.*`));
 
+    console.log(lintResults.map(lintResult => `Fixed ${path.basename(lintResult.filePath)}`).join('\n'));
     await ESLint.outputFixes(lintResults);
     /* eslint-enable no-await-in-loop */
   }
