@@ -59,7 +59,7 @@
       "repository": "OpenTermsArchive/sandbox",
       "label": "bot-report",
       "color": "FEF2C0",
-      "description": "automatically created by Open Terms Archive when fetching error is encountered"
+      "description": "Automatically created by Open Terms Archive when fetching error is encountered"
     }
   },
   "dataset": {
