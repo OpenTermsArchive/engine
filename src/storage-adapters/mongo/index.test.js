@@ -363,6 +363,12 @@ describe('MongoAdapter', () => {
     it('stores the snapshot ID', () => {
       expect(record.snapshotId).to.equal(SNAPSHOT_ID);
     });
+
+    context('when requested record does not exists', () => {
+      it('returns an empty object', async () => {
+        expect(await subject.get('inexistantID')).to.deep.equal({});
+      });
+    });
   });
 
   describe('#getAll', () => {
@@ -555,16 +561,8 @@ describe('MongoAdapter', () => {
         latestRecord = await subject.getLatest(SERVICE_PROVIDER_ID, DOCUMENT_TYPE);
       });
 
-      it('returns no id', () => {
-        expect(latestRecord.id).to.not.be.ok;
-      });
-
-      it('returns no content', () => {
-        expect(latestRecord.content).to.not.be.ok;
-      });
-
-      it('returns no mime type', () => {
-        expect(latestRecord.mimeType).to.not.be.ok;
+      it('returns an empty object', async () => {
+        expect(latestRecord).to.deep.equal({});
       });
     });
   });

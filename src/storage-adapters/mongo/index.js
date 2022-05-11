@@ -69,19 +69,11 @@ export default class MongoAdapter {
   async getLatest(serviceId, documentType) {
     const [mongoDocument] = await this.collection.find({ serviceId, documentType }).limit(1).sort({ fetchDate: -1 }).toArray(); // `findOne` doesn't support the `sort` method, so even for only one document use `find`
 
-    if (!mongoDocument) {
-      return {};
-    }
-
     return this._convertDocumentToRecord(mongoDocument);
   }
 
   async get(recordId) {
     const mongoDocument = await this.collection.findOne({ _id: new ObjectId(recordId) });
-
-    if (!mongoDocument) {
-      return {};
-    }
 
     return this._convertDocumentToRecord(mongoDocument);
   }
@@ -111,7 +103,13 @@ export default class MongoAdapter {
     return this.collection.deleteMany();
   }
 
-  _convertDocumentToRecord({ _id, serviceId, documentType, fetchDate, mimeType, isRefilter, isFirstRecord, snapshotId }) {
+  _convertDocumentToRecord(document) {
+    if (!document || !document._id) {
+      return {};
+    }
+
+    const { _id, serviceId, documentType, fetchDate, mimeType, isRefilter, isFirstRecord, snapshotId } = document;
+
     const { collection } = this;
     const result = {
       id: _id.toString(),
