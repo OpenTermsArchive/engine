@@ -10,7 +10,7 @@
     state: latest
 
 - name: Add the NodeSource repository to the system
-  shell: curl -sL https://deb.nodesource.com/setup_14.x | sudo bash -
+  shell: curl -sL https://deb.nodesource.com/setup_16.x | sudo bash -
 
 - name: Install NodeJS and NPM
   apt:

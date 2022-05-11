@@ -5,7 +5,7 @@
   "main": "index.js",
   "type": "module",
   "engines": {
-    "node": ">=14.0.0"
+    "node": ">=16.0.0"
   },
   "scripts": {
     "start": "node --max-http-header-size=32768 src/main.js",
@@ -45,8 +45,8 @@
     "sinon-chai": "^3.7.0"
   },
   "dependencies": {
-    "@accordproject/markdown-cicero": "^0.14.1",
-    "@accordproject/markdown-pdf": "^0.14.1",
+    "@accordproject/markdown-cicero": "^0.15.2",
+    "@accordproject/markdown-pdf": "^0.15.2",
     "abort-controller": "^3.0.0",
     "ajv": "^6.12.6",
     "archiver": "^5.3.0",

@@ -135,7 +135,7 @@ See the [CONTRIBUTING](https://github.com/OpenTermsArchive/contrib-declarations/
 
 ### Installing
 
-This module is built with [Node](https://nodejs.org/en/). You will need to [install Node >= v14.x](https://nodejs.org/en/download/) to run it.
+This module is built with [Node](https://nodejs.org/en/). You will need to [install Node >= v16.x](https://nodejs.org/en/download/) to run it.
 
 Clone the repository and install dependencies:
 
