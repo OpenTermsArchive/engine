@@ -1,14 +1,16 @@
+import fsApi from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
 import config from 'config';
-import { Low, JSONFile } from 'lowdb';
 
 import GitAdapter from '../../src/storage-adapters/git/index.js';
 import MongoAdapter from '../../src/storage-adapters/mongo/index.js';
 
 import readme from './assets/README.template.js';
 import logger from './logger/index.js';
+
+const fs = fsApi.promises;
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT_PATH = path.resolve(__dirname, '../../');
@@ -21,16 +23,11 @@ const COUNTERS = {
 (async function main() {
   console.time('Total time');
 
-  const file = path.join(__dirname, 'ids-mapping.json');
-  const adapter = new JSONFile(file);
-  const db = new Low(adapter);
-
-  await db.read();
-  db.data = db.data || {};
+  const idsMapping = {};
 
   const sourceAdapter = new GitAdapter({
     ...config.get('recorder.snapshots.storage.git'),
-    path: path.resolve(ROOT_PATH, './data/snapshots'),
+    path: path.resolve(ROOT_PATH, './data/to-snapshots'),
   });
 
   const targetAdpater = new MongoAdapter({
@@ -55,7 +52,7 @@ const COUNTERS = {
   for await (const record of sourceAdapter.iterate()) {
     const { id: recordId } = await targetAdpater.record(record);
 
-    db.data[record.id] = recordId; // Saves the mapping between the old ID and the new one.
+    idsMapping[record.id] = recordId; // Saves the mapping between the old ID and the new one.
 
     if (recordId) {
       logger.info({ message: `Imported with new ID: ${recordId}`, serviceId: record.serviceId, type: record.documentType, id: record.id, current: i, total: numberOfRecords });
@@ -73,7 +70,7 @@ const COUNTERS = {
   console.log(`⌙ Skipped records: ${COUNTERS.skipped}`);
   console.timeEnd('Total time');
 
-  await db.write();
+  await fs.writeFile(path.join(__dirname, 'ids-mapping.json'), JSON.stringify(idsMapping, null, 4));
 
   await sourceAdapter.finalize();
   await targetAdpater.finalize();
