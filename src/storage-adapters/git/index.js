@@ -75,13 +75,7 @@ export default class GitAdapter {
   }
 
   async getLatest(serviceId, documentType) {
-    const filePathGlob = this._getPathFor(serviceId, documentType, '*');
-    const { commit, filePath } = await this.git.findUnique(filePathGlob);
-    const recordFilePath = `${this.path}/${filePath}`;
-
-    if (!commit || !filePath || !fsApi.existsSync(recordFilePath)) {
-      return {};
-    }
+    const [commit] = await this.git.log([ '-1', `${serviceId}/${documentType}.*` ]);
 
     return this._convertCommitToRecord(commit);
   }
@@ -172,16 +166,15 @@ export default class GitAdapter {
       return {};
     }
 
-    let relativeFilePath;
     const { hash, date, message, body } = commit;
 
-    if (diff) {
-      ({ files: [{ file: relativeFilePath }] } = diff);
+    const modifiedFilesInCommit = (await this.git.show([ '--name-only', '--pretty=', hash ])).trim().split('\n');
+
+    if (modifiedFilesInCommit.length > 1) {
+      throw new Error(`Only one document should have been recorded in ${hash}, but all these documents were recorded: ${modifiedFilesInCommit.join(', ')}`);
     }
 
-    if (!relativeFilePath) {
-      relativeFilePath = (await this.git.show([ '--name-only', '--pretty=', hash ])).trim();
-    }
+    const [relativeFilePath] = modifiedFilesInCommit;
 
     const snapshotIdMatch = body.match(/\b[0-9a-f]{5,40}\b/g);
     const adapter = this;
