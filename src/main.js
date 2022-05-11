@@ -51,7 +51,10 @@ const extraArgs = args.filter(arg => !arg.startsWith('--'));
   }
 
   if (process.env.GITHUB_TOKEN) {
-    archivist.attach(new Tracker());
+    const tracker = new Tracker();
+
+    await tracker.initialize();
+    archivist.attach(tracker);
   }
 
   await archivist.trackChanges(serviceIds);
