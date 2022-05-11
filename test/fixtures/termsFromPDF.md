@@ -1,7 +1,25 @@
-THIS IS A LEGAL AGREEMENT BETWEEN YOU AND TESTCOMPANYTESTCOMPANY Developer Agreement 
+THIS IS A LEGAL AGREEMENT BETWEEN YOU AND TESTCOMPANY
 
-1\. Relationship With TestCompany. Et pulvinar integer platea sociosqu nibh risus parturient, sit hac turpis dictumst placerat malesuada, ut potenti elementum nostra aptent porttitor.
+TESTCOMPANY Developer Agreement
 
-2\. Developer Benefits. Et pulvinar integer platea sociosqu nibh risus parturient, sit hac turpis dictumst placerat malesuada, ut potenti elementum nostra aptent porttitor.
 
-3\. Restrictions. Et pulvinar integer platea sociosqu nibh risus parturient, sit hac turpis dictumst placerat malesuada, ut potenti elementum nostra aptent porttitor.
+
+1\. Relationship With TestCompany. Et pulvinar integer platea sociosqu nibh
+
+risus parturient, sit hac turpis dictumst placerat malesuada, ut potenti elementum
+
+nostra aptent porttitor.
+
+
+
+2\. Developer Benefits. Et pulvinar integer platea sociosqu nibh risus parturient,
+
+sit hac turpis dictumst placerat malesuada, ut potenti elementum nostra aptent
+
+porttitor.
+
+
+
+3\. Restrictions. Et pulvinar integer platea sociosqu nibh risus parturient, sit hac
+
+turpis dictumst placerat malesuada, ut potenti elementum nostra aptent porttitor.
