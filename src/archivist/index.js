@@ -71,8 +71,7 @@ export default class Archivist extends events.EventEmitter {
       const { service, type } = documentDeclaration;
 
       if (error.toString().includes('HttpError: API rate limit exceeded for user ID')) {
-        // This is an error due to SendInBlue quota, bypass
-        return;
+        return; // This is an error due to SendInBlue quota, bypass
       }
 
       if (error instanceof InaccessibleContentError) {
@@ -175,10 +174,7 @@ export default class Archivist extends events.EventEmitter {
   async refilterAndRecordDocument(documentDeclaration) {
     const { type, service } = documentDeclaration;
 
-    const { id: snapshotId, content: snapshotContent, mimeType, fetchDate } = await this.recorder.getLatestSnapshot(
-      service.id,
-      type,
-    );
+    const { id: snapshotId, content: snapshotContent, mimeType, fetchDate } = await this.recorder.getLatestSnapshot(service.id, type);
 
     if (!snapshotId) {
       return;
