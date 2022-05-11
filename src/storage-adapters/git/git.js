@@ -93,25 +93,6 @@ export default class Git {
     return Boolean(result);
   }
 
-  async findUnique(glob) {
-    const [latestCommit] = await this.log([ '-n', '1', '--stat=4096', glob ]);
-
-    if (!latestCommit) {
-      return {};
-    }
-
-    const filePaths = latestCommit.diff.files.map(file => file.file);
-
-    if (filePaths.length > 1) {
-      throw new Error(`Only one document should have been recorded in ${latestCommit.hash}, but all these documents were recorded: ${filePaths}`);
-    }
-
-    return {
-      commit: latestCommit,
-      filePath: filePaths[0],
-    };
-  }
-
   async checkout(options) {
     return this.git.checkout(options);
   }
