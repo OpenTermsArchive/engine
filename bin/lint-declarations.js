@@ -24,8 +24,11 @@ config.util.setModuleDefaults('services', { declarationsPath: path.resolve(proce
 
 let servicesToValidate = process.argv.slice(2); // Keep only args that are after the script filename
 
+const DECLARATIONS_PATH = config.get('services.declarationsPath');
+
 (async () => {
-  const declarationsPath = path.resolve(ROOT_PATH, config.get('services.declarationsPath'));
+  console.log(`Linting files in ${DECLARATIONS_PATH}`);
+  const declarationsPath = path.resolve(ROOT_PATH, DECLARATIONS_PATH);
 
   if (!servicesToValidate.length) {
     servicesToValidate = ['*'];
@@ -36,7 +39,7 @@ let servicesToValidate = process.argv.slice(2); // Keep only args that are after
     const lintResults = await new ESLint({ overrideConfigFile: ESLINT_CONFIG_PATH, fix: true }).lintFiles(path.join(declarationsPath, `${service}.*`));
 
     await ESLint.outputFixes(lintResults);
-    console.log(lintResults.map(lintResult => `${path.basename(lintResult.filePath)} fixed`).join('\n'));
+    console.log(lintResults.map(lintResult => `${path.basename(lintResult.filePath)} linted`).join('\n'));
     /* eslint-enable no-await-in-loop */
   }
 })();
