@@ -199,7 +199,7 @@ export default class GitAdapter {
       const filePath = path.join(this.path, file.name);
 
       if (file.isDirectory()) {
-        return fs.rmdir(filePath, { recursive: true });
+        return fs.rm(filePath, { recursive: true });
       }
 
       return fs.unlink(filePath);
