@@ -19,6 +19,7 @@ const COMMIT_MESSAGE_PREFIX = {
   refilter: 'Refilter',
   update: 'Update',
 };
+const COMMIT_MESSAGE_PREFIXES_REGEXP = new RegExp(`^(${COMMIT_MESSAGE_PREFIX.startTracking}|${COMMIT_MESSAGE_PREFIX.refilter}|${COMMIT_MESSAGE_PREFIX.update})`);
 
 const PDF_MIME_TYPE = 'application/pdf';
 
@@ -88,7 +89,7 @@ export default class GitAdapter {
 
   async _getMeaningfulCommitsAscending() {
     return (await this.git.log([ '--reverse', '--no-merges' ]))
-      .filter(({ message }) => message.match(/^(Start tracking|Update|Refilter)/)) // Skip commits which are not a document record (README, LICENSE, …)
+      .filter(({ message }) => message.match(COMMIT_MESSAGE_PREFIXES_REGEXP)) // Skip commits which are not a document record (README, LICENSE, …)
       .sort((commitA, commitB) => new Date(commitA.date) - new Date(commitB.date)); // Make sure that the commits are sorted in ascending order
   }
 
