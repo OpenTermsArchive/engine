@@ -73,7 +73,7 @@ describe('MongoAdapter', () => {
         }));
       });
 
-      after(async () => subject._removeAllRecords());
+      after(async () => subject._removeAll());
 
       it('saves the record', () => {
         expect(numberOfRecordsAfter).to.equal(numberOfRecordsBefore + 1);
@@ -156,7 +156,7 @@ describe('MongoAdapter', () => {
         }).limit(1).sort({ created_at: -1 }).toArray());
       });
 
-      after(async () => subject._removeAllRecords());
+      after(async () => subject._removeAll());
 
       it('saves the record', () => {
         expect(numberOfRecordsAfter).to.equal(numberOfRecordsBefore + 1);
@@ -200,7 +200,7 @@ describe('MongoAdapter', () => {
         }).count();
       });
 
-      after(async () => subject._removeAllRecords());
+      after(async () => subject._removeAll());
 
       it('does not save the record', () => {
         expect(numberOfRecordsAfter).to.equal(numberOfRecordsBefore);
@@ -247,7 +247,7 @@ describe('MongoAdapter', () => {
         }).limit(1).sort({ created_at: -1 }).toArray());
       });
 
-      after(async () => subject._removeAllRecords());
+      after(async () => subject._removeAll());
 
       it('saves the record', () => {
         expect(numberOfRecordsAfter).to.equal(numberOfRecordsBefore + 1);
@@ -291,7 +291,7 @@ describe('MongoAdapter', () => {
         }));
       });
 
-      after(async () => subject._removeAllRecords());
+      after(async () => subject._removeAll());
 
       it('saves the record', () => {
         expect(numberOfRecordsAfter).to.equal(numberOfRecordsBefore + 1);
@@ -313,7 +313,7 @@ describe('MongoAdapter', () => {
     });
   });
 
-  describe('#getRecord', () => {
+  describe('#get', () => {
     let record;
     let id;
 
@@ -327,10 +327,10 @@ describe('MongoAdapter', () => {
         mimeType: MIME_TYPE,
       }));
 
-      (record = await subject.getRecord(id));
+      (record = await subject.get(id));
     });
 
-    after(async () => subject._removeAllRecords());
+    after(async () => subject._removeAll());
 
     it('returns the record id', () => {
       expect(record.id).to.include(id);
@@ -365,7 +365,7 @@ describe('MongoAdapter', () => {
     });
   });
 
-  describe('#getRecords', () => {
+  describe('#getAll', () => {
     let records;
     const expectedIds = [];
 
@@ -404,10 +404,10 @@ describe('MongoAdapter', () => {
 
       expectedIds.push(id3);
 
-      (records = await subject.getRecords());
+      (records = await subject.getAll());
     });
 
-    after(async () => subject._removeAllRecords());
+    after(async () => subject._removeAll());
 
     it('returns all records', () => {
       expect(records.length).to.equal(3);
@@ -457,14 +457,14 @@ describe('MongoAdapter', () => {
       (count = await subject.count());
     });
 
-    after(async () => subject._removeAllRecords());
+    after(async () => subject._removeAll());
 
     it('returns the proper count', async () => {
       expect(count).to.equal(3);
     });
   });
 
-  describe('#getLatestRecord', () => {
+  describe('#getLatest', () => {
     context('when there are records for the given service', () => {
       let lastSnapshotId;
       let latestRecord;
@@ -488,13 +488,13 @@ describe('MongoAdapter', () => {
             fetchDate: FETCH_DATE_LATER,
           }));
 
-          latestRecord = await subject.getLatestRecord(
+          latestRecord = await subject.getLatest(
             SERVICE_PROVIDER_ID,
             DOCUMENT_TYPE,
           );
         });
 
-        after(async () => subject._removeAllRecords());
+        after(async () => subject._removeAll());
 
         it('returns the latest record id', () => {
           expect(latestRecord.id).to.include(lastSnapshotId);
@@ -527,10 +527,10 @@ describe('MongoAdapter', () => {
             fetchDate: FETCH_DATE_LATER,
           }));
 
-          latestRecord = await subject.getLatestRecord(SERVICE_PROVIDER_ID, DOCUMENT_TYPE);
+          latestRecord = await subject.getLatest(SERVICE_PROVIDER_ID, DOCUMENT_TYPE);
         });
 
-        after(async () => subject._removeAllRecords());
+        after(async () => subject._removeAll());
 
         it('returns the latest record id', () => {
           expect(latestRecord.id).to.include(lastSnapshotId);
@@ -552,7 +552,7 @@ describe('MongoAdapter', () => {
       let latestRecord;
 
       before(async () => {
-        latestRecord = await subject.getLatestRecord(SERVICE_PROVIDER_ID, DOCUMENT_TYPE);
+        latestRecord = await subject.getLatest(SERVICE_PROVIDER_ID, DOCUMENT_TYPE);
       });
 
       it('returns no id', () => {
@@ -615,7 +615,7 @@ describe('MongoAdapter', () => {
       }
     });
 
-    after(async () => subject._removeAllRecords());
+    after(async () => subject._removeAll());
 
     it('iterates through all records', async () => {
       expect(ids).to.have.members(expectedIds);

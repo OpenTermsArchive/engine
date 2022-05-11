@@ -67,7 +67,7 @@ export default class GitAdapter {
     return this.git.pushChanges();
   }
 
-  async getLatestRecord(serviceId, documentType) {
+  async getLatest(serviceId, documentType) {
     const filePathGlob = this._getPathFor(serviceId, documentType, '*');
     const { commit, filePath } = await this.git.findUnique(filePathGlob);
     const recordFilePath = `${this.path}/${filePath}`;
@@ -76,18 +76,17 @@ export default class GitAdapter {
       return {};
     }
 
-    return this._getRecordFromCommitMetadata(commit);
+    return this._convertCommitToRecord(commit);
   }
 
-  async getRecord(recordId) {
+  async get(recordId) {
     const [commit] = await this.git.log([ '-1', recordId ]);
 
     return this._getRecordFromCommitMetadata(commit);
   }
 
-  async getRecords() {
-    return Promise.all((await this._getMeaningfulCommitsAscending())
-      .map(this._getRecordFromCommitMetadata.bind(this)));
+  async getAll() {
+    return Promise.all((await this._getSortedRecordsRelatedCommits()).map(this._convertCommitToRecord.bind(this)));
   }
 
   async count() {
@@ -95,14 +94,14 @@ export default class GitAdapter {
   }
 
   async* iterate() {
-    const commits = await this._getMeaningfulCommitsAscending();
+    const commits = await this._getSortedRecordsRelatedCommits();
 
     for (const commit of commits) {
-      yield this._getRecordFromCommitMetadata(commit);
+      yield this._convertCommitToRecord(commit);
     }
   }
 
-  async _getMeaningfulCommitsAscending() {
+  async _getSortedRecordsRelatedCommits() {
     return (await this.git.log([ '--reverse', '--no-merges' ]))
       .filter(({ message }) => message.match(COMMIT_MESSAGE_PREFIXES_REGEXP)) // Skip commits which are not a document record (README, LICENSE, …)
       .sort((commitA, commitB) => new Date(commitA.date) - new Date(commitB.date)); // Make sure that the commits are sorted in ascending order
@@ -160,7 +159,7 @@ export default class GitAdapter {
     return message;
   }
 
-  async _getRecordFromCommitMetadata(commit) {
+  async _convertCommitToRecord(commit) {
     const { hash, date, message, body, diff } = commit;
 
     let relativeFilePath;
@@ -208,7 +207,7 @@ export default class GitAdapter {
     };
   }
 
-  async _removeAllRecords() {
+  async _removeAll() {
     const files = await fs.readdir(this.path, { withFileTypes: true });
     const promises = files.map(file => {
       const filePath = path.join(this.path, file.name);

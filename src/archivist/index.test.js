@@ -31,7 +31,7 @@ let snapshotsStorageAdapter;
 let versionsStorageAdapter;
 
 async function resetGitRepositories() {
-  return Promise.all([ snapshotsStorageAdapter._removeAllRecords(), versionsStorageAdapter._removeAllRecords() ]);
+  return Promise.all([ snapshotsStorageAdapter._removeAll(), versionsStorageAdapter._removeAll() ]);
 }
 
 let gitVersion;
@@ -168,8 +168,8 @@ describe('Archivist', function () {
           await app.initialize();
           await app.trackChanges(serviceIds);
 
-          ({ id: originalSnapshotId } = await snapshotsStorageAdapter.getLatestRecord(SERVICE_A_ID, SERVICE_A_TYPE));
-          ({ id: firstVersionId } = await versionsStorageAdapter.getLatestRecord(SERVICE_A_ID, SERVICE_A_TYPE));
+          ({ id: originalSnapshotId } = await snapshotsStorageAdapter.getLatest(SERVICE_A_ID, SERVICE_A_TYPE));
+          ({ id: firstVersionId } = await versionsStorageAdapter.getLatest(SERVICE_A_ID, SERVICE_A_TYPE));
 
           serviceBCommits = await gitVersion.log({ file: SERVICE_B_EXPECTED_VERSION_FILE_PATH });
 

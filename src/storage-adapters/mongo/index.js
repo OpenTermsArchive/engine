@@ -32,7 +32,7 @@ export default class MongoAdapter {
       content = await content;
     }
 
-    const previousRecord = await this.getLatestRecord(serviceId, documentType);
+    const previousRecord = await this.getLatest(serviceId, documentType);
 
     if (previousRecord && await previousRecord.content == content) {
       return {};
@@ -66,29 +66,29 @@ export default class MongoAdapter {
     };
   }
 
-  async getLatestRecord(serviceId, documentType) {
-    const [record] = await this.collection.find({ serviceId, documentType }).limit(1).sort({ fetchDate: -1 }).toArray();
+  async getLatest(serviceId, documentType) {
+    const [mongoDocument] = await this.collection.find({ serviceId, documentType }).limit(1).sort({ fetchDate: -1 }).toArray(); // `findOne` doesn't support the `sort` method, so even for only one document use `find`
 
-    if (!record) {
+    if (!mongoDocument) {
       return {};
     }
 
-    return this.getRecordFromMongoMetadata(record);
+    return this._convertDocumentToRecord(mongoDocument);
   }
 
-  async getRecord(recordId) {
-    const record = await this.collection.findOne({ _id: new ObjectId(recordId) });
+  async get(recordId) {
+    const mongoDocument = await this.collection.findOne({ _id: new ObjectId(recordId) });
 
-    if (!record) {
+    if (!mongoDocument) {
       return {};
     }
 
-    return this.getRecordFromMongoMetadata(record);
+    return this._convertDocumentToRecord(mongoDocument);
   }
 
-  async getRecords() {
+  async getAll() {
     return (await this.collection.find().project({ content: 0 }).sort({ fetchDate: 1 }).toArray())
-      .map(record => this.getRecordFromMongoMetadata(record));
+      .map(mongoDocument => this._convertDocumentToRecord(mongoDocument));
   }
 
   async count() {
@@ -100,18 +100,18 @@ export default class MongoAdapter {
 
     /* eslint-disable no-await-in-loop */
     while (await cursor.hasNext()) {
-      const record = await cursor.next();
+      const mongoDocument = await cursor.next();
 
-      yield this.getRecordFromMongoMetadata(record);
+      yield this._convertDocumentToRecord(mongoDocument);
     }
     /* eslint-enable no-await-in-loop */
   }
 
-  async _removeAllRecords() {
+  async _removeAll() {
     return this.collection.deleteMany();
   }
 
-  getRecordFromMongoMetadata({ _id, serviceId, documentType, fetchDate, mimeType, isRefilter, isFirstRecord, snapshotId }) {
+  _convertDocumentToRecord({ _id, serviceId, documentType, fetchDate, mimeType, isRefilter, isFirstRecord, snapshotId }) {
     const { collection } = this;
     const result = {
       id: _id.toString(),

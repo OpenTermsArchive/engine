@@ -103,7 +103,7 @@ describe('Export', () => {
 
     after(async () => {
       await fs.rm(TMP_PATH, { recursive: true });
-      await storageAdapter._removeAllRecords();
+      await storageAdapter._removeAll();
     });
 
     it('is an archive', () => {
