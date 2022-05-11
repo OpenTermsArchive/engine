@@ -250,5 +250,5 @@ async function lintFile(filePath) {
   // So use two linters to have access both to `errorCount` and fix `output` variables.
   const [lintResultFixed] = await eslintWithFix.lintFiles(filePath);
 
-  expect(lintResult.source).to.equal(lintResultFixed.output, `${path.basename(filePath)} is not properly formatted.\n`);
+  expect(lintResult.source).to.equal(lintResultFixed.output, `${path.basename(filePath)} is not properly formatted. Use the lint script to format it correctly.\n`);
 }
