@@ -17,7 +17,7 @@ export default class Recorder {
   }
 
   async getLatestSnapshot(serviceId, documentType) {
-    const record = await this.snapshotsStorageAdapter.getLatestRecord(serviceId, documentType);
+    const record = await this.snapshotsStorageAdapter.getLatest(serviceId, documentType);
 
     return {
       ...record,

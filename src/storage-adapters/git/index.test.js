@@ -61,7 +61,7 @@ describe('GitAdapter', () => {
         fileExtension: 'html',
       }));
 
-      after(async () => subject._removeAllRecords());
+      after(async () => subject._removeAll());
 
       it('creates a file for the given service', () => {
         expect(fs.readFileSync(EXPECTED_FILE_PATH, { encoding: 'utf8' })).to.equal(CONTENT);
@@ -72,7 +72,7 @@ describe('GitAdapter', () => {
       const NEW_SERVICE_ID = 'test_not_existing_service';
       const NEW_SERVICE_EXPECTED_FILE_PATH = `${RECORDER_PATH}/${NEW_SERVICE_ID}/${DOCUMENT_TYPE}.html`;
 
-      after(async () => subject._removeAllRecords());
+      after(async () => subject._removeAll());
 
       it('creates a directory and file for the given service', async () => {
         await subject._save({
@@ -105,7 +105,7 @@ describe('GitAdapter', () => {
       ([commit] = await git.log());
     });
 
-    after(async () => subject._removeAllRecords());
+    after(async () => subject._removeAll());
 
     it('returns the id of the commit', () => {
       expect(commit.hash).to.include(id);
@@ -123,7 +123,7 @@ describe('GitAdapter', () => {
   });
 
   describe('#_isTracked', () => {
-    after(async () => subject._removeAllRecords());
+    after(async () => subject._removeAll());
 
     context('when the file does not exists', () => {
       it('returns false', async () => {
@@ -171,7 +171,7 @@ describe('GitAdapter', () => {
         ([commit] = await git.log());
       });
 
-      after(async () => subject._removeAllRecords());
+      after(async () => subject._removeAll());
 
       it('saves the record', () => {
         expect(numberOfRecordsAfter).to.equal(numberOfRecordsBefore + 1);
@@ -242,7 +242,7 @@ describe('GitAdapter', () => {
         ([commit] = await git.log());
       });
 
-      after(async () => subject._removeAllRecords());
+      after(async () => subject._removeAll());
 
       it('saves the record', () => {
         expect(numberOfRecordsAfter).to.equal(numberOfRecordsBefore + 1);
@@ -278,7 +278,7 @@ describe('GitAdapter', () => {
         numberOfRecordsAfter = (await git.log()).length;
       });
 
-      after(async () => subject._removeAllRecords());
+      after(async () => subject._removeAll());
 
       it('does not save the record', () => {
         expect(numberOfRecordsAfter).to.equal(numberOfRecordsBefore);
@@ -316,7 +316,7 @@ describe('GitAdapter', () => {
         ([commit] = await git.log());
       });
 
-      after(async () => subject._removeAllRecords());
+      after(async () => subject._removeAll());
 
       it('saves the record', () => {
         expect(numberOfRecordsAfter).to.equal(numberOfRecordsBefore + 1);
@@ -349,7 +349,7 @@ describe('GitAdapter', () => {
         ([commit] = await git.log());
       });
 
-      after(async () => subject._removeAllRecords());
+      after(async () => subject._removeAll());
 
       it('saves the record', () => {
         expect(numberOfRecordsAfter).to.equal(numberOfRecordsBefore + 1);
@@ -369,7 +369,7 @@ describe('GitAdapter', () => {
     });
   });
 
-  describe('#getRecord', () => {
+  describe('#get', () => {
     let record;
     let id;
 
@@ -383,10 +383,10 @@ describe('GitAdapter', () => {
         mimeType: MIME_TYPE,
       }));
 
-      (record = await subject.getRecord(id));
+      (record = await subject.get(id));
     });
 
-    after(async () => subject._removeAllRecords());
+    after(async () => subject._removeAll());
 
     it('returns the record id', () => {
       expect(record.id).to.include(id);
@@ -421,7 +421,7 @@ describe('GitAdapter', () => {
     });
   });
 
-  describe('#getRecords', () => {
+  describe('#getAll', () => {
     let records;
     const expectedIds = [];
 
@@ -460,10 +460,10 @@ describe('GitAdapter', () => {
 
       expectedIds.push(id3);
 
-      (records = await subject.getRecords());
+      (records = await subject.getAll());
     });
 
-    after(async () => subject._removeAllRecords());
+    after(async () => subject._removeAll());
 
     it('returns all records', () => {
       expect(records.length).to.equal(3);
@@ -513,14 +513,14 @@ describe('GitAdapter', () => {
       (count = await subject.count());
     });
 
-    after(async () => subject._removeAllRecords());
+    after(async () => subject._removeAll());
 
     it('returns the proper count', async () => {
       expect(count).to.equal(3);
     });
   });
 
-  describe('#getLatestRecord', () => {
+  describe('#getLatest', () => {
     context('when there are records for the given service', () => {
       let lastSnapshotId;
       let latestRecord;
@@ -543,10 +543,10 @@ describe('GitAdapter', () => {
             mimeType: MIME_TYPE,
           }));
 
-          latestRecord = await subject.getLatestRecord(SERVICE_PROVIDER_ID, DOCUMENT_TYPE);
+          latestRecord = await subject.getLatest(SERVICE_PROVIDER_ID, DOCUMENT_TYPE);
         });
 
-        after(async () => subject._removeAllRecords());
+        after(async () => subject._removeAll());
 
         it('returns the latest record id', () => {
           expect(latestRecord.id).to.include(lastSnapshotId);
@@ -570,10 +570,10 @@ describe('GitAdapter', () => {
             mimeType: PDF_MIME_TYPE,
           }));
 
-          latestRecord = await subject.getLatestRecord(SERVICE_PROVIDER_ID, DOCUMENT_TYPE);
+          latestRecord = await subject.getLatest(SERVICE_PROVIDER_ID, DOCUMENT_TYPE);
         });
 
-        after(async () => subject._removeAllRecords());
+        after(async () => subject._removeAll());
 
         it('returns the latest record id', () => {
           expect(latestRecord.id).to.include(lastSnapshotId);
@@ -593,7 +593,7 @@ describe('GitAdapter', () => {
       let latestRecord;
 
       before(async () => {
-        latestRecord = await subject.getLatestRecord(SERVICE_PROVIDER_ID, DOCUMENT_TYPE);
+        latestRecord = await subject.getLatest(SERVICE_PROVIDER_ID, DOCUMENT_TYPE);
       });
 
       it('returns no id', () => {
@@ -656,7 +656,7 @@ describe('GitAdapter', () => {
       }
     });
 
-    after(async () => subject._removeAllRecords());
+    after(async () => subject._removeAll());
 
     it('iterates through all records', async () => {
       expect(ids).to.have.members(expectedIds);

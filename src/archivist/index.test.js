@@ -31,7 +31,7 @@ let snapshotsStorageAdapter;
 let versionsStorageAdapter;
 
 async function resetGitRepositories() {
-  return Promise.all([ snapshotsStorageAdapter._removeAllRecords(), versionsStorageAdapter._removeAllRecords() ]);
+  return Promise.all([ snapshotsStorageAdapter._removeAll(), versionsStorageAdapter._removeAll() ]);
 }
 
 let gitVersion;
