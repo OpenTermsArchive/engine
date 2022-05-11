@@ -40,8 +40,6 @@ export default class Tracker {
       repo,
       accept: 'application/vnd.github.v3+json',
     };
-
-    this.initialize();
   }
 
   async initialize() {
