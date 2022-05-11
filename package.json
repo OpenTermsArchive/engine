@@ -15,14 +15,16 @@
   "type": "module",
   "main": "index.js",
   "bin": {
-    "ota-fix-declarations": "./bin/fix-declarations.js",
-    "ota-validate": "./bin/validate.js"
+    "ota-lint-declarations": "./bin/lint-declarations.js",
+    "ota-validate-declarations": "./bin/validate-declarations.js"
   },
   "scripts": {
     "dataset:generate": "node scripts/dataset/main.js",
     "dataset:release": "node scripts/dataset/main.js --publish --remove-local-copy",
     "dataset:scheduler": "npm run dataset:release -- --schedule",
-    "declarations:fix": "node ./bin/fix-declarations.js",
+    "declarations:lint": "node ./bin/lint-declarations.js",
+    "declarations:validate": "node ./bin/validate-declarations.js",
+    "declarations:validate:schema": "npm run declarations:validate -- --schema-only",
     "lint": "eslint src test scripts bin",
     "lint:fix": "npm run lint -- --fix",
     "refilter": "node src/main.js --refilter-only",
@@ -30,9 +32,7 @@
     "start:scheduler": "node --max-http-header-size=32768 src/main.js --schedule",
     "test": "cross-env NODE_ENV=test mocha --recursive \"./src/**/*.test.js\" \"./scripts/**/*.test.js\" --exit",
     "posttest": "npm run lint",
-    "test:debug": "npm run test -- --inspect-brk --exit",
-    "validate": "node ./bin/validate.js",
-    "validate:schema": "npm run validate -- --schema-only"
+    "test:debug": "npm run test -- --inspect-brk --exit"
   },
   "dependencies": {
     "@accordproject/markdown-cicero": "^0.15.2",
