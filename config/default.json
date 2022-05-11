@@ -57,7 +57,9 @@
   "tracker": {
     "githubIssues": {
       "repository": "OpenTermsArchive/sandbox",
-      "label": "update"
+      "label": "bot-report",
+      "color": "FEF2C0",
+      "description": "Automatically created by Open Terms Archive when fetching error is encountered"
     }
   },
   "dataset": {
