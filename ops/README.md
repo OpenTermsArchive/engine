@@ -59,6 +59,10 @@ For example, you can update `Open Terms Archive` by running:
 ansible-playbook ops/app.yml --tags update
 ```
 
+### Allowed keys
+
+Some instances might have user-specific SSH keys enabled. But if they are automatically deployed in CI, they will all have the bot key enabled. If your access is denied on an instance, you can thus run any of the commands with the `--private-key` option, passing it the bot SSH private key. This key can be found in the passwords database.
+
 ### Commands examples
 
 - Deploy Open Terms Archive application on all servers declared in the `ops/inventories/production.yml` inventory file:
