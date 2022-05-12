@@ -3,8 +3,9 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 
 import Ajv from 'ajv';
-import chai from 'chai';
+import { expect } from 'chai';
 import config from 'config';
+import { ESLint } from 'eslint';
 import jsonSourceMap from 'json-source-map';
 
 import fetch, { launchHeadlessBrowser, stopHeadlessBrowser } from '../../src/archivist/fetcher/index.js';
@@ -14,10 +15,11 @@ import * as services from '../../src/archivist/services/index.js';
 import serviceHistorySchema from './service.history.schema.js';
 import serviceSchema from './service.schema.js';
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const fs = fsApi.promises;
 
-const { expect } = chai;
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const ROOT_PATH = path.resolve(__dirname, '../../');
+const ESLINT_CONFIG_PATH = path.join(ROOT_PATH, '.eslintrc.yaml');
 
 const MIN_DOC_LENGTH = 100;
 const SLOW_DOCUMENT_THRESHOLD = 10 * 1000; // number of milliseconds after which a document fetch is considered slow
@@ -25,6 +27,9 @@ const SLOW_DOCUMENT_THRESHOLD = 10 * 1000; // number of milliseconds after which
 const args = process.argv.slice(2); // Keep only args that are after the script filename
 
 let schemaOnly = false;
+
+const eslint = new ESLint({ overrideConfigFile: ESLINT_CONFIG_PATH, fix: false });
+const eslintWithFix = new ESLint({ overrideConfigFile: ESLINT_CONFIG_PATH, fix: true });
 
 if (args.includes('--schema-only')) {
   schemaOnly = true;
@@ -34,7 +39,7 @@ if (args.includes('--schema-only')) {
 let servicesToValidate = args;
 
 (async () => {
-  const declarationsPath = path.resolve(__dirname, '../../', config.get('services.declarationsPath'));
+  const declarationsPath = path.resolve(ROOT_PATH, config.get('services.declarationsPath'));
 
   // If services to validate are passed as a string with services id separated by a newline character
   if (servicesToValidate.length == 1 && servicesToValidate[0].includes('\n')) {
@@ -53,6 +58,8 @@ let servicesToValidate = args;
 
     servicesToValidate.forEach(serviceId => {
       const service = serviceDeclarations[serviceId];
+      const filePath = path.join(declarationsPath, `${serviceId}.json`);
+      const historyFilePath = path.join(declarationsPath, `${serviceId}.history.json`);
 
       if (!service) {
         throw new Error(`Could not find any service with id "${serviceId}"`);
@@ -63,20 +70,41 @@ let servicesToValidate = args;
       after(stopHeadlessBrowser);
 
       describe(serviceId, async () => {
-        it('valid declaration', async () => {
-          const declaration = JSON.parse(await fs.readFile(path.join(declarationsPath, `${serviceId}.json`)));
+        it('valid declaration schema', async () => {
+          const declaration = JSON.parse(await fs.readFile(filePath));
 
           assertValid(serviceSchema, declaration);
         });
 
+        it('valid declaration file format', async () => {
+          await lintFile(filePath);
+        });
+
         if (service.hasHistory()) {
-          it('valid history declaration', async () => {
-            const declarationHistory = JSON.parse(await fs.readFile(path.join(
-              declarationsPath,
-              `${serviceId}.history.json`,
-            )));
+          it('valid history declaration schema', async () => {
+            const declarationHistory = JSON.parse(await fs.readFile(historyFilePath));
 
             assertValid(serviceHistorySchema, declarationHistory);
+          });
+
+          it('valid history declaration file format', async () => {
+            await lintFile(path.join(declarationsPath, `${serviceId}.history.json`));
+          });
+        }
+
+        const filtersFilePath = path.join(declarationsPath, `${serviceId}.filters.js`);
+
+        if (fsApi.existsSync(filtersFilePath)) {
+          it('valid filters file format', async () => {
+            await lintFile(filtersFilePath);
+          });
+        }
+
+        const filtersHistoryFilePath = path.join(declarationsPath, `${serviceId}.filters.history.js`);
+
+        if (fsApi.existsSync(filtersHistoryFilePath)) {
+          it('valid filters history file format', async () => {
+            await lintFile(filtersHistoryFilePath);
           });
         }
 
@@ -208,4 +236,19 @@ function assertValid(schema, subject) {
 
     throw new Error(errorMessage);
   }
+}
+
+async function lintFile(filePath) {
+  const [lintResult] = await eslint.lintFiles(filePath);
+
+  if (!lintResult.errorCount) {
+    return;
+  }
+
+  // Create a new instance of linter with option `fix` set to true to get a fixed output.
+  // It is not possible to use only a linter with this option enabled because when this option is set, if it can fix errors, it considers that there are no errors and returns `0` for the `errorCount`.
+  // So use two linters to have access both to `errorCount` and fix `output` variables.
+  const [lintResultFixed] = await eslintWithFix.lintFiles(filePath);
+
+  expect(lintResult.source).to.equal(lintResultFixed.output, `${path.basename(filePath)} is not properly formatted. Use the lint script to format it correctly.\n`);
 }

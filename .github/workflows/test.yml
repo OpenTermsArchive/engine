@@ -57,4 +57,4 @@ jobs:
         with:
           node-version: 16.x
       - run: npm ci
-      - run: ./node_modules/.bin/cross-env NODE_ENV=ci npm run validate:schema
+      - run: ./node_modules/.bin/cross-env NODE_ENV=ci npm run declarations:validate:schema

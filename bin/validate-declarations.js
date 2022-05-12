@@ -20,10 +20,7 @@ process.on('unhandledRejection', reason => {
 
 // Initialise configs to allow clients of this module to use it without requiring node-config in their own application.
 // see https://github.com/lorenwest/node-config/wiki/Sub-Module-Configuration
-config.util.setModuleDefaults('services', {
-  declarationsPath: path.resolve(process.cwd(), './declarations'),
-  documentTypesPath: path.resolve(process.cwd(), './document-types.json'),
-});
+config.util.setModuleDefaults('services', { declarationsPath: path.resolve(process.cwd(), './declarations') });
 config.util.setModuleDefaults('fetcher', defaultConfigs.fetcher);
 
 const mocha = new Mocha({

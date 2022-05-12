@@ -160,8 +160,7 @@ The default configuration can be found in `config/default.json`.
 ```js
 {
   "services": {
-    "declarationsPath": "Directory containing services declarations and associated filters.",
-    "documentTypesPath": "File containing document types."
+    "declarationsPath": "Directory containing services declarations and associated filters."
   },
   "recorder": {
     "versions": {
