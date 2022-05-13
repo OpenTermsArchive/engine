@@ -34,7 +34,7 @@
     - [Environment variables](#environment-variables)
   - [Running](#running)
 - [Deploying](#deploying)
-- [Dataset](#dataset)
+- [Publishing](#publishing) 
 - [License](#license)
 
 ## How it works
@@ -337,7 +337,7 @@ npm start $service_id
 
 See [Ops Readme](ops/README.md).
 
-## Dataset
+## Publishing
 
 To generate a dataset:
 
