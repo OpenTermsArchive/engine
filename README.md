@@ -138,9 +138,9 @@ This module is built with [Node](https://nodejs.org/en/) and is tested on macOS,
 
 #### Declarations repository
 
-1. Locally clone your declarations repository, e.g., `git@github.com:OpenTermsArchive/contrib-declarations.git`.
-2. Go into your folder and initialize it, e.g., `cd contrib-declarations; npm install`.
-3. You can now modify your declarations in the `./declarations/` folder, following [these instructions](https://github.com/OpenTermsArchive/contrib-declarations/blob/main/CONTRIBUTING.md).
+1. Locally clone your declarations repository, e.g., `git@github.com:OpenTermsArchive/template-declarations.git`.
+2. Go into your folder and initialize it, e.g., `cd template-declarations; npm install`.
+3. You can now modify your declarations in the `./declarations/` folder, following [these instructions](https://github.com/OpenTermsArchive/template-declarations/blob/main/CONTRIBUTING.md).
 4. When you want to test:
     - If you want to test every declaration, run `npm test`.
     - If you want to test a specific declaration, run `npm test $serviceId`, e.g., `npm test HER`.
@@ -160,7 +160,7 @@ When refering to the base folder, it means the folder where you will be `git pul
 
 1. If not done already, follow the previous part with the repo of your choice.
 2. In the base folder of the previous step (i.e., not _in_ the previous folder, but _where the previous folder is_), clone the core engine: `git clone git@github.com:ambanum/OpenTermsArchive.git`.
-3. Go into the cloned folder and install dependencies: `cd contrib-declarations; npm install`.
+3. Go into the cloned folder and install dependencies: `cd template-declarations; npm install`.
 4. If you are using the main repo, you are done, go to step 6.
 5. If you are using a special repo instance (e.g., `dating-declarations`), create a new [config file](#configuring), `config/development.json`, and add:
     ```json
