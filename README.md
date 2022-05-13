@@ -318,7 +318,7 @@ To get the latest versions of all services' terms:
 npm start
 ```
 
-The latest version of a document will be available in `/data/versions/$service_provider_name/$document_type.md`.
+The latest version of a document will be available in the versions path defined in your configuration, under `$versions_folder/$service_provider_name/$document_type.md`.
 
 To update documents automatically:
 
