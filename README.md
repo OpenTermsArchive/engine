@@ -312,7 +312,7 @@ If your infrastructure requires using an outgoing HTTP/HTTPS proxy to access Int
 
 ### Running
 
-To get the latest versions of all services' terms:
+To get the latest versions of all documents:
 
 ```
 npm start
