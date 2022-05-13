@@ -222,7 +222,7 @@ The default configuration can be found in `config/default.json`.
     "waitForElementsTimeout": "Maximum time (in milliseconds) to wait for elements to be present in the page when fetching document in a headless browser"
   },
   "notifier": { // Notify specified mailing lists when new versions are recorded
-    "sendInBlue": { // SendInBlue API Key is defined in environment variables, see see the “Environment variables” section below
+    "sendInBlue": { // SendInBlue API Key is defined in environment variables, see the “Environment variables” section below
       "updatesListId": "SendInBlue contacts list ID of persons to notify on document updates",
       "updateTemplateId": "SendInBlue email template ID used for updates notifications"
     }
