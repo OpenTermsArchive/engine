@@ -201,17 +201,17 @@ The default configuration can be found in `config/default.json`. The full refere
 ```js
 {
   "services": {
-    "declarationsPath": "Directory containing services declarations and associated filters."
+    "declarationsPath": "Directory containing services declarations and associated filters"
   },
   "recorder": {
     "versions": {
       "storage": {
-        "<storage-adapter>": "Object. Storage adapter configuration. See below."
+        "<storage-adapter>": "Storage adapter configuration object; see below"
       }
     },
     "snapshots": {
       "storage": {
-        "<storage-adapter>": "Object. Storage adapter configuration. See below."
+        "<storage-adapter>": "Storage adapter configuration object; see below"
       }
     }
   },
