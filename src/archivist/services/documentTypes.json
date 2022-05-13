@@ -313,5 +313,15 @@
       "audience": "buyer",
       "object": "warranty, delivery, return of goods or services bought through a monetary transaction"
     }
+  },
+  "Marketplace Buyers Conditions": {
+    "writer": "online marketplace",
+    "audience": "buyer",
+    "object": "buying through a monetary transaction goods or services offered by sellers other than the marketplace itself"
+  },
+  "Marketplace Sellers Conditions": {
+    "writer": "online marketplace",
+    "audience": "seller",
+    "object": "selling through a monetary transaction goods or services to buyers other than the marketplace itself"
   }
 }
