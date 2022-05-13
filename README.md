@@ -25,9 +25,7 @@
       - [Notes: Tips](#notes--tips)
   - [Configuring](#configuring)
     - [Configuration file](#configuration-file)
-      - [Storage adapters configuration](#storage-adapters-configuration)
-        - [Git configuration](#git-configuration)
-        - [MongoDB configuration](#mongodb-configuration)
+      - [Storage adapters](#storage-adapters)
     - [Environment variables](#environment-variables)
   - [Running](#running)
 - [Deploying](#deploying)
@@ -243,12 +241,11 @@ The default configuration is merged with (and overridden by) environment-specifi
 
 If you want to change your local configuration, we suggest you create a `config/development.json` file with overridden values. An example of a production configuration file can be found in `config/production.json`.
 
-
-##### Storage adapters configuration
+##### Storage adapters
 
 Two storage adapters are currently supported: Git and MongoDB. Each one can be used independently for versions and snapshots.
 
-###### Git configuration
+###### Git
 
 ```json
 {
@@ -267,7 +264,7 @@ Two storage adapters are currently supported: Git and MongoDB. Each one can be u
   …
 }
 ```
-###### MongoDB configuration
+###### MongoDB
 
 ```json
 {
