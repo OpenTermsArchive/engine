@@ -320,7 +320,7 @@ npm start
 
 The latest version of a document will be available in `/data/versions/$service_provider_name/$document_type.md`.
 
-To hourly update documents:
+To update documents automatically:
 
 ```
 npm run start:scheduler
