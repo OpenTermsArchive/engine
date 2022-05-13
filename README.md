@@ -20,7 +20,8 @@
   - [By RSS](#by-rss)
     - [Recap of available RSS feeds](#recap-of-available-rss-feeds)
 - [Contributing](#contributing)
-  - [Adding or updating a new service](#adding-or-updating-a-new-service)
+  - [Core engine](#core-engine)
+  - [Adding or updating a service](#adding-a-new-service-or-updating-an-existing-service)
 - [Using locally](#using-locally)
   - [Installing](#installing)
     - [Declarations repository](#declarations-repository)
@@ -119,11 +120,15 @@ For example:
 
 ## Contributing
 
-See [CONTRIBUTING](CONTRIBUTING.md).
+Thanks for wanting to contribute! There are different ways to contribute to Open Terms Archive. We describe the most common below. If you want to explore other venues for contributing, please contact us over email (contact@[our domain name]) or [Twitter](https://twitter.com/OpenTerms).
 
-### Adding or updating a new service
+### Adding a new service or updating an existing service
 
-See the [CONTRIBUTING](https://github.com/OpenTermsArchive/contrib-declarations/blob/main/CONTRIBUTING.md) of repository [OpenTermsArchive/contrib-declarations](https://github.com/OpenTermsArchive/contrib-declarations).
+See the [CONTRIBUTING](https://github.com/OpenTermsArchive/contrib-declarations/blob/main/CONTRIBUTING.md) of repository [`OpenTermsArchive/contrib-declarations`](https://github.com/OpenTermsArchive/contrib-declarations). You will need knowledge of JSON and web DOM.
+
+### Core engine
+
+To contribute to the core engine of Open Terms Archive, see the [CONTRIBUTING](CONTRIBUTING.md) file of this repository. You will need knowledge of JavaScript and NodeJS.
 
 ## Using locally
 
