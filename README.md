@@ -239,11 +239,10 @@ The default configuration can be found in `config/default.json`. The full refere
 }
 ```
 
-The default configuration is merged with (and overridden by) environment-specific configuration that can be specified at startup with the `NODE_ENV` environment variable.
+The default configuration is merged with (and overridden by) environment-specific configuration that can be specified at startup with the `NODE_ENV` environment variable. For example, you would run `NODE_ENV=development npm start` to load the `development.json` configuration file.
 
-If you want to change your local configuration, we suggest you create a `config/development.json` file with overridden values.
+If you want to change your local configuration, we suggest you create a `config/development.json` file with overridden values. An example of a production configuration file can be found in `config/production.json`.
 
-An example of a production configuration file can be found in `config/production.json`.
 
 ##### Storage adapters configuration
 
