@@ -284,9 +284,9 @@ Two storage adapters are currently supported: Git and MongoDB. Each one can be u
 
 Environment variables can be passed in the command-line or provided in a `.env` file at the root of the repository. See `.env.example` for an example of such a file.
 
-- `SMTP_PASSWORD`: a password for email server authentication, in order to send email notifications
-- `SENDINBLUE_API_KEY`: a SendInBlue API key, in order to send email notifications with that service
-- `GITHUB_TOKEN`: a token with repository privileges to access the [GitHub API](https://github.com/settings/tokens)
+- `SMTP_PASSWORD`: a password for email server authentication, in order to send email notifications.
+- `SENDINBLUE_API_KEY`: a SendInBlue API key, in order to send email notifications with that service.
+- `GITHUB_TOKEN`: a token with repository privileges to access the [GitHub API](https://github.com/settings/tokens).
 
 If your infrastructure requires using an outgoing HTTP/HTTPS proxy to access Internet, you can provide it through the `HTTP_PROXY` and `HTTPS_PROXY` environment variable.
 
