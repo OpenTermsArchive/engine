@@ -17,9 +17,6 @@
     - [For all documents at once](#for-all-documents-at-once)
   - [By RSS](#by-rss)
     - [Recap of available RSS feeds](#recap-of-available-rss-feeds)
-- [Contributing](#contributing)
-  - [Core engine](#core-engine)
-  - [Adding or updating a service](#adding-a-new-service-or-updating-an-existing-service)
 - [Using locally](#using-locally)
   - [Installing](#installing)
     - [Declarations repository](#declarations-repository)
@@ -35,6 +32,10 @@
   - [Running](#running)
 - [Deploying](#deploying)
 - [Publishing](#publishing) 
+- [Contributing](#contributing)
+  - [Adding or updating a service](#adding-a-new-service-or-updating-an-existing-service)
+  - [Core engine](#core-engine)
+  - [Funding and partnerships](#funding-and-partnerships)
 - [License](#license)
 
 ## How it works
@@ -115,22 +116,6 @@ For example:
 
 - To receive all updates of `Facebook` documents, the URL is `https://github.com/OpenTermsArchive/contrib-versions/commits/main/Facebook.atom`.
 - To receive all updates of the `Privacy Policy` from `Google`, the URL is `https://github.com/OpenTermsArchive/contrib-versions/commits/main/Google/Privacy%20Policy.md.atom`.
-
-## Contributing
-
-Thanks for wanting to contribute! There are different ways to contribute to Open Terms Archive. We describe the most common below. If you want to explore other venues for contributing, please contact us over email (contact@[our domain name]) or [Twitter](https://twitter.com/OpenTerms).
-
-### Adding a new service or updating an existing service
-
-See the [CONTRIBUTING](https://github.com/OpenTermsArchive/contrib-declarations/blob/main/CONTRIBUTING.md) of repository [`OpenTermsArchive/contrib-declarations`](https://github.com/OpenTermsArchive/contrib-declarations). You will need knowledge of JSON and web DOM.
-
-### Core engine
-
-To contribute to the core engine of Open Terms Archive, see the [CONTRIBUTING](CONTRIBUTING.md) file of this repository. You will need knowledge of JavaScript and NodeJS.
-
-### Funding and partnerships
-
-Beyond individual contributions, we need funds and committed partners to pay for a core team to maintain and grow Open Terms Archive. If you know of opportunities, please let us know! You can find [on our website](https://opentermsarchive.org/en/about) an up-to-date list of the partners and funders that make Open Terms Archive possible.
 
 ## Using locally
 
@@ -356,6 +341,23 @@ To weekly release a dataset:
 ```
 npm run dataset:scheduler
 ```
+
+## Contributing
+
+Thanks for wanting to contribute! There are different ways to contribute to Open Terms Archive. We describe the most common below. If you want to explore other venues for contributing, please contact us over email (contact@[our domain name]) or [Twitter](https://twitter.com/OpenTerms).
+
+### Adding a new service or updating an existing service
+
+See the [CONTRIBUTING](https://github.com/OpenTermsArchive/contrib-declarations/blob/main/CONTRIBUTING.md) of repository [`OpenTermsArchive/contrib-declarations`](https://github.com/OpenTermsArchive/contrib-declarations). You will need knowledge of JSON and web DOM.
+
+### Core engine
+
+To contribute to the core engine of Open Terms Archive, see the [CONTRIBUTING](CONTRIBUTING.md) file of this repository. You will need knowledge of JavaScript and NodeJS.
+
+### Funding and partnerships
+
+Beyond individual contributions, we need funds and committed partners to pay for a core team to maintain and grow Open Terms Archive. If you know of opportunities, please let us know! You can find [on our website](https://opentermsarchive.org/en/about) an up-to-date list of the partners and funders that make Open Terms Archive possible.
+
 
 ---
 
