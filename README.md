@@ -19,7 +19,6 @@
     - [For all documents at once](#for-all-documents-at-once)
   - [By RSS](#by-rss)
     - [Recap of available RSS feeds](#recap-of-available-rss-feeds)
-  - [Unsubscribe](#unsubscribe)
 - [Contributing](#contributing)
   - [Adding or updating a new service](#adding-or-updating-a-new-service)
 - [Using locally](#using-locally)
@@ -118,14 +117,6 @@ For example:
 - To receive all updates of `Facebook` documents, the URL is `https://github.com/OpenTermsArchive/contrib-versions/commits/main/Facebook.atom`.
 - To receive all updates of the `Privacy Policy` from `Google`, the URL is `https://github.com/OpenTermsArchive/contrib-versions/commits/main/Google/Privacy%20Policy.md.atom`.
 
-### Unsubscribe
-
-In order to not receive emails of updated services anymore, two links are included in every email received:
-
-- one to stop receiving all emails from bot@opentermsarchive.org
-- one to stop receiving emails of a particular document
-
-The latter consists in sending an email to contact@opentermsarchive.org to be manually removed from the corresponding list.
 ## Contributing
 
 See [CONTRIBUTING](CONTRIBUTING.md).
