@@ -1,5 +1,3 @@
-<img src="https://disinfo.quaidorsay.fr/assets/img/logo.png" width="140">
-
 # Open Terms Archive
 
 **Services** have **terms** that can change over time. _Open Terms Archive_ enables users rights advocates, regulatory bodies and any interested citizen to follow the **changes** to these **terms** by being **notified** whenever a new **version** is published, and exploring their entire **history**.
@@ -129,6 +127,10 @@ See the [CONTRIBUTING](https://github.com/OpenTermsArchive/contrib-declarations/
 ### Core engine
 
 To contribute to the core engine of Open Terms Archive, see the [CONTRIBUTING](CONTRIBUTING.md) file of this repository. You will need knowledge of JavaScript and NodeJS.
+
+### Funding and partnerships
+
+Beyond individual contributions, we need funds and committed partners to pay for a core team to maintain and grow Open Terms Archive. If you know of opportunities, please let us know! You can find [on our website](https://opentermsarchive.org/en/about) an up-to-date list of the partners and funders that make Open Terms Archive possible.
 
 ## Using locally
 
