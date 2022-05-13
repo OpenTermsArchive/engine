@@ -190,11 +190,13 @@ When refering to the base folder, it means the folder where you will be `git pul
 - You have to `npm install` in the declarations repo at least once, and a least once each time `package.json` changes.
 - Be careful, it doesn't download the history! If you want that, you need to git clone `snapshots` and `versions` in `data/`.
 
+You can clone as many declarations repositories as you want. The one that will be loaded at execution will be defined through configuration.
+
 ### Configuring
 
 #### Configuration file
 
-The default configuration can be found in `config/default.json`.
+The default configuration can be found in `config/default.json`. The full reference is given below. You are unlikely to want to edit all of these elements.
 
 ```js
 {
