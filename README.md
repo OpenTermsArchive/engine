@@ -150,6 +150,16 @@ For now, some scripts are exposed through the form of `bin` commands (You can fi
 - `./bin/lint-declarations.js` to lint a json declaration file
 - `./bin/validate-declarations.js` to test if a json declaration file is valid.
 
+### features
+
+Some of the main features are also exposed: 
+
+#### fetcher
+
+You can use the fetcher in your code by using
+
+`import fetcher, { launchHeadlessBrowser, stopHeadlessBrowser, FetchDocumentError } from "open-terms-archive/fetcher"`
+
 ## Using locally
 
 > **Windows Support**: This module can run locally on Windows systems.
