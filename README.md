@@ -199,7 +199,7 @@ The default configuration can be found in `config/default.json`.
     "githubIssues": {
       "repository": "GitHub repository where to create isssues",
       "label": {
-        "name": "GitHub issues label to attach to a newly created issue. This specific label will be created automatically in the target repository",
+        "name": "Label to attach to bot-created issues. This specific label will be created automatically in the target repository",
         "color": "The hexadecimal color code for the label, without the leading #",
         "description": "A short description of the label"
       }
