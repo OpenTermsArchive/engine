@@ -74,6 +74,8 @@ export async function launchHeadlessBrowser() {
   }
 
   browser = await puppeteerExtra.launch({ headless: true });
+
+  return browser;
 }
 
 export async function stopHeadlessBrowser() {
