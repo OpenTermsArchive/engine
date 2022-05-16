@@ -20,12 +20,12 @@ const GITHUB_REPO_URL = `https://github.com/${TRACKER_REPOSITORY}/blob/main/decl
 const GOOGLE_URL = 'https://www.google.com/search?q=';
 
 export default class Tracker {
-  static isTokenValid() {
+  static isRepositoryValid() {
     return (TRACKER_REPOSITORY || '').includes('/');
   }
 
   constructor() {
-    if (!Tracker.isTokenValid()) {
+    if (!Tracker.isRepositoryValid()) {
       throw new Error('tracker.githubIssues.repository should be a string with <owner>/<repo>');
     }
 
