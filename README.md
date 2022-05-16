@@ -13,6 +13,7 @@
 - [Be notified](#be-notified)
   - [By email](#by-email)
   - [By RSS](#by-rss)
+- [Reuse](#reuse)
 - [Using locally](#using-locally)
   - [Installing](#installing)
     - [Declarations repository](#declarations-repository)
@@ -108,6 +109,20 @@ For example:
 
 - To receive all updates of `Facebook` documents, the URL is `https://github.com/OpenTermsArchive/contrib-versions/commits/main/Facebook.atom`.
 - To receive all updates of the `Privacy Policy` from `Google`, the URL is `https://github.com/OpenTermsArchive/contrib-versions/commits/main/Google/Privacy%20Policy.md.atom`.
+## Reuse
+
+Open Terms Archive is built on several modules. Some of them are already exposed.
+
+As `open-terms-archive` has not yet been published on npm, you can install it with: 
+
+```
+npm install ambanum/OpenTermsArchive#main
+```
+### scripts
+For now, some scripts are exposed through the form of `bin` commands (You can find them in `./bin`)
+
+- `ota-lint-declarations` to lint a json declaration file
+- `ota-validate-declarations` to test if a json declaration file is valid.
 
 ## Using locally
 
