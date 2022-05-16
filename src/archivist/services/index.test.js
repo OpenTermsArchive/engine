@@ -67,7 +67,7 @@ describe('Services', () => {
     });
 
     context('when a service has no history', async () => {
-      describe('Service wihout history', async () => {
+      describe('Service without history', async () => {
         await validateServiceWithoutHistory(
           'service_without_history',
           expectedServices.service_without_history,
@@ -217,7 +217,7 @@ describe('Services', () => {
     });
 
     context('when a service has no history', async () => {
-      describe('Service wihout history', async () => {
+      describe('Service without history', async () => {
         await validateServiceWithHistory(
           'service_without_history',
           expectedServices.service_without_history,
