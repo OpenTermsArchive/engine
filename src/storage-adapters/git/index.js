@@ -133,11 +133,11 @@ export default class GitAdapter {
     return filePath;
   }
 
-  async _commit(filePath, message, authorDate) {
+  async _commit(filePath, message, date) {
     try {
       await this.git.add(filePath);
 
-      return await this.git.commit(filePath, message, authorDate);
+      return await this.git.commit(filePath, message, date);
     } catch (error) {
       throw new Error(`Could not commit ${filePath} with message "${message}" due to error: "${error}"`);
     }

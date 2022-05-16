@@ -32,19 +32,25 @@ export default class Git {
     return this.git.add(this.relativePath(filepath));
   }
 
-  async commit(filepath, message, authorDate) {
-    const options = {};
+  async commit(filepath, message, date) {
+    if (date) {
+      const commitDate = new Date(date).toISOString();
 
-    if (authorDate) {
-      options['--date'] = new Date(authorDate).toISOString();
+      process.env.GIT_AUTHOR_DATE = commitDate;
+      process.env.GIT_COMMITTER_DATE = commitDate;
     }
 
     let summary;
 
-    if (filepath) {
-      summary = await this.git.commit(message, this.relativePath(filepath), options);
-    } else {
-      summary = await this.git.commit(message, options);
+    try {
+      if (filepath) {
+        summary = await this.git.commit(message, filepath);
+      } else {
+        summary = await this.git.commit(message);
+      }
+    } finally {
+      process.env.GIT_AUTHOR_DATE = '';
+      process.env.GIT_COMMITTER_DATE = '';
     }
 
     if (!summary.commit) { // Nothing committed, no hash to return
