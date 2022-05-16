@@ -22,6 +22,7 @@
   - [Unsubscribe](#unsubscribe)
 - [Contributing](#contributing)
   - [Adding or updating a new service](#adding-or-updating-a-new-service)
+- [Reuse](#reuse)
 - [Using locally](#using-locally)
   - [Installing](#installing)
     - [Declarations repository](#declarations-repository)
@@ -133,6 +134,21 @@ See [CONTRIBUTING](CONTRIBUTING.md).
 ### Adding or updating a new service
 
 See the [CONTRIBUTING](https://github.com/OpenTermsArchive/contrib-declarations/blob/main/CONTRIBUTING.md) of repository [OpenTermsArchive/contrib-declarations](https://github.com/OpenTermsArchive/contrib-declarations).
+
+## Reuse
+
+Open Terms Archive is built on several modules that we will try to expose or externalize in a near future.
+
+As `open-terms-archive` has not yet been published on npm, you can install it with: 
+
+```
+npm install ambanum/OpenTermsArchive#master
+```
+### scripts
+For now, some scripts are exposed through the form of `bin` commands (You can find them in `./bin`)
+
+- `./bin/lint-declarations.js` to lint a json declaration file
+- `./bin/validate-declarations.js` to test if a json declaration file is valid.
 
 ## Using locally
 
