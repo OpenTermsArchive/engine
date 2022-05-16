@@ -61,7 +61,7 @@ ansible-playbook ops/app.yml --tags update
 
 ### Allowed keys
 
-Some instances might have user-specific SSH keys enabled. But if they are automatically deployed in CI, they will all have the bot key enabled. If your access is denied on an instance, you can thus run any of the commands with the `--private-key` option, passing it the bot SSH private key. This key can be found in the passwords database.
+In case the instance you're deploying on is operated by the Core team, you can use the `OTA-bot` SSH private key instead of your personal one. You can thus run any of the commands with the `--private-key` option, passing it the path to the bot SSH private key. This key can be found in the passwords database.
 
 ### Commands examples
 
