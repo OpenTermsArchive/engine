@@ -241,9 +241,11 @@ The default configuration can be found in `config/default.json`.
   "tracker": { // Tracking mechanism to create GitHub issues when document content is inaccessible
     "githubIssues": {
       "repository": "GitHub repository where to create isssues",
-      "label": "GitHub issues label to attach to a newly created issue. This specific label has to exist in the repository",
-      "color": "The hexadecimal color code for the label, without the leading #.",
-      "description": "A short description of the label."
+      "label": {
+        "name": "Label to attach to bot-created issues. This specific label will be created automatically in the target repository",
+        "color": "The hexadecimal color code for the label, without the leading #",
+        "description": "A short description of the label"
+      }
     }
   },
   "dataset": { // Release mechanism to create dataset periodically

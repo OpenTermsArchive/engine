@@ -11,24 +11,25 @@ const ISSUE_STATE_CLOSED = 'closed';
 const ISSUE_STATE_OPEN = 'open';
 const ISSUE_STATE_ALL = 'all';
 
-const UPDATE_DOCUMENT_LABEL = config.get('tracker.githubIssues.label');
+const TRACKER_LABEL = config.get('tracker.githubIssues.label.name');
+const TRACKER_REPOSITORY = config.get('tracker.githubIssues.repository');
 
 const LOCAL_CONTRIBUTE_URL = 'http://localhost:3000/en/service';
 const CONTRIBUTE_URL = 'https://contribute.opentermsarchive.org/en/service';
-const GITHUB_REPO_URL = `https://github.com/${config.get('tracker.githubIssues.repository')}/blob/main/declarations`;
+const GITHUB_REPO_URL = `https://github.com/${TRACKER_REPOSITORY}/blob/main/declarations`;
 const GOOGLE_URL = 'https://www.google.com/search?q=';
 
 export default class Tracker {
-  static isTokenValid() {
-    return (config.get('tracker.githubIssues.repository') || '').includes('/');
+  static isRepositoryValid() {
+    return (TRACKER_REPOSITORY || '').includes('/');
   }
 
   constructor() {
-    if (!Tracker.isTokenValid()) {
+    if (!Tracker.isRepositoryValid()) {
       throw new Error('tracker.githubIssues.repository should be a string with <owner>/<repo>');
     }
 
-    const [ owner, repo ] = config.get('tracker.githubIssues.repository').split('/');
+    const [ owner, repo ] = TRACKER_REPOSITORY.split('/');
 
     this.octokit = new Octokit({
       auth: process.env.GITHUB_TOKEN,
@@ -44,15 +45,15 @@ export default class Tracker {
 
   async initialize() {
     await this.createLabel({
-      name: config.get('tracker.githubIssues.label'),
-      color: config.get('tracker.githubIssues.color'),
-      description: config.get('tracker.githubIssues.description'),
+      name: TRACKER_LABEL,
+      color: config.get('tracker.githubIssues.label.color'),
+      description: config.get('tracker.githubIssues.label.description'),
     });
   }
 
   async onVersionRecorded(serviceId, type) {
     await this.closeIssueIfExists({
-      labels: [UPDATE_DOCUMENT_LABEL],
+      labels: [TRACKER_LABEL],
       title: `Fix ${serviceId} - ${type}`,
       comment: '🤖 Closed automatically as data was gathered successfully',
     });
@@ -60,7 +61,7 @@ export default class Tracker {
 
   async onVersionNotChanged(serviceId, type) {
     await this.closeIssueIfExists({
-      labels: [UPDATE_DOCUMENT_LABEL],
+      labels: [TRACKER_LABEL],
       title: `Fix ${serviceId} - ${type}`,
       comment: '🤖 Closed automatically as version is unchanged but data has been fetched correctly',
     });
@@ -85,7 +86,7 @@ export default class Tracker {
     await this.createIssueIfNotExists({
       title,
       body,
-      labels: [UPDATE_DOCUMENT_LABEL],
+      labels: [TRACKER_LABEL],
       comment: '🤖 Reopened automatically as an error occured',
     });
   }
@@ -232,7 +233,7 @@ export default class Tracker {
     const encodedName = encodeURIComponent(name);
     const encodedType = encodeURIComponent(documentType);
     const encodedUrl = encodeURIComponent(url);
-    const encodedDestination = encodeURIComponent(config.get('tracker.githubIssues.repository'));
+    const encodedDestination = encodeURIComponent(TRACKER_REPOSITORY);
 
     const urlQueryParams = `destination=${encodedDestination}&step=2&url=${encodedUrl}&name=${encodedName}&documentType=${encodedType}${noiseSelectorsQueryString}${contentSelectorsQueryString}&expertMode=true`;
 
