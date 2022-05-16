@@ -124,6 +124,16 @@ For now, some scripts are exposed through the form of `bin` commands (You can fi
 - `ota-lint-declarations` to lint a json declaration file
 - `ota-validate-declarations` to test if a json declaration file is valid.
 
+### features
+
+Some of the main features are also exposed: 
+
+#### fetcher
+
+You can use the fetcher in your code by using
+
+`import fetcher, { launchHeadlessBrowser, stopHeadlessBrowser, FetchDocumentError } from "open-terms-archive/fetcher"`
+
 ## Using locally
 
 ### Installing

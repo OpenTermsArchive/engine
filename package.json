@@ -13,7 +13,9 @@
   "license": "EUPL-1.2",
   "author": "ambanum",
   "type": "module",
-  "main": "index.js",
+  "exports": {
+    "./fetcher": "./src/archivist/fetcher/index.js"
+  },
   "bin": {
     "ota-lint-declarations": "./bin/lint-declarations.js",
     "ota-validate-declarations": "./bin/validate-declarations.js"
