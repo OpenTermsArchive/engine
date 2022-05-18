@@ -8,6 +8,7 @@ all:
     declarations_directory: declarations
     app_directory: ota
     ota_repository: https://github.com/ambanum/OpenTermsArchive.git
+    ota_branch: main
   children:
     production:
       children:
