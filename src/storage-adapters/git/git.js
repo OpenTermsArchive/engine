@@ -54,7 +54,7 @@ export default class Git {
     const shortHash = summary.commit.replace('HEAD ', '').replace('(root-commit) ', '');
     const longHash = (await this.git.show([ shortHash, '--pretty=%H', '-s' ])).trim();
 
-    return longHash; // Return a long commit hash to always handle ids in the same format and facilitate comparison as other commands return a long hash
+    return longHash; // Return a long commit hash to always handle ids in the same format and facilitate comparison
   }
 
   async pushChanges() {
