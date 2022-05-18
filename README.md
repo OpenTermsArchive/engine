@@ -151,7 +151,7 @@ See the [CONTRIBUTING](https://github.com/OpenTermsArchive/contrib-declarations/
 4. When you want to test:
     - If you want to test every declaration, run `npm test`.
     - If you want to test a specific declaration, run `npm test $serviceId`, e.g., `npm test HER`.
-    - If you want to have faster feedback on the structure of a specific declaration, run `npm test -- --schema-only $serviceId`, e.g., `npm test -- --schema-only HER`.
+    - If you want to have faster feedback on the structure of a specific declaration, run `npm run test:schema $serviceId`, e.g., `npm run test:schema HER`.
 5. Once you have done that, if you have any error, it will be prompted and detailed at the end of the test.
     - E.g., `InaccessibleContentError`: Your selector is wrong and should be fixed.
     - E.g., `TypeError`: The file declaration is invalid.
@@ -159,7 +159,7 @@ See the [CONTRIBUTING](https://github.com/OpenTermsArchive/contrib-declarations/
 
 ##### Note: Testing
 
-Testing works with multiple tests (e.g., checking the validity of the file, that the URL is correct and reachable, that the content is correctly gathered, etc.); as it may take a bit of time, that's why you may want to `--schema-only`.
+Testing works with multiple tests (e.g., checking the validity of the file, that the URL is correct and reachable, that the content is correctly gathered, etc.); as it may take a bit of time, that's why you may want to use `npm run test:schema`.
 
 #### Core tool
 
