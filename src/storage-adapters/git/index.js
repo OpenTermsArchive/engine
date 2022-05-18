@@ -12,14 +12,14 @@ import Git from './git.js';
 
 const fs = fsApi.promises;
 
+mime.define({ 'text/markdown': ['md'] }, true); // ensure extension for markdown files is `.md` and not `.markdown`
+
 export default class GitAdapter {
   constructor({ path, author, publish, prefixMessageToSnapshotId }) {
     this.path = path;
     this.author = author;
     this.needsPublication = publish;
     this.prefixMessageToSnapshotId = prefixMessageToSnapshotId;
-
-    mime.define({ 'text/markdown': ['md'] }, true); // ensure extension for markdown files is `.md` and not `.markdown`
   }
 
   async initialize() {
