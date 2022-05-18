@@ -47,7 +47,14 @@ export default class Git {
       summary = await this.git.commit(message, options);
     }
 
-    return summary.commit.replace('HEAD ', '').replace('(root-commit) ', '');
+    if (!summary.commit) { // Nothing committed, no hash to return
+      return;
+    }
+
+    const shortHash = summary.commit.replace('HEAD ', '').replace('(root-commit) ', '');
+    const longHash = (await this.git.show([ shortHash, '--pretty=%H', '-s' ])).trim();
+
+    return longHash; // Return a long commit hash to always handle ids in the same format and facilitate comparison
   }
 
   async pushChanges() {
