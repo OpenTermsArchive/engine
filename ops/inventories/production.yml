@@ -41,7 +41,7 @@ all:
               versions_repository: git@github.com:OpenTermsArchive/france-elections-versions.git
         pga:
           hosts:
-            0.0.0.0: # To replace
+            134.102.58.23:
               config_file_name: pga
               services_repository: https://github.com/OpenTermsArchive/pga-declarations.git
               snapshots_repository: git@github.com:OpenTermsArchive/pga-snapshots.git
