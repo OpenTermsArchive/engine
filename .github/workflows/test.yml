@@ -3,7 +3,7 @@ name: Test
 on:
   push:
     branches-ignore:
-      - master # tests will be launched by workflow_call push:
+      - main # tests will be launched by workflow_call push:
   pull_request:
     types: [ opened, reopened ]
   workflow_call:

@@ -2,7 +2,7 @@
 
 All services declarations, snapshots and versions repo has been renamed and moved to the [OpenTermArchive organization](https://github.com/OpenTermsArchive) on github.
 
-Documentation on the new naming system can be found [here](https://github.com/ambanum/OpenTermsArchive/blob/master/CONTRIBUTING.md#instances-and-repositories-names)
+Documentation on the new naming system can be found [here](https://github.com/ambanum/OpenTermsArchive/blob/main/CONTRIBUTING.md#instances-and-repositories-names)
 
 If you already have some of those projects locally, you can run
 
