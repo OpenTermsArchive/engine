@@ -19,7 +19,7 @@ all:
               snapshots_repository: git@github.com:OpenTermsArchive/contrib-snapshots.git
               snapshots_branch: master
               versions_repository: git@github.com:OpenTermsArchive/contrib-versions.git
-              versions_branch: master
+              versions_branch: main
         dating:
           hosts:
             vps-99ae1d89.vps.ovh.net:
