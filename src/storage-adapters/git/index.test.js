@@ -45,7 +45,6 @@ describe('GitAdapter', () => {
     subject = new GitAdapter({
       ...config.get('recorder.snapshots.storage.git'),
       path: RECORDER_PATH,
-      fileExtension: 'html',
     });
 
     return subject.initialize();
@@ -57,31 +56,13 @@ describe('GitAdapter', () => {
         serviceId: SERVICE_PROVIDER_ID,
         documentType: DOCUMENT_TYPE,
         content: CONTENT,
+        fileExtension: 'html',
       }));
 
       after(async () => subject._removeAllRecords());
 
       it('creates a file for the given service', () => {
         expect(fs.readFileSync(EXPECTED_FILE_PATH, { encoding: 'utf8' })).to.equal(CONTENT);
-      });
-
-      context('with provided extension', () => {
-        let savedFilePath;
-
-        before(async () => {
-          savedFilePath = await subject._save({
-            serviceId: SERVICE_PROVIDER_ID,
-            documentType: DOCUMENT_TYPE,
-            content: CONTENT,
-            fileExtension: 'pdf',
-          });
-        });
-
-        after(async () => subject._removeAllRecords());
-
-        it('creates a file for the given service with the given extension', () => {
-          expect(savedFilePath).to.equal(EXPECTED_PDF_FILE_PATH);
-        });
       });
     });
 
@@ -92,7 +73,12 @@ describe('GitAdapter', () => {
       after(async () => subject._removeAllRecords());
 
       it('creates a directory and file for the given service', async () => {
-        await subject._save({ serviceId: NEW_SERVICE_ID, documentType: DOCUMENT_TYPE, content: CONTENT });
+        await subject._save({
+          serviceId: NEW_SERVICE_ID,
+          documentType: DOCUMENT_TYPE,
+          content: CONTENT,
+          fileExtension: 'html',
+        });
 
         expect(fs.readFileSync(NEW_SERVICE_EXPECTED_FILE_PATH, { encoding: 'utf8' })).to.equal(CONTENT);
       });
@@ -109,6 +95,7 @@ describe('GitAdapter', () => {
         serviceId: SERVICE_PROVIDER_ID,
         documentType: DOCUMENT_TYPE,
         content: CONTENT,
+        fileExtension: 'html',
       });
 
       id = await subject._commit(EXPECTED_FILE_PATH, COMMIT_MESSAGE);
@@ -128,16 +115,8 @@ describe('GitAdapter', () => {
   });
 
   describe('#_getPathFor', () => {
-    context('without provided extension', () => {
-      it('returns the file path with default extension for the given service provider’s document type', () => {
-        expect(subject._getPathFor(SERVICE_PROVIDER_ID, DOCUMENT_TYPE)).to.equal(EXPECTED_FILE_PATH);
-      });
-    });
-
-    context('with provided extension', () => {
-      it('returns the file path with given extension for the given service provider’s document type', () => {
-        expect(subject._getPathFor(SERVICE_PROVIDER_ID, DOCUMENT_TYPE, 'pdf')).to.equal(EXPECTED_PDF_FILE_PATH);
-      });
+    it('returns the file path with given extension for the given service provider’s document type', () => {
+      expect(subject._getPathFor(SERVICE_PROVIDER_ID, DOCUMENT_TYPE, 'pdf')).to.equal(EXPECTED_PDF_FILE_PATH);
     });
   });
 
@@ -399,12 +378,14 @@ describe('GitAdapter', () => {
             serviceId: SERVICE_PROVIDER_ID,
             documentType: DOCUMENT_TYPE,
             content: CONTENT,
+            mimeType: MIME_TYPE,
           });
 
           ({ id: lastSnapshotId } = await subject.record({
             serviceId: SERVICE_PROVIDER_ID,
             documentType: DOCUMENT_TYPE,
             content: UPDATED_FILE_CONTENT,
+            mimeType: MIME_TYPE,
           }));
 
           latestRecord = await subject.getLatestRecord(SERVICE_PROVIDER_ID, DOCUMENT_TYPE);

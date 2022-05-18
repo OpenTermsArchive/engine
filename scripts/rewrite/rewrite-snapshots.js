@@ -53,12 +53,10 @@ let recorder;
     versionsStorageAdapter: new GitAdapter({
       ...config.get('recorder.versions.storage.git'),
       path: VERSIONS_TARGET_PATH,
-      fileExtension: 'md',
     }),
     snapshotsStorageAdapter: new GitAdapter({
       ...config.get('recorder.snapshots.storage.git'),
       path: SNAPSHOTS_TARGET_PATH,
-      fileExtension: 'html',
     }),
   });
   await recorder.initialize();

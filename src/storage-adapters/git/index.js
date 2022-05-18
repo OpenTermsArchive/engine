@@ -12,11 +12,12 @@ import Git from './git.js';
 
 const fs = fsApi.promises;
 
+mime.define({ 'text/markdown': ['md'] }, true); // ensure extension for markdown files is `.md` and not `.markdown`
+
 export default class GitAdapter {
-  constructor({ path, fileExtension, author, publish, prefixMessageToSnapshotId }) {
+  constructor({ path, author, publish, prefixMessageToSnapshotId }) {
     this.path = path;
     this.author = author;
-    this.fileExtension = fileExtension;
     this.needsPublication = publish;
     this.prefixMessageToSnapshotId = prefixMessageToSnapshotId;
   }
@@ -143,7 +144,7 @@ export default class GitAdapter {
   }
 
   _getPathFor(serviceId, documentType, fileExtension) {
-    return `${this.path}/${serviceId}/${documentType}.${fileExtension || this.fileExtension}`;
+    return `${this.path}/${serviceId}/${documentType}.${fileExtension}`;
   }
 
   _isTracked(serviceId, documentType) {
