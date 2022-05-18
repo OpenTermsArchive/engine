@@ -15,7 +15,7 @@
   "type": "module",
   "main": "src/index.js",
   "exports": {
-    "./fetcher": "./src/archivist/fetcher.js"
+    "./fetcher": "./src/archivist/fetcher/index.js"
   },
   "bin": {
     "ota-lint-declarations": "./bin/lint-declarations.js",
