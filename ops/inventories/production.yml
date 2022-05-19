@@ -18,9 +18,7 @@ all:
               config_file_name: contrib
               services_repository: https://github.com/OpenTermsArchive/contrib-declarations.git
               snapshots_repository: git@github.com:OpenTermsArchive/contrib-snapshots.git
-              snapshots_branch: master
               versions_repository: git@github.com:OpenTermsArchive/contrib-versions.git
-              versions_branch: main
         dating:
           hosts:
             vps-99ae1d89.vps.ovh.net:
