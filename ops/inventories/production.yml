@@ -42,6 +42,7 @@ all:
         pga:
           hosts:
             134.102.58.23:
+              ansible_user: pga
               config_file_name: pga
               services_repository: https://github.com/OpenTermsArchive/pga-declarations.git
               snapshots_repository: git@github.com:OpenTermsArchive/pga-snapshots.git
