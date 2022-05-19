@@ -5,7 +5,7 @@ First of all, thanks for taking the time to contribute! 🎉👍
 - [Workflow](#workflow)
   - [Pull requests](#pull-requests)
   - [Peer reviews](#peer-reviews)
-  - [Commit messages](#commits-naming-convention)
+  - [Commit messages](#commit-messages)
 - [Continuous delivery](#continuous-delivery)
 - [Instances and repositories names](#instances-and-repositories-names)
 - [Practices](#practices)
