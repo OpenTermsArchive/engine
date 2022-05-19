@@ -1,5 +1,3 @@
-<img src="https://disinfo.quaidorsay.fr/assets/img/logo.png" width="140">
-
 # Open Terms Archive
 
 **Services** have **terms** that can change over time. _Open Terms Archive_ enables users rights advocates, regulatory bodies and any interested citizen to follow the **changes** to these **terms** by being **notified** whenever a new **version** is published, and exploring their entire **history**.
@@ -19,9 +17,6 @@
     - [For all documents at once](#for-all-documents-at-once)
   - [By RSS](#by-rss)
     - [Recap of available RSS feeds](#recap-of-available-rss-feeds)
-  - [Unsubscribe](#unsubscribe)
-- [Contributing](#contributing)
-  - [Adding or updating a new service](#adding-or-updating-a-new-service)
 - [Using locally](#using-locally)
   - [Installing](#installing)
     - [Declarations repository](#declarations-repository)
@@ -30,13 +25,15 @@
       - [Notes: Tips](#notes--tips)
   - [Configuring](#configuring)
     - [Configuration file](#configuration-file)
-      - [Storage adapters configuration](#storage-adapters-configuration)
-        - [Git configuration](#git-configuration)
-        - [MongoDB configuration](#mongodb-configuration)
+      - [Storage adapters](#storage-adapters)
     - [Environment variables](#environment-variables)
   - [Running](#running)
 - [Deploying](#deploying)
-- [Dataset](#dataset)
+- [Publishing](#publishing) 
+- [Contributing](#contributing)
+  - [Adding or updating a service](#adding-a-new-service-or-updating-an-existing-service)
+  - [Core engine](#core-engine)
+  - [Funding and partnerships](#funding-and-partnerships)
 - [License](#license)
 
 ## How it works
@@ -111,37 +108,18 @@ To find out the address of the RSS feed you want to subscribe to:
 | ----------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | all services and documents          | `https://github.com/OpenTermsArchive/contrib-versions/commits.atom`                                                                                                                            |
 | all the documents of a service      | Replace `$serviceId` with the service ID:<br>`https://github.com/OpenTermsArchive/contrib-versions/commits/main/$serviceId.atom.`                                                            |
-| un document spécifique d'un service | Replace `$serviceId` with the service ID and `$documentType` with the document type:<br>`https://github.com/OpenTermsArchive/contrib-versions/commits/main/$serviceId/$documentType.md.atom` |
+| a specific document of a service | Replace `$serviceId` with the service ID and `$documentType` with the document type:<br>`https://github.com/OpenTermsArchive/contrib-versions/commits/main/$serviceId/$documentType.md.atom` |
 
 For example:
 
 - To receive all updates of `Facebook` documents, the URL is `https://github.com/OpenTermsArchive/contrib-versions/commits/main/Facebook.atom`.
 - To receive all updates of the `Privacy Policy` from `Google`, the URL is `https://github.com/OpenTermsArchive/contrib-versions/commits/main/Google/Privacy%20Policy.md.atom`.
 
-### Unsubscribe
-
-In order to not receive emails of updated services anymore, two links are included in every email received:
-
-- one to stop receiving all emails from bot@opentermsarchive.org
-- one to stop receiving emails of a particular document
-
-The latter consists in sending an email to contact@opentermsarchive.org to be manually removed from the corresponding list.
-## Contributing
-
-See [CONTRIBUTING](CONTRIBUTING.md).
-
-### Adding or updating a new service
-
-See the [CONTRIBUTING](https://github.com/OpenTermsArchive/contrib-declarations/blob/main/CONTRIBUTING.md) of repository [OpenTermsArchive/contrib-declarations](https://github.com/OpenTermsArchive/contrib-declarations).
-
 ## Using locally
-
-> **Windows Support**: This module can run locally on Windows systems.
 
 ### Installing
 
-- This module is built with [Node](https://nodejs.org/en/). You will need to [install Node >= v16.x](https://nodejs.org/en/download/) to run it.
-- When refering to the base folder, it means the folder where you will be `git pull`ing everything.
+This module is built with [Node](https://nodejs.org/en/) and is tested on macOS, UNIX and Windows. You will need to [install Node >= v16.x](https://nodejs.org/en/download/) to run it.
 
 #### Declarations repository
 
@@ -162,6 +140,8 @@ See the [CONTRIBUTING](https://github.com/OpenTermsArchive/contrib-declarations/
 Testing works with multiple tests (e.g., checking the validity of the file, that the URL is correct and reachable, that the content is correctly gathered, etc.); as it may take a bit of time, that's why you may want to use `npm run test:schema`.
 
 #### Core tool
+
+When refering to the base folder, it means the folder where you will be `git pull`ing everything.
 
 1. If not done already, follow the previous part with the repo of your choice.
 2. In the base folder of the previous step (i.e., not _in_ the previous folder, but _where the previous folder is_), clone the core engine: `git clone git@github.com:ambanum/OpenTermsArchive.git`.
@@ -195,26 +175,28 @@ Testing works with multiple tests (e.g., checking the validity of the file, that
 - You have to `npm install` in the declarations repo at least once, and a least once each time `package.json` changes.
 - Be careful, it doesn't download the history! If you want that, you need to git clone `snapshots` and `versions` in `data/`.
 
+You can clone as many declarations repositories as you want. The one that will be loaded at execution will be defined through configuration.
+
 ### Configuring
 
 #### Configuration file
 
-The default configuration can be found in `config/default.json`.
+The default configuration can be found in `config/default.json`. The full reference is given below. You are unlikely to want to edit all of these elements.
 
 ```js
 {
   "services": {
-    "declarationsPath": "Directory containing services declarations and associated filters."
+    "declarationsPath": "Directory containing services declarations and associated filters"
   },
   "recorder": {
     "versions": {
       "storage": {
-        "<storage-adapter>": "Object. Storage adapter configuration. See below."
+        "<storage-adapter>": "Storage adapter configuration object; see below"
       }
     },
     "snapshots": {
       "storage": {
-        "<storage-adapter>": "Object. Storage adapter configuration. See below."
+        "<storage-adapter>": "Storage adapter configuration object; see below"
       }
     }
   },
@@ -222,7 +204,7 @@ The default configuration can be found in `config/default.json`.
     "waitForElementsTimeout": "Maximum time (in milliseconds) to wait for elements to be present in the page when fetching document in a headless browser"
   },
   "notifier": { // Notify specified mailing lists when new versions are recorded
-    "sendInBlue": { // SendInBlue API Key is defined in environment variables, see see the “Environment variables” section below
+    "sendInBlue": { // SendInBlue API Key is defined in environment variables, see the “Environment variables” section below
       "updatesListId": "SendInBlue contacts list ID of persons to notify on document updates",
       "updateTemplateId": "SendInBlue email template ID used for updates notifications"
     }
@@ -255,17 +237,15 @@ The default configuration can be found in `config/default.json`.
 }
 ```
 
-The default configuration is merged with (and overridden by) environment-specific configuration that can be specified at startup with the [`NODE_ENV` environment variable](#node-env).
+The default configuration is merged with (and overridden by) environment-specific configuration that can be specified at startup with the `NODE_ENV` environment variable. For example, you would run `NODE_ENV=development npm start` to load the `development.json` configuration file.
 
-If you want to change your local configuration, we suggest you create a `config/development.json` file with overridden values.
+If you want to change your local configuration, we suggest you create a `config/development.json` file with overridden values. An example of a production configuration file can be found in `config/production.json`.
 
-An example of a production configuration file can be found in `config/production.json`.
-
-##### Storage adapters configuration
+##### Storage adapters
 
 Two storage adapters are currently supported: Git and MongoDB. Each one can be used independently for versions and snapshots.
 
-###### Git configuration
+###### Git
 
 ```json
 {
@@ -284,7 +264,7 @@ Two storage adapters are currently supported: Git and MongoDB. Each one can be u
   …
 }
 ```
-###### MongoDB configuration
+###### MongoDB
 
 ```json
 {
@@ -302,25 +282,25 @@ Two storage adapters are currently supported: Git and MongoDB. Each one can be u
 
 #### Environment variables
 
-Environment variables can be provided in a `.env` file at the root of the repository. See `.env.example` for an example of such a file.
+Environment variables can be passed in the command-line or provided in a `.env` file at the root of the repository. See `.env.example` for an example of such a file.
 
-- `SMTP_PASSWORD`: a password for email server authentication, in order to send email notifications
-- `SENDINBLUE_API_KEY`: a SendInBlue API key, in order to send email notifications
-- `GITHUB_TOKEN`: a token with repository privileges to access to the [GitHub API](https://github.com/settings/tokens)
+- `SMTP_PASSWORD`: a password for email server authentication, in order to send email notifications.
+- `SENDINBLUE_API_KEY`: a SendInBlue API key, in order to send email notifications with that service.
+- `GITHUB_TOKEN`: a token with repository privileges to access the [GitHub API](https://github.com/settings/tokens).
 
-If your infrastructure requires using an outgoing HTTP/HTTPS proxy to access Internet, you can provide it through the `HTTP_PROXY` and `HTTPS_PROXY` environment variable.
+If your infrastructure requires using an outgoing HTTP/HTTPS proxy to access the Internet, you can provide it through the `HTTP_PROXY` and `HTTPS_PROXY` environment variable.
 
 ### Running
 
-To get the latest versions of all services' terms:
+To get the latest versions of all documents:
 
 ```
 npm start
 ```
 
-The latest version of a document will be available in `/data/versions/$service_provider_name/$document_type.md`.
+The latest version of a document will be available in the versions path defined in your configuration, under `$versions_folder/$service_provider_name/$document_type.md`.
 
-To hourly update documents:
+To update documents automatically:
 
 ```
 npm run start:scheduler
@@ -338,7 +318,7 @@ npm start $service_id
 
 See [Ops Readme](ops/README.md).
 
-## Dataset
+## Publishing
 
 To generate a dataset:
 
@@ -352,12 +332,28 @@ To release a dataset:
 npm run dataset:release
 ```
 
-
 To weekly release a dataset:
 
 ```
 npm run dataset:scheduler
 ```
+
+## Contributing
+
+Thanks for wanting to contribute! There are different ways to contribute to Open Terms Archive. We describe the most common below. If you want to explore other venues for contributing, please contact us over email (contact@[our domain name]) or [Twitter](https://twitter.com/OpenTerms).
+
+### Adding a new service or updating an existing service
+
+See the [CONTRIBUTING](https://github.com/OpenTermsArchive/contrib-declarations/blob/main/CONTRIBUTING.md) of repository [`OpenTermsArchive/contrib-declarations`](https://github.com/OpenTermsArchive/contrib-declarations). You will need knowledge of JSON and web DOM.
+
+### Core engine
+
+To contribute to the core engine of Open Terms Archive, see the [CONTRIBUTING](CONTRIBUTING.md) file of this repository. You will need knowledge of JavaScript and NodeJS.
+
+### Funding and partnerships
+
+Beyond individual contributions, we need funds and committed partners to pay for a core team to maintain and grow Open Terms Archive. If you know of opportunities, please let us know! You can find [on our website](https://opentermsarchive.org/en/about) an up-to-date list of the partners and funders that make Open Terms Archive possible.
+
 
 ---
 

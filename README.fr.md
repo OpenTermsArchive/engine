@@ -54,14 +54,6 @@ Cliquez sur une modification pour voir en quoi elle consiste (par exemple [celle
 
 ### Par courriel
 
-#### Document par document
-
-You can go on the official front website [opentermsarchive.org](https://opentermsarchive.org). From there, you can select a service and then the corresponding document type.
-After you enter your email and click on subscribe, we will add your email to the correspondning mailing list in send in blue and will not sore your email anywhere else.
-Then, everytime a modification is found on the correspondning document, we will send you an email.
-
-You can unsubscribe at any moment by clicking on the `unsubscribe` link at the bottom of the received email.
-
 #### Pour tous les documents d'un coup
 
 Vous pouvez [vous abonner](https://59692a77.sibforms.com/serve/MUIEAKuTv3y67e27PkjAiw7UkHCn0qVrcD188cQb-ofHVBGpvdUWQ6EraZ5AIb6vJqz3L8LDvYhEzPb2SE6eGWP35zXrpwEFVJCpGuER9DKPBUrifKScpF_ENMqwE_OiOZ3FdCV2ra-TXQNxB2sTEL13Zj8HU7U0vbbeF7TnbFiW8gGbcOa5liqmMvw_rghnEB2htMQRCk6A3eyj) pour recevoir un courriel à chaque modification d'un document dans l'ensemble de la base.
