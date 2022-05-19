@@ -17,8 +17,8 @@ all:
           ansible_python_interpreter: /usr/bin/python3
           ansible_ssh_private_key_file: ~/.ssh/ota-vagrant
           services_repository: https://github.com/OpenTermsArchive/contrib-declarations.git
-          snapshots_repository: git@github.com:OpenTermsArchive/contrib-snapshots.git
-          snapshots_branch: master
-          versions_repository: git@github.com:OpenTermsArchive/contrib-versions.git
+          snapshots_repository: git@github.com:OpenTermsArchive/sandbox-snapshots.git
+          snapshots_branch: main
+          versions_repository: git@github.com:OpenTermsArchive/sandbox-versions.git
           versions_branch: main
 
