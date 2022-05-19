@@ -136,9 +136,13 @@ Some of the main features are also exposed:
 
 #### fetcher
 
-You can use the fetcher in your code by using
+Fetcher gives the ability to fetch a url and retrieve its mime type and content.
 
-`import fetcher, { launchHeadlessBrowser, stopHeadlessBrowser, FetchDocumentError } from "open-terms-archive/fetcher"`
+You can use the fetcher in your code by using:
+
+`import fetcher, { launchHeadlessBrowser, stopHeadlessBrowser, FetchDocumentError } from 'open-terms-archive/fetcher'`
+
+Documentation on how to use is provided as JSDoc within `./src/archivist/fetcher/index.js`.
 
 ## Using locally
 
