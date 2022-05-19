@@ -16,7 +16,7 @@
 - [Using locally](#using-locally)
   - [Installing](#installing)
     - [Declarations repository](#declarations-repository)
-    - [Core tool](#core-tool)
+    - [Core](#core)
   - [Configuring](#configuring)
     - [Configuration file](#configuration-file)
       - [Storage adapters](#storage-adapters)
@@ -133,7 +133,7 @@ This module is built with [Node](https://nodejs.org/en/) and is tested on macOS,
 
 Testing works with multiple tests (e.g., checking the validity of the file, that the URL is correct and reachable, that the content is correctly gathered, etc.); as it may take a bit of time, that's why you may want to use `npm run test:schema`.
 
-#### Core tool
+#### Core
 
 When refering to the base folder, it means the folder where you will be `git pull`ing everything.
 
