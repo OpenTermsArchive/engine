@@ -110,7 +110,7 @@ ssh user@machine pm2 logs ota
 
 ## Process
 
-To avoid breaking the production when making changes you can follow this process:
+To avoid breaking the production when making changes, follow this process:
 
 - Start by applying your changes on your Vagrant virtual machine
   `ansible-playbook ops/site.yml`.
@@ -129,7 +129,7 @@ To avoid breaking the production when making changes you can follow this process
 
 ### Provision a server
 
-If you use [OVH Horizon](https://horizon.cloud.ovh.net/project/instances/), click on the `Launch Instance` button. Then fill, at least, the following fields:
+If you use [OVH Horizon](https://horizon.cloud.ovh.net/project/instances/), click on the `Launch Instance` button. Then fill in at least the following fields:
 
 - `Instance name`.
 - `Source`. Suggested: `Debian 11`.
