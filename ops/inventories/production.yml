@@ -17,7 +17,6 @@ all:
             51.89.227.206:
               config_file_name: contrib
               services_repository: https://github.com/OpenTermsArchive/contrib-declarations.git
-              snapshots_repository: git@github.com:OpenTermsArchive/contrib-snapshots.git
               versions_repository: git@github.com:OpenTermsArchive/contrib-versions.git
         dating:
           hosts:
