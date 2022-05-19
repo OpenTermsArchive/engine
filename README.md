@@ -58,11 +58,11 @@ _Note: For now, when multiple versions coexist, **terms** are only **tracked** i
 
 We offer a public database of versions recorded each time there is a change in the terms of service and other contractual documents of tracked services: [contrib-versions](https://github.com/OpenTermsArchive/contrib-versions).
 
-From the **repository homepage** [contrib-versions](https://github.com/OpenTermsArchive/contrib-versions), open the folder of the **service of your choice** (e.g. [WhatsApp](https://github.com/OpenTermsArchive/contrib-versions/tree/master/WhatsApp)).
+From the **repository homepage** [contrib-versions](https://github.com/OpenTermsArchive/contrib-versions), open the folder of the **service of your choice** (e.g. [WhatsApp](https://github.com/OpenTermsArchive/contrib-versions/tree/main/WhatsApp)).
 
-You will see the **set of documents tracked** for that service, now click **on the document of your choice** (e.g. [WhatsApp's Privacy Policy](https://github.com/OpenTermsArchive/contrib-versions/blob/master/WhatsApp/Privacy%20Policy.md)). The **latest version** (updated hourly) will be displayed.
+You will see the **set of documents tracked** for that service, now click **on the document of your choice** (e.g. [WhatsApp's Privacy Policy](https://github.com/OpenTermsArchive/contrib-versions/blob/main/WhatsApp/Privacy%20Policy.md)). The **latest version** (updated hourly) will be displayed.
 
-To view the **history of changes** made to this document, click on **History** at the top right of the document (for our previous [example](https://github.com/OpenTermsArchive/contrib-versions/commits/master/WhatsApp/Privacy%20Policy.md)). The **changes** are ordered **by date**, with the latest first.
+To view the **history of changes** made to this document, click on **History** at the top right of the document (for our previous [example](https://github.com/OpenTermsArchive/contrib-versions/commits/main/WhatsApp/Privacy%20Policy.md)). The **changes** are ordered **by date**, with the latest first.
 
 Click on a change to see what it consists of (for example [this one](https://github.com/OpenTermsArchive/contrib-versions/commit/58a1d2ae4187a3260ac58f3f3c7dcd3aeacaebcd)). There are **two types of display** you can choose from the icons in the gray bar above the document.
 
@@ -100,9 +100,9 @@ You can receive notification for a specific service or document by subscribing t
 
 To find out the address of the RSS feed you want to subscribe to:
 
-1. [Navigate](#exploring-the-versions-history) to the page with the history of changes you are interested in. _In the WhatsApp example above, this would be [this page](https://github.com/OpenTermsArchive/contrib-versions/commits/master/WhatsApp/Privacy%20Policy.md)._
-2. Copy the address of that page from your browser’s address bar. _In the WhatsApp example, this would be `https://github.com/OpenTermsArchive/contrib-versions/commits/master/WhatsApp/Privacy%20Policy.md`._
-3. Append `.atom` at the end of this address. _In the WhatsApp example, this would become `https://github.com/OpenTermsArchive/contrib-versions/commits/master/WhatsApp/Privacy%20Policy.md.atom`._
+1. [Navigate](#exploring-the-versions-history) to the page with the history of changes you are interested in. _In the WhatsApp example above, this would be [this page](https://github.com/OpenTermsArchive/contrib-versions/commits/main/WhatsApp/Privacy%20Policy.md)._
+2. Copy the address of that page from your browser’s address bar. _In the WhatsApp example, this would be `https://github.com/OpenTermsArchive/contrib-versions/commits/main/WhatsApp/Privacy%20Policy.md`._
+3. Append `.atom` at the end of this address. _In the WhatsApp example, this would become `https://github.com/OpenTermsArchive/contrib-versions/commits/main/WhatsApp/Privacy%20Policy.md.atom`._
 4. Subscribe your RSS feed reader to the resulting address.
 
 #### Recap of available RSS feeds
@@ -110,13 +110,13 @@ To find out the address of the RSS feed you want to subscribe to:
 | Updated for                         | URL                                                                                                                                                                                            |
 | ----------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | all services and documents          | `https://github.com/OpenTermsArchive/contrib-versions/commits.atom`                                                                                                                            |
-| all the documents of a service      | Replace `$serviceId` with the service ID:<br>`https://github.com/OpenTermsArchive/contrib-versions/commits/master/$serviceId.atom.`                                                            |
-| un document spécifique d'un service | Replace `$serviceId` with the service ID and `$documentType` with the document type:<br>`https://github.com/OpenTermsArchive/contrib-versions/commits/master/$serviceId/$documentType.md.atom` |
+| all the documents of a service      | Replace `$serviceId` with the service ID:<br>`https://github.com/OpenTermsArchive/contrib-versions/commits/main/$serviceId.atom.`                                                            |
+| un document spécifique d'un service | Replace `$serviceId` with the service ID and `$documentType` with the document type:<br>`https://github.com/OpenTermsArchive/contrib-versions/commits/main/$serviceId/$documentType.md.atom` |
 
 For example:
 
-- To receive all updates of `Facebook` documents, the URL is `https://github.com/OpenTermsArchive/contrib-versions/commits/master/Facebook.atom`.
-- To receive all updates of the `Privacy Policy` from `Google`, the URL is `https://github.com/OpenTermsArchive/contrib-versions/commits/master/Google/Privacy%20Policy.md.atom`.
+- To receive all updates of `Facebook` documents, the URL is `https://github.com/OpenTermsArchive/contrib-versions/commits/main/Facebook.atom`.
+- To receive all updates of the `Privacy Policy` from `Google`, the URL is `https://github.com/OpenTermsArchive/contrib-versions/commits/main/Google/Privacy%20Policy.md.atom`.
 
 ### Unsubscribe
 
