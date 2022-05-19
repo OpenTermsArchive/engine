@@ -138,6 +138,17 @@ You can use the fetcher in your code by using:
 
 Documentation on how to use is provided as JSDoc within `./src/archivist/fetcher/index.js`.
 
+#### filter
+
+Filter gives the ability to transform HTML or pdf content into a markdown string.
+It will format content based on the [document declaration](https://github.com/OpenTermsArchive/contrib-declarations/blob/main/CONTRIBUTING.md#declaring-a-new-service) 
+
+You can use the filter in your code by using:
+
+`import filter, { convertRelativeURLsToAbsolute, filterHTML, filterPDF } from 'open-terms-archive/filter';`
+
+Documentation on how to use this is provided as JSDoc within `./src/archivist/filter/index.js`.
+
 ## Using locally
 
 ### Installing
