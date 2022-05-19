@@ -37,7 +37,7 @@ Note that executing the playbook on the `production` inventory will affect **all
 If you want to execute a playbook on a specific server only, add the `--limit` option with the `hostname` as parameter:
 
 ```
-ansible-playbook --inventory ops/inventories/production.yml ops/site.yml --limit $hostname
+ansible-playbook --inventory ops/inventories/production.yml ops/site.yml --limit <hostname>
 ```
 
 The hostname is the one defined in the `ops/inventories/production.yml` inventory file.

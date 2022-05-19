@@ -6,6 +6,8 @@ First of all, thanks for taking the time to contribute! 🎉👍
   - [Pull requests](#pull-requests)
   - [Commit messages](#commit-messages)
   - [Continuous delivery](#continuous-delivery)
+- [Development](#development)
+  - [Documentation](#documentation)
 - [Instances and repositories names](#instances-and-repositories-names)
 - [Practices](#practices)
   - [Errors handling](#errors-handling)
@@ -47,6 +49,23 @@ We strive to follow this [recommendation](https://chris.beams.io/posts/git-commi
 We add this additional rule:
 
 - Do not rely on GitHub issue reference numbers in commit messages, as we have no guarantee the host system and its autolinking will be stable in time. Make sure the context is self-explanatory. If an external reference is given, use its full URL.
+
+## Development
+
+### Documentation
+
+#### CLI
+
+For command-line examples and documentation, we follow the [docopt usage patterns](http://docopt.org) syntax. Quick recap of the main points:
+
+- mandatory arguments are given between `<` and `>`;
+- optional elements are given between `[` and `]`;
+- mutually exclusive elements are given between `(` and `)` and separated by `|`.
+
+```diff
+- npm start $service_id [, $service_id, ...]
++ npm start <service_id>...
+```
 
 ## Instances and repositories names
 
