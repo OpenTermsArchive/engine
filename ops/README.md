@@ -87,17 +87,17 @@ In case the instance you're deploying on is operated by the Core team, you can u
 
 - Update services declarations only on the `france` instance:
   ```
-  ansible-playbook -i ops/inventories/production.yml ops/app.yml -l france -t update-declarations
+  ansible-playbook --inventory ops/inventories/production.yml ops/app.yml --limit france --tag update-declarations
   ```
 
 - Stop the Open Terms Archive application only on the `france` instance:
   ```
-  ansible-playbook -i ops/inventories/production.yml ops/app.yml -l france -t stop
+  ansible-playbook --inventory ops/inventories/production.yml ops/app.yml --limit france --tag stop
   ```
 
 - Deploy the infrastructure and the Open Terms Archive application on all servers:
   ```
-  ansible-playbook -i ops/inventories/production.yml ops/site.yml
+  ansible-playbook --inventory ops/inventories/production.yml ops/site.yml
   ```
 
 ### Logs
@@ -123,7 +123,7 @@ To avoid breaking the production when making changes, follow this process:
 - Re-check that everything is ok
   `vagrant ssh`, `pm2 logs`…
 - Then you can now deploy the changes in production
-  `ansible-playbook -i ops/inventories/production.yml ops/site.yml`.
+  `ansible-playbook --inventory ops/inventories/production.yml ops/site.yml`.
 
 ## Initialize a new instance
 

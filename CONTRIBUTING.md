@@ -56,6 +56,8 @@ We add this additional rule:
 
 #### CLI
 
+##### docopt
+
 For command-line examples and documentation, we follow the [docopt usage patterns](http://docopt.org) syntax. Quick recap of the main points:
 
 - mandatory arguments are given between `<` and `>`;
@@ -65,6 +67,16 @@ For command-line examples and documentation, we follow the [docopt usage pattern
 ```diff
 - npm start $service_id [, $service_id, ...]
 + npm start <service_id>...
+```
+
+##### Long options
+
+In order to improve the understandability of commands, we document all CLI options and examples with the long version of the options.
+
+
+```diff
+- ansible-playbook -i production.yml app.yml -l france -t stop
++ ansible-playbook --inventory production.yml app.yml --limit france --tag stop
 ```
 
 ## Instances and repositories names
