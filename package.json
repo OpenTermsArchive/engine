@@ -14,7 +14,8 @@
   "author": "ambanum",
   "type": "module",
   "exports": {
-    "./fetcher": "./src/archivist/fetcher/index.js"
+    "./fetcher": "./src/archivist/fetcher/index.js",
+    "./filter": "./src/archivist/filter/index.js"
   },
   "bin": {
     "ota-lint-declarations": "./bin/lint-declarations.js",

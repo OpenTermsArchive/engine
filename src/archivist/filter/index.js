@@ -20,6 +20,19 @@ const { CiceroMarkTransformer } = ciceroMark;
 
 const ciceroMarkTransformer = new CiceroMarkTransformer();
 
+/**
+ * Filter content and format it in markdown
+ *
+ * @param {Object} config - The filter config
+ * @param {string} config.content - The content of the file to be filtered
+ * @param {string} config.mimeType - The mime type used to retrieve the above content
+ * @param {Object} config.documentDeclaration - The document declaration used to describe document in Open Terms Archive
+ * @param {string} config.location - The url which held the content
+ * @param {string[]} config.contentSelectors - The CSS selectors which needs to be kept
+ * @param {Object} config.noiseSelectors - The CSS selectors which needs to be removed
+ * @param {Object} config.filters - The name of the javascript functions to apply to the content
+ * @returns {Promise<string>} Promise string containing content filtered and formatted in markdown
+*/
 export default async function filter({ content, mimeType, documentDeclaration }) {
   if (mimeType == 'application/pdf') {
     return filterPDF({ content });
