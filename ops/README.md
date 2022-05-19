@@ -130,10 +130,11 @@ To avoid breaking the production when making changes you can follow this process
 ### Provision a server
 
 If you use [OVH Horizon](https://horizon.cloud.ovh.net/project/instances/), click on the `Launch Instance` button. Then fill, at least, the following fields:
-  - `Instance name`.
-  - `Source`. Suggested: `Debian 11`.
-  - `Flavor`. Suggested: `b2-30-flex`.
-  - `Key pair`. Suggested: Your own personal SSH key, to allow you to connect to the freshly created server.
+
+- `Instance name`.
+- `Source`. Suggested: `Debian 11`.
+- `Flavor`. Suggested: `b2-30-flex`.
+- `Key pair`. Suggested: Your own personal SSH key, to allow you to connect to the freshly created server.
 
 ### Add host configuration
 
