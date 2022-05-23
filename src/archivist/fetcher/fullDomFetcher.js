@@ -9,10 +9,10 @@ puppeteerExtra.use(stealthPlugin());
 
 let browser;
 
-const defaultOptions = { navigationTimeout: 5000, language: 'en', waitForElementsTimeout: 5000 };
+const DEFAULT_OPTIONS = { navigationTimeout: 5000, language: 'en', waitForElementsTimeout: 5000 };
 
 export default async function fetch(url, cssSelectors, fetchOptions = {}) {
-  const options = { ...defaultOptions, ...fetchOptions };
+  const options = { ...DEFAULT_OPTIONS, ...fetchOptions };
   let page;
   let response;
   const selectors = [].concat(cssSelectors);
