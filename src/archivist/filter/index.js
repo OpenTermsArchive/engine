@@ -21,17 +21,17 @@ const { CiceroMarkTransformer } = ciceroMark;
 const ciceroMarkTransformer = new CiceroMarkTransformer();
 
 /**
- * Filter content and format it in markdown
+ * Filter content and convert it to markdown
  *
- * @param {Object} config - The filter config
- * @param {string} config.content - The content of the file to be filtered
- * @param {string} config.mimeType - The mime type used to retrieve the above content
- * @param {Object} config.documentDeclaration - The document declaration used to describe document in Open Terms Archive
- * @param {string} config.location - The url which held the content
- * @param {string[]} config.contentSelectors - The CSS selectors which needs to be kept
- * @param {Object} config.noiseSelectors - The CSS selectors which needs to be removed
- * @param {Object} config.filters - The name of the javascript functions to apply to the content
- * @returns {Promise<string>} Promise string containing content filtered and formatted in markdown
+ * @param {Object} config - Filter configuration
+ * @param {string} config.content - Content to filter
+ * @param {string} config.mimeType - Mime type of the given content
+ * @param {Object} config.documentDeclaration - Document declaration used to describe document in Open Terms Archive
+ * @param {string} config.location - URL which held the content
+ * @param {string|Object|Array} config.contentSelectors - Content selectors for the parts of the content to be retained. Can be a Range Selector, a CSS selector or an array of a combination of both
+ * @param {string|Object|Array} config.noiseSelectors - Content selectors for the parts of the content to be removed. Can be a Range Selector, a CSS selector or an array of a combination of both
+ * @param {Array} config.filters - Names of the JavaScript functions to apply to the content
+ * @returns {Promise<string>} Promise which is fulfilled once the content is filtered and converted in markdown. The promise will resolve into a string containing the filtred content in markdown format
 */
 export default async function filter({ content, mimeType, documentDeclaration }) {
   if (mimeType == 'application/pdf') {
