@@ -17,10 +17,10 @@ export { FetchDocumentError } from './errors.js';
  * @param {number} [config.options.waitForElementsTimeout=5000] - Maximum time (in milliseconds) to wait for selectors to exist on page before considering the fetch failed. Only relevant when `executeClientScripts` is enabled
  * @returns {Promise} Promise which is fulfilled once the resource is available. The promise will resolve into an object containing the mime type of the resource and its content, defined in `mimeType` and `content` keys
  */
-export default async function fetch({ url, executeClientScripts, cssSelectors, options }) {
+export default async function fetch({ url, executeClientScripts, cssSelectors, options: { navigationTimeout = 5000, language = 'en', waitForElementsTimeout = 5000 } = {} }) {
   if (executeClientScripts) {
-    return fetchFullDom(url, cssSelectors, options);
+    return fetchFullDom(url, cssSelectors, { navigationTimeout, language, waitForElementsTimeout });
   }
 
-  return fetchHtmlOnly(url, options);
+  return fetchHtmlOnly(url, { navigationTimeout, language });
 }
