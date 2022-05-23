@@ -134,7 +134,7 @@ Fetcher gives the ability to fetch a url and retrieve its mime type and content.
 
 You can use the fetcher in your code by using:
 
-`import fetcher, { launchHeadlessBrowser, stopHeadlessBrowser, FetchDocumentError } from 'open-terms-archive/fetcher'`
+`import fetcher, { launchHeadlessBrowser, stopHeadlessBrowser } from 'open-terms-archive/fetcher'`
 
 Documentation on how to use is provided as JSDoc within `./src/archivist/fetcher/index.js`.
 
