@@ -15,7 +15,7 @@
   "type": "module",
   "exports": {
     "./fetcher": "./src/archivist/fetcher/exports.js",
-    "./filter": "./src/export/filter.js"
+    "./filter": "./src/archivist/filter/exports.js"
   },
   "bin": {
     "ota-lint-declarations": "./bin/lint-declarations.js",

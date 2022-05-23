@@ -145,7 +145,7 @@ It will format content based on the [document declaration](https://github.com/Op
 
 You can use the filter in your code by using:
 
-`import filter, { filterHTML, filterPDF } from 'open-terms-archive/filter';`
+`import filter from 'open-terms-archive/filter';`
 
 Documentation on how to use this is provided as JSDoc within `./src/archivist/filter/index.js`.
 
