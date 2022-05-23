@@ -1,9 +1,10 @@
-import puppeteer from 'puppeteer-extra';
+import puppeteer from 'puppeteer';
+import puppeteerExtra from 'puppeteer-extra';
 import stealthPlugin from 'puppeteer-extra-plugin-stealth';
 
 import { FetchDocumentError } from './errors.js';
 
-puppeteer.use(stealthPlugin());
+puppeteerExtra.use(stealthPlugin());
 
 let browser;
 
@@ -52,6 +53,9 @@ export default async function fetch(url, cssSelectors, configuration) {
       content: await page.content(),
     };
   } catch (error) {
+    if (error instanceof puppeteer.errors.TimeoutError) {
+      throw new FetchDocumentError(`Timed out after ${configuration.navigationTimeout / 1000} seconds when trying to fetch '${url}'`);
+    }
     throw new FetchDocumentError(error.message);
   } finally {
     if (page) {
@@ -65,7 +69,7 @@ export async function launchHeadlessBrowser() {
     return browser;
   }
 
-  browser = await puppeteer.launch({ headless: true });
+  browser = await puppeteerExtra.launch({ headless: true });
 
   return browser;
 }
