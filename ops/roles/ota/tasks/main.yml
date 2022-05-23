@@ -71,6 +71,8 @@
     - update-declarations
 
 - include_tasks: database.yml
+  name: Setup snapshots git repository
+  when: snapshots_repository is defined
   vars:
     name: snapshots
     repository: '{{ snapshots_repository }}'
@@ -81,6 +83,8 @@
     - update
 
 - include_tasks: database.yml
+  name: Setup versions git repository
+  when: versions_repository is defined
   vars:
     name: versions
     repository: '{{ versions_repository }}'
