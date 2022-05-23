@@ -5,10 +5,7 @@ import nodeFetch, { AbortError } from 'node-fetch';
 
 import { FetchDocumentError } from './errors.js';
 
-const DEFAULT_OPTIONS = { navigationTimeout: 5000, language: 'en' };
-
-export default async function fetch(url, fetchOptions = {}) {
-  const options = { ...DEFAULT_OPTIONS, ...fetchOptions };
+export default async function fetch(url, options) {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), options.navigationTimeout);
 
