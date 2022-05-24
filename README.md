@@ -13,7 +13,11 @@
 - [Be notified](#be-notified)
   - [By email](#by-email)
   - [By RSS](#by-rss)
-- [Reuse](#reuse)
+- [Importing as a module](#importing-as-a-module)
+  - [CLI](#cli)
+  - [Features](#features)
+    - [fetcher](#fetcher)
+    - [filter](#filter)
 - [Using locally](#using-locally)
   - [Installing](#installing)
     - [Declarations repository](#declarations-repository)
@@ -109,22 +113,23 @@ For example:
 
 - To receive all updates of `Facebook` documents, the URL is `https://github.com/OpenTermsArchive/contrib-versions/commits/main/Facebook.atom`.
 - To receive all updates of the `Privacy Policy` from `Google`, the URL is `https://github.com/OpenTermsArchive/contrib-versions/commits/main/Google/Privacy%20Policy.md.atom`.
-## Reuse
 
-Open Terms Archive is built on several modules. Some of them are already exposed.
+## Importing as a module
 
-As `open-terms-archive` has not yet been published on npm, you can install it with: 
+Open Terms Archive exposes a JavaScript API to make some of its capabilities available in NodeJS. You can install it as an NPM module: 
 
 ```
 npm install ambanum/OpenTermsArchive#main
 ```
-### scripts
-For now, some scripts are exposed through the form of `bin` commands (You can find them in `./bin`)
 
-- `ota-lint-declarations` to lint a json declaration file
-- `ota-validate-declarations` to test if a json declaration file is valid.
+### CLI
 
-### features
+The following commands are available:
+
+- `ota-lint-declarations` to lint declarations. Use it with `./bin/ota-lint-declarations.sh`
+- `ota-validate-declarations` to test declarations. Use it with `./bin/ota-validate-declarations.sh`
+
+### Features
 
 Some of the main features are also exposed: 
 
@@ -140,7 +145,7 @@ Documentation on how to use is provided as JSDoc within `./src/archivist/fetcher
 
 #### filter
 
-Filter gives the ability to transform HTML or pdf content into a markdown string.
+The `filter` module transforms HTML or PDF content into a Markdown string.
 It will format content based on the [document declaration](https://github.com/OpenTermsArchive/contrib-declarations/blob/main/CONTRIBUTING.md#declaring-a-new-service) 
 
 You can use the filter in your code by using:

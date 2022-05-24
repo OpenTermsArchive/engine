@@ -15,7 +15,7 @@ export { FetchDocumentError } from './errors.js';
  * @param {number} [config.options.navigationTimeout=5000] - Maximum time (in milliseconds) to wait before considering the fetch failed.
  * @param {string} [config.options.language=en] - Language (in [ISO 639-1 format](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes)) to be passed in request headers
  * @param {number} [config.options.waitForElementsTimeout=5000] - Maximum time (in milliseconds) to wait for selectors to exist on page before considering the fetch failed. Only relevant when `executeClientScripts` is enabled
- * @returns {Promise} Promise which is fulfilled once the resource is available. The promise will resolve into an object containing the mime type of the resource and its content, defined in `mimeType` and `content` keys
+ * @returns {Promise} @returns {Promise<string>} Promise which will be resolved with a string containing the filtered content in Markdown format
  */
 export default async function fetch({ url, executeClientScripts, cssSelectors, options: { navigationTimeout = 5000, language = 'en', waitForElementsTimeout = 5000 } = {} }) {
   if (executeClientScripts) {
