@@ -1,3 +1,5 @@
+import '../../../bin/.env.js'; // Workaround to ensure `SUPPRESS_NO_CONFIG_WARNING` is set before config is imported
+
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
