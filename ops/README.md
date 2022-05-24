@@ -37,7 +37,7 @@ Note that executing the playbook on the `production` inventory will affect **all
 If you want to execute a playbook on a specific server only, add the `--limit` option with the `hostname` as parameter:
 
 ```
-ansible-playbook --inventory ops/inventories/production.yml ops/site.yml --limit $hostname
+ansible-playbook --inventory ops/inventories/production.yml ops/site.yml --limit <hostname>
 ```
 
 The hostname is the one defined in the `ops/inventories/production.yml` inventory file.
@@ -87,17 +87,17 @@ In case the instance you're deploying on is operated by the Core team, you can u
 
 - Update services declarations only on the `france` instance:
   ```
-  ansible-playbook -i ops/inventories/production.yml ops/app.yml -l france -t update-declarations
+  ansible-playbook --inventory ops/inventories/production.yml ops/app.yml --limit france --tag update-declarations
   ```
 
 - Stop the Open Terms Archive application only on the `france` instance:
   ```
-  ansible-playbook -i ops/inventories/production.yml ops/app.yml -l france -t stop
+  ansible-playbook --inventory ops/inventories/production.yml ops/app.yml --limit france --tag stop
   ```
 
 - Deploy the infrastructure and the Open Terms Archive application on all servers:
   ```
-  ansible-playbook -i ops/inventories/production.yml ops/site.yml
+  ansible-playbook --inventory ops/inventories/production.yml ops/site.yml
   ```
 
 ### Logs
@@ -110,7 +110,7 @@ ssh user@machine pm2 logs ota
 
 ## Process
 
-To avoid breaking the production when making changes you can follow this process:
+To avoid breaking the production when making changes, follow this process:
 
 - Start by applying your changes on your Vagrant virtual machine
   `ansible-playbook ops/site.yml`.
@@ -123,17 +123,18 @@ To avoid breaking the production when making changes you can follow this process
 - Re-check that everything is ok
   `vagrant ssh`, `pm2 logs`…
 - Then you can now deploy the changes in production
-  `ansible-playbook -i ops/inventories/production.yml ops/site.yml`.
+  `ansible-playbook --inventory ops/inventories/production.yml ops/site.yml`.
 
 ## Initialize a new instance
 
 ### Provision a server
 
-If you use [OVH Horizon](https://horizon.cloud.ovh.net/project/instances/), click on the `Launch Instance` button. Then fill, at least, the following fields:
-  - `Instance name`.
-  - `Source`. Suggested: `Debian 11`.
-  - `Flavor`. Suggested: `b2-30-flex`.
-  - `Key pair`. Suggested: Your own personal SSH key, to allow you to connect to the freshly created server.
+If you use [OVH Horizon](https://horizon.cloud.ovh.net/project/instances/), click on the `Launch Instance` button. Then fill in at least the following fields:
+
+- `Instance name`.
+- `Source`. Suggested: `Debian 11`.
+- `Flavor`. Suggested: `b-7-flex`.
+- `Key pair`. Suggested: Your own personal SSH key, to allow you to connect to the freshly created server.
 
 ### Add host configuration
 
@@ -146,6 +147,8 @@ Create the `snapshot` and `version` repositories, with:
 - A `main` branch.
 - The `main` branch should be the default branch.
 - At least one commit on this branch with some content (`README.md` and `LICENSE`).
+
+Templates are provided to that end, for [declarations](https://github.com/OpenTermsArchive/template-declarations/), [snapshots](https://github.com/OpenTermsArchive/template-snapshots/) and [versions](https://github.com/OpenTermsArchive/template-versions/).
 
 ### Set up permissions
 

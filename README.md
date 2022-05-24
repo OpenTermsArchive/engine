@@ -10,19 +10,13 @@
 
 - [How it works](#how-it-works)
 - [Exploring the versions history](#exploring-the-versions-history)
-  - [Notes](#notes)
 - [Be notified](#be-notified)
   - [By email](#by-email)
-    - [Document per document](#document-per-document)
-    - [For all documents at once](#for-all-documents-at-once)
   - [By RSS](#by-rss)
-    - [Recap of available RSS feeds](#recap-of-available-rss-feeds)
 - [Using locally](#using-locally)
   - [Installing](#installing)
     - [Declarations repository](#declarations-repository)
-      - [Note: Testing](#note--testing)
-    - [Core tool](#core-tool)
-      - [Notes: Tips](#notes--tips)
+    - [Core](#core)
   - [Configuring](#configuring)
     - [Configuration file](#configuration-file)
       - [Storage adapters](#storage-adapters)
@@ -139,7 +133,7 @@ This module is built with [Node](https://nodejs.org/en/) and is tested on macOS,
 
 Testing works with multiple tests (e.g., checking the validity of the file, that the URL is correct and reachable, that the content is correctly gathered, etc.); as it may take a bit of time, that's why you may want to use `npm run test:schema`.
 
-#### Core tool
+#### Core
 
 When refering to the base folder, it means the folder where you will be `git pull`ing everything.
 
@@ -309,7 +303,7 @@ npm run start:scheduler
 To get the latest version of a specific service's terms:
 
 ```
-npm start $service_id
+npm start <service_id>
 ```
 
 > The service ID is the case sensitive name of the service declaration file without the extension. For example, for `Twitter.json`, the service ID is `Twitter`.

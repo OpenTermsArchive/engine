@@ -4,9 +4,10 @@ First of all, thanks for taking the time to contribute! 🎉👍
 
 - [Workflow](#workflow)
   - [Pull requests](#pull-requests)
-  - [Peer reviews](#peer-reviews)
-  - [Commit messages](#commits-naming-convention)
-- [Continuous delivery](#continuous-delivery)
+  - [Commit messages](#commit-messages)
+  - [Continuous delivery](#continuous-delivery)
+- [Development](#development)
+  - [Documentation](#documentation)
 - [Instances and repositories names](#instances-and-repositories-names)
 - [Practices](#practices)
   - [Errors handling](#errors-handling)
@@ -19,13 +20,19 @@ First of all, thanks for taking the time to contribute! 🎉👍
 
 We follow the [GitHub Flow](https://guides.github.com/introduction/flow/): all code contributions are submitted via a pull request towards the `main` branch.
 
-Opening a Pull Request means you want that code to be merged. If you want to only discuss it, send a link to your branch along with your questions through whichever communication channel you prefer.
+Opening a pull request means you want that code to be merged. If you want to only discuss it, send a link to your branch along with your questions through whichever communication channel you prefer.
 
 #### Peer reviews
 
 All pull requests must be reviewed by at least one person who is not their original author.
 
 To help reviewers, make sure to describe your pull request with a **clear text explanation** of your changes.
+
+### Continuous delivery
+
+GitHub Actions is used to deploy the application on every merge to the main branch.
+
+Branch protection is active, meaning that a merge to the main branch can only take place once all tests pass in CI, and that the peer review policy has been fulfilled.
 
 ### Commit messages
 
@@ -43,11 +50,34 @@ We add this additional rule:
 
 - Do not rely on GitHub issue reference numbers in commit messages, as we have no guarantee the host system and its autolinking will be stable in time. Make sure the context is self-explanatory. If an external reference is given, use its full URL.
 
-## Continuous delivery
+## Development
 
-GitHub Actions is used to deploy the application on every merge to the main branch.
+### Documentation
 
-Branch protection is active, meaning that a merge to the main branch can only take place once all tests pass in CI, and that at least one human reviewer approved the changes.
+#### CLI
+
+##### docopt
+
+For command-line examples and documentation, we follow the [docopt usage patterns](http://docopt.org) syntax. Quick recap of the main points:
+
+- mandatory arguments are given between `<` and `>`;
+- optional elements are given between `[` and `]`;
+- mutually exclusive elements are given between `(` and `)` and separated by `|`.
+
+```diff
+- npm start [ $service_id ] [, $service_id, ...]
++ npm start [service_id]...
+```
+
+##### Long options
+
+In order to improve the understandability of commands, we document all CLI options and examples with the long version of the options.
+
+
+```diff
+- ansible-playbook -i production.yml app.yml -l france -t stop
++ ansible-playbook --inventory production.yml app.yml --limit france --tag stop
+```
 
 ## Instances and repositories names
 
