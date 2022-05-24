@@ -65,8 +65,8 @@ For command-line examples and documentation, we follow the [docopt usage pattern
 - mutually exclusive elements are given between `(` and `)` and separated by `|`.
 
 ```diff
-- npm start $service_id [, $service_id, ...]
-+ npm start <service_id>...
+- npm start [ $service_id ] [, $service_id, ...]
++ npm start [service_id]...
 ```
 
 ##### Long options
