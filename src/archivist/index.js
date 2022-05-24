@@ -130,7 +130,15 @@ export default class Archivist extends events.EventEmitter {
       }));
     } catch (error) {
       if (error instanceof FetchDocumentError) {
-        throw new InaccessibleContentError(error.message);
+        if (error.message.includes('EAI_AGAIN')) {
+          // DNS error is a network connectivity error or proxy related error. It does
+          // not necesarily mean the document is not accesible to all users but
+          // only to the Open Terms Archive engine at this specific time.
+          // As this is transient most of the time, consider it as a system error
+          throw error;
+        } else {
+          throw new InaccessibleContentError(error.message);
+        }
       }
 
       throw error;
