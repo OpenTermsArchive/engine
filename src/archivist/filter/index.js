@@ -21,12 +21,11 @@ const { CiceroMarkTransformer } = ciceroMark;
 const ciceroMarkTransformer = new CiceroMarkTransformer();
 
 /**
- * Filter content and convert it to markdown
+ * Filter document content and convert it to Markdown
  *
  * @param {Object} config - Filter configuration
  * @param {string} config.content - Content to filter
  * @param {string} config.mimeType - Mime type of the given content
- * @param {Object} config.documentDeclaration - Document declaration used to describe document in Open Terms Archive
  * @param {string} config.documentDeclaration.location - URL which held the content
  * @param {string|Object|Array} config.documentDeclaration.contentSelectors - Content selectors for the parts of the content to be retained. Can be a Range Selector, a CSS selector or an array of a combination of both
  * @param {string|Object|Array} config.documentDeclaration.noiseSelectors - Content selectors for the parts of the content to be removed. Can be a Range Selector, a CSS selector or an array of a combination of both
