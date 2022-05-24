@@ -5,9 +5,8 @@ import { fileURLToPath } from 'url';
 
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import config from 'config';
 
-import fetchWithoutConfig, { launchHeadlessBrowser, stopHeadlessBrowser, FetchDocumentError } from './index.js';
+import fetch, { launchHeadlessBrowser, stopHeadlessBrowser, FetchDocumentError } from './index.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -17,8 +16,6 @@ const SERVER_PORT = 8976;
 chai.use(chaiAsPromised);
 
 const termsHTML = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>First provider TOS</title></head><body><h1>Terms of service</h1><p>Dapibus quis diam sagittis</p></body></html>';
-
-const fetch = args => fetchWithoutConfig({ options: config.get('fetcher'), ...args });
 
 describe('Fetcher', function () {
   this.timeout(10000);
