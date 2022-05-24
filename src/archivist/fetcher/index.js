@@ -1,7 +1,3 @@
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
-
 import config from 'config';
 
 import fetchFullDom from './fullDomFetcher.js';
@@ -9,11 +5,6 @@ import fetchHtmlOnly from './htmlOnlyFetcher.js';
 
 export { launchHeadlessBrowser, stopHeadlessBrowser } from './fullDomFetcher.js';
 export { FetchDocumentError } from './errors.js';
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const defaultConfigs = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../../../config/default.json')));
-
-config.util.setModuleDefaults('fetcher', defaultConfigs.fetcher);
 
 /**
  * Fetch a resource from the network, returning a promise which is fulfilled once the response is available
