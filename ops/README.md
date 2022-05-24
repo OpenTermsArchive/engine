@@ -133,7 +133,7 @@ If you use [OVH Horizon](https://horizon.cloud.ovh.net/project/instances/), clic
 
 - `Instance name`.
 - `Source`. Suggested: `Debian 11`.
-- `Flavor`. Suggested: `b2-30-flex`.
+- `Flavor`. Suggested: `b-7-flex`.
 - `Key pair`. Suggested: Your own personal SSH key, to allow you to connect to the freshly created server.
 
 ### Add host configuration
