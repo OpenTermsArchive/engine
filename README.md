@@ -135,10 +135,24 @@ The following commands are available globally once package is imported:
 
 The `fetch` module gets the MIME type and content of a document from its URL.
 
-You can use it in your code by using `import fetch, { launchHeadlessBrowser, stopHeadlessBrowser } from 'open-terms-archive/fetch'`.
+You can use it in your code by using `import fetch from 'open-terms-archive/fetch';`.
 
+Documentation on how to use `fetch` is provided as JSDoc within [./src/archivist/fetcher/index.js](./src/archivist/fetcher/index.js).
 
-Documentation on how to use is provided as JSDoc within [./src/archivist/fetcher/index.js](./src/archivist/fetcher/index.js).
+If you plan to use `executeClientScripts` as a parameter of `fetch`, the fetching will be done using a headless browser.
+In order to not instantiate this browser at each fetch, the starting and stopping of the browser is the responsibility of the user.
+
+Here is an example on how to use it:
+
+```js
+import fetch, { launchHeadlessBrowser, stopHeadlessBrowser } from 'open-terms-archive/fetch';
+
+await launchHeadlessBrowser();
+await fetch({ executeClientScripts: true, ... });
+await fetch({ executeClientScripts: true, ... });
+await fetch({ executeClientScripts: true, ... });
+await stopHeadlessBrowser();
+```
 
 #### filter
 
