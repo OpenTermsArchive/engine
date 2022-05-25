@@ -16,7 +16,7 @@
 - [Importing as a module](#importing-as-a-module)
   - [CLI](#cli)
   - [Features exposed](#features-exposed)
-    - [fetcher](#fetcher)
+    - [fetch](#fetch)
     - [filter](#filter)
 - [Using locally](#using-locally)
   - [Installing](#installing)
@@ -131,11 +131,11 @@ The following commands are available globally once package is imported:
 
 ### Features exposed
 
-#### fetcher
+#### fetch
 
-The `fetcher` modules gets the MIME type and content of a document from its URL.
+The `fetch` module gets the MIME type and content of a document from its URL.
 
-You can use the fetcher in your code by using `import fetcher, { launchHeadlessBrowser, stopHeadlessBrowser } from 'open-terms-archive/fetcher'`.
+You can use it in your code by using `import fetch, { launchHeadlessBrowser, stopHeadlessBrowser } from 'open-terms-archive/fetch'`.
 
 
 Documentation on how to use is provided as JSDoc within [./src/archivist/fetcher/index.js](./src/archivist/fetcher/index.js).
