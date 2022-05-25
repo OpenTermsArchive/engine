@@ -160,6 +160,9 @@ await fetch({ executeClientScripts: true, ... });
 await stopHeadlessBrowser();
 ```
 
+The `fetch` module can also be configured as a [node config submodule](https://github.com/node-config/node-config/wiki/Sub-Module-Configuration).
+If [node-config](https://github.com/node-config/node-config) is used in the project, default `fetcher` configuration can be overridden by adding a `fetcher` object to the local config. See [Configuration file](#configuration-file) for full reference.
+
 #### filter
 
 Filter gives the ability to transform HTML or pdf content into a markdown string.
