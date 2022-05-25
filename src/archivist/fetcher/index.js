@@ -9,7 +9,7 @@ export { FetchDocumentError } from './errors.js';
  *
  * @param {Object} config - Fetcher configuration
  * @param {string} config.url - URL of the resource you want to fetch
- * @param {boolean} [config.executeClientScripts] - Enable execution of client scripts. When set to true, this boolean property loads the page in a headless browser to load all assets and execute client scripts before trying to get resource content
+ * @param {boolean} [config.executeClientScripts] - Enable execution of client scripts. When set to `true`, this property loads the page in a headless browser to load all assets and execute client scripts before returning its content
  * @param {string|Array} [config.cssSelectors] - List of CSS selectors to await for when loading resource in a headless browser. Can be a CSS selector or an array CSS selectors. Only relevant when `executeClientScripts` is enabled
  * @param {Object} [config.options] - Fetcher options
  * @param {number} [config.options.navigationTimeout=5000] - Maximum time (in milliseconds) to wait before considering the fetch failed.

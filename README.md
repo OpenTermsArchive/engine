@@ -19,7 +19,7 @@
     - [Recap of available RSS feeds](#recap-of-available-rss-feeds)
 - [Importing as a module](#importing-as-a-module)
   - [CLI](#cli)
-  - [Features](#features)
+  - [Features exposed](#features-exposed)
     - [fetcher](#fetcher)
     - [filter](#filter)
 - [Using locally](#using-locally)
@@ -130,35 +130,30 @@ npm install ambanum/OpenTermsArchive#main
 
 ### CLI
 
-The following commands are available:
+The following commands are available globally once package is imported:
 
-- `ota-lint-declarations` to lint declarations. Use it with `./bin/ota-lint-declarations.sh`
-- `ota-validate-declarations` to test declarations. Use it with `./bin/ota-validate-declarations.sh`
+- `ota-lint-declarations [service_id]...` to lint declarations
+- `ota-validate-declarations [service_id]...` to test declarations
 
-### Features
-
-Some of the main features are also exposed: 
+### Features exposed
 
 #### fetcher
 
-Fetcher gives the ability to fetch a url and retrieve its mime type and content.
+The `fetcher` modules gets the MIME type and content of a document from its URL.
 
-You can use the fetcher in your code by using:
+You can use the fetcher in your code by using `import fetcher, { launchHeadlessBrowser, stopHeadlessBrowser } from 'open-terms-archive/fetcher'`.
 
-`import fetcher, { launchHeadlessBrowser, stopHeadlessBrowser } from 'open-terms-archive/fetcher'`
 
-Documentation on how to use is provided as JSDoc within `./src/archivist/fetcher/index.js`.
+Documentation on how to use is provided as JSDoc within [./src/archivist/fetcher/index.js](./src/archivist/fetcher/index.js).
 
 #### filter
 
-The `filter` module transforms HTML or PDF content into a Markdown string.
-It will format content based on the [document declaration](https://github.com/OpenTermsArchive/contrib-declarations/blob/main/CONTRIBUTING.md#declaring-a-new-service) 
+Filter gives the ability to transform HTML or pdf content into a markdown string.
+It will filter content based on the [document declaration](https://github.com/OpenTermsArchive/contrib-declarations/blob/main/CONTRIBUTING.md#declaring-a-new-service).
 
-You can use the filter in your code by using:
+You can use the filter in your code by using `import filter from 'open-terms-archive/filter';`.
 
-`import filter from 'open-terms-archive/filter';`
-
-Documentation on how to use this is provided as JSDoc within `./src/archivist/filter/index.js`.
+The `filter` function documentation is available as JSDoc within [./src/archivist/filter/index.js](./src/archivist/filter/index.js).
 
 ## Using locally
 
