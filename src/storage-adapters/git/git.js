@@ -58,9 +58,8 @@ export default class Git {
     }
 
     const shortHash = summary.commit.replace('HEAD ', '').replace('(root-commit) ', '');
-    const longHash = (await this.git.show([ shortHash, '--pretty=%H', '-s' ])).trim();
 
-    return longHash; // Return a long commit hash to always handle ids in the same format and facilitate comparison
+    return this.getFullHash(shortHash); // Return a long commit hash to always handle ids in the same format and facilitate comparison
   }
 
   async pushChanges() {
@@ -103,6 +102,10 @@ export default class Git {
 
   async show(options) {
     return this.git.show(options);
+  }
+
+  async getFullHash(shortHash) {
+    return (await this.git.show([ shortHash, '--pretty=%H', '-s' ])).trim();
   }
 
   relativePath(absolutePath) {
