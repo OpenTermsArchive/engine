@@ -14,7 +14,7 @@
   "author": "ambanum",
   "type": "module",
   "exports": {
-    "./fetcher": "./src/archivist/fetcher/exports.js",
+    "./fetch": "./src/archivist/fetcher/exports.js",
     "./filter": "./src/archivist/filter/exports.js"
   },
   "bin": {
