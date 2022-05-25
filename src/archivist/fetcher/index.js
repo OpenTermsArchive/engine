@@ -12,10 +12,10 @@ export { FetchDocumentError } from './errors.js';
  * @param {boolean} [config.executeClientScripts] - Enable execution of client scripts. When set to `true`, this property loads the page in a headless browser to load all assets and execute client scripts before returning its content
  * @param {string|Array} [config.cssSelectors] - List of CSS selectors to await for when loading resource in a headless browser. Can be a CSS selector or an array CSS selectors. Only relevant when `executeClientScripts` is enabled
  * @param {Object} [config.options] - Fetcher options
- * @param {number} [config.options.navigationTimeout=5000] - Maximum time (in milliseconds) to wait before considering the fetch failed.
+ * @param {number} [config.options.navigationTimeout=5000] - Maximum time (in milliseconds) to wait before considering the fetch failed
  * @param {string} [config.options.language=en] - Language (in [ISO 639-1 format](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes)) to be passed in request headers
  * @param {number} [config.options.waitForElementsTimeout=5000] - Maximum time (in milliseconds) to wait for selectors to exist on page before considering the fetch failed. Only relevant when `executeClientScripts` is enabled
- * @returns {Promise} @returns {Promise<string>} Promise which will be resolved with a string containing the filtered content in Markdown format
+ * @returns {Promise} @returns {Promise<Object>} Promise which will be resolved with an object containing the `mimeType` and the `content` of the url as string or buffer
  */
 export default async function fetch({ url, executeClientScripts, cssSelectors, options: { navigationTimeout = 5000, language = 'en', waitForElementsTimeout = 5000 } = {} }) {
   if (executeClientScripts) {
