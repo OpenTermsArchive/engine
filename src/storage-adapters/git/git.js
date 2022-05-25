@@ -1,7 +1,7 @@
 import fsApi from 'fs';
 import path from 'path';
 
-import simpleGit from 'simple-git';
+import simpleGit from '@opentermsarchive/simple-git';
 
 process.env.LC_ALL = 'en_GB'; // Ensure git messages will be in English as some errors are handled by analysing the message content
 

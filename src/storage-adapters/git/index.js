@@ -68,13 +68,13 @@ export default class GitAdapter {
   }
 
   async getLatest(serviceId, documentType) {
-    const [commit] = await this.git.log([ '-1', `${serviceId}/${documentType}.*` ]);
+    const [commit] = await this.git.log([ '-1', '--name-only', `${serviceId}/${documentType}.*` ]);
 
     return this._convertCommitToRecord(commit);
   }
 
   async get(recordId) {
-    const [commit] = await this.git.log([ '-1', recordId ]);
+    const [commit] = await this.git.log([ '-1', '--name-only', recordId ]);
 
     return this._convertCommitToRecord(commit);
   }
@@ -96,7 +96,7 @@ export default class GitAdapter {
   }
 
   async _getSortedRecordsRelatedCommits() {
-    return (await this.git.log([ '--reverse', '--no-merges' ]))
+    return (await this.git.log([ '--reverse', '--no-merges', '--name-only' ]))
       .filter(({ message }) => message.match(COMMIT_MESSAGE_PREFIXES_REGEXP)) // Skip commits which are not a document record (README, LICENSE, …)
       .sort((commitA, commitB) => new Date(commitA.date) - new Date(commitB.date)); // Make sure that the commits are sorted in ascending order
   }
@@ -158,9 +158,9 @@ export default class GitAdapter {
       return {};
     }
 
-    const { hash, date, message, body } = commit;
+    const { hash, date, message, body, diff } = commit;
 
-    const modifiedFilesInCommit = (await this.git.show([ '--name-only', '--pretty=', hash ])).trim().split('\n');
+    const modifiedFilesInCommit = diff.files.map(({ file }) => file);
 
     if (modifiedFilesInCommit.length > 1) {
       throw new Error(`Only one document should have been recorded in ${hash}, but all these documents were recorded: ${modifiedFilesInCommit.join(', ')}`);
