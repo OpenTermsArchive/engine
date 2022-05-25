@@ -26,9 +26,7 @@ const ciceroMarkTransformer = new CiceroMarkTransformer();
  * @param {Object} config - Filter configuration
  * @param {string|Buffer} config.content - Content to filter: a buffer containing PDF data in case mimetype associated is PDF or a DOM dump of an HTML page given as a string
  * @param {string} config.mimeType - Mime type of the given content
- * @param {string} config.documentDeclaration.location - URL which held the content
- * @param {string|Object|Array} config.documentDeclaration.contentSelectors - Content selectors for the parts of the content to be retained. Can be a Range Selector, a CSS selector or an array of a combination of both
- * @param {string|Object|Array} config.documentDeclaration.noiseSelectors - Content selectors for the parts of the content to be removed. Can be a Range Selector, a CSS selector or an array of a combination of both
+ * @param {string} config.documentDeclaration - @see {@link ./src/archivist/services/documentDeclaration.js}
  * @returns {Promise<string>} Promise which is fulfilled once the content is filtered and converted in markdown. The promise will resolve into a string containing the filtred content in markdown format
 */
 export default async function filter({ content, mimeType, documentDeclaration }) {
