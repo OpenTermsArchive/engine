@@ -250,6 +250,8 @@ The default configuration can be found in `config/default.json`. The full refere
   },
   "fetcher": {
     "waitForElementsTimeout": "Maximum time (in milliseconds) to wait for elements to be present in the page when fetching document in a headless browser"
+    "navigationTimeout": "Maximum time (in milliseconds) to wait for page to load",
+    "language": "Language (in ISO 639-1 format) to pass in request headers"
   },
   "notifier": { // Notify specified mailing lists when new versions are recorded
     "sendInBlue": { // SendInBlue API Key is defined in environment variables, see the “Environment variables” section below
