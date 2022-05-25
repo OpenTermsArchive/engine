@@ -154,6 +154,9 @@ await fetch({ executeClientScripts: true, ... });
 await stopHeadlessBrowser();
 ```
 
+The `fetch` module can also be configured as a [node config submodule](https://github.com/node-config/node-config/wiki/Sub-Module-Configuration).
+If [node-config](https://github.com/node-config/node-config) is used in the project, default `fetcher` configuration can be overridden by adding a `fetcher` object to the local config. See [Configuration file](#configuration-file) for full reference.
+
 #### filter
 
 Filter gives the ability to transform HTML or pdf content into a markdown string.
@@ -250,6 +253,8 @@ The default configuration can be found in `config/default.json`. The full refere
   },
   "fetcher": {
     "waitForElementsTimeout": "Maximum time (in milliseconds) to wait for elements to be present in the page when fetching document in a headless browser"
+    "navigationTimeout": "Maximum time (in milliseconds) to wait for page to load",
+    "language": "Language (in ISO 639-1 format) to pass in request headers"
   },
   "notifier": { // Notify specified mailing lists when new versions are recorded
     "sendInBlue": { // SendInBlue API Key is defined in environment variables, see the “Environment variables” section below
