@@ -126,7 +126,7 @@ export default class Archivist extends events.EventEmitter {
         url: location,
         executeClientScripts,
         cssSelectors: documentDeclaration.getCssSelectors(),
-        options: config.get('fetcher'),
+        config: config.get('fetcher'),
       }));
     } catch (error) {
       if (error instanceof FetchDocumentError) {
