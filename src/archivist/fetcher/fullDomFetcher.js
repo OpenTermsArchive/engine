@@ -9,7 +9,7 @@ puppeteerExtra.use(stealthPlugin());
 
 let browser;
 
-export default async function fetch(url, cssSelectors, options) {
+export default async function fetch(url, cssSelectors, configuration) {
   let page;
   let response;
   const selectors = [].concat(cssSelectors);
@@ -21,8 +21,8 @@ export default async function fetch(url, cssSelectors, options) {
   try {
     page = await browser.newPage();
 
-    await page.setDefaultNavigationTimeout(options.navigationTimeout);
-    await page.setExtraHTTPHeaders({ 'Accept-Language': options.language });
+    await page.setDefaultNavigationTimeout(configuration.navigationTimeout);
+    await page.setExtraHTTPHeaders({ 'Accept-Language': configuration.language });
 
     response = await page.goto(url, { waitUntil: 'networkidle0' });
 
@@ -36,7 +36,7 @@ export default async function fetch(url, cssSelectors, options) {
       throw new FetchDocumentError(`Received HTTP code ${statusCode} when trying to fetch '${url}'`);
     }
 
-    const waitForSelectorsPromises = selectors.map(selector => page.waitForSelector(selector, { timeout: options.waitForElementsTimeout }));
+    const waitForSelectorsPromises = selectors.map(selector => page.waitForSelector(selector, { timeout: configuration.waitForElementsTimeout }));
 
     // We expect all elements to be present on the page…
     await Promise.all(waitForSelectorsPromises).catch(error => {
@@ -67,7 +67,7 @@ export default async function fetch(url, cssSelectors, options) {
 
 export async function launchHeadlessBrowser() {
   if (browser) {
-    return;
+    return browser;
   }
 
   browser = await puppeteerExtra.launch({ headless: true });
