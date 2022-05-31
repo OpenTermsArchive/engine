@@ -80,7 +80,7 @@ export default class MongoAdapter {
 
   async getAll() {
     return (await this.collection.find().project({ content: 0 }).sort({ fetchDate: 1 }).toArray())
-      .map(mongoDocument => this._convertDocumentToRecord(mongoDocument));
+      .map(this._convertDocumentToRecord.bind(this));
   }
 
   async count() {
