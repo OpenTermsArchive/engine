@@ -43,11 +43,7 @@ export default class Git {
     let summary;
 
     try {
-      if (filepath) {
-        summary = await this.git.commit(message, filepath);
-      } else {
-        summary = await this.git.commit(message);
-      }
+      summary = await this.git.commit(message, filepath);
     } finally {
       process.env.GIT_AUTHOR_DATE = '';
       process.env.GIT_COMMITTER_DATE = '';
