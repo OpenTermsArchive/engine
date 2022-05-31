@@ -21,7 +21,10 @@ export async function initReadmeAndLicense(targetRepo, targetPath, authorDate) {
   await fs.copyFile(LICENSE_PATH, targetLicenseFilePath);
   await targetRepo.add(targetReadmeFilePath);
   await targetRepo.add(targetLicenseFilePath);
-  await targetRepo.commit(null, 'Add Readme and License', authorDate);
+  await targetRepo.commit({
+    message: 'Add Readme and License',
+    date: authorDate,
+  });
 }
 
 export async function initTargetRepo(targetRepoPath) {

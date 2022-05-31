@@ -47,7 +47,7 @@ export default class GitAdapter {
     const message = this._generateCommitMessage({ serviceId, documentType, isRefilter, snapshotId, isFirstRecord });
     const fileExtension = mime.getExtension(mimeType);
     const filePath = await this._save({ serviceId, documentType, content, fileExtension });
-    const sha = await this._commit(filePath, message, fetchDate);
+    const sha = await this._commit({ filePath, message, date: fetchDate });
 
     if (!sha) {
       return {};
@@ -115,11 +115,11 @@ export default class GitAdapter {
     return filePath;
   }
 
-  async _commit(filePath, message, date) {
+  async _commit({ filePath, message, date }) {
     try {
       await this.git.add(filePath);
 
-      return await this.git.commit(filePath, message, date);
+      return await this.git.commit({ filePath, message, date });
     } catch (error) {
       throw new Error(`Could not commit ${filePath} with message "${message}" due to error: "${error}"`);
     }

@@ -100,7 +100,10 @@ describe('GitAdapter', () => {
         fileExtension: 'html',
       });
 
-      id = await subject._commit(EXPECTED_FILE_PATH, COMMIT_MESSAGE);
+      id = await subject._commit({
+        filePath: EXPECTED_FILE_PATH,
+        message: COMMIT_MESSAGE,
+      });
 
       ([commit] = await git.log());
     });
