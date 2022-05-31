@@ -32,7 +32,7 @@ export default class Git {
     return this.git.add(this.relativePath(filepath));
   }
 
-  async commit(filepath, message, date) {
+  async commit({ filepath, message, date }) {
     if (date) {
       const commitDate = new Date(date).toISOString();
 

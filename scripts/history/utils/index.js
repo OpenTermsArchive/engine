@@ -15,5 +15,9 @@ export async function importReadme({ from: sourceAdapter, to: targetAdapter }) {
   }
 
   await fs.copyFile(sourceAdapterReadmePath, targetAdapterReadmePath);
-  await targetAdapter._commit(targetAdapterReadmePath, readmeCommit.message, readmeCommit.date);
+  await targetAdapter._commit({
+    filePath: targetAdapterReadmePath,
+    message: readmeCommit.message,
+    date: readmeCommit.date,
+  });
 }
