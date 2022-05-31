@@ -32,17 +32,15 @@ export default class Git {
     return this.git.add(this.relativePath(filepath));
   }
 
-  async commit({ filepath, message, date }) {
-    if (date) {
+  async commit({ filepath, message, date = new Date() }) {
+    let summary;
+
+    try {
       const commitDate = new Date(date).toISOString();
 
       process.env.GIT_AUTHOR_DATE = commitDate;
       process.env.GIT_COMMITTER_DATE = commitDate;
-    }
 
-    let summary;
-
-    try {
       summary = await this.git.commit(message, filepath);
     } finally {
       process.env.GIT_AUTHOR_DATE = '';
