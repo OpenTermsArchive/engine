@@ -3,7 +3,9 @@
  * Object IDs are used as opaque unique IDs.
  */
 
-import { Binary, MongoClient, ObjectId } from 'mongodb';
+import { MongoClient, ObjectId, Binary } from 'mongodb';
+
+import DataMapper from './dataMapper.js';
 
 export default class MongoAdapter {
   constructor({ database: databaseName, collection: collectionName, connectionURI }) {
@@ -12,6 +14,7 @@ export default class MongoAdapter {
     this.databaseName = databaseName;
     this.collectionName = collectionName;
     this.client = client;
+    this.dataMapper = new DataMapper({ adapter: this });
   }
 
   async initialize() {
@@ -27,108 +30,68 @@ export default class MongoAdapter {
     return this.client.close();
   }
 
-  async record({ serviceId, documentType, content, mimeType, fetchDate, isRefilter, snapshotId }) {
-    if (content instanceof Promise) {
-      content = await content;
+  async save(record) {
+    const { serviceId, documentType } = record;
+
+    const previousRecord = await this.findLatestByServiceIdAndDocumentType(serviceId, documentType);
+
+    if (record.isFirstRecord === undefined || record.isFirstRecord === null) {
+      record.isFirstRecord = !await this.collection.findOne({ serviceId, documentType });
     }
 
-    const previousRecord = await this.getLatest(serviceId, documentType);
+    const documentProperties = await this.dataMapper.toPersistence(record);
 
-    if (previousRecord && await previousRecord.content == content) {
+    if (previousRecord && previousRecord.content == documentProperties.content) {
       return {};
     }
 
-    const recordProperties = Object.fromEntries(Object.entries({
-      serviceId,
-      documentType,
-      content,
-      mimeType,
-      fetchDate,
-      isRefilter,
-      snapshotId,
-    }).filter(([ , value ]) => value)); // Remove empty values
+    const insertResult = await this.collection.insertOne(documentProperties);
 
-    const isFirstRecord = !await this.collection.findOne({ serviceId, documentType });
+    record.id = insertResult.insertedId.toString();
 
-    if (snapshotId) {
-      recordProperties.snapshotId = new ObjectId(snapshotId);
-    }
-
-    if (isFirstRecord) {
-      recordProperties.isFirstRecord = isFirstRecord;
-    }
-
-    const insertResult = await this.collection.insertOne({ ...recordProperties, created_at: new Date() });
-
-    return {
-      id: insertResult.insertedId.toString(),
-      isFirstRecord,
-    };
+    return record;
   }
 
-  async getLatest(serviceId, documentType) {
+  async findLatestByServiceIdAndDocumentType(serviceId, documentType, { lazyLoadContent } = {}) {
     const [mongoDocument] = await this.collection.find({ serviceId, documentType }).limit(1).sort({ fetchDate: -1 }).toArray(); // `findOne` doesn't support the `sort` method, so even for only one document use `find`
 
-    return this._convertDocumentToRecord(mongoDocument);
+    return this.dataMapper.toDomain(mongoDocument, { lazyLoadContent });
   }
 
-  async get(recordId) {
+  async findById(recordId, { lazyLoadContent } = {}) {
     const mongoDocument = await this.collection.findOne({ _id: new ObjectId(recordId) });
 
-    return this._convertDocumentToRecord(mongoDocument);
+    return this.dataMapper.toDomain(mongoDocument, { lazyLoadContent });
   }
 
-  async getAll() {
-    return (await this.collection.find().project({ content: 0 }).sort({ fetchDate: 1 }).toArray())
-      .map(this._convertDocumentToRecord.bind(this));
+  async findAll({ lazyLoadContent } = {}) {
+    return Promise.all((await this.collection.find().project({ content: 0 }).sort({ fetchDate: 1 }).toArray())
+      .map(mongoDocument => this.dataMapper.toDomain(mongoDocument, { lazyLoadContent })));
   }
 
   async count() {
     return this.collection.find().count();
   }
 
-  async* iterate() {
+  async* iterate({ lazyLoadContent } = {}) {
     const cursor = this.collection.find().sort({ fetchDate: 1 });
 
     /* eslint-disable no-await-in-loop */
     while (await cursor.hasNext()) {
       const mongoDocument = await cursor.next();
 
-      yield this._convertDocumentToRecord(mongoDocument);
+      yield this.dataMapper.toDomain(mongoDocument, { lazyLoadContent });
     }
     /* eslint-enable no-await-in-loop */
   }
 
-  async _removeAll() {
+  async removeAll() {
     return this.collection.deleteMany();
   }
 
-  _convertDocumentToRecord(document) {
-    if (!document || !document._id) {
-      return {};
-    }
+  async loadRecordContent(record) {
+    const { content } = await this.collection.findOne({ _id: new ObjectId(record.id) }, { projection: { content: 1 } });
 
-    const { _id, serviceId, documentType, fetchDate, mimeType, isRefilter, isFirstRecord, snapshotId } = document;
-
-    const { collection } = this;
-    const result = {
-      id: _id.toString(),
-      serviceId,
-      documentType,
-      mimeType,
-      fetchDate: new Date(fetchDate),
-      isFirstRecord: Boolean(isFirstRecord),
-      isRefilter: Boolean(isRefilter),
-      snapshotId: snapshotId && snapshotId.toString(),
-      get content() {
-        return (async () => {
-          const { content } = await collection.findOne({ _id }, { projection: { content: 1 } });
-
-          return content instanceof Binary ? content.buffer : content;
-        })();
-      },
-    };
-
-    return result;
+    record.content = content instanceof Binary ? content.buffer : content;
   }
 }

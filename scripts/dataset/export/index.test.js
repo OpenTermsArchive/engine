@@ -9,6 +9,7 @@ import mime from 'mime';
 import StreamZip from 'node-stream-zip';
 
 import GitAdapter from '../../../src/storage-adapters/git/index.js';
+import Record from '../../../src/storage-adapters/record.js';
 
 import generateArchive from './index.js';
 
@@ -55,41 +56,41 @@ describe('Export', () => {
 
       await storageAdapter.initialize();
 
-      await storageAdapter.record({
+      await storageAdapter.save(new Record({
         serviceId: FIRST_SERVICE_PROVIDER_ID,
         documentType: FIRST_DOCUMENT_TYPE,
         content: FIRST_CONTENT,
         mimeType: MIME_TYPE,
         fetchDate: FIRST_FETCH_DATE,
         snapshotId: SNAPSHOT_ID,
-      });
+      }));
 
-      await storageAdapter.record({
+      await storageAdapter.save(new Record({
         serviceId: FIRST_SERVICE_PROVIDER_ID,
         documentType: FIRST_DOCUMENT_TYPE,
         content: SECOND_CONTENT,
         mimeType: MIME_TYPE,
         fetchDate: SECOND_FETCH_DATE,
         snapshotId: SNAPSHOT_ID,
-      });
+      }));
 
-      await storageAdapter.record({
+      await storageAdapter.save(new Record({
         serviceId: SECOND_SERVICE_PROVIDER_ID,
         documentType: FIRST_DOCUMENT_TYPE,
         content: FIRST_CONTENT,
         mimeType: MIME_TYPE,
         fetchDate: THIRD_FETCH_DATE,
         snapshotId: SNAPSHOT_ID,
-      });
+      }));
 
-      await storageAdapter.record({
+      await storageAdapter.save(new Record({
         serviceId: SECOND_SERVICE_PROVIDER_ID,
         documentType: SECOND_DOCUMENT_TYPE,
         content: FIRST_CONTENT,
         mimeType: MIME_TYPE,
         fetchDate: FOURTH_FETCH_DATE,
         snapshotId: SNAPSHOT_ID,
-      });
+      }));
 
       await generateArchive({
         archivePath: ARCHIVE_PATH,
@@ -103,7 +104,7 @@ describe('Export', () => {
 
     after(async () => {
       await fs.rm(TMP_PATH, { recursive: true });
-      await storageAdapter._removeAll();
+      await storageAdapter.removeAll();
     });
 
     it('is an archive', () => {

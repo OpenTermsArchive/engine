@@ -1,3 +1,5 @@
+import Record from '../../storage-adapters/record.js';
+
 export default class Recorder {
   constructor({ versionsStorageAdapter, snapshotsStorageAdapter }) {
     if (!versionsStorageAdapter || !snapshotsStorageAdapter) {
@@ -17,12 +19,7 @@ export default class Recorder {
   }
 
   async getLatestSnapshot(serviceId, documentType) {
-    const record = await this.snapshotsStorageAdapter.getLatest(serviceId, documentType);
-
-    return {
-      ...record,
-      content: await record.content,
-    };
+    return this.snapshotsStorageAdapter.findLatestByServiceIdAndDocumentType(serviceId, documentType);
   }
 
   async recordSnapshot({ serviceId, documentType, fetchDate, mimeType, content }) {
@@ -46,7 +43,7 @@ export default class Recorder {
       throw new Error('A document mime type is required to ensure data consistency');
     }
 
-    return this.snapshotsStorageAdapter.record({ serviceId, documentType, fetchDate, mimeType, content });
+    return this.snapshotsStorageAdapter.save(new Record({ serviceId, documentType, fetchDate, mimeType, content }));
   }
 
   async recordVersion({ serviceId, documentType, snapshotId, fetchDate, mimeType, content, isRefilter }) {
@@ -74,7 +71,7 @@ export default class Recorder {
       throw new Error('A document mime type is required to ensure data consistency');
     }
 
-    return this.versionsStorageAdapter.record({ serviceId, documentType, snapshotId, fetchDate, mimeType, content, isRefilter });
+    return this.versionsStorageAdapter.save(new Record({ serviceId, documentType, snapshotId, fetchDate, mimeType, content, isRefilter }));
   }
 
   async recordRefilter(params) {

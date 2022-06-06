@@ -6,6 +6,8 @@ import chai from 'chai';
 import config from 'config';
 import { MongoClient } from 'mongodb';
 
+import Record from '../record.js';
+
 import MongoAdapter from './index.js';
 
 const { expect } = chai;
@@ -40,7 +42,7 @@ describe('MongoAdapter', () => {
     collection = db.collection(config.get('recorder.snapshots.storage.mongo.collection'));
   });
 
-  describe('#record', () => {
+  describe('#save', () => {
     let record;
     let mongoDocument;
     let numberOfRecordsBefore;
@@ -53,14 +55,14 @@ describe('MongoAdapter', () => {
           documentType: DOCUMENT_TYPE,
         }).count();
 
-        (record = await subject.record({
+        (record = await subject.save(new Record({
           serviceId: SERVICE_PROVIDER_ID,
           documentType: DOCUMENT_TYPE,
           content: CONTENT,
           mimeType: MIME_TYPE,
           fetchDate: FETCH_DATE,
           snapshotId: SNAPSHOT_ID,
-        }));
+        })));
 
         numberOfRecordsAfter = await collection.find({
           serviceId: SERVICE_PROVIDER_ID,
@@ -73,7 +75,7 @@ describe('MongoAdapter', () => {
         }));
       });
 
-      after(async () => subject._removeAll());
+      after(async () => subject.removeAll());
 
       it('saves the record', () => {
         expect(numberOfRecordsAfter).to.equal(numberOfRecordsBefore + 1);
@@ -122,28 +124,28 @@ describe('MongoAdapter', () => {
       const UPDATED_CONTENT = `${CONTENT} updated`;
 
       before(async () => {
-        (record = await subject.record({
+        (record = await subject.save(new Record({
           serviceId: SERVICE_PROVIDER_ID,
           documentType: DOCUMENT_TYPE,
           content: CONTENT,
           mimeType: MIME_TYPE,
           fetchDate: FETCH_DATE,
           snapshotId: SNAPSHOT_ID,
-        }));
+        })));
 
         numberOfRecordsBefore = await collection.find({
           serviceId: SERVICE_PROVIDER_ID,
           documentType: DOCUMENT_TYPE,
         }).count();
 
-        (record = await subject.record({
+        (record = await subject.save(new Record({
           serviceId: SERVICE_PROVIDER_ID,
           documentType: DOCUMENT_TYPE,
           content: UPDATED_CONTENT,
           mimeType: MIME_TYPE,
           fetchDate: FETCH_DATE,
           snapshotId: SNAPSHOT_ID,
-        }));
+        })));
 
         numberOfRecordsAfter = await collection.find({
           serviceId: SERVICE_PROVIDER_ID,
@@ -156,7 +158,7 @@ describe('MongoAdapter', () => {
         }).limit(1).sort({ created_at: -1 }).toArray());
       });
 
-      after(async () => subject._removeAll());
+      after(async () => subject.removeAll());
 
       it('saves the record', () => {
         expect(numberOfRecordsAfter).to.equal(numberOfRecordsBefore + 1);
@@ -173,26 +175,26 @@ describe('MongoAdapter', () => {
 
     context('when the content has not changed', () => {
       before(async () => {
-        await subject.record({
+        await subject.save(new Record({
           serviceId: SERVICE_PROVIDER_ID,
           documentType: DOCUMENT_TYPE,
           content: CONTENT,
           mimeType: MIME_TYPE,
           fetchDate: FETCH_DATE,
-        });
+        }));
 
         numberOfRecordsBefore = await collection.find({
           serviceId: SERVICE_PROVIDER_ID,
           documentType: DOCUMENT_TYPE,
         }).count();
 
-        (record = await subject.record({
+        (record = await subject.save(new Record({
           serviceId: SERVICE_PROVIDER_ID,
           documentType: DOCUMENT_TYPE,
           content: CONTENT,
           mimeType: MIME_TYPE,
           fetchDate: FETCH_DATE_LATER,
-        }));
+        })));
 
         numberOfRecordsAfter = await collection.find({
           serviceId: SERVICE_PROVIDER_ID,
@@ -200,7 +202,7 @@ describe('MongoAdapter', () => {
         }).count();
       });
 
-      after(async () => subject._removeAll());
+      after(async () => subject.removeAll());
 
       it('does not save the record', () => {
         expect(numberOfRecordsAfter).to.equal(numberOfRecordsBefore);
@@ -215,18 +217,18 @@ describe('MongoAdapter', () => {
       const REFILTERED_CONTENT = `${CONTENT} refiltered`;
 
       before(async () => {
-        await subject.record({
+        await subject.save(new Record({
           serviceId: SERVICE_PROVIDER_ID,
           documentType: DOCUMENT_TYPE,
           content: CONTENT,
-        }); // A refilter cannot be the first record
+        })); // A refilter cannot be the first record
 
         numberOfRecordsBefore = await collection.find({
           serviceId: SERVICE_PROVIDER_ID,
           documentType: DOCUMENT_TYPE,
         }).count();
 
-        (record = await subject.record({
+        (record = await subject.save(new Record({
           serviceId: SERVICE_PROVIDER_ID,
           documentType: DOCUMENT_TYPE,
           content: REFILTERED_CONTENT,
@@ -234,7 +236,7 @@ describe('MongoAdapter', () => {
           fetchDate: FETCH_DATE,
           snapshotId: SNAPSHOT_ID,
           isRefilter: true,
-        }));
+        })));
 
         numberOfRecordsAfter = await collection.find({
           serviceId: SERVICE_PROVIDER_ID,
@@ -247,7 +249,7 @@ describe('MongoAdapter', () => {
         }).limit(1).sort({ created_at: -1 }).toArray());
       });
 
-      after(async () => subject._removeAll());
+      after(async () => subject.removeAll());
 
       it('saves the record', () => {
         expect(numberOfRecordsAfter).to.equal(numberOfRecordsBefore + 1);
@@ -271,14 +273,14 @@ describe('MongoAdapter', () => {
           mimeType: PDF_MIME_TYPE,
         }).count();
 
-        (record = await subject.record({
+        (record = await subject.save(new Record({
           serviceId: SERVICE_PROVIDER_ID,
           documentType: DOCUMENT_TYPE,
           content: PDF_CONTENT,
           mimeType: PDF_MIME_TYPE,
           fetchDate: FETCH_DATE,
           snapshotId: SNAPSHOT_ID,
-        }));
+        })));
 
         numberOfRecordsAfter = await collection.find({
           serviceId: SERVICE_PROVIDER_ID,
@@ -291,7 +293,7 @@ describe('MongoAdapter', () => {
         }));
       });
 
-      after(async () => subject._removeAll());
+      after(async () => subject.removeAll());
 
       it('saves the record', () => {
         expect(numberOfRecordsAfter).to.equal(numberOfRecordsBefore + 1);
@@ -313,24 +315,24 @@ describe('MongoAdapter', () => {
     });
   });
 
-  describe('#get', () => {
+  describe('#findById', () => {
     let record;
     let id;
 
     before(async () => {
-      ({ id } = await subject.record({
+      ({ id } = await subject.save(new Record({
         serviceId: SERVICE_PROVIDER_ID,
         documentType: DOCUMENT_TYPE,
         content: CONTENT,
         fetchDate: FETCH_DATE,
         snapshotId: SNAPSHOT_ID,
         mimeType: MIME_TYPE,
-      }));
+      })));
 
-      (record = await subject.get(id));
+      (record = await subject.findById(id));
     });
 
-    after(async () => subject._removeAll());
+    after(async () => subject.removeAll());
 
     it('returns the record id', () => {
       expect(record.id).to.include(id);
@@ -348,8 +350,8 @@ describe('MongoAdapter', () => {
       expect(record.documentType).to.equal(DOCUMENT_TYPE);
     });
 
-    it('returns a asynchronous content getter', async () => {
-      expect(await record.content).to.equal(CONTENT);
+    it('returns the content', async () => {
+      expect(record.content).to.equal(CONTENT);
     });
 
     it('stores the fetch date', () => {
@@ -366,39 +368,39 @@ describe('MongoAdapter', () => {
 
     context('when requested record does not exists', () => {
       it('returns an empty object', async () => {
-        expect(await subject.get('inexistantID')).to.deep.equal({});
+        expect(await subject.findById('inexistantID')).to.deep.equal({});
       });
     });
   });
 
-  describe('#getAll', () => {
+  describe('#findAll', () => {
     let records;
     const expectedIds = [];
 
     before(async () => {
-      const { id: id1 } = await subject.record({
+      const { id: id1 } = await subject.save(new Record({
         serviceId: SERVICE_PROVIDER_ID,
         documentType: DOCUMENT_TYPE,
         content: CONTENT,
         fetchDate: FETCH_DATE,
-        // snapshotId: SNAPSHOT_ID,
+        snapshotId: SNAPSHOT_ID,
         mimeType: MIME_TYPE,
-      });
+      }));
 
       expectedIds.push(id1);
 
-      const { id: id2 } = await subject.record({
+      const { id: id2 } = await subject.save(new Record({
         serviceId: SERVICE_PROVIDER_ID,
         documentType: DOCUMENT_TYPE,
         content: `${CONTENT} - updated`,
         fetchDate: FETCH_DATE_LATER,
         snapshotId: SNAPSHOT_ID,
         mimeType: MIME_TYPE,
-      });
+      }));
 
       expectedIds.push(id2);
 
-      const { id: id3 } = await subject.record({
+      const { id: id3 } = await subject.save(new Record({
         serviceId: SERVICE_PROVIDER_ID,
         documentType: DOCUMENT_TYPE,
         content: `${CONTENT} - updated 2`,
@@ -406,22 +408,22 @@ describe('MongoAdapter', () => {
         fetchDate: FETCH_DATE_EARLIER,
         snapshotId: SNAPSHOT_ID,
         mimeType: MIME_TYPE,
-      });
+      }));
 
       expectedIds.push(id3);
 
-      (records = await subject.getAll());
+      (records = await subject.findAll());
     });
 
-    after(async () => subject._removeAll());
+    after(async () => subject.removeAll());
 
     it('returns all records', () => {
       expect(records.length).to.equal(3);
     });
 
-    it('returns records with proper keys', () => {
+    it('returns Record objects', () => {
       for (const record of records) {
-        expect(record).to.have.keys([ 'id', 'serviceId', 'documentType', 'mimeType', 'fetchDate', 'content', 'isFirstRecord', 'isRefilter', 'snapshotId' ]);
+        expect(record).to.be.an.instanceof(Record);
       }
     });
 
@@ -434,23 +436,23 @@ describe('MongoAdapter', () => {
     let count;
 
     before(async () => {
-      await subject.record({
+      await subject.save(new Record({
         serviceId: SERVICE_PROVIDER_ID,
         documentType: DOCUMENT_TYPE,
         content: CONTENT,
         fetchDate: FETCH_DATE,
         snapshotId: SNAPSHOT_ID,
         mimeType: MIME_TYPE,
-      });
-      await subject.record({
+      }));
+      await subject.save(new Record({
         serviceId: SERVICE_PROVIDER_ID,
         documentType: DOCUMENT_TYPE,
         content: `${CONTENT} - updated`,
         fetchDate: FETCH_DATE_LATER,
         snapshotId: SNAPSHOT_ID,
         mimeType: MIME_TYPE,
-      });
-      await subject.record({
+      }));
+      await subject.save(new Record({
         serviceId: SERVICE_PROVIDER_ID,
         documentType: DOCUMENT_TYPE,
         content: `${CONTENT} - updated 2`,
@@ -458,19 +460,19 @@ describe('MongoAdapter', () => {
         fetchDate: FETCH_DATE_EARLIER,
         snapshotId: SNAPSHOT_ID,
         mimeType: MIME_TYPE,
-      });
+      }));
 
       (count = await subject.count());
     });
 
-    after(async () => subject._removeAll());
+    after(async () => subject.removeAll());
 
     it('returns the proper count', async () => {
       expect(count).to.equal(3);
     });
   });
 
-  describe('#getLatest', () => {
+  describe('#findLatestByServiceIdAndDocumentType', () => {
     context('when there are records for the given service', () => {
       let lastSnapshotId;
       let latestRecord;
@@ -479,28 +481,28 @@ describe('MongoAdapter', () => {
         const UPDATED_CONTENT = `${CONTENT} (with additional content to trigger a record)`;
 
         before(async () => {
-          await subject.record({
+          await subject.save(new Record({
             serviceId: SERVICE_PROVIDER_ID,
             documentType: DOCUMENT_TYPE,
             content: CONTENT,
             fetchDate: FETCH_DATE,
-          });
+          }));
 
-          ({ id: lastSnapshotId } = await subject.record({
+          ({ id: lastSnapshotId } = await subject.save(new Record({
             serviceId: SERVICE_PROVIDER_ID,
             documentType: DOCUMENT_TYPE,
             content: UPDATED_CONTENT,
             mimeType: MIME_TYPE,
             fetchDate: FETCH_DATE_LATER,
-          }));
+          })));
 
-          latestRecord = await subject.getLatest(
+          latestRecord = await subject.findLatestByServiceIdAndDocumentType(
             SERVICE_PROVIDER_ID,
             DOCUMENT_TYPE,
           );
         });
 
-        after(async () => subject._removeAll());
+        after(async () => subject.removeAll());
 
         it('returns the latest record id', () => {
           expect(latestRecord.id).to.include(lastSnapshotId);
@@ -517,33 +519,33 @@ describe('MongoAdapter', () => {
 
       context('with PDF document', () => {
         before(async () => {
-          await subject.record({
+          await subject.save(new Record({
             serviceId: SERVICE_PROVIDER_ID,
             documentType: DOCUMENT_TYPE,
             content: PDF_CONTENT,
             mimeType: PDF_MIME_TYPE,
             fetchDate: FETCH_DATE,
-          });
+          }));
 
-          ({ id: lastSnapshotId } = await subject.record({
+          ({ id: lastSnapshotId } = await subject.save(new Record({
             serviceId: SERVICE_PROVIDER_ID,
             documentType: DOCUMENT_TYPE,
             content: UPDATED_PDF_CONTENT,
             mimeType: PDF_MIME_TYPE,
             fetchDate: FETCH_DATE_LATER,
-          }));
+          })));
 
-          latestRecord = await subject.getLatest(SERVICE_PROVIDER_ID, DOCUMENT_TYPE);
+          latestRecord = await subject.findLatestByServiceIdAndDocumentType(SERVICE_PROVIDER_ID, DOCUMENT_TYPE);
         });
 
-        after(async () => subject._removeAll());
+        after(async () => subject.removeAll());
 
         it('returns the latest record id', () => {
           expect(latestRecord.id).to.include(lastSnapshotId);
         });
 
         it('returns the latest record content', async () => {
-          const isSameContent = Buffer.compare(await latestRecord.content, UPDATED_PDF_CONTENT) == 0;
+          const isSameContent = Buffer.compare(latestRecord.content, UPDATED_PDF_CONTENT) == 0;
 
           expect(isSameContent).to.be.true;
         });
@@ -558,7 +560,7 @@ describe('MongoAdapter', () => {
       let latestRecord;
 
       before(async () => {
-        latestRecord = await subject.getLatest(SERVICE_PROVIDER_ID, DOCUMENT_TYPE);
+        latestRecord = await subject.findLatestByServiceIdAndDocumentType(SERVICE_PROVIDER_ID, DOCUMENT_TYPE);
       });
 
       it('returns an empty object', async () => {
@@ -573,29 +575,29 @@ describe('MongoAdapter', () => {
     const fetchDates = [];
 
     before(async () => {
-      const { id: id1 } = await subject.record({
+      const { id: id1 } = await subject.save(new Record({
         serviceId: SERVICE_PROVIDER_ID,
         documentType: DOCUMENT_TYPE,
         content: CONTENT,
         fetchDate: FETCH_DATE,
         snapshotId: SNAPSHOT_ID,
         mimeType: MIME_TYPE,
-      });
+      }));
 
       expectedIds.push(id1);
 
-      const { id: id2 } = await subject.record({
+      const { id: id2 } = await subject.save(new Record({
         serviceId: SERVICE_PROVIDER_ID,
         documentType: DOCUMENT_TYPE,
         content: `${CONTENT} - updated`,
         fetchDate: FETCH_DATE_LATER,
         snapshotId: SNAPSHOT_ID,
         mimeType: MIME_TYPE,
-      });
+      }));
 
       expectedIds.push(id2);
 
-      const { id: id3 } = await subject.record({
+      const { id: id3 } = await subject.save(new Record({
         serviceId: SERVICE_PROVIDER_ID,
         documentType: DOCUMENT_TYPE,
         content: `${CONTENT} - updated 2`,
@@ -603,7 +605,7 @@ describe('MongoAdapter', () => {
         fetchDate: FETCH_DATE_EARLIER,
         snapshotId: SNAPSHOT_ID,
         mimeType: MIME_TYPE,
-      });
+      }));
 
       expectedIds.push(id3);
 
@@ -613,7 +615,7 @@ describe('MongoAdapter', () => {
       }
     });
 
-    after(async () => subject._removeAll());
+    after(async () => subject.removeAll());
 
     it('iterates through all records', async () => {
       expect(ids).to.have.members(expectedIds);

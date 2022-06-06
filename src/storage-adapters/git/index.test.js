@@ -6,6 +6,8 @@ import chai from 'chai';
 import config from 'config';
 import mime from 'mime';
 
+import Record from '../record.js';
+
 import Git from './git.js';
 
 import GitAdapter from './index.js';
@@ -52,104 +54,7 @@ describe('GitAdapter', () => {
     return subject.initialize();
   });
 
-  describe('#_save', () => {
-    context('when service directory already exists', () => {
-      before(async () => subject._save({
-        serviceId: SERVICE_PROVIDER_ID,
-        documentType: DOCUMENT_TYPE,
-        content: CONTENT,
-        fileExtension: 'html',
-      }));
-
-      after(async () => subject._removeAll());
-
-      it('creates a file for the given service', () => {
-        expect(fs.readFileSync(EXPECTED_FILE_PATH, { encoding: 'utf8' })).to.equal(CONTENT);
-      });
-    });
-
-    context('when service directory does not already exist', () => {
-      const NEW_SERVICE_ID = 'test_not_existing_service';
-      const NEW_SERVICE_EXPECTED_FILE_PATH = `${RECORDER_PATH}/${NEW_SERVICE_ID}/${DOCUMENT_TYPE}.html`;
-
-      after(async () => subject._removeAll());
-
-      it('creates a directory and file for the given service', async () => {
-        await subject._save({
-          serviceId: NEW_SERVICE_ID,
-          documentType: DOCUMENT_TYPE,
-          content: CONTENT,
-          fileExtension: 'html',
-        });
-
-        expect(fs.readFileSync(NEW_SERVICE_EXPECTED_FILE_PATH, { encoding: 'utf8' })).to.equal(CONTENT);
-      });
-    });
-  });
-
-  describe('#_commit', () => {
-    const COMMIT_MESSAGE = 'Message to check if the commit message is properly saved';
-    let id;
-    let commit;
-
-    before(async () => {
-      await subject._save({
-        serviceId: SERVICE_PROVIDER_ID,
-        documentType: DOCUMENT_TYPE,
-        content: CONTENT,
-        fileExtension: 'html',
-      });
-
-      id = await subject._commit({
-        filePath: EXPECTED_FILE_PATH,
-        message: COMMIT_MESSAGE,
-      });
-
-      ([commit] = await git.log());
-    });
-
-    after(async () => subject._removeAll());
-
-    it('returns the id of the commit', () => {
-      expect(commit.hash).to.include(id);
-    });
-
-    it('properly saves the commit message', () => {
-      expect(commit.message).to.equal(COMMIT_MESSAGE);
-    });
-  });
-
-  describe('#_getPathFor', () => {
-    it('returns the file path with given extension for the given service provider’s document type', () => {
-      expect(subject._getPathFor(SERVICE_PROVIDER_ID, DOCUMENT_TYPE, 'pdf')).to.equal(EXPECTED_PDF_FILE_PATH);
-    });
-  });
-
-  describe('#_isTracked', () => {
-    after(async () => subject._removeAll());
-
-    context('when the file does not exists', () => {
-      it('returns false', async () => {
-        expect(await subject._isTracked(SERVICE_PROVIDER_ID, DOCUMENT_TYPE)).to.be.false;
-      });
-    });
-
-    context('when the file already exists', () => {
-      before(async () => {
-        await subject.record({
-          serviceId: SERVICE_PROVIDER_ID,
-          documentType: DOCUMENT_TYPE,
-          content: CONTENT,
-        });
-      });
-
-      it('returns true', async () => {
-        expect(await subject._isTracked(SERVICE_PROVIDER_ID, DOCUMENT_TYPE)).to.be.true;
-      });
-    });
-  });
-
-  describe('#record', () => {
+  describe('#save', () => {
     let id;
     let commit;
     let isFirstRecord;
@@ -160,21 +65,21 @@ describe('GitAdapter', () => {
       before(async () => {
         numberOfRecordsBefore = (await git.log()).length;
 
-        ({ id, isFirstRecord } = await subject.record({
+        ({ id, isFirstRecord } = await subject.save(new Record({
           serviceId: SERVICE_PROVIDER_ID,
           documentType: DOCUMENT_TYPE,
           content: CONTENT,
           fetchDate: FETCH_DATE,
           snapshotId: SNAPSHOT_ID,
           mimeType: MIME_TYPE,
-        }));
+        })));
 
         numberOfRecordsAfter = (await git.log()).length;
 
         ([commit] = await git.log());
       });
 
-      after(async () => subject._removeAll());
+      after(async () => subject.removeAll());
 
       it('saves the record', () => {
         expect(numberOfRecordsAfter).to.equal(numberOfRecordsBefore + 1);
@@ -223,29 +128,29 @@ describe('GitAdapter', () => {
       const UPDATED_CONTENT = `${CONTENT} updated`;
 
       before(async () => {
-        await subject.record({
+        await subject.save(new Record({
           serviceId: SERVICE_PROVIDER_ID,
           documentType: DOCUMENT_TYPE,
           content: CONTENT,
-        });
+        }));
 
         numberOfRecordsBefore = (await git.log()).length;
 
-        ({ id, isFirstRecord } = await subject.record({
+        ({ id, isFirstRecord } = await subject.save(new Record({
           serviceId: SERVICE_PROVIDER_ID,
           documentType: DOCUMENT_TYPE,
           content: UPDATED_CONTENT,
           fetchDate: FETCH_DATE,
           snapshotId: SNAPSHOT_ID,
           mimeType: MIME_TYPE,
-        }));
+        })));
 
         numberOfRecordsAfter = (await git.log()).length;
 
         ([commit] = await git.log());
       });
 
-      after(async () => subject._removeAll());
+      after(async () => subject.removeAll());
 
       it('saves the record', () => {
         expect(numberOfRecordsAfter).to.equal(numberOfRecordsBefore + 1);
@@ -262,26 +167,26 @@ describe('GitAdapter', () => {
 
     context('when the content has not changed', () => {
       before(async () => {
-        await subject.record({
-          serviceId: SERVICE_PROVIDER_ID,
-          documentType: DOCUMENT_TYPE,
-          content: CONTENT,
-          mimeType: MIME_TYPE,
-        });
-
-        numberOfRecordsBefore = (await git.log()).length;
-
-        ({ id, isFirstRecord } = await subject.record({
+        await subject.save(new Record({
           serviceId: SERVICE_PROVIDER_ID,
           documentType: DOCUMENT_TYPE,
           content: CONTENT,
           mimeType: MIME_TYPE,
         }));
 
+        numberOfRecordsBefore = (await git.log()).length;
+
+        ({ id, isFirstRecord } = await subject.save(new Record({
+          serviceId: SERVICE_PROVIDER_ID,
+          documentType: DOCUMENT_TYPE,
+          content: CONTENT,
+          mimeType: MIME_TYPE,
+        })));
+
         numberOfRecordsAfter = (await git.log()).length;
       });
 
-      after(async () => subject._removeAll());
+      after(async () => subject.removeAll());
 
       it('does not save the record', () => {
         expect(numberOfRecordsAfter).to.equal(numberOfRecordsBefore);
@@ -296,15 +201,15 @@ describe('GitAdapter', () => {
       const REFILTERED_CONTENT = `${CONTENT} refiltered`;
 
       before(async () => {
-        await subject.record({
+        await subject.save(new Record({
           serviceId: SERVICE_PROVIDER_ID,
           documentType: DOCUMENT_TYPE,
           content: CONTENT,
-        }); // A refilter cannot be the first record
+        })); // A refilter cannot be the first record
 
         numberOfRecordsBefore = (await git.log()).length;
 
-        ({ id, isFirstRecord } = await subject.record({
+        ({ id, isFirstRecord } = await subject.save(new Record({
           serviceId: SERVICE_PROVIDER_ID,
           documentType: DOCUMENT_TYPE,
           content: REFILTERED_CONTENT,
@@ -312,14 +217,14 @@ describe('GitAdapter', () => {
           isRefilter: true,
           snapshotId: SNAPSHOT_ID,
           mimeType: MIME_TYPE,
-        }));
+        })));
 
         numberOfRecordsAfter = (await git.log()).length;
 
         ([commit] = await git.log());
       });
 
-      after(async () => subject._removeAll());
+      after(async () => subject.removeAll());
 
       it('saves the record', () => {
         expect(numberOfRecordsAfter).to.equal(numberOfRecordsBefore + 1);
@@ -338,21 +243,21 @@ describe('GitAdapter', () => {
       before(async () => {
         numberOfRecordsBefore = (await git.log()).length;
 
-        ({ id, isFirstRecord } = await subject.record({
+        ({ id, isFirstRecord } = await subject.save(new Record({
           serviceId: SERVICE_PROVIDER_ID,
           documentType: DOCUMENT_TYPE,
           content: PDF_CONTENT,
           fetchDate: FETCH_DATE,
           snapshotId: SNAPSHOT_ID,
           mimeType: PDF_MIME_TYPE,
-        }));
+        })));
 
         numberOfRecordsAfter = (await git.log()).length;
 
         ([commit] = await git.log());
       });
 
-      after(async () => subject._removeAll());
+      after(async () => subject.removeAll());
 
       it('saves the record', () => {
         expect(numberOfRecordsAfter).to.equal(numberOfRecordsBefore + 1);
@@ -372,24 +277,24 @@ describe('GitAdapter', () => {
     });
   });
 
-  describe('#get', () => {
+  describe('#findById', () => {
     let record;
     let id;
 
     before(async () => {
-      ({ id } = await subject.record({
+      ({ id } = await subject.save(new Record({
         serviceId: SERVICE_PROVIDER_ID,
         documentType: DOCUMENT_TYPE,
         content: CONTENT,
         fetchDate: FETCH_DATE,
         snapshotId: SNAPSHOT_ID,
         mimeType: MIME_TYPE,
-      }));
+      })));
 
-      (record = await subject.get(id));
+      (record = await subject.findById(id));
     });
 
-    after(async () => subject._removeAll());
+    after(async () => subject.removeAll());
 
     it('returns the record id', () => {
       expect(record.id).to.include(id);
@@ -407,8 +312,8 @@ describe('GitAdapter', () => {
       expect(record.documentType).to.equal(DOCUMENT_TYPE);
     });
 
-    it('returns a asynchronous content getter', async () => {
-      expect(await record.content).to.equal(CONTENT);
+    it('returns the content', async () => {
+      expect(record.content).to.equal(CONTENT);
     });
 
     it('stores the fetch date', () => {
@@ -425,39 +330,39 @@ describe('GitAdapter', () => {
 
     context('when requested record does not exists', () => {
       it('returns an empty object', async () => {
-        expect(await subject.get('inexistantID')).to.deep.equal({});
+        expect(await subject.findById('inexistantID')).to.deep.equal({});
       });
     });
   });
 
-  describe('#getAll', () => {
+  describe('#findAll', () => {
     let records;
     const expectedIds = [];
 
     before(async () => {
-      const { id: id1 } = await subject.record({
+      const { id: id1 } = await subject.save(new Record({
         serviceId: SERVICE_PROVIDER_ID,
         documentType: DOCUMENT_TYPE,
         content: CONTENT,
         fetchDate: FETCH_DATE,
         snapshotId: SNAPSHOT_ID,
         mimeType: MIME_TYPE,
-      });
+      }));
 
       expectedIds.push(id1);
 
-      const { id: id2 } = await subject.record({
+      const { id: id2 } = await subject.save(new Record({
         serviceId: SERVICE_PROVIDER_ID,
         documentType: DOCUMENT_TYPE,
         content: `${CONTENT} - updated`,
         fetchDate: FETCH_DATE_LATER,
         snapshotId: SNAPSHOT_ID,
         mimeType: MIME_TYPE,
-      });
+      }));
 
       expectedIds.push(id2);
 
-      const { id: id3 } = await subject.record({
+      const { id: id3 } = await subject.save(new Record({
         serviceId: SERVICE_PROVIDER_ID,
         documentType: DOCUMENT_TYPE,
         content: `${CONTENT} - updated 2`,
@@ -465,22 +370,22 @@ describe('GitAdapter', () => {
         fetchDate: FETCH_DATE_EARLIER,
         snapshotId: SNAPSHOT_ID,
         mimeType: MIME_TYPE,
-      });
+      }));
 
       expectedIds.push(id3);
 
-      (records = await subject.getAll());
+      (records = await subject.findAll());
     });
 
-    after(async () => subject._removeAll());
+    after(async () => subject.removeAll());
 
     it('returns all records', () => {
       expect(records.length).to.equal(3);
     });
 
-    it('returns records with proper keys', () => {
+    it('returns Record objects', () => {
       for (const record of records) {
-        expect(record).to.have.keys([ 'id', 'serviceId', 'documentType', 'mimeType', 'fetchDate', 'content', 'isFirstRecord', 'isRefilter', 'snapshotId' ]);
+        expect(record).to.be.an.instanceof(Record);
       }
     });
 
@@ -493,23 +398,23 @@ describe('GitAdapter', () => {
     let count;
 
     before(async () => {
-      await subject.record({
+      await subject.save(new Record({
         serviceId: SERVICE_PROVIDER_ID,
         documentType: DOCUMENT_TYPE,
         content: CONTENT,
         fetchDate: FETCH_DATE,
         snapshotId: SNAPSHOT_ID,
         mimeType: MIME_TYPE,
-      });
-      await subject.record({
+      }));
+      await subject.save(new Record({
         serviceId: SERVICE_PROVIDER_ID,
         documentType: DOCUMENT_TYPE,
         content: `${CONTENT} - updated`,
         fetchDate: FETCH_DATE_LATER,
         snapshotId: SNAPSHOT_ID,
         mimeType: MIME_TYPE,
-      });
-      await subject.record({
+      }));
+      await subject.save(new Record({
         serviceId: SERVICE_PROVIDER_ID,
         documentType: DOCUMENT_TYPE,
         content: `${CONTENT} - updated 2`,
@@ -517,19 +422,19 @@ describe('GitAdapter', () => {
         fetchDate: FETCH_DATE_EARLIER,
         snapshotId: SNAPSHOT_ID,
         mimeType: MIME_TYPE,
-      });
+      }));
 
       (count = await subject.count());
     });
 
-    after(async () => subject._removeAll());
+    after(async () => subject.removeAll());
 
     it('returns the proper count', async () => {
       expect(count).to.equal(3);
     });
   });
 
-  describe('#getLatest', () => {
+  describe('#findLatestByServiceIdAndDocumentType', () => {
     context('when there are records for the given service', () => {
       let lastSnapshotId;
       let latestRecord;
@@ -538,31 +443,31 @@ describe('GitAdapter', () => {
         const UPDATED_FILE_CONTENT = `${CONTENT} (with additional content to trigger a record)`;
 
         before(async () => {
-          await subject.record({
+          await subject.save(new Record({
             serviceId: SERVICE_PROVIDER_ID,
             documentType: DOCUMENT_TYPE,
             content: CONTENT,
             mimeType: MIME_TYPE,
-          });
+          }));
 
-          ({ id: lastSnapshotId } = await subject.record({
+          ({ id: lastSnapshotId } = await subject.save(new Record({
             serviceId: SERVICE_PROVIDER_ID,
             documentType: DOCUMENT_TYPE,
             content: UPDATED_FILE_CONTENT,
             mimeType: MIME_TYPE,
-          }));
+          })));
 
-          latestRecord = await subject.getLatest(SERVICE_PROVIDER_ID, DOCUMENT_TYPE);
+          latestRecord = await subject.findLatestByServiceIdAndDocumentType(SERVICE_PROVIDER_ID, DOCUMENT_TYPE);
         });
 
-        after(async () => subject._removeAll());
+        after(async () => subject.removeAll());
 
         it('returns the latest record id', () => {
           expect(latestRecord.id).to.include(lastSnapshotId);
         });
 
         it('returns the latest record content', async () => {
-          expect((await latestRecord.content).toString('utf8')).to.equal(UPDATED_FILE_CONTENT);
+          expect((latestRecord.content).toString('utf8')).to.equal(UPDATED_FILE_CONTENT);
         });
 
         it('returns the latest record mime type', () => {
@@ -572,24 +477,24 @@ describe('GitAdapter', () => {
 
       context('with PDF document', () => {
         before(async () => {
-          ({ id: lastSnapshotId } = await subject.record({
+          ({ id: lastSnapshotId } = await subject.save(new Record({
             serviceId: SERVICE_PROVIDER_ID,
             documentType: DOCUMENT_TYPE,
             content: PDF_CONTENT,
             mimeType: PDF_MIME_TYPE,
-          }));
+          })));
 
-          latestRecord = await subject.getLatest(SERVICE_PROVIDER_ID, DOCUMENT_TYPE);
+          latestRecord = await subject.findLatestByServiceIdAndDocumentType(SERVICE_PROVIDER_ID, DOCUMENT_TYPE);
         });
 
-        after(async () => subject._removeAll());
+        after(async () => subject.removeAll());
 
         it('returns the latest record id', () => {
           expect(latestRecord.id).to.include(lastSnapshotId);
         });
 
         it('returns the latest record content', async () => {
-          expect((await latestRecord.content).toString('utf8')).to.equal(PDF_CONTENT);
+          expect((latestRecord.content).toString('utf8')).to.equal(PDF_CONTENT);
         });
 
         it('returns the latest record mime type', () => {
@@ -602,7 +507,7 @@ describe('GitAdapter', () => {
       let latestRecord;
 
       before(async () => {
-        latestRecord = await subject.getLatest(SERVICE_PROVIDER_ID, DOCUMENT_TYPE);
+        latestRecord = await subject.findLatestByServiceIdAndDocumentType(SERVICE_PROVIDER_ID, DOCUMENT_TYPE);
       });
 
       it('returns an empty object', async () => {
@@ -617,29 +522,29 @@ describe('GitAdapter', () => {
     const fetchDates = [];
 
     before(async () => {
-      const { id: id1 } = await subject.record({
+      const { id: id1 } = await subject.save(new Record({
         serviceId: SERVICE_PROVIDER_ID,
         documentType: DOCUMENT_TYPE,
         content: CONTENT,
         fetchDate: FETCH_DATE,
         snapshotId: SNAPSHOT_ID,
         mimeType: MIME_TYPE,
-      });
+      }));
 
       expectedIds.push(id1);
 
-      const { id: id2 } = await subject.record({
+      const { id: id2 } = await subject.save(new Record({
         serviceId: SERVICE_PROVIDER_ID,
         documentType: DOCUMENT_TYPE,
         content: `${CONTENT} - updated`,
         fetchDate: FETCH_DATE_LATER,
         snapshotId: SNAPSHOT_ID,
         mimeType: MIME_TYPE,
-      });
+      }));
 
       expectedIds.push(id2);
 
-      const { id: id3 } = await subject.record({
+      const { id: id3 } = await subject.save(new Record({
         serviceId: SERVICE_PROVIDER_ID,
         documentType: DOCUMENT_TYPE,
         content: `${CONTENT} - updated 2`,
@@ -647,7 +552,7 @@ describe('GitAdapter', () => {
         fetchDate: FETCH_DATE_EARLIER,
         snapshotId: SNAPSHOT_ID,
         mimeType: MIME_TYPE,
-      });
+      }));
 
       expectedIds.push(id3);
 
@@ -657,7 +562,7 @@ describe('GitAdapter', () => {
       }
     });
 
-    after(async () => subject._removeAll());
+    after(async () => subject.removeAll());
 
     it('iterates through all records', async () => {
       expect(ids).to.have.members(expectedIds);

@@ -60,6 +60,14 @@ export default class Git {
     return this.git.push();
   }
 
+  async listCommits(options = []) {
+    return this.log([ '--reverse', '--no-merges', '--name-only', ...options ]);
+  }
+
+  async getCommit(options) {
+    return this.listCommits([ '-1', ...options ]);
+  }
+
   async log(options = {}) {
     try {
       options.file = options.file && this.relativePath(options.file);
@@ -100,6 +108,10 @@ export default class Git {
 
   async getFullHash(shortHash) {
     return (await this.git.show([ shortHash, '--pretty=%H', '-s' ])).trim();
+  }
+
+  async restore(path, commit) {
+    return this.git.raw([ 'restore', '-s', commit, '--', path ]);
   }
 
   relativePath(absolutePath) {
