@@ -5,10 +5,13 @@
 
 import { MongoClient, ObjectId, Binary } from 'mongodb';
 
+import RepositoryInterface from '../repositoryInterface.js';
+
 import DataMapper from './dataMapper.js';
 
-export default class MongoRepository {
+export default class MongoRepository extends RepositoryInterface {
   constructor({ database: databaseName, collection: collectionName, connectionURI }) {
+    super();
     const client = new MongoClient(connectionURI);
 
     this.databaseName = databaseName;

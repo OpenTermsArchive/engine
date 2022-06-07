@@ -8,6 +8,8 @@ import path from 'path';
 
 import mime from 'mime';
 
+import RepositoryInterface from '../repositoryInterface.js';
+
 import DataMapper, { COMMIT_MESSAGE_PREFIXES_REGEXP, COMMIT_MESSAGE_PREFIX } from './dataMapper.js';
 import Git from './git.js';
 
@@ -16,8 +18,9 @@ const PDF_MIME_TYPE = 'application/pdf';
 
 mime.define({ 'text/markdown': ['md'] }, true); // ensure extension for markdown files is `.md` and not `.markdown`
 
-export default class GitRepository {
+export default class GitRepository extends RepositoryInterface {
   constructor({ path, author, publish, prefixMessageToSnapshotId }) {
+    super();
     this.path = path;
     this.needsPublication = publish;
     this.git = new Git({ path: this.path, author });
