@@ -4,75 +4,79 @@ import { fileURLToPath } from 'url';
 
 import chai from 'chai';
 import config from 'config';
-import { MongoClient } from 'mongodb';
+import mime from 'mime';
 
 import Record from '../record.js';
 
-import MongoAdapter from './index.js';
+import Git from './git.js';
+
+import GitRepository from './index.js';
 
 const { expect } = chai;
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-const { connectionURI } = config.get('recorder.snapshots.storage.mongo');
-const client = new MongoClient(connectionURI);
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const RECORDER_PATH = path.resolve(__dirname, '../../../', config.get('recorder.versions.storage.git.path'));
 
 const SERVICE_PROVIDER_ID = 'test_service';
 const DOCUMENT_TYPE = 'Terms of Service';
 const CONTENT = 'ToS fixture data with UTF-8 çhãràčtęrs';
-const MIME_TYPE = 'text/html';
+const EXPECTED_FILE_PATH = `${RECORDER_PATH}/${SERVICE_PROVIDER_ID}/${DOCUMENT_TYPE}.html`;
+const EXPECTED_PDF_FILE_PATH = EXPECTED_FILE_PATH.replace('html', 'pdf');
 const FETCH_DATE = new Date('2000-01-01T12:00:00.000Z');
 const FETCH_DATE_LATER = new Date('2000-01-02T12:00:00.000Z');
 const FETCH_DATE_EARLIER = new Date('2000-01-01T06:00:00.000Z');
-const SNAPSHOT_ID = '61af86dc5ff5caa74ae926ad';
-const PDF_CONTENT = fs.readFileSync(path.resolve(__dirname, '../../../test/fixtures/terms.pdf'));
-const UPDATED_PDF_CONTENT = fs.readFileSync(path.resolve(__dirname, '../../../test/fixtures/termsModified.pdf'));
+const SNAPSHOT_ID = '513fadb2ae415c87747047e33287805d59e2dd55';
+const MIME_TYPE = 'text/html';
+const PDF_CONTENT = fs.readFileSync(path.resolve(__dirname, '../../../test/fixtures/terms.pdf'), { encoding: 'utf8' });
 const PDF_MIME_TYPE = 'application/pdf';
 
-let collection;
+let git;
 
-describe('MongoAdapter', () => {
+describe('GitRepository', () => {
   let subject;
 
   before(async () => {
-    subject = new MongoAdapter(config.get('recorder.snapshots.storage.mongo'));
-    await subject.initialize();
-    await client.connect();
-    const db = client.db(config.get('recorder.snapshots.storage.mongo.database'));
+    git = new Git({
+      path: RECORDER_PATH,
+      author: {
+        name: config.get('recorder.versions.storage.git.author.name'),
+        email: config.get('recorder.versions.storage.git.author.email'),
+      },
+    });
 
-    collection = db.collection(config.get('recorder.snapshots.storage.mongo.collection'));
+    await git.initialize();
+
+    subject = new GitRepository({
+      ...config.get('recorder.versions.storage.git'),
+      path: RECORDER_PATH,
+    });
+
+    return subject.initialize();
   });
 
   describe('#save', () => {
-    let record;
-    let mongoDocument;
+    let id;
+    let commit;
+    let isFirstRecord;
     let numberOfRecordsBefore;
     let numberOfRecordsAfter;
 
     context('when it is the first record', () => {
       before(async () => {
-        numberOfRecordsBefore = await collection.find({
-          serviceId: SERVICE_PROVIDER_ID,
-          documentType: DOCUMENT_TYPE,
-        }).count();
+        numberOfRecordsBefore = (await git.log()).length;
 
-        (record = await subject.save(new Record({
+        ({ id, isFirstRecord } = await subject.save(new Record({
           serviceId: SERVICE_PROVIDER_ID,
           documentType: DOCUMENT_TYPE,
           content: CONTENT,
-          mimeType: MIME_TYPE,
           fetchDate: FETCH_DATE,
           snapshotId: SNAPSHOT_ID,
+          mimeType: MIME_TYPE,
         })));
 
-        numberOfRecordsAfter = await collection.find({
-          serviceId: SERVICE_PROVIDER_ID,
-          documentType: DOCUMENT_TYPE,
-        }).count();
+        numberOfRecordsAfter = (await git.log()).length;
 
-        (mongoDocument = await collection.findOne({
-          serviceId: SERVICE_PROVIDER_ID,
-          documentType: DOCUMENT_TYPE,
-        }));
+        ([commit] = await git.log());
       });
 
       after(async () => subject.removeAll());
@@ -82,40 +86,40 @@ describe('MongoAdapter', () => {
       });
 
       it('returns the record id', () => {
-        expect(mongoDocument._id.toString()).to.equal(record.id);
+        expect(commit.hash).to.include(id);
       });
 
       it('returns a boolean to know if it is the first record', () => {
-        expect(record.isFirstRecord).to.be.true;
+        expect(isFirstRecord).to.be.true;
       });
 
       it('stores the service id', () => {
-        expect(mongoDocument.serviceId).to.include(SERVICE_PROVIDER_ID);
+        expect(commit.message).to.include(SERVICE_PROVIDER_ID);
       });
 
       it('stores the document type', () => {
-        expect(mongoDocument.documentType).to.include(DOCUMENT_TYPE);
+        expect(commit.message).to.include(DOCUMENT_TYPE);
       });
 
       it('stores information that it is the first record for this specific document', () => {
-        expect(mongoDocument.isFirstRecord).to.be.true;
+        expect(commit.message).to.include('Start tracking');
       });
 
       it('stores the proper content', () => {
-        expect(mongoDocument.content).to.equal(CONTENT);
+        expect(fs.readFileSync(EXPECTED_FILE_PATH, { encoding: 'utf8' })).to.equal(CONTENT);
       });
 
       context('when provided', () => {
         it('stores the fetch date', () => {
-          expect(new Date(mongoDocument.fetchDate).getTime()).to.equal(FETCH_DATE.getTime());
+          expect(new Date(commit.date).getTime()).to.equal(FETCH_DATE.getTime());
         });
 
         it('stores the mime type', () => {
-          expect(mongoDocument.mimeType).to.equal(MIME_TYPE);
+          expect(mime.getType(EXPECTED_FILE_PATH)).to.equal(MIME_TYPE);
         });
 
         it('stores the snapshot ID', () => {
-          expect(mongoDocument.snapshotId.toString()).to.include(SNAPSHOT_ID);
+          expect(commit.body).to.include(SNAPSHOT_ID);
         });
       });
     });
@@ -124,38 +128,26 @@ describe('MongoAdapter', () => {
       const UPDATED_CONTENT = `${CONTENT} updated`;
 
       before(async () => {
-        (record = await subject.save(new Record({
+        await subject.save(new Record({
           serviceId: SERVICE_PROVIDER_ID,
           documentType: DOCUMENT_TYPE,
           content: CONTENT,
-          mimeType: MIME_TYPE,
-          fetchDate: FETCH_DATE,
-          snapshotId: SNAPSHOT_ID,
-        })));
+        }));
 
-        numberOfRecordsBefore = await collection.find({
-          serviceId: SERVICE_PROVIDER_ID,
-          documentType: DOCUMENT_TYPE,
-        }).count();
+        numberOfRecordsBefore = (await git.log()).length;
 
-        (record = await subject.save(new Record({
+        ({ id, isFirstRecord } = await subject.save(new Record({
           serviceId: SERVICE_PROVIDER_ID,
           documentType: DOCUMENT_TYPE,
           content: UPDATED_CONTENT,
-          mimeType: MIME_TYPE,
           fetchDate: FETCH_DATE,
           snapshotId: SNAPSHOT_ID,
+          mimeType: MIME_TYPE,
         })));
 
-        numberOfRecordsAfter = await collection.find({
-          serviceId: SERVICE_PROVIDER_ID,
-          documentType: DOCUMENT_TYPE,
-        }).count();
+        numberOfRecordsAfter = (await git.log()).length;
 
-        ([mongoDocument] = await collection.find({
-          serviceId: SERVICE_PROVIDER_ID,
-          documentType: DOCUMENT_TYPE,
-        }).limit(1).sort({ created_at: -1 }).toArray());
+        ([commit] = await git.log());
       });
 
       after(async () => subject.removeAll());
@@ -165,11 +157,11 @@ describe('MongoAdapter', () => {
       });
 
       it('returns the record id', () => {
-        expect(mongoDocument._id.toString()).to.equal(record.id);
+        expect(commit.hash).to.include(id);
       });
 
       it('returns a boolean to know if it is the first record', () => {
-        expect(record.isFirstRecord).to.be.false;
+        expect(isFirstRecord).to.be.false;
       });
     });
 
@@ -180,26 +172,18 @@ describe('MongoAdapter', () => {
           documentType: DOCUMENT_TYPE,
           content: CONTENT,
           mimeType: MIME_TYPE,
-          fetchDate: FETCH_DATE,
         }));
 
-        numberOfRecordsBefore = await collection.find({
-          serviceId: SERVICE_PROVIDER_ID,
-          documentType: DOCUMENT_TYPE,
-        }).count();
+        numberOfRecordsBefore = (await git.log()).length;
 
-        (record = await subject.save(new Record({
+        ({ id, isFirstRecord } = await subject.save(new Record({
           serviceId: SERVICE_PROVIDER_ID,
           documentType: DOCUMENT_TYPE,
           content: CONTENT,
           mimeType: MIME_TYPE,
-          fetchDate: FETCH_DATE_LATER,
         })));
 
-        numberOfRecordsAfter = await collection.find({
-          serviceId: SERVICE_PROVIDER_ID,
-          documentType: DOCUMENT_TYPE,
-        }).count();
+        numberOfRecordsAfter = (await git.log()).length;
       });
 
       after(async () => subject.removeAll());
@@ -209,7 +193,7 @@ describe('MongoAdapter', () => {
       });
 
       it('returns no id', () => {
-        expect(record.id).to.equal(undefined);
+        expect(id).to.equal(undefined);
       });
     });
 
@@ -223,30 +207,21 @@ describe('MongoAdapter', () => {
           content: CONTENT,
         })); // A refilter cannot be the first record
 
-        numberOfRecordsBefore = await collection.find({
-          serviceId: SERVICE_PROVIDER_ID,
-          documentType: DOCUMENT_TYPE,
-        }).count();
+        numberOfRecordsBefore = (await git.log()).length;
 
-        (record = await subject.save(new Record({
+        ({ id, isFirstRecord } = await subject.save(new Record({
           serviceId: SERVICE_PROVIDER_ID,
           documentType: DOCUMENT_TYPE,
           content: REFILTERED_CONTENT,
-          mimeType: MIME_TYPE,
           fetchDate: FETCH_DATE,
-          snapshotId: SNAPSHOT_ID,
           isRefilter: true,
+          snapshotId: SNAPSHOT_ID,
+          mimeType: MIME_TYPE,
         })));
 
-        numberOfRecordsAfter = await collection.find({
-          serviceId: SERVICE_PROVIDER_ID,
-          documentType: DOCUMENT_TYPE,
-        }).count();
+        numberOfRecordsAfter = (await git.log()).length;
 
-        ([mongoDocument] = await collection.find({
-          serviceId: SERVICE_PROVIDER_ID,
-          documentType: DOCUMENT_TYPE,
-        }).limit(1).sort({ created_at: -1 }).toArray());
+        ([commit] = await git.log());
       });
 
       after(async () => subject.removeAll());
@@ -256,41 +231,30 @@ describe('MongoAdapter', () => {
       });
 
       it('returns the record id', () => {
-        expect(mongoDocument._id.toString()).to.equal(record.id);
+        expect(commit.hash).to.include(id);
       });
 
       it('stores information that it is a refilter of this specific document', () => {
-        expect(mongoDocument.isRefilter).to.be.true;
+        expect(commit.message).to.include('Refilter');
       });
     });
 
     context('with PDF document', () => {
       before(async () => {
-        numberOfRecordsBefore = await collection.find({
-          serviceId: SERVICE_PROVIDER_ID,
-          documentType: DOCUMENT_TYPE,
-          content: PDF_CONTENT,
-          mimeType: PDF_MIME_TYPE,
-        }).count();
+        numberOfRecordsBefore = (await git.log()).length;
 
-        (record = await subject.save(new Record({
+        ({ id, isFirstRecord } = await subject.save(new Record({
           serviceId: SERVICE_PROVIDER_ID,
           documentType: DOCUMENT_TYPE,
           content: PDF_CONTENT,
-          mimeType: PDF_MIME_TYPE,
           fetchDate: FETCH_DATE,
           snapshotId: SNAPSHOT_ID,
+          mimeType: PDF_MIME_TYPE,
         })));
 
-        numberOfRecordsAfter = await collection.find({
-          serviceId: SERVICE_PROVIDER_ID,
-          documentType: DOCUMENT_TYPE,
-        }).count();
+        numberOfRecordsAfter = (await git.log()).length;
 
-        (mongoDocument = await collection.findOne({
-          serviceId: SERVICE_PROVIDER_ID,
-          documentType: DOCUMENT_TYPE,
-        }));
+        ([commit] = await git.log());
       });
 
       after(async () => subject.removeAll());
@@ -300,17 +264,15 @@ describe('MongoAdapter', () => {
       });
 
       it('returns the record id', () => {
-        expect(mongoDocument._id.toString()).to.equal(record.id);
+        expect(commit.hash).to.include(id);
       });
 
-      it('stores the proper content', async () => {
-        const isSameContent = Buffer.compare(mongoDocument.content.buffer, PDF_CONTENT) == 0;
-
-        expect(isSameContent).to.be.true;
+      it('stores the proper content', () => {
+        expect(fs.readFileSync(EXPECTED_PDF_FILE_PATH, { encoding: 'utf8' })).to.equal(PDF_CONTENT);
       });
 
       it('stores the mime type', () => {
-        expect(mongoDocument.mimeType).to.equal(PDF_MIME_TYPE);
+        expect(mime.getType(EXPECTED_PDF_FILE_PATH)).to.equal(PDF_MIME_TYPE);
       });
     });
   });
@@ -478,61 +440,21 @@ describe('MongoAdapter', () => {
       let latestRecord;
 
       context('with HTML document', () => {
-        const UPDATED_CONTENT = `${CONTENT} (with additional content to trigger a record)`;
+        const UPDATED_FILE_CONTENT = `${CONTENT} (with additional content to trigger a record)`;
 
         before(async () => {
           await subject.save(new Record({
             serviceId: SERVICE_PROVIDER_ID,
             documentType: DOCUMENT_TYPE,
             content: CONTENT,
-            fetchDate: FETCH_DATE,
-          }));
-
-          ({ id: lastSnapshotId } = await subject.save(new Record({
-            serviceId: SERVICE_PROVIDER_ID,
-            documentType: DOCUMENT_TYPE,
-            content: UPDATED_CONTENT,
             mimeType: MIME_TYPE,
-            fetchDate: FETCH_DATE_LATER,
-          })));
-
-          latestRecord = await subject.findLatestByServiceIdAndDocumentType(
-            SERVICE_PROVIDER_ID,
-            DOCUMENT_TYPE,
-          );
-        });
-
-        after(async () => subject.removeAll());
-
-        it('returns the latest record id', () => {
-          expect(latestRecord.id).to.include(lastSnapshotId);
-        });
-
-        it('returns the latest record content', async () => {
-          expect((await latestRecord.content).toString('utf8')).to.equal(UPDATED_CONTENT);
-        });
-
-        it('returns the latest record mime type', () => {
-          expect(latestRecord.mimeType).to.equal(MIME_TYPE);
-        });
-      });
-
-      context('with PDF document', () => {
-        before(async () => {
-          await subject.save(new Record({
-            serviceId: SERVICE_PROVIDER_ID,
-            documentType: DOCUMENT_TYPE,
-            content: PDF_CONTENT,
-            mimeType: PDF_MIME_TYPE,
-            fetchDate: FETCH_DATE,
           }));
 
           ({ id: lastSnapshotId } = await subject.save(new Record({
             serviceId: SERVICE_PROVIDER_ID,
             documentType: DOCUMENT_TYPE,
-            content: UPDATED_PDF_CONTENT,
-            mimeType: PDF_MIME_TYPE,
-            fetchDate: FETCH_DATE_LATER,
+            content: UPDATED_FILE_CONTENT,
+            mimeType: MIME_TYPE,
           })));
 
           latestRecord = await subject.findLatestByServiceIdAndDocumentType(SERVICE_PROVIDER_ID, DOCUMENT_TYPE);
@@ -545,9 +467,34 @@ describe('MongoAdapter', () => {
         });
 
         it('returns the latest record content', async () => {
-          const isSameContent = Buffer.compare(latestRecord.content, UPDATED_PDF_CONTENT) == 0;
+          expect((latestRecord.content).toString('utf8')).to.equal(UPDATED_FILE_CONTENT);
+        });
 
-          expect(isSameContent).to.be.true;
+        it('returns the latest record mime type', () => {
+          expect(latestRecord.mimeType).to.equal(MIME_TYPE);
+        });
+      });
+
+      context('with PDF document', () => {
+        before(async () => {
+          ({ id: lastSnapshotId } = await subject.save(new Record({
+            serviceId: SERVICE_PROVIDER_ID,
+            documentType: DOCUMENT_TYPE,
+            content: PDF_CONTENT,
+            mimeType: PDF_MIME_TYPE,
+          })));
+
+          latestRecord = await subject.findLatestByServiceIdAndDocumentType(SERVICE_PROVIDER_ID, DOCUMENT_TYPE);
+        });
+
+        after(async () => subject.removeAll());
+
+        it('returns the latest record id', () => {
+          expect(latestRecord.id).to.include(lastSnapshotId);
+        });
+
+        it('returns the latest record content', async () => {
+          expect((latestRecord.content).toString('utf8')).to.equal(PDF_CONTENT);
         });
 
         it('returns the latest record mime type', () => {

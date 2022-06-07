@@ -4,7 +4,7 @@ import { fileURLToPath } from 'url';
 
 import archiver from 'archiver';
 
-import { instantiateVersionsStorageAdapter } from '../../../src/index.js';
+import { instantiateVersionsRepository } from '../../../src/index.js';
 import * as renamer from '../../utils/renamer/index.js';
 import readme from '../assets/README.template.js';
 import logger from '../logger/index.js';
@@ -16,7 +16,7 @@ const fs = fsApi.promises;
 const ARCHIVE_FORMAT = 'zip'; // for supported formats, see https://www.archiverjs.com/docs/archive-formats
 
 export default async function generate({ archivePath, releaseDate }) {
-  const versionsStorageAdapter = await (instantiateVersionsStorageAdapter()).initialize();
+  const versionsRepository = await (instantiateVersionsRepository()).initialize();
 
   const archive = await initializeArchive(archivePath);
 
@@ -28,7 +28,7 @@ export default async function generate({ archivePath, releaseDate }) {
 
   let index = 1;
 
-  for await (const version of versionsStorageAdapter.iterate()) {
+  for await (const version of versionsRepository.iterate()) {
     const { content, fetchDate } = version;
     const { serviceId, documentType } = renamer.applyRules(version.serviceId, version.documentType);
 
@@ -70,7 +70,7 @@ export default async function generate({ archivePath, releaseDate }) {
   archive.stream.finalize();
 
   await archive.done;
-  await versionsStorageAdapter.finalize();
+  await versionsRepository.finalize();
 
   return {
     servicesCount: services.size,

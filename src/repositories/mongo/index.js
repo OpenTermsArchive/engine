@@ -7,14 +7,14 @@ import { MongoClient, ObjectId, Binary } from 'mongodb';
 
 import DataMapper from './dataMapper.js';
 
-export default class MongoAdapter {
+export default class MongoRepository {
   constructor({ database: databaseName, collection: collectionName, connectionURI }) {
     const client = new MongoClient(connectionURI);
 
     this.databaseName = databaseName;
     this.collectionName = collectionName;
     this.client = client;
-    this.dataMapper = new DataMapper({ adapter: this });
+    this.dataMapper = new DataMapper({ repository: this });
   }
 
   async initialize() {

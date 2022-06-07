@@ -4,8 +4,8 @@ import { fileURLToPath } from 'url';
 import config from 'config';
 
 import Recorder from '../../src/archivist/recorder/index.js';
-import Git from '../../src/storage-adapters/git/git.js';
-import GitAdapter from '../../src/storage-adapters/git/index.js';
+import Git from '../../src/repositories/git/git.js';
+import GitRepository from '../../src/repositories/git/index.js';
 import * as renamer from '../utils/renamer/index.js';
 
 import * as initializer from './initializer/index.js';
@@ -50,11 +50,11 @@ let recorder;
   }
 
   recorder = new Recorder({
-    versionsStorageAdapter: new GitAdapter({
+    versionsRepository: new GitRepository({
       ...config.get('recorder.versions.storage.git'),
       path: VERSIONS_TARGET_PATH,
     }),
-    snapshotsStorageAdapter: new GitAdapter({
+    snapshotsRepository: new GitRepository({
       ...config.get('recorder.snapshots.storage.git'),
       path: SNAPSHOTS_TARGET_PATH,
     }),

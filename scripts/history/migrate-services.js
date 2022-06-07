@@ -5,7 +5,7 @@ import { fileURLToPath } from 'url';
 import config from 'config';
 import winston from 'winston';
 
-import GitAdapter from '../../src/storage-adapters/git/index.js';
+import GitRepository from '../../src/repositories/git/index.js';
 
 import { format } from './logger/index.js';
 import { importReadme } from './utils/index.js';
@@ -40,22 +40,22 @@ const COUNTERS = {
     services: CONFIG.servicesToMigrate,
     from: {
       snapshots: {
-        source: new GitAdapter({
+        source: new GitRepository({
           ...config.get('recorder.snapshots.storage.git'),
           path: path.resolve(ROOT_PATH, `./data/${CONFIG.from.snapshots}`),
         }),
-        destination: new GitAdapter({
+        destination: new GitRepository({
           ...config.get('recorder.snapshots.storage.git'),
           path: path.resolve(ROOT_PATH, `./data/${CONFIG.from.snapshots}-migrated`),
         }),
         logger: winston.createLogger({ transports: [ new (winston.transports.File)({ filename: `${__dirname}/logs/${CONFIG.from.snapshots}.log` }), new winston.transports.Console() ], format }),
       },
       versions: {
-        source: new GitAdapter({
+        source: new GitRepository({
           ...config.get('recorder.versions.storage.git'),
           path: path.resolve(ROOT_PATH, `./data/${CONFIG.from.versions}`),
         }),
-        destination: new GitAdapter({
+        destination: new GitRepository({
           ...config.get('recorder.versions.storage.git'),
           path: path.resolve(ROOT_PATH, `./data/${CONFIG.from.versions}-migrated`),
           prefixMessageToSnapshotId: CONFIG.from.prefixMessageToSnapshotId,
@@ -65,22 +65,22 @@ const COUNTERS = {
     },
     to: {
       snapshots: {
-        source: new GitAdapter({
+        source: new GitRepository({
           ...config.get('recorder.snapshots.storage.git'),
           path: path.resolve(ROOT_PATH, `./data/${CONFIG.to.snapshots}`),
         }),
-        destination: new GitAdapter({
+        destination: new GitRepository({
           ...config.get('recorder.snapshots.storage.git'),
           path: path.resolve(ROOT_PATH, `./data/${CONFIG.to.snapshots}-migrated`),
         }),
         logger: winston.createLogger({ transports: [ new (winston.transports.File)({ filename: `${__dirname}/logs/${CONFIG.to.snapshots}.log` }), new winston.transports.Console() ], format }),
       },
       versions: {
-        source: new GitAdapter({
+        source: new GitRepository({
           ...config.get('recorder.versions.storage.git'),
           path: path.resolve(ROOT_PATH, `./data/${CONFIG.to.versions}`),
         }),
-        destination: new GitAdapter({
+        destination: new GitRepository({
           ...config.get('recorder.versions.storage.git'),
           path: path.resolve(ROOT_PATH, `./data/${CONFIG.to.versions}-migrated`),
           prefixMessageToSnapshotId: CONFIG.to.prefixMessageToSnapshotId,
@@ -136,11 +136,11 @@ const COUNTERS = {
   await finalize(migration);
 }());
 
-async function rewriteSnapshots(adapter, records, idsMapping, logger) {
+async function rewriteSnapshots(repository, records, idsMapping, logger) {
   let i = 1;
 
   for (const record of records) {
-    const { id: recordId } = await adapter.record(record); // eslint-disable-line no-await-in-loop
+    const { id: recordId } = await repository.record(record); // eslint-disable-line no-await-in-loop
 
     idsMapping[record.id] = recordId; // Saves the mapping between the old ID and the new one.
 
@@ -154,7 +154,7 @@ async function rewriteSnapshots(adapter, records, idsMapping, logger) {
   }
 }
 
-async function rewriteVersions(adapter, records, idsMapping, logger) {
+async function rewriteVersions(repository, records, idsMapping, logger) {
   let i = 1;
 
   for (const record of records) {
@@ -166,7 +166,7 @@ async function rewriteVersions(adapter, records, idsMapping, logger) {
 
     record.snapshotId = newSnapshotId;
 
-    const { id: recordId } = await adapter.record(record); // eslint-disable-line no-await-in-loop
+    const { id: recordId } = await repository.record(record); // eslint-disable-line no-await-in-loop
 
     if (recordId) {
       logger.info({ message: `Migrated version with new ID: ${recordId}`, serviceId: record.serviceId, type: record.documentType, id: record.id, current: i++, total: records.length });

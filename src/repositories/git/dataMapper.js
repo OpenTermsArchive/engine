@@ -13,14 +13,14 @@ export const COMMIT_MESSAGE_PREFIX = {
 export const COMMIT_MESSAGE_PREFIXES_REGEXP = new RegExp(`^(${COMMIT_MESSAGE_PREFIX.startTracking}|${COMMIT_MESSAGE_PREFIX.refilter}|${COMMIT_MESSAGE_PREFIX.update})`);
 
 export default class GitDataMapper {
-  constructor({ adapter, prefixMessageToSnapshotId }) {
-    this.adapter = adapter;
+  constructor({ repository, prefixMessageToSnapshotId }) {
+    this.repository = repository;
     this.prefixMessageToSnapshotId = prefixMessageToSnapshotId;
   }
 
   async toPersistence(record) {
     if (!record.content) {
-      await this.adapter.loadRecordContent(record);
+      await this.repository.loadRecordContent(record);
     }
 
     const { serviceId, documentType, isRefilter, snapshotId, mimeType, isFirstRecord } = record;
@@ -67,14 +67,14 @@ export default class GitDataMapper {
       isFirstRecord: message.startsWith(COMMIT_MESSAGE_PREFIX.startTracking),
       isRefilter: message.startsWith(COMMIT_MESSAGE_PREFIX.refilter),
       snapshotId: snapshotIdMatch && snapshotIdMatch[0],
-      adapter: this.adapter,
+      repository: this.repository,
     });
 
     if (lazyLoadContent) {
       return record;
     }
 
-    await this.adapter.loadRecordContent(record);
+    await this.repository.loadRecordContent(record);
 
     return record;
   }

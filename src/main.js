@@ -5,7 +5,7 @@ import logger from './logger/index.js';
 import Notifier from './notifier/index.js';
 import Tracker from './tracker/index.js';
 
-import { instantiateVersionsStorageAdapter, instantiateSnapshotsStorageAdapter } from './index.js';
+import { instantiateVersionsRepository, instantiateSnapshotsRepository } from './index.js';
 
 const args = process.argv.slice(2);
 const refilterOnly = args.includes('--refilter-only');
@@ -15,8 +15,8 @@ const extraArgs = args.filter(arg => !arg.startsWith('--'));
 (async function startOpenTermsArchive() {
   const archivist = new Archivist({
     storage: {
-      versions: instantiateVersionsStorageAdapter(),
-      snapshots: instantiateSnapshotsStorageAdapter(),
+      versions: instantiateVersionsRepository(),
+      snapshots: instantiateSnapshotsRepository(),
     },
   });
 

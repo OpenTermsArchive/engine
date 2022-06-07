@@ -5,7 +5,7 @@ import { fileURLToPath } from 'url';
 import config from 'config';
 import { MongoClient } from 'mongodb';
 
-import Git from '../../src/storage-adapters/git/git.js';
+import Git from '../../src/repositories/git/git.js';
 
 import logger from './logger/index.js';
 

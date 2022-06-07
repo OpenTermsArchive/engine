@@ -3,13 +3,13 @@ import { ObjectId } from 'mongodb';
 import Record from '../record.js';
 
 export default class DataMapper {
-  constructor({ adapter }) {
-    this.adapter = adapter;
+  constructor({ repository }) {
+    this.repository = repository;
   }
 
   async toPersistence(record) {
     if (record.content === undefined || record.content === null) {
-      await this.adapter.loadRecordContent(record);
+      await this.repository.loadRecordContent(record);
     }
 
     const { serviceId, documentType, content, mimeType, fetchDate, isRefilter, snapshotId, isFirstRecord } = record;
@@ -57,7 +57,7 @@ export default class DataMapper {
       return record;
     }
 
-    await this.adapter.loadRecordContent(record);
+    await this.repository.loadRecordContent(record);
 
     return record;
   }

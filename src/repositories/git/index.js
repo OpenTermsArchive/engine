@@ -16,12 +16,12 @@ const PDF_MIME_TYPE = 'application/pdf';
 
 mime.define({ 'text/markdown': ['md'] }, true); // ensure extension for markdown files is `.md` and not `.markdown`
 
-export default class GitAdapter {
+export default class GitRepository {
   constructor({ path, author, publish, prefixMessageToSnapshotId }) {
     this.path = path;
     this.needsPublication = publish;
     this.git = new Git({ path: this.path, author });
-    this.dataMapper = new DataMapper({ adapter: this, prefixMessageToSnapshotId });
+    this.dataMapper = new DataMapper({ repository: this, prefixMessageToSnapshotId });
   }
 
   async initialize() {

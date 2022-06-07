@@ -43,7 +43,7 @@ export default class Archivist extends events.EventEmitter {
 
   constructor({ storage: { versions, snapshots } }) {
     super();
-    this.recorder = new Recorder({ versionsStorageAdapter: versions, snapshotsStorageAdapter: snapshots });
+    this.recorder = new Recorder({ versionsRepository: versions, snapshotsRepository: snapshots });
   }
 
   async initialize() {

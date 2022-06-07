@@ -8,8 +8,8 @@ import dircompare from 'dir-compare';
 import mime from 'mime';
 import StreamZip from 'node-stream-zip';
 
-import GitAdapter from '../../../src/storage-adapters/git/index.js';
-import Record from '../../../src/storage-adapters/record.js';
+import GitRepository from '../../../src/repositories/git/index.js';
+import Record from '../../../src/repositories/record.js';
 
 import generateArchive from './index.js';
 
@@ -44,19 +44,19 @@ describe('Export', () => {
     const TMP_PATH = path.resolve(__dirname, './tmp');
     const EXPECTED_DATASET_PATH = path.resolve(__dirname, './test/fixtures/dataset');
 
-    let storageAdapter;
+    let repository;
     let zip;
 
     before(async function () {
       this.timeout(10000);
-      storageAdapter = new GitAdapter({
+      repository = new GitRepository({
         ...config.get('recorder.versions.storage.git'),
         path: path.resolve(__dirname, '../../../', config.get('recorder.versions.storage.git.path')),
       });
 
-      await storageAdapter.initialize();
+      await repository.initialize();
 
-      await storageAdapter.save(new Record({
+      await repository.save(new Record({
         serviceId: FIRST_SERVICE_PROVIDER_ID,
         documentType: FIRST_DOCUMENT_TYPE,
         content: FIRST_CONTENT,
@@ -65,7 +65,7 @@ describe('Export', () => {
         snapshotId: SNAPSHOT_ID,
       }));
 
-      await storageAdapter.save(new Record({
+      await repository.save(new Record({
         serviceId: FIRST_SERVICE_PROVIDER_ID,
         documentType: FIRST_DOCUMENT_TYPE,
         content: SECOND_CONTENT,
@@ -74,7 +74,7 @@ describe('Export', () => {
         snapshotId: SNAPSHOT_ID,
       }));
 
-      await storageAdapter.save(new Record({
+      await repository.save(new Record({
         serviceId: SECOND_SERVICE_PROVIDER_ID,
         documentType: FIRST_DOCUMENT_TYPE,
         content: FIRST_CONTENT,
@@ -83,7 +83,7 @@ describe('Export', () => {
         snapshotId: SNAPSHOT_ID,
       }));
 
-      await storageAdapter.save(new Record({
+      await repository.save(new Record({
         serviceId: SECOND_SERVICE_PROVIDER_ID,
         documentType: SECOND_DOCUMENT_TYPE,
         content: FIRST_CONTENT,
@@ -104,7 +104,7 @@ describe('Export', () => {
 
     after(async () => {
       await fs.rm(TMP_PATH, { recursive: true });
-      await storageAdapter.removeAll();
+      await repository.removeAll();
     });
 
     it('is an archive', () => {

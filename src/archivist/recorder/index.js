@@ -1,25 +1,25 @@
-import Record from '../../storage-adapters/record.js';
+import Record from '../../repositories/record.js';
 
 export default class Recorder {
-  constructor({ versionsStorageAdapter, snapshotsStorageAdapter }) {
-    if (!versionsStorageAdapter || !snapshotsStorageAdapter) {
-      throw new RangeError('Storage adapters should be defined both for versions and snapshots');
+  constructor({ versionsRepository, snapshotsRepository }) {
+    if (!versionsRepository || !snapshotsRepository) {
+      throw new RangeError('Storage repositories should be defined both for versions and snapshots');
     }
 
-    this.versionsStorageAdapter = versionsStorageAdapter;
-    this.snapshotsStorageAdapter = snapshotsStorageAdapter;
+    this.versionsRepository = versionsRepository;
+    this.snapshotsRepository = snapshotsRepository;
   }
 
   async initialize() {
-    return Promise.all([ this.versionsStorageAdapter.initialize(), this.snapshotsStorageAdapter.initialize() ]);
+    return Promise.all([ this.versionsRepository.initialize(), this.snapshotsRepository.initialize() ]);
   }
 
   async finalize() {
-    return Promise.all([ this.versionsStorageAdapter.finalize(), this.snapshotsStorageAdapter.finalize() ]);
+    return Promise.all([ this.versionsRepository.finalize(), this.snapshotsRepository.finalize() ]);
   }
 
   async getLatestSnapshot(serviceId, documentType) {
-    return this.snapshotsStorageAdapter.findLatestByServiceIdAndDocumentType(serviceId, documentType);
+    return this.snapshotsRepository.findLatestByServiceIdAndDocumentType(serviceId, documentType);
   }
 
   async recordSnapshot({ serviceId, documentType, fetchDate, mimeType, content }) {
@@ -43,7 +43,7 @@ export default class Recorder {
       throw new Error('A document mime type is required to ensure data consistency');
     }
 
-    return this.snapshotsStorageAdapter.save(new Record({ serviceId, documentType, fetchDate, mimeType, content }));
+    return this.snapshotsRepository.save(new Record({ serviceId, documentType, fetchDate, mimeType, content }));
   }
 
   async recordVersion({ serviceId, documentType, snapshotId, fetchDate, mimeType, content, isRefilter }) {
@@ -71,7 +71,7 @@ export default class Recorder {
       throw new Error('A document mime type is required to ensure data consistency');
     }
 
-    return this.versionsStorageAdapter.save(new Record({ serviceId, documentType, snapshotId, fetchDate, mimeType, content, isRefilter }));
+    return this.versionsRepository.save(new Record({ serviceId, documentType, snapshotId, fetchDate, mimeType, content, isRefilter }));
   }
 
   async recordRefilter(params) {

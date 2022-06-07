@@ -3,7 +3,7 @@ import { fileURLToPath } from 'url';
 
 import config from 'config';
 
-import GitAdapter from '../../src/storage-adapters/git/index.js';
+import GitRepository from '../../src/repositories/git/index.js';
 
 import logger from './logger/index.js';
 import { importReadme } from './utils/index.js';
@@ -14,35 +14,35 @@ const ROOT_PATH = path.resolve(__dirname, '../../');
 (async function main() {
   console.time('Total time');
 
-  const versionsAdapter = new GitAdapter({
+  const versionsRepository = new GitRepository({
     ...config.get('recorder.versions.storage.git'),
     path: path.resolve(ROOT_PATH, './data/france-elections-versions'),
   });
 
-  const versionsTargetAdapter = new GitAdapter({
+  const versionsTargetRepository = new GitRepository({
     ...config.get('recorder.versions.storage.git'),
     prefixMessageToSnapshotId: 'This version was recorded after filtering snapshot https://github.com/OpenTermsArchive/france-elections-snapshots/commit/',
     path: path.resolve(ROOT_PATH, './data/france-elections-versions-hash-updated-test'),
   });
 
-  const snapshotsAdapter = new GitAdapter({
+  const snapshotsRepository = new GitRepository({
     ...config.get('recorder.snapshots.storage.git'),
     path: path.resolve(ROOT_PATH, './data/france-elections-snapshots'),
   });
 
-  await versionsAdapter.initialize();
-  await versionsTargetAdapter.initialize();
-  await snapshotsAdapter.initialize();
+  await versionsRepository.initialize();
+  await versionsTargetRepository.initialize();
+  await snapshotsRepository.initialize();
 
-  await importReadme({ from: versionsAdapter, to: versionsTargetAdapter });
+  await importReadme({ from: versionsRepository, to: versionsTargetRepository });
 
-  const total = await versionsAdapter.count();
+  const total = await versionsRepository.count();
   let current = 1;
 
-  for await (const record of versionsAdapter.iterate()) {
-    const fullSnapshotId = await snapshotsAdapter.git.getFullHash(record.snapshotId);
+  for await (const record of versionsRepository.iterate()) {
+    const fullSnapshotId = await snapshotsRepository.git.getFullHash(record.snapshotId);
 
-    const { id: recordId } = await versionsTargetAdapter.record({ ...record, snapshotId: fullSnapshotId });
+    const { id: recordId } = await versionsTargetRepository.record({ ...record, snapshotId: fullSnapshotId });
 
     if (!recordId) {
       logger.warn({ message: 'Record skipped', serviceId: record.serviceId, type: record.documentType, id: record.id, current, total });
@@ -53,7 +53,7 @@ const ROOT_PATH = path.resolve(__dirname, '../../');
     current++;
   }
 
-  await versionsAdapter.finalize();
-  await versionsTargetAdapter.finalize();
-  await snapshotsAdapter.finalize();
+  await versionsRepository.finalize();
+  await versionsTargetRepository.finalize();
+  await snapshotsRepository.finalize();
 }());
