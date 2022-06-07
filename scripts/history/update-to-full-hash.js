@@ -42,7 +42,7 @@ const ROOT_PATH = path.resolve(__dirname, '../../');
   for await (const record of versionsRepository.iterate()) {
     const fullSnapshotId = await snapshotsRepository.git.getFullHash(record.snapshotId);
 
-    const { id: recordId } = await versionsTargetRepository.record({ ...record, snapshotId: fullSnapshotId });
+    const { id: recordId } = await versionsTargetRepository.save({ ...record, snapshotId: fullSnapshotId });
 
     if (!recordId) {
       logger.warn({ message: 'Record skipped', serviceId: record.serviceId, type: record.documentType, id: record.id, current, total });
