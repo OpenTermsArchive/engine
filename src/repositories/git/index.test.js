@@ -132,6 +132,8 @@ describe('GitRepository', () => {
           serviceId: SERVICE_PROVIDER_ID,
           documentType: DOCUMENT_TYPE,
           content: CONTENT,
+          mimeType: MIME_TYPE,
+          fetchDate: FETCH_DATE,
         }));
 
         numberOfRecordsBefore = (await git.log()).length;
@@ -172,6 +174,7 @@ describe('GitRepository', () => {
           documentType: DOCUMENT_TYPE,
           content: CONTENT,
           mimeType: MIME_TYPE,
+          fetchDate: FETCH_DATE,
         }));
 
         numberOfRecordsBefore = (await git.log()).length;
@@ -181,6 +184,7 @@ describe('GitRepository', () => {
           documentType: DOCUMENT_TYPE,
           content: CONTENT,
           mimeType: MIME_TYPE,
+          fetchDate: FETCH_DATE,
         })));
 
         numberOfRecordsAfter = (await git.log()).length;
@@ -205,6 +209,8 @@ describe('GitRepository', () => {
           serviceId: SERVICE_PROVIDER_ID,
           documentType: DOCUMENT_TYPE,
           content: CONTENT,
+          mimeType: MIME_TYPE,
+          fetchDate: FETCH_DATE_EARLIER,
         })); // A refilter cannot be the first record
 
         numberOfRecordsBefore = (await git.log()).length;
@@ -448,6 +454,7 @@ describe('GitRepository', () => {
             documentType: DOCUMENT_TYPE,
             content: CONTENT,
             mimeType: MIME_TYPE,
+            fetchDate: FETCH_DATE_EARLIER,
           }));
 
           ({ id: lastSnapshotId } = await subject.save(new Record({
@@ -455,6 +462,7 @@ describe('GitRepository', () => {
             documentType: DOCUMENT_TYPE,
             content: UPDATED_FILE_CONTENT,
             mimeType: MIME_TYPE,
+            fetchDate: FETCH_DATE,
           })));
 
           latestRecord = await subject.findLatestByServiceIdAndDocumentType(SERVICE_PROVIDER_ID, DOCUMENT_TYPE);
@@ -482,6 +490,7 @@ describe('GitRepository', () => {
             documentType: DOCUMENT_TYPE,
             content: PDF_CONTENT,
             mimeType: PDF_MIME_TYPE,
+            fetchDate: FETCH_DATE,
           })));
 
           latestRecord = await subject.findLatestByServiceIdAndDocumentType(SERVICE_PROVIDER_ID, DOCUMENT_TYPE);

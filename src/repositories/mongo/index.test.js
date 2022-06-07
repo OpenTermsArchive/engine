@@ -221,6 +221,8 @@ describe('MongoRepository', () => {
           serviceId: SERVICE_PROVIDER_ID,
           documentType: DOCUMENT_TYPE,
           content: CONTENT,
+          mimeType: MIME_TYPE,
+          fetchDate: FETCH_DATE_EARLIER,
         })); // A refilter cannot be the first record
 
         numberOfRecordsBefore = await collection.find({
@@ -486,6 +488,7 @@ describe('MongoRepository', () => {
             documentType: DOCUMENT_TYPE,
             content: CONTENT,
             fetchDate: FETCH_DATE,
+            mimeType: MIME_TYPE,
           }));
 
           ({ id: lastSnapshotId } = await subject.save(new Record({
