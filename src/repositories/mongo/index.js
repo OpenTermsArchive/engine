@@ -33,54 +33,54 @@ export default class MongoRepository {
   async save(record) {
     const { serviceId, documentType } = record;
 
-    const previousRecord = await this.findLatestByServiceIdAndDocumentType(serviceId, documentType);
-
     if (record.isFirstRecord === undefined || record.isFirstRecord === null) {
       record.isFirstRecord = !await this.collection.findOne({ serviceId, documentType });
     }
 
-    const documentProperties = await this.dataMapper.toPersistence(record);
+    const documentFields = await this.dataMapper.toPersistence(record);
 
-    if (previousRecord && previousRecord.content == documentProperties.content) {
+    const { content: previousRecordContent } = await this.findLatestByServiceIdAndDocumentType(serviceId, documentType);
+
+    if (previousRecordContent == documentFields.content) {
       return {};
     }
 
-    const insertResult = await this.collection.insertOne(documentProperties);
+    const insertResult = await this.collection.insertOne(documentFields);
 
     record.id = insertResult.insertedId.toString();
 
     return record;
   }
 
-  async findLatestByServiceIdAndDocumentType(serviceId, documentType, { lazyLoadContent } = {}) {
+  async findLatestByServiceIdAndDocumentType(serviceId, documentType, { deferContentLoading } = {}) {
     const [mongoDocument] = await this.collection.find({ serviceId, documentType }).limit(1).sort({ fetchDate: -1 }).toArray(); // `findOne` doesn't support the `sort` method, so even for only one document use `find`
 
-    return this.dataMapper.toDomain(mongoDocument, { lazyLoadContent });
+    return this.dataMapper.toDomain(mongoDocument, { deferContentLoading });
   }
 
-  async findById(recordId, { lazyLoadContent } = {}) {
+  async findById(recordId, { deferContentLoading } = {}) {
     const mongoDocument = await this.collection.findOne({ _id: new ObjectId(recordId) });
 
-    return this.dataMapper.toDomain(mongoDocument, { lazyLoadContent });
+    return this.dataMapper.toDomain(mongoDocument, { deferContentLoading });
   }
 
-  async findAll({ lazyLoadContent } = {}) {
+  async findAll({ deferContentLoading } = {}) {
     return Promise.all((await this.collection.find().project({ content: 0 }).sort({ fetchDate: 1 }).toArray())
-      .map(mongoDocument => this.dataMapper.toDomain(mongoDocument, { lazyLoadContent })));
+      .map(mongoDocument => this.dataMapper.toDomain(mongoDocument, { deferContentLoading })));
   }
 
   async count() {
     return this.collection.find().count();
   }
 
-  async* iterate({ lazyLoadContent } = {}) {
+  async* iterate({ deferContentLoading } = {}) {
     const cursor = this.collection.find().sort({ fetchDate: 1 });
 
     /* eslint-disable no-await-in-loop */
     while (await cursor.hasNext()) {
       const mongoDocument = await cursor.next();
 
-      yield this.dataMapper.toDomain(mongoDocument, { lazyLoadContent });
+      yield this.dataMapper.toDomain(mongoDocument, { deferContentLoading });
     }
     /* eslint-enable no-await-in-loop */
   }

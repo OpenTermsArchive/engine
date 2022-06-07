@@ -92,14 +92,14 @@ const COUNTERS = {
 
   await initialize(migration);
 
-  const fromSnapshotsRecords = await (await migration.from.snapshots.source.findAll({ lazyLoadContent: true }));
-  const toSnapshotsRecords = await (await migration.to.snapshots.source.findAll({ lazyLoadContent: true }));
+  const fromSnapshotsRecords = await (await migration.from.snapshots.source.findAll({ deferContentLoading: true }));
+  const toSnapshotsRecords = await (await migration.to.snapshots.source.findAll({ deferContentLoading: true }));
   const snapshotsToMigrate = fromSnapshotsRecords.filter(({ serviceId }) => migration.services.includes(serviceId));
   const fromSnapshotsRecordsToRewrite = fromSnapshotsRecords.filter(({ serviceId }) => !migration.services.includes(serviceId));
   const toSnapshotsRecordsMigrated = [ ...toSnapshotsRecords, ...snapshotsToMigrate ].sort((recordA, recordB) => new Date(recordA.fetchDate) - new Date(recordB.fetchDate));
 
-  const fromVersionsRecords = await (await migration.from.versions.source.findAll({ lazyLoadContent: true }));
-  const toVersionsRecords = await (await migration.to.versions.source.findAll({ lazyLoadContent: true }));
+  const fromVersionsRecords = await (await migration.from.versions.source.findAll({ deferContentLoading: true }));
+  const toVersionsRecords = await (await migration.to.versions.source.findAll({ deferContentLoading: true }));
   const versionsToMigrate = fromVersionsRecords.filter(({ serviceId }) => migration.services.includes(serviceId));
   const fromVersionsRecordsToRewrite = fromVersionsRecords.filter(({ serviceId }) => !migration.services.includes(serviceId));
   const toVersionsRecordsMigrated = [ ...toVersionsRecords, ...versionsToMigrate ].sort((recordA, recordB) => new Date(recordA.fetchDate) - new Date(recordB.fetchDate));

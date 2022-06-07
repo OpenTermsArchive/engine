@@ -58,20 +58,20 @@ export default class GitRepository {
     return this.git.pushChanges();
   }
 
-  async findLatestByServiceIdAndDocumentType(serviceId, documentType, { lazyLoadContent } = {}) {
+  async findLatestByServiceIdAndDocumentType(serviceId, documentType, { deferContentLoading } = {}) {
     const [commit] = await this.git.getCommit([`${serviceId}/${documentType}.*`]);
 
-    return this.dataMapper.toDomain(commit, { lazyLoadContent });
+    return this.dataMapper.toDomain(commit, { deferContentLoading });
   }
 
-  async findById(recordId, { lazyLoadContent } = {}) {
+  async findById(recordId, { deferContentLoading } = {}) {
     const [commit] = await this.git.getCommit([recordId]);
 
-    return this.dataMapper.toDomain(commit, { lazyLoadContent });
+    return this.dataMapper.toDomain(commit, { deferContentLoading });
   }
 
-  async findAll({ lazyLoadContent } = {}) {
-    return Promise.all((await this.#getSortedRecordsRelatedCommits()).map(commit => this.dataMapper.toDomain(commit, { lazyLoadContent })));
+  async findAll({ deferContentLoading } = {}) {
+    return Promise.all((await this.#getSortedRecordsRelatedCommits()).map(commit => this.dataMapper.toDomain(commit, { deferContentLoading })));
   }
 
   async count() {
@@ -82,11 +82,11 @@ export default class GitRepository {
     ])).length;
   }
 
-  async* iterate({ lazyLoadContent } = {}) {
+  async* iterate({ deferContentLoading } = {}) {
     const commits = await this.#getSortedRecordsRelatedCommits();
 
     for (const commit of commits) {
-      yield this.dataMapper.toDomain(commit, { lazyLoadContent });
+      yield this.dataMapper.toDomain(commit, { deferContentLoading });
     }
   }
 

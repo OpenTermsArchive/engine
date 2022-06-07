@@ -11,7 +11,6 @@ export const COMMIT_MESSAGE_PREFIX = {
 };
 
 export const COMMIT_MESSAGE_PREFIXES_REGEXP = new RegExp(`^(${COMMIT_MESSAGE_PREFIX.startTracking}|${COMMIT_MESSAGE_PREFIX.refilter}|${COMMIT_MESSAGE_PREFIX.update})`);
-
 export default class GitDataMapper {
   constructor({ repository, prefixMessageToSnapshotId }) {
     this.repository = repository;
@@ -42,7 +41,7 @@ export default class GitDataMapper {
     };
   }
 
-  async toDomain(commit, { lazyLoadContent } = {}) {
+  async toDomain(commit, { deferContentLoading } = {}) {
     if (!commit) {
       return {};
     }
@@ -67,10 +66,9 @@ export default class GitDataMapper {
       isFirstRecord: message.startsWith(COMMIT_MESSAGE_PREFIX.startTracking),
       isRefilter: message.startsWith(COMMIT_MESSAGE_PREFIX.refilter),
       snapshotId: snapshotIdMatch && snapshotIdMatch[0],
-      repository: this.repository,
     });
 
-    if (lazyLoadContent) {
+    if (deferContentLoading) {
       return record;
     }
 

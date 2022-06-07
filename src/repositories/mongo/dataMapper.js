@@ -14,7 +14,7 @@ export default class DataMapper {
 
     const { serviceId, documentType, content, mimeType, fetchDate, isRefilter, snapshotId, isFirstRecord } = record;
 
-    const recordProperties = Object.fromEntries(Object.entries({
+    const documentFields = Object.fromEntries(Object.entries({
       serviceId,
       documentType,
       content,
@@ -25,17 +25,17 @@ export default class DataMapper {
       isFirstRecord,
     }).filter(([ , value ]) => value)); // Remove empty values
 
-    if (recordProperties.snapshotId) {
-      recordProperties.snapshotId = new ObjectId(snapshotId);
+    if (documentFields.snapshotId) {
+      documentFields.snapshotId = new ObjectId(snapshotId);
     }
 
-    recordProperties.content = record.content;
-    recordProperties.created_at = new Date();
+    documentFields.content = record.content;
+    documentFields.created_at = new Date();
 
-    return recordProperties;
+    return documentFields;
   }
 
-  async toDomain(document, { lazyLoadContent = false } = {}) {
+  async toDomain(document, { deferContentLoading = false } = {}) {
     if (!document || !document._id) {
       return {};
     }
@@ -53,7 +53,7 @@ export default class DataMapper {
       snapshotId: snapshotId && snapshotId.toString(),
     });
 
-    if (lazyLoadContent) {
+    if (deferContentLoading) {
       return record;
     }
 
