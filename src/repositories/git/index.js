@@ -1,5 +1,5 @@
 /**
- * This file is the boundary beyond which the usage of git is abstracted.
+ * This module is the boundary beyond which the usage of git is abstracted.
  * Commit SHAs are used as opaque unique IDs.
  */
 

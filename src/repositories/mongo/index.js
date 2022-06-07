@@ -1,5 +1,5 @@
 /**
- * This file is the boundary beyond which the usage of MongoDB is abstracted.
+ * This module is the boundary beyond which the usage of MongoDB is abstracted.
  * Object IDs are used as opaque unique IDs.
  */
 
