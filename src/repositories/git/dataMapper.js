@@ -4,6 +4,8 @@ import mime from 'mime';
 
 import Record from '../record.js';
 
+mime.define({ 'text/markdown': ['md'] }, true); // ensure extension for markdown files is `.md` and not `.markdown`
+
 export const COMMIT_MESSAGE_PREFIX = {
   startTracking: 'Start tracking',
   refilter: 'Refilter',
