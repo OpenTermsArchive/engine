@@ -440,7 +440,7 @@ describe('GitRepository', () => {
     });
   });
 
-  describe('#findLatestByServiceIdAndDocumentType', () => {
+  describe('#findLatest', () => {
     context('when there are records for the given service', () => {
       let lastSnapshotId;
       let latestRecord;
@@ -465,7 +465,7 @@ describe('GitRepository', () => {
             fetchDate: FETCH_DATE,
           })));
 
-          latestRecord = await subject.findLatestByServiceIdAndDocumentType(SERVICE_PROVIDER_ID, DOCUMENT_TYPE);
+          latestRecord = await subject.findLatest(SERVICE_PROVIDER_ID, DOCUMENT_TYPE);
         });
 
         after(async () => subject.removeAll());
@@ -493,7 +493,7 @@ describe('GitRepository', () => {
             fetchDate: FETCH_DATE,
           })));
 
-          latestRecord = await subject.findLatestByServiceIdAndDocumentType(SERVICE_PROVIDER_ID, DOCUMENT_TYPE);
+          latestRecord = await subject.findLatest(SERVICE_PROVIDER_ID, DOCUMENT_TYPE);
         });
 
         after(async () => subject.removeAll());
@@ -516,7 +516,7 @@ describe('GitRepository', () => {
       let latestRecord;
 
       before(async () => {
-        latestRecord = await subject.findLatestByServiceIdAndDocumentType(SERVICE_PROVIDER_ID, DOCUMENT_TYPE);
+        latestRecord = await subject.findLatest(SERVICE_PROVIDER_ID, DOCUMENT_TYPE);
       });
 
       it('returns an empty object', async () => {

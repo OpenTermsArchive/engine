@@ -61,14 +61,14 @@ export default class GitRepository extends RepositoryInterface {
     return this.git.pushChanges();
   }
 
-  async findLatestByServiceIdAndDocumentType(serviceId, documentType, { deferContentLoading } = {}) {
     const [commit] = await this.git.getCommit([`${serviceId}/${documentType}.*`]);
+  async findLatest(serviceId, documentType) {
 
     return this.#toDomain(commit);
   }
 
-  async findById(recordId, { deferContentLoading } = {}) {
     const [commit] = await this.git.getCommit([recordId]);
+  async findById(recordId) {
 
     return this.#toDomain(commit);
   }
@@ -127,7 +127,7 @@ export default class GitRepository extends RepositoryInterface {
       await this.git.restore(relativeFilePath, record.id); // So, temporarily restore the PDF file to a specific commit
       pdfBuffer = await fs.readFile(`${this.path}/${relativeFilePath}`); // …read the content
     } finally {
-      await this.git.restore(relativeFilePath, 'HEAD'); // …and finally restore the file to its last state.
+      await this.git.restore(relativeFilePath, 'HEAD'); // …and finally restore the file to its last state
     }
 
     record.content = pdfBuffer;

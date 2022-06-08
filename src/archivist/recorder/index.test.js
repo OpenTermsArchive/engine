@@ -111,7 +111,7 @@ describe('Recorder', () => {
               fetchDate: FETCH_DATE,
             }));
 
-            record = await snapshotsRepository.findLatestByServiceIdAndDocumentType(SERVICE_ID, TYPE);
+            record = await snapshotsRepository.findLatest(SERVICE_ID, TYPE);
           });
 
           after(async () => snapshotsRepository.removeAll());
@@ -149,7 +149,7 @@ describe('Recorder', () => {
               fetchDate: FETCH_DATE_LATER,
             }));
 
-            record = await snapshotsRepository.findLatestByServiceIdAndDocumentType(SERVICE_ID, TYPE);
+            record = await snapshotsRepository.findLatest(SERVICE_ID, TYPE);
           });
 
           after(async () => snapshotsRepository.removeAll());
@@ -185,7 +185,7 @@ describe('Recorder', () => {
               fetchDate: FETCH_DATE_LATER,
             }));
 
-            record = await snapshotsRepository.findLatestByServiceIdAndDocumentType(SERVICE_ID, TYPE);
+            record = await snapshotsRepository.findLatest(SERVICE_ID, TYPE);
           });
 
           after(async () => snapshotsRepository.removeAll());
@@ -267,7 +267,7 @@ describe('Recorder', () => {
               fetchDate: FETCH_DATE,
             }));
 
-            record = await versionsRepository.findLatestByServiceIdAndDocumentType(SERVICE_ID, TYPE);
+            record = await versionsRepository.findLatest(SERVICE_ID, TYPE);
           });
 
           after(async () => versionsRepository.removeAll());
@@ -307,7 +307,7 @@ describe('Recorder', () => {
               fetchDate: FETCH_DATE_LATER,
             }));
 
-            record = await versionsRepository.findLatestByServiceIdAndDocumentType(SERVICE_ID, TYPE);
+            record = await versionsRepository.findLatest(SERVICE_ID, TYPE);
           });
 
           after(async () => versionsRepository.removeAll());
@@ -349,7 +349,7 @@ describe('Recorder', () => {
               fetchDate: FETCH_DATE_LATER,
             }));
 
-            record = await versionsRepository.findLatestByServiceIdAndDocumentType(SERVICE_ID, TYPE);
+            record = await versionsRepository.findLatest(SERVICE_ID, TYPE);
           });
 
           after(async () => versionsRepository.removeAll());
@@ -432,7 +432,7 @@ describe('Recorder', () => {
               fetchDate: FETCH_DATE,
             }));
 
-            record = await versionsRepository.findLatestByServiceIdAndDocumentType(SERVICE_ID, TYPE);
+            record = await versionsRepository.findLatest(SERVICE_ID, TYPE);
           });
 
           after(async () => versionsRepository.removeAll()); after(async () => versionsRepository.removeAll());
@@ -472,7 +472,7 @@ describe('Recorder', () => {
               fetchDate: FETCH_DATE_LATER,
             }));
 
-            record = await versionsRepository.findLatestByServiceIdAndDocumentType(SERVICE_ID, TYPE);
+            record = await versionsRepository.findLatest(SERVICE_ID, TYPE);
           });
 
           after(async () => versionsRepository.removeAll());
@@ -514,7 +514,7 @@ describe('Recorder', () => {
               fetchDate: FETCH_DATE_LATER,
             }));
 
-            record = await versionsRepository.findLatestByServiceIdAndDocumentType(SERVICE_ID, TYPE);
+            record = await versionsRepository.findLatest(SERVICE_ID, TYPE);
           });
 
           after(async () => versionsRepository.removeAll());

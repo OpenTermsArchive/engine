@@ -41,7 +41,7 @@ export default class MongoRepository extends RepositoryInterface {
 
     const documentFields = await this.#toPersistence(record);
 
-    const { content: previousRecordContent } = await this.findLatestByServiceIdAndDocumentType(serviceId, documentType);
+    const { content: previousRecordContent } = await this.findLatest(serviceId, documentType);
 
     if (previousRecordContent == documentFields.content) {
       return {};
@@ -54,7 +54,7 @@ export default class MongoRepository extends RepositoryInterface {
     return record;
   }
 
-  async findLatestByServiceIdAndDocumentType(serviceId, documentType, { deferContentLoading } = {}) {
+  async findLatest(serviceId, documentType) {
     const [mongoDocument] = await this.collection.find({ serviceId, documentType }).limit(1).sort({ fetchDate: -1 }).toArray(); // `findOne` doesn't support the `sort` method, so even for only one document use `find`
 
     return this.#toDomain(mongoDocument);

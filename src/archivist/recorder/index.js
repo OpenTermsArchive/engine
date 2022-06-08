@@ -19,7 +19,7 @@ export default class Recorder {
   }
 
   async getLatestSnapshot(serviceId, documentType) {
-    return this.snapshotsRepository.findLatestByServiceIdAndDocumentType(serviceId, documentType);
+    return this.snapshotsRepository.findLatest(serviceId, documentType);
   }
 
   async recordSnapshot({ serviceId, documentType, fetchDate, mimeType, content }) {

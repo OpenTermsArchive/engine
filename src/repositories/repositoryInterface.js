@@ -1,14 +1,12 @@
-/* eslint-disable no-unused-vars, require-yield, class-methods-use-this, no-empty-function */
-
 /**
- * Interface for classes that represent a repository and act like a collection of domain objects with querying capabilities
- *
+ * Interface for classes that model a collection of domain objects with querying capabilities
+ * @see {@link https://martinfowler.com/eaaCatalog/repository.html|Repository}
  * @interface
  */
 export default class RepositoryInterface {
   /**
   * [Optional] Initialize repository
-  * Override this function if the repository needs some asynchronous initialization code (open DB connection and create collections, initializate git repository, …)
+  * Override this method if the repository needs some asynchronous initialization code (open database connection and create collections, initialize Git…)
   *
   * @returns {Promise<Repository>} Promise that will be resolved with the current repository
   */
@@ -16,72 +14,71 @@ export default class RepositoryInterface {
 
   /**
   * [Optional] Finalize repository
-  * Override this function if the repository needs some asynchronous code to properly close the repository (close DB connection, push changes on git remote, …)
+  * Override this method if the repository needs some asynchronous code to properly close the repository (close database connection, push changes on Git remote…)
   *
   * @returns {Promise<Repository>} Promise that will be resolved with the current repository
   */
   async finalize() {}
 
   /**
-  * Save the given record if it's not already exist
+  * Persist the given record if it does not already exist in repository
   *
-  * @param {Record} record - Record to save - @see {@link ./record.js}
-  * @returns {Promise<Record>} Promise that will be resolved with the given record updated with its recorded Id
+  * @param {Record} record - Record to persist
+  * @returns {Promise<Record>} Promise that will be resolved with the given record when it has been persisted
   */
   async save(record) {
-    throw new Error(`#save function is not yet implemented in ${this.constructor.name}`);
+    throw new Error(`#save method is not yet implemented in ${this.constructor.name}`);
   }
 
   /**
-  * Find the latest record that matches given service Id and document type
+  * Find the most recent record that matches the given service ID and document type
   *
-  * @param {string} serviceId - Service Id of record to find
+  * @param {string} serviceId - Service ID of record to find
   * @param {string} documentType - Document type of record to find
-  * @param {boolean} options.deferContentLoading - Enable deferred content loading to improve performance; load content later with #loadRecordContent method
-  * @returns {Promise<Record>} Promise that will be resolved with the found record
+  * @returns {Promise<Record>} Promise that will be resolved with the found record or an empty object if none match the given criteria
   */
-  async findLatestByServiceIdAndDocumentType(serviceId, documentType, { deferContentLoading } = {}) {
-    throw new Error(`#findLatestByServiceIdAndDocumentType function is not yet implemented in ${this.constructor.name}`);
+  async findLatest(serviceId, documentType) {
+    throw new Error(`#findLatest method is not yet implemented in ${this.constructor.name}`);
   }
 
   /**
-  * Find the record for the given record Id
+  * Find the record that matches the given record ID
   *
-  * @param {string} recordId - Record Id of the record to find
-  * @param {boolean} options.deferContentLoading - Enable deferred content loading to improve performance; load content later with #loadRecordContent method
-  * @returns {Promise<Record>} Promise that will be resolved with the found record
+  * @param {string} recordId - Record ID of the record to find
+  * @returns {Promise<Record>} Promise that will be resolved with the found record or an empty object if none match the given ID
   */
-  async findById(recordId, { deferContentLoading } = {}) {
-    throw new Error(`#findById function is not yet implemented in ${this.constructor.name}`);
+  async findById(recordId) {
+    throw new Error(`#findById method is not yet implemented in ${this.constructor.name}`);
   }
 
   /**
   * Find all records
+  * For performance reasons, the content of the records will not be loaded by default. Use #loadRecordContent to load the content of individual records
   *
-  * @param {boolean} options.deferContentLoading - Enable deferred content loading to improve performance; load content later with #loadRecordContent method
-  * @returns {Promise<Array<Record>>} Promise that will be resolved with an array of all found records
+  * @see RepositoryInterface#loadRecordContent
+  * @returns {Promise<Array<Record>>} Promise that will be resolved with an array of all records
   */
-  async findAll({ deferContentLoading } = {}) {
-    throw new Error(`#findAll function is not yet implemented in ${this.constructor.name}`);
+  async findAll() {
+    throw new Error(`#findAll method is not yet implemented in ${this.constructor.name}`);
   }
 
   /**
-  * Count the number of records
+  * Count the total number of records in the repository
+  * For performance reasons, use this method rather than counting the number of entries returned by #findAll if you only need the size of a repository
   *
   * @returns {Promise<number>} Promise that will be resolved with the total number of records
   */
   async count() {
-    throw new Error(`#count function is not yet implemented in ${this.constructor.name}`);
+    throw new Error(`#count method is not yet implemented in ${this.constructor.name}`);
   }
 
   /**
-  * Iterate through all records
+  * Iterate over all records in the repository, from oldest to most recent
   *
-  * @param {boolean} options.deferContentLoading - Enable deferred content loading to improve performance; load content later with #loadRecordContent method
-  * @yields {Record} Next record in the iteration
+  * @yields {Record}
   */
-  async* iterate({ deferContentLoading } = {}) {
-    throw new Error(`#iterate function is not yet implemented in ${this.constructor.name}`);
+  async* iterate() {
+    throw new Error(`#iterate method is not yet implemented in ${this.constructor.name}`);
   }
 
   /**
@@ -90,16 +87,16 @@ export default class RepositoryInterface {
   * @returns {Promise} Promise that will be resolved when all records are removed
   */
   async removeAll() {
-    throw new Error(`#removeAll function is not yet implemented in ${this.constructor.name}`);
+    throw new Error(`#removeAll method is not yet implemented in ${this.constructor.name}`);
   }
 
   /**
-  * Load content in the given record
+  * Load content of the given record
   *
-  * @param {Record} record - Record to load content - @see {@link ./record.js}
-  * @returns {Promise} Promise that will be resolved when the content will be loaded
+  * @param {Record} record - Record of which to populate content
+  * @returns {Promise<Record>} Promise that will be resolved with the given record when its content has been loaded
   */
   async loadRecordContent(record) {
-    throw new Error(`#loadRecordContent function is not yet implemented in ${this.constructor.name}`);
+    throw new Error(`#loadRecordContent method is not yet implemented in ${this.constructor.name}`);
   }
 }

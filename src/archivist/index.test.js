@@ -168,8 +168,8 @@ describe('Archivist', function () {
           await app.initialize();
           await app.trackChanges(serviceIds);
 
-          ({ id: originalSnapshotId } = await snapshotsRepository.findLatestByServiceIdAndDocumentType(SERVICE_A_ID, SERVICE_A_TYPE));
-          ({ id: firstVersionId } = await versionsRepository.findLatestByServiceIdAndDocumentType(SERVICE_A_ID, SERVICE_A_TYPE));
+          ({ id: originalSnapshotId } = await snapshotsRepository.findLatest(SERVICE_A_ID, SERVICE_A_TYPE));
+          ({ id: firstVersionId } = await versionsRepository.findLatest(SERVICE_A_ID, SERVICE_A_TYPE));
 
           serviceBCommits = await gitVersion.log({ file: SERVICE_B_EXPECTED_VERSION_FILE_PATH });
 

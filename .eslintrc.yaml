@@ -106,3 +106,10 @@ overrides:
     rules:
       func-names: 0
       import/no-extraneous-dependencies: 0
+  - files:
+      - src/**/*Interface.js
+    rules:
+      no-unused-vars: 0
+      require-yield: 0
+      class-methods-use-this: 0
+      no-empty-function: 0
