@@ -1,4 +1,4 @@
-import Record from '../../repositories/record.js';
+import Record from './repositories/record.js';
 
 export default class Recorder {
   constructor({ versionsRepository, snapshotsRepository }) {

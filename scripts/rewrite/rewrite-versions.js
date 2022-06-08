@@ -6,9 +6,9 @@ import config from 'config';
 import { InaccessibleContentError } from '../../src/archivist/errors.js';
 import filter from '../../src/archivist/filter/index.js';
 import Recorder from '../../src/archivist/recorder/index.js';
+import Git from '../../src/archivist/recorder/repositories/git/git.js';
+import GitRepository from '../../src/archivist/recorder/repositories/git/index.js';
 import * as services from '../../src/archivist/services/index.js';
-import Git from '../../src/repositories/git/git.js';
-import GitRepository from '../../src/repositories/git/index.js';
 import * as renamer from '../utils/renamer/index.js';
 
 import * as initializer from './initializer/index.js';

@@ -5,7 +5,7 @@ import { fileURLToPath } from 'url';
 import config from 'config';
 import winston from 'winston';
 
-import GitRepository from '../../src/repositories/git/index.js';
+import GitRepository from '../../src/archivist/recorder/repositories/git/index.js';
 
 import { format } from './logger/index.js';
 import { importReadme } from './utils/index.js';

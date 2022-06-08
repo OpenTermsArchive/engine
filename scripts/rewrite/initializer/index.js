@@ -4,7 +4,7 @@ import { fileURLToPath } from 'url';
 
 import config from 'config';
 
-import Git from '../../../src/repositories/git/git.js';
+import Git from '../../../src/archivist/recorder/repositories/git/git.js';
 import { fileExists } from '../utils.js';
 
 const fs = fsApi.promises;

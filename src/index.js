@@ -3,8 +3,8 @@ import { fileURLToPath } from 'url';
 
 import config from 'config';
 
-import GitRepository from './repositories/git/index.js';
-import MongoRepository from './repositories/mongo/index.js';
+import GitRepository from './archivist/recorder/repositories/git/index.js';
+import MongoRepository from './archivist/recorder/repositories/mongo/index.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 

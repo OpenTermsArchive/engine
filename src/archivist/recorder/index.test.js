@@ -4,8 +4,8 @@ import { fileURLToPath } from 'url';
 import chai from 'chai';
 import config from 'config';
 
-import GitRepository from '../../repositories/git/index.js';
-import MongoRepository from '../../repositories/mongo/index.js';
+import GitRepository from './repositories/git/index.js';
+import MongoRepository from './repositories/mongo/index.js';
 
 import Recorder from './index.js';
 

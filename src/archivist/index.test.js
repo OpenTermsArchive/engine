@@ -8,8 +8,8 @@ import nock from 'nock';
 import sinon from 'sinon';
 import sinonChai from 'sinon-chai';
 
-import Git from '../repositories/git/git.js';
-import GitRepository from '../repositories/git/index.js';
+import Git from './recorder/repositories/git/git.js';
+import GitRepository from './recorder/repositories/git/index.js';
 
 import Archivist, { AVAILABLE_EVENTS } from './index.js';
 

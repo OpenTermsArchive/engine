@@ -3,7 +3,7 @@ import { fileURLToPath } from 'url';
 
 import config from 'config';
 
-import GitRepository from '../../src/repositories/git/index.js';
+import GitRepository from '../../src/archivist/recorder/repositories/git/index.js';
 
 import logger from './logger/index.js';
 import { importReadme } from './utils/index.js';
