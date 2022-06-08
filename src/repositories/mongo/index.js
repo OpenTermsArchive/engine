@@ -44,7 +44,7 @@ export default class MongoRepository extends RepositoryInterface {
     const { content: previousRecordContent } = await this.findLatest(serviceId, documentType);
 
     if (previousRecordContent == documentFields.content) {
-      return {};
+      return Object(null);
     }
 
     const insertResult = await this.collection.insertOne(documentFields);
