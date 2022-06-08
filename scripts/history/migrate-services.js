@@ -92,14 +92,14 @@ const COUNTERS = {
 
   await initialize(migration);
 
-  const fromSnapshotsRecords = await (await migration.from.snapshots.source.findAll({ deferContentLoading: true }));
-  const toSnapshotsRecords = await (await migration.to.snapshots.source.findAll({ deferContentLoading: true }));
+  const fromSnapshotsRecords = await migration.from.snapshots.source.findAll();
+  const toSnapshotsRecords = await migration.to.snapshots.source.findAll();
   const snapshotsToMigrate = fromSnapshotsRecords.filter(({ serviceId }) => migration.services.includes(serviceId));
   const fromSnapshotsRecordsToRewrite = fromSnapshotsRecords.filter(({ serviceId }) => !migration.services.includes(serviceId));
   const toSnapshotsRecordsMigrated = [ ...toSnapshotsRecords, ...snapshotsToMigrate ].sort((recordA, recordB) => new Date(recordA.fetchDate) - new Date(recordB.fetchDate));
 
-  const fromVersionsRecords = await (await migration.from.versions.source.findAll({ deferContentLoading: true }));
-  const toVersionsRecords = await (await migration.to.versions.source.findAll({ deferContentLoading: true }));
+  const fromVersionsRecords = await migration.from.versions.source.findAll();
+  const toVersionsRecords = await migration.to.versions.source.findAll();
   const versionsToMigrate = fromVersionsRecords.filter(({ serviceId }) => migration.services.includes(serviceId));
   const fromVersionsRecordsToRewrite = fromVersionsRecords.filter(({ serviceId }) => !migration.services.includes(serviceId));
   const toVersionsRecordsMigrated = [ ...toVersionsRecords, ...versionsToMigrate ].sort((recordA, recordB) => new Date(recordA.fetchDate) - new Date(recordB.fetchDate));
@@ -121,7 +121,7 @@ const COUNTERS = {
 
   await fs.writeFile(path.join(__dirname, 'ids-mapping.json'), JSON.stringify(idsMapping, null, 4));
 
-  console.log('Snapshots-migrated');
+  console.log('Snapshots migrated\n');
 
   await Promise.all([
     rewriteVersions(migration.from.versions.destination, fromVersionsRecordsToRewrite, idsMapping, migration.from.versions.logger),
