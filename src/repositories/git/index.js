@@ -133,7 +133,7 @@ export default class GitRepository extends RepositoryInterface {
     record.content = pdfBuffer;
   }
 
-  async #getSortedRecordsRelatedCommits() {
+  async #getCommits() {
     return (await this.git.listCommits())
       .filter(({ message }) => message.match(COMMIT_MESSAGE_PREFIXES_REGEXP)) // Skip commits which are not a document record (README, LICENSE, …)
       .sort((commitA, commitB) => new Date(commitA.date) - new Date(commitB.date)); // Make sure that the commits are sorted in ascending order
