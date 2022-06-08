@@ -61,14 +61,14 @@ export default class GitRepository extends RepositoryInterface {
     return this.git.pushChanges();
   }
 
-    const [commit] = await this.git.getCommit([`${serviceId}/${documentType}.*`]);
   async findLatest(serviceId, documentType) {
+    const commit = await this.git.getCommit([`${serviceId}/${documentType}.*`]);
 
     return this.#toDomain(commit);
   }
 
-    const [commit] = await this.git.getCommit([recordId]);
   async findById(recordId) {
+    const commit = await this.git.getCommit([recordId]);
 
     return this.#toDomain(commit);
   }

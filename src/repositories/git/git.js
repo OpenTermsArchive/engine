@@ -65,7 +65,9 @@ export default class Git {
   }
 
   async getCommit(options) {
-    return this.listCommits([ '-1', ...options ]);
+    const [commit] = await this.listCommits([ '-1', ...options ]);
+
+    return commit;
   }
 
   async log(options = {}) {
