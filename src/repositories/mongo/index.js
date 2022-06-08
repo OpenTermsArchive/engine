@@ -17,7 +17,6 @@ export default class MongoRepository extends RepositoryInterface {
     this.databaseName = databaseName;
     this.collectionName = collectionName;
     this.client = client;
-    this.dataMapper = new DataMapper({ repository: this });
   }
 
   async initialize() {
@@ -40,7 +39,7 @@ export default class MongoRepository extends RepositoryInterface {
       record.isFirstRecord = !await this.collection.findOne({ serviceId, documentType });
     }
 
-    const documentFields = await this.dataMapper.toPersistence(record);
+    const documentFields = await this.#toPersistence(record);
 
     const { content: previousRecordContent } = await this.findLatestByServiceIdAndDocumentType(serviceId, documentType);
 
@@ -58,32 +57,32 @@ export default class MongoRepository extends RepositoryInterface {
   async findLatestByServiceIdAndDocumentType(serviceId, documentType, { deferContentLoading } = {}) {
     const [mongoDocument] = await this.collection.find({ serviceId, documentType }).limit(1).sort({ fetchDate: -1 }).toArray(); // `findOne` doesn't support the `sort` method, so even for only one document use `find`
 
-    return this.dataMapper.toDomain(mongoDocument, { deferContentLoading });
+    return this.#toDomain(mongoDocument);
   }
 
-  async findById(recordId, { deferContentLoading } = {}) {
+  async findById(recordId) {
     const mongoDocument = await this.collection.findOne({ _id: new ObjectId(recordId) });
 
-    return this.dataMapper.toDomain(mongoDocument, { deferContentLoading });
+    return this.#toDomain(mongoDocument);
   }
 
-  async findAll({ deferContentLoading } = {}) {
+  async findAll() {
     return Promise.all((await this.collection.find().project({ content: 0 }).sort({ fetchDate: 1 }).toArray())
-      .map(mongoDocument => this.dataMapper.toDomain(mongoDocument, { deferContentLoading })));
+      .map(mongoDocument => this.#toDomain(mongoDocument, { deferContentLoading: true })));
   }
 
   async count() {
     return this.collection.find().count();
   }
 
-  async* iterate({ deferContentLoading } = {}) {
+  async* iterate() {
     const cursor = this.collection.find().sort({ fetchDate: 1 });
 
     /* eslint-disable no-await-in-loop */
     while (await cursor.hasNext()) {
       const mongoDocument = await cursor.next();
 
-      yield this.dataMapper.toDomain(mongoDocument, { deferContentLoading });
+      yield this.#toDomain(mongoDocument);
     }
     /* eslint-enable no-await-in-loop */
   }
@@ -96,5 +95,29 @@ export default class MongoRepository extends RepositoryInterface {
     const { content } = await this.collection.findOne({ _id: new ObjectId(record.id) }, { projection: { content: 1 } });
 
     record.content = content instanceof Binary ? content.buffer : content;
+  }
+
+  async #toDomain(document, { deferContentLoading } = {}) {
+    if (!document) {
+      return Object(null);
+    }
+
+    const record = DataMapper.toDomain(document);
+
+    if (deferContentLoading) {
+      return record;
+    }
+
+    await this.loadRecordContent(record);
+
+    return record;
+  }
+
+  async #toPersistence(record) {
+    if (record.content === undefined || record.content === null) {
+      await this.repository.loadRecordContent(record);
+    }
+
+    return DataMapper.toPersistence(record);
   }
 }

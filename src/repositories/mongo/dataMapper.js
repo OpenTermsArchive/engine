@@ -3,15 +3,7 @@ import { ObjectId } from 'mongodb';
 import Record from '../record.js';
 
 export default class DataMapper {
-  constructor({ repository }) {
-    this.repository = repository;
-  }
-
-  async toPersistence(record) {
-    if (record.content === undefined || record.content === null) {
-      await this.repository.loadRecordContent(record);
-    }
-
+  static toPersistence(record) {
     const { serviceId, documentType, content, mimeType, fetchDate, isRefilter, snapshotId, isFirstRecord } = record;
 
     const documentFields = Object.fromEntries(Object.entries({
@@ -35,11 +27,7 @@ export default class DataMapper {
     return documentFields;
   }
 
-  async toDomain(document, { deferContentLoading = false } = {}) {
-    if (!document || !document._id) {
-      return {};
-    }
-
+  static toDomain(document) {
     const { _id, serviceId, documentType, fetchDate, mimeType, isRefilter, isFirstRecord, snapshotId } = document;
 
     const record = new Record({
@@ -52,12 +40,6 @@ export default class DataMapper {
       isRefilter: Boolean(isRefilter),
       snapshotId: snapshotId && snapshotId.toString(),
     });
-
-    if (deferContentLoading) {
-      return record;
-    }
-
-    await this.repository.loadRecordContent(record);
 
     return record;
   }

@@ -24,7 +24,7 @@ export default class GitRepository extends RepositoryInterface {
     this.path = path;
     this.needsPublication = publish;
     this.git = new Git({ path: this.path, author });
-    this.dataMapper = new DataMapper({ repository: this, prefixMessageToSnapshotId });
+    this.prefixMessageToSnapshotId = prefixMessageToSnapshotId;
   }
 
   async initialize() {
@@ -39,7 +39,7 @@ export default class GitRepository extends RepositoryInterface {
     if (record.isFirstRecord === undefined || record.isFirstRecord === null) {
       record.isFirstRecord = await this.#isFirstRecord(serviceId, documentType);
     }
-    const { message, content, fileExtension } = await this.dataMapper.toPersistence(record);
+    const { message, content, fileExtension } = await this.#toPersistence(record);
 
     const filePath = await this.#writeFile({ serviceId, documentType, content, fileExtension });
     const sha = await this.#commit({ filePath, message, date: fetchDate });
@@ -64,17 +64,17 @@ export default class GitRepository extends RepositoryInterface {
   async findLatestByServiceIdAndDocumentType(serviceId, documentType, { deferContentLoading } = {}) {
     const [commit] = await this.git.getCommit([`${serviceId}/${documentType}.*`]);
 
-    return this.dataMapper.toDomain(commit, { deferContentLoading });
+    return this.#toDomain(commit);
   }
 
   async findById(recordId, { deferContentLoading } = {}) {
     const [commit] = await this.git.getCommit([recordId]);
 
-    return this.dataMapper.toDomain(commit, { deferContentLoading });
+    return this.#toDomain(commit);
   }
 
-  async findAll({ deferContentLoading } = {}) {
-    return Promise.all((await this.#getSortedRecordsRelatedCommits()).map(commit => this.dataMapper.toDomain(commit, { deferContentLoading })));
+  async findAll() {
+    return Promise.all((await this.#getCommits()).map(commit => this.#toDomain(commit, { deferContentLoading: true })));
   }
 
   async count() {
@@ -85,11 +85,11 @@ export default class GitRepository extends RepositoryInterface {
     ])).length;
   }
 
-  async* iterate({ deferContentLoading } = {}) {
-    const commits = await this.#getSortedRecordsRelatedCommits();
+  async* iterate() {
+    const commits = await this.#getCommits();
 
     for (const commit of commits) {
-      yield this.dataMapper.toDomain(commit, { deferContentLoading });
+      yield this.#toDomain(commit);
     }
   }
 
@@ -175,5 +175,29 @@ export default class GitRepository extends RepositoryInterface {
 
   async #isFirstRecord(serviceId, documentType) {
     return !await this.#isTracked(serviceId, documentType);
+  }
+
+  async #toDomain(commit, { deferContentLoading } = {}) {
+    if (!commit) {
+      return Object(null);
+    }
+
+    const record = DataMapper.toDomain(commit);
+
+    if (deferContentLoading) {
+      return record;
+    }
+
+    await this.loadRecordContent(record);
+
+    return record;
+  }
+
+  async #toPersistence(record) {
+    if (record.content === undefined || record.content === null) {
+      await this.loadRecordContent(record);
+    }
+
+    return DataMapper.toPersistence(record, this.prefixMessageToSnapshotId);
   }
 }
