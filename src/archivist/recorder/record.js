@@ -1,4 +1,6 @@
 export default class Record {
+  #content;
+
   #REQUIRED_PARAMS = [ 'serviceId', 'documentType', 'mimeType', 'fetchDate' ];
 
   constructor(params) {
@@ -19,8 +21,20 @@ export default class Record {
     }
 
     if (content) {
-      this.content = content;
+      this.#content = content;
     }
+  }
+
+  get content() {
+    if (this.#content === undefined) {
+      throw new Error('Record content not defined, set the content or use Repository#loadRecordContent');
+    }
+
+    return this.#content;
+  }
+
+  set content(content) {
+    this.#content = content;
   }
 
   #validate(givenParams) {
