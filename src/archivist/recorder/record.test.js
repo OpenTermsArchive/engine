@@ -9,22 +9,54 @@ const { expect } = chai;
 describe('Record', () => {
   let repository;
   let record;
+  const REQUIRED_PARAMS = [ 'serviceId', 'documentType', 'mimeType', 'fetchDate' ];
+  const recordParams = {
+    serviceId: 'ServiceA',
+    documentType: 'Terms of Service',
+    mimeType: 'text/html',
+    fetchDate: new Date('2000-01-01T12:00:00.000Z'),
+  };
 
-  before(async () => {
-    repository = await (RepositoryFactory.create(config.get('recorder.versions.storage'))).initialize();
-    await repository.save(new Record({
-      serviceId: 'ServiceA',
-      documentType: 'Terms of Service',
-      mimeType: 'text/html',
-      fetchDate: new Date('2000-01-01T12:00:00.000Z'),
-      content: 'content',
-    }));
-    ([record] = await repository.findAll());
-  });
+  describe('Validation', () => {
+    describe('Required paramaters', () => {
+      REQUIRED_PARAMS.forEach(requiredParam => {
+        describe(`"${requiredParam}"`, () => {
+          context('when it is missing', () => {
+            it('throws an error', async () => {
+              try {
+                const params = {};
 
-  after(async () => {
-    await repository.removeAll();
-    await repository.finalize();
+                Object.keys(recordParams).filter(param => param != requiredParam).forEach(param => {
+                  params[param] = recordParams[param];
+                });
+
+                record = new Record({ ...params });
+              } catch (e) {
+                expect(e).to.be.an('error');
+                expect(e.message).to.have.string(`"${requiredParam}" is required`);
+
+                return;
+              }
+              expect.fail('No error was thrown');
+            });
+          });
+
+          context('when it is null', () => {
+            it('throws an error', async () => {
+              try {
+                record = new Record({ ...recordParams, [requiredParam]: null });
+              } catch (e) {
+                expect(e).to.be.an('error');
+                expect(e.message).to.have.string(`"${requiredParam}" is required`);
+
+                return;
+              }
+              expect.fail('No error was thrown');
+            });
+          });
+        });
+      });
+    });
   });
 
   context('when trying to access content and it is neither defined nor loaded', () => {

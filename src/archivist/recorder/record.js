@@ -39,7 +39,7 @@ export default class Record {
 
   #validate(givenParams) {
     for (const param of this.#REQUIRED_PARAMS) {
-      if (!Object.prototype.hasOwnProperty.call(givenParams, param)) {
+      if (!Object.prototype.hasOwnProperty.call(givenParams, param) || givenParams[param] == null) {
         throw new Error(`"${param}" is required`);
       }
     }
