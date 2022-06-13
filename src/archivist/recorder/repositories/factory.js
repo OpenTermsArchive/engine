@@ -17,7 +17,7 @@ export default class RepositoryFactory {
     case 'mongo':
       return new MongoRepository(params.mongo);
     default:
-      throw new Error(`Unknow storage repository configuration with type: ${params.type}`);
+      throw new Error(`Unknown storage repository configuration for type '${params.type}'`);
     }
   }
 }

@@ -22,7 +22,7 @@ export async function initReadmeAndLicense(targetRepo, targetPath, authorDate) {
   await targetRepo.add(targetReadmeFilePath);
   await targetRepo.add(targetLicenseFilePath);
   await targetRepo.commit({
-    message: 'Add Readme and License',
+    message: 'Add readme and license',
     date: authorDate,
   });
 }
