@@ -1,6 +1,6 @@
 import { ObjectId } from 'mongodb';
 
-import Record from '../record.js';
+import Record from '../../record.js';
 
 export default class DataMapper {
   static toPersistence(record) {

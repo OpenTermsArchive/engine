@@ -1,4 +1,4 @@
-import Record from './repositories/record.js';
+import Record from './record.js';
 import RepositoryFactory from './repositories/factory.js';
 
 export default class Recorder {

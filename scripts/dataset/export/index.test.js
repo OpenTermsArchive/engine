@@ -8,8 +8,8 @@ import dircompare from 'dir-compare';
 import mime from 'mime';
 import StreamZip from 'node-stream-zip';
 
+import Record from '../../../src/archivist/recorder/record.js';
 import GitRepository from '../../../src/archivist/recorder/repositories/git/index.js';
-import Record from '../../../src/archivist/recorder/repositories/record.js';
 
 import generateArchive from './index.js';
 

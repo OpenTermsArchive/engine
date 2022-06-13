@@ -107,7 +107,7 @@ overrides:
       func-names: 0
       import/no-extraneous-dependencies: 0
   - files:
-      - src/**/*Interface.js
+      - src/**/*[iI]nterface.js
     rules:
       no-unused-vars: 0
       require-yield: 0

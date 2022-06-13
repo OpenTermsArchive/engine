@@ -8,7 +8,7 @@ import path from 'path';
 
 import mime from 'mime';
 
-import RepositoryInterface from '../repositoryInterface.js';
+import RepositoryInterface from '../interface.js';
 
 import DataMapper, { COMMIT_MESSAGE_PREFIXES_REGEXP, COMMIT_MESSAGE_PREFIX } from './dataMapper.js';
 import Git from './git.js';

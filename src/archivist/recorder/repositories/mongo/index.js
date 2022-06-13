@@ -5,7 +5,7 @@
 
 import { MongoClient, ObjectId, Binary } from 'mongodb';
 
-import RepositoryInterface from '../repositoryInterface.js';
+import RepositoryInterface from '../interface.js';
 
 import DataMapper from './dataMapper.js';
 

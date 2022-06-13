@@ -6,7 +6,7 @@ import chai from 'chai';
 import config from 'config';
 import { MongoClient } from 'mongodb';
 
-import Record from '../record.js';
+import Record from '../../record.js';
 
 import MongoRepository from './index.js';
 

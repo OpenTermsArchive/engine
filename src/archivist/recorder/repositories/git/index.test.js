@@ -6,7 +6,7 @@ import chai from 'chai';
 import config from 'config';
 import mime from 'mime';
 
-import Record from '../record.js';
+import Record from '../../record.js';
 
 import Git from './git.js';
 
