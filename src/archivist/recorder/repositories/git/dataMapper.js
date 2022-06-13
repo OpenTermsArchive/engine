@@ -13,6 +13,7 @@ export const COMMIT_MESSAGE_PREFIX = {
 };
 
 export const COMMIT_MESSAGE_PREFIXES_REGEXP = new RegExp(`^(${COMMIT_MESSAGE_PREFIX.startTracking}|${COMMIT_MESSAGE_PREFIX.refilter}|${COMMIT_MESSAGE_PREFIX.update})`);
+
 export default class GitDataMapper {
   static toPersistence(record, prefixMessageToSnapshotId) {
     const { serviceId, documentType, isRefilter, snapshotId, mimeType, isFirstRecord } = record;
