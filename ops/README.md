@@ -129,12 +129,29 @@ To avoid breaking the production when making changes, follow this process:
 
 ### Provision a server
 
-If you use [OVH Horizon](https://horizon.cloud.ovh.net/project/instances/), click on the `Launch Instance` button. Then fill in at least the following fields:
+#### With [OVH Horizon](https://horizon.cloud.ovh.net/project/instances/)
+
+Click on the `Launch Instance` button. Then fill in at least the following fields:
 
 - `Instance name`.
 - `Source`. Suggested: `Debian 11`.
 - `Flavor`. Suggested: `b-7-flex`.
 - `Key pair`. Suggested: Your own personal SSH key, to allow you to connect to the freshly created server.
+
+#### Recommended specs
+
+The following setup is sufficient to track 20 services:
+
+- 1 vCore @ 1.8GHz
+- 2 GB RAM
+- 1 MBps bandwidth
+- 20 GB disk space
+
+The major factor for performance is bandwidth.
+
+Disk space is used up linearily with time as the archive grows. The number of services, their frequency of change and the chosen storage mechanism will all influence the speed at which disk space is used. You can start with 20GB but will have to consider expansion in the future. You should be safe for a longer time period with 100GB.
+
+We suggest using a dedicated attached volume for storage, independently from the main VM drive, so that you can more easily upgrade or format it.
 
 ### Add host configuration
 
