@@ -61,7 +61,7 @@ describe('Record', () => {
 
   describe('Content access', () => {
     before(async () => {
-      repository = await (RepositoryFactory.create(config.get('recorder.versions.storage'))).initialize();
+      repository = await RepositoryFactory.create(config.get('recorder.versions.storage')).initialize();
       await repository.save(new Record({
         ...recordParams,
         content: 'content',
