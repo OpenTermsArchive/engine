@@ -8,7 +8,7 @@ const { expect } = chai;
 
 describe('Record', () => {
   let repository;
-  let record;
+  let subject;
   const REQUIRED_PARAMS = [ 'serviceId', 'documentType', 'mimeType', 'fetchDate' ];
   const recordParams = {
     serviceId: 'ServiceA',
@@ -30,7 +30,7 @@ describe('Record', () => {
                   params[param] = recordParams[param];
                 });
 
-                record = new Record({ ...params });
+                subject = new Record({ ...params });
               } catch (e) {
                 expect(e).to.be.an('error');
                 expect(e.message).to.have.string(`"${requiredParam}" is required`);
@@ -44,7 +44,7 @@ describe('Record', () => {
           context('when it is null', () => {
             it('throws an error', async () => {
               try {
-                record = new Record({ ...recordParams, [requiredParam]: null });
+                subject = new Record({ ...recordParams, [requiredParam]: null });
               } catch (e) {
                 expect(e).to.be.an('error');
                 expect(e.message).to.have.string(`"${requiredParam}" is required`);
@@ -66,7 +66,7 @@ describe('Record', () => {
         ...recordParams,
         content: 'content',
       }));
-      ([record] = await repository.findAll());
+      ([subject] = await repository.findAll());
     });
 
     after(async () => {
@@ -77,7 +77,7 @@ describe('Record', () => {
     context('when it is neither defined nor loaded', () => {
       it('throws an error explaining how to recover', async () => {
         try {
-          console.log(record.content);
+          console.log(subject.content);
         } catch (e) {
           expect(e).to.be.an('error');
           expect(e.message).to.have.string('set the content or use Repository#loadRecordContent');
