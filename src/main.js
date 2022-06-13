@@ -1,3 +1,4 @@
+import config from 'config';
 import cron from 'croner';
 
 import Archivist from './archivist/index.js';
@@ -5,20 +6,13 @@ import logger from './logger/index.js';
 import Notifier from './notifier/index.js';
 import Tracker from './tracker/index.js';
 
-import { instantiateVersionsRepository, instantiateSnapshotsRepository } from './index.js';
-
 const args = process.argv.slice(2);
 const refilterOnly = args.includes('--refilter-only');
 const schedule = args.includes('--schedule');
 const extraArgs = args.filter(arg => !arg.startsWith('--'));
 
 (async function startOpenTermsArchive() {
-  const archivist = new Archivist({
-    storage: {
-      versions: instantiateVersionsRepository(),
-      snapshots: instantiateSnapshotsRepository(),
-    },
-  });
+  const archivist = new Archivist(config);
 
   archivist.attach(logger);
 

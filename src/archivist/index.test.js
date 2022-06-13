@@ -9,7 +9,6 @@ import sinon from 'sinon';
 import sinonChai from 'sinon-chai';
 
 import Git from './recorder/repositories/git/git.js';
-import GitRepository from './recorder/repositories/git/index.js';
 
 import Archivist, { AVAILABLE_EVENTS } from './index.js';
 
@@ -27,14 +26,12 @@ const VERSIONS_PATH = path.resolve(ROOT_PATH, config.get('recorder.versions.stor
 const MIME_TYPE = 'text/html';
 const FETCH_DATE = new Date('2000-01-02T12:00:00.000Z');
 
-let snapshotsRepository;
-let versionsRepository;
-
 async function resetGitRepositories() {
-  return Promise.all([ snapshotsRepository.removeAll(), versionsRepository.removeAll() ]);
+  return Promise.all([ app.recorder.snapshotsRepository.removeAll(), app.recorder.versionsRepository.removeAll() ]);
 }
 
 let gitVersion;
+let app;
 
 describe('Archivist', function () {
   this.timeout(10000);
@@ -69,23 +66,13 @@ describe('Archivist', function () {
     serviceAVersionExpectedContent = await fs.readFile(path.resolve(ROOT_PATH, 'test/fixtures/service_A_terms.md'), { encoding: 'utf8' });
     serviceBSnapshotExpectedContent = await fs.readFile(path.resolve(ROOT_PATH, 'test/fixtures/terms.pdf'));
     serviceBVersionExpectedContent = await fs.readFile(path.resolve(ROOT_PATH, 'test/fixtures/termsFromPDF.md'), { encoding: 'utf8' });
-    snapshotsRepository = new GitRepository({
-      ...config.get('recorder.snapshots.storage.git'),
-      path: SNAPSHOTS_PATH,
-    });
-    versionsRepository = new GitRepository({
-      ...config.get('recorder.versions.storage.git'),
-      path: VERSIONS_PATH,
-    });
   });
 
   describe('#trackChanges', () => {
-    let app;
-
     before(async () => {
       nock('https://www.servicea.example').get('/tos').reply(200, serviceASnapshotExpectedContent, { 'Content-Type': 'text/html' });
       nock('https://www.serviceb.example').get('/privacy').reply(200, serviceBSnapshotExpectedContent, { 'Content-Type': 'application/pdf' });
-      app = new Archivist({ storage: { versions: versionsRepository, snapshots: snapshotsRepository } });
+      app = new Archivist(config);
       await app.initialize();
     });
 
@@ -163,13 +150,13 @@ describe('Archivist', function () {
         before(async () => {
           nock('https://www.servicea.example').get('/tos').reply(200, serviceASnapshotExpectedContent, { 'Content-Type': 'text/html' });
           nock('https://www.serviceb.example').get('/privacy').reply(200, serviceBSnapshotExpectedContent, { 'Content-Type': 'application/pdf' });
-          const app = new Archivist({ storage: { versions: versionsRepository, snapshots: snapshotsRepository } });
+          app = new Archivist(config);
 
           await app.initialize();
           await app.trackChanges(serviceIds);
 
-          ({ id: originalSnapshotId } = await snapshotsRepository.findLatest(SERVICE_A_ID, SERVICE_A_TYPE));
-          ({ id: firstVersionId } = await versionsRepository.findLatest(SERVICE_A_ID, SERVICE_A_TYPE));
+          ({ id: originalSnapshotId } = await app.recorder.snapshotsRepository.findLatest(SERVICE_A_ID, SERVICE_A_TYPE));
+          ({ id: firstVersionId } = await app.recorder.versionsRepository.findLatest(SERVICE_A_ID, SERVICE_A_TYPE));
 
           serviceBCommits = await gitVersion.log({ file: SERVICE_B_EXPECTED_VERSION_FILE_PATH });
 
@@ -219,7 +206,7 @@ describe('Archivist', function () {
         before(async () => {
           nock('https://www.servicea.example').get('/tos').reply(200, serviceASnapshotExpectedContent, { 'Content-Type': 'text/html' });
           nock('https://www.serviceb.example').get('/privacy').reply(200, serviceBSnapshotExpectedContent, { 'Content-Type': 'application/pdf' });
-          const app = new Archivist({ storage: { versions: versionsRepository, snapshots: snapshotsRepository } });
+          app = new Archivist(config);
 
           await app.initialize();
           await app.trackChanges(serviceIds);
@@ -265,7 +252,7 @@ describe('Archivist', function () {
     }
 
     before(async () => {
-      app = new Archivist({ storage: { versions: versionsRepository, snapshots: snapshotsRepository } });
+      app = new Archivist(config);
       await app.initialize();
 
       AVAILABLE_EVENTS.forEach(event => {

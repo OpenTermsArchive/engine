@@ -41,9 +41,9 @@ export default class Archivist extends events.EventEmitter {
     return Object.keys(this.services);
   }
 
-  constructor({ storage: { versions, snapshots } }) {
+  constructor(config) {
     super();
-    this.recorder = new Recorder({ versionsRepository: versions, snapshotsRepository: snapshots });
+    this.recorder = new Recorder(config.get('recorder'));
   }
 
   async initialize() {

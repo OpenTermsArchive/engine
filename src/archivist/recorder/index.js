@@ -1,13 +1,10 @@
 import Record from './repositories/record.js';
+import RepositoryFactory from './repositories/factory.js';
 
 export default class Recorder {
-  constructor({ versionsRepository, snapshotsRepository }) {
-    if (!versionsRepository || !snapshotsRepository) {
-      throw new RangeError('Storage repositories should be defined both for versions and snapshots');
-    }
-
-    this.versionsRepository = versionsRepository;
-    this.snapshotsRepository = snapshotsRepository;
+  constructor(config) {
+    this.versionsRepository = RepositoryFactory.create(config.versions.storage);
+    this.snapshotsRepository = RepositoryFactory.create(config.snapshots.storage);
   }
 
   async initialize() {

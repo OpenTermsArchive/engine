@@ -3,8 +3,9 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 
 import archiver from 'archiver';
+import config from 'config';
 
-import { instantiateVersionsRepository } from '../../../src/index.js';
+import RepositoryFactory from '../../../src/archivist/recorder/repositories/factory.js';
 import * as renamer from '../../utils/renamer/index.js';
 import readme from '../assets/README.template.js';
 import logger from '../logger/index.js';
@@ -16,7 +17,7 @@ const fs = fsApi.promises;
 const ARCHIVE_FORMAT = 'zip'; // for supported formats, see https://www.archiverjs.com/docs/archive-formats
 
 export default async function generate({ archivePath, releaseDate }) {
-  const versionsRepository = await (instantiateVersionsRepository()).initialize();
+  const versionsRepository = await (RepositoryFactory.create(config.get('recorder.versions.storage'))).initialize();
 
   const archive = await initializeArchive(archivePath);
 
