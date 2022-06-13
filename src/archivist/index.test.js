@@ -25,13 +25,12 @@ const VERSIONS_PATH = path.resolve(ROOT_PATH, config.get('recorder.versions.stor
 
 const MIME_TYPE = 'text/html';
 const FETCH_DATE = new Date('2000-01-02T12:00:00.000Z');
+let gitVersion;
+let app;
 
 async function resetGitRepositories() {
   return Promise.all([ app.recorder.snapshotsRepository.removeAll(), app.recorder.versionsRepository.removeAll() ]);
 }
-
-let gitVersion;
-let app;
 
 describe('Archivist', function () {
   this.timeout(10000);
