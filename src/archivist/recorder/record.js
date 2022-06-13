@@ -1,10 +1,10 @@
 export default class Record {
   #content;
 
-  #REQUIRED_PARAMS = [ 'serviceId', 'documentType', 'mimeType', 'fetchDate' ];
+  static #REQUIRED_PARAMS = [ 'serviceId', 'documentType', 'mimeType', 'fetchDate' ];
 
   constructor(params) {
-    this.#validate(params);
+    Record.#validate(params);
 
     const { id, serviceId, documentType, mimeType, fetchDate, isFirstRecord, isRefilter, snapshotId, content } = params;
 
@@ -37,8 +37,8 @@ export default class Record {
     this.#content = content;
   }
 
-  #validate(givenParams) {
-    for (const param of this.#REQUIRED_PARAMS) {
+  static #validate(givenParams) {
+    for (const param of Record.#REQUIRED_PARAMS) {
       if (!Object.prototype.hasOwnProperty.call(givenParams, param) || givenParams[param] == null) {
         throw new Error(`"${param}" is required`);
       }
