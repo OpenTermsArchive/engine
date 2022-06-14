@@ -128,7 +128,15 @@ export default class Archivist extends events.EventEmitter {
       }));
     } catch (error) {
       if (error instanceof FetchDocumentError) {
-        throw new InaccessibleContentError(error.message);
+        if (error.message.includes('EAI_AGAIN')) {
+          // EAI_AGAIN is a DNS lookup timed out error, which means it is a network connectivity error or proxy related error.
+          // This operational error is mostly transient and should be handled by retrying the operation.
+          // As there is no retry mechanism in the engine yet, crash the engine and leave it to the process
+          // manager to handle the retries and the delay between them.
+          throw error;
+        } else {
+          throw new InaccessibleContentError(error.message);
+        }
       }
 
       throw error;
