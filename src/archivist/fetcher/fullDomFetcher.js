@@ -1,4 +1,3 @@
-import config from 'config';
 import puppeteer from 'puppeteer';
 import puppeteerExtra from 'puppeteer-extra';
 import stealthPlugin from 'puppeteer-extra-plugin-stealth';
@@ -55,7 +54,7 @@ export default async function fetch(url, cssSelectors, configuration) {
     };
   } catch (error) {
     if (error instanceof puppeteer.errors.TimeoutError) {
-      throw new FetchDocumentError(`Timed out after ${options.navigationTimeout / 1000} seconds when trying to fetch '${url}'`);
+      throw new FetchDocumentError(`Timed out after ${configuration.navigationTimeout / 1000} seconds when trying to fetch '${url}'`);
     }
     throw new FetchDocumentError(error.message);
   } finally {
