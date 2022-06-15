@@ -475,7 +475,7 @@ describe('GitRepository', () => {
         });
 
         it('returns the latest record content', async () => {
-          expect((latestRecord.content).toString('utf8')).to.equal(UPDATED_FILE_CONTENT);
+          expect(latestRecord.content.toString('utf8')).to.equal(UPDATED_FILE_CONTENT);
         });
 
         it('returns the latest record mime type', () => {
@@ -503,7 +503,7 @@ describe('GitRepository', () => {
         });
 
         it('returns the latest record content', async () => {
-          expect((latestRecord.content).toString('utf8')).to.equal(PDF_CONTENT);
+          expect(latestRecord.content.toString('utf8')).to.equal(PDF_CONTENT);
         });
 
         it('returns the latest record mime type', () => {
