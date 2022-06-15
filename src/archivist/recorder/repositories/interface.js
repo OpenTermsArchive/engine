@@ -10,7 +10,9 @@ export default class RepositoryInterface {
   *
   * @returns {Promise<Repository>} Promise that will be resolved with the current repository instance
   */
-  async initialize() {}
+  async initialize() {
+    return this;
+  }
 
   /**
   * [Optional] Finalize repository
@@ -18,7 +20,9 @@ export default class RepositoryInterface {
   *
   * @returns {Promise<Repository>} Promise that will be resolved with the current repository instance
   */
-  async finalize() {}
+  async finalize() {
+    return this;
+  }
 
   /**
   * Persist the given record if it does not already exist in repository
