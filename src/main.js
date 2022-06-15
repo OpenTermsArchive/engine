@@ -12,7 +12,7 @@ const schedule = args.includes('--schedule');
 const extraArgs = args.filter(arg => !arg.startsWith('--'));
 
 (async function startOpenTermsArchive() {
-  const archivist = new Archivist({ recorder: config.get('recorder') });
+  const archivist = new Archivist({ recorderConfig: config.get('recorder') });
 
   archivist.attach(logger);
 

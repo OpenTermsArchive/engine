@@ -71,7 +71,7 @@ describe('Archivist', function () {
     before(async () => {
       nock('https://www.servicea.example').get('/tos').reply(200, serviceASnapshotExpectedContent, { 'Content-Type': 'text/html' });
       nock('https://www.serviceb.example').get('/privacy').reply(200, serviceBSnapshotExpectedContent, { 'Content-Type': 'application/pdf' });
-      app = new Archivist(config);
+      app = new Archivist({ recorderConfig: config.get('recorder') });
       await app.initialize();
     });
 
@@ -149,7 +149,7 @@ describe('Archivist', function () {
         before(async () => {
           nock('https://www.servicea.example').get('/tos').reply(200, serviceASnapshotExpectedContent, { 'Content-Type': 'text/html' });
           nock('https://www.serviceb.example').get('/privacy').reply(200, serviceBSnapshotExpectedContent, { 'Content-Type': 'application/pdf' });
-          app = new Archivist(config);
+          app = new Archivist({ recorderConfig: config.get('recorder') });
 
           await app.initialize();
           await app.trackChanges(serviceIds);
@@ -205,7 +205,7 @@ describe('Archivist', function () {
         before(async () => {
           nock('https://www.servicea.example').get('/tos').reply(200, serviceASnapshotExpectedContent, { 'Content-Type': 'text/html' });
           nock('https://www.serviceb.example').get('/privacy').reply(200, serviceBSnapshotExpectedContent, { 'Content-Type': 'application/pdf' });
-          app = new Archivist(config);
+          app = new Archivist({ recorderConfig: config.get('recorder') });
 
           await app.initialize();
           await app.trackChanges(serviceIds);
@@ -251,7 +251,7 @@ describe('Archivist', function () {
     }
 
     before(async () => {
-      app = new Archivist(config);
+      app = new Archivist({ recorderConfig: config.get('recorder') });
       await app.initialize();
 
       AVAILABLE_EVENTS.forEach(event => {
