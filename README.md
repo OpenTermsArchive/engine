@@ -19,11 +19,11 @@
     - [Core](#core)
   - [Configuring](#configuring)
     - [Configuration file](#configuration-file)
-      - [Storage adapters](#storage-adapters)
+      - [Storage repositories](#storage-repositories)
     - [Environment variables](#environment-variables)
   - [Running](#running)
 - [Deploying](#deploying)
-- [Publishing](#publishing) 
+- [Publishing](#publishing)
 - [Contributing](#contributing)
   - [Adding or updating a service](#adding-a-new-service-or-updating-an-existing-service)
   - [Core engine](#core-engine)
@@ -144,7 +144,7 @@ When refering to the base folder, it means the folder where you will be `git pul
 5. If you are using a special repo instance (e.g., `dating-declarations`), create a new [config file](#configuring), `config/development.json`, and add:
     ```json
     {
-   
+
       "services": {
         "declarationsPath": "../<name of the repo>/declarations"
       }
@@ -185,12 +185,12 @@ The default configuration can be found in `config/default.json`. The full refere
   "recorder": {
     "versions": {
       "storage": {
-        "<storage-adapter>": "Storage adapter configuration object; see below"
+        "<storage-repository>": "Storage repository configuration object; see below"
       }
     },
     "snapshots": {
       "storage": {
-        "<storage-adapter>": "Storage adapter configuration object; see below"
+        "<storage-repository>": "Storage repository configuration object; see below"
       }
     }
   },
@@ -235,9 +235,9 @@ The default configuration is merged with (and overridden by) environment-specifi
 
 If you want to change your local configuration, we suggest you create a `config/development.json` file with overridden values. An example of a production configuration file can be found in `config/production.json`.
 
-##### Storage adapters
+##### Storage repositories
 
-Two storage adapters are currently supported: Git and MongoDB. Each one can be used independently for versions and snapshots.
+Two storage repositories are currently supported: Git and MongoDB. Each one can be used independently for versions and snapshots.
 
 ###### Git
 

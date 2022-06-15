@@ -41,9 +41,9 @@ export default class Archivist extends events.EventEmitter {
     return Object.keys(this.services);
   }
 
-  constructor({ storage: { versions, snapshots } }) {
+  constructor({ recorderConfig }) {
     super();
-    this.recorder = new Recorder({ versionsStorageAdapter: versions, snapshotsStorageAdapter: snapshots });
+    this.recorder = new Recorder(recorderConfig);
   }
 
   async initialize() {
@@ -105,7 +105,7 @@ export default class Archivist extends events.EventEmitter {
 
     await Promise.all([ launchHeadlessBrowser(), this.recorder.initialize() ]);
 
-    this._forEachDocumentOf(servicesIds, documentDeclaration => this.trackDocumentChangesQueue.push(documentDeclaration));
+    this.#forEachDocumentOf(servicesIds, documentDeclaration => this.trackDocumentChangesQueue.push(documentDeclaration));
 
     await this.trackDocumentChangesQueue.drain();
 
@@ -172,7 +172,7 @@ export default class Archivist extends events.EventEmitter {
 
     await this.recorder.initialize();
 
-    this._forEachDocumentOf(servicesIds, documentDeclaration => this.refilterDocumentsQueue.push(documentDeclaration));
+    this.#forEachDocumentOf(servicesIds, documentDeclaration => this.refilterDocumentsQueue.push(documentDeclaration));
 
     await this.refilterDocumentsQueue.drain();
     await this.recorder.finalize();
@@ -202,7 +202,7 @@ export default class Archivist extends events.EventEmitter {
     });
   }
 
-  async _forEachDocumentOf(servicesIds = [], callback) { // eslint-disable-line default-param-last
+  async #forEachDocumentOf(servicesIds = [], callback) { // eslint-disable-line default-param-last
     servicesIds.forEach(serviceId => {
       this.services[serviceId].getDocumentTypes().forEach(documentType => {
         callback(this.services[serviceId].getDocumentDeclaration(documentType));

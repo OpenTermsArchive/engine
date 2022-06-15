@@ -1,7 +1,7 @@
 import fsApi from 'fs';
 import path from 'path';
 
-import simpleGit from 'simple-git';
+import simpleGit from '@opentermsarchive/simple-git';
 
 process.env.LC_ALL = 'en_GB'; // Ensure git messages will be in English as some errors are handled by analysing the message content
 
@@ -32,19 +32,19 @@ export default class Git {
     return this.git.add(this.relativePath(filepath));
   }
 
-  async commit(filepath, message, authorDate) {
-    const options = {};
-
-    if (authorDate) {
-      options['--date'] = new Date(authorDate).toISOString();
-    }
-
+  async commit({ filepath, message, date = new Date() }) {
     let summary;
 
-    if (filepath) {
-      summary = await this.git.commit(message, this.relativePath(filepath), options);
-    } else {
-      summary = await this.git.commit(message, options);
+    try {
+      const commitDate = new Date(date).toISOString();
+
+      process.env.GIT_AUTHOR_DATE = commitDate;
+      process.env.GIT_COMMITTER_DATE = commitDate;
+
+      summary = await this.git.commit(message, filepath);
+    } finally {
+      process.env.GIT_AUTHOR_DATE = '';
+      process.env.GIT_COMMITTER_DATE = '';
     }
 
     if (!summary.commit) { // Nothing committed, no hash to return
@@ -52,13 +52,22 @@ export default class Git {
     }
 
     const shortHash = summary.commit.replace('HEAD ', '').replace('(root-commit) ', '');
-    const longHash = (await this.git.show([ shortHash, '--pretty=%H', '-s' ])).trim();
 
-    return longHash; // Return a long commit hash to always handle ids in the same format and facilitate comparison
+    return this.getFullHash(shortHash); // Return a long commit hash to always handle ids in the same format and facilitate comparison
   }
 
   async pushChanges() {
     return this.git.push();
+  }
+
+  async listCommits(options = []) {
+    return this.log([ '--reverse', '--no-merges', '--name-only', ...options ]);
+  }
+
+  async getCommit(options) {
+    const [commit] = await this.listCommits([ '-1', ...options ]);
+
+    return commit;
   }
 
   async log(options = {}) {
@@ -87,31 +96,24 @@ export default class Git {
     return Boolean(result);
   }
 
-  async findUnique(glob) {
-    const [latestCommit] = await this.log([ '-n', '1', '--stat=4096', glob ]);
-
-    if (!latestCommit) {
-      return {};
-    }
-
-    const filePaths = latestCommit.diff.files.map(file => file.file);
-
-    if (filePaths.length > 1) {
-      throw new Error(`Only one document should have been recorded in ${latestCommit.hash}, but all these documents were recorded: ${filePaths}`);
-    }
-
-    return {
-      commit: latestCommit,
-      filePath: filePaths[0],
-    };
-  }
-
   async checkout(options) {
     return this.git.checkout(options);
   }
 
   async raw(options) {
     return this.git.raw(options);
+  }
+
+  async show(options) {
+    return this.git.show(options);
+  }
+
+  async getFullHash(shortHash) {
+    return (await this.git.show([ shortHash, '--pretty=%H', '-s' ])).trim();
+  }
+
+  async restore(path, commit) {
+    return this.git.raw([ 'restore', '-s', commit, '--', path ]);
   }
 
   relativePath(absolutePath) {

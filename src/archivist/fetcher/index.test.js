@@ -69,7 +69,7 @@ describe('Fetcher', function () {
             expect(content).to.equal(termsHTML);
           });
 
-          it('returns the mime type of the given URL', async () => {
+          it('returns the MIME type of the given URL', async () => {
             expect(mimeType).to.equal('text/html');
           });
 
@@ -82,7 +82,7 @@ describe('Fetcher', function () {
               expect(content).to.equal(termsHTML);
             });
 
-            it('returns the mime type of the given URL', async () => {
+            it('returns the MIME type of the given URL', async () => {
               expect(mimeType).to.equal('text/html');
             });
           });
@@ -99,7 +99,7 @@ describe('Fetcher', function () {
             expect(content).to.equal(termsHTML);
           });
 
-          it('returns the mime type of the given URL', async () => {
+          it('returns the MIME type of the given URL', async () => {
             expect(mimeType).to.equal('text/html');
           });
 
@@ -112,7 +112,7 @@ describe('Fetcher', function () {
               expect(content).to.equal(termsHTML);
             });
 
-            it('returns the mime type of the given URL', async () => {
+            it('returns the MIME type of the given URL', async () => {
               expect(mimeType).to.equal('text/html');
             });
           });

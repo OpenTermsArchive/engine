@@ -8,8 +8,7 @@ import nock from 'nock';
 import sinon from 'sinon';
 import sinonChai from 'sinon-chai';
 
-import Git from '../storage-adapters/git/git.js';
-import GitAdapter from '../storage-adapters/git/index.js';
+import Git from './recorder/repositories/git/git.js';
 
 import Archivist, { AVAILABLE_EVENTS } from './index.js';
 
@@ -26,15 +25,12 @@ const VERSIONS_PATH = path.resolve(ROOT_PATH, config.get('recorder.versions.stor
 
 const MIME_TYPE = 'text/html';
 const FETCH_DATE = new Date('2000-01-02T12:00:00.000Z');
-
-let snapshotsStorageAdapter;
-let versionsStorageAdapter;
+let gitVersion;
+let app;
 
 async function resetGitRepositories() {
-  return Promise.all([ snapshotsStorageAdapter._removeAllRecords(), versionsStorageAdapter._removeAllRecords() ]);
+  return Promise.all([ app.recorder.snapshotsRepository.removeAll(), app.recorder.versionsRepository.removeAll() ]);
 }
-
-let gitVersion;
 
 describe('Archivist', function () {
   this.timeout(10000);
@@ -69,23 +65,13 @@ describe('Archivist', function () {
     serviceAVersionExpectedContent = await fs.readFile(path.resolve(ROOT_PATH, 'test/fixtures/service_A_terms.md'), { encoding: 'utf8' });
     serviceBSnapshotExpectedContent = await fs.readFile(path.resolve(ROOT_PATH, 'test/fixtures/terms.pdf'));
     serviceBVersionExpectedContent = await fs.readFile(path.resolve(ROOT_PATH, 'test/fixtures/termsFromPDF.md'), { encoding: 'utf8' });
-    snapshotsStorageAdapter = new GitAdapter({
-      ...config.get('recorder.snapshots.storage.git'),
-      path: SNAPSHOTS_PATH,
-    });
-    versionsStorageAdapter = new GitAdapter({
-      ...config.get('recorder.versions.storage.git'),
-      path: VERSIONS_PATH,
-    });
   });
 
   describe('#trackChanges', () => {
-    let app;
-
     before(async () => {
       nock('https://www.servicea.example').get('/tos').reply(200, serviceASnapshotExpectedContent, { 'Content-Type': 'text/html' });
       nock('https://www.serviceb.example').get('/privacy').reply(200, serviceBSnapshotExpectedContent, { 'Content-Type': 'application/pdf' });
-      app = new Archivist({ storage: { versions: versionsStorageAdapter, snapshots: snapshotsStorageAdapter } });
+      app = new Archivist({ recorderConfig: config.get('recorder') });
       await app.initialize();
     });
 
@@ -163,13 +149,13 @@ describe('Archivist', function () {
         before(async () => {
           nock('https://www.servicea.example').get('/tos').reply(200, serviceASnapshotExpectedContent, { 'Content-Type': 'text/html' });
           nock('https://www.serviceb.example').get('/privacy').reply(200, serviceBSnapshotExpectedContent, { 'Content-Type': 'application/pdf' });
-          const app = new Archivist({ storage: { versions: versionsStorageAdapter, snapshots: snapshotsStorageAdapter } });
+          app = new Archivist({ recorderConfig: config.get('recorder') });
 
           await app.initialize();
           await app.trackChanges(serviceIds);
 
-          ({ id: originalSnapshotId } = await snapshotsStorageAdapter.getLatestRecord(SERVICE_A_ID, SERVICE_A_TYPE));
-          ({ id: firstVersionId } = await versionsStorageAdapter.getLatestRecord(SERVICE_A_ID, SERVICE_A_TYPE));
+          ({ id: originalSnapshotId } = await app.recorder.snapshotsRepository.findLatest(SERVICE_A_ID, SERVICE_A_TYPE));
+          ({ id: firstVersionId } = await app.recorder.versionsRepository.findLatest(SERVICE_A_ID, SERVICE_A_TYPE));
 
           serviceBCommits = await gitVersion.log({ file: SERVICE_B_EXPECTED_VERSION_FILE_PATH });
 
@@ -219,7 +205,7 @@ describe('Archivist', function () {
         before(async () => {
           nock('https://www.servicea.example').get('/tos').reply(200, serviceASnapshotExpectedContent, { 'Content-Type': 'text/html' });
           nock('https://www.serviceb.example').get('/privacy').reply(200, serviceBSnapshotExpectedContent, { 'Content-Type': 'application/pdf' });
-          const app = new Archivist({ storage: { versions: versionsStorageAdapter, snapshots: snapshotsStorageAdapter } });
+          app = new Archivist({ recorderConfig: config.get('recorder') });
 
           await app.initialize();
           await app.trackChanges(serviceIds);
@@ -265,7 +251,7 @@ describe('Archivist', function () {
     }
 
     before(async () => {
-      app = new Archivist({ storage: { versions: versionsStorageAdapter, snapshots: snapshotsStorageAdapter } });
+      app = new Archivist({ recorderConfig: config.get('recorder') });
       await app.initialize();
 
       AVAILABLE_EVENTS.forEach(event => {

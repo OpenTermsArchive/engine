@@ -1,7 +1,7 @@
 extends:
   - airbnb-base
 parserOptions:
-  ecmaVersion: 2020
+  ecmaVersion: 2022
 env:
   node: true
   mocha: true
@@ -106,3 +106,10 @@ overrides:
     rules:
       func-names: 0
       import/no-extraneous-dependencies: 0
+  - files:
+      - src/**/*[iI]nterface.js
+    rules:
+      no-unused-vars: 0
+      require-yield: 0
+      class-methods-use-this: 0
+      no-empty-function: 0

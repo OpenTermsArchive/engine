@@ -4,7 +4,7 @@ import { fileURLToPath } from 'url';
 
 import config from 'config';
 
-import Git from '../../../src/storage-adapters/git/git.js';
+import Git from '../../../src/archivist/recorder/repositories/git/git.js';
 import { fileExists } from '../utils.js';
 
 const fs = fsApi.promises;
@@ -21,7 +21,10 @@ export async function initReadmeAndLicense(targetRepo, targetPath, authorDate) {
   await fs.copyFile(LICENSE_PATH, targetLicenseFilePath);
   await targetRepo.add(targetReadmeFilePath);
   await targetRepo.add(targetLicenseFilePath);
-  await targetRepo.commit(null, 'Add Readme and License', authorDate);
+  await targetRepo.commit({
+    message: 'Add readme and license',
+    date: authorDate,
+  });
 }
 
 export async function initTargetRepo(targetRepoPath) {

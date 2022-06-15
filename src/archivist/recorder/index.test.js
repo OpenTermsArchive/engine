@@ -1,18 +1,7 @@
-import path from 'path';
-import { fileURLToPath } from 'url';
-
 import chai from 'chai';
 import config from 'config';
 
-import GitAdapter from '../../storage-adapters/git/index.js';
-import MongoAdapter from '../../storage-adapters/mongo/index.js';
-
 import Recorder from './index.js';
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-
-export const SNAPSHOTS_PATH = path.resolve(__dirname, '../../../', config.get('recorder.snapshots.storage.git.path'));
-export const VERSIONS_PATH = path.resolve(__dirname, '../../../', config.get('recorder.versions.storage.git.path'));
 
 const { expect } = chai;
 
@@ -24,25 +13,8 @@ describe('Recorder', () => {
   const SERVICE_ID = 'test_service';
   const TYPE = 'Terms of Service';
 
-  const adaptersTypes = {
-    git: {
-      snapshots: new GitAdapter({
-        ...config.get('recorder.snapshots.storage.git'),
-        path: SNAPSHOTS_PATH,
-      }),
-      versions: new GitAdapter({
-        ...config.get('recorder.versions.storage.git'),
-        path: VERSIONS_PATH,
-      }),
-    },
-    mongo: {
-      snapshots: new MongoAdapter(config.get('recorder.versions.storage.mongo')),
-      versions: new MongoAdapter(config.get('recorder.snapshots.storage.mongo')),
-    },
-  };
-
-  for (const [ adapterName, { versions: versionsAdapter, snapshots: snapshotsAdapter }] of Object.entries(adaptersTypes)) {
-    describe(adapterName, () => {
+  for (const repositoryType of [ 'git', 'mongo' ]) {
+    describe(repositoryType, () => {
       describe('#recordSnapshot', () => {
         const CONTENT = '<html><h1>ToS fixture data with UTF-8 çhãràčtęrs</h1></html>';
         let recorder;
@@ -51,20 +23,19 @@ describe('Recorder', () => {
         let record;
 
         before(async () => {
-          recorder = new Recorder({
-            versionsStorageAdapter: versionsAdapter,
-            snapshotsStorageAdapter: snapshotsAdapter,
-          });
+          const options = config.util.cloneDeep(config.recorder);
+
+          options.versions.storage.type = repositoryType;
+          options.snapshots.storage.type = repositoryType;
+
+          recorder = new Recorder(options);
           await recorder.initialize();
         });
 
-        after(async () => {
-          await snapshotsAdapter._removeAllRecords();
-          await recorder.finalize();
-        });
+        after(async () => recorder.finalize());
 
         context('when a required param is missing', () => {
-          after(async () => snapshotsAdapter._removeAllRecords());
+          after(async () => recorder.snapshotsRepository.removeAll());
 
           const validParams = {
             serviceId: SERVICE_ID,
@@ -111,13 +82,13 @@ describe('Recorder', () => {
               fetchDate: FETCH_DATE,
             }));
 
-            record = await snapshotsAdapter.getLatestRecord(SERVICE_ID, TYPE);
+            record = await recorder.snapshotsRepository.findLatest(SERVICE_ID, TYPE);
           });
 
-          after(async () => snapshotsAdapter._removeAllRecords());
+          after(async () => recorder.snapshotsRepository.removeAll());
 
           it('records the document with the proper content', async () => {
-            expect(record.content).to.equal(CONTENT);
+            expect(await record.content).to.equal(CONTENT);
           });
 
           it('returns the record id', async () => {
@@ -149,13 +120,13 @@ describe('Recorder', () => {
               fetchDate: FETCH_DATE_LATER,
             }));
 
-            record = await snapshotsAdapter.getLatestRecord(SERVICE_ID, TYPE);
+            record = await recorder.snapshotsRepository.findLatest(SERVICE_ID, TYPE);
           });
 
-          after(async () => snapshotsAdapter._removeAllRecords());
+          after(async () => recorder.snapshotsRepository.removeAll());
 
           it('records the document with the proper content', async () => {
-            expect(record.content).to.equal(UPDATED_CONTENT);
+            expect(await record.content).to.equal(UPDATED_CONTENT);
           });
 
           it('returns the record id', async () => {
@@ -185,10 +156,10 @@ describe('Recorder', () => {
               fetchDate: FETCH_DATE_LATER,
             }));
 
-            record = await snapshotsAdapter.getLatestRecord(SERVICE_ID, TYPE);
+            record = await recorder.snapshotsRepository.findLatest(SERVICE_ID, TYPE);
           });
 
-          after(async () => snapshotsAdapter._removeAllRecords());
+          after(async () => recorder.snapshotsRepository.removeAll());
 
           it('does not record the document', async () => {
             expect(id).to.not.be.ok;
@@ -205,19 +176,14 @@ describe('Recorder', () => {
         let record;
 
         before(async () => {
-          recorder = new Recorder({
-            versionsStorageAdapter: versionsAdapter,
-            snapshotsStorageAdapter: snapshotsAdapter,
-          });
+          recorder = new Recorder(config.get('recorder'));
           await recorder.initialize();
         });
 
-        after(async () => {
-          await recorder.finalize();
-        });
+        after(async () => recorder.finalize());
 
         context('when a required param is missing', () => {
-          after(async () => versionsAdapter._removeAllRecords());
+          after(async () => recorder.versionsRepository.removeAll());
 
           const validParams = {
             serviceId: SERVICE_ID,
@@ -267,13 +233,13 @@ describe('Recorder', () => {
               fetchDate: FETCH_DATE,
             }));
 
-            record = await versionsAdapter.getLatestRecord(SERVICE_ID, TYPE);
+            record = await recorder.versionsRepository.findLatest(SERVICE_ID, TYPE);
           });
 
-          after(async () => versionsAdapter._removeAllRecords());
+          after(async () => recorder.versionsRepository.removeAll());
 
           it('records the document with the proper content', async () => {
-            expect(record.content).to.equal(CONTENT);
+            expect(await record.content).to.equal(CONTENT);
           });
 
           it('returns the record id', async () => {
@@ -307,13 +273,13 @@ describe('Recorder', () => {
               fetchDate: FETCH_DATE_LATER,
             }));
 
-            record = await versionsAdapter.getLatestRecord(SERVICE_ID, TYPE);
+            record = await recorder.versionsRepository.findLatest(SERVICE_ID, TYPE);
           });
 
-          after(async () => versionsAdapter._removeAllRecords());
+          after(async () => recorder.versionsRepository.removeAll());
 
           it('records the document with the proper content', async () => {
-            expect(record.content).to.equal(UPDATED_CONTENT);
+            expect(await record.content).to.equal(UPDATED_CONTENT);
           });
 
           it('records in the document that it is not a refilter', async () => {
@@ -349,10 +315,10 @@ describe('Recorder', () => {
               fetchDate: FETCH_DATE_LATER,
             }));
 
-            record = await versionsAdapter.getLatestRecord(SERVICE_ID, TYPE);
+            record = await recorder.versionsRepository.findLatest(SERVICE_ID, TYPE);
           });
 
-          after(async () => versionsAdapter._removeAllRecords());
+          after(async () => recorder.versionsRepository.removeAll());
 
           it('does not record the document', async () => {
             expect(id).to.not.be.ok;
@@ -369,20 +335,14 @@ describe('Recorder', () => {
         let record;
 
         before(async () => {
-          recorder = new Recorder({
-            versionsStorageAdapter: versionsAdapter,
-            snapshotsStorageAdapter: snapshotsAdapter,
-          });
+          recorder = new Recorder(config.get('recorder'));
           await recorder.initialize();
         });
 
-        after(async () => {
-          await versionsAdapter._removeAllRecords();
-          await recorder.finalize();
-        });
+        after(async () => recorder.finalize());
 
         context('when a required param is missing', () => {
-          after(async () => versionsAdapter._removeAllRecords());
+          after(async () => recorder.versionsRepository.removeAll());
 
           const validParams = {
             serviceId: SERVICE_ID,
@@ -432,13 +392,13 @@ describe('Recorder', () => {
               fetchDate: FETCH_DATE,
             }));
 
-            record = await versionsAdapter.getLatestRecord(SERVICE_ID, TYPE);
+            record = await recorder.versionsRepository.findLatest(SERVICE_ID, TYPE);
           });
 
-          after(async () => versionsAdapter._removeAllRecords()); after(async () => versionsAdapter._removeAllRecords());
+          after(async () => recorder.versionsRepository.removeAll()); after(async () => recorder.versionsRepository.removeAll());
 
           it('records the document with the proper content', async () => {
-            expect(record.content).to.equal(CONTENT);
+            expect(await record.content).to.equal(CONTENT);
           });
 
           it('returns the record id', async () => {
@@ -472,13 +432,13 @@ describe('Recorder', () => {
               fetchDate: FETCH_DATE_LATER,
             }));
 
-            record = await versionsAdapter.getLatestRecord(SERVICE_ID, TYPE);
+            record = await recorder.versionsRepository.findLatest(SERVICE_ID, TYPE);
           });
 
-          after(async () => versionsAdapter._removeAllRecords());
+          after(async () => recorder.versionsRepository.removeAll());
 
           it('records the document with the proper content', async () => {
-            expect(record.content).to.equal(UPDATED_CONTENT);
+            expect(await record.content).to.equal(UPDATED_CONTENT);
           });
 
           it('records in the document that it is a refilter', async () => {
@@ -514,10 +474,10 @@ describe('Recorder', () => {
               fetchDate: FETCH_DATE_LATER,
             }));
 
-            record = await versionsAdapter.getLatestRecord(SERVICE_ID, TYPE);
+            record = await recorder.versionsRepository.findLatest(SERVICE_ID, TYPE);
           });
 
-          after(async () => versionsAdapter._removeAllRecords());
+          after(async () => recorder.versionsRepository.removeAll());
 
           it('does not record the document', async () => {
             expect(id).to.not.be.ok;
