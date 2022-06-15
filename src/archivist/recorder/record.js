@@ -6,22 +6,10 @@ export default class Record {
   constructor(params) {
     Record.#validate(params);
 
-    const { id, serviceId, documentType, mimeType, fetchDate, isFirstRecord, isRefilter, snapshotId, content } = params;
+    Object.assign(this, Object.fromEntries(Object.entries(params)));
 
-    this.serviceId = serviceId;
-    this.documentType = documentType;
-    this.mimeType = mimeType;
-    this.fetchDate = fetchDate;
-    this.isFirstRecord = isFirstRecord;
-    this.isRefilter = isRefilter;
-    this.snapshotId = snapshotId;
-
-    if (id) {
-      this.id = id;
-    }
-
-    if (content) {
-      this.#content = content;
+    if (params.content) {
+      this.#content = params.content;
     }
   }
 
