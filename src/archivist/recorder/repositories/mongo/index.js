@@ -7,7 +7,7 @@ import { MongoClient, ObjectId, Binary } from 'mongodb';
 
 import RepositoryInterface from '../interface.js';
 
-import DataMapper from './dataMapper.js';
+import * as DataMapper from './dataMapper.js';
 
 export default class MongoRepository extends RepositoryInterface {
   constructor({ database: databaseName, collection: collectionName, connectionURI }) {
