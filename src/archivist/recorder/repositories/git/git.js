@@ -51,7 +51,7 @@ export default class Git {
       return;
     }
 
-    return summary.commit.replace('HEAD ', '').replace('(root-commit) ', '');
+    return summary.commit;
   }
 
   async pushChanges() {
