@@ -114,7 +114,7 @@ describe('GitRepository', () => {
           expect(new Date(commit.date).getTime()).to.equal(FETCH_DATE.getTime());
         });
 
-        it('stores the mime type', () => {
+        it('stores the MIME type', () => {
           expect(mime.getType(EXPECTED_FILE_PATH)).to.equal(MIME_TYPE);
         });
 
@@ -277,7 +277,7 @@ describe('GitRepository', () => {
         expect(fs.readFileSync(EXPECTED_PDF_FILE_PATH, { encoding: 'utf8' })).to.equal(PDF_CONTENT);
       });
 
-      it('stores the mime type', () => {
+      it('stores the MIME type', () => {
         expect(mime.getType(EXPECTED_PDF_FILE_PATH)).to.equal(PDF_MIME_TYPE);
       });
     });
@@ -326,7 +326,7 @@ describe('GitRepository', () => {
       expect(new Date(record.fetchDate).getTime()).to.equal(FETCH_DATE.getTime());
     });
 
-    it('stores the mime type', () => {
+    it('stores the MIME type', () => {
       expect(record.mimeType).to.equal(MIME_TYPE);
     });
 
@@ -334,7 +334,7 @@ describe('GitRepository', () => {
       expect(record.snapshotId).to.equal(SNAPSHOT_ID);
     });
 
-    context('when requested record does not exists', () => {
+    context('when requested record does not exist', () => {
       it('returns an empty object', async () => {
         expect(await subject.findById('inexistantID')).to.deep.equal({});
       });

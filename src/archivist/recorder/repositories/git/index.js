@@ -119,15 +119,15 @@ export default class GitRepository extends RepositoryInterface {
       return;
     }
 
-    // In case of PDF, `git show` cannot be used as it converts PDF binary into string which not retain the original binary representation
+    // In case of PDF files, `git show` cannot be used as it converts PDF binary into strings that do not retain the original binary representation
     // It is impossible to restore the original binary data from the resulting string
     let pdfBuffer;
 
     try {
-      await this.git.restore(relativeFilePath, record.id); // So, temporarily restore the PDF file to a specific commit
+      await this.git.restore(relativeFilePath, record.id); // Temporarily restore the PDF file to a specific commit
       pdfBuffer = await fs.readFile(`${this.path}/${relativeFilePath}`); // …read the content
     } finally {
-      await this.git.restore(relativeFilePath, 'HEAD'); // …and finally restore the file to its last state
+      await this.git.restore(relativeFilePath, 'HEAD'); // …and finally restore the file to its most recent state
     }
 
     record.content = pdfBuffer;
@@ -135,8 +135,8 @@ export default class GitRepository extends RepositoryInterface {
 
   async #getCommits() {
     return (await this.git.listCommits())
-      .filter(({ message }) => message.match(DataMapper.COMMIT_MESSAGE_PREFIXES_REGEXP)) // Skip commits which are not a document record (README, LICENSE, …)
-      .sort((commitA, commitB) => new Date(commitA.date) - new Date(commitB.date)); // Make sure that the commits are sorted in ascending order
+      .filter(({ message }) => message.match(DataMapper.COMMIT_MESSAGE_PREFIXES_REGEXP)) // Skip commits which are not a document record (README, LICENSE…)
+      .sort((commitA, commitB) => new Date(commitA.date) - new Date(commitB.date)); // Make sure that the commits are sorted in ascending chronological order
   }
 
   async #writeFile({ serviceId, documentType, content, fileExtension }) {

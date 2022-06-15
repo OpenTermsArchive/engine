@@ -110,7 +110,7 @@ describe('MongoRepository', () => {
           expect(new Date(mongoDocument.fetchDate).getTime()).to.equal(FETCH_DATE.getTime());
         });
 
-        it('stores the mime type', () => {
+        it('stores the MIME type', () => {
           expect(mongoDocument.mimeType).to.equal(MIME_TYPE);
         });
 
@@ -311,7 +311,7 @@ describe('MongoRepository', () => {
         expect(isSameContent).to.be.true;
       });
 
-      it('stores the mime type', () => {
+      it('stores the MIME type', () => {
         expect(mongoDocument.mimeType).to.equal(PDF_MIME_TYPE);
       });
     });
@@ -360,7 +360,7 @@ describe('MongoRepository', () => {
       expect(new Date(record.fetchDate).getTime()).to.equal(FETCH_DATE.getTime());
     });
 
-    it('stores the mime type', () => {
+    it('stores the MIME type', () => {
       expect(record.mimeType).to.equal(MIME_TYPE);
     });
 
@@ -368,7 +368,7 @@ describe('MongoRepository', () => {
       expect(record.snapshotId).to.equal(SNAPSHOT_ID);
     });
 
-    context('when requested record does not exists', () => {
+    context('when requested record does not exist', () => {
       it('returns an empty object', async () => {
         expect(await subject.findById('inexistantID')).to.deep.equal({});
       });

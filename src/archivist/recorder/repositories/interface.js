@@ -8,7 +8,7 @@ export default class RepositoryInterface {
   * [Optional] Initialize repository
   * Override this method if the repository needs some asynchronous initialization code (open database connection and create collections, initialize Git…)
   *
-  * @returns {Promise<Repository>} Promise that will be resolved with the current repository
+  * @returns {Promise<Repository>} Promise that will be resolved with the current repository instance
   */
   async initialize() {}
 
@@ -16,7 +16,7 @@ export default class RepositoryInterface {
   * [Optional] Finalize repository
   * Override this method if the repository needs some asynchronous code to properly close the repository (close database connection, push changes on Git remote…)
   *
-  * @returns {Promise<Repository>} Promise that will be resolved with the current repository
+  * @returns {Promise<Repository>} Promise that will be resolved with the current repository instance
   */
   async finalize() {}
 
@@ -27,7 +27,7 @@ export default class RepositoryInterface {
   * @returns {Promise<Record>} Promise that will be resolved with the given record when it has been persisted
   */
   async save(record) {
-    throw new Error(`#save method is not yet implemented in ${this.constructor.name}`);
+    throw new Error(`#save method is not implemented in ${this.constructor.name}`);
   }
 
   /**
@@ -38,7 +38,7 @@ export default class RepositoryInterface {
   * @returns {Promise<Record>} Promise that will be resolved with the found record or an empty object if none match the given criteria
   */
   async findLatest(serviceId, documentType) {
-    throw new Error(`#findLatest method is not yet implemented in ${this.constructor.name}`);
+    throw new Error(`#findLatest method is not implemented in ${this.constructor.name}`);
   }
 
   /**
@@ -48,7 +48,7 @@ export default class RepositoryInterface {
   * @returns {Promise<Record>} Promise that will be resolved with the found record or an empty object if none match the given ID
   */
   async findById(recordId) {
-    throw new Error(`#findById method is not yet implemented in ${this.constructor.name}`);
+    throw new Error(`#findById method is not implemented in ${this.constructor.name}`);
   }
 
   /**
@@ -59,7 +59,7 @@ export default class RepositoryInterface {
   * @returns {Promise<Array<Record>>} Promise that will be resolved with an array of all records
   */
   async findAll() {
-    throw new Error(`#findAll method is not yet implemented in ${this.constructor.name}`);
+    throw new Error(`#findAll method is not implemented in ${this.constructor.name}`);
   }
 
   /**
@@ -69,7 +69,7 @@ export default class RepositoryInterface {
   * @returns {Promise<number>} Promise that will be resolved with the total number of records
   */
   async count() {
-    throw new Error(`#count method is not yet implemented in ${this.constructor.name}`);
+    throw new Error(`#count method is not implemented in ${this.constructor.name}`);
   }
 
   /**
@@ -78,7 +78,7 @@ export default class RepositoryInterface {
   * @yields {Record}
   */
   async* iterate() {
-    throw new Error(`#iterate method is not yet implemented in ${this.constructor.name}`);
+    throw new Error(`#iterate method is not implemented in ${this.constructor.name}`);
   }
 
   /**
@@ -87,7 +87,7 @@ export default class RepositoryInterface {
   * @returns {Promise} Promise that will be resolved when all records are removed
   */
   async removeAll() {
-    throw new Error(`#removeAll method is not yet implemented in ${this.constructor.name}`);
+    throw new Error(`#removeAll method is not implemented in ${this.constructor.name}`);
   }
 
   /**
@@ -97,6 +97,6 @@ export default class RepositoryInterface {
   * @returns {Promise<Record>} Promise that will be resolved with the given record when its content has been loaded
   */
   async loadRecordContent(record) {
-    throw new Error(`#loadRecordContent method is not yet implemented in ${this.constructor.name}`);
+    throw new Error(`#loadRecordContent method is not implemented in ${this.constructor.name}`);
   }
 }
