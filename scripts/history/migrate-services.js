@@ -28,8 +28,8 @@ const CONFIG = {
   },
 };
 
-const COUNTERS = {
-  imported: 0,
+const counters = {
+  migrated: 0,
   skipped: 0,
 };
 
@@ -128,9 +128,9 @@ const COUNTERS = {
     rewriteVersions(migration.to.versions.destination, toVersionsRecordsMigrated, idsMapping, migration.to.versions.logger),
   ]);
 
-  console.log(`Records treated: ${Object.values(COUNTERS).reduce((acc, value) => acc + value, 0)}`);
-  console.log(`⌙ Migrated records: ${COUNTERS.imported}`);
-  console.log(`⌙ Skipped records: ${COUNTERS.skipped}`);
+  console.log(`Records treated: ${Object.values(counters).reduce((acc, value) => acc + value, 0)}`);
+  console.log(`⌙ Migrated records: ${counters.migrated}`);
+  console.log(`⌙ Skipped records: ${counters.skipped}`);
   console.timeEnd('Total time');
 
   await finalize(migration);
@@ -146,10 +146,10 @@ async function rewriteSnapshots(repository, records, idsMapping, logger) {
 
     if (recordId) {
       logger.info({ message: `Migrated snapshot with new ID: ${recordId}`, serviceId: record.serviceId, type: record.documentType, id: record.id, current: i++, total: records.length });
-      COUNTERS.imported++;
+      counters.migrated++;
     } else {
       logger.info({ message: 'Skipped snapshot', serviceId: record.serviceId, type: record.documentType, id: record.id, current: i++, total: records.length });
-      COUNTERS.skipped++;
+      counters.skipped++;
     }
   }
 }
@@ -170,10 +170,10 @@ async function rewriteVersions(repository, records, idsMapping, logger) {
 
     if (recordId) {
       logger.info({ message: `Migrated version with new ID: ${recordId}`, serviceId: record.serviceId, type: record.documentType, id: record.id, current: i++, total: records.length });
-      COUNTERS.imported++;
+      counters.migrated++;
     } else {
       logger.info({ message: 'Skipped version', serviceId: record.serviceId, type: record.documentType, id: record.id, current: i++, total: records.length });
-      COUNTERS.skipped++;
+      counters.skipped++;
     }
   }
 }
