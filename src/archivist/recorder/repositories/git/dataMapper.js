@@ -46,7 +46,7 @@ export function toDomain(commit) {
   const [relativeFilePath] = modifiedFilesInCommit;
   const snapshotIdMatch = body.match(/\b[0-9a-f]{5,40}\b/g);
 
-  const record = new Record({
+  return new Record({
     id: hash,
     serviceId: path.dirname(relativeFilePath),
     documentType: path.basename(relativeFilePath, path.extname(relativeFilePath)),
@@ -56,6 +56,4 @@ export function toDomain(commit) {
     isRefilter: message.startsWith(COMMIT_MESSAGE_PREFIX.refilter),
     snapshotId: snapshotIdMatch && snapshotIdMatch[0],
   });
-
-  return record;
 }

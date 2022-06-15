@@ -29,7 +29,7 @@ export function toPersistence(record) {
 export function toDomain(document) {
   const { _id, serviceId, documentType, fetchDate, mimeType, isRefilter, isFirstRecord, snapshotId } = document;
 
-  const record = new Record({
+  return new Record({
     id: _id.toString(),
     serviceId,
     documentType,
@@ -39,6 +39,4 @@ export function toDomain(document) {
     isRefilter: Boolean(isRefilter),
     snapshotId: snapshotId && snapshotId.toString(),
   });
-
-  return record;
 }
