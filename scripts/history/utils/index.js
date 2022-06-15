@@ -2,7 +2,7 @@ import fsApi from 'fs';
 
 const fs = fsApi.promises;
 
-export async function importReadme({ from: sourceRepository, to: targetRepository }) {
+export async function importReadmeInGit({ from: sourceRepository, to: targetRepository }) {
   const sourceRepositoryReadmePath = `${sourceRepository.path}/README.md`;
   const targetRepositoryReadmePath = `${targetRepository.path}/README.md`;
 

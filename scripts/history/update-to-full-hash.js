@@ -6,7 +6,7 @@ import config from 'config';
 import GitRepository from '../../src/archivist/recorder/repositories/git/index.js';
 
 import logger from './logger/index.js';
-import { importReadme } from './utils/index.js';
+import { importReadmeInGit } from './utils/index.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT_PATH = path.resolve(__dirname, '../../');
@@ -34,7 +34,7 @@ const ROOT_PATH = path.resolve(__dirname, '../../');
   await versionsTargetRepository.initialize();
   await snapshotsRepository.initialize();
 
-  await importReadme({ from: versionsRepository, to: versionsTargetRepository });
+  await importReadmeInGit({ from: versionsRepository, to: versionsTargetRepository });
 
   const total = await versionsRepository.count();
   let current = 1;

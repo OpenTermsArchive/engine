@@ -8,7 +8,7 @@ import winston from 'winston';
 import GitRepository from '../../src/archivist/recorder/repositories/git/index.js';
 
 import { format } from './logger/index.js';
-import { importReadme } from './utils/index.js';
+import { importReadmeInGit } from './utils/index.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT_PATH = path.resolve(__dirname, '../../');
@@ -191,10 +191,10 @@ async function initialize(migration) {
   ]);
 
   return Promise.all([
-    importReadme({ from: migration.from.snapshots.source, to: migration.from.snapshots.destination }),
-    importReadme({ from: migration.from.versions.source, to: migration.from.versions.destination }),
-    importReadme({ from: migration.to.snapshots.source, to: migration.to.snapshots.destination }),
-    importReadme({ from: migration.to.versions.source, to: migration.to.versions.destination }),
+    importReadmeInGit({ from: migration.from.snapshots.source, to: migration.from.snapshots.destination }),
+    importReadmeInGit({ from: migration.from.versions.source, to: migration.from.versions.destination }),
+    importReadmeInGit({ from: migration.to.snapshots.source, to: migration.to.snapshots.destination }),
+    importReadmeInGit({ from: migration.to.versions.source, to: migration.to.versions.destination }),
   ]);
 }
 
