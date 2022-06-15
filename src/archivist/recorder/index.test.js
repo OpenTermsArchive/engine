@@ -32,10 +32,7 @@ describe('Recorder', () => {
           await recorder.initialize();
         });
 
-        after(async () => {
-          await recorder.snapshotsRepository.removeAll();
-          await recorder.finalize();
-        });
+        after(async () => recorder.finalize());
 
         context('when a required param is missing', () => {
           after(async () => recorder.snapshotsRepository.removeAll());
@@ -183,9 +180,7 @@ describe('Recorder', () => {
           await recorder.initialize();
         });
 
-        after(async () => {
-          await recorder.finalize();
-        });
+        after(async () => recorder.finalize());
 
         context('when a required param is missing', () => {
           after(async () => recorder.versionsRepository.removeAll());
@@ -344,10 +339,7 @@ describe('Recorder', () => {
           await recorder.initialize();
         });
 
-        after(async () => {
-          await recorder.versionsRepository.removeAll();
-          await recorder.finalize();
-        });
+        after(async () => recorder.finalize());
 
         context('when a required param is missing', () => {
           after(async () => recorder.versionsRepository.removeAll());
