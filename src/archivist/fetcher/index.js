@@ -17,7 +17,7 @@ export { FetchDocumentError } from './errors.js';
  * @param {number} [params.config.navigationTimeout] - Maximum time (in milliseconds) to wait before considering the fetch failed
  * @param {string} [params.config.language] - Language (in [ISO 639-1 format](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes)) to be passed in request headers
  * @param {number} [params.config.waitForElementsTimeout] - Maximum time (in milliseconds) to wait for selectors to exist on page before considering the fetch failed. Only relevant when `executeClientScripts` is enabled
- * @returns {Promise} @returns {Promise<Object>} Promise which will be resolved with an object containing the `mimeType` and the `content` of the url as string or buffer
+ * @returns {Promise} @returns {Promise<Object>} Promise which will be resolved with an object containing the `mimeType` and the `content` of the URL as string or Buffer
  */
 export default async function fetch({
   url, executeClientScripts, cssSelectors,
