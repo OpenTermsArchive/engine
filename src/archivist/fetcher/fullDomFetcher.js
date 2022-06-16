@@ -8,7 +8,7 @@ puppeteerExtra.use(stealthPlugin());
 
 let browser;
 
-export default async function fetch(url, cssSelectors, configuration) {
+export default async function fetch(url, cssSelectors, config) {
   let page;
   let response;
   const selectors = [].concat(cssSelectors);
@@ -20,8 +20,8 @@ export default async function fetch(url, cssSelectors, configuration) {
   try {
     page = await browser.newPage();
 
-    await page.setDefaultNavigationTimeout(configuration.navigationTimeout);
-    await page.setExtraHTTPHeaders({ 'Accept-Language': configuration.language });
+    await page.setDefaultNavigationTimeout(config.navigationTimeout);
+    await page.setExtraHTTPHeaders({ 'Accept-Language': config.language });
 
     response = await page.goto(url, { waitUntil: 'networkidle0' });
 
@@ -35,7 +35,7 @@ export default async function fetch(url, cssSelectors, configuration) {
       throw new FetchDocumentError(`Received HTTP code ${statusCode} when trying to fetch '${url}'`);
     }
 
-    const waitForSelectorsPromises = selectors.map(selector => page.waitForSelector(selector, { timeout: configuration.waitForElementsTimeout }));
+    const waitForSelectorsPromises = selectors.map(selector => page.waitForSelector(selector, { timeout: config.waitForElementsTimeout }));
 
     // We expect all elements to be present on the page…
     await Promise.all(waitForSelectorsPromises).catch(error => {
@@ -54,7 +54,7 @@ export default async function fetch(url, cssSelectors, configuration) {
     };
   } catch (error) {
     if (error instanceof puppeteer.errors.TimeoutError) {
-      throw new FetchDocumentError(`Timed out after ${configuration.navigationTimeout / 1000} seconds when trying to fetch '${url}'`);
+      throw new FetchDocumentError(`Timed out after ${config.navigationTimeout / 1000} seconds when trying to fetch '${url}'`);
     }
     throw new FetchDocumentError(error.message);
   } finally {
