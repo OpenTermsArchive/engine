@@ -124,10 +124,12 @@ npm install ambanum/OpenTermsArchive#main
 
 ### CLI
 
-The following commands are available globally once package is imported:
+The following commands are available where the package is installed:
 
-- `ota-lint-declarations [service_id]...` to lint declarations
-- `ota-validate-declarations [service_id]...` to test declarations
+- `./node_modules/.bin/ota-lint-declarations [service_id]...` to lint declarations
+- `./node_modules/.bin/ota-validate-declarations [service_id]...` to test declarations
+
+In order to have them available globally in your command line, install it with the `--global` option.
 
 ### Features exposed
 
@@ -140,7 +142,7 @@ You can use it in your code by using `import fetch from 'open-terms-archive/fetc
 Documentation on how to use `fetch` is provided as JSDoc within [./src/archivist/fetcher/index.js](./src/archivist/fetcher/index.js).
 
 If you plan to use `executeClientScripts` as a parameter of `fetch`, the fetching will be done using a headless browser.
-In order to not instantiate this browser at each fetch, the starting and stopping of the browser is the responsibility of the user.
+In order to not instantiate this browser at each fetch, the starting and stopping of the browser is your responsibility.
 
 Here is an example on how to use it:
 
@@ -154,12 +156,12 @@ await fetch({ executeClientScripts: true, ... });
 await stopHeadlessBrowser();
 ```
 
-The `fetch` module can also be configured as a [node config submodule](https://github.com/node-config/node-config/wiki/Sub-Module-Configuration).
-If [node-config](https://github.com/node-config/node-config) is used in the project, default `fetcher` configuration can be overridden by adding a `fetcher` object to the local config. See [Configuration file](#configuration-file) for full reference.
+The `fetch` module can also be configured as a [`node-config` submodule](https://github.com/node-config/node-config/wiki/Sub-Module-Configuration).
+If [`node-config`](https://github.com/node-config/node-config) is used in the project, the default `fetcher` configuration can be overridden by adding a `fetcher` object to the local config. See [Configuration file](#configuration-file) for full reference.
 
 #### filter
 
-Filter gives the ability to transform HTML or pdf content into a markdown string.
+The `filter` module transforms HTML or PDF content into a Markdown string.
 It will filter content based on the [document declaration](https://github.com/OpenTermsArchive/contrib-declarations/blob/main/CONTRIBUTING.md#declaring-a-new-service).
 
 You can use the filter in your code by using `import filter from 'open-terms-archive/filter';`.
