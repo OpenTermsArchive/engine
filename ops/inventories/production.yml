@@ -41,7 +41,7 @@ all:
               versions_repository: git@github.com:OpenTermsArchive/france-elections-versions.git
         pga:
           hosts:
-            134.102.58.23:
+            134.102.58.70:
               ansible_user: pga
               config_file_name: pga
               services_repository: https://github.com/OpenTermsArchive/pga-declarations.git
