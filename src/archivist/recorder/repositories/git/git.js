@@ -51,9 +51,7 @@ export default class Git {
       return;
     }
 
-    const shortHash = summary.commit.replace('HEAD ', '').replace('(root-commit) ', '');
-
-    return this.getFullHash(shortHash); // Return a long commit hash to always handle ids in the same format and facilitate comparison
+    return summary.commit;
   }
 
   async pushChanges() {
