@@ -1,34 +1,30 @@
 import AbortController from 'abort-controller';
-import config from 'config';
 import HttpProxyAgent from 'http-proxy-agent';
 import HttpsProxyAgent from 'https-proxy-agent';
 import nodeFetch, { AbortError } from 'node-fetch';
 
 import { FetchDocumentError } from './errors.js';
 
-const NAVIGATION_TIMEOUT = config.get('fetcher.navigationTimeout');
-const LANGUAGE = config.get('fetcher.language');
-
-export default async function fetch(url) {
+export default async function fetch(url, configuration) {
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), NAVIGATION_TIMEOUT);
+  const timeout = setTimeout(() => controller.abort(), configuration.navigationTimeout);
 
-  const options = {
+  const nodeFetchOptions = {
     signal: controller.signal,
     credentials: 'include',
-    headers: { 'Accept-Language': LANGUAGE },
+    headers: { 'Accept-Language': configuration.language },
   };
 
   if (url.startsWith('https:') && process.env.HTTPS_PROXY) {
-    options.agent = new HttpsProxyAgent(process.env.HTTPS_PROXY);
+    nodeFetchOptions.agent = new HttpsProxyAgent(process.env.HTTPS_PROXY);
   } else if (url.startsWith('http:') && process.env.HTTP_PROXY) {
-    options.agent = new HttpProxyAgent(process.env.HTTP_PROXY);
+    nodeFetchOptions.agent = new HttpProxyAgent(process.env.HTTP_PROXY);
   }
 
   let response;
 
   try {
-    response = await nodeFetch(url, options);
+    response = await nodeFetch(url, nodeFetchOptions);
 
     if (!response.ok) {
       throw new FetchDocumentError(`Received HTTP code ${response.status} when trying to fetch '${url}'`);
@@ -54,7 +50,7 @@ export default async function fetch(url) {
     };
   } catch (error) {
     if (error instanceof AbortError) {
-      throw new FetchDocumentError(`Timed out after ${NAVIGATION_TIMEOUT / 1000} seconds when trying to fetch '${url}'`);
+      throw new FetchDocumentError(`Timed out after ${configuration.navigationTimeout / 1000} seconds when trying to fetch '${url}'`);
     }
 
     throw new FetchDocumentError(error.message);

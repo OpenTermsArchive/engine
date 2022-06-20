@@ -20,6 +20,15 @@ const { CiceroMarkTransformer } = ciceroMark;
 
 const ciceroMarkTransformer = new CiceroMarkTransformer();
 
+/**
+ * Filter document content and convert it to Markdown
+ *
+ * @param {Object} params - Filter parameters
+ * @param {string|Buffer} params.content - Content to filter: a buffer containing PDF data in case mimetype associated is PDF or a DOM dump of an HTML page given as a string
+ * @param {string} params.mimeType - MIME type of the given content
+ * @param {string} params.documentDeclaration - see {@link ./src/archivist/services/documentDeclaration.js}
+ * @returns {Promise<string>} Promise which is fulfilled once the content is filtered and converted in Markdown. The promise will resolve into a string containing the filtered content in Markdown format
+*/
 export default async function filter({ content, mimeType, documentDeclaration }) {
   if (mimeType == 'application/pdf') {
     return filterPDF({ content });

@@ -1,6 +1,7 @@
 import events from 'events';
 
 import async from 'async';
+import config from 'config';
 
 import { InaccessibleContentError } from './errors.js';
 import fetch, { launchHeadlessBrowser, stopHeadlessBrowser, FetchDocumentError } from './fetcher/index.js';
@@ -125,6 +126,7 @@ export default class Archivist extends events.EventEmitter {
         url: location,
         executeClientScripts,
         cssSelectors: documentDeclaration.getCssSelectors(),
+        config: config.get('fetcher'),
       }));
     } catch (error) {
       if (error instanceof FetchDocumentError) {

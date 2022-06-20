@@ -13,6 +13,11 @@
 - [Be notified](#be-notified)
   - [By email](#by-email)
   - [By RSS](#by-rss)
+- [Importing as a module](#importing-as-a-module)
+  - [CLI](#cli)
+  - [Features exposed](#features-exposed)
+    - [fetch](#fetch)
+    - [filter](#filter)
 - [Using locally](#using-locally)
   - [Installing](#installing)
     - [Declarations repository](#declarations-repository)
@@ -109,6 +114,60 @@ For example:
 - To receive all updates of `Facebook` documents, the URL is `https://github.com/OpenTermsArchive/contrib-versions/commits/main/Facebook.atom`.
 - To receive all updates of the `Privacy Policy` from `Google`, the URL is `https://github.com/OpenTermsArchive/contrib-versions/commits/main/Google/Privacy%20Policy.md.atom`.
 
+## Importing as a module
+
+Open Terms Archive exposes a JavaScript API to make some of its capabilities available in NodeJS. You can install it as an NPM module: 
+
+```
+npm install ambanum/OpenTermsArchive#main
+```
+
+### CLI
+
+The following commands are available where the package is installed:
+
+- `./node_modules/.bin/ota-lint-declarations [service_id]...` to lint declarations
+- `./node_modules/.bin/ota-validate-declarations [service_id]...` to test declarations
+
+In order to have them available globally in your command line, install it with the `--global` option.
+
+### Features exposed
+
+#### fetch
+
+The `fetch` module gets the MIME type and content of a document from its URL.
+
+You can use it in your code by using `import fetch from 'open-terms-archive/fetch';`.
+
+Documentation on how to use `fetch` is provided as JSDoc within [./src/archivist/fetcher/index.js](./src/archivist/fetcher/index.js).
+
+If you plan to use `executeClientScripts` as a parameter of `fetch`, the fetching will be done using a headless browser.
+In order to not instantiate this browser at each fetch, the starting and stopping of the browser is your responsibility.
+
+Here is an example on how to use it:
+
+```js
+import fetch, { launchHeadlessBrowser, stopHeadlessBrowser } from 'open-terms-archive/fetch';
+
+await launchHeadlessBrowser();
+await fetch({ executeClientScripts: true, ... });
+await fetch({ executeClientScripts: true, ... });
+await fetch({ executeClientScripts: true, ... });
+await stopHeadlessBrowser();
+```
+
+The `fetch` module can also be configured as a [`node-config` submodule](https://github.com/node-config/node-config/wiki/Sub-Module-Configuration).
+If [`node-config`](https://github.com/node-config/node-config) is used in the project, the default `fetcher` configuration can be overridden by adding a `fetcher` object to the local config. See [Configuration file](#configuration-file) for full reference.
+
+#### filter
+
+The `filter` module transforms HTML or PDF content into a Markdown string.
+It will filter content based on the [document declaration](https://github.com/OpenTermsArchive/contrib-declarations/blob/main/CONTRIBUTING.md#declaring-a-new-service).
+
+You can use the filter in your code by using `import filter from 'open-terms-archive/filter';`.
+
+The `filter` function documentation is available as JSDoc within [./src/archivist/filter/index.js](./src/archivist/filter/index.js).
+
 ## Using locally
 
 ### Installing
@@ -196,6 +255,8 @@ The default configuration can be found in `config/default.json`. The full refere
   },
   "fetcher": {
     "waitForElementsTimeout": "Maximum time (in milliseconds) to wait for elements to be present in the page when fetching document in a headless browser"
+    "navigationTimeout": "Maximum time (in milliseconds) to wait for page to load",
+    "language": "Language (in ISO 639-1 format) to pass in request headers"
   },
   "notifier": { // Notify specified mailing lists when new versions are recorded
     "sendInBlue": { // SendInBlue API Key is defined in environment variables, see the “Environment variables” section below

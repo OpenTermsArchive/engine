@@ -129,6 +129,7 @@ let servicesToValidate = args;
                   url: location,
                   executeClientScripts,
                   cssSelectors: documentDeclaration.getCssSelectors(),
+                  config: config.get('fetcher'),
                 });
 
                 content = document.content;
@@ -185,6 +186,7 @@ let servicesToValidate = args;
                   url: location,
                   executeClientScripts,
                   cssSelectors: documentDeclaration.getCssSelectors(),
+                  config: config.get('fetcher'),
                 });
                 const secondFilteredContent = await filter({
                   content: document.content,
