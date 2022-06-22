@@ -40,7 +40,6 @@
   "dependencies": {
     "@accordproject/markdown-cicero": "^0.15.2",
     "@accordproject/markdown-pdf": "^0.15.2",
-    "@opentermsarchive/simple-git": "^3.7.2",
     "abort-controller": "^3.0.0",
     "ajv": "^6.12.6",
     "archiver": "^5.3.0",
@@ -76,6 +75,7 @@
     "puppeteer-extra": "^3.2.3",
     "puppeteer-extra-plugin-stealth": "^2.9.0",
     "sib-api-v3-sdk": "^8.2.1",
+    "simple-git": "^3.8.0",
     "turndown": "^7.0.0",
     "winston": "^3.3.3",
     "winston-mail": "^2.0.0"
