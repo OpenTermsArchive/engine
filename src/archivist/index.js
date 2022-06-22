@@ -31,8 +31,6 @@ export const AVAILABLE_EVENTS = [
   'error',
 ];
 
-const MARKDOWN_MIME_TYPE = 'text/markdown';
-
 export default class Archivist extends events.EventEmitter {
   get serviceDeclarations() {
     return this.services;
@@ -80,8 +78,7 @@ export default class Archivist extends events.EventEmitter {
       const { service, type } = documentDeclaration;
 
       if (error.toString().includes('HttpError: API rate limit exceeded for user ID')) {
-        // This is an error due to SendInBlue quota, bypass
-        return;
+        return; // This is an error due to SendInBlue quota, bypass
       }
 
       if (error instanceof InaccessibleContentError) {
@@ -252,7 +249,6 @@ export default class Archivist extends events.EventEmitter {
       serviceId: service.id,
       documentType: type,
       content,
-      mimeType: MARKDOWN_MIME_TYPE, // The result of the `filter` function is always in markdown format
       fetchDate,
       snapshotId,
     });

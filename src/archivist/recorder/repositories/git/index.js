@@ -14,7 +14,6 @@ import * as DataMapper from './dataMapper.js';
 import Git from './git.js';
 
 const fs = fsApi.promises;
-const PDF_MIME_TYPE = 'application/pdf';
 
 mime.define({ 'text/markdown': ['md'] }, true); // ensure extension for markdown files is `.md` and not `.markdown`
 
@@ -113,7 +112,7 @@ export default class GitRepository extends RepositoryInterface {
   async loadRecordContent(record) {
     const relativeFilePath = `${record.serviceId}/${record.documentType}.${mime.getExtension(record.mimeType)}`;
 
-    if (record.mimeType != PDF_MIME_TYPE) {
+    if (record.mimeType != mime.getType('pdf')) {
       record.content = await this.git.show(`${record.id}:${relativeFilePath}`);
 
       return;
