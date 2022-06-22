@@ -57,10 +57,18 @@ export default class Archivist extends events.EventEmitter {
     this.services = await services.load();
 
     this.on('error', async () => {
+      console.log('Abort and clean up operations before exiting…');
+
+      setTimeout(() => {
+        console.log('Cleaning timed out, force process to exit');
+        process.exit(2);
+      }, 60 * 1000);
+
       this.refilterDocumentsQueue.kill();
       this.trackDocumentChangesQueue.kill();
-      stopHeadlessBrowser();
-      await this.recorder.finalize();
+      await stopHeadlessBrowser().then(() => console.log('Headless browser stopped'));
+      await this.recorder.finalize().then(() => console.log('Recorder finalized'));
+      process.exit(1);
     });
   }
 
