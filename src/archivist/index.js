@@ -70,8 +70,7 @@ export default class Archivist extends events.EventEmitter {
       const { service, type } = documentDeclaration;
 
       if (error.toString().includes('HttpError: API rate limit exceeded for user ID')) {
-        // This is an error due to SendInBlue quota, bypass
-        return;
+        return; // This is an error due to SendInBlue quota, bypass
       }
 
       if (error instanceof InaccessibleContentError) {
