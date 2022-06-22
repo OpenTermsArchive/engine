@@ -1,3 +1,5 @@
+import mime from 'mime';
+
 import Record from './record.js';
 import RepositoryFactory from './repositories/factory.js';
 
@@ -43,7 +45,7 @@ export default class Recorder {
     return this.snapshotsRepository.save(new Record({ serviceId, documentType, fetchDate, mimeType, content }));
   }
 
-  async recordVersion({ serviceId, documentType, snapshotId, fetchDate, mimeType, content, isRefilter }) {
+  async recordVersion({ serviceId, documentType, snapshotId, fetchDate, content, isRefilter }) {
     if (!serviceId) {
       throw new Error('A service ID is required');
     }
@@ -64,9 +66,7 @@ export default class Recorder {
       throw new Error('A document content is required');
     }
 
-    if (!mimeType) {
-      throw new Error('A document mime type is required to ensure data consistency');
-    }
+    const mimeType = mime.getType('markdown'); // A version is always in markdown format
 
     return this.versionsRepository.save(new Record({ serviceId, documentType, snapshotId, fetchDate, mimeType, content, isRefilter }));
   }
