@@ -39,3 +39,11 @@ all:
               services_repository: https://github.com/OpenTermsArchive/france-elections-declarations.git
               snapshots_repository: git@github.com:OpenTermsArchive/france-elections-snapshots.git
               versions_repository: git@github.com:OpenTermsArchive/france-elections-versions.git
+        pga:
+          hosts:
+            134.102.58.70:
+              ansible_user: pga
+              config_file_name: pga
+              services_repository: https://github.com/OpenTermsArchive/pga-declarations.git
+              snapshots_repository: git@github.com:OpenTermsArchive/pga-snapshots.git
+              versions_repository: git@github.com:OpenTermsArchive/pga-versions.git

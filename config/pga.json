@@ -1,0 +1,29 @@
+{
+  "recorder": {
+    "versions": {
+      "storage": {
+        "git": {
+          "prefixMessageToSnapshotId": "This version was recorded after filtering snapshot https://github.com/OpenTermsArchive/pga-snapshots/commit/"
+        }
+      }
+    }
+  },
+  "fetcher": {
+    "language": "en"
+  },
+  "notifier": {
+    "sendInBlue": {
+      "updatesListId": 855,
+      "updateTemplateId": 41
+    }
+  },
+  "tracker": {
+    "githubIssues": {
+      "repository": "OpenTermsArchive/pga-declarations"
+    }
+  },
+  "dataset": {
+    "title": "pga",
+    "versionsRepositoryURL": "https://github.com/OpenTermsArchive/pga-versions"
+  }
+}
