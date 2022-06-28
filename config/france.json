@@ -1,9 +1,20 @@
 {
+  "services": {
+    "repository": "https://github.com/OpenTermsArchive/france-declarations.git"
+  },
   "recorder": {
     "versions": {
       "storage": {
         "git": {
-          "prefixMessageToSnapshotId": "This version was recorded after filtering snapshot https://github.com/OpenTermsArchive/france-snapshots/commit/"
+          "prefixMessageToSnapshotId": "This version was recorded after filtering snapshot https://github.com/OpenTermsArchive/france-snapshots/commit/",
+          "repository": "git@github.com:OpenTermsArchive/france-versions.git"
+        }
+      }
+    },
+    "snapshots": {
+      "storage": {
+        "git": {
+          "repository": "git@github.com:OpenTermsArchive/france-snapshots.git"
         }
       }
     }

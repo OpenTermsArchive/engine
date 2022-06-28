@@ -41,7 +41,7 @@
 
 - name: Install services declarations
   git:
-    repo: '{{ services_repository }}'
+    repo: '{{ app_config.services.repository }}'
     dest: '/home/{{ ansible_user }}/{{ declarations_directory }}'
     force: yes
     accept_hostkey: yes
@@ -72,10 +72,10 @@
 
 - include_tasks: database.yml
   name: Setup snapshots git repository
-  when: snapshots_repository is defined
+  when: app_config.recorder.snapshots.storage.git.repository is defined
   vars:
     name: snapshots
-    repository: '{{ snapshots_repository }}'
+    repository: '{{ app_config.recorder.snapshots.storage.git.repository }}'
     branch: '{{ snapshots_branch }}'
     directory: '{{ snapshots_directory }}'
   tags:
@@ -84,10 +84,10 @@
 
 - include_tasks: database.yml
   name: Setup versions git repository
-  when: versions_repository is defined
+  when: app_config.recorder.versions.storage.git.repository is defined
   vars:
     name: versions
-    repository: '{{ versions_repository }}'
+    repository: '{{ app_config.recorder.versions.storage.git.repository }}'
     branch: '{{ versions_branch }}'
     directory: '{{ versions_directory }}'
   tags:
