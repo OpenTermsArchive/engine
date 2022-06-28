@@ -9,6 +9,7 @@ all:
     app_directory: ota
     ota_repository: https://github.com/ambanum/OpenTermsArchive.git
     ota_branch: main
+    app_config: "{{ lookup('file','../config/{{config_file_name}}.json') | from_json }}"
   children:
     production:
       children:

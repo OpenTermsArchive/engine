@@ -1,4 +1,8 @@
 ---
+- name: "Define variables"
+  set_fact:
+    mongo_required: '{{ (app_config.recorder.versions.storage.type is defined and app_config.recorder.versions.storage.type == "mongo") or (app_config.recorder.snapshots.storage.type is defined and app_config.recorder.snapshots.storage.type == "mongo") }}'
+
 - name: Install common required packages
   apt:
     pkg:
@@ -67,4 +71,6 @@
   when: ansible_facts['architecture'] != "aarch64"
 
 - include_tasks: mongo.yml
-  when: ansible_facts['architecture'] != "aarch64"
+  when:
+    - mongo_required
+    - ansible_facts['architecture'] != "aarch64"
