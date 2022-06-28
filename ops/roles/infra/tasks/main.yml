@@ -45,12 +45,21 @@
     group: '{{ ansible_user }}'
     mode: 0644
 
-- name: Install Chromium
+- name: Install Chromium — Debian
   apt:
     pkg:
       - chromium
     update_cache: yes
     state: latest
+  when: ansible_distribution == 'Debian'
+
+- name: Install Chromium — Ubuntu
+  apt:
+    pkg:
+      - chromium-browser
+    update_cache: yes
+    state: latest
+  when: ansible_distribution == 'Ubuntu'
 
   # See https://github.com/puppeteer/puppeteer/blob/main/docs/troubleshooting.md#recommended-enable-user-namespace-cloning
 - name: Enable user namespace cloning to allow running Chromium in a sandbox
