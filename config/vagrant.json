@@ -1,4 +1,23 @@
 {
+  "services": {
+    "repository": "https://github.com/OpenTermsArchive/contrib-declarations.git"
+  },
+  "recorder": {
+    "versions": {
+      "storage": {
+        "git": {
+          "repository": "git@github.com:OpenTermsArchive/sandbox-versions.git"
+        }
+      }
+    },
+    "snapshots": {
+      "storage": {
+        "git": {
+          "repository": "git@github.com:OpenTermsArchive/sandbox-snapshots.git"
+        }
+      }
+    }
+  },
   "logger": {
     "sendMailOnError": false
   }

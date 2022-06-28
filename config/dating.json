@@ -1,9 +1,20 @@
 {
+  "services": {
+    "repository": "https://github.com/OpenTermsArchive/dating-declarations.git"
+  },
   "recorder": {
     "versions": {
       "storage": {
         "git": {
-          "prefixMessageToSnapshotId": "This version was recorded after filtering snapshot https://github.com/OpenTermsArchive/dating-snapshots/commit/"
+          "prefixMessageToSnapshotId": "This version was recorded after filtering snapshot https://github.com/OpenTermsArchive/dating-snapshots/commit/",
+          "repository": "git@github.com:OpenTermsArchive/dating-versions.git"
+        }
+      }
+    },
+    "snapshots": {
+      "storage": {
+        "git": {
+          "repository": "git@github.com:OpenTermsArchive/dating-snapshots.git"
         }
       }
     }

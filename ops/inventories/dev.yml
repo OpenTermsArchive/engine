@@ -9,6 +9,7 @@ all:
     app_directory: ota
     ota_repository: https://github.com/ambanum/OpenTermsArchive.git
     ota_branch: main
+    app_config: "{{ lookup('file','../config/{{config_file_name}}.json') | from_json }}"
   children:
     dev:
       hosts:
@@ -17,7 +18,4 @@ all:
           config_file_name: vagrant
           ansible_python_interpreter: /usr/bin/python3
           ansible_ssh_private_key_file: ~/.ssh/ota-vagrant
-          services_repository: https://github.com/OpenTermsArchive/contrib-declarations.git
-          snapshots_repository: git@github.com:OpenTermsArchive/sandbox-snapshots.git
-          versions_repository: git@github.com:OpenTermsArchive/sandbox-versions.git
 
