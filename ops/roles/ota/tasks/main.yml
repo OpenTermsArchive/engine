@@ -26,7 +26,7 @@
   tags:
     - setup
 
-- name: "Check if path exists"
+- name: Check if path exists
   when: config_file_name is defined
   stat:
     path: '/home/{{ ansible_user }}/{{ app_directory }}/config/{{ config_file_name }}.json'
