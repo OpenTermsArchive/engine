@@ -68,10 +68,11 @@
   # See https://github.com/puppeteer/puppeteer/blob/main/docs/troubleshooting.md#recommended-enable-user-namespace-cloning
 - name: Enable user namespace cloning to allow running Chromium in a sandbox
   command: sysctl -w kernel.unprivileged_userns_clone=1
-  when: ansible_facts['architecture'] != "aarch64"
+  when: ansible_facts['architecture'] != 'aarch64'
 
 - include_tasks: mongo.yml
   when:
     - mongo_required
-    # on Apple M1, installing mongo generates the following error: "No package matching 'mongodb-org' is available"
-    - ansible_facts['architecture'] != "aarch64"
+    # Skip Debian 11 with ARM architecture as it is not currently supported by MongoDB. See https://www.mongodb.com/docs/manual/installation/#supported-platforms
+    - ansible_distribution != 'Debian' or (ansible_distribution == 'Debian' and ansible_facts['architecture'] != 'aarch64')
+
