@@ -106,6 +106,12 @@ export default class Git {
     return this.git.show(options);
   }
 
+  async clear() {
+    await this.git.reset('hard');
+
+    return this.git.clean('f', '-d');
+  }
+
   async getFullHash(shortHash) {
     return (await this.git.show([ shortHash, '--pretty=%H', '-s' ])).trim();
   }

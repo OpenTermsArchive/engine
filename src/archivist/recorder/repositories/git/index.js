@@ -28,6 +28,7 @@ export default class GitRepository extends RepositoryInterface {
 
   async initialize() {
     await this.git.initialize();
+    await this.git.clear(); // Drop all uncommitted changes and remove all leftover files that may be present if the process was killed aggressively
 
     return this;
   }
