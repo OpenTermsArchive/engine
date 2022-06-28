@@ -73,4 +73,5 @@
 - include_tasks: mongo.yml
   when:
     - mongo_required
+    # on Apple M1, installing mongo generates the following error: "No package matching 'mongodb-org' is available"
     - ansible_facts['architecture'] != "aarch64"
