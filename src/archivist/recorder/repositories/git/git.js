@@ -75,16 +75,11 @@ export default class Git {
 
       return logSummary.all;
     } catch (error) {
-      if (
-        !(
-          error.message.includes('unknown revision or path not in the working tree')
-          || error.message.includes('does not have any commits yet')
-        )
-      ) {
-        throw error;
+      if (/unknown revision or path not in the working tree|does not have any commits yet/.test(error.message)) {
+        return [];
       }
 
-      return [];
+      throw error;
     }
   }
 
