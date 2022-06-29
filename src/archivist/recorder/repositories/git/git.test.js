@@ -39,7 +39,7 @@ describe('GitRepository', () => {
       commitId = await subject.commit({ filePath: expectedFilePath, message: DEFAULT_COMMIT_MESSAGE });
     });
 
-    after(() => subject.cleanUp());
+    after(() => subject.destroyHistory());
 
     it('returns a full length SHA1 commit ID', () => {
       expect(commitId).to.match(/\b[0-9a-f]{40}\b/);
@@ -72,7 +72,7 @@ describe('GitRepository', () => {
         ([{ file: committedFileName }] = committedFiles);
       });
 
-      after(() => subject.cleanUp());
+      after(() => subject.destroyHistory());
 
       it('commits the specified file', () => {
         expect(committedFileName).to.equal(expectedFileName);

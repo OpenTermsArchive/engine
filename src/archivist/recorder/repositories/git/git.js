@@ -105,7 +105,7 @@ export default class Git {
     return this.git.show(options);
   }
 
-  async clear() {
+  async cleanUp() {
     await this.git.reset('hard');
 
     return this.git.clean('f', '-d');
@@ -119,10 +119,10 @@ export default class Git {
     return this.git.raw([ 'restore', '-s', commit, '--', path ]);
   }
 
-  async cleanUp() {
-    await this.git.raw([ 'update-ref', '-d', 'HEAD' ]);
+  async destroyHistory() {
+    await fs.rm(this.path, { recursive: true });
 
-    return this.clear();
+    return this.initialize();
   }
 
   relativePath(absolutePath) {

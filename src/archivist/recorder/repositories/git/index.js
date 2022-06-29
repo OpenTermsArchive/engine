@@ -27,7 +27,7 @@ export default class GitRepository extends RepositoryInterface {
 
   async initialize() {
     await this.git.initialize();
-    await this.git.clear(); // Drop all uncommitted changes and remove all leftover files that may be present if the process was killed aggressively
+    await this.git.cleanUp(); // Drop all uncommitted changes and remove all leftover files that may be present if the process was killed aggressively
 
     return this;
   }
@@ -93,7 +93,7 @@ export default class GitRepository extends RepositoryInterface {
   }
 
   async removeAll() {
-    return this.git.cleanUp();
+    return this.git.destroyHistory();
   }
 
   async loadRecordContent(record) {
