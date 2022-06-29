@@ -28,8 +28,8 @@ export default class Git {
       .addConfig('user.email', this.author.email);
   }
 
-  async add(filepath) {
-    return this.git.add(this.relativePath(filepath));
+  async add(filePath) {
+    return this.git.add(this.relativePath(filePath));
   }
 
   async commit({ filePath, message, date = new Date() }) {
@@ -88,8 +88,8 @@ export default class Git {
     }
   }
 
-  async isTracked(filepath) {
-    const result = await this.git.raw('ls-files', this.relativePath(filepath));
+  async isTracked(filePath) {
+    const result = await this.git.raw('ls-files', this.relativePath(filePath));
 
     return Boolean(result);
   }
