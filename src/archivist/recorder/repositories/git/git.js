@@ -33,11 +33,10 @@ export default class Git {
   }
 
   async commit({ filePath, message, date = new Date() }) {
+    const commitDate = new Date(date).toISOString();
     let summary;
 
     try {
-      const commitDate = new Date(date).toISOString();
-
       process.env.GIT_AUTHOR_DATE = commitDate;
       process.env.GIT_COMMITTER_DATE = commitDate;
 
