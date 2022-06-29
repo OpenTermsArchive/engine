@@ -19,6 +19,7 @@ export default class Git {
     }
 
     this.git = simpleGit(this.path, { maxConcurrentProcesses: 1 });
+
     await this.git.init();
 
     return this.git
@@ -126,7 +127,6 @@ export default class Git {
   }
 
   relativePath(absolutePath) {
-    // Git needs a path relative to the .git directory, not an absolute one
-    return path.relative(this.path, absolutePath);
+    return path.relative(this.path, absolutePath); // Git needs a path relative to the .git directory, not an absolute one
   }
 }
