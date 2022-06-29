@@ -98,10 +98,6 @@ export default class Git {
     return this.git.checkout(options);
   }
 
-  async raw(options) {
-    return this.git.raw(options);
-  }
-
   async show(options) {
     return this.git.show(options);
   }
