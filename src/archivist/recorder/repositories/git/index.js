@@ -4,7 +4,6 @@
  */
 
 import fsApi from 'fs';
-import path from 'path';
 
 import mime from 'mime';
 
@@ -94,20 +93,7 @@ export default class GitRepository extends RepositoryInterface {
   }
 
   async removeAll() {
-    const files = await fs.readdir(this.path, { withFileTypes: true });
-    const promises = files.map(file => {
-      const filePath = path.join(this.path, file.name);
-
-      if (file.isDirectory()) {
-        return fs.rm(filePath, { recursive: true });
-      }
-
-      return fs.unlink(filePath);
-    });
-
-    await Promise.all(promises);
-
-    return this.initialize();
+    return this.git.cleanUp();
   }
 
   async loadRecordContent(record) {
