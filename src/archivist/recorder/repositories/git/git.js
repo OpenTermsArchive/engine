@@ -120,6 +120,12 @@ export default class Git {
     return this.git.raw([ 'restore', '-s', commit, '--', path ]);
   }
 
+  async cleanUp() {
+    await this.git.raw([ 'update-ref', '-d', 'HEAD' ]);
+
+    return this.clear();
+  }
+
   relativePath(absolutePath) {
     // Git needs a path relative to the .git directory, not an absolute one
     return path.relative(this.path, absolutePath);
