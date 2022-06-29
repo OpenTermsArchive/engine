@@ -32,7 +32,7 @@ export default class Git {
     return this.git.add(this.relativePath(filepath));
   }
 
-  async commit({ filepath, message, date = new Date() }) {
+  async commit({ filePath, message, date = new Date() }) {
     let summary;
 
     try {
@@ -41,7 +41,7 @@ export default class Git {
       process.env.GIT_AUTHOR_DATE = commitDate;
       process.env.GIT_COMMITTER_DATE = commitDate;
 
-      summary = await this.git.commit(message, filepath);
+      summary = await this.git.commit(message, filePath);
     } finally {
       process.env.GIT_AUTHOR_DATE = '';
       process.env.GIT_COMMITTER_DATE = '';
