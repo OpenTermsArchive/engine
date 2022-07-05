@@ -4,7 +4,6 @@
  */
 
 import fsApi from 'fs';
-import path from 'path';
 
 import mime from 'mime';
 
@@ -28,7 +27,7 @@ export default class GitRepository extends RepositoryInterface {
 
   async initialize() {
     await this.git.initialize();
-    await this.git.clear(); // Drop all uncommitted changes and remove all leftover files that may be present if the process was killed aggressively
+    await this.git.cleanUp(); // Drop all uncommitted changes and remove all leftover files that may be present if the process was killed aggressively
 
     return this;
   }
@@ -94,20 +93,7 @@ export default class GitRepository extends RepositoryInterface {
   }
 
   async removeAll() {
-    const files = await fs.readdir(this.path, { withFileTypes: true });
-    const promises = files.map(file => {
-      const filePath = path.join(this.path, file.name);
-
-      if (file.isDirectory()) {
-        return fs.rm(filePath, { recursive: true });
-      }
-
-      return fs.unlink(filePath);
-    });
-
-    await Promise.all(promises);
-
-    return this.initialize();
+    return this.git.destroyHistory();
   }
 
   async loadRecordContent(record) {
@@ -146,7 +132,7 @@ export default class GitRepository extends RepositoryInterface {
       await fs.mkdir(directory, { recursive: true });
     }
 
-    const filePath = this.#getPathFor(serviceId, documentType, fileExtension);
+    const filePath = `${this.path}/${serviceId}/${documentType}.${fileExtension}`;
 
     await fs.writeFile(filePath, content);
 
@@ -163,18 +149,10 @@ export default class GitRepository extends RepositoryInterface {
     }
   }
 
-  #getPathFor(serviceId, documentType, fileExtension) {
-    return `${this.path}/${serviceId}/${documentType}.${fileExtension}`;
-  }
-
-  #isTracked(serviceId, documentType) {
-    const filePath = this.#getPathFor(serviceId, documentType, '*');
-
-    return this.git.isTracked(filePath);
-  }
-
   async #isFirstRecord(serviceId, documentType) {
-    return !await this.#isTracked(serviceId, documentType);
+    const filePattern = `${this.path}/${serviceId}/${documentType}.*`;
+
+    return !await this.git.isTracked(filePattern);
   }
 
   async #toDomain(commit, { deferContentLoading } = {}) {

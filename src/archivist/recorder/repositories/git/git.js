@@ -19,6 +19,7 @@ export default class Git {
     }
 
     this.git = simpleGit(this.path, { maxConcurrentProcesses: 1 });
+
     await this.git.init();
 
     return this.git
@@ -28,20 +29,19 @@ export default class Git {
       .addConfig('user.email', this.author.email);
   }
 
-  async add(filepath) {
-    return this.git.add(this.relativePath(filepath));
+  async add(filePath) {
+    return this.git.add(this.relativePath(filePath));
   }
 
-  async commit({ filepath, message, date = new Date() }) {
+  async commit({ filePath, message, date = new Date() }) {
+    const commitDate = new Date(date).toISOString();
     let summary;
 
     try {
-      const commitDate = new Date(date).toISOString();
-
       process.env.GIT_AUTHOR_DATE = commitDate;
       process.env.GIT_COMMITTER_DATE = commitDate;
 
-      summary = await this.git.commit(message, filepath);
+      summary = await this.git.commit(message, filePath);
     } finally {
       process.env.GIT_AUTHOR_DATE = '';
       process.env.GIT_COMMITTER_DATE = '';
@@ -68,28 +68,22 @@ export default class Git {
     return commit;
   }
 
-  async log(options = {}) {
+  async log(options = []) {
     try {
-      options.file = options.file && this.relativePath(options.file);
       const logSummary = await this.git.log(options);
 
       return logSummary.all;
     } catch (error) {
-      if (
-        !(
-          error.message.includes('unknown revision or path not in the working tree')
-          || error.message.includes('does not have any commits yet')
-        )
-      ) {
-        throw error;
+      if (/unknown revision or path not in the working tree|does not have any commits yet/.test(error.message)) {
+        return [];
       }
 
-      return [];
+      throw error;
     }
   }
 
-  async isTracked(filepath) {
-    const result = await this.git.raw('ls-files', this.relativePath(filepath));
+  async isTracked(filePath) {
+    const result = await this.git.raw('ls-files', this.relativePath(filePath));
 
     return Boolean(result);
   }
@@ -98,15 +92,11 @@ export default class Git {
     return this.git.checkout(options);
   }
 
-  async raw(options) {
-    return this.git.raw(options);
-  }
-
   async show(options) {
     return this.git.show(options);
   }
 
-  async clear() {
+  async cleanUp() {
     await this.git.reset('hard');
 
     return this.git.clean('f', '-d');
@@ -120,8 +110,13 @@ export default class Git {
     return this.git.raw([ 'restore', '-s', commit, '--', path ]);
   }
 
+  async destroyHistory() {
+    await fs.rm(this.path, { recursive: true });
+
+    return this.initialize();
+  }
+
   relativePath(absolutePath) {
-    // Git needs a path relative to the .git directory, not an absolute one
-    return path.relative(this.path, absolutePath);
+    return path.relative(this.path, absolutePath); // Git needs a path relative to the .git directory, not an absolute one
   }
 }

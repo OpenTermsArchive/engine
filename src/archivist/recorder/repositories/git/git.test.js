@@ -9,9 +9,10 @@ import Git from './git.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const RECORDER_PATH = path.resolve(__dirname, '../../../../../', config.get('recorder.versions.storage.git.path'));
-const EXPECTED_FILE_PATH = `${RECORDER_PATH}/test.md`;
 
 describe('GitRepository', () => {
+  const DEFAULT_CONTENT = 'default content';
+  const DEFAULT_COMMIT_MESSAGE = 'default commit message';
   let subject;
 
   before(() => {
@@ -27,19 +28,59 @@ describe('GitRepository', () => {
   });
 
   describe('#commit', () => {
+    const expectedFilePath = `${RECORDER_PATH}/test.md`;
+
     let commitId;
 
     before(async () => {
-      await fs.writeFile(EXPECTED_FILE_PATH, 'content');
+      await fs.writeFile(expectedFilePath, DEFAULT_CONTENT);
 
-      await subject.add(EXPECTED_FILE_PATH);
-      commitId = await subject.commit({ filepath: EXPECTED_FILE_PATH, message: 'Test message' });
+      await subject.add(expectedFilePath);
+      commitId = await subject.commit({ filePath: expectedFilePath, message: DEFAULT_COMMIT_MESSAGE });
     });
 
-    after(() => fs.rmdir(RECORDER_PATH, { recursive: true }));
+    after(() => subject.destroyHistory());
 
     it('returns a full length SHA1 commit ID', () => {
       expect(commitId).to.match(/\b[0-9a-f]{40}\b/);
+    });
+
+    context('when stage area is dirty', () => {
+      const expectedFileName = 'file-to-commit.md';
+      const expectedFilePath = `${RECORDER_PATH}/${expectedFileName}`;
+      const unwantedFilePath = `${RECORDER_PATH}/unwanted-file.md`;
+      let commit;
+      let committedFiles;
+      let committedFileName;
+
+      before(async () => {
+        await fs.writeFile(expectedFilePath, DEFAULT_CONTENT);
+        await fs.writeFile(unwantedFilePath, DEFAULT_CONTENT);
+
+        await subject.add(expectedFilePath);
+        await subject.add(unwantedFilePath);
+
+        const commitId = await subject.commit({ filePath: expectedFilePath, message: DEFAULT_COMMIT_MESSAGE });
+
+        commit = await subject.getCommit([commitId]);
+
+        if (!commit) {
+          return;
+        }
+
+        ({ files: committedFiles } = commit.diff);
+        ([{ file: committedFileName }] = committedFiles);
+      });
+
+      after(() => subject.destroyHistory());
+
+      it('commits the specified file', () => {
+        expect(committedFileName).to.equal(expectedFileName);
+      });
+
+      it('commits only one file', () => {
+        expect(committedFiles).to.have.lengthOf(1);
+      });
     });
   });
 });
