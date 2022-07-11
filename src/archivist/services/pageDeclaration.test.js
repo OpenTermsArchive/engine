@@ -1,15 +1,17 @@
 import chai from 'chai';
 
-import DocumentDeclaration from './documentDeclaration.js';
+import PageDecalration from './pageDeclaration.js';
 
 const { expect } = chai;
 
-describe('DocumentDeclaration', () => {
-  describe('#extractCssSelectors', () => {
+describe('PageDecalration', () => {
+  const URL = 'http://www.test.com/page';
+
+  describe('#getCssSelectors', () => {
     context('with "select" property', () => {
       context('with string selector', () => {
         it('extracts selectors', async () => {
-          const result = new DocumentDeclaration({ contentSelectors: 'body' }).getCssSelectors();
+          const result = new PageDecalration({ location: URL, contentSelectors: 'body' }).getCssSelectors();
 
           expect(result).to.deep.equal(['body']);
         });
@@ -17,7 +19,8 @@ describe('DocumentDeclaration', () => {
 
       context('with range selector', () => {
         it('extracts selectors', async () => {
-          const result = new DocumentDeclaration({
+          const result = new PageDecalration({
+            location: URL,
             contentSelectors: {
               startBefore: '#startBefore',
               endBefore: '#endBefore',
@@ -30,7 +33,8 @@ describe('DocumentDeclaration', () => {
 
       context('with an array of mixed selectors', () => {
         it('extracts selectors', async () => {
-          const result = new DocumentDeclaration({
+          const result = new PageDecalration({
+            location: URL,
             contentSelectors: [
               {
                 startBefore: '#startBefore',
@@ -48,7 +52,7 @@ describe('DocumentDeclaration', () => {
     context('with "remove" property', () => {
       context('with string selector', () => {
         it('extracts selectors', async () => {
-          const result = new DocumentDeclaration({ noiseSelectors: 'body' }).getCssSelectors();
+          const result = new PageDecalration({ location: URL, noiseSelectors: 'body' }).getCssSelectors();
 
           expect(result).to.deep.equal(['body']);
         });
@@ -56,7 +60,8 @@ describe('DocumentDeclaration', () => {
 
       context('with range selector', () => {
         it('extracts selectors', async () => {
-          const result = new DocumentDeclaration({
+          const result = new PageDecalration({
+            location: URL,
             noiseSelectors: {
               startBefore: '#startBefore',
               endBefore: '#endBefore',
@@ -69,7 +74,8 @@ describe('DocumentDeclaration', () => {
 
       context('with an array of mixed selectors', () => {
         it('extracts selectors', async () => {
-          const result = new DocumentDeclaration({
+          const result = new PageDecalration({
+            location: URL,
             noiseSelectors: [
               {
                 startBefore: '#startBefore',
@@ -87,7 +93,8 @@ describe('DocumentDeclaration', () => {
     context('with both "select" and "remove" property', () => {
       context('with string selector', () => {
         it('extracts selectors', async () => {
-          const result = new DocumentDeclaration({
+          const result = new PageDecalration({
+            location: URL,
             contentSelectors: 'body',
             noiseSelectors: 'h1',
           }).getCssSelectors();
@@ -98,7 +105,8 @@ describe('DocumentDeclaration', () => {
 
       context('with range selector', () => {
         it('extracts selectors', async () => {
-          const result = new DocumentDeclaration({
+          const result = new PageDecalration({
+            location: URL,
             contentSelectors: {
               startBefore: '#startBefore',
               endBefore: '#endBefore',
@@ -120,7 +128,8 @@ describe('DocumentDeclaration', () => {
 
       context('with an array of mixed selectors', () => {
         it('extracts selectors', async () => {
-          const result = new DocumentDeclaration({
+          const result = new PageDecalration({
+            location: URL,
             contentSelectors: [
               {
                 startBefore: '#startBefore',

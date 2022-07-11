@@ -1,4 +1,5 @@
 import DocumentDeclaration from '../../src/archivist/services/documentDeclaration.js';
+import PageDeclaration from '../../src/archivist/services/pageDeclaration.js';
 import Service from '../../src/archivist/services/service.js';
 
 const service = new Service({
@@ -15,16 +16,20 @@ const filters = [
   },
 ];
 
-const latest = new DocumentDeclaration({
-  service,
-  type: 'Terms of Service',
+const page = new PageDeclaration({
   location: 'https://www.service-without-history.example/tos',
   contentSelectors: 'body',
   noiseSelectors: undefined,
   filters,
+});
+
+const document = new DocumentDeclaration({
+  service,
+  type: 'Terms of Service',
+  pages: [page],
   validUntil: null,
 });
 
-service._documents = { 'Terms of Service': { _latest: latest } };
+service.addDocumentDeclaration(document);
 
 export default service;

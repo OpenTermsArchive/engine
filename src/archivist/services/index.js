@@ -5,6 +5,7 @@ import { fileURLToPath, pathToFileURL } from 'url';
 import config from 'config';
 
 import DocumentDeclaration from './documentDeclaration.js';
+import PageDeclaration from './pageDeclaration.js';
 import Service from './service.js';
 
 const fs = fsApi.promises;
@@ -13,91 +14,104 @@ const declarationsPath = path.resolve(__dirname, '../../..', config.get('service
 
 export const DOCUMENT_TYPES = JSON.parse(fsApi.readFileSync(path.resolve(__dirname, './documentTypes.json')));
 
-export async function load(servicesIds = []) {
-  const services = {};
-  const fileNames = await fs.readdir(declarationsPath);
-  let serviceFileNames = fileNames.filter(fileName => path.extname(fileName) == '.json' && !fileName.includes('.history.json'));
+export async function load(servicesIdsToLoad = []) {
+  let servicesIds = await getDeclaredServicesIds();
 
-  if (servicesIds.length) {
-    serviceFileNames = serviceFileNames.filter(fileName => path.basename(fileName, '.json').match(new RegExp(`^${servicesIds.join('|')}$`, 'g')));
+  if (servicesIdsToLoad.length) {
+    servicesIds = servicesIds.filter(serviceId => serviceId.match(new RegExp(`^${servicesIdsToLoad.join('|')}$`, 'g')));
   }
 
-  await Promise.all(serviceFileNames.map(async fileName => {
-    const jsonDeclarationFilePath = path.join(declarationsPath, fileName);
-    let serviceDeclaration;
+  const services = {};
 
-    try {
-      serviceDeclaration = JSON.parse(await fs.readFile(jsonDeclarationFilePath));
-    } catch (e) {
-      throw new Error(`The "${path.basename(fileName, '.json')}" service declaration is malformed and cannot be parsed in ${jsonDeclarationFilePath}`);
-    }
-    const service = new Service({
-      id: path.basename(fileName, '.json'),
-      name: serviceDeclaration.name,
-    });
+  await Promise.all(servicesIds.map(async serviceId => {
+    const { name, documents: documentsDeclaration } = await loadServiceDeclaration(serviceId);
 
-    services[service.id] = service;
+    const service = new Service({ id: serviceId, name });
 
-    const documentNames = Object.keys(serviceDeclaration.documents);
+    await Promise.all(Object.keys(documentsDeclaration).map(documentType => loadServiceDocument(service, documentType, documentsDeclaration[documentType])));
 
-    await Promise.all(documentNames.map(async documentName => {
-      const documentType = serviceDeclaration.documents[documentName];
-      const {
-        filter: filterNames,
-        fetch: location,
-        executeClientScripts,
-        select: contentSelectors,
-        remove: noiseSelectors,
-      } = documentType;
-
-      let filters;
-
-      if (filterNames) {
-        const filterFilePath = fileName.replace('.json', '.filters.js');
-        const serviceFilters = await import(pathToFileURL(path.join(declarationsPath, filterFilePath))); // eslint-disable-line no-await-in-loop
-
-        filters = filterNames.map(filterName => serviceFilters[filterName]);
-      }
-      const document = new DocumentDeclaration({
-        service,
-        type: documentName,
-        location,
-        executeClientScripts,
-        contentSelectors,
-        noiseSelectors,
-        filters,
-      });
-
-      services[service.id].addDocumentDeclaration(document);
-    }));
+    services[serviceId] = service;
   }));
 
   return services;
+}
+
+async function loadServiceDeclaration(serviceId) {
+  const jsonDeclarationFilePath = path.join(declarationsPath, `${serviceId}.json`);
+  const rawServiceDeclaration = await fs.readFile(jsonDeclarationFilePath);
+
+  try {
+    return JSON.parse(rawServiceDeclaration);
+  } catch (error) {
+    throw new Error(`The "${serviceId}" service declaration is malformed and cannot be parsed in ${jsonDeclarationFilePath}`);
+  }
+}
+
+async function loadServiceFilters(serviceId, filterNames) {
+  if (!filterNames) {
+    return;
+  }
+
+  const filterFilePath = `${serviceId}.filters.js`;
+  const serviceFilters = await import(pathToFileURL(path.join(declarationsPath, filterFilePath))); // eslint-disable-line no-await-in-loop
+
+  return filterNames.map(filterName => serviceFilters[filterName]);
+}
+
+async function loadServiceDocument(service, documentType, documentTypeDeclaration) {
+  const { filter: filterNames, fetch: location, executeClientScripts, select: contentSelectors, remove: noiseSelectors, combine } = documentTypeDeclaration;
+
+  const pages = [];
+
+  const filters = await loadServiceFilters(service.id, filterNames);
+
+  if (!combine) {
+    pages.push(new PageDeclaration({ location, executeClientScripts, contentSelectors, noiseSelectors, filters }));
+  } else {
+    for (const pageDeclaration of combine) {
+      const { filter: pageFilterNames, fetch: pageLocation, pageExecuteClientScripts, select: pageContentSelectors, remove: pageNoiseSelectors } = pageDeclaration;
+
+      const pageFilters = await loadServiceFilters(service.id, pageFilterNames); // eslint-disable-line no-await-in-loop
+
+      pages.push(new PageDeclaration({
+        location: pageLocation || location,
+        executeClientScripts: pageExecuteClientScripts || executeClientScripts,
+        contentSelectors: pageContentSelectors || contentSelectors,
+        noiseSelectors: pageNoiseSelectors || noiseSelectors,
+        filters: pageFilters || filters,
+      }));
+    }
+  }
+
+  service.addDocumentDeclaration(new DocumentDeclaration({ service, type: documentType, pages }));
+}
+
+async function getDeclaredServicesIds() {
+  const fileNames = await fs.readdir(declarationsPath);
+
+  const servicesFileNames = fileNames.filter(fileName => path.extname(fileName) == '.json' && !fileName.includes('.history.json'));
+
+  return servicesFileNames.map(serviceFileName => path.basename(serviceFileName, '.json'));
 }
 
 export async function loadWithHistory(servicesIds = []) {
   const services = await load(servicesIds);
 
   for (const serviceId of Object.keys(services)) {
-    const { declaration, filters } = await loadServiceHistoryFiles(serviceId); // eslint-disable-line no-await-in-loop
+    const { declarations, filters } = await loadServiceHistoryFiles(serviceId); // eslint-disable-line no-await-in-loop
 
-    for (const documentType of Object.keys(declaration)) {
-      const documenTypeDeclarationEntries = declaration[documentType];
+    for (const documentType of Object.keys(declarations)) {
+      const documenTypeDeclarationEntries = declarations[documentType];
+      const filterNames = [...new Set(documenTypeDeclarationEntries.flatMap(declaration => declaration.filter))].filter(Boolean);
+      const allHistoryDates = extractHistoryDates({ documenTypeDeclarationEntries, filters, filterNames });
 
-      const filterNames = [...new Set(documenTypeDeclarationEntries.flatMap(declaration => declaration.filter))].filter(el => el);
+      const latestValidDocumentDeclaration = documenTypeDeclarationEntries.find(entry => !entry.validUntil);
 
-      const allHistoryDates = extractHistoryDates({
-        documenTypeDeclarationEntries,
-        filters,
-        filterNames,
-      });
+      allHistoryDates.forEach(async date => {
+        const declarationForThisDate = documenTypeDeclarationEntries.find(entry => new Date(date) <= new Date(entry.validUntil)) || latestValidDocumentDeclaration;
+        const { filter: declarationForThisDateFilterNames, combine } = declarationForThisDate;
 
-      const currentlyValidDocumentDeclaration = documenTypeDeclarationEntries.find(entry => !entry.validUntil);
-
-      allHistoryDates.forEach(date => {
-        const declarationForThisDate = documenTypeDeclarationEntries.find(entry => new Date(date) <= new Date(entry.validUntil)) || currentlyValidDocumentDeclaration;
-        const { filter: declarationForThisDateFilterNames } = declarationForThisDate;
-
+        const pages = [];
         let actualFilters;
 
         if (declarationForThisDateFilterNames) {
@@ -110,14 +124,34 @@ export async function loadWithHistory(servicesIds = []) {
           });
         }
 
+        if (!combine) {
+          pages.push(new PageDeclaration({
+            location: declarationForThisDate.fetch,
+            executeClientScripts: declarationForThisDate.executeClientScripts,
+            contentSelectors: declarationForThisDate.select,
+            noiseSelectors: declarationForThisDate.remove,
+            filters: actualFilters,
+          }));
+        } else {
+          for (const pageDeclaration of combine) {
+            const { filter: pageFilterNames, fetch: pageLocation, pageExecuteClientScripts, select: pageContentSelectors, remove: pageNoiseSelectors } = pageDeclaration;
+
+            const pageFilters = await loadServiceFilters(serviceId, pageFilterNames); // eslint-disable-line no-await-in-loop
+
+            pages.push(new PageDeclaration({
+              location: pageLocation || declarationForThisDate.fetch,
+              executeClientScripts: pageExecuteClientScripts || declarationForThisDate.executeClientScripts,
+              contentSelectors: pageContentSelectors || declarationForThisDate.select,
+              noiseSelectors: pageNoiseSelectors || declarationForThisDate.remove,
+              filters: pageFilters || actualFilters,
+            }));
+          }
+        }
+
         services[serviceId].addDocumentDeclaration(new DocumentDeclaration({
           service: services[serviceId],
           type: documentType,
-          location: declarationForThisDate.fetch,
-          executeClientScripts: declarationForThisDate.executeClientScripts,
-          contentSelectors: declarationForThisDate.select,
-          noiseSelectors: declarationForThisDate.remove,
-          filters: actualFilters,
+          pages,
           validUntil: date,
         }));
       });
@@ -163,10 +197,7 @@ async function loadServiceHistoryFiles(serviceId) {
 
   const serviceHistoryFileName = path.join(declarationsPath, `${serviceId}.history.json`);
   const serviceFiltersFileName = path.join(declarationsPath, `${serviceId}.filters.js`);
-  const serviceFiltersHistoryFileName = path.join(
-    declarationsPath,
-    `${serviceId}.filters.history.js`,
-  );
+  const serviceFiltersHistoryFileName = path.join(declarationsPath, `${serviceId}.filters.history.js`);
 
   let serviceHistory = {};
   const serviceFiltersHistory = {};
@@ -206,7 +237,7 @@ async function loadServiceHistoryFiles(serviceId) {
   sortHistory(serviceFiltersHistory);
 
   return {
-    declaration: serviceHistory || {},
+    declarations: serviceHistory || {},
     filters: serviceFiltersHistory || {},
   };
 }

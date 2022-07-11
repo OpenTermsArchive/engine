@@ -1,4 +1,5 @@
 import DocumentDeclaration from '../../src/archivist/services/documentDeclaration.js';
+import PageDeclaration from '../../src/archivist/services/pageDeclaration.js';
 import Service from '../../src/archivist/services/service.js';
 
 const service = new Service({
@@ -6,16 +7,18 @@ const service = new Service({
   name: 'Service B',
 });
 
-const latest = new DocumentDeclaration({
+const document = new DocumentDeclaration({
   service,
   type: 'Privacy Policy',
-  location: 'https://www.serviceb.example/privacy',
-  contentSelectors: 'body',
-  noiseSelectors: undefined,
-  filters: undefined,
+  pages: [new PageDeclaration({
+    location: 'https://www.serviceb.example/privacy',
+    contentSelectors: 'body',
+    noiseSelectors: undefined,
+    filters: undefined,
+  })],
   validUntil: null,
 });
 
-service._documents = { 'Privacy Policy': { _latest: latest } };
+service.addDocumentDeclaration(document);
 
 export default service;

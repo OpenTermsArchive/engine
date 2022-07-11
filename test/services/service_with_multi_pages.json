@@ -1,0 +1,28 @@
+{
+  "name": "Service with multi pages",
+  "documents": {
+    "Community Guidelines": {
+      "combine": [
+        {
+          "fetch": "https://www.service-with-multi-pages.example/community-standards",
+          "select": [
+            "#main"
+          ]
+        },
+        {
+          "fetch": "https://www.service-with-multi-pages.example/community-standards/hate-speech/"
+        },
+        {
+          "fetch": "https://www.service-with-multi-pages.example/community-standards/violence-incitement/",
+          "filter": [
+            "removeSharesButton",
+            "removePrintButton"
+          ]
+        }
+      ],
+      "select": [
+        "body"
+      ]
+    }
+  }
+}
