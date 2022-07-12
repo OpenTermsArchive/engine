@@ -70,7 +70,7 @@ describe('GitRepository', () => {
           documentType: DOCUMENT_TYPE,
           content: CONTENT,
           fetchDate: FETCH_DATE,
-          snapshotId: SNAPSHOT_ID,
+          snapshotIds: [SNAPSHOT_ID],
           mimeType: MIME_TYPE,
         })));
 
@@ -143,7 +143,7 @@ describe('GitRepository', () => {
           documentType: DOCUMENT_TYPE,
           content: UPDATED_CONTENT,
           fetchDate: FETCH_DATE,
-          snapshotId: SNAPSHOT_ID,
+          snapshotIds: [SNAPSHOT_ID],
           mimeType: MIME_TYPE,
         })));
 
@@ -221,7 +221,7 @@ describe('GitRepository', () => {
           content: REFILTERED_CONTENT,
           fetchDate: FETCH_DATE,
           isRefilter: true,
-          snapshotId: SNAPSHOT_ID,
+          snapshotIds: [SNAPSHOT_ID],
           mimeType: MIME_TYPE,
         })));
 
@@ -254,7 +254,7 @@ describe('GitRepository', () => {
           documentType: DOCUMENT_TYPE,
           content: PDF_CONTENT,
           fetchDate: FETCH_DATE,
-          snapshotId: SNAPSHOT_ID,
+          snapshotIds: [SNAPSHOT_ID],
           mimeType: PDF_MIME_TYPE,
         })));
 
@@ -293,7 +293,7 @@ describe('GitRepository', () => {
         documentType: DOCUMENT_TYPE,
         content: CONTENT,
         fetchDate: FETCH_DATE,
-        snapshotId: SNAPSHOT_ID,
+        snapshotIds: [SNAPSHOT_ID],
         mimeType: MIME_TYPE,
       })));
 
@@ -331,7 +331,7 @@ describe('GitRepository', () => {
     });
 
     it('stores the snapshot ID', () => {
-      expect(record.snapshotId).to.equal(SNAPSHOT_ID);
+      expect(record.snapshotIds).to.deep.equal([SNAPSHOT_ID]);
     });
 
     context('when requested record does not exist', () => {
@@ -351,7 +351,7 @@ describe('GitRepository', () => {
         documentType: DOCUMENT_TYPE,
         content: CONTENT,
         fetchDate: FETCH_DATE,
-        snapshotId: SNAPSHOT_ID,
+        snapshotIds: [SNAPSHOT_ID],
         mimeType: MIME_TYPE,
       }));
 
@@ -362,7 +362,7 @@ describe('GitRepository', () => {
         documentType: DOCUMENT_TYPE,
         content: `${CONTENT} - updated`,
         fetchDate: FETCH_DATE_LATER,
-        snapshotId: SNAPSHOT_ID,
+        snapshotIds: [SNAPSHOT_ID],
         mimeType: MIME_TYPE,
       }));
 
@@ -374,7 +374,7 @@ describe('GitRepository', () => {
         content: `${CONTENT} - updated 2`,
         isRefilter: true,
         fetchDate: FETCH_DATE_EARLIER,
-        snapshotId: SNAPSHOT_ID,
+        snapshotIds: [SNAPSHOT_ID],
         mimeType: MIME_TYPE,
       }));
 
@@ -409,7 +409,7 @@ describe('GitRepository', () => {
         documentType: DOCUMENT_TYPE,
         content: CONTENT,
         fetchDate: FETCH_DATE,
-        snapshotId: SNAPSHOT_ID,
+        snapshotIds: [SNAPSHOT_ID],
         mimeType: MIME_TYPE,
       }));
       await subject.save(new Record({
@@ -417,7 +417,7 @@ describe('GitRepository', () => {
         documentType: DOCUMENT_TYPE,
         content: `${CONTENT} - updated`,
         fetchDate: FETCH_DATE_LATER,
-        snapshotId: SNAPSHOT_ID,
+        snapshotIds: [SNAPSHOT_ID],
         mimeType: MIME_TYPE,
       }));
       await subject.save(new Record({
@@ -426,7 +426,7 @@ describe('GitRepository', () => {
         content: `${CONTENT} - updated 2`,
         isRefilter: true,
         fetchDate: FETCH_DATE_EARLIER,
-        snapshotId: SNAPSHOT_ID,
+        snapshotIds: [SNAPSHOT_ID],
         mimeType: MIME_TYPE,
       }));
 
@@ -536,7 +536,7 @@ describe('GitRepository', () => {
         documentType: DOCUMENT_TYPE,
         content: CONTENT,
         fetchDate: FETCH_DATE,
-        snapshotId: SNAPSHOT_ID,
+        snapshotIds: [SNAPSHOT_ID],
         mimeType: MIME_TYPE,
       }));
 
@@ -547,7 +547,7 @@ describe('GitRepository', () => {
         documentType: DOCUMENT_TYPE,
         content: `${CONTENT} - updated`,
         fetchDate: FETCH_DATE_LATER,
-        snapshotId: SNAPSHOT_ID,
+        snapshotIds: [SNAPSHOT_ID],
         mimeType: MIME_TYPE,
       }));
 
@@ -559,7 +559,7 @@ describe('GitRepository', () => {
         content: `${CONTENT} - updated 2`,
         isRefilter: true,
         fetchDate: FETCH_DATE_EARLIER,
-        snapshotId: SNAPSHOT_ID,
+        snapshotIds: [SNAPSHOT_ID],
         mimeType: MIME_TYPE,
       }));
 

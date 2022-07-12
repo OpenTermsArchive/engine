@@ -4,6 +4,7 @@
  */
 
 import fsApi from 'fs';
+import path from 'path';
 
 import mime from 'mime';
 
@@ -38,9 +39,11 @@ export default class GitRepository extends RepositoryInterface {
     if (record.isFirstRecord === undefined || record.isFirstRecord === null) {
       record.isFirstRecord = await this.#isFirstRecord(serviceId, documentType);
     }
-    const { message, content, fileExtension } = await this.#toPersistence(record);
+    const { message, content, filePath: relativeFilePath } = await this.#toPersistence(record);
 
-    const filePath = await this.#writeFile({ serviceId, documentType, content, fileExtension });
+    const filePath = `${this.path}/${relativeFilePath}`;
+
+    await GitRepository.#writeFile({ filePath, content });
     const sha = await this.#commit({ filePath, message, date: fetchDate });
 
     if (!sha) {
@@ -60,8 +63,9 @@ export default class GitRepository extends RepositoryInterface {
     return this.git.pushChanges();
   }
 
-  async findLatest(serviceId, documentType) {
-    const commit = await this.git.getCommit([`${serviceId}/${documentType}.*`]);
+  async findLatest(serviceId, documentType, pageId) {
+    const filePath = DataMapper.generateFilePath(serviceId, documentType, pageId);
+    const commit = await this.git.getCommit([filePath]);
 
     return this.#toDomain(commit);
   }
@@ -97,7 +101,7 @@ export default class GitRepository extends RepositoryInterface {
   }
 
   async loadRecordContent(record) {
-    const relativeFilePath = `${record.serviceId}/${record.documentType}.${mime.getExtension(record.mimeType)}`;
+    const relativeFilePath = DataMapper.generateFilePath(record.serviceId, record.documentType, record.pageId, record.mimeType);
 
     if (record.mimeType != mime.getType('pdf')) {
       record.content = await this.git.show(`${record.id}:${relativeFilePath}`);
@@ -125,14 +129,12 @@ export default class GitRepository extends RepositoryInterface {
       .sort((commitA, commitB) => new Date(commitA.date) - new Date(commitB.date)); // Make sure that the commits are sorted in ascending chronological order
   }
 
-  async #writeFile({ serviceId, documentType, content, fileExtension }) {
-    const directory = `${this.path}/${serviceId}`;
+  static async #writeFile({ filePath, content }) {
+    const directory = path.dirname(filePath);
 
     if (!fsApi.existsSync(directory)) {
       await fs.mkdir(directory, { recursive: true });
     }
-
-    const filePath = `${this.path}/${serviceId}/${documentType}.${fileExtension}`;
 
     await fs.writeFile(filePath, content);
 

@@ -61,7 +61,7 @@ describe('MongoRepository', () => {
           content: CONTENT,
           mimeType: MIME_TYPE,
           fetchDate: FETCH_DATE,
-          snapshotId: SNAPSHOT_ID,
+          snapshotIds: [SNAPSHOT_ID],
         })));
 
         numberOfRecordsAfter = await collection.find({
@@ -115,7 +115,7 @@ describe('MongoRepository', () => {
         });
 
         it('stores the snapshot ID', () => {
-          expect(mongoDocument.snapshotId.toString()).to.include(SNAPSHOT_ID);
+          expect(mongoDocument.snapshotIds.map(snapshotId => snapshotId.toString())).to.deep.equal([SNAPSHOT_ID]);
         });
       });
     });
@@ -130,7 +130,7 @@ describe('MongoRepository', () => {
           content: CONTENT,
           mimeType: MIME_TYPE,
           fetchDate: FETCH_DATE,
-          snapshotId: SNAPSHOT_ID,
+          snapshotIds: [SNAPSHOT_ID],
         })));
 
         numberOfRecordsBefore = await collection.find({
@@ -144,7 +144,7 @@ describe('MongoRepository', () => {
           content: UPDATED_CONTENT,
           mimeType: MIME_TYPE,
           fetchDate: FETCH_DATE,
-          snapshotId: SNAPSHOT_ID,
+          snapshotIds: [SNAPSHOT_ID],
         })));
 
         numberOfRecordsAfter = await collection.find({
@@ -236,7 +236,7 @@ describe('MongoRepository', () => {
           content: REFILTERED_CONTENT,
           mimeType: MIME_TYPE,
           fetchDate: FETCH_DATE,
-          snapshotId: SNAPSHOT_ID,
+          snapshotIds: [SNAPSHOT_ID],
           isRefilter: true,
         })));
 
@@ -281,7 +281,7 @@ describe('MongoRepository', () => {
           content: PDF_CONTENT,
           mimeType: PDF_MIME_TYPE,
           fetchDate: FETCH_DATE,
-          snapshotId: SNAPSHOT_ID,
+          snapshotIds: [SNAPSHOT_ID],
         })));
 
         numberOfRecordsAfter = await collection.find({
@@ -327,7 +327,7 @@ describe('MongoRepository', () => {
         documentType: DOCUMENT_TYPE,
         content: CONTENT,
         fetchDate: FETCH_DATE,
-        snapshotId: SNAPSHOT_ID,
+        snapshotIds: [SNAPSHOT_ID],
         mimeType: MIME_TYPE,
       })));
 
@@ -365,7 +365,7 @@ describe('MongoRepository', () => {
     });
 
     it('stores the snapshot ID', () => {
-      expect(record.snapshotId).to.equal(SNAPSHOT_ID);
+      expect(record.snapshotIds).to.deep.equal([SNAPSHOT_ID]);
     });
 
     context('when requested record does not exist', () => {
@@ -385,7 +385,7 @@ describe('MongoRepository', () => {
         documentType: DOCUMENT_TYPE,
         content: CONTENT,
         fetchDate: FETCH_DATE,
-        snapshotId: SNAPSHOT_ID,
+        snapshotIds: [SNAPSHOT_ID],
         mimeType: MIME_TYPE,
       }));
 
@@ -396,7 +396,7 @@ describe('MongoRepository', () => {
         documentType: DOCUMENT_TYPE,
         content: `${CONTENT} - updated`,
         fetchDate: FETCH_DATE_LATER,
-        snapshotId: SNAPSHOT_ID,
+        snapshotIds: [SNAPSHOT_ID],
         mimeType: MIME_TYPE,
       }));
 
@@ -408,7 +408,7 @@ describe('MongoRepository', () => {
         content: `${CONTENT} - updated 2`,
         isRefilter: true,
         fetchDate: FETCH_DATE_EARLIER,
-        snapshotId: SNAPSHOT_ID,
+        snapshotIds: [SNAPSHOT_ID],
         mimeType: MIME_TYPE,
       }));
 
@@ -443,7 +443,7 @@ describe('MongoRepository', () => {
         documentType: DOCUMENT_TYPE,
         content: CONTENT,
         fetchDate: FETCH_DATE,
-        snapshotId: SNAPSHOT_ID,
+        snapshotIds: [SNAPSHOT_ID],
         mimeType: MIME_TYPE,
       }));
       await subject.save(new Record({
@@ -451,7 +451,7 @@ describe('MongoRepository', () => {
         documentType: DOCUMENT_TYPE,
         content: `${CONTENT} - updated`,
         fetchDate: FETCH_DATE_LATER,
-        snapshotId: SNAPSHOT_ID,
+        snapshotIds: [SNAPSHOT_ID],
         mimeType: MIME_TYPE,
       }));
       await subject.save(new Record({
@@ -460,7 +460,7 @@ describe('MongoRepository', () => {
         content: `${CONTENT} - updated 2`,
         isRefilter: true,
         fetchDate: FETCH_DATE_EARLIER,
-        snapshotId: SNAPSHOT_ID,
+        snapshotIds: [SNAPSHOT_ID],
         mimeType: MIME_TYPE,
       }));
 
@@ -583,7 +583,7 @@ describe('MongoRepository', () => {
         documentType: DOCUMENT_TYPE,
         content: CONTENT,
         fetchDate: FETCH_DATE,
-        snapshotId: SNAPSHOT_ID,
+        snapshotIds: [SNAPSHOT_ID],
         mimeType: MIME_TYPE,
       }));
 
@@ -594,7 +594,7 @@ describe('MongoRepository', () => {
         documentType: DOCUMENT_TYPE,
         content: `${CONTENT} - updated`,
         fetchDate: FETCH_DATE_LATER,
-        snapshotId: SNAPSHOT_ID,
+        snapshotIds: [SNAPSHOT_ID],
         mimeType: MIME_TYPE,
       }));
 
@@ -606,7 +606,7 @@ describe('MongoRepository', () => {
         content: `${CONTENT} - updated 2`,
         isRefilter: true,
         fetchDate: FETCH_DATE_EARLIER,
-        snapshotId: SNAPSHOT_ID,
+        snapshotIds: [SNAPSHOT_ID],
         mimeType: MIME_TYPE,
       }));
 
