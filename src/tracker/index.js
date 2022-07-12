@@ -240,20 +240,18 @@ export default class Tracker {
     const title = `Fix ${name} - ${documentType}`;
 
     const body = `
-  This document declaration is not fetched correctly anymore.
+This document is no longer properly tracked.
 
-  \`${message}\`
+\`${message}\`
 
-  Check what's wrong by:
-  - using the [online contribution tool](${CONTRIBUTE_URL}?${urlQueryParams})
-  - using the [local contribution tool](${LOCAL_CONTRIBUTE_URL}?${urlQueryParams}). See [Setup Guide](https://github.com/OpenTermsArchive/contribution-tool#usage)
-  ${message.includes('404') ? `- [Searching Google](${GOOGLE_URL}%22${encodedName}%22+%22${encodedType}%22) to get for a new URL` : ''}
+Check what's wrong by:
+- Using the [online contribution tool](${CONTRIBUTE_URL}?${urlQueryParams}).
+- Using the [local contribution tool](${LOCAL_CONTRIBUTE_URL}?${urlQueryParams}). See [Setup Guide](https://github.com/OpenTermsArchive/contribution-tool#usage).
+${message.includes('404') ? `- [Searching Google](${GOOGLE_URL}%22${encodedName}%22+%22${encodedType}%22) to get for a new URL.` : ''}
 
-  And some info about what has already been tracked
-  - See [service declaration JSON file](${GITHUB_REPO_URL}/${encodedName}.json)
-
-  Thanks
-  `;
+And some info about what has already been tracked:
+- See [service declaration JSON file](${GITHUB_REPO_URL}/${encodedName}.json).
+`;
 
     return {
       title,
