@@ -34,11 +34,12 @@ export default class GitRepository extends RepositoryInterface {
   }
 
   async save(record) {
-    const { serviceId, documentType, fetchDate } = record;
+    const { serviceId, documentType, pageId, fetchDate } = record;
 
     if (record.isFirstRecord === undefined || record.isFirstRecord === null) {
-      record.isFirstRecord = await this.#isFirstRecord(serviceId, documentType);
+      record.isFirstRecord = !await this.#isTracked(serviceId, documentType, pageId);
     }
+
     const { message, content, filePath: relativeFilePath } = await this.#toPersistence(record);
 
     const filePath = `${this.path}/${relativeFilePath}`;
@@ -151,10 +152,8 @@ export default class GitRepository extends RepositoryInterface {
     }
   }
 
-  async #isFirstRecord(serviceId, documentType) {
-    const filePattern = `${this.path}/${serviceId}/${documentType}.*`;
-
-    return !await this.git.isTracked(filePattern);
+  #isTracked(serviceId, documentType, pageId) {
+    return this.git.isTracked(`${this.path}/${DataMapper.generateFilePath(serviceId, documentType, pageId)}`);
   }
 
   async #toDomain(commit, { deferContentLoading } = {}) {

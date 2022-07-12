@@ -12,7 +12,7 @@ export const COMMIT_MESSAGE_PREFIX = {
   update: 'Update',
 };
 
-const DOCUMENT_TYPE_AND_PAGE_ID_SEPARATOR = ' - ';
+export const DOCUMENT_TYPE_AND_PAGE_ID_SEPARATOR = ' - ';
 
 export const COMMIT_MESSAGE_PREFIXES_REGEXP = new RegExp(`^(${COMMIT_MESSAGE_PREFIX.startTracking}|${COMMIT_MESSAGE_PREFIX.refilter}|${COMMIT_MESSAGE_PREFIX.update})`);
 
@@ -23,7 +23,7 @@ export function toPersistence(record, prefixMessageToSnapshotId) {
 
   prefix = isFirstRecord ? COMMIT_MESSAGE_PREFIX.startTracking : prefix;
 
-  let message = `${prefix} ${serviceId} ${documentType}\n`;
+  let message = `${prefix} ${serviceId} ${documentType}${pageId ? ` - ${pageId}` : ''}\n`;
 
   if (snapshotIds?.length) {
     for (const snapshotId of snapshotIds) {

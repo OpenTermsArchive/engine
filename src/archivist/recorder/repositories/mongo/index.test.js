@@ -18,6 +18,7 @@ const client = new MongoClient(connectionURI);
 
 const SERVICE_PROVIDER_ID = 'test_service';
 const DOCUMENT_TYPE = 'Terms of Service';
+const PAGE_ID = 'community-standards-hate-speech';
 const CONTENT = 'ToS fixture data with UTF-8 çhãràčtęrs';
 const MIME_TYPE = 'text/html';
 const FETCH_DATE = new Date('2000-01-01T12:00:00.000Z');
@@ -58,6 +59,7 @@ describe('MongoRepository', () => {
         (record = await subject.save(new Record({
           serviceId: SERVICE_PROVIDER_ID,
           documentType: DOCUMENT_TYPE,
+          pageId: PAGE_ID,
           content: CONTENT,
           mimeType: MIME_TYPE,
           fetchDate: FETCH_DATE,
@@ -116,6 +118,10 @@ describe('MongoRepository', () => {
 
         it('stores the snapshot ID', () => {
           expect(mongoDocument.snapshotIds.map(snapshotId => snapshotId.toString())).to.deep.equal([SNAPSHOT_ID]);
+        });
+
+        it('stores the page ID', () => {
+          expect(mongoDocument.pageId).to.equal(PAGE_ID);
         });
       });
     });
@@ -325,6 +331,7 @@ describe('MongoRepository', () => {
       ({ id } = await subject.save(new Record({
         serviceId: SERVICE_PROVIDER_ID,
         documentType: DOCUMENT_TYPE,
+        pageId: PAGE_ID,
         content: CONTENT,
         fetchDate: FETCH_DATE,
         snapshotIds: [SNAPSHOT_ID],
@@ -356,16 +363,20 @@ describe('MongoRepository', () => {
       expect(record.content).to.equal(CONTENT);
     });
 
-    it('stores the fetch date', () => {
+    it('returns the fetch date', () => {
       expect(new Date(record.fetchDate).getTime()).to.equal(FETCH_DATE.getTime());
     });
 
-    it('stores the MIME type', () => {
+    it('returns the MIME type', () => {
       expect(record.mimeType).to.equal(MIME_TYPE);
     });
 
-    it('stores the snapshot ID', () => {
+    it('returns the snapshot ID', () => {
       expect(record.snapshotIds).to.deep.equal([SNAPSHOT_ID]);
+    });
+
+    it('returns the page ID', () => {
+      expect(record.pageId).to.equal(PAGE_ID);
     });
 
     context('when requested record does not exist', () => {

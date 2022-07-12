@@ -16,12 +16,13 @@ export function toPersistence(record) {
 }
 
 export function toDomain(document) {
-  const { _id, serviceId, documentType, fetchDate, mimeType, isRefilter, isFirstRecord, snapshotIds } = document;
+  const { _id, serviceId, documentType, pageId, fetchDate, mimeType, isRefilter, isFirstRecord, snapshotIds } = document;
 
   return new Record({
     id: _id.toString(),
     serviceId,
     documentType,
+    pageId,
     mimeType,
     fetchDate: new Date(fetchDate),
     isFirstRecord: Boolean(isFirstRecord),
