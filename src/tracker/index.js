@@ -237,23 +237,20 @@ export default class Tracker {
 
     const urlQueryParams = `destination=${encodedDestination}&step=2&url=${encodedUrl}&name=${encodedName}&documentType=${encodedType}${noiseSelectorsQueryString}${contentSelectorsQueryString}&expertMode=true`;
 
-    const message404 = message.includes('404') ? `- Search Google to get the new url: ${GOOGLE_URL}%22${encodedName}%22+%22${encodedType}%22` : '';
-
     const title = `Fix ${name} - ${documentType}`;
 
     const body = `
-  This service is not available anymore.
-  Please fix it.
+  This document declaration is not fetched correctly anymore.
 
   \`${message}\`
 
-  Here some ideas on how to fix this issue:
-  - See what's wrong online: ${CONTRIBUTE_URL}?${urlQueryParams}
-  - Or on your local: ${LOCAL_CONTRIBUTE_URL}?${urlQueryParams}
-  ${message404}
+  Check what's wrong by:
+  - using the [online contribution tool](${CONTRIBUTE_URL}?${urlQueryParams})
+  - using the [local contribution tool](${LOCAL_CONTRIBUTE_URL}?${urlQueryParams}). See [Setup Guide](https://github.com/OpenTermsArchive/contribution-tool#usage)
+  ${message.includes('404') ? `- [Searching Google](${GOOGLE_URL}%22${encodedName}%22+%22${encodedType}%22) to get for a new URL` : ''}
 
   And some info about what has already been tracked
-  - See original JSON file: ${GITHUB_REPO_URL}/${encodedName}.json
+  - See [service declaration JSON file](${GITHUB_REPO_URL}/${encodedName}.json)
 
   Thanks
   `;
