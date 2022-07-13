@@ -32,7 +32,7 @@ export async function initTargetRepo(targetRepoPath) {
 
   if (await fileExists(targetRepoPath)) {
     console.log(`Removed already existing target repository: ${targetRepoPath}`);
-    await fs.rmdir(targetRepoPath, { recursive: true });
+    await fs.rm(targetRepoPath, { recursive: true });
   }
   await fs.mkdir(targetRepoPath);
 
