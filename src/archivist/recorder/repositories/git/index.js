@@ -47,11 +47,9 @@ export default class GitRepository extends RepositoryInterface {
     await GitRepository.#writeFile({ filePath, content });
     const sha = await this.#commit({ filePath, message, date: fetchDate });
 
-    if (!sha) {
-      return Object(null);
+    if (sha) {
+      record.id = sha;
     }
-
-    record.id = sha;
 
     return record;
   }
