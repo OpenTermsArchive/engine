@@ -121,51 +121,92 @@ export default class Archivist extends events.EventEmitter {
   }
 
   async trackDocumentChanges(documentDeclaration) {
-    const { location, executeClientScripts } = documentDeclaration;
+    const { service: { id: serviceId }, type: documentType, pages } = documentDeclaration;
 
-    let mimeType;
-    let content;
+    const snapshots = [];
+    const snapshotIds = [];
+    const contents = [];
+    let fetchDate;
 
-    try {
-      ({ mimeType, content } = await fetch({
-        url: location,
-        executeClientScripts,
-        cssSelectors: documentDeclaration.getCssSelectors(),
-        config: config.get('fetcher'),
-      }));
-    } catch (error) {
-      if (error instanceof FetchDocumentError) {
-        if (error.message.includes('EAI_AGAIN')) {
+    /* eslint-disable no-await-in-loop */
+    for (const page of pages) {
+      const { location, executeClientScripts } = page;
+
+      let mimeType;
+      let content;
+      const pageId = documentDeclaration.isMultiPage() && page.id;
+
+      try {
+        ({ mimeType, content } = await fetch({
+          url: location,
+          executeClientScripts,
+          cssSelectors: page.getCssSelectors(),
+          config: config.get('fetcher'),
+        }));
+        fetchDate = new Date();
+      } catch (error) {
+        if (error instanceof FetchDocumentError) {
+          if (error.message.includes('EAI_AGAIN')) {
           // EAI_AGAIN is a DNS lookup timed out error, which means it is a network connectivity error or proxy related error.
           // This operational error is mostly transient and should be handled by retrying the operation.
           // As there is no retry mechanism in the engine yet, crash the engine and leave it to the process
           // manager to handle the retries and the delay between them.
-          throw error;
-        } else {
-          throw new InaccessibleContentError(error.message);
+            throw error;
+          } else {
+            throw new InaccessibleContentError(error.message);
+          }
         }
+
+        throw error;
       }
 
-      throw error;
+      let snapshotId = await this.recordSnapshot({
+        content,
+        mimeType,
+        serviceId,
+        documentType,
+        pageId,
+        fetchDate,
+      });
+
+      if (!snapshotId && documentDeclaration.isMultiPage()) { // on multi-page documents, where one of the pages has not been changed, use the last saved snapshot to ensure that this page is present in the version
+        ({ id: snapshotId, content, mimeType, fetchDate } = await this.recorder.getLatestSnapshot(serviceId, documentType, pageId));
+      }
+
+      snapshots.push({
+        snapshotId,
+        content,
+        mimeType,
+        fetchDate,
+        page,
+      });
     }
 
-    const fetchDate = new Date();
-    const snapshotId = await this.recordSnapshot({
-      content,
-      mimeType,
-      documentDeclaration,
-      fetchDate,
-    });
+    for (const { snapshotId, content, mimeType, page } of snapshots) {
+      if (!snapshotId) {
+        continue;
+      }
 
-    if (!snapshotId) {
+      snapshotIds.push(snapshotId);
+
+      const versionContent = await filter({
+        content,
+        mimeType,
+        pageDeclaration: page,
+      });
+
+      contents.push(versionContent);
+    }
+
+    if (!snapshotIds.length) {
       return;
     }
 
     const recordedVersion = await this.recordVersion({
-      snapshotContent: content,
-      mimeType,
-      snapshotId,
-      documentDeclaration,
+      content: contents.join('\n\n'),
+      snapshotIds,
+      serviceId,
+      documentType,
       fetchDate,
     });
 
@@ -188,24 +229,52 @@ export default class Archivist extends events.EventEmitter {
   }
 
   async refilterAndRecordDocument(documentDeclaration) {
-    const { type, service } = documentDeclaration;
+    const { service: { id: serviceId }, type: documentType, pages } = documentDeclaration;
 
-    const { id: snapshotId, content: snapshotContent, mimeType, fetchDate } = await this.recorder.getLatestSnapshot(
-      service.id,
-      type,
-    );
+    const snapshots = [];
+    const contents = [];
+    let fetchDate;
 
-    if (!snapshotId) {
+    for (const page of pages) {
+      const pageId = documentDeclaration.isMultiPage() && page.id;
+      const { id: snapshotId, content, mimeType, fetchDate: snapshotFetchDate } = await this.recorder.getLatestSnapshot(serviceId, documentType, pageId);
+
+      if (!snapshotId) {
+        continue;
+      }
+
+      fetchDate = snapshotFetchDate;
+
+      snapshots.push({
+        snapshotId,
+        content,
+        mimeType,
+        fetchDate: snapshotFetchDate,
+        page,
+      });
+    }
+
+    for (const { snapshotId, content, mimeType, page } of snapshots) {
+      if (!snapshotId) {
+        continue;
+      }
+
+      const versionContent = await filter({ content, mimeType, pageDeclaration: page });
+
+      contents.push(versionContent);
+    }
+
+    if (!snapshots.length) {
       return;
     }
 
     return this.recordVersion({
-      snapshotContent,
-      mimeType,
-      snapshotId,
-      documentDeclaration,
-      isRefiltering: true,
+      content: contents.join('\n\n'),
+      snapshotIds: snapshots.map(({ snapshotId }) => snapshotId),
+      serviceId,
+      documentType,
       fetchDate,
+      isRefiltering: true,
     });
   }
 
@@ -217,47 +286,45 @@ export default class Archivist extends events.EventEmitter {
     });
   }
 
-  async recordSnapshot({ content, mimeType, fetchDate, documentDeclaration: { service, type } }) {
+  async recordSnapshot({ content, mimeType, fetchDate, serviceId, documentType, pageId }) {
     const { id: snapshotId, isFirstRecord } = await this.recorder.recordSnapshot({
-      serviceId: service.id,
-      documentType: type,
+      serviceId,
+      documentType,
+      pageId,
       content,
       mimeType,
       fetchDate,
     });
 
     if (!snapshotId) {
-      return this.emit('snapshotNotChanged', service.id, type);
+      this.emit('snapshotNotChanged', serviceId, documentType, pageId);
+
+      return;
     }
 
-    this.emit(isFirstRecord ? 'firstSnapshotRecorded' : 'snapshotRecorded', service.id, type, snapshotId);
+    this.emit(isFirstRecord ? 'firstSnapshotRecorded' : 'snapshotRecorded', serviceId, documentType, pageId, snapshotId);
 
     return snapshotId;
   }
 
-  async recordVersion({ snapshotContent, mimeType, fetchDate, snapshotId, documentDeclaration, isRefiltering }) {
-    const { service, type } = documentDeclaration;
-    const content = await filter({
-      content: snapshotContent,
-      mimeType,
-      documentDeclaration,
-    });
-
+  async recordVersion({ content, fetchDate, snapshotIds, serviceId, documentType, isRefiltering }) {
     const recordFunction = !isRefiltering ? 'recordVersion' : 'recordRefilter';
 
     const { id: versionId, isFirstRecord } = await this.recorder[recordFunction]({
-      serviceId: service.id,
-      documentType: type,
+      serviceId,
+      documentType,
       content,
       fetchDate,
-      snapshotId,
+      snapshotIds,
     });
 
     if (!versionId) {
-      return this.emit('versionNotChanged', service.id, type);
+      this.emit('versionNotChanged', serviceId, documentType);
+
+      return;
     }
 
-    this.emit(isFirstRecord ? 'firstVersionRecorded' : 'versionRecorded', service.id, type, versionId);
+    this.emit(isFirstRecord ? 'firstVersionRecorded' : 'versionRecorded', serviceId, documentType, versionId);
   }
 
   getNumberOfDocuments(serviceIds = this.serviceIds) {
