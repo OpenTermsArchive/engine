@@ -283,12 +283,12 @@ The following instructions assume [OVH Horizon](https://horizon.cloud.ovh.net/pr
 - Then use `sudo fdisk /dev/sd$N` (where `$N` is the identifier of the volume) and answer `n`, `p`, `1`, `w`.
 - Install XFS utilities `sudo apt-get install xfsprogs`
 - Format the disk to XFS: `sudo mkfs.xfs -f /dev/sd$N1`/
-- Finally, create a folder (for example in `/mnt`) and mount the volume in it: `sudo mount -t auto /dev/sd$N1 /mnt/mongodb`.
+- Finally, create a folder (for example in `/mnt`) and mount the volume in it: `sudo mount -t auto /dev/sd$N1 /mnt/disk`.
 
 #### Unmounting
 
 To remove a volume:
 
-- Unmount it with `sudo umount /mnt/mongodb`.
+- Unmount it with `sudo umount /mnt/disk`.
 - Unattach it from the Horizon console.
 - Remove the volume from the Horizon console.
