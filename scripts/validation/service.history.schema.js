@@ -1,5 +1,7 @@
 import { DOCUMENT_TYPES } from '../../src/archivist/services/index.js';
 
+import definitions from './definitions.js';
+
 const AVAILABLE_TYPES_NAME = Object.keys(DOCUMENT_TYPES);
 
 const documentsProperties = () => {
@@ -10,8 +12,9 @@ const documentsProperties = () => {
       type: 'array',
       items: {
         oneOf: [
-          { $ref: '#/definitions/document' },
-          { $ref: '#/definitions/pdfDocument' },
+          { $ref: '#/definitions/singlePageDocumentHistory' },
+          { $ref: '#/definitions/multiPageDocumentHistory' },
+          { $ref: '#/definitions/pdfDocumentHistory' },
         ],
       },
     };
@@ -27,10 +30,11 @@ const schema = {
   properties: documentsProperties(),
   propertyNames: { enum: AVAILABLE_TYPES_NAME },
   definitions: {
-    pdfDocument: {
+    ...definitions,
+    pdfDocumentHistory: {
       type: 'object',
       additionalProperties: false,
-      required: ['fetch'],
+      required: [ 'fetch', 'validUntil' ],
       properties: {
         fetch: {
           type: 'string',
@@ -43,86 +47,45 @@ const schema = {
         },
       },
     },
-    document: {
+    singlePageDocumentHistory: {
       type: 'object',
       additionalProperties: false,
-      required: [ 'fetch', 'select' ],
+      required: [ 'fetch', 'validUntil' ],
       properties: {
-        fetch: {
-          type: 'string',
-          format: 'uri',
-          description: 'The URL where the document can be found',
-        },
-        select: {
-          description: 'Selector(s) that targets element to include',
-          oneOf: [
-            { $ref: '#/definitions/cssSelector' },
-            { $ref: '#/definitions/range' },
-            {
-              type: 'array',
-              items: {
-                oneOf: [
-                  { $ref: '#/definitions/cssSelector' },
-                  { $ref: '#/definitions/range' },
-                ],
-              },
-            },
-          ],
-        },
-        filter: {
+        fetch: { $ref: '#/definitions/location' },
+        select: { $ref: '#/definitions/contentSelectors' },
+        filter: { $ref: '#/definitions/filters' },
+        remove: { $ref: '#/definitions/noiseSelectors' },
+        executeClientScripts: { $ref: '#/definitions/executeClientScripts' },
+        validUntil: { $ref: '#/definitions/validUntil' },
+      },
+    },
+    multiPageDocumentHistory: {
+      type: 'object',
+      additionalProperties: false,
+      required: ['combine'],
+      properties: {
+        combine: {
           type: 'array',
           items: {
-            type: 'string',
-            pattern: '^.+$',
-            description: 'Filter function name',
+            type: 'object',
+            additionalProperties: false,
+            required: ['fetch'],
+            properties: {
+              fetch: { $ref: '#/definitions/location' },
+              select: { $ref: '#/definitions/contentSelectors' },
+              filter: { $ref: '#/definitions/filters' },
+              remove: { $ref: '#/definitions/noiseSelectors' },
+              executeClientScripts: { $ref: '#/definitions/executeClientScripts' },
+            },
           },
         },
-        remove: {
-          description: 'Selector(s) that targets element to exclude',
-          oneOf: [
-            { $ref: '#/definitions/cssSelector' },
-            { $ref: '#/definitions/range' },
-            {
-              type: 'array',
-              items: {
-                oneOf: [
-                  { $ref: '#/definitions/cssSelector' },
-                  { $ref: '#/definitions/range' },
-                ],
-              },
-            },
-          ],
-        },
-        validUntil: {
-          type: 'string',
-          format: 'date-time',
-        },
-        executeClientScripts: {
-          type: 'boolean',
-          description:
-            'Execute client-side JavaScript loaded by the document before accessing the content, in case the DOM modifications are needed to access the content.',
-        },
+        select: { $ref: '#/definitions/contentSelectors' },
+        filter: { $ref: '#/definitions/filters' },
+        remove: { $ref: '#/definitions/noiseSelectors' },
+        executeClientScripts: { $ref: '#/definitions/executeClientScripts' },
+        validUntil: { $ref: '#/definitions/validUntil' },
       },
-    },
-    cssSelector: {
-      type: 'string',
-      pattern: '^.+$',
-      description: 'A CSS selector',
-    },
-    range: {
-      type: 'object',
-      properties: {
-        startBefore: { $ref: '#/definitions/cssSelector' },
-        startAfter: { $ref: '#/definitions/cssSelector' },
-        endBefore: { $ref: '#/definitions/cssSelector' },
-        endAfter: { $ref: '#/definitions/cssSelector' },
-      },
-      oneOf: [
-        { required: [ 'startBefore', 'endBefore' ] },
-        { required: [ 'startBefore', 'endAfter' ] },
-        { required: [ 'startAfter', 'endBefore' ] },
-        { required: [ 'startAfter', 'endAfter' ] },
-      ],
     },
   },
 };
