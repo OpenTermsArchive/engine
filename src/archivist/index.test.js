@@ -518,12 +518,21 @@ describe('Archivist', function () {
           expect(spies.onSnapshotNotChanged).to.have.been.calledTwice;
         });
 
+        it('emits "versionNotChanged" events', async () => {
+          expect(spies.onVersionNotChanged).to.have.been.calledTwice;
+        });
+
+        it('emits "versionNotChanged" events after "snapshotRecorded" events', async () => {
+          expect(spies.onVersionNotChanged).to.have.been.calledAfter(spies.onSnapshotNotChanged);
+        });
+
         it('emits "trackingCompleted" event', async () => {
           expect(spies.onTrackingCompleted).to.have.been.calledAfter(spies.onTrackingStarted);
         });
 
         emitsOnly([
           'snapshotNotChanged',
+          'versionNotChanged',
           'trackingStarted',
           'trackingCompleted',
         ]);
@@ -561,6 +570,10 @@ describe('Archivist', function () {
           expect(spies.onSnapshotRecorded).to.have.been.calledOnceWith(SERVICE_A_ID, SERVICE_A_TYPE);
         });
 
+        it('emits "versionNotChanged" events for the service that was not changed', async () => {
+          expect(spies.onVersionNotChanged).to.have.been.calledOnceWith(SERVICE_B_ID, SERVICE_B_TYPE);
+        });
+
         it('emits "versionRecorded" event for the service that was changed', async () => {
           expect(spies.onVersionRecorded).to.have.been.calledOnceWith(SERVICE_A_ID, SERVICE_A_TYPE);
         });
@@ -576,6 +589,7 @@ describe('Archivist', function () {
         emitsOnly([
           'snapshotNotChanged',
           'snapshotRecorded',
+          'versionNotChanged',
           'versionRecorded',
           'trackingStarted',
           'trackingCompleted',
