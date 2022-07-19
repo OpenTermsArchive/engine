@@ -8,7 +8,7 @@ export default class PageDeclaration {
     this.id = new URL(location).pathname.split('/').filter(Boolean).join('-');
   }
 
-  getCssSelectors() {
+  get cssSelectors() {
     const { contentSelectors, noiseSelectors } = this;
 
     const result = [

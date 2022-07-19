@@ -11,7 +11,7 @@ describe('PageDeclaration', () => {
     context('with "select" property', () => {
       context('with string selector', () => {
         it('extracts selectors', async () => {
-          const result = new PageDeclaration({ location: URL, contentSelectors: 'body' }).getCssSelectors();
+          const result = new PageDeclaration({ location: URL, contentSelectors: 'body' }).cssSelectors;
 
           expect(result).to.deep.equal(['body']);
         });
@@ -25,7 +25,7 @@ describe('PageDeclaration', () => {
               startBefore: '#startBefore',
               endBefore: '#endBefore',
             },
-          }).getCssSelectors();
+          }).cssSelectors;
 
           expect(result).to.deep.equal([ '#startBefore', '#endBefore' ]);
         });
@@ -42,7 +42,7 @@ describe('PageDeclaration', () => {
               },
               'body',
             ],
-          }).getCssSelectors();
+          }).cssSelectors;
 
           expect(result).to.deep.equal([ '#startBefore', '#endBefore', 'body' ]);
         });
@@ -52,7 +52,7 @@ describe('PageDeclaration', () => {
     context('with "remove" property', () => {
       context('with string selector', () => {
         it('extracts selectors', async () => {
-          const result = new PageDeclaration({ location: URL, noiseSelectors: 'body' }).getCssSelectors();
+          const result = new PageDeclaration({ location: URL, noiseSelectors: 'body' }).cssSelectors;
 
           expect(result).to.deep.equal(['body']);
         });
@@ -66,7 +66,7 @@ describe('PageDeclaration', () => {
               startBefore: '#startBefore',
               endBefore: '#endBefore',
             },
-          }).getCssSelectors();
+          }).cssSelectors;
 
           expect(result).to.deep.equal([ '#startBefore', '#endBefore' ]);
         });
@@ -83,7 +83,7 @@ describe('PageDeclaration', () => {
               },
               'body',
             ],
-          }).getCssSelectors();
+          }).cssSelectors;
 
           expect(result).to.deep.equal([ '#startBefore', '#endBefore', 'body' ]);
         });
@@ -97,7 +97,7 @@ describe('PageDeclaration', () => {
             location: URL,
             contentSelectors: 'body',
             noiseSelectors: 'h1',
-          }).getCssSelectors();
+          }).cssSelectors;
 
           expect(result).to.deep.equal([ 'body', 'h1' ]);
         });
@@ -115,7 +115,7 @@ describe('PageDeclaration', () => {
               startBefore: '#startBefore',
               endBefore: '#endBefore',
             },
-          }).getCssSelectors();
+          }).cssSelectors;
 
           expect(result).to.deep.equal([
             '#startBefore',
@@ -144,7 +144,7 @@ describe('PageDeclaration', () => {
               },
               'body',
             ],
-          }).getCssSelectors();
+          }).cssSelectors;
 
           expect(result).to.deep.equal([
             '#startBefore',

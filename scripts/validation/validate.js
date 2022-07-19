@@ -128,7 +128,7 @@ let servicesToValidate = args;
                 const document = await fetch({
                   url: location,
                   executeClientScripts,
-                  cssSelectors: documentDeclaration.getCssSelectors(),
+                  cssSelectors: documentDeclaration.cssSelectors,
                   config: config.get('fetcher'),
                 });
 
@@ -185,7 +185,7 @@ let servicesToValidate = args;
                 const document = await fetch({
                   url: location,
                   executeClientScripts,
-                  cssSelectors: documentDeclaration.getCssSelectors(),
+                  cssSelectors: documentDeclaration.cssSelectors,
                   config: config.get('fetcher'),
                 });
                 const secondFilteredContent = await filter({
