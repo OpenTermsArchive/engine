@@ -1,5 +1,5 @@
 export default class Service {
-  documents = {};
+  documents = new Map();
 
   constructor({ id, name }) {
     this.id = id;
