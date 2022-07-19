@@ -17,7 +17,10 @@ export default class Service {
       return currentlyValidDocumentDeclaration;
     }
 
-    return ((history && history.find(entry => new Date(date) <= new Date(entry.validUntil))) || currentlyValidDocumentDeclaration);
+    return (
+      (history && history.find(entry => new Date(date) <= new Date(entry.validUntil)))
+      || currentlyValidDocumentDeclaration
+    );
   }
 
   getDocumentTypes() {
