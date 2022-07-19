@@ -17,24 +17,18 @@ export const DOCUMENT_TYPE_AND_PAGE_ID_SEPARATOR = ' - ';
 export const COMMIT_MESSAGE_PREFIXES_REGEXP = new RegExp(`^(${COMMIT_MESSAGE_PREFIX.startTracking}|${COMMIT_MESSAGE_PREFIX.refilter}|${COMMIT_MESSAGE_PREFIX.update})`);
 
 export function toPersistence(record, prefixMessageToSnapshotId) {
-  const { serviceId, documentType, pageId, isRefilter, snapshotIds, mimeType, isFirstRecord } = record;
+  const { serviceId, documentType, pageId, isRefilter, snapshotIds = [], mimeType, isFirstRecord } = record;
 
   let prefix = isRefilter ? COMMIT_MESSAGE_PREFIX.refilter : COMMIT_MESSAGE_PREFIX.update;
 
   prefix = isFirstRecord ? COMMIT_MESSAGE_PREFIX.startTracking : prefix;
 
-  let message = `${prefix} ${serviceId} ${documentType}${pageId ? ` - ${pageId}` : ''}\n`;
-
-  if (snapshotIds?.length) {
-    for (const snapshotId of snapshotIds) {
-      message = `${message}\n${prefixMessageToSnapshotId}${snapshotId}`;
-    }
-  }
-
+  const subject = `${prefix} ${serviceId} ${documentType}${pageId ? `${DOCUMENT_TYPE_AND_PAGE_ID_SEPARATOR}${pageId}` : ''}`;
+  const description = snapshotIds.map(snapshotId => `${prefixMessageToSnapshotId}${snapshotId}`).join('\n');
   const filePath = generateFilePath(serviceId, documentType, pageId, mimeType);
 
   return {
-    message,
+    message: `${subject}\n\n${description}`,
     content: record.content,
     filePath,
   };
