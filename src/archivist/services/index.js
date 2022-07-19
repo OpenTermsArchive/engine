@@ -69,13 +69,13 @@ async function loadServiceDocument(service, documentType, documentTypeDeclaratio
     pages.push(new PageDeclaration({ location, executeClientScripts, contentSelectors, noiseSelectors, filters }));
   } else {
     for (const pageDeclaration of combine) {
-      const { filter: pageFilterNames, fetch: pageLocation, pageExecuteClientScripts, select: pageContentSelectors, remove: pageNoiseSelectors } = pageDeclaration;
+      const { filter: pageFilterNames, fetch: pageLocation, executeClientScripts: pageExecuteClientScripts, select: pageContentSelectors, remove: pageNoiseSelectors } = pageDeclaration;
 
       const pageFilters = await loadServiceFilters(service.id, pageFilterNames); // eslint-disable-line no-await-in-loop
 
       pages.push(new PageDeclaration({
         location: pageLocation || location,
-        executeClientScripts: pageExecuteClientScripts || executeClientScripts,
+        executeClientScripts: (pageExecuteClientScripts === undefined || pageExecuteClientScripts === null ? executeClientScripts : pageExecuteClientScripts),
         contentSelectors: pageContentSelectors || contentSelectors,
         noiseSelectors: pageNoiseSelectors || noiseSelectors,
         filters: pageFilters || filters,
@@ -134,13 +134,13 @@ export async function loadWithHistory(servicesIds = []) {
           }));
         } else {
           for (const pageDeclaration of combine) {
-            const { filter: pageFilterNames, fetch: pageLocation, pageExecuteClientScripts, select: pageContentSelectors, remove: pageNoiseSelectors } = pageDeclaration;
+            const { filter: pageFilterNames, fetch: pageLocation, executeClientScripts: pageExecuteClientScripts, select: pageContentSelectors, remove: pageNoiseSelectors } = pageDeclaration;
 
             const pageFilters = await loadServiceFilters(serviceId, pageFilterNames); // eslint-disable-line no-await-in-loop
 
             pages.push(new PageDeclaration({
               location: pageLocation || declarationForThisDate.fetch,
-              executeClientScripts: pageExecuteClientScripts || declarationForThisDate.executeClientScripts,
+              executeClientScripts: (pageExecuteClientScripts === undefined || pageExecuteClientScripts === null ? declarationForThisDate.executeClientScripts : pageExecuteClientScripts),
               contentSelectors: pageContentSelectors || declarationForThisDate.select,
               noiseSelectors: pageNoiseSelectors || declarationForThisDate.remove,
               filters: pageFilters || actualFilters,
