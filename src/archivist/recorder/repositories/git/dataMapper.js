@@ -57,7 +57,7 @@ export function toDomain(commit) {
     fetchDate: new Date(date),
     isFirstRecord: message.startsWith(COMMIT_MESSAGE_PREFIX.startTracking),
     isRefilter: message.startsWith(COMMIT_MESSAGE_PREFIX.refilter),
-    snapshotIds: snapshotIdsMatch,
+    snapshotIds: snapshotIdsMatch || [],
   });
 }
 

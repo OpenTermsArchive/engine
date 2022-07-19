@@ -27,6 +27,6 @@ export function toDomain(document) {
     fetchDate: new Date(fetchDate),
     isFirstRecord: Boolean(isFirstRecord),
     isRefilter: Boolean(isRefilter),
-    snapshotIds: snapshotIds?.map(snapshotId => snapshotId.toString()),
+    snapshotIds: snapshotIds?.map(snapshotId => snapshotId.toString()) || [],
   });
 }
