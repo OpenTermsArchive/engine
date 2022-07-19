@@ -5,7 +5,7 @@ import PageDeclaration from './pageDeclaration.js';
 const { expect } = chai;
 
 describe('PageDeclaration', () => {
-  const URL = 'http://www.test.com/page';
+  const URL = 'https://www.service.example/terms';
 
   describe('#getCssSelectors', () => {
     context('with "select" property', () => {
