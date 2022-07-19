@@ -1,0 +1,40 @@
+{
+  "services": {
+    "repository": "https://github.com/OpenTermsArchive/p2b-compliance-declarations.git"
+  },
+  "recorder": {
+    "versions": {
+      "storage": {
+        "git": {
+          "prefixMessageToSnapshotId": "This version was recorded after filtering snapshot https://github.com/OpenTermsArchive/p2b-compliance-snapshots/commit/",
+          "repository": "git@github.com:OpenTermsArchive/p2b-compliance-versions.git"
+        }
+      }
+    },
+    "snapshots": {
+      "storage": {
+        "git": {
+          "repository": "git@github.com:OpenTermsArchive/p2b-compliance-snapshots.git"
+        }
+      }
+    }
+  },
+  "fetcher": {
+    "language": "en"
+  },
+  "notifier": {
+    "sendInBlue": {
+      "updatesListId": 861,
+      "updateTemplateId": 56
+    }
+  },
+  "tracker": {
+    "githubIssues": {
+      "repository": "OpenTermsArchive/p2b-compliance-declarations"
+    }
+  },
+  "dataset": {
+    "title": "p2b-compliance",
+    "versionsRepositoryURL": "https://github.com/OpenTermsArchive/p2b-compliance-versions"
+  }
+}

@@ -34,3 +34,8 @@ all:
             134.102.58.70:
               ansible_user: pga
               config_file_name: pga
+        p2b_compliance:
+          hosts:
+            vps-463f0baf.vps.ovh.net:
+              ansible_user: ota
+              config_file_name: p2b-compliance
