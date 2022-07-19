@@ -1,17 +1,17 @@
 import chai from 'chai';
 
-import PageDecalration from './pageDeclaration.js';
+import PageDeclaration from './pageDeclaration.js';
 
 const { expect } = chai;
 
-describe('PageDecalration', () => {
+describe('PageDeclaration', () => {
   const URL = 'http://www.test.com/page';
 
   describe('#getCssSelectors', () => {
     context('with "select" property', () => {
       context('with string selector', () => {
         it('extracts selectors', async () => {
-          const result = new PageDecalration({ location: URL, contentSelectors: 'body' }).getCssSelectors();
+          const result = new PageDeclaration({ location: URL, contentSelectors: 'body' }).getCssSelectors();
 
           expect(result).to.deep.equal(['body']);
         });
@@ -19,7 +19,7 @@ describe('PageDecalration', () => {
 
       context('with range selector', () => {
         it('extracts selectors', async () => {
-          const result = new PageDecalration({
+          const result = new PageDeclaration({
             location: URL,
             contentSelectors: {
               startBefore: '#startBefore',
@@ -33,7 +33,7 @@ describe('PageDecalration', () => {
 
       context('with an array of mixed selectors', () => {
         it('extracts selectors', async () => {
-          const result = new PageDecalration({
+          const result = new PageDeclaration({
             location: URL,
             contentSelectors: [
               {
@@ -52,7 +52,7 @@ describe('PageDecalration', () => {
     context('with "remove" property', () => {
       context('with string selector', () => {
         it('extracts selectors', async () => {
-          const result = new PageDecalration({ location: URL, noiseSelectors: 'body' }).getCssSelectors();
+          const result = new PageDeclaration({ location: URL, noiseSelectors: 'body' }).getCssSelectors();
 
           expect(result).to.deep.equal(['body']);
         });
@@ -60,7 +60,7 @@ describe('PageDecalration', () => {
 
       context('with range selector', () => {
         it('extracts selectors', async () => {
-          const result = new PageDecalration({
+          const result = new PageDeclaration({
             location: URL,
             noiseSelectors: {
               startBefore: '#startBefore',
@@ -74,7 +74,7 @@ describe('PageDecalration', () => {
 
       context('with an array of mixed selectors', () => {
         it('extracts selectors', async () => {
-          const result = new PageDecalration({
+          const result = new PageDeclaration({
             location: URL,
             noiseSelectors: [
               {
@@ -93,7 +93,7 @@ describe('PageDecalration', () => {
     context('with both "select" and "remove" property', () => {
       context('with string selector', () => {
         it('extracts selectors', async () => {
-          const result = new PageDecalration({
+          const result = new PageDeclaration({
             location: URL,
             contentSelectors: 'body',
             noiseSelectors: 'h1',
@@ -105,7 +105,7 @@ describe('PageDecalration', () => {
 
       context('with range selector', () => {
         it('extracts selectors', async () => {
-          const result = new PageDecalration({
+          const result = new PageDeclaration({
             location: URL,
             contentSelectors: {
               startBefore: '#startBefore',
@@ -128,7 +128,7 @@ describe('PageDecalration', () => {
 
       context('with an array of mixed selectors', () => {
         it('extracts selectors', async () => {
-          const result = new PageDecalration({
+          const result = new PageDeclaration({
             location: URL,
             contentSelectors: [
               {
