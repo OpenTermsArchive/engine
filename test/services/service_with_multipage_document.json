@@ -5,12 +5,12 @@
       "combine": [
         {
           "fetch": "https://www.service-with-multipage-document.example/community-standards",
-          "select": [
-            "#main"
-          ]
+          "select": "#main"
         },
         {
-          "fetch": "https://www.service-with-multipage-document.example/community-standards/hate-speech/"
+          "fetch": "https://www.service-with-multipage-document.example/community-standards/hate-speech/",
+          "remove": "#footer",
+          "executeClientScripts": false
         },
         {
           "fetch": "https://www.service-with-multipage-document.example/community-standards/violence-incitement/",
@@ -20,9 +20,9 @@
           ]
         }
       ],
-      "select": [
-        "body"
-      ]
+      "select": "body",
+      "remove": "body",
+      "executeClientScripts": true
     }
   }
 }

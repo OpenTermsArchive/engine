@@ -18,20 +18,33 @@ describe('Services', () => {
         context(`${documentType}`, () => {
           let actualDocumentDeclaration;
           let actualFilters;
+          let actualContentSelectors;
+          let actualNoiseSelectors;
+          let actualExecuteClientScripts;
 
           const expectedDocumentDeclaration = expected.getDocumentDeclaration(documentType);
 
           const { pages } = expectedDocumentDeclaration;
 
           pages.forEach((page, index) => {
-            const { filters: expectedFilters } = page;
+            const {
+              filters: expectedFilters,
+              contentSelectors: expectedContentSelectors,
+              noiseSelectors: expectedNoiseSelectors,
+              executeClientScripts: expectedExecuteClientScripts,
+            } = page;
 
             context(`Page: ${page.id}`, () => {
               before(() => {
                 actualDocumentDeclaration = result[serviceId].getDocumentDeclaration(documentType);
                 const { pages: actualPages } = actualDocumentDeclaration;
 
-                ({ filters: actualFilters } = actualPages[index]);
+                ({
+                  filters: actualFilters,
+                  contentSelectors: actualContentSelectors,
+                  noiseSelectors: actualNoiseSelectors,
+                  executeClientScripts: actualExecuteClientScripts,
+                } = actualPages[index]);
               });
 
               it('has the proper service name', () => {
@@ -44,6 +57,18 @@ describe('Services', () => {
 
               it('has no validity date', () => {
                 expect(actualDocumentDeclaration.validUntil).to.be.undefined;
+              });
+
+              it('has the proper content selectors', async () => {
+                expect(actualContentSelectors).to.equal(expectedContentSelectors);
+              });
+
+              it('has the proper noise selectors', async () => {
+                expect(actualNoiseSelectors).to.equal(expectedNoiseSelectors);
+              });
+
+              it('has the proper executeClientScripts option', async () => {
+                expect(actualExecuteClientScripts).to.equal(expectedExecuteClientScripts);
               });
 
               if (expectedFilters) {
@@ -163,14 +188,39 @@ describe('Services', () => {
                 for (const date of expectedHistoryDates) {
                   context(`${date || 'Current'}`, () => {
                     let actualFiltersForThisDate;
+                    let contentSelectorsForThisDate;
+                    let noiseSelectorsForThisDate;
+                    let actualExecuteClientScriptsForThisDate;
 
                     const { pages: pagesForThisDate } = expected.getDocumentDeclaration(documentType, date);
-                    const { filters: expectedFiltersForThisDate } = pagesForThisDate[index];
+                    const {
+                      filters: expectedFiltersForThisDate,
+                      contentSelectors: expectedContentSelectors,
+                      noiseSelectors: expectedNoiseSelectors,
+                      expectedExecuteClientScripts: expectedExecuteClientScriptsForThisDate,
+                    } = pagesForThisDate[index];
 
                     before(() => {
                       const { pages: actualPagesForThisDate } = result[serviceId].getDocumentDeclaration(documentType, date);
 
-                      ({ filters: actualFiltersForThisDate } = actualPagesForThisDate[index]);
+                      ({
+                        filters: actualFiltersForThisDate,
+                        contentSelectors: contentSelectorsForThisDate,
+                        noiseSelectors: noiseSelectorsForThisDate,
+                        expectedExecuteClientScripts: actualExecuteClientScriptsForThisDate,
+                      } = actualPagesForThisDate[index]);
+                    });
+
+                    it('has the proper content selectors', async () => {
+                      expect(contentSelectorsForThisDate).to.equal(expectedContentSelectors);
+                    });
+
+                    it('has the proper noise selectors', async () => {
+                      expect(noiseSelectorsForThisDate).to.equal(expectedNoiseSelectors);
+                    });
+
+                    it('has the proper executeClientScripts option', async () => {
+                      expect(actualExecuteClientScriptsForThisDate).to.equal(expectedExecuteClientScriptsForThisDate);
                     });
 
                     if (expectedFiltersForThisDate) {

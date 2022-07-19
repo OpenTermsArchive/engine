@@ -15,9 +15,7 @@
           ]
         }
       ],
-      "select": [
-        "body"
-      ],
+      "select": "body",
       "validUntil": "2020-04-15T21:30:21.000Z"
     },
     {
@@ -32,9 +30,7 @@
           "fetch": "https://www.service-with-multipage-document.example/community-standards/violence-incitement/"
         }
       ],
-      "select": [
-        "body"
-      ],
+      "select": "body",
       "validUntil": "2020-03-15T21:30:21.000Z"
     }
   ]
