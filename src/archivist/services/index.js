@@ -101,14 +101,14 @@ export async function loadWithHistory(servicesIds = []) {
     const { declarations, filters } = await loadServiceHistoryFiles(serviceId); // eslint-disable-line no-await-in-loop
 
     for (const documentType of Object.keys(declarations)) {
-      const documenTypeDeclarationEntries = declarations[documentType];
-      const filterNames = [...new Set(documenTypeDeclarationEntries.flatMap(declaration => declaration.filter))].filter(Boolean);
-      const allHistoryDates = extractHistoryDates({ documenTypeDeclarationEntries, filters, filterNames });
+      const documentTypeDeclarationEntries = declarations[documentType];
+      const filterNames = [...new Set(documentTypeDeclarationEntries.flatMap(declaration => declaration.filter))].filter(Boolean);
+      const allHistoryDates = extractHistoryDates({ documentTypeDeclarationEntries, filters, filterNames });
 
-      const latestValidDocumentDeclaration = documenTypeDeclarationEntries.find(entry => !entry.validUntil);
+      const latestValidDocumentDeclaration = documentTypeDeclarationEntries.find(entry => !entry.validUntil);
 
       allHistoryDates.forEach(async date => {
-        const declarationForThisDate = documenTypeDeclarationEntries.find(entry => new Date(date) <= new Date(entry.validUntil)) || latestValidDocumentDeclaration;
+        const declarationForThisDate = documentTypeDeclarationEntries.find(entry => new Date(date) <= new Date(entry.validUntil)) || latestValidDocumentDeclaration;
         const { filter: declarationForThisDateFilterNames, combine } = declarationForThisDate;
 
         const pages = [];
@@ -161,7 +161,7 @@ export async function loadWithHistory(servicesIds = []) {
   return services;
 }
 
-function extractHistoryDates({ filters, filterNames, documenTypeDeclarationEntries }) {
+function extractHistoryDates({ filters, filterNames, documentTypeDeclarationEntries }) {
   const allHistoryDates = [];
 
   Object.keys(filters).forEach(filterName => {
@@ -170,7 +170,7 @@ function extractHistoryDates({ filters, filterNames, documenTypeDeclarationEntri
     }
   });
 
-  documenTypeDeclarationEntries.forEach(({ validUntil }) => allHistoryDates.push(validUntil));
+  documentTypeDeclarationEntries.forEach(({ validUntil }) => allHistoryDates.push(validUntil));
 
   const sortedDates = allHistoryDates.sort((a, b) => new Date(a) - new Date(b));
   const uniqSortedDates = [...new Set(sortedDates)];
