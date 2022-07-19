@@ -380,8 +380,8 @@ describe('MongoRepository', () => {
     });
 
     context('when requested record does not exist', () => {
-      it('returns an empty object', async () => {
-        expect(await subject.findById('inexistantID')).to.deep.equal({});
+      it('returns null', async () => {
+        expect(await subject.findById('inexistantID')).to.equal(null);
       });
     });
   });
@@ -577,8 +577,8 @@ describe('MongoRepository', () => {
         latestRecord = await subject.findLatest(SERVICE_PROVIDER_ID, DOCUMENT_TYPE);
       });
 
-      it('returns an empty object', async () => {
-        expect(latestRecord).to.deep.equal({});
+      it('returns null', async () => {
+        expect(latestRecord).to.equal(null);
       });
     });
   });

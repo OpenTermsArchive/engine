@@ -156,7 +156,7 @@ export default class GitRepository extends RepositoryInterface {
 
   async #toDomain(commit, { deferContentLoading } = {}) {
     if (!commit) {
-      return Object(null);
+      return null;
     }
 
     const record = DataMapper.toDomain(commit);
