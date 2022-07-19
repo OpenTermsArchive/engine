@@ -7,7 +7,7 @@ const service = new Service({
   name: 'Service A',
 });
 
-const document = new DocumentDeclaration({
+service.addDocumentDeclaration(new DocumentDeclaration({
   service,
   type: 'Terms of Service',
   validUntil: null,
@@ -17,8 +17,6 @@ const document = new DocumentDeclaration({
     noiseSelectors: undefined,
     filters: undefined,
   })],
-});
-
-service.addDocumentDeclaration(document);
+}));
 
 export default service;

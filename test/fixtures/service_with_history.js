@@ -16,7 +16,7 @@ const filters = [
   },
 ];
 
-const documentsDeclarations = [
+[
   new DocumentDeclaration({
     service,
     type: 'Terms of Service',
@@ -170,24 +170,19 @@ const documentsDeclarations = [
     ],
     validUntil: '2020-11-01T12:30:21.000Z',
   }),
-];
-
-for (const document of documentsDeclarations) {
-  service.addDocumentDeclaration(document);
-}
-
-service.addDocumentDeclaration(new DocumentDeclaration({
-  service,
-  type: 'Privacy Policy',
-  pages: [
-    new PageDeclaration({
-      location: 'https://www.service-with-history.example/privacy',
-      contentSelectors: 'body',
-      noiseSelectors: undefined,
-      filters: undefined,
-    }),
-  ],
-  validUntil: null,
-}));
+  new DocumentDeclaration({
+    service,
+    type: 'Privacy Policy',
+    pages: [
+      new PageDeclaration({
+        location: 'https://www.service-with-history.example/privacy',
+        contentSelectors: 'body',
+        noiseSelectors: undefined,
+        filters: undefined,
+      }),
+    ],
+    validUntil: null,
+  }),
+].forEach(declaration => service.addDocumentDeclaration(declaration));
 
 export default service;

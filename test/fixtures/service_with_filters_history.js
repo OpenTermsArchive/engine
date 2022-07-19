@@ -16,7 +16,7 @@ const filters = [
   },
 ];
 
-const documentsDeclarations = [
+[
   new DocumentDeclaration({
     service,
     type: 'Terms of Service',
@@ -150,10 +150,6 @@ const documentsDeclarations = [
     ],
     validUntil: '2020-11-01T12:30:21.000Z',
   }),
-];
-
-for (const document of documentsDeclarations) {
-  service.addDocumentDeclaration(document);
-}
+].forEach(declaration => service.addDocumentDeclaration(declaration));
 
 export default service;

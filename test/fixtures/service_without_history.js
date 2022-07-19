@@ -16,20 +16,16 @@ const filters = [
   },
 ];
 
-const page = new PageDeclaration({
-  location: 'https://www.service-without-history.example/tos',
-  contentSelectors: 'body',
-  noiseSelectors: undefined,
-  filters,
-});
-
-const document = new DocumentDeclaration({
+service.addDocumentDeclaration(new DocumentDeclaration({
   service,
   type: 'Terms of Service',
-  pages: [page],
+  pages: [new PageDeclaration({
+    location: 'https://www.service-without-history.example/tos',
+    contentSelectors: 'body',
+    noiseSelectors: undefined,
+    filters,
+  })],
   validUntil: null,
-});
-
-service.addDocumentDeclaration(document);
+}));
 
 export default service;

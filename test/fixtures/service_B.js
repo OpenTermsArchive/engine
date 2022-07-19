@@ -7,7 +7,7 @@ const service = new Service({
   name: 'Service B',
 });
 
-const document = new DocumentDeclaration({
+service.addDocumentDeclaration(new DocumentDeclaration({
   service,
   type: 'Privacy Policy',
   pages: [new PageDeclaration({
@@ -17,8 +17,6 @@ const document = new DocumentDeclaration({
     filters: undefined,
   })],
   validUntil: null,
-});
-
-service.addDocumentDeclaration(document);
+}));
 
 export default service;

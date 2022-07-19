@@ -16,54 +16,50 @@ const filters = [
   },
 ];
 
-const latest = new DocumentDeclaration({
-  service,
-  type: 'Terms of Service',
-  pages: [
-    new PageDeclaration({
-      location: 'https://www.service-with-declaration-history.example/terms',
-      contentSelectors: 'main',
-      noiseSelectors: undefined,
-      filters,
-    }),
-  ],
-  validUntil: null,
-});
-
-const document = new DocumentDeclaration({
-  service,
-  type: 'Terms of Service',
-  pages: [
-    new PageDeclaration({
-      location: 'https://www.service-with-declaration-history.example/tos',
-      contentSelectors: 'body',
-      noiseSelectors: undefined,
-      filters: undefined,
-    }),
-  ],
-  validUntil: '2020-08-22T21:30:21.000Z',
-});
-
-const document2 = new DocumentDeclaration({
-  service,
-  type: 'Terms of Service',
-  pages: [
-    new PageDeclaration({
-      location: 'https://www.service-with-declaration-history.example/tos',
-      contentSelectors: 'main',
-      noiseSelectors: undefined,
-      filters: [
-        async function removeSharesButton() {
-          return 'last-removeSharesButton';
-        },
-      ],
-    }),
-  ],
-  validUntil: '2020-09-30T21:30:21.000Z',
-});
-
-service.addDocumentDeclaration(latest);
-service.addDocumentDeclaration(document);
-service.addDocumentDeclaration(document2);
+[
+  new DocumentDeclaration({
+    service,
+    type: 'Terms of Service',
+    pages: [
+      new PageDeclaration({
+        location: 'https://www.service-with-declaration-history.example/terms',
+        contentSelectors: 'main',
+        noiseSelectors: undefined,
+        filters,
+      }),
+    ],
+    validUntil: null,
+  }),
+  new DocumentDeclaration({
+    service,
+    type: 'Terms of Service',
+    pages: [
+      new PageDeclaration({
+        location: 'https://www.service-with-declaration-history.example/tos',
+        contentSelectors: 'body',
+        noiseSelectors: undefined,
+        filters: undefined,
+      }),
+    ],
+    validUntil: '2020-08-22T21:30:21.000Z',
+  }),
+  new DocumentDeclaration({
+    service,
+    type: 'Terms of Service',
+    pages: [
+      new PageDeclaration({
+        location: 'https://www.service-with-declaration-history.example/tos',
+        contentSelectors: 'main',
+        noiseSelectors: undefined,
+        filters: [
+          async function removeSharesButton() {
+            return 'last-removeSharesButton';
+          },
+        ],
+      }),
+    ],
+    validUntil: '2020-09-30T21:30:21.000Z',
+  }),
+].forEach(declaration => service.addDocumentDeclaration(declaration));
 
 export default service;

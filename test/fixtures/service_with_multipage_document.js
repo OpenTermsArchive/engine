@@ -16,7 +16,7 @@ const filters = [
   },
 ];
 
-const documentsDeclarations = [
+[
   new DocumentDeclaration({
     service,
     type: 'Community Guidelines',
@@ -92,10 +92,6 @@ const documentsDeclarations = [
       }),
     ],
   }),
-];
-
-for (const document of documentsDeclarations) {
-  service.addDocumentDeclaration(document);
-}
+].forEach(declaration => service.addDocumentDeclaration(declaration));
 
 export default service;
