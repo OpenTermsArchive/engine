@@ -3,8 +3,8 @@ import PageDeclaration from '../../src/archivist/services/pageDeclaration.js';
 import Service from '../../src/archivist/services/service.js';
 
 const service = new Service({
-  id: 'service_with_multi_pages',
-  name: 'Service with multi pages',
+  id: 'service_with_multipage_document',
+  name: 'Service with multipage',
 });
 
 const filters = [
@@ -23,19 +23,19 @@ const documentsDeclarations = [
     validUntil: null,
     pages: [
       new PageDeclaration({
-        location: 'https://www.service-with-multi-pages.example/community-standards',
+        location: 'https://www.service-with-multipage-document.example/community-standards',
         contentSelectors: '#main',
         noiseSelectors: undefined,
         filters: undefined,
       }),
       new PageDeclaration({
-        location: 'https://www.service-with-multi-pages.example/community-standards/hate-speech/',
+        location: 'https://www.service-with-multipage-document.example/community-standards/hate-speech/',
         contentSelectors: 'body',
         noiseSelectors: undefined,
         filters: undefined,
       }),
       new PageDeclaration({
-        location: 'https://www.service-with-multi-pages.example/community-standards/violence-incitement/',
+        location: 'https://www.service-with-multipage-document.example/community-standards/violence-incitement/',
         contentSelectors: 'body',
         noiseSelectors: undefined,
         filters,
@@ -48,19 +48,19 @@ const documentsDeclarations = [
     validUntil: '2020-04-15T21:30:21.000Z',
     pages: [
       new PageDeclaration({
-        location: 'https://www.service-with-multi-pages.example/community-standards',
+        location: 'https://www.service-with-multipage-document.example/community-standards',
         contentSelectors: 'body',
         noiseSelectors: undefined,
         filters: undefined,
       }),
       new PageDeclaration({
-        location: 'https://www.service-with-multi-pages.example/community-standards/hate-speech/',
+        location: 'https://www.service-with-multipage-document.example/community-standards/hate-speech/',
         contentSelectors: 'body',
         noiseSelectors: undefined,
         filters: undefined,
       }),
       new PageDeclaration({
-        location: 'https://www.service-with-multi-pages.example/community-standards/violence-incitement/',
+        location: 'https://www.service-with-multipage-document.example/community-standards/violence-incitement/',
         contentSelectors: 'body',
         noiseSelectors: undefined,
         filters: [filters[0]],
@@ -73,19 +73,19 @@ const documentsDeclarations = [
     validUntil: '2020-03-15T21:30:21.000Z',
     pages: [
       new PageDeclaration({
-        location: 'https://www.service-with-multi-pages.example/community-standards',
+        location: 'https://www.service-with-multipage-document.example/community-standards',
         contentSelectors: 'body',
         noiseSelectors: undefined,
         filters: undefined,
       }),
       new PageDeclaration({
-        location: 'https://www.service-with-multi-pages.example/community-standards/hate-speech/',
+        location: 'https://www.service-with-multipage-document.example/community-standards/hate-speech/',
         contentSelectors: 'body',
         noiseSelectors: undefined,
         filters: undefined,
       }),
       new PageDeclaration({
-        location: 'https://www.service-with-multi-pages.example/community-standards/violence-incitement/',
+        location: 'https://www.service-with-multipage-document.example/community-standards/violence-incitement/',
         contentSelectors: 'body',
         noiseSelectors: undefined,
         filters: undefined,

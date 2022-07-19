@@ -104,9 +104,9 @@ describe('Services', () => {
       });
     });
 
-    context('when a service has a multi pages document', async () => {
-      describe('Service with a multi pages document', async () => {
-        await validateServiceWithoutHistory('service_with_multi_pages', expectedServices.service_with_multi_pages);
+    context('when a service has a multipage document', async () => {
+      describe('Service with a multipage document', async () => {
+        await validateServiceWithoutHistory('service_with_multipage_document', expectedServices.service_with_multipage_document);
       });
     });
 
@@ -258,9 +258,9 @@ describe('Services', () => {
       });
     });
 
-    context('when a service has a multi pages document', async () => {
-      describe('Service with a multi pages document', async () => {
-        await validateServiceWithHistory('service_with_multi_pages', expectedServices.service_with_multi_pages);
+    context('when a service has a multipage document', async () => {
+      describe('Service with a multipage document', async () => {
+        await validateServiceWithHistory('service_with_multipage_document', expectedServices.service_with_multipage_document);
       });
     });
 
