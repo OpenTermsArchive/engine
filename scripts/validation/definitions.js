@@ -8,7 +8,7 @@ const definitions = {
     type: 'boolean',
     description: 'Execute client-side JavaScript loaded by the document before accessing the content, in case the DOM modifications are needed to access the content.',
   },
-  contentSelectors: {
+  selectors: {
     description: 'Selector(s) that targets element to include',
     oneOf: [
       { $ref: '#/definitions/cssSelector' },
@@ -19,17 +19,8 @@ const definitions = {
       },
     ],
   },
-  noiseSelectors: {
-    description: 'Selector(s) that targets element to exclude',
-    oneOf: [
-      { $ref: '#/definitions/cssSelector' },
-      { $ref: '#/definitions/range' },
-      {
-        type: 'array',
-        items: { oneOf: [{ $ref: '#/definitions/cssSelector' }, { $ref: '#/definitions/range' }] },
-      },
-    ],
-  },
+  contentSelectors: { $ref: '#/definitions/selectors' },
+  noiseSelectors: { $ref: '#/definitions/selectors' },
   filters: {
     type: 'array',
     items: {
