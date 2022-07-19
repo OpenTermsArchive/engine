@@ -9,7 +9,7 @@ export default class DocumentDeclaration {
     }
   }
 
-  isMultiPage() {
+  get isMultiPage() {
     return this.pages.length > 1;
   }
 }

@@ -134,7 +134,7 @@ export default class Archivist extends events.EventEmitter {
 
       let mimeType;
       let content;
-      const pageId = documentDeclaration.isMultiPage() && page.id;
+      const pageId = documentDeclaration.isMultiPage && page.id;
 
       try {
         ({ mimeType, content } = await fetch({
@@ -169,7 +169,7 @@ export default class Archivist extends events.EventEmitter {
         fetchDate,
       });
 
-      if (!snapshotId && documentDeclaration.isMultiPage()) { // on multi-page documents, where one of the pages has not been changed, use the last saved snapshot to ensure that this page is present in the version
+      if (!snapshotId && documentDeclaration.isMultiPage) { // on multi-page documents, where one of the pages has not been changed, use the last saved snapshot to ensure that this page is present in the version
         ({ id: snapshotId, content, mimeType, fetchDate } = await this.recorder.getLatestSnapshot(serviceId, documentType, pageId));
       }
 
@@ -236,7 +236,7 @@ export default class Archivist extends events.EventEmitter {
     let fetchDate;
 
     for (const page of pages) {
-      const pageId = documentDeclaration.isMultiPage() && page.id;
+      const pageId = documentDeclaration.isMultiPage && page.id;
       const { id: snapshotId, content, mimeType, fetchDate: snapshotFetchDate } = await this.recorder.getLatestSnapshot(serviceId, documentType, pageId);
 
       if (!snapshotId) {
