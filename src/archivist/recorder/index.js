@@ -55,7 +55,7 @@ export default class Recorder {
     }
 
     if (!snapshotIds?.length) {
-      throw new Error(`At least a snapshot ID is required to ensure data consistency for ${serviceId}'s ${documentType}`);
+      throw new Error(`At least one snapshot ID is required to ensure data consistency for ${serviceId}'s ${documentType}`);
     }
 
     if (!fetchDate) {

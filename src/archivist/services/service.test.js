@@ -23,7 +23,7 @@ describe('Service', () => {
       });
     });
 
-    context('when document declaration as no validity date', () => {
+    context('when document declaration has no validity date', () => {
       before(async () => {
         subject = new Service({ id: 'serviceID', name: 'serviceName' });
         subject.addDocumentDeclaration(documentDeclaration);
@@ -34,7 +34,7 @@ describe('Service', () => {
       });
     });
 
-    context('when document declaration as validity date', () => {
+    context('when document declaration has a validity date', () => {
       let expiredDocumentDeclaration;
       const VALIDITY_DATE = new Date('2020-07-22T11:30:21.000Z');
 
@@ -87,7 +87,7 @@ describe('Service', () => {
       });
     });
 
-    context('when the document as an history', () => {
+    context('when the document has a history', () => {
       const firstDeclaration = new DocumentDeclaration({
         type: 'Terms of Service',
         location: 'https://www.service.example/terms',
