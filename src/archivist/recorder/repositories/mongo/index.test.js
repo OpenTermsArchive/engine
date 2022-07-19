@@ -321,6 +321,83 @@ describe('MongoRepository', () => {
         expect(mongoDocument.mimeType).to.equal(PDF_MIME_TYPE);
       });
     });
+
+    context('when there is no snapshots IDs specified', () => {
+      before(async () => {
+        (record = await subject.save(new Record({
+          serviceId: SERVICE_PROVIDER_ID,
+          documentType: DOCUMENT_TYPE,
+          pageId: PAGE_ID,
+          content: CONTENT,
+          mimeType: MIME_TYPE,
+          fetchDate: FETCH_DATE,
+        })));
+
+        (mongoDocument = await collection.findOne({
+          serviceId: SERVICE_PROVIDER_ID,
+          documentType: DOCUMENT_TYPE,
+        }));
+      });
+
+      after(async () => subject.removeAll());
+
+      it('does not store snapshots IDs', () => {
+        expect(mongoDocument.snapshotIds).to.be.undefined;
+      });
+
+      it('stores the service id', () => {
+        expect(mongoDocument.serviceId).to.include(SERVICE_PROVIDER_ID);
+      });
+
+      it('stores the document type', () => {
+        expect(mongoDocument.documentType).to.include(DOCUMENT_TYPE);
+      });
+
+      it('stores the page ID', () => {
+        expect(mongoDocument.pageId).to.include(PAGE_ID);
+      });
+    });
+
+    context('when there are many snapshots IDs specified', () => {
+      const SNAPSHOT_ID_1 = 'c01533c0e546ef430eea84d23c1b18a2b8420dfb';
+      const SNAPSHOT_ID_2 = '0fd16cca9e1a86a2267bd587107c485f06099d7d';
+
+      before(async () => {
+        (record = await subject.save(new Record({
+          serviceId: SERVICE_PROVIDER_ID,
+          documentType: DOCUMENT_TYPE,
+          pageId: PAGE_ID,
+          content: CONTENT,
+          mimeType: MIME_TYPE,
+          fetchDate: FETCH_DATE,
+          snapshotIds: [ SNAPSHOT_ID_1, SNAPSHOT_ID_2 ],
+        })));
+
+        (mongoDocument = await collection.findOne({
+          serviceId: SERVICE_PROVIDER_ID,
+          documentType: DOCUMENT_TYPE,
+        }));
+      });
+
+      after(async () => subject.removeAll());
+
+      it('stores snapshots IDs', () => {
+        expect(mongoDocument.snapshotIds).to.include(SNAPSHOT_ID_1);
+        expect(mongoDocument.snapshotIds).to.include(SNAPSHOT_ID_2);
+      });
+
+      it('stores the service id', () => {
+        expect(mongoDocument.serviceId).to.include(SERVICE_PROVIDER_ID);
+      });
+
+      it('stores the document type', () => {
+        expect(mongoDocument.documentType).to.include(DOCUMENT_TYPE);
+      });
+
+      it('stores the page ID', () => {
+        expect(mongoDocument.pageId).to.include(PAGE_ID);
+      });
+    });
   });
 
   describe('#findById', () => {

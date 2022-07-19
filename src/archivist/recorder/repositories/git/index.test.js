@@ -289,6 +289,77 @@ describe('GitRepository', () => {
         expect(mime.getType(EXPECTED_PDF_FILE_PATH)).to.equal(PDF_MIME_TYPE);
       });
     });
+
+    context('when there is no snapshots IDs specified', () => {
+      before(async () => {
+        ({ id, isFirstRecord } = await subject.save(new Record({
+          serviceId: SERVICE_PROVIDER_ID,
+          documentType: DOCUMENT_TYPE,
+          pageId: PAGE_ID,
+          content: CONTENT,
+          fetchDate: FETCH_DATE,
+          mimeType: MIME_TYPE,
+        })));
+
+        ([commit] = await git.log());
+      });
+
+      after(async () => subject.removeAll());
+
+      it('does not store snapshots IDs', () => {
+        expect(commit.body).to.be.empty;
+      });
+
+      it('stores the service id', () => {
+        expect(commit.message).to.include(SERVICE_PROVIDER_ID);
+      });
+
+      it('stores the document type', () => {
+        expect(commit.message).to.include(DOCUMENT_TYPE);
+      });
+
+      it('stores the page ID', () => {
+        expect(commit.message).to.include(PAGE_ID);
+      });
+    });
+
+    context('when there are many snapshots IDs specified', () => {
+      const SNAPSHOT_ID_1 = 'c01533c0e546ef430eea84d23c1b18a2b8420dfb';
+      const SNAPSHOT_ID_2 = '0fd16cca9e1a86a2267bd587107c485f06099d7d';
+
+      before(async () => {
+        ({ id, isFirstRecord } = await subject.save(new Record({
+          serviceId: SERVICE_PROVIDER_ID,
+          documentType: DOCUMENT_TYPE,
+          pageId: PAGE_ID,
+          content: CONTENT,
+          fetchDate: FETCH_DATE,
+          mimeType: MIME_TYPE,
+          snapshotIds: [ SNAPSHOT_ID_1, SNAPSHOT_ID_2 ],
+        })));
+
+        ([commit] = await git.log());
+      });
+
+      after(async () => subject.removeAll());
+
+      it('stores snapshots IDs', () => {
+        expect(commit.body).to.include(SNAPSHOT_ID_1);
+        expect(commit.body).to.include(SNAPSHOT_ID_2);
+      });
+
+      it('stores the service id', () => {
+        expect(commit.message).to.include(SERVICE_PROVIDER_ID);
+      });
+
+      it('stores the document type', () => {
+        expect(commit.message).to.include(DOCUMENT_TYPE);
+      });
+
+      it('stores the page ID', () => {
+        expect(commit.message).to.include(PAGE_ID);
+      });
+    });
   });
 
   describe('#findById', () => {
