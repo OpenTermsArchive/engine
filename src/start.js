@@ -40,7 +40,7 @@ async function startOpenTermsArchive({ services, refilterOnly, schedule }) {
   }
 
   if (process.env.GITHUB_TOKEN) {
-    const tracker = new Tracker();
+    const tracker = new Tracker(config.get('tracker'));
 
     await tracker.initialize();
     archivist.attach(tracker);

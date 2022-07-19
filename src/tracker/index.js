@@ -1,6 +1,5 @@
 import fs from 'fs';
 
-import config from 'config';
 import { Octokit } from 'octokit';
 
 import logger from '../logger/index.js';
@@ -11,24 +10,22 @@ const ISSUE_STATE_CLOSED = 'closed';
 const ISSUE_STATE_OPEN = 'open';
 const ISSUE_STATE_ALL = 'all';
 
-const TRACKER_LABEL = config.get('tracker.githubIssues.label.name');
-const TRACKER_REPOSITORY = config.get('tracker.githubIssues.repository');
-
 const CONTRIBUTE_URL = 'https://contribute.opentermsarchive.org/en/service';
-const GITHUB_REPO_URL = `https://github.com/${TRACKER_REPOSITORY}/blob/main/declarations`;
 const GOOGLE_URL = 'https://www.google.com/search?q=';
 
 export default class Tracker {
-  static isRepositoryValid() {
-    return (TRACKER_REPOSITORY || '').includes('/');
+  static isRepositoryValid(repository) {
+    return repository.includes('/');
   }
 
-  constructor() {
-    if (!Tracker.isRepositoryValid()) {
+  constructor(trackerConfig) {
+    const { repository, label } = trackerConfig.githubIssues;
+
+    if (!Tracker.isRepositoryValid(repository)) {
       throw new Error('tracker.githubIssues.repository should be a string with <owner>/<repo>');
     }
 
-    const [ owner, repo ] = TRACKER_REPOSITORY.split('/');
+    const [ owner, repo ] = repository.split('/');
 
     this.octokit = new Octokit({
       auth: process.env.GITHUB_TOKEN,
@@ -40,19 +37,21 @@ export default class Tracker {
       repo,
       accept: 'application/vnd.github.v3+json',
     };
+    this.repository = repository;
+    this.label = label;
   }
 
   async initialize() {
     await this.createLabel({
-      name: TRACKER_LABEL,
-      color: config.get('tracker.githubIssues.label.color'),
-      description: config.get('tracker.githubIssues.label.description'),
+      name: this.label.name,
+      color: this.label.color,
+      description: this.label.description,
     });
   }
 
   async onVersionRecorded(serviceId, type) {
     await this.closeIssueIfExists({
-      labels: [TRACKER_LABEL],
+      labels: [this.label.name],
       title: `Fix ${serviceId} - ${type}`,
       comment: '🤖 Closed automatically as data was gathered successfully',
     });
@@ -60,7 +59,7 @@ export default class Tracker {
 
   async onVersionNotChanged(serviceId, type) {
     await this.closeIssueIfExists({
-      labels: [TRACKER_LABEL],
+      labels: [this.label.name],
       title: `Fix ${serviceId} - ${type}`,
       comment: '🤖 Closed automatically as version is unchanged but data has been fetched correctly',
     });
@@ -80,12 +79,13 @@ export default class Tracker {
       name: serviceId,
       documentType: type,
       message: error.toString(),
+      repository: this.repository,
     });
 
     await this.createIssueIfNotExists({
       title,
       body,
-      labels: [TRACKER_LABEL],
+      labels: [this.label.name],
       comment: '🤖 Reopened automatically as an error occured',
     });
   }
@@ -190,7 +190,7 @@ export default class Tracker {
   }
 
   static formatIssueTitleAndBody(messageOrObject) {
-    const { message, contentSelectors, noiseSelectors, url, name, documentType } = messageOrObject;
+    const { message, contentSelectors, noiseSelectors, url, name, documentType, repository } = messageOrObject;
     let contentSelectorsAsArray = contentSelectors;
     let noiseSelectorsAsArray = noiseSelectors;
 
@@ -215,7 +215,7 @@ export default class Tracker {
     const encodedName = encodeURIComponent(name);
     const encodedType = encodeURIComponent(documentType);
     const encodedUrl = encodeURIComponent(url);
-    const encodedDestination = encodeURIComponent(TRACKER_REPOSITORY);
+    const encodedDestination = encodeURIComponent(repository);
 
     const urlQueryParams = `destination=${encodedDestination}&step=2&url=${encodedUrl}&name=${encodedName}&documentType=${encodedType}${noiseSelectorsQueryString}${contentSelectorsQueryString}&expertMode=true`;
 
@@ -231,7 +231,7 @@ Check what's wrong by:
 ${message.includes('404') ? `- [Searching Google](${GOOGLE_URL}%22${encodedName}%22+%22${encodedType}%22) to get for a new URL.` : ''}
 
 And some info about what has already been tracked:
-- See [service declaration JSON file](${GITHUB_REPO_URL}/${encodedName}.json).
+- See [service declaration JSON file](https://github.com/${repository}/blob/main/declarations/${encodedName}.json).
 `;
 
     return {
