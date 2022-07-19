@@ -23,7 +23,7 @@ describe('Services', () => {
 
           const { pages } = expectedDocumentDeclaration;
 
-          for (const [ index, page ] of pages.entries()) {
+          pages.forEach((page, index) => {
             const { filters: expectedFilters } = page;
 
             context(`Page: ${page.id}`, () => {
@@ -62,7 +62,7 @@ describe('Services', () => {
                 });
               }
             });
-          }
+          });
         });
       }
       /* eslint-enable no-loop-func */
@@ -149,7 +149,7 @@ describe('Services', () => {
             expect(actualDocumentDeclaration.type).to.eql(expectedDocumentDeclaration.type);
           });
 
-          for (const [ index, page ] of pages.entries()) {
+          pages.forEach((page, index) => {
             const { filters: expectedFilters } = page;
 
             context(`${page.id} page`, () => {
@@ -216,7 +216,7 @@ describe('Services', () => {
                 }
               }
             });
-          }
+          });
         });
       }
       /* eslint-enable no-loop-func */
