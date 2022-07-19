@@ -50,7 +50,7 @@ export default class Notifier {
     const notificationListName = `${this.serviceProviders[serviceProviderId].name} - ${documentTypeId} - Update`;
     const notificationList = await this.searchContactList(notificationListName);
 
-    if (notificationList && notificationList.id) {
+    if (notificationList?.id) {
       lists.push(notificationList.id);
     }
 
