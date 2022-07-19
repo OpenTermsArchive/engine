@@ -74,5 +74,5 @@ export function generateFileName(documentType, pageId, mimeType) {
 }
 
 export function generateFilePath(serviceId, documentType, pageId, mimeType) {
-  return `${serviceId}/${generateFileName(documentType, pageId, mimeType)}`;
+  return path.join(serviceId, generateFileName(documentType, pageId, mimeType));
 }

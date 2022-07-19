@@ -42,7 +42,7 @@ export default class GitRepository extends RepositoryInterface {
 
     const { message, content, filePath: relativeFilePath } = await this.#toPersistence(record);
 
-    const filePath = `${this.path}/${relativeFilePath}`;
+    const filePath = path.join(this.path, relativeFilePath);
 
     await GitRepository.#writeFile({ filePath, content });
     const sha = await this.#commit({ filePath, message, date: fetchDate });
