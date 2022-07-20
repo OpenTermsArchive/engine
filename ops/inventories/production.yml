@@ -15,7 +15,7 @@ all:
       children:
         contrib:
           hosts:
-            51.89.227.206:
+            198.244.153.104:
               config_file_name: contrib
         dating:
           hosts:
