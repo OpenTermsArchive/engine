@@ -128,6 +128,7 @@ The following commands are available where the package is installed:
 
 - `./node_modules/.bin/ota-lint-declarations [service_id]...` to lint declarations
 - `./node_modules/.bin/ota-validate-declarations [service_id]...` to test declarations
+- `./node_modules/.bin/ota [service_id]...` to test services and generate artifacts
 
 In order to have them available globally in your command line, install it with the `--global` option.
 
