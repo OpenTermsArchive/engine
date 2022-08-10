@@ -119,7 +119,7 @@ For example:
 Open Terms Archive exposes a JavaScript API to make some of its capabilities available in NodeJS. You can install it as an NPM module: 
 
 ```
-npm install ambanum/OpenTermsArchive#main
+npm install "ambanum/OpenTermsArchive#main"
 ```
 
 ### CLI
