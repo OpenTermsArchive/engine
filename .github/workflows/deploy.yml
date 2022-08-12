@@ -23,22 +23,20 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Get target server hostname
-        uses: KJ002/read-yaml@v1
         id: get_hostname
+        uses: mikefarah/yq@master
         with:
-          file: ops/inventories/production.yml
-          key-path: [ all, children, ${{ matrix.instance }}, hosts ]
+          cmd: yq ".all.children.production.children.${{ matrix.instance }}.hosts.* | key" ops/inventories/production.yml
       - name: Get target server fingerprint
-        uses: KJ002/read-yaml@v1
         id: get_fingerprint
+        uses: mikefarah/yq@master
         with:
-          file: ops/inventories/production.yml
-          key-path: [ all, children, ${{ matrix.instance }}, hosts, ${{ steps.get_hostname.outputs.contents }}, ed25519_fingerprint ]
+          cmd: yq .all.children.production.children.${{ matrix.instance }}.hosts.${{ steps.get_hostname.outputs.result }}.ed25519_fingerprint ops/inventories/production.yml
       - name: Set up SSH
         uses: shimataro/ssh-key-action@v2
         with:
           key: ${{ secrets.SERVER_SSH_KEY }}
-          known_hosts: ${{ matrix.instance }} ssh-ed25519 ${{ steps.get_fingerprint.outputs.contents }}
+          known_hosts: ${{ steps.get_hostname.outputs.result }} ssh-ed25519 ${{ steps.get_fingerprint.outputs.result }}
       - run: echo "${{ secrets.ANSIBLE_VAULT_KEY }}" > vault.key
       - run: pip install --upgrade setuptools
       - run: pip install 'ansible ~= 2.9'
