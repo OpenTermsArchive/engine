@@ -27,23 +27,13 @@ jobs:
         id: get_hostname
         with:
           file: ops/inventories/production.yml
-          key-path:
-            - all
-            - children
-            - ${{ matrix.instance }},
-            - hosts
+          key-path: [ all, children, ${{ matrix.instance }}, hosts ]
       - name: Get target server fingerprint
         uses: KJ002/read-yaml@v1
         id: get_fingerprint
         with:
           file: ops/inventories/production.yml
-          key-path:
-            - all
-            - children
-            - ${{ matrix.instance }},
-            - hosts
-            - ${{ steps.get_hostname.outputs.contents }}
-            - ed25519_fingerprint
+          key-path: [ all, children, ${{ matrix.instance }}, hosts, ${{ steps.get_hostname.outputs.contents }}, ed25519_fingerprint ]
       - name: Set up SSH
         uses: shimataro/ssh-key-action@v2
         with:
