@@ -31,7 +31,7 @@ jobs:
         id: get_fingerprint
         uses: mikefarah/yq@master
         with:
-          cmd: yq .all.children.production.children.${{ matrix.instance }}.hosts.${{ steps.get_hostname.outputs.result }}.ed25519_fingerprint ops/inventories/production.yml
+          cmd: yq '.all.children.production.children.${{ matrix.instance }}.hosts.["${{ steps.get_hostname.outputs.result }}"].ed25519_fingerprint' ops/inventories/production.yml
       - name: Set up SSH
         uses: shimataro/ssh-key-action@v2
         with:
