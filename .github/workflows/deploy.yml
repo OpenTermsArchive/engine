@@ -13,14 +13,16 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - name: Set known hosts
-        id: set_known_hosts
-        run: echo "::set-output name=fingerprints::$(cat ops/roles/infra/files/known_hosts)"
-      - name: Install SSH key
+      - name: Get target servers fingerprints
+        uses: bfren/read-file@v1
+        id: get_fingerprints
+        with:
+          file: ops/roles/infra/files/known_hosts
+      - name: Set up SSH
         uses: shimataro/ssh-key-action@v2
         with:
           key: ${{ secrets.SERVER_SSH_KEY }}
-          known_hosts: ${{ steps.set_known_hosts.outputs.fingerprints }}
+          known_hosts: ${{ steps.get_fingerprints.outputs.contents }}
       - run: echo "${{ secrets.ANSIBLE_VAULT_KEY }}" > vault.key
       - run: pip install --upgrade setuptools
       - run: pip install 'ansible ~= 2.9'
