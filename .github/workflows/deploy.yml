@@ -10,20 +10,36 @@ jobs:
   deploy:
     needs: [ test ]
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        instance:
+          - contrib
+          - dating
+          - france
+          - france_elections
+          - pga
+          - p2b_compliance
 
     steps:
       - uses: actions/checkout@v2
-      - name: Get target servers fingerprints
-        uses: bfren/read-file@v1
-        id: get_fingerprints
+      - name: Get target server hostname
+        uses: KJ002/read-yaml@v1
+        id: get_hostname
         with:
-          file: ops/roles/infra/files/known_hosts
+          file: ops/inventories/production.yml
+          key-path: [ all, children, ${{ matrix.instance }}, hosts ]
+      - name: Get target server fingerprint
+        uses: KJ002/read-yaml@v1
+        id: get_fingerprint
+        with:
+          file: ops/inventories/production.yml
+          key-path: [ all, children, ${{ matrix.instance }}, hosts, ${{ steps.get_hostname.outputs.contents }}, ed25519_fingerprint ]
       - name: Set up SSH
         uses: shimataro/ssh-key-action@v2
         with:
           key: ${{ secrets.SERVER_SSH_KEY }}
-          known_hosts: ${{ steps.get_fingerprints.outputs.contents }}
+          known_hosts: ${{ matrix.instance }} ssh-ed25519 ${{ steps.get_fingerprint.outputs.contents }}
       - run: echo "${{ secrets.ANSIBLE_VAULT_KEY }}" > vault.key
       - run: pip install --upgrade setuptools
       - run: pip install 'ansible ~= 2.9'
-      - run: ansible-playbook ops/site.yml --inventory ops/inventories/production.yml
+      - run: ansible-playbook ops/site.yml --inventory ops/inventories/production.yml --limit ${{ matrix.instance }}
