@@ -11,23 +11,22 @@ jobs:
   get_instances:
     runs-on: ubuntu-latest
     outputs:
-      matrix: ${{ steps.set-matrix.outputs.matrix }}
+      names: ${{ steps.get_production_instances_names.outputs.result }}
     steps:
       - uses: actions/checkout@v2
-      - name: Set matrix with instance names
-        id: get_instance_names
+      - name: Get production instance names
+        id: get_production_instances_names
         uses: mikefarah/yq@master
         with:
-          cmd: yq ".all.children.production.children | keys" ops/inventories/production.yml -o=json | tr '\n' ' '
-      - id: set-matrix
-        run: echo "::set-output name=matrix::{\"instance\":${{ toJson(steps.get_instance_names.outputs.result) }}}"
+          cmd: yq ".all.children.production.children | keys" ops/inventories/production.yml -o=json
 
   deploy:
     needs: [ test, get_instances ]
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false  # deploy other instances even if one fails to deploy
-      matrix: ${{ fromJSON(needs.get_instances.outputs.matrix) }}
+      matrix:
+        instance: ${{ fromJSON(needs.get_instances.outputs.names) }}
     steps:
       - uses: actions/checkout@v2
       - name: Get target server hostname
