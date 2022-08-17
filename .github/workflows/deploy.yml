@@ -29,22 +29,12 @@ jobs:
         instance: ${{ fromJSON(needs.get_instances.outputs.names) }}
     steps:
       - uses: actions/checkout@v2
-      - name: Get target server hostname
-        id: get_hostname
-        uses: mikefarah/yq@master
-        with:
-          cmd: yq ".all.children.production.children.${{ matrix.instance }}.hosts.* | key" ops/inventories/production.yml
-      - name: Get target server fingerprint
-        id: get_fingerprint
-        uses: mikefarah/yq@master
-        with:
-          cmd: yq '.all.children.production.children.${{ matrix.instance }}.hosts.["${{ steps.get_hostname.outputs.result }}"].ed25519_fingerprint' ops/inventories/production.yml
-      - name: Set up SSH
-        uses: shimataro/ssh-key-action@v2
-        with:
-          key: ${{ secrets.SERVER_SSH_KEY }}
-          known_hosts: ${{ steps.get_hostname.outputs.result }} ssh-ed25519 ${{ steps.get_fingerprint.outputs.result }}
       - run: echo "${{ secrets.ANSIBLE_VAULT_KEY }}" > vault.key
-      - run: pip install --upgrade setuptools
-      - run: pip install 'ansible ~= 2.9'
-      - run: ansible-playbook ops/site.yml --inventory ops/inventories/production.yml --limit ${{ matrix.instance }}
+      - name: Deploy with Ansible
+        uses: saubermacherag/ansible-playbook-docker-action@v1.4
+        with:
+          playbookName: ops/site.yml
+          inventoryFile: ops/inventories/production.yml
+          keyFile: ops/roles/infra/files/ota-bot-key.private_key
+          keyFileVaultPass: ${{ secrets.ANSIBLE_VAULT_KEY }}
+          extraVars: --limit ${{ matrix.instance }}
