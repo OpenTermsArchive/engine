@@ -17,6 +17,9 @@ jobs:
 
     runs-on: ${{ matrix.operating_system }}
 
+    env:
+      MONGODB_VERSION: 4.4
+
     steps:
       - run: |
           git config --global user.name 'Open Terms Archive Bot'
@@ -30,12 +33,12 @@ jobs:
         if: matrix.operating_system == 'ubuntu-latest'
         uses: supercharge/mongodb-github-action@1.7.0
         with:
-          mongodb-version: 4.4
+          mongodb-version: ${{ env.MONGODB_VERSION }}
       - name: Install and Start MongoDB (windows)
         if: matrix.operating_system == 'windows-2019'
         uses: crazy-max/ghaction-chocolatey@v2
         with:
-          args: install mongodb
+          args: install mongodb --force --version=${{ env.MONGODB_VERSION }}
       - run: npm ci
       - run: npm test
 
