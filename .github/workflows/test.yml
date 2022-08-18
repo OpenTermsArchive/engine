@@ -33,7 +33,7 @@ jobs:
           mongodb-version: 4.4
       - name: Install and Start MongoDB (windows)
         if: matrix.operating_system == 'windows-2019'
-        uses: crazy-max/ghaction-chocolatey@v1.6.0
+        uses: crazy-max/ghaction-chocolatey@v2
         with:
           args: install mongodb
       - run: npm ci
