@@ -7,20 +7,26 @@ on:
 jobs:
   test:
     uses: "ambanum/OpenTermsArchive/.github/workflows/test.yml@main"
+
+  get_instances:
+    runs-on: ubuntu-latest
+    outputs:
+      names: ${{ steps.get_production_instances_names.outputs.result }}
+    steps:
+      - uses: actions/checkout@v2
+      - name: Get production instance names
+        id: get_production_instances_names
+        uses: mikefarah/yq@master
+        with:
+          cmd: yq '.all.children.production.children | keys' ops/inventories/production.yml --output-format=json
+
   deploy:
-    needs: [ test ]
+    needs: [ test, get_instances ]
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false  # deploy other instances even if one fails to deploy
       matrix:
-        instance:
-          - contrib
-          - dating
-          - france
-          - france_elections
-          - pga
-          - p2b_compliance
-
+        instance: ${{ fromJSON(needs.get_instances.outputs.names) }}
     steps:
       - uses: actions/checkout@v2
       - name: Get target server hostname
