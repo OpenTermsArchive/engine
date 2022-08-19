@@ -15,24 +15,26 @@ describe('Recorder', () => {
 
   for (const repositoryType of [ 'git', 'mongo' ]) {
     describe(repositoryType, () => {
+      let recorder;
+
+      before(async () => {
+        const options = config.util.cloneDeep(config.recorder);
+
+        options.versions.storage.type = repositoryType;
+        options.snapshots.storage.type = repositoryType;
+
+        recorder = new Recorder(options);
+        await recorder.initialize();
+      });
+
+      after(async () => recorder.finalize());
+
       describe('#recordSnapshot', () => {
         const CONTENT = '<html><h1>ToS fixture data with UTF-8 çhãràčtęrs</h1></html>';
-        let recorder;
+
         let id;
         let isFirstRecord;
         let record;
-
-        before(async () => {
-          const options = config.util.cloneDeep(config.recorder);
-
-          options.versions.storage.type = repositoryType;
-          options.snapshots.storage.type = repositoryType;
-
-          recorder = new Recorder(options);
-          await recorder.initialize();
-        });
-
-        after(async () => recorder.finalize());
 
         context('when a required param is missing', () => {
           after(async () => recorder.snapshotsRepository.removeAll());
@@ -170,17 +172,10 @@ describe('Recorder', () => {
       describe('#recordVersion', () => {
         const CONTENT = '# ToS fixture data with UTF-8 çhãràčtęrs';
         const SNAPSHOT_ID = '61af86dc5ff5caa74ae926ad';
-        let recorder;
+
         let id;
         let isFirstRecord;
         let record;
-
-        before(async () => {
-          recorder = new Recorder(config.get('recorder'));
-          await recorder.initialize();
-        });
-
-        after(async () => recorder.finalize());
 
         context('when a required param is missing', () => {
           after(async () => recorder.versionsRepository.removeAll());
@@ -322,17 +317,10 @@ describe('Recorder', () => {
       describe('#recordRefilter', () => {
         const CONTENT = '# ToS fixture data with UTF-8 çhãràčtęrs';
         const SNAPSHOT_ID = '61af86dc5ff5caa74ae926ad';
-        let recorder;
+
         let id;
         let isFirstRecord;
         let record;
-
-        before(async () => {
-          recorder = new Recorder(config.get('recorder'));
-          await recorder.initialize();
-        });
-
-        after(async () => recorder.finalize());
 
         context('when a required param is missing', () => {
           after(async () => recorder.versionsRepository.removeAll());
