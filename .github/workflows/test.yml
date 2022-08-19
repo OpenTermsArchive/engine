@@ -12,7 +12,7 @@ jobs:
   test:
     strategy:
       matrix:
-        operating_system: [ ubuntu-latest, windows-2019 ]
+        operating_system: [ ubuntu-latest, windows-latest ]
       fail-fast: false # run tests on other operating systems even if one fails
 
     runs-on: ${{ matrix.operating_system }}
@@ -36,7 +36,7 @@ jobs:
   validate_declarations:
     strategy:
       matrix:
-        operating_system: [ubuntu-latest, windows-2019]
+        operating_system: [ ubuntu-latest, windows-latest ]
       fail-fast: false # run tests on other operating systems even if one fails
 
     runs-on: ${{ matrix.operating_system }}
