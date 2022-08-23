@@ -18,8 +18,6 @@ jobs:
     runs-on: ${{ matrix.operating_system }}
 
     steps:
-      - run: |
-          git config --global core.autocrlf false
       - uses: actions/checkout@v2
       - name: Start MongoDB (UNIX)
         if: runner.os != 'Windows'
@@ -51,8 +49,6 @@ jobs:
     runs-on: ${{ matrix.operating_system }}
 
     steps:
-      - run: |
-          git config --global core.autocrlf false
       - uses: actions/checkout@v2
       - uses: actions/checkout@v2
         with:
