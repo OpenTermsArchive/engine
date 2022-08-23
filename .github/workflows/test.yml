@@ -12,7 +12,7 @@ jobs:
   test:
     strategy:
       matrix:
-        operating_system: [ ubuntu-latest, windows-latest ]
+        operating_system: [ ubuntu-latest, windows-latest, macos-latest ]
       fail-fast: false # run tests on other operating systems even if one fails
 
     runs-on: ${{ matrix.operating_system }}
@@ -24,8 +24,8 @@ jobs:
       - name: Start MongoDB (UNIX)
         if: runner.os != 'Windows'
         run: |
-          mkdir /tmp/test-database
-          mongod --dbpath /tmp/test-database --fork --logpath /tmp/mongodb-log
+          mkdir $RUNNER_TEMP/test-database
+          mongod --dbpath $RUNNER_TEMP/test-database --fork --logpath $RUNNER_TEMP/mongodb-log
       - name: Start MongoDB (Windows)
         if: runner.os == 'Windows'
         run: |
@@ -40,7 +40,7 @@ jobs:
   validate_declarations:
     strategy:
       matrix:
-        operating_system: [ ubuntu-latest, windows-latest ]
+        operating_system: [ ubuntu-latest, windows-latest, macos-latest ]
       fail-fast: false # run tests on other operating systems even if one fails
 
     runs-on: ${{ matrix.operating_system }}
