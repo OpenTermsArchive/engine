@@ -19,8 +19,6 @@ jobs:
 
     steps:
       - run: |
-          git config --global user.name 'Open Terms Archive Bot'
-          git config --global user.email 'bot@opentermsarchive.org'
           git config --global core.autocrlf false
       - uses: actions/checkout@v2
       - name: Start MongoDB (UNIX)
