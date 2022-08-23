@@ -17,12 +17,6 @@ jobs:
 
     runs-on: ${{ matrix.operating_system }}
 
-    services:
-      mongo:
-        image: mongo
-        ports:
-          - 27017:27017
-
     steps:
       - run: |
           git config --global user.name 'Open Terms Archive Bot'
@@ -32,6 +26,10 @@ jobs:
       - uses: actions/setup-node@v2
         with:
           node-version: 16
+      - name: Start MongoDB
+        run: |
+          mkdir /tmp/test-database
+          mongod --dbpath /tmp/test-database --fork --logpath /tmp/mongodb-log
       - run: npm ci
       - run: npm test
 
