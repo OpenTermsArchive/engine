@@ -26,16 +26,18 @@
   tags:
     - setup
 
-- name: Check if path exists
-  when: config_file_name is defined
-  stat:
-    path: '/home/{{ ansible_user }}/{{ app_directory }}/config/{{ config_file_name }}.json'
-  register: custom_config_file
+- name: Define instance name
+  ansible.builtin.set_fact:
+    instance_name: '{{ group_names[0] }}'
 
-- name: Create a symbolic link
-  when: config_file_name is defined and custom_config_file.stat.exists
+- name: Load app config
+  ansible.builtin.include_vars:
+    name: app_config
+    file: '../config/{{ instance_name }}.json'
+
+- name: Make config available to app
   ansible.builtin.file:
-    src: '/home/{{ ansible_user }}/{{ app_directory }}/config/{{ config_file_name }}.json'
+    src: '/home/{{ ansible_user }}/{{ app_directory }}/config/{{ instance_name }}.json'
     dest: '/home/{{ ansible_user }}/{{ app_directory }}/config/local.json'
     state: link
 

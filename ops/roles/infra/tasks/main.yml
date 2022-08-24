@@ -1,7 +1,8 @@
 ---
-- name: "Define variables"
-  set_fact:
-    mongo_required: '{{ (app_config.recorder.versions.storage.type is defined and app_config.recorder.versions.storage.type == "mongo") or (app_config.recorder.snapshots.storage.type is defined and app_config.recorder.snapshots.storage.type == "mongo") }}'
+- name: Load app config
+  ansible.builtin.include_vars:
+    name: app_config
+    file: '../config/{{ group_names[0] }}.json'
 
 - name: Install common required packages
   apt:
@@ -72,7 +73,7 @@
 
 - include_tasks: mongo.yml
   when:
-    - mongo_required
+    - (app_config.recorder.versions.storage.type is defined and app_config.recorder.versions.storage.type == 'mongo') or (app_config.recorder.snapshots.storage.type is defined and app_config.recorder.snapshots.storage.type == 'mongo')
     # Skip Debian 11 with ARM architecture as it is not currently supported by MongoDB. See https://www.mongodb.com/docs/manual/installation/#supported-platforms
     - ansible_distribution != 'Debian' or (ansible_distribution == 'Debian' and ansible_facts['architecture'] != 'aarch64')
 

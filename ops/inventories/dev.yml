@@ -9,13 +9,10 @@ all:
     app_directory: ota
     ota_repository: https://github.com/ambanum/OpenTermsArchive.git
     ota_branch: main
-    app_config: "{{ lookup('file','../config/{{config_file_name}}.json') | from_json }}"
   children:
-    dev:
+    vagrant:
       hosts:
-        '127.0.0.1':
+        127.0.0.1:
           ansible_ssh_port: 2222
-          config_file_name: vagrant
           ansible_python_interpreter: /usr/bin/python3
           ansible_ssh_private_key_file: ~/.ssh/ota-vagrant
-

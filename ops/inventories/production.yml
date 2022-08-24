@@ -9,40 +9,30 @@ all:
     app_directory: ota
     ota_repository: https://github.com/ambanum/OpenTermsArchive.git
     ota_branch: main
-    app_config: "{{ lookup('file','../config/{{config_file_name}}.json') | from_json }}"
-    ed25519_fingerprint: False  # obtain this information with `ssh-keyscan -t ssh-ed25519 $host_ip_or_domain`
   children:
-    production:
-      children:
-        contrib:
-          hosts:
-            198.244.153.104:
-              config_file_name: contrib
-              ed25519_fingerprint: AAAAC3NzaC1lZDI1NTE5AAAAIITN8hTCst7+6mHNzeo465crCZwHrc/SzUL1410mb9Lv
-        dating:
-          hosts:
-            vps-99ae1d89.vps.ovh.net:
-              config_file_name: dating
-              ed25519_fingerprint: AAAAC3NzaC1lZDI1NTE5AAAAIClFdaZhaXFmxdQI+rNSOsZaSlrgPlK9UzyGvi66u88V
-        france:
-          hosts:
-            198.244.142.9:
-              config_file_name: france
-              ed25519_fingerprint: AAAAC3NzaC1lZDI1NTE5AAAAIKH7P9SCnnSiVOhGMNvHIjWw5+3TYlmgmTK45Y9d1aCu
-        france_elections:
-          hosts:
-            198.244.140.194:
-              config_file_name: france-elections
-              ed25519_fingerprint: AAAAC3NzaC1lZDI1NTE5AAAAINVdbg1Xualy2P6VB4mTMDGpUlKe9p+J8PViDAK08l7L
-        pga:
-          hosts:
-            134.102.58.70:
-              ansible_user: pga
-              config_file_name: pga
-              ed25519_fingerprint: AAAAC3NzaC1lZDI1NTE5AAAAIDmKHW4LMOEIxnBHkdNzwvSrzjmfhQkx5n2lFtJdraOy
-        p2b_compliance:
-          hosts:
-            vps-463f0baf.vps.ovh.net:
-              ansible_user: ota
-              config_file_name: p2b-compliance
-              ed25519_fingerprint: AAAAC3NzaC1lZDI1NTE5AAAAIDOrkEl2aR2gJe0XmLy4j+0/51G/kAlkupfU4S2Qv0dJ
+    contrib:
+      hosts:
+        198.244.153.104:
+          ed25519_fingerprint: AAAAC3NzaC1lZDI1NTE5AAAAIITN8hTCst7+6mHNzeo465crCZwHrc/SzUL1410mb9Lv
+    dating:
+      hosts:
+        vps-99ae1d89.vps.ovh.net:
+          ed25519_fingerprint: AAAAC3NzaC1lZDI1NTE5AAAAIClFdaZhaXFmxdQI+rNSOsZaSlrgPlK9UzyGvi66u88V
+    france:
+      hosts:
+        198.244.142.9:
+          ed25519_fingerprint: AAAAC3NzaC1lZDI1NTE5AAAAIKH7P9SCnnSiVOhGMNvHIjWw5+3TYlmgmTK45Y9d1aCu
+    france_elections:
+      hosts:
+        198.244.140.194:
+          ed25519_fingerprint: AAAAC3NzaC1lZDI1NTE5AAAAINVdbg1Xualy2P6VB4mTMDGpUlKe9p+J8PViDAK08l7L
+    pga:
+      hosts:
+        134.102.58.70:
+          ansible_user: pga
+          ed25519_fingerprint: AAAAC3NzaC1lZDI1NTE5AAAAIDmKHW4LMOEIxnBHkdNzwvSrzjmfhQkx5n2lFtJdraOy
+    p2b_compliance:
+      hosts:
+        vps-463f0baf.vps.ovh.net:
+          ansible_user: ota
+          ed25519_fingerprint: AAAAC3NzaC1lZDI1NTE5AAAAIDOrkEl2aR2gJe0XmLy4j+0/51G/kAlkupfU4S2Qv0dJ

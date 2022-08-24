@@ -18,7 +18,7 @@ jobs:
         id: get_production_instances_names
         uses: mikefarah/yq@master
         with:
-          cmd: yq '.all.children.production.children | keys' ops/inventories/production.yml --output-format=json
+          cmd: yq '.all.children | keys' ops/inventories/production.yml --output-format=json
 
   deploy:
     needs: [ test, get_instances ]
