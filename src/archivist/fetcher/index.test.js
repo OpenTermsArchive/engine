@@ -62,7 +62,7 @@ describe('Fetcher', function () {
 
         context('when expected selectors are present', () => {
           before(async () => {
-            ({ content, mimeType } = await fetch({ url, selectors: 'body' }));
+            ({ content, mimeType } = await fetch({ url, cssSelectors: 'body' }));
           });
 
           it('returns the web page content of the given URL', async () => {
@@ -75,7 +75,7 @@ describe('Fetcher', function () {
 
           context('with client script enabled', () => {
             before(async () => {
-              ({ content, mimeType } = await fetch({ url, selectors: 'body', executeClientScripts: true }));
+              ({ content, mimeType } = await fetch({ url, cssSelectors: 'body', executeClientScripts: true }));
             });
 
             it('returns the web page content of the given URL', async () => {
@@ -92,7 +92,7 @@ describe('Fetcher', function () {
           const NOT_PRESENT_SELECTOR = 'h2';
 
           before(async () => {
-            ({ content, mimeType } = await fetch({ url, selectors: NOT_PRESENT_SELECTOR }));
+            ({ content, mimeType } = await fetch({ url, cssSelectors: NOT_PRESENT_SELECTOR }));
           });
 
           it('returns the web page content of the given URL', async () => {
@@ -105,7 +105,7 @@ describe('Fetcher', function () {
 
           context('with client script enabled', () => {
             before(async () => {
-              ({ content, mimeType } = await fetch({ url, selectors: NOT_PRESENT_SELECTOR, executeClientScripts: true }));
+              ({ content, mimeType } = await fetch({ url, cssSelectors: NOT_PRESENT_SELECTOR, executeClientScripts: true }));
             });
 
             it('returns the web page content of the given URL', async () => {
