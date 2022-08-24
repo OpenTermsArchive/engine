@@ -60,22 +60,18 @@ describe('Fetcher', function () {
         let mimeType;
         const url = `http://127.0.0.1:${SERVER_PORT}`;
 
-        context('when expected selectors are present', () => {
-          before(async () => {
-            ({ content, mimeType } = await fetch({ url, cssSelectors: 'body' }));
-          });
+        const EXISTING_SELECTORS = {
+          String: 'body',
+          'Array of strings': [ 'body', 'p' ],
+          Range: { startBefore: 'p', endBefore: 'body' },
+          'Array of ranges': [{ startBefore: 'p', endBefore: 'body' }],
+          Mixed: [{ startBefore: 'h1', endBefore: 'body' }, 'p' ],
+        };
 
-          it('returns the web page content of the given URL', async () => {
-            expect(content).to.equal(termsHTML);
-          });
-
-          it('returns the MIME type of the given URL', async () => {
-            expect(mimeType).to.equal('text/html');
-          });
-
-          context('with client script enabled', () => {
+        Object.entries(EXISTING_SELECTORS).forEach(([ name, existingSelectors ]) => {
+          context(`when ${name} selectors are present`, () => {
             before(async () => {
-              ({ content, mimeType } = await fetch({ url, cssSelectors: 'body', executeClientScripts: true }));
+              ({ content, mimeType } = await fetch({ url, cssSelectors: existingSelectors }));
             });
 
             it('returns the web page content of the given URL', async () => {
@@ -84,28 +80,36 @@ describe('Fetcher', function () {
 
             it('returns the MIME type of the given URL', async () => {
               expect(mimeType).to.equal('text/html');
+            });
+
+            context('with client script enabled', () => {
+              before(async () => {
+                ({ content, mimeType } = await fetch({ url, cssSelectors: existingSelectors, executeClientScripts: true }));
+              });
+
+              it('returns the web page content of the given URL', async () => {
+                expect(content).to.equal(termsHTML);
+              });
+
+              it('returns the MIME type of the given URL', async () => {
+                expect(mimeType).to.equal('text/html');
+              });
             });
           });
         });
 
-        context('when expected range selectors are present', () => {
-          const PRESENT_RANGE_SELECTOR = { startBefore: 'p', endBefore: 'body' };
+        const ABSENT_SELECTORS = {
+          String: 'h2',
+          'Array of strings': [ 'h2', 'p' ],
+          Range: { startBefore: 'h2', endBefore: 'body' },
+          'Array of ranges': [{ startBefore: 'h2', endBefore: 'body' }],
+          Mixed: [{ startBefore: 'h2', endBefore: 'body' }, 'p' ],
+        };
 
-          before(async () => {
-            ({ content, mimeType } = await fetch({ url, cssSelectors: PRESENT_RANGE_SELECTOR }));
-          });
-
-          it('returns the web page content of the given URL', async () => {
-            expect(content).to.equal(termsHTML);
-          });
-
-          it('returns the MIME type of the given URL', async () => {
-            expect(mimeType).to.equal('text/html');
-          });
-
-          context('with client script enabled', () => {
+        Object.entries(ABSENT_SELECTORS).forEach(([ name, absentSelectors ]) => {
+          context(`when ${name} selectors are not existing in the page`, () => {
             before(async () => {
-              ({ content, mimeType } = await fetch({ url, cssSelectors: PRESENT_RANGE_SELECTOR, executeClientScripts: true }));
+              ({ content, mimeType } = await fetch({ url, cssSelectors: absentSelectors }));
             });
 
             it('returns the web page content of the given URL', async () => {
@@ -115,65 +119,19 @@ describe('Fetcher', function () {
             it('returns the MIME type of the given URL', async () => {
               expect(mimeType).to.equal('text/html');
             });
-          });
-        });
 
-        context('when expected selectors are not present', () => {
-          const NOT_PRESENT_SELECTOR = 'h2';
+            context('with client script enabled', () => {
+              before(async () => {
+                ({ content, mimeType } = await fetch({ url, cssSelectors: absentSelectors, executeClientScripts: true }));
+              });
 
-          before(async () => {
-            ({ content, mimeType } = await fetch({ url, cssSelectors: NOT_PRESENT_SELECTOR }));
-          });
+              it('returns the web page content of the given URL', async () => {
+                expect(content).to.equal(termsHTML);
+              });
 
-          it('returns the web page content of the given URL', async () => {
-            expect(content).to.equal(termsHTML);
-          });
-
-          it('returns the MIME type of the given URL', async () => {
-            expect(mimeType).to.equal('text/html');
-          });
-
-          context('with client script enabled', () => {
-            before(async () => {
-              ({ content, mimeType } = await fetch({ url, cssSelectors: NOT_PRESENT_SELECTOR, executeClientScripts: true }));
-            });
-
-            it('returns the web page content of the given URL', async () => {
-              expect(content).to.equal(termsHTML);
-            });
-
-            it('returns the MIME type of the given URL', async () => {
-              expect(mimeType).to.equal('text/html');
-            });
-          });
-        });
-
-        context('when expected range selectors are not present', () => {
-          const NOT_PRESENT_RANGE_SELECTOR = { startBefore: 'h2', endBefore: 'body' };
-
-          before(async () => {
-            ({ content, mimeType } = await fetch({ url, cssSelectors: NOT_PRESENT_RANGE_SELECTOR }));
-          });
-
-          it('returns the web page content of the given URL', async () => {
-            expect(content).to.equal(termsHTML);
-          });
-
-          it('returns the MIME type of the given URL', async () => {
-            expect(mimeType).to.equal('text/html');
-          });
-
-          context('with client script enabled', () => {
-            before(async () => {
-              ({ content, mimeType } = await fetch({ url, cssSelectors: NOT_PRESENT_RANGE_SELECTOR, executeClientScripts: true }));
-            });
-
-            it('returns the web page content of the given URL', async () => {
-              expect(content).to.equal(termsHTML);
-            });
-
-            it('returns the MIME type of the given URL', async () => {
-              expect(mimeType).to.equal('text/html');
+              it('returns the MIME type of the given URL', async () => {
+                expect(mimeType).to.equal('text/html');
+              });
             });
           });
         });
