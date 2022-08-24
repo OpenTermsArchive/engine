@@ -7,18 +7,44 @@ on:
 jobs:
   test:
     uses: "ambanum/OpenTermsArchive/.github/workflows/test.yml@main"
-  deploy:
-    needs: [ test ]
-    runs-on: ubuntu-latest
 
+  get_instances:
+    runs-on: ubuntu-latest
+    outputs:
+      names: ${{ steps.get_production_instances_names.outputs.result }}
     steps:
       - uses: actions/checkout@v2
-      - name: Install SSH key
+      - name: Get production instance names
+        id: get_production_instances_names
+        uses: mikefarah/yq@master
+        with:
+          cmd: yq '.all.children.production.children | keys' ops/inventories/production.yml --output-format=json
+
+  deploy:
+    needs: [ test, get_instances ]
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false  # deploy other instances even if one fails to deploy
+      matrix:
+        instance: ${{ fromJSON(needs.get_instances.outputs.names) }}
+    steps:
+      - uses: actions/checkout@v2
+      - name: Get target server hostname
+        id: get_hostname
+        uses: mikefarah/yq@master
+        with:
+          cmd: yq ".all.children.production.children.${{ matrix.instance }}.hosts.* | key" ops/inventories/production.yml
+      - name: Get target server fingerprint
+        id: get_fingerprint
+        uses: mikefarah/yq@master
+        with:
+          cmd: yq '.all.children.production.children.${{ matrix.instance }}.hosts.["${{ steps.get_hostname.outputs.result }}"].ed25519_fingerprint' ops/inventories/production.yml
+      - name: Set up SSH
         uses: shimataro/ssh-key-action@v2
         with:
           key: ${{ secrets.SERVER_SSH_KEY }}
-          known_hosts: ${{ secrets.SERVER_FINGERPRINT }}
+          known_hosts: ${{ steps.get_hostname.outputs.result }} ssh-ed25519 ${{ steps.get_fingerprint.outputs.result }}
       - run: echo "${{ secrets.ANSIBLE_VAULT_KEY }}" > vault.key
       - run: pip install --upgrade setuptools
       - run: pip install 'ansible ~= 2.9'
-      - run: ansible-playbook ops/site.yml --inventory ops/inventories/production.yml
+      - run: ansible-playbook ops/site.yml --inventory ops/inventories/production.yml --limit ${{ matrix.instance }}
