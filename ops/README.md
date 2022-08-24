@@ -227,9 +227,15 @@ Disk space is used up linearily with time as the archive grows. The number of se
 
 We suggest using a dedicated attached volume for storage, independently from the main VM drive, so that you can more easily upgrade or format it.
 
-### Add host configuration
+### Define host
 
 Add an entry to the production inventory file `ops/inventories/production.yml` for the created host with the server address and proper variables.
+
+The host name can not contain dashes. Use snake_case.
+
+### Configure instance
+
+Create a JSON file in the `config` folder with the name of the instance.
 
 ### Create repositories
 
