@@ -31,8 +31,8 @@ jobs:
       - name: Start MongoDB (Windows)
         if: runner.os == 'Windows'
         run: |
-          sc.exe config MongoDB start= auto
-          sc.exe start MongoDB
+          Set-Service MongoDB -StartupType Automatic          
+          Start-Service -Name MongoDB
       - uses: actions/setup-node@v2
         with:
           node-version: 16
