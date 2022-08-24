@@ -3,7 +3,7 @@ name: Test
 on:
   push:
     branches-ignore:
-      - main # tests will be launched by workflow_call push:
+      - main # tests will be launched by workflow_call from the deploy workflow
   pull_request:
     types: [ opened, reopened ]
   workflow_call:
@@ -12,22 +12,20 @@ jobs:
   test:
     strategy:
       matrix:
-        operating_system: [ ubuntu-latest, windows-latest ]
+        operating_system: [ ubuntu-latest, windows-latest, macos-latest ]
       fail-fast: false # run tests on other operating systems even if one fails
 
     runs-on: ${{ matrix.operating_system }}
 
     steps:
       - run: |
-          git config --global user.name 'Open Terms Archive Bot'
-          git config --global user.email 'bot@opentermsarchive.org'
           git config --global core.autocrlf false
       - uses: actions/checkout@v2
       - name: Start MongoDB (UNIX)
         if: runner.os != 'Windows'
         run: |
-          mkdir /tmp/test-database
-          mongod --dbpath /tmp/test-database --fork --logpath /tmp/mongodb-log
+          mkdir $RUNNER_TEMP/test-database
+          mongod --dbpath $RUNNER_TEMP/test-database --fork --logpath $RUNNER_TEMP/mongodb-log
       - name: Start MongoDB (Windows)
         if: runner.os == 'Windows'
         run: |
@@ -38,11 +36,16 @@ jobs:
           node-version: 16
       - run: npm ci
       - run: npm test
+      - name: Archive database logs
+        uses: actions/upload-artifact@v3
+        with:
+          name: mongodb-log
+          path: $RUNNER_TEMP/mongodb-log
 
   validate_declarations:
     strategy:
       matrix:
-        operating_system: [ ubuntu-latest, windows-latest ]
+        operating_system: [ ubuntu-latest, windows-latest, macos-latest ]
       fail-fast: false # run tests on other operating systems even if one fails
 
     runs-on: ${{ matrix.operating_system }}

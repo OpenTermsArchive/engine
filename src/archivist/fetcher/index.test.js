@@ -58,7 +58,7 @@ describe('Fetcher', function () {
       context('when html page is available', () => {
         let content;
         let mimeType;
-        const url = `http://localhost:${SERVER_PORT}`;
+        const url = `http://127.0.0.1:${SERVER_PORT}`;
 
         context('when expected selectors are present', () => {
           before(async () => {
@@ -122,7 +122,7 @@ describe('Fetcher', function () {
       context('when url targets a PDF file', () => {
         let content;
         let mimeType;
-        const pdfUrl = `http://localhost:${SERVER_PORT}/terms.pdf`;
+        const pdfUrl = `http://127.0.0.1:${SERVER_PORT}/terms.pdf`;
 
         before(async () => {
           ({ content, mimeType } = await fetch({ url: pdfUrl }));
@@ -143,7 +143,7 @@ describe('Fetcher', function () {
     });
 
     describe('Error handling', () => {
-      const url404 = `http://localhost:${SERVER_PORT}/404`;
+      const url404 = `http://127.0.0.1:${SERVER_PORT}/404`;
 
       context('when web page is not available', () => {
         it('throws a FetchDocumentError error', async () => {

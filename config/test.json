@@ -15,7 +15,7 @@
           }
         },
         "mongo": {
-          "connectionURI": "mongodb://localhost:27017",
+          "connectionURI": "mongodb://127.0.0.1:27017",
           "database": "open-terms-archive-test",
           "collection": "versions"
         }
@@ -32,7 +32,7 @@
           }
         },
         "mongo": {
-          "connectionURI": "mongodb://localhost:27017",
+          "connectionURI": "mongodb://127.0.0.1:27017",
           "database": "open-terms-archive-test",
           "collection": "snapshots"
         }
