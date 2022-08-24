@@ -1,5 +1,7 @@
 import config from 'config';
 
+import DocumentDeclaration from '../services/documentDeclaration.js';
+
 import fetchFullDom from './fullDomFetcher.js';
 import fetchHtmlOnly from './htmlOnlyFetcher.js';
 
@@ -20,7 +22,9 @@ export { FetchDocumentError } from './errors.js';
  * @returns {Promise} @returns {Promise<Object>} Promise which will be resolved with an object containing the `mimeType` and the `content` of the URL as string or Buffer
  */
 export default async function fetch({
-  url, executeClientScripts, cssSelectors,
+  url,
+  executeClientScripts,
+  cssSelectors,
   config: {
     navigationTimeout = config.get('fetcher.navigationTimeout'),
     language = config.get('fetcher.language'),
@@ -28,7 +32,7 @@ export default async function fetch({
   } = {},
 }) {
   if (executeClientScripts) {
-    return fetchFullDom(url, cssSelectors, { navigationTimeout, language, waitForElementsTimeout });
+    return fetchFullDom(url, DocumentDeclaration.extractCssSelectorsFromProperty(cssSelectors), { navigationTimeout, language, waitForElementsTimeout });
   }
 
   return fetchHtmlOnly(url, { navigationTimeout, language });
