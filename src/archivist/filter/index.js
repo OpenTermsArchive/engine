@@ -161,7 +161,7 @@ function select(webPageDOM, contentSelectors) {
 
       result.appendChild(rangeSelection.cloneContents());
     } else {
-      webPageDOM.querySelectorAll(selector).forEach(element => result.appendChild(element));
+      webPageDOM.querySelectorAll(selector).forEach(element => result.appendChild(element.cloneNode(true)));
     }
   });
 
