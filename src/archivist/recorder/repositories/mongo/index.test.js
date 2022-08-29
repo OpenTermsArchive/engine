@@ -359,8 +359,8 @@ describe('MongoRepository', () => {
     });
 
     context('when there are many snapshots IDs specified', () => {
-      const SNAPSHOT_ID_1 = 'c01533c0e546ef430eea84d23c1b18a2b8420dfb';
-      const SNAPSHOT_ID_2 = '0fd16cca9e1a86a2267bd587107c485f06099d7d';
+      const SNAPSHOT_ID_1 = '61af86dc5ff5caa74ae926ad';
+      const SNAPSHOT_ID_2 = '630cdfa67d2e3cc51f6e284c';
 
       before(async () => {
         (record = await subject.save(new Record({
@@ -382,8 +382,10 @@ describe('MongoRepository', () => {
       after(async () => subject.removeAll());
 
       it('stores snapshots IDs', () => {
-        expect(mongoDocument.snapshotIds).to.include(SNAPSHOT_ID_1);
-        expect(mongoDocument.snapshotIds).to.include(SNAPSHOT_ID_2);
+        const snapshotIds = mongoDocument.snapshotIds.map(id => id.toString());
+
+        expect(snapshotIds).to.include(SNAPSHOT_ID_1);
+        expect(snapshotIds).to.include(SNAPSHOT_ID_2);
       });
 
       it('stores the service id', () => {
