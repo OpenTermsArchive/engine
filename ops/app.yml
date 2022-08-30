@@ -1,6 +1,5 @@
 ---
 - name: Set up Open Terms Archive app and databases
   hosts: all
-
   roles:
     - ota
