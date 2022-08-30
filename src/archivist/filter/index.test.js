@@ -244,7 +244,7 @@ describe('Filter', () => {
         it('filters the given HTML content', async () => {
           const result = await filterHTML({
             content: rawHTML,
-            documentDeclaration: new DocumentDeclaration({
+            pageDeclaration: new PageDeclaration({
               location: virtualLocation,
               contentSelectors: [ 'h1', 'h1 ~ p' ],
             }),
@@ -519,7 +519,7 @@ describe('Filter', () => {
           it('removes all the selections', async () => {
             const result = await filterHTML({
               content: rawHTML,
-              documentDeclaration: new DocumentDeclaration({
+              pageDeclaration: new PageDeclaration({
                 location: virtualLocation,
                 contentSelectors: 'body',
                 noiseSelectors: [
