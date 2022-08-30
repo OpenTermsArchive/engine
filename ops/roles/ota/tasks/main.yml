@@ -29,11 +29,11 @@
 - name: Load app config
   ansible.builtin.include_vars:
     name: app_config
-    file: '../config/{{ instance_name }}.json'
+    file: '../config/{{ config_file_name }}.json'
 
 - name: Make config available to app
   ansible.builtin.file:
-    src: '/home/{{ ansible_user }}/{{ app_directory }}/config/{{ instance_name }}.json'
+    src: '/home/{{ ansible_user }}/{{ app_directory }}/config/{{ config_file_name }}.json'
     dest: '/home/{{ ansible_user }}/{{ app_directory }}/config/local.json'
     state: link
 
