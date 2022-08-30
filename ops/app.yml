@@ -1,5 +1,5 @@
 ---
-- name: Setup OpenTermsArchive app and databases
+- name: Set up Open Terms Archive app and databases
   hosts: all
 
   roles:

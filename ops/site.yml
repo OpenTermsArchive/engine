@@ -1,5 +1,5 @@
 ---
-- name: Setup OpenTermsArchive infra and app
+- name: Set up Open Terms Archive
   hosts: all
 
 - import_playbook: infra.yml
