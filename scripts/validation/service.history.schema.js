@@ -36,15 +36,11 @@ const schema = {
       additionalProperties: false,
       required: [ 'fetch', 'validUntil' ],
       properties: {
-        fetch: {
-          type: 'string',
-          pattern: '^https?://.+.[pP][dD][fF](\\?.+)?$',
-          description: 'The URL where the document can be found',
-        },
         validUntil: {
           type: 'string',
           format: 'date-time',
         },
+        fetch: { $ref: '#/definitions/pdfLocation' },
       },
     },
     singlePageDocumentHistory: {

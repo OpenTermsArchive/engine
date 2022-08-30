@@ -50,13 +50,7 @@ const schema = {
       type: 'object',
       additionalProperties: false,
       required: ['fetch'],
-      properties: {
-        fetch: {
-          type: 'string',
-          pattern: '^https?://.+.[pP][dD][fF](\\?.+)?$',
-          description: 'The URL where the document can be found',
-        },
-      },
+      properties: { fetch: { $ref: '#/definitions/pdfLocation' } },
     },
     page: {
       type: 'object',
