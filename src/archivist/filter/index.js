@@ -142,17 +142,18 @@ export function convertRelativeURLsToAbsolute(document, baseURL) {
 // Works in place
 function remove(webPageDOM, noiseSelectors) {
   const rangeSelections = [];
+  const nodes = [];
 
   [].concat(noiseSelectors).forEach(selector => {
     if (typeof selector === 'object') {
       rangeSelections.push(selectRange(webPageDOM, selector));
     } else {
-      Array.from(webPageDOM.querySelectorAll(selector)).forEach(node => node.classList.add('open-terms-archive-remove-marker')); // Tag the nodes to be deleted instead of deleting them directly. Ensure all nodes are still present on the page when trying to use precedent-dependent selector (`~`, `+`, `:nth-child`…)
+      nodes.push(...webPageDOM.querySelectorAll(selector));
     }
   });
 
-  // Removing range selections still works even if the starting or ending node is deleted. So, start by removing all tagged nodes selected by a direct CSS selector, then delete all contents selections.
-  Array.from(webPageDOM.querySelectorAll('.open-terms-archive-remove-marker')).forEach(node => node.remove());
+  // Removing range selections still works even if the starting or ending node is deleted. So, start by removing all nodes selected by a direct CSS selector, then delete all contents selections.
+  nodes.forEach(node => node.remove());
   rangeSelections.forEach(rangeSelection => rangeSelection.deleteContents());
 }
 
