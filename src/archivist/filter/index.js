@@ -148,7 +148,7 @@ function remove(webPageDOM, noiseSelectors) {
     if (typeof selector === 'object') {
       rangeSelections.push(selectRange(webPageDOM, selector));
     } else {
-      Array.from(webPageDOM.querySelectorAll(selector)).forEach(node => nodes.push(node));
+      nodes.push(...webPageDOM.querySelectorAll(selector));
     }
   });
 
