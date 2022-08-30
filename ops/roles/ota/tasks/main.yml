@@ -1,7 +1,7 @@
 - name: Clone Open Terms Archive engine
   git:
     repo: '{{ ota_repository }}'
-    dest: '/home/{{ ansible_user }}/{{ app_directory }}'
+    dest: '/home/{{ ansible_user }}/{{ ota_directory }}'
     version: '{{ ota_branch }}'
     force: yes
     accept_hostkey: yes
@@ -14,7 +14,7 @@
 - name: Install dependencies
   command:
     cmd: npm ci --production
-    chdir: '/home/{{ ansible_user }}/{{ app_directory }}'
+    chdir: '/home/{{ ansible_user }}/{{ ota_directory }}'
   tags:
     - setup
     - update
@@ -22,7 +22,7 @@
 - name: Add .env file
   copy:
     src: .env
-    dest: '/home/{{ ansible_user }}/{{ app_directory }}/.env'
+    dest: '/home/{{ ansible_user }}/{{ ota_directory }}/.env'
   tags:
     - setup
 
@@ -33,8 +33,8 @@
 
 - name: Make config available to app
   ansible.builtin.file:
-    src: '/home/{{ ansible_user }}/{{ app_directory }}/config/{{ config_file_name }}.json'
-    dest: '/home/{{ ansible_user }}/{{ app_directory }}/config/local.json'
+    src: '/home/{{ ansible_user }}/{{ ota_directory }}/config/{{ config_file_name }}.json'
+    dest: '/home/{{ ansible_user }}/{{ ota_directory }}/config/local.json'
     state: link
 
 - name: Install services declarations
@@ -62,7 +62,7 @@
 - name: Stop Open Terms Archive schedulers
   command:
     cmd: pm2 stop pm2.config.cjs
-    chdir: '/home/{{ ansible_user }}/{{ app_directory }}'
+    chdir: '/home/{{ ansible_user }}/{{ ota_directory }}'
   tags:
     - stop
     - update
@@ -95,7 +95,7 @@
 - name: Start Open Terms Archive schedulers
   command:
     cmd: pm2 startOrRestart pm2.config.cjs
-    chdir: '/home/{{ ansible_user }}/{{ app_directory }}'
+    chdir: '/home/{{ ansible_user }}/{{ ota_directory }}'
   environment:
     NODE_ENV: production
   tags:
