@@ -26,10 +26,6 @@
   tags:
     - setup
 
-- name: Define instance name
-  ansible.builtin.set_fact:
-    instance_name: '{{ group_names[0] }}'
-
 - name: Load app config
   ansible.builtin.include_vars:
     name: app_config

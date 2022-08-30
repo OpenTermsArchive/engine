@@ -1,0 +1,15 @@
+ansible_user: debian
+
+# Try out experimental features by deploying alternative versions of the engine, configuration or databases
+ota_repository: https://github.com/ambanum/OpenTermsArchive.git
+ota_branch: main
+snapshots_branch: main
+versions_branch: main
+config_filename: '{{ instance_name }}'
+
+# Avoid collisions in case of multi-tenancy (running several instances on the same hosts)
+instance_name: '{{ group_names[0] }}'  # assume there is only one named group per host; override if a single server runs several instances
+app_directory: ota
+declarations_directory: declarations
+snapshots_directory: snapshots
+versions_directory: versions
