@@ -3,6 +3,7 @@ ansible_user: debian
 # Try out experimental features by deploying alternative versions of the engine, configuration or databases
 ota_repository: https://github.com/ambanum/OpenTermsArchive.git
 ota_branch: main
+declarations_branch: main
 snapshots_branch: main
 versions_branch: main
 config_file_name: '{{ instance_name }}'
