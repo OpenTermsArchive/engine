@@ -239,6 +239,20 @@ describe('Filter', () => {
 
         expect(result).to.equal('Title\n=====\n\n[link 2](#anchor)');
       });
+
+      context('when one selector is dependent on another', () => {
+        it('filters the given HTML content', async () => {
+          const result = await filterHTML({
+            content: rawHTML,
+            documentDeclaration: new DocumentDeclaration({
+              location: virtualLocation,
+              contentSelectors: [ 'h1', 'h1 ~ p' ],
+            }),
+          });
+
+          expect(result).to.equal('Title\n=====\n\n[link 1](https://exemple.com/relative/link)\n\n[link 2](#anchor)\n\n[link 3](http://absolute.url/link)');
+        });
+      });
     });
 
     context('with range selector', () => {
