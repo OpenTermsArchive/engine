@@ -14,6 +14,7 @@ france_elections:
   hosts:
     198.244.140.194:
       ed25519_fingerprint: AAAAC3NzaC1lZDI1NTE5AAAAINVdbg1Xualy2P6VB4mTMDGpUlKe9p+J8PViDAK08l7L
+      config_file_name: france-elections
 pga:
   hosts:
     134.102.58.70:
@@ -24,3 +25,4 @@ p2b_compliance:
     vps-463f0baf.vps.ovh.net:
       ansible_user: ota
       ed25519_fingerprint: AAAAC3NzaC1lZDI1NTE5AAAAIDOrkEl2aR2gJe0XmLy4j+0/51G/kAlkupfU4S2Qv0dJ
+      config_file_name: p2b-compliance
