@@ -43,7 +43,7 @@ const schema = {
     singlePageDocumentHistory: {
       type: 'object',
       additionalProperties: false,
-      required: [ 'fetch', 'validUntil' ],
+      required: [ 'fetch', 'select', 'validUntil' ],
       properties: {
         fetch: { $ref: '#/definitions/location' },
         select: { $ref: '#/definitions/contentSelectors' },
