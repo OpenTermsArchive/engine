@@ -4,13 +4,26 @@ Recipes to set up the infrastructure of and deploy Open Terms Archive.
 
 ## Requirements
 
-- Install [Ansible](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html)
+1. Install [Ansible](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html).
+2. Install [Vagrant](https://www.vagrantup.com/downloads).
+3. Install [VirtualBox](https://www.virtualbox.org/wiki/Downloads) to manage virtual machines. If you prefer Docker, or have an Apple Silicon machine, install [Docker](https://docs.docker.com/get-docker/) instead.
+4. Create a dedicated SSH key with no password: `ssh-keygen -f ~/.ssh/ota-vagrant -q -N ""`. This key will be automatically used by Vagrant.
+
+> VirtualBox is not compatible with Apple Silicon (M1…) processors. If you have such a machine, you will need to use the Docker provider. Since MongoDB cannot be installed on ARM, it is skipped in the infrastructure installation process. This means you cannot test the MongoDB storage repository with Vagrant with an Apple Silicon processor.
 
 ## Usage
 
-_To avoid making changes on the production server by mistake, by default all commands will only affect the Vagrant development virtual machine (VM), see [Development section](#development) for more details._
+**You should never apply changes to production from your machine.** We use continuous deployment to apply changes. To avoid making changes on the production server by mistake, we use [Vagrant](https://www.vagrantup.com) to describe and spawn virtual machines. By default all commands will only affect the Vagrant development virtual machine (VM).
 
-_To execute commands on the production server you should specify it by adding the option `--inventory ops/inventories/production.yml` to the following commands:_
+### Launch
+
+If you’re on an Apple Silicon processor or want to use Docker instead of VirtualBox, use `vagrant up --provider=docker`.
+
+In all other cases, use `vagrant up` 🙂
+
+You can then deploy the code to the running machine with all the options described below.
+
+### Main commands
 
 - To set up a full [(phoenix)](https://martinfowler.com/bliki/PhoenixServer.html) server:
 
@@ -29,171 +42,6 @@ ansible-playbook ops/infra.yml
 ```
 ansible-playbook ops/app.yml
 ```
-
-Setting up the production infrastructure for publishing on the shared versions repository entails decrypting a private key managed with [Ansible Vault](https://docs.ansible.com/ansible/latest/user_guide/vault.html). It is decrypted with a password that we keep safe. You do not need to decrypt this specific private key on your own production server.
-
-Note that executing the playbook on the `production` inventory will affect **all** production servers.
-
-If you want to execute a playbook on a specific server only, add the `--limit` option with the `hostname` as parameter:
-
-```
-ansible-playbook --inventory ops/inventories/production.yml ops/site.yml --limit <hostname>
-```
-
-The hostname is the one defined in the `ops/inventories/production.yml` inventory file.
-
-### Tags
-
-Some tags are available to refine what will happen, use them with `--tags`:
-
-- `setup`: to only setup system dependencies required by the app (cloning repo, installing app dependencies, all config files, and so on…)
-- `start`: to start the app
-- `stop`: to stop the app
-- `restart`: to restart the app
-- `update`: to update the app (pull code, install dependencies and restart app)
-- `update-declarations`: to update services declarations (pull declarations, install dependencies and restart app)
-
-For example, you can update `Open Terms Archive` by running:
-
-```
-ansible-playbook ops/app.yml --tags update
-```
-
-### Allowed keys
-
-In case the instance you're deploying on is operated by the Core team, you can use the `OTA-bot` SSH private key instead of your personal one. You can thus run any of the commands with the `--private-key` option, passing it the path to the bot SSH private key. This key can be found in the passwords database.
-
-### Commands examples
-
-- Deploy Open Terms Archive application on all servers declared in the `ops/inventories/production.yml` inventory file:
-  ```
-  ansible-playbook --inventory ops/inventories/production.yml ops/app.yml
-  ```
-
-- Check deployment without applying changes for the `dating` instance:
-  ```
-  ansible-playbook --inventory ops/inventories/production.yml ops/app.yml --limit dating --check --diff
-  ```
-
-- Deploy Open Terms Archive application only on the `dating` instance and without applying changes to the infrastructure:
-  ```
-  ansible-playbook --inventory ops/inventories/production.yml ops/app.yml --limit dating
-  ```
-
-- Update and restart the Open Terms Archive application only on `dating` instance:
-  ```
-  ansible-playbook --inventory ops/inventories/production.yml ops/app.yml --limit dating --tag update
-  ```
-
-- Update services declarations only on the `france` instance:
-  ```
-  ansible-playbook --inventory ops/inventories/production.yml ops/app.yml --limit france --tag update-declarations
-  ```
-
-- Stop the Open Terms Archive application only on the `france` instance:
-  ```
-  ansible-playbook --inventory ops/inventories/production.yml ops/app.yml --limit france --tag stop
-  ```
-
-- Deploy the infrastructure and the Open Terms Archive application on all servers:
-  ```
-  ansible-playbook --inventory ops/inventories/production.yml ops/site.yml
-  ```
-
-### Logs
-
-You can get logs by connecting to the target machine over SSH and obtaining logs from the process manager:
-
-```
-ssh user@machine pm2 logs ota
-```
-
-## Process
-
-To avoid breaking the production when making changes, follow this process:
-
-- Start by applying your changes on your Vagrant virtual machine
-  `ansible-playbook ops/site.yml`.
-- Connect through SSH to the virtual machine and check that everything is ok
-  `vagrant ssh`, `pm2 logs`…
-- **As you will test the PRODUCTION environnement, stop the OTA application server to avoid sending emails to our users**
-  `ansible-playbook ops/app.yml -t stop`
-- If everything works, destroy that machine and re-run the entire installation on a clean machine to ensure that your changes do not work by coincidence
-  `vagrant destroy && vagrant up && ansible-playbook ops/site.yml`
-- Re-check that everything is ok
-  `vagrant ssh`, `pm2 logs`…
-- Then you can now deploy the changes in production
-  `ansible-playbook --inventory ops/inventories/production.yml ops/site.yml`.
-
-## Initialize a new instance
-
-### Provision a server
-
-#### With [OVH Horizon](https://horizon.cloud.ovh.net/project/instances/)
-
-Click on the `Launch Instance` button. Then fill in at least the following fields:
-
-- `Instance name`.
-- `Source`. Suggested: `Debian 11`.
-- `Flavor`. Suggested: `b-7-flex`.
-- `Key pair`. Suggested: Your own personal SSH key, to allow you to connect to the freshly created server.
-
-#### Recommended specs
-
-The following setup is sufficient to track 20 services:
-
-- 1 vCore @ 1.8GHz
-- 2 GB RAM
-- 1 MBps bandwidth
-- 20 GB disk space
-
-The major factor for performance is bandwidth.
-
-Disk space is used up linearily with time as the archive grows. The number of services, their frequency of change and the chosen storage mechanism will all influence the speed at which disk space is used. You can start with 20GB but will have to consider expansion in the future. You should be safe for a longer time period with 100GB.
-
-We suggest using a dedicated attached volume for storage, independently from the main VM drive, so that you can more easily upgrade or format it.
-
-### Add host configuration
-
-Add an entry to the production inventory file `ops/inventories/production.yml` for the created host with the server address and proper variables.
-
-### Create repositories
-
-Create the `snapshot` and `version` repositories, with:
-
-- A `main` branch.
-- The `main` branch should be the default branch.
-- At least one commit on this branch with some content (`README.md` and `LICENSE`).
-
-Templates are provided to that end, for [declarations](https://github.com/OpenTermsArchive/template-declarations/), [snapshots](https://github.com/OpenTermsArchive/template-snapshots/) and [versions](https://github.com/OpenTermsArchive/template-versions/).
-
-### Set up permissions
-
-The @OTA-Bot GitHub user should have write access to all three (declarations, snapshots, versions) repositories, so it can publish data, create issues, and publish dataset releases.
-
-Each instance should have a responsible entity, which we currently model as a [“team” in the @OpenTermsArchive](https://github.com/orgs/OpenTermsArchive/teams) GitHub organisation. Each team has write access to the three repositories, and @OTA-Bot should be added to that team along with the human maintainers.
-
-## Development
-
-In order to try out the infrastructure setup, we use virtual machines. We use [Vagrant](https://www.vagrantup.com) to describe and spawn these virtual machines with a simple `vagrant up` command.
-
-### Dependencies
-
-In order to automatically set up a virtual machine:
-
-1. Install [Vagrant](https://www.vagrantup.com/docs/installation/).
-2. Install [VirtualBox](https://www.virtualbox.org/wiki/Downloads) to manage virtual machines. If you prefer Docker, or have an Apple Silicon machine, install [Docker](https://docs.docker.com/get-docker/) instead.
-3. Create a dedicated SSH key with no password: `ssh-keygen -f ~/.ssh/ota-vagrant -q -N ""`. This key will be automatically used by Vagrant.
-
-> VirtualBox is not compatible with Apple Silicon (M1…) processors. If you have such a machine, you will need to use the Docker provider. Since MongoDB cannot be installed on ARM, it is skipped in the infrastructure installation process. This means you cannot test the MongoDB storage repository with Vagrant with an Apple Silicon processor.
-
-### Launch
-
-If you’re on an Apple Silicon processor or want to use Docker instead of VirtualBox, use `vagrant up --provider=docker`.
-
-In all other cases, use `vagrant up` 🙂
-
-You can then deploy the code to the running machine with `ansible-playbook ops/site.yml` and all the options described above.
 
 ### Vagrant quick reference
 
@@ -254,18 +102,150 @@ provider supports automatic port collision detection and resolution.
     22 (guest) => 2200 (host)
 ```
 
-Modify the Ansible SSH options to the `ops/inventories/dev.yml` file with the proper `ansible_ssh_port`:
+Modify the Ansible SSH options in the `ops/inventories/dev.yml` file with the proper `ansible_ssh_port`:
 
 ```
 all:
   children:
-    dev:
+    vagrant:
       hosts:
-        '127.0.0.1':
+        127.0.0.1:
           […]
           ansible_ssh_port: 2200
           […]
 ```
+
+### Logs
+
+You can obtain logs from the process manager over SSH:
+
+```
+ssh <user>@<instance_hostname> pm2 logs ota
+```
+
+### Tags
+
+Some tags are available to refine what will happen, use them with `--tags`:
+
+- `setup`: to only setup system dependencies required by the app (cloning repo, installing app dependencies, all config files, and so on…)
+- `start`: to start the app
+- `stop`: to stop the app
+- `restart`: to restart the app
+- `update`: to update the app (pull code, install dependencies and restart app)
+- `update-declarations`: to update services declarations (pull declarations, install dependencies and restart app)
+
+For example, if you have changes to the core engine to deploy but no infrastructure changes, you can update the app only by running:
+
+```
+ansible-playbook ops/app.yml --tags update --limit <instance_name>
+```
+
+## Production
+
+### Applying changes
+
+To test locally your changes to the playbook before opening a pull request:
+
+- Remove all traces of previous tests to ensure that your changes do not work by coincidence: `vagrant destroy && vagrant up`.
+- Start by applying your changes on the virtual machine: `ansible-playbook ops/site.yml`.
+- Connect through SSH to the virtual machine and check that everything works as intended: `vagrant ssh`, `pm2 logs`…
+- Open a pull request and wait for it to be reviewed and merged. The continuous deployment process will take care of applying your changes to every production instance.
+
+### Deploying manually from your machine
+
+**You should not be doing this.** If something terrible is happening in production, did you try just stopping the instance? Any fix should be applied through a PR and deployed in CD to ensure reproducibility.
+
+Note that executing the playbook on the `production` inventory will affect **all** production servers. Unless you know exactly what you are doing, you should always execute a playbook on a specific server only, add the `--limit` option with the instance name defined in `ops/inventories/production.yml` as parameter:
+
+```
+ansible-playbook --inventory ops/inventories/production.yml ops/site.yml --limit <instance_name>
+```
+
+### Allowed keys
+
+Setting up the production infrastructure for publishing on the shared versions repository entails decrypting a private key managed with [Ansible Vault](https://docs.ansible.com/ansible/latest/user_guide/vault.html). It is decrypted with a password stored in the passwords database.
+
+In case the instance you're deploying on is operated by the Core team, you should use the `OTA-bot` SSH private key instead of your personal one. You can thus run any of the commands with the `--private-key` option, passing it the path to the bot SSH private key. This key can be found in the passwords database.
+
+### Commands examples
+
+- Check deployment without actually applying changes for the `dating` instance:
+
+```
+ansible-playbook --inventory ops/inventories/production.yml ops/app.yml --limit dating --check --diff
+```
+
+- Update the Open Terms Archive application only on the `dating` instance, without applying changes to the infrastructure:
+
+```
+ansible-playbook --inventory ops/inventories/production.yml ops/app.yml --limit dating --tag update
+```
+
+- Update services declarations only on the `france` instance:
+
+```
+ansible-playbook --inventory ops/inventories/production.yml ops/app.yml --limit france --tag update-declarations
+```
+
+- Stop the Open Terms Archive application only on the `france` instance:
+
+```
+ansible-playbook --inventory ops/inventories/production.yml ops/app.yml --limit france --tag stop
+```
+
+- Update the infrastructure and the Open Terms Archive application on all servers:
+
+```
+ansible-playbook --inventory ops/inventories/production.yml ops/site.yml
+```
+
+## Set up a new instance
+
+### Provision a server
+
+#### With [OVH Horizon](https://horizon.cloud.ovh.net/project/instances/)
+
+Click on the `Launch Instance` button. Then fill in at least the following fields:
+
+- `Instance name`.
+- `Source`. Suggested: `Debian 11`.
+- `Flavor`. Suggested: `b-7-flex`.
+- `Key pair`. Suggested: Your own personal SSH key, to allow you to connect to the freshly created server.
+
+#### Recommended specs
+
+The following setup is sufficient to track 20 services:
+
+- 1 vCore @ 1.8GHz
+- 2 GB RAM
+- 1 MBps bandwidth
+- 20 GB disk space
+
+The major factor for performance is bandwidth.
+
+Disk space is used up linearily with time as the archive grows. The number of services, their frequency of change and the chosen storage mechanism will all influence the speed at which disk space is used. You can start with 20GB but will have to consider expansion in the future. You should be safe for a longer time period with 100GB.
+
+We suggest using a dedicated attached volume for storage, independently from the main VM drive, so that you can more easily upgrade or format it.
+
+### Add host configuration
+
+Add an entry to the production inventory file `ops/inventories/production.yml` for the created host with the server address and proper variables.
+
+### Create repositories
+
+Create the `snapshot` and `version` repositories, with:
+
+- A `main` branch.
+- The `main` branch should be the default branch.
+- At least one commit on this branch with some content (`README.md` and `LICENSE`).
+
+Templates are provided to that end, for [declarations](https://github.com/OpenTermsArchive/template-declarations/), [snapshots](https://github.com/OpenTermsArchive/template-snapshots/) and [versions](https://github.com/OpenTermsArchive/template-versions/).
+
+### Set up permissions
+
+The @OTA-Bot GitHub user should have write access to all three (declarations, snapshots, versions) repositories, so it can publish data, create issues, and publish dataset releases.
+
+Each instance should have a responsible entity, which we currently model as a [“team” in the @OpenTermsArchive](https://github.com/orgs/OpenTermsArchive/teams) GitHub organisation. Each team has write access to the three repositories, and @OTA-Bot should be added to that team along with the human maintainers.
 
 ## Optimise performance
 
