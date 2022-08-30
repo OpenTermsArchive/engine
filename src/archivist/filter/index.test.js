@@ -514,6 +514,27 @@ describe('Filter', () => {
 
           expect(result).to.equal('[link 1](https://exemple.com/relative/link)\n\n[link 2](#anchor)');
         });
+
+        context('where one selector is dependent on another', () => {
+          it('removes all the selections', async () => {
+            const result = await filterHTML({
+              content: rawHTML,
+              documentDeclaration: new DocumentDeclaration({
+                location: virtualLocation,
+                contentSelectors: 'body',
+                noiseSelectors: [
+                  'h1',
+                  {
+                    startAfter: 'h1',
+                    endBefore: '#link2',
+                  },
+                ],
+              }),
+            });
+
+            expect(result).to.equal('[link 2](#anchor)\n\n[link 3](http://absolute.url/link)');
+          });
+        });
       });
     });
   });
