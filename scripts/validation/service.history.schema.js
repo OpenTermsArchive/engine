@@ -36,11 +36,8 @@ const schema = {
       additionalProperties: false,
       required: [ 'fetch', 'validUntil' ],
       properties: {
-        validUntil: {
-          type: 'string',
-          format: 'date-time',
-        },
         fetch: { $ref: '#/definitions/pdfLocation' },
+        validUntil: { $ref: '#/definitions/validUntil' },
       },
     },
     singlePageDocumentHistory: {
