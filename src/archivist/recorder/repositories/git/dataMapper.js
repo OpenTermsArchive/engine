@@ -61,12 +61,12 @@ export function toDomain(commit) {
   });
 }
 
-export function generateFileName(documentType, pageId, mimeType) {
-  const extension = mime.getExtension(mimeType) || '*';
-
+function generateFileName(documentType, pageId, extension) {
   return `${documentType}${pageId ? `${DOCUMENT_TYPE_AND_PAGE_ID_SEPARATOR}${pageId}` : ''}.${extension}`;
 }
 
 export function generateFilePath(serviceId, documentType, pageId, mimeType) {
-  return path.join(serviceId, generateFileName(documentType, pageId, mimeType));
+  const extension = mime.getExtension(mimeType) || '*'; // If mime type is undefined, an asterisk is set as an extension. Used to match all files for the given service ID, document type and page ID when mime type is unknown.
+
+  return path.join(serviceId, generateFileName(documentType, pageId, extension));
 }
