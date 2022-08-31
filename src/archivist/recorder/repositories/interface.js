@@ -40,7 +40,7 @@ export default class RepositoryInterface {
   *
   * @param {string} serviceId - Service ID of record to find
   * @param {string} documentType - Document type of record to find
-  * @param {string} [pageId] - Page ID of record to find
+  * @param {string} [pageId] - Page ID of record to find. Used to differentiate pages of multipage document. Not necessary for single page document
   * @returns {Promise<Record>} Promise that will be resolved with the found record or an empty object if none match the given criteria
   */
   async findLatest(serviceId, documentType, pageId) {
