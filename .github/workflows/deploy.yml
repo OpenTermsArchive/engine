@@ -18,7 +18,7 @@ jobs:
         id: get_production_instances_names
         uses: mikefarah/yq@master
         with:
-          cmd: yq '.all.children | keys' ops/inventories/production.yml --output-format=json
+          cmd: yq '. | keys' ops/inventories/production.yml --output-format=json
 
   deploy:
     needs: [ test, get_instances ]
@@ -33,12 +33,12 @@ jobs:
         id: get_hostname
         uses: mikefarah/yq@master
         with:
-          cmd: yq ".all.children.production.children.${{ matrix.instance }}.hosts.* | key" ops/inventories/production.yml
+          cmd: yq ".${{ matrix.instance }}.hosts.* | key" ops/inventories/production.yml
       - name: Get target server fingerprint
         id: get_fingerprint
         uses: mikefarah/yq@master
         with:
-          cmd: yq '.all.children.production.children.${{ matrix.instance }}.hosts.["${{ steps.get_hostname.outputs.result }}"].ed25519_fingerprint' ops/inventories/production.yml
+          cmd: yq '.${{ matrix.instance }}.hosts.["${{ steps.get_hostname.outputs.result }}"].ed25519_fingerprint' ops/inventories/production.yml
       - name: Set up SSH
         uses: shimataro/ssh-key-action@v2
         with:
