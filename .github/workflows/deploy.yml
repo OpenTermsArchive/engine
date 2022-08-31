@@ -2,7 +2,7 @@ name: Deploy
 
 on:
   push:
-    branches: [ main ]
+    branches: [ fix-deploy ]
 
 jobs:
   test:
@@ -21,7 +21,7 @@ jobs:
           cmd: yq '. | keys' ops/inventories/production.yml --output-format=json
 
   deploy:
-    needs: [ test, get_instances ]
+    needs: [ get_instances ]
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false  # deploy other instances even if one fails to deploy
