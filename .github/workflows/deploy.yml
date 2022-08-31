@@ -9,7 +9,12 @@ jobs:
     uses: "ambanum/OpenTermsArchive/.github/workflows/test.yml@main"
 
   get_instances:
-    uses: "ambanum/OpenTermsArchive/.github/workflows/get_instances.yml@main"
+    outputs:
+      names: ${{ steps.list.outputs.names }}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ./get_instances.yml
+        id: list
 
   deploy:
     needs:
