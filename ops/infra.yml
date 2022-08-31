@@ -1,7 +1,6 @@
 ---
-- name: Setup OpenTermsArchive infrastructure
+- name: Set up Open Terms Archive infrastructure
   hosts: all
   become: yes
-
   roles:
     - infra
