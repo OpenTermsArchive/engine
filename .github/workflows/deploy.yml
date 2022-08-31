@@ -2,23 +2,13 @@ name: Deploy
 
 on:
   push:
-    branches: [ fix-deploy ]
+    branches: [ fix-deploy-reusable-workflow ]
 
 jobs:
   test:
-    uses: "ambanum/OpenTermsArchive/.github/workflows/test.yml@main"
-
-  get_instances:
-    runs-on: ubuntu-latest
-    outputs:
-      names: ${{ steps.get_production_instances_names.outputs.result }}
-    steps:
-      - uses: actions/checkout@v2
-      - name: Get production instance names
-        id: get_production_instances_names
-        uses: mikefarah/yq@master
-        with:
-          cmd: yq 'with_entries(select(.key | test("all") | not))' ops/inventories/production.yml --output-format=json  # list all groups except `all`
+    uses:
+      - "ambanum/OpenTermsArchive/.github/workflows/test.yml@main"
+      - "ambanum/OpenTermsArchive/.github/workflows/get_instances.yml@main"
 
   deploy:
     needs: [ get_instances ]
@@ -29,21 +19,16 @@ jobs:
         instance: ${{ fromJSON(needs.get_instances.outputs.names) }}
     steps:
       - uses: actions/checkout@v2
-      - name: Get target server hostname
-        id: get_hostname
-        uses: mikefarah/yq@master
+      - name: Obtain known host entry
+        id: get_known_host_entry
+        uses: ./get_instances.yml
         with:
-          cmd: yq ".${{ matrix.instance }}.hosts.* | key" ops/inventories/production.yml
-      - name: Get target server fingerprint
-        id: get_fingerprint
-        uses: mikefarah/yq@master
-        with:
-          cmd: yq '.${{ matrix.instance }}.hosts.["${{ steps.get_hostname.outputs.result }}"].ed25519_fingerprint' ops/inventories/production.yml
+          instance: ${{ matrix.instance }}
       - name: Set up SSH
         uses: shimataro/ssh-key-action@v2
         with:
           key: ${{ secrets.SERVER_SSH_KEY }}
-          known_hosts: ${{ steps.get_hostname.outputs.result }} ssh-ed25519 ${{ steps.get_fingerprint.outputs.result }}
+          known_hosts: ${{ steps.get_known_host_entry.outputs.known_host_entry }}
       - run: echo "${{ secrets.ANSIBLE_VAULT_KEY }}" > vault.key
       - run: pip install --upgrade setuptools
       - run: pip install 'ansible ~= 2.9'

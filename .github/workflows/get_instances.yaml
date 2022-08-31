@@ -1,0 +1,37 @@
+name: Get production instances
+
+on:
+  workflow_call:
+    inputs:
+      instance:
+        type: string
+
+jobs:
+  get_instances:
+    runs-on: ubuntu-latest
+    outputs:
+      names: ${{ steps.get_production_instances_names.outputs.result }}
+      known_host_entry: ${{ steps.get_known_host.outputs.entry }}
+    steps:
+      - uses: actions/checkout@v2
+      - name: Get production instance names
+        id: get_production_instances_names
+        uses: mikefarah/yq@master
+        with:
+          cmd: yq 'with_entries(select(.key | test("all") | not))' ops/inventories/production.yml --output-format=json  # list all groups except `all`
+      - name: Get target server hostname
+        id: get_hostname
+        if: ${{ inputs.instance }}
+        uses: mikefarah/yq@master
+        with:
+          cmd: yq ".${{ inputs.instance }}.hosts.* | key" ops/inventories/production.yml
+      - name: Get target server fingerprint
+        id: get_fingerprint
+        if: ${{ inputs.instance }}
+        uses: mikefarah/yq@master
+        with:
+          cmd: yq '.${{ inputs.instance }}.hosts.["${{ steps.get_hostname.outputs.result }}"].ed25519_fingerprint' ops/inventories/production.yml
+      - name: Generate known host entry
+        if: ${{ inputs.instance }}
+        id: get_known_host
+        run: echo "::set-output name=entry::${{ steps.get_hostname.outputs.result }} ssh-ed25519 ${{ steps.get_fingerprint.outputs.result }}"
