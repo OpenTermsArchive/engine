@@ -19,6 +19,8 @@ jobs:
         uses: mikefarah/yq@master
         with:
           cmd: yq 'with_entries(select(.key | test("all") | not)) | keys' ops/inventories/production.yml --output-format=json  # list all group names except `all`
+      - name: List available instance names
+        run: echo ${{ steps.get_production_instances_names.outputs.result }}
       - name: Get target server hostname
         id: get_hostname
         if: ${{ inputs.instance }}
