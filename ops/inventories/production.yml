@@ -26,3 +26,7 @@ p2b_compliance:
       ansible_user: ota
       ed25519_fingerprint: AAAAC3NzaC1lZDI1NTE5AAAAIDOrkEl2aR2gJe0XmLy4j+0/51G/kAlkupfU4S2Qv0dJ
       config_file_name: p2b-compliance
+
+all:
+  vars:
+    ansible_user: debian
