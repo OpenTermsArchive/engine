@@ -14,7 +14,7 @@ jobs:
       names: ${{ steps.list.outputs.names }}
     steps:
       - uses: actions/checkout@v2
-      - uses: ./get_instances.yml
+      - uses: ./.github/workflows/get_instances.yml
         id: list
 
   deploy:
