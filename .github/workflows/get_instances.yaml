@@ -18,7 +18,7 @@ jobs:
         id: get_production_instances_names
         uses: mikefarah/yq@master
         with:
-          cmd: yq 'with_entries(select(.key | test("all") | not))' ops/inventories/production.yml --output-format=json  # list all groups except `all`
+          cmd: yq 'with_entries(select(.key | test("all") | not)) | keys' ops/inventories/production.yml --output-format=json  # list all group names except `all`
       - name: Get target server hostname
         id: get_hostname
         if: ${{ inputs.instance }}
