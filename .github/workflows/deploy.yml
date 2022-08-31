@@ -8,9 +8,12 @@ jobs:
   test:
     uses: "ambanum/OpenTermsArchive/.github/workflows/test.yml@main"
 
+  get_instances:
+    uses: "ambanum/OpenTermsArchive/.github/workflows/get_instances.yml@main"
+
   deploy:
     needs:
-      - ./get_instances.yml
+      - get_instances
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false  # deploy other instances even if one fails to deploy
