@@ -6,9 +6,7 @@ on:
 
 jobs:
   test:
-    uses:
-      - "ambanum/OpenTermsArchive/.github/workflows/test.yml@main"
-      - "ambanum/OpenTermsArchive/.github/workflows/get_instances.yml@main"
+    uses: "ambanum/OpenTermsArchive/.github/workflows/test.yml@main"
 
   deploy:
     needs: [ get_instances ]
