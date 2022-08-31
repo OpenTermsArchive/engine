@@ -18,7 +18,7 @@ jobs:
         id: get_production_instances_names
         uses: mikefarah/yq@master
         with:
-          cmd: yq '. | keys' ops/inventories/production.yml --output-format=json
+          cmd: yq 'with_entries(select(.key | test("all") | not)) | keys' ops/inventories/production.yml --output-format=json  # list all group names except `all`
 
   deploy:
     needs: [ test, get_instances ]
