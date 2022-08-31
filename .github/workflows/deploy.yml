@@ -9,6 +9,7 @@ jobs:
     uses: "ambanum/OpenTermsArchive/.github/workflows/test.yml@main"
 
   get_instances:
+    runs-on: ubuntu-latest
     outputs:
       names: ${{ steps.list.outputs.names }}
     steps:
