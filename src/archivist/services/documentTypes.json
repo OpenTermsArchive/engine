@@ -330,7 +330,7 @@
   },
   "Ranking Parameters Description": {
     "commitment": {
-      "writer": "listing service provider",
+      "writer": "search engine or intermediation service provider",
       "audience": "users presented with a list of ranked results, or contributors of results that are ranked",
       "object": "parameters determining ranking and the reasons for their relative importance"
     }
