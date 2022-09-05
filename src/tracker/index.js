@@ -162,7 +162,7 @@ export default class Tracker {
           logger.error(`🤖 Could not create Github issue for ${title}`);
         }
 
-        return existingIssue;
+        return;
       }
 
       const openedIssues = existingIssues.filter(existingIssue => existingIssue.state === ISSUE_STATE_OPEN);
@@ -187,7 +187,7 @@ export default class Tracker {
         }
       }
 
-      return existingIssues;
+      return;
     } catch (e) {
       logger.error('Could not create issue', e.toString());
     }
