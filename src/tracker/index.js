@@ -102,39 +102,26 @@ export default class Tracker {
   }
 
   async createIssue(params) {
-    try {
-      const { data } = await this.octokit.rest.issues.create(params);
+    const { data } = await this.octokit.rest.issues.create(params);
 
-      return data;
-    } catch (e) {
-      logger.error('Could not create issue');
-      logger.error(e.toString());
-
-      return null;
-    }
+    return data;
   }
 
   async searchIssues({ title, ...searchParams }) {
-    try {
-      const request = {
-        per_page: 100,
-        ...searchParams,
-      };
+    const request = {
+      per_page: 100,
+      ...searchParams,
+    };
 
-      const issues = await this.octokit.paginate(
-        this.octokit.rest.issues.listForRepo,
-        request,
-        response => response.data,
-      );
+    const issues = await this.octokit.paginate(
+      this.octokit.rest.issues.listForRepo,
+      request,
+      response => response.data,
+    );
 
-      const issuesWithSameTitle = issues.filter(item => item.title === title);
+    const issuesWithSameTitle = issues.filter(item => item.title === title);
 
-      return issuesWithSameTitle;
-    } catch (e) {
-      logger.error('Could not search issue');
-      logger.error(e.toString());
-      throw e;
-    }
+    return issuesWithSameTitle;
   }
 
   async addCommentToIssue(params) {
