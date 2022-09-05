@@ -143,11 +143,7 @@ export default class Tracker {
       if (!existingIssues.length) {
         const existingIssue = await this.createIssue({ ...this.commonParams, title, body, labels });
 
-        if (existingIssue) {
-          logger.info(`🤖 Creating Github issue for ${title}: ${existingIssue.html_url}`);
-        } else {
-          logger.error(`🤖 Could not create Github issue for ${title}`);
-        }
+        logger.info(`🤖 Creating Github issue for ${title}: ${existingIssue.html_url}`);
 
         return;
       }
@@ -177,10 +173,8 @@ export default class Tracker {
           break;
         }
       }
-
-      return;
     } catch (e) {
-      logger.error('Could not create issue', e.toString());
+      logger.error(`🤖 Could not create Github issue for ${title}. ${e.toString()}`);
     }
   }
 
