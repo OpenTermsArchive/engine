@@ -107,7 +107,7 @@ export default class GitRepository extends RepositoryInterface {
     if (record.mimeType != mime.getType('pdf')) {
       record.content = await this.git.show(`${record.id}:${relativeFilePath}`);
 
-      return;
+      return record.content;
     }
 
     // In case of PDF files, `git show` cannot be used as it converts PDF binary into strings that do not retain the original binary representation
@@ -122,6 +122,8 @@ export default class GitRepository extends RepositoryInterface {
     }
 
     record.content = pdfBuffer;
+
+    return record.content;
   }
 
   async #getCommits() {

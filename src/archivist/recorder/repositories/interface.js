@@ -100,7 +100,7 @@ export default class RepositoryInterface {
   * Load content of the given record
   *
   * @param {Record} record - Record of which to populate content
-  * @returns {Promise<Record>} Promise that will be resolved with the given record when its content has been loaded
+  * @returns {Promise<Record>} Promise that will be resolved with the given record content when its content has been loaded
   */
   async loadRecordContent(record) {
     throw new Error(`#loadRecordContent method is not implemented in ${this.constructor.name}`);

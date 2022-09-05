@@ -93,6 +93,8 @@ export default class MongoRepository extends RepositoryInterface {
     const { content } = await this.collection.findOne({ _id: new ObjectId(record.id) }, { projection: { content: 1 } });
 
     record.content = content instanceof Binary ? content.buffer : content;
+
+    return record.content;
   }
 
   async #toDomain(document, { deferContentLoading } = {}) {
