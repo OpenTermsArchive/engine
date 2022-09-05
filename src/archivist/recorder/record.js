@@ -1,7 +1,12 @@
 export default class Record {
   #content;
 
-  static REQUIRED_PARAMS = Object.freeze([ 'serviceId', 'documentType', 'mimeType', 'fetchDate' ]);
+  static REQUIRED_PARAMS = Object.freeze([
+    'serviceId',
+    'documentType',
+    'mimeType',
+    'fetchDate',
+  ]);
 
   constructor(params) {
     Record.validate(params);
