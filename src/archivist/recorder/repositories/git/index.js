@@ -89,8 +89,8 @@ export default class GitRepository extends RepositoryInterface {
     ])).length;
   }
 
-  async* iterate() {
-    const commits = await this.#getCommits();
+  async* iterate(options) {
+    const commits = await this.#getCommits(options);
 
     for (const commit of commits) {
       yield this.#toDomain(commit);
@@ -126,8 +126,8 @@ export default class GitRepository extends RepositoryInterface {
     return record.content;
   }
 
-  async #getCommits() {
-    return (await this.git.listCommits())
+  async #getCommits(options) {
+    return (await this.git.listCommits(options))
       .filter(({ message }) => message.match(DataMapper.COMMIT_MESSAGE_PREFIXES_REGEXP)) // Skip commits which are not a document record (README, LICENSE…)
       .sort((commitA, commitB) => new Date(commitA.date) - new Date(commitB.date)); // Make sure that the commits are sorted in ascending chronological order
   }
