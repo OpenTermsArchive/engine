@@ -8,8 +8,8 @@ const service = new Service({
 });
 
 const filters = [
-  async function removeSharesButton() {
-    return 'last-removeSharesButton';
+  async function removeShareButton() {
+    return 'last-removeShareButton';
   },
   async function removePrintButton() {
     return 'last-removePrintButton';

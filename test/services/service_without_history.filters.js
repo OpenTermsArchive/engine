@@ -1,5 +1,5 @@
-export async function removeSharesButton() {
-  return 'last-removeSharesButton';
+export async function removeShareButton() {
+  return 'last-removeShareButton';
 }
 
 export async function removePrintButton() {

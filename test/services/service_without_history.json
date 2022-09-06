@@ -5,7 +5,7 @@
       "fetch": "https://www.service-without-history.example/tos",
       "select": "body",
       "filter": [
-        "removeSharesButton",
+        "removeShareButton",
         "removePrintButton"
       ]
     }

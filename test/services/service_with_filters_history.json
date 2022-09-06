@@ -5,7 +5,7 @@
       "fetch": "https://www.service-with-filters-history.example/terms",
       "select": "main",
       "filter": [
-        "removeSharesButton",
+        "removeShareButton",
         "removePrintButton"
       ]
     }

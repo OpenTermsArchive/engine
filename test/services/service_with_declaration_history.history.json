@@ -4,7 +4,7 @@
       "fetch": "https://www.service-with-declaration-history.example/tos",
       "select": "main",
       "filter": [
-        "removeSharesButton"
+        "removeShareButton"
       ],
       "validUntil": "2020-09-30T21:30:21.000Z"
     },

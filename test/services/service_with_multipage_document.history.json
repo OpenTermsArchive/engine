@@ -11,7 +11,7 @@
         {
           "fetch": "https://www.service-with-multipage-document.example/community-standards/violence-incitement/",
           "filter": [
-            "removeSharesButton"
+            "removeShareButton"
           ]
         }
       ],
