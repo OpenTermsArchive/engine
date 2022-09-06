@@ -13,22 +13,33 @@ export const COMMIT_MESSAGE_PREFIX = {
 };
 
 export const DOCUMENT_TYPE_AND_PAGE_ID_SEPARATOR = ' - ';
+export const SNAPSHOT_ID_MARKER = '%SNAPSHOT_ID';
+const SINGLE_SNAPSHOT_PREFIX = 'This version was recorded after filtering snapshot';
+const MULTIPLE_SNAPSHOT_PREFIX = 'This version was recorded after filtering and assembling the following snapshots from %NUMBER pages:';
 
 export const COMMIT_MESSAGE_PREFIXES_REGEXP = new RegExp(`^(${COMMIT_MESSAGE_PREFIX.startTracking}|${COMMIT_MESSAGE_PREFIX.refilter}|${COMMIT_MESSAGE_PREFIX.update})`);
 
-export function toPersistence(record, prefixMessageToSnapshotId) {
+export function toPersistence(record, snapshotIdentiferTemplate) {
   const { serviceId, documentType, pageId, isRefilter, snapshotIds = [], mimeType, isFirstRecord } = record;
 
   let prefix = isRefilter ? COMMIT_MESSAGE_PREFIX.refilter : COMMIT_MESSAGE_PREFIX.update;
 
   prefix = isFirstRecord ? COMMIT_MESSAGE_PREFIX.startTracking : prefix;
 
-  const subject = `${prefix} ${serviceId} ${documentType}${pageId ? `${DOCUMENT_TYPE_AND_PAGE_ID_SEPARATOR}${pageId}` : ''}`;
-  const description = snapshotIds.map(snapshotId => `${prefixMessageToSnapshotId}${snapshotId}`).join('\n');
+  const subject = `${prefix} ${serviceId} ${documentType}`;
+  const pageIdMessage = `${pageId ? `Page ID ${pageId}\n\n` : ''}`;
+  let snapshotIdsMessage;
+
+  if (snapshotIds.length == 1) {
+    snapshotIdsMessage = `${SINGLE_SNAPSHOT_PREFIX} ${snapshotIdentiferTemplate.replace(SNAPSHOT_ID_MARKER, snapshotIds[0])}`;
+  } else if (snapshotIds.length > 1) {
+    snapshotIdsMessage = `${MULTIPLE_SNAPSHOT_PREFIX.replace('%NUMBER', snapshotIds.length)}\n${snapshotIds.map(snapshotId => `- ${snapshotIdentiferTemplate.replace(SNAPSHOT_ID_MARKER, snapshotId)}`).join('\n')}`;
+  }
+
   const filePath = generateFilePath(serviceId, documentType, pageId, mimeType);
 
   return {
-    message: `${subject}\n\n${description}`,
+    message: `${subject}\n\n${pageIdMessage || ''}\n\n${snapshotIdsMessage || ''}`,
     content: record.content,
     filePath,
   };

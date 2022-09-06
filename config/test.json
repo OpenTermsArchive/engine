@@ -8,7 +8,7 @@
         "git": {
           "path": "./test/data/versions",
           "publish": false,
-          "prefixMessageToSnapshotId": "This version was recorded after filtering snapshot https://github.com/ambanum/OpenTermsArchive-snapshots/commit/",
+          "snapshotIdentiferTemplate": "https://github.com/ambanum/OpenTermsArchive-snapshots/commit/%SNAPSHOT_ID",
           "author": {
             "name": "Open Terms Archive Testing Bot",
             "email": "bot@opentermsarchive.org"

@@ -8,7 +8,7 @@ import mime from 'mime';
 
 import Record from '../../record.js';
 
-import { DOCUMENT_TYPE_AND_PAGE_ID_SEPARATOR } from './dataMapper.js';
+import { DOCUMENT_TYPE_AND_PAGE_ID_SEPARATOR, SNAPSHOT_ID_MARKER } from './dataMapper.js';
 import Git from './git.js';
 
 import GitRepository from './index.js';
@@ -127,7 +127,7 @@ describe('GitRepository', () => {
         });
 
         it('stores the page ID', () => {
-          expect(commit.message).to.include(PAGE_ID);
+          expect(commit.body).to.include(PAGE_ID);
         });
       });
     });
@@ -307,7 +307,7 @@ describe('GitRepository', () => {
       after(async () => subject.removeAll());
 
       it('does not store snapshots IDs', () => {
-        expect(commit.body).to.be.empty;
+        expect(commit.body).to.be.equal(`Page ID ${PAGE_ID}\n`);
       });
 
       it('stores the service id', () => {
@@ -319,13 +319,13 @@ describe('GitRepository', () => {
       });
 
       it('stores the page ID', () => {
-        expect(commit.message).to.include(PAGE_ID);
+        expect(commit.body).to.include(PAGE_ID);
       });
     });
 
-    context('when there are many snapshots IDs specified', () => {
-      const SNAPSHOT_ID_1 = 'c01533c0e546ef430eea84d23c1b18a2b8420dfb';
-      const SNAPSHOT_ID_2 = '0fd16cca9e1a86a2267bd587107c485f06099d7d';
+    context('when one snapshot ID is specified', () => {
+      const SNAPSHOT_ID = 'c01533c0e546ef430eea84d23c1b18a2b8420dfb';
+      const snapshotIds = [SNAPSHOT_ID];
 
       before(async () => {
         ({ id, isFirstRecord } = await subject.save(new Record({
@@ -335,7 +335,7 @@ describe('GitRepository', () => {
           content: CONTENT,
           fetchDate: FETCH_DATE,
           mimeType: MIME_TYPE,
-          snapshotIds: [ SNAPSHOT_ID_1, SNAPSHOT_ID_2 ],
+          snapshotIds,
         })));
 
         ([commit] = await git.log());
@@ -343,9 +343,8 @@ describe('GitRepository', () => {
 
       after(async () => subject.removeAll());
 
-      it('stores snapshots IDs', () => {
-        expect(commit.body).to.include(SNAPSHOT_ID_1);
-        expect(commit.body).to.include(SNAPSHOT_ID_2);
+      it('stores snapshot ID', () => {
+        expect(commit.body).to.include(config.get('recorder.versions.storage.git.snapshotIdentiferTemplate').replace(SNAPSHOT_ID_MARKER, SNAPSHOT_ID));
       });
 
       it('stores the service id', () => {
@@ -357,7 +356,50 @@ describe('GitRepository', () => {
       });
 
       it('stores the page ID', () => {
-        expect(commit.message).to.include(PAGE_ID);
+        expect(commit.body).to.include(PAGE_ID);
+      });
+    });
+
+    context('when there are many snapshots IDs specified', () => {
+      const SNAPSHOT_ID_1 = 'c01533c0e546ef430eea84d23c1b18a2b8420dfb';
+      const SNAPSHOT_ID_2 = '0fd16cca9e1a86a2267bd587107c485f06099d7d';
+      const snapshotIds = [ SNAPSHOT_ID_1, SNAPSHOT_ID_2 ];
+
+      before(async () => {
+        ({ id, isFirstRecord } = await subject.save(new Record({
+          serviceId: SERVICE_PROVIDER_ID,
+          documentType: DOCUMENT_TYPE,
+          pageId: PAGE_ID,
+          content: CONTENT,
+          fetchDate: FETCH_DATE,
+          mimeType: MIME_TYPE,
+          snapshotIds,
+        })));
+
+        ([commit] = await git.log());
+      });
+
+      after(async () => subject.removeAll());
+
+      it('stores snapshots IDs', () => {
+        expect(commit.body).to.include(config.get('recorder.versions.storage.git.snapshotIdentiferTemplate').replace(SNAPSHOT_ID_MARKER, SNAPSHOT_ID_1));
+        expect(commit.body).to.include(config.get('recorder.versions.storage.git.snapshotIdentiferTemplate').replace(SNAPSHOT_ID_MARKER, SNAPSHOT_ID_2));
+      });
+
+      it('stores number of pages', () => {
+        expect(commit.body).to.include(`${snapshotIds.length} pages`);
+      });
+
+      it('stores the service id', () => {
+        expect(commit.message).to.include(SERVICE_PROVIDER_ID);
+      });
+
+      it('stores the document type', () => {
+        expect(commit.message).to.include(DOCUMENT_TYPE);
+      });
+
+      it('stores the page ID', () => {
+        expect(commit.body).to.include(PAGE_ID);
       });
     });
   });

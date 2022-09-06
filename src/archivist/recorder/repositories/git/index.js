@@ -18,12 +18,12 @@ const fs = fsApi.promises;
 mime.define({ 'text/markdown': ['md'] }, true); // ensure extension for markdown files is `.md` and not `.markdown`
 
 export default class GitRepository extends RepositoryInterface {
-  constructor({ path, author, publish, prefixMessageToSnapshotId }) {
+  constructor({ path, author, publish, snapshotIdentiferTemplate }) {
     super();
     this.path = path;
     this.needsPublication = publish;
     this.git = new Git({ path: this.path, author });
-    this.prefixMessageToSnapshotId = prefixMessageToSnapshotId;
+    this.snapshotIdentiferTemplate = snapshotIdentiferTemplate;
   }
 
   async initialize() {
@@ -177,6 +177,6 @@ export default class GitRepository extends RepositoryInterface {
       await this.loadRecordContent(record);
     }
 
-    return DataMapper.toPersistence(record, this.prefixMessageToSnapshotId);
+    return DataMapper.toPersistence(record, this.snapshotIdentiferTemplate);
   }
 }
