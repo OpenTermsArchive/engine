@@ -6,7 +6,7 @@ import logger from './logger/index.js';
 import Notifier from './notifier/index.js';
 import Tracker from './tracker/index.js';
 
-async function startOpenTermsArchive({ services, refilterOnly, schedule }) {
+export default async function track({ services, refilterOnly, schedule }) {
   const archivist = new Archivist({ recorderConfig: config.get('recorder') });
 
   archivist.attach(logger);
@@ -57,5 +57,3 @@ async function startOpenTermsArchive({ services, refilterOnly, schedule }) {
 
   cron('30 */6 * * *', () => archivist.trackChanges(serviceIds));
 }
-
-export default startOpenTermsArchive;

@@ -26,7 +26,7 @@ config.util.setModuleDefaults('tracker', {});
 const servicesToValidate = process.argv.slice(2);
 
 (async () => {
-  const startOpenTermsArchive = (await import(pathToFileURL(path.resolve(__dirname, '../src/start.js')))).default;
+  const track = (await import(pathToFileURL(path.resolve(__dirname, '../src/index.js')))).default;
 
-  await startOpenTermsArchive({ services: servicesToValidate, refilterOnly: false, schedule: false });
+  await track({ services: servicesToValidate, refilterOnly: false, schedule: false });
 })();
