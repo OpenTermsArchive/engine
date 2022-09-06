@@ -125,15 +125,9 @@ export default class Tracker {
   }
 
   async addCommentToIssue(params) {
-    try {
-      const { data } = await this.octokit.rest.issues.createComment(params);
+    const { data } = await this.octokit.rest.issues.createComment(params);
 
-      return data;
-    } catch (e) {
-      logger.error('Could not add comment to issue:', e.toString());
-
-      return null;
-    }
+    return data;
   }
 
   async createIssueIfNotExists({ title, body, labels, comment }) {
