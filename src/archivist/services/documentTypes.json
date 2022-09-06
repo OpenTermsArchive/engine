@@ -146,7 +146,7 @@
       "object": "expressions of desire, requests for a romantic or sexual relationship"
     }
   },
-    "Community Guidelines - Intellectual Property": {
+  "Community Guidelines - Intellectual Property": {
     "commitment": {
       "writer": "service provider",
       "audience": "content-publishing user",
@@ -326,6 +326,19 @@
       "writer": "online marketplace",
       "audience": "seller",
       "object": "selling through a monetary transaction goods or services to buyers other than the marketplace itself"
+    }
+  },
+  "Ranking Parameters Description": {
+    "commitment": {
+      "writer": "search engine or intermediation service provider",
+      "audience": "users presented with a list of ranked results, or contributors of results that are ranked",
+      "object": "parameters determining ranking and the reasons for their relative importance"
+    },
+    "references": {
+      "Open Terms Archive Discussion": "https://github.com/ambanum/OpenTermsArchive/discussions/902",
+      "Article 5 of P2B Regulation 2019/1150": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=celex%3A32019R1150#d1e868-57-1",
+      "Article 6a of Directive 2011/83/EU": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX%3A02011L0083-20220528#tocId12",
+      "Point (m) of Article 2(1) of Directive 2005/29/EC": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:02005L0029-20220528#tocId5"
     }
   }
 }
