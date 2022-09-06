@@ -14,7 +14,6 @@ const ISSUE_STATE_ALL = 'all';
 const TRACKER_LABEL = config.get('tracker.githubIssues.label.name');
 const TRACKER_REPOSITORY = config.get('tracker.githubIssues.repository');
 
-const LOCAL_CONTRIBUTE_URL = 'http://localhost:3000/en/service';
 const CONTRIBUTE_URL = 'https://contribute.opentermsarchive.org/en/service';
 const GITHUB_REPO_URL = `https://github.com/${TRACKER_REPOSITORY}/blob/main/declarations`;
 const GOOGLE_URL = 'https://www.google.com/search?q=';
@@ -229,7 +228,6 @@ This document is no longer properly tracked.
 
 Check what's wrong by:
 - Using the [online contribution tool](${CONTRIBUTE_URL}?${urlQueryParams}).
-- Using the [local contribution tool](${LOCAL_CONTRIBUTE_URL}?${urlQueryParams}). See [Setup Guide](https://github.com/OpenTermsArchive/contribution-tool#usage).
 ${message.includes('404') ? `- [Searching Google](${GOOGLE_URL}%22${encodedName}%22+%22${encodedType}%22) to get for a new URL.` : ''}
 
 And some info about what has already been tracked:
