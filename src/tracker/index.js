@@ -143,7 +143,7 @@ export default class Tracker {
       if (!existingIssues.length) {
         const existingIssue = await this.createIssue({ ...this.commonParams, title, body, labels });
 
-        logger.info(`🤖 Creating Github issue for ${title}: ${existingIssue.html_url}`);
+        logger.info(`🤖 Creating GitHub issue for ${title}: ${existingIssue.html_url}`);
 
         return;
       }
@@ -168,13 +168,13 @@ export default class Tracker {
             /* eslint-enable no-await-in-loop */
             logger.info(`🤖 Reopened automatically as an error occured for ${title}: ${existingIssue.html_url}`);
           } catch (e) {
-            logger.error(`🤖 Could not update Github issue ${existingIssue.html_url}. ${e.toString()}`);
+            logger.error(`🤖 Could not update GitHub issue ${existingIssue.html_url}: ${e}`);
           }
           break;
         }
       }
     } catch (e) {
-      logger.error(`🤖 Could not create Github issue for ${title}. ${e.toString()}`);
+      logger.error(`🤖 Could not create GitHub issue for ${title}: ${e}`);
     }
   }
 
@@ -186,13 +186,13 @@ export default class Tracker {
         try {
           await this.octokit.rest.issues.update({ ...this.commonParams, issue_number: openedIssue.number, state: ISSUE_STATE_CLOSED }); // eslint-disable-line no-await-in-loop
           await this.addCommentToIssue({ ...this.commonParams, issue_number: openedIssue.number, body: comment }); // eslint-disable-line no-await-in-loop
-          logger.info(`🤖 Github issue closed for ${title}: ${openedIssue.html_url}`);
+          logger.info(`🤖 GitHub issue closed for ${title}: ${openedIssue.html_url}`);
         } catch (e) {
-          logger.error(`🤖 Could not close Github issue ${openedIssue.html_url}. ${e.toString()}`);
+          logger.error(`🤖 Could not close GitHub issue ${openedIssue.html_url}: ${e.toString()}`);
         }
       }
     } catch (e) {
-      logger.error(`🤖 Could not close Github issues for ${title}. ${e.toString()}`);
+      logger.error(`🤖 Could not close GitHub issue for ${title}: ${e}`);
     }
   }
 
