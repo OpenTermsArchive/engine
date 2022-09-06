@@ -102,51 +102,32 @@ export default class Tracker {
   }
 
   async createIssue(params) {
-    try {
-      const { data } = await this.octokit.rest.issues.create(params);
+    const { data } = await this.octokit.rest.issues.create(params);
 
-      return data;
-    } catch (e) {
-      logger.error('Could not create issue');
-      logger.error(e.toString());
-
-      return null;
-    }
+    return data;
   }
 
   async searchIssues({ title, ...searchParams }) {
-    try {
-      const request = {
-        per_page: 100,
-        ...searchParams,
-      };
+    const request = {
+      per_page: 100,
+      ...searchParams,
+    };
 
-      const issues = await this.octokit.paginate(
-        this.octokit.rest.issues.listForRepo,
-        request,
-        response => response.data,
-      );
+    const issues = await this.octokit.paginate(
+      this.octokit.rest.issues.listForRepo,
+      request,
+      response => response.data,
+    );
 
-      const issuesWithSameTitle = issues.filter(item => item.title === title);
+    const issuesWithSameTitle = issues.filter(item => item.title === title);
 
-      return issuesWithSameTitle;
-    } catch (e) {
-      logger.error('Could not search issue');
-      logger.error(e.toString());
-      throw e;
-    }
+    return issuesWithSameTitle;
   }
 
   async addCommentToIssue(params) {
-    try {
-      const { data } = await this.octokit.rest.issues.createComment(params);
+    const { data } = await this.octokit.rest.issues.createComment(params);
 
-      return data;
-    } catch (e) {
-      logger.error('Could not add comment to issue:', e.toString());
-
-      return null;
-    }
+    return data;
   }
 
   async createIssueIfNotExists({ title, body, labels, comment }) {
@@ -156,13 +137,9 @@ export default class Tracker {
       if (!existingIssues.length) {
         const existingIssue = await this.createIssue({ ...this.commonParams, title, body, labels });
 
-        if (existingIssue) {
-          logger.info(`🤖 Creating Github issue for ${title}: ${existingIssue.html_url}`);
-        } else {
-          logger.error(`🤖 Could not create Github issue for ${title}`);
-        }
+        logger.info(`🤖 Creating GitHub issue for ${title}: ${existingIssue.html_url}`);
 
-        return existingIssue;
+        return;
       }
 
       const openedIssues = existingIssues.filter(existingIssue => existingIssue.state === ISSUE_STATE_OPEN);
@@ -170,40 +147,46 @@ export default class Tracker {
 
       for (const existingIssue of existingIssues) {
         if (hasNoneOpened) {
-          /* eslint-disable no-await-in-loop */
-          await this.octokit.rest.issues.update({
-            ...this.commonParams,
-            issue_number: existingIssue.number,
-            state: ISSUE_STATE_OPEN,
-          });
-          await this.addCommentToIssue({
-            ...this.commonParams,
-            issue_number: existingIssue.number,
-            body: `${comment}\n${body}`,
-          });
-          /* eslint-enable no-await-in-loop */
-          logger.info(`🤖 Reopened automatically as an error occured for ${title}: ${existingIssue.html_url}`);
+          try {
+            /* eslint-disable no-await-in-loop */
+            await this.octokit.rest.issues.update({
+              ...this.commonParams,
+              issue_number: existingIssue.number,
+              state: ISSUE_STATE_OPEN,
+            });
+            await this.addCommentToIssue({
+              ...this.commonParams,
+              issue_number: existingIssue.number,
+              body: `${comment}\n${body}`,
+            });
+            /* eslint-enable no-await-in-loop */
+            logger.info(`🤖 Reopened automatically as an error occured for ${title}: ${existingIssue.html_url}`);
+          } catch (e) {
+            logger.error(`🤖 Could not update GitHub issue ${existingIssue.html_url}: ${e}`);
+          }
           break;
         }
       }
-
-      return existingIssues;
     } catch (e) {
-      logger.error('Could not create issue', e.toString());
+      logger.error(`🤖 Could not create GitHub issue for ${title}: ${e}`);
     }
   }
 
   async closeIssueIfExists({ title, comment, labels }) {
-    const openedIssues = await this.searchIssues({ ...this.commonParams, title, labels, state: ISSUE_STATE_OPEN });
+    try {
+      const openedIssues = await this.searchIssues({ ...this.commonParams, title, labels, state: ISSUE_STATE_OPEN });
 
-    if (!openedIssues) {
-      return;
-    }
-
-    for (const openedIssue of openedIssues) {
-      await this.octokit.rest.issues.update({ ...this.commonParams, issue_number: openedIssue.number, state: ISSUE_STATE_CLOSED }); // eslint-disable-line no-await-in-loop
-      await this.addCommentToIssue({ ...this.commonParams, issue_number: openedIssue.number, body: comment }); // eslint-disable-line no-await-in-loop
-      logger.info(`🤖 Github issue closed for ${title}: ${openedIssue.html_url}`);
+      for (const openedIssue of openedIssues) {
+        try {
+          await this.octokit.rest.issues.update({ ...this.commonParams, issue_number: openedIssue.number, state: ISSUE_STATE_CLOSED }); // eslint-disable-line no-await-in-loop
+          await this.addCommentToIssue({ ...this.commonParams, issue_number: openedIssue.number, body: comment }); // eslint-disable-line no-await-in-loop
+          logger.info(`🤖 GitHub issue closed for ${title}: ${openedIssue.html_url}`);
+        } catch (e) {
+          logger.error(`🤖 Could not close GitHub issue ${openedIssue.html_url}: ${e.toString()}`);
+        }
+      }
+    } catch (e) {
+      logger.error(`🤖 Could not close GitHub issue for ${title}: ${e}`);
     }
   }
 
