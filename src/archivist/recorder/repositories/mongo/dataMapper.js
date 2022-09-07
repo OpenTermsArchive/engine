@@ -5,8 +5,8 @@ import Record from '../../record.js';
 export function toPersistence(record) {
   const documentFields = Object.fromEntries(Object.entries(record));
 
-  if (documentFields.snapshotId) {
-    documentFields.snapshotId = new ObjectId(record.snapshotId);
+  if (documentFields.snapshotIds) {
+    documentFields.snapshotIds = record.snapshotIds.map(snapshotId => new ObjectId(snapshotId));
   }
 
   documentFields.content = record.content;
@@ -16,16 +16,17 @@ export function toPersistence(record) {
 }
 
 export function toDomain(document) {
-  const { _id, serviceId, documentType, fetchDate, mimeType, isRefilter, isFirstRecord, snapshotId } = document;
+  const { _id, serviceId, documentType, pageId, fetchDate, mimeType, isRefilter, isFirstRecord, snapshotIds } = document;
 
   return new Record({
     id: _id.toString(),
     serviceId,
     documentType,
+    pageId,
     mimeType,
     fetchDate: new Date(fetchDate),
     isFirstRecord: Boolean(isFirstRecord),
     isRefilter: Boolean(isRefilter),
-    snapshotId: snapshotId && snapshotId.toString(),
+    snapshotIds: snapshotIds?.map(snapshotId => snapshotId.toString()) || [],
   });
 }

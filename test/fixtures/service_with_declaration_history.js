@@ -1,4 +1,5 @@
 import DocumentDeclaration from '../../src/archivist/services/documentDeclaration.js';
+import PageDeclaration from '../../src/archivist/services/pageDeclaration.js';
 import Service from '../../src/archivist/services/service.js';
 
 const service = new Service({
@@ -7,54 +8,58 @@ const service = new Service({
 });
 
 const filters = [
-  async function removeSharesButton() {
-    return 'last-removeSharesButton';
+  async function removeShareButton() {
+    return 'last-removeShareButton';
   },
   async function removePrintButton() {
     return 'last-removePrintButton';
   },
 ];
 
-const latest = new DocumentDeclaration({
-  service,
-  type: 'Terms of Service',
-  location: 'https://www.service-with-declaration-history.example/terms',
-  contentSelectors: 'main',
-  noiseSelectors: undefined,
-  filters,
-  validUntil: null,
-});
-
-const history = [
+[
   new DocumentDeclaration({
     service,
     type: 'Terms of Service',
-    location: 'https://www.service-with-declaration-history.example/tos',
-    contentSelectors: 'body',
-    noiseSelectors: undefined,
-    filters: undefined,
+    pages: [
+      new PageDeclaration({
+        location: 'https://www.service-with-declaration-history.example/terms',
+        contentSelectors: 'main',
+        noiseSelectors: undefined,
+        filters,
+      }),
+    ],
+    validUntil: null,
+  }),
+  new DocumentDeclaration({
+    service,
+    type: 'Terms of Service',
+    pages: [
+      new PageDeclaration({
+        location: 'https://www.service-with-declaration-history.example/tos',
+        contentSelectors: 'body',
+        noiseSelectors: undefined,
+        filters: undefined,
+      }),
+    ],
     validUntil: '2020-08-22T21:30:21.000Z',
   }),
   new DocumentDeclaration({
     service,
     type: 'Terms of Service',
-    location: 'https://www.service-with-declaration-history.example/tos',
-    contentSelectors: 'main',
-    noiseSelectors: undefined,
-    filters: [
-      async function removeSharesButton() {
-        return 'last-removeSharesButton';
-      },
+    pages: [
+      new PageDeclaration({
+        location: 'https://www.service-with-declaration-history.example/tos',
+        contentSelectors: 'main',
+        noiseSelectors: undefined,
+        filters: [
+          async function removeShareButton() {
+            return 'last-removeShareButton';
+          },
+        ],
+      }),
     ],
     validUntil: '2020-09-30T21:30:21.000Z',
   }),
-];
-
-service._documents = {
-  'Terms of Service': {
-    _latest: latest,
-    _history: history,
-  },
-};
+].forEach(declaration => service.addDocumentDeclaration(declaration));
 
 export default service;

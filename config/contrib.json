@@ -6,7 +6,7 @@
     "versions": {
       "storage": {
         "git": {
-          "prefixMessageToSnapshotId": "This version was recorded after filtering snapshot with Mongo ID ",
+          "snapshotIdentiferTemplate": "mongo://contrib/open-terms-archive/snapshots/%SNAPSHOT_ID",
           "repository": "git@github.com:OpenTermsArchive/contrib-versions.git"
         }
       }

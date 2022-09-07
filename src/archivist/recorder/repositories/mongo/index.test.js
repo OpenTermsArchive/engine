@@ -18,6 +18,7 @@ const client = new MongoClient(connectionURI);
 
 const SERVICE_PROVIDER_ID = 'test_service';
 const DOCUMENT_TYPE = 'Terms of Service';
+const PAGE_ID = 'community-standards-hate-speech';
 const CONTENT = 'ToS fixture data with UTF-8 çhãràčtęrs';
 const MIME_TYPE = 'text/html';
 const FETCH_DATE = new Date('2000-01-01T12:00:00.000Z');
@@ -58,10 +59,11 @@ describe('MongoRepository', () => {
         (record = await subject.save(new Record({
           serviceId: SERVICE_PROVIDER_ID,
           documentType: DOCUMENT_TYPE,
+          pageId: PAGE_ID,
           content: CONTENT,
           mimeType: MIME_TYPE,
           fetchDate: FETCH_DATE,
-          snapshotId: SNAPSHOT_ID,
+          snapshotIds: [SNAPSHOT_ID],
         })));
 
         numberOfRecordsAfter = await collection.find({
@@ -89,7 +91,7 @@ describe('MongoRepository', () => {
         expect(record.isFirstRecord).to.be.true;
       });
 
-      it('stores the service id', () => {
+      it('stores the service ID', () => {
         expect(mongoDocument.serviceId).to.include(SERVICE_PROVIDER_ID);
       });
 
@@ -115,7 +117,11 @@ describe('MongoRepository', () => {
         });
 
         it('stores the snapshot ID', () => {
-          expect(mongoDocument.snapshotId.toString()).to.include(SNAPSHOT_ID);
+          expect(mongoDocument.snapshotIds.map(snapshotId => snapshotId.toString())).to.deep.equal([SNAPSHOT_ID]);
+        });
+
+        it('stores the page ID', () => {
+          expect(mongoDocument.pageId).to.equal(PAGE_ID);
         });
       });
     });
@@ -130,7 +136,7 @@ describe('MongoRepository', () => {
           content: CONTENT,
           mimeType: MIME_TYPE,
           fetchDate: FETCH_DATE,
-          snapshotId: SNAPSHOT_ID,
+          snapshotIds: [SNAPSHOT_ID],
         })));
 
         numberOfRecordsBefore = await collection.find({
@@ -144,7 +150,7 @@ describe('MongoRepository', () => {
           content: UPDATED_CONTENT,
           mimeType: MIME_TYPE,
           fetchDate: FETCH_DATE,
-          snapshotId: SNAPSHOT_ID,
+          snapshotIds: [SNAPSHOT_ID],
         })));
 
         numberOfRecordsAfter = await collection.find({
@@ -236,7 +242,7 @@ describe('MongoRepository', () => {
           content: REFILTERED_CONTENT,
           mimeType: MIME_TYPE,
           fetchDate: FETCH_DATE,
-          snapshotId: SNAPSHOT_ID,
+          snapshotIds: [SNAPSHOT_ID],
           isRefilter: true,
         })));
 
@@ -281,7 +287,7 @@ describe('MongoRepository', () => {
           content: PDF_CONTENT,
           mimeType: PDF_MIME_TYPE,
           fetchDate: FETCH_DATE,
-          snapshotId: SNAPSHOT_ID,
+          snapshotIds: [SNAPSHOT_ID],
         })));
 
         numberOfRecordsAfter = await collection.find({
@@ -315,6 +321,85 @@ describe('MongoRepository', () => {
         expect(mongoDocument.mimeType).to.equal(PDF_MIME_TYPE);
       });
     });
+
+    context('when there is no snapshots IDs specified', () => {
+      before(async () => {
+        (record = await subject.save(new Record({
+          serviceId: SERVICE_PROVIDER_ID,
+          documentType: DOCUMENT_TYPE,
+          pageId: PAGE_ID,
+          content: CONTENT,
+          mimeType: MIME_TYPE,
+          fetchDate: FETCH_DATE,
+        })));
+
+        (mongoDocument = await collection.findOne({
+          serviceId: SERVICE_PROVIDER_ID,
+          documentType: DOCUMENT_TYPE,
+        }));
+      });
+
+      after(async () => subject.removeAll());
+
+      it('does not store snapshots IDs', () => {
+        expect(mongoDocument.snapshotIds).to.be.undefined;
+      });
+
+      it('stores the service ID', () => {
+        expect(mongoDocument.serviceId).to.include(SERVICE_PROVIDER_ID);
+      });
+
+      it('stores the document type', () => {
+        expect(mongoDocument.documentType).to.include(DOCUMENT_TYPE);
+      });
+
+      it('stores the page ID', () => {
+        expect(mongoDocument.pageId).to.include(PAGE_ID);
+      });
+    });
+
+    context('when there are many snapshots IDs specified', () => {
+      const SNAPSHOT_ID_1 = '61af86dc5ff5caa74ae926ad';
+      const SNAPSHOT_ID_2 = '630cdfa67d2e3cc51f6e284c';
+
+      before(async () => {
+        (record = await subject.save(new Record({
+          serviceId: SERVICE_PROVIDER_ID,
+          documentType: DOCUMENT_TYPE,
+          pageId: PAGE_ID,
+          content: CONTENT,
+          mimeType: MIME_TYPE,
+          fetchDate: FETCH_DATE,
+          snapshotIds: [ SNAPSHOT_ID_1, SNAPSHOT_ID_2 ],
+        })));
+
+        (mongoDocument = await collection.findOne({
+          serviceId: SERVICE_PROVIDER_ID,
+          documentType: DOCUMENT_TYPE,
+        }));
+      });
+
+      after(async () => subject.removeAll());
+
+      it('stores snapshots IDs', () => {
+        const snapshotIds = mongoDocument.snapshotIds.map(id => id.toString());
+
+        expect(snapshotIds).to.include(SNAPSHOT_ID_1);
+        expect(snapshotIds).to.include(SNAPSHOT_ID_2);
+      });
+
+      it('stores the service ID', () => {
+        expect(mongoDocument.serviceId).to.include(SERVICE_PROVIDER_ID);
+      });
+
+      it('stores the document type', () => {
+        expect(mongoDocument.documentType).to.include(DOCUMENT_TYPE);
+      });
+
+      it('stores the page ID', () => {
+        expect(mongoDocument.pageId).to.include(PAGE_ID);
+      });
+    });
   });
 
   describe('#findById', () => {
@@ -325,9 +410,10 @@ describe('MongoRepository', () => {
       ({ id } = await subject.save(new Record({
         serviceId: SERVICE_PROVIDER_ID,
         documentType: DOCUMENT_TYPE,
+        pageId: PAGE_ID,
         content: CONTENT,
         fetchDate: FETCH_DATE,
-        snapshotId: SNAPSHOT_ID,
+        snapshotIds: [SNAPSHOT_ID],
         mimeType: MIME_TYPE,
       })));
 
@@ -344,7 +430,7 @@ describe('MongoRepository', () => {
       expect(record.isFirstRecord).to.be.true;
     });
 
-    it('returns the service id', () => {
+    it('returns the service ID', () => {
       expect(record.serviceId).to.equal(SERVICE_PROVIDER_ID);
     });
 
@@ -356,21 +442,25 @@ describe('MongoRepository', () => {
       expect(record.content).to.equal(CONTENT);
     });
 
-    it('stores the fetch date', () => {
+    it('returns the fetch date', () => {
       expect(new Date(record.fetchDate).getTime()).to.equal(FETCH_DATE.getTime());
     });
 
-    it('stores the MIME type', () => {
+    it('returns the MIME type', () => {
       expect(record.mimeType).to.equal(MIME_TYPE);
     });
 
-    it('stores the snapshot ID', () => {
-      expect(record.snapshotId).to.equal(SNAPSHOT_ID);
+    it('returns the snapshot ID', () => {
+      expect(record.snapshotIds).to.deep.equal([SNAPSHOT_ID]);
+    });
+
+    it('returns the page ID', () => {
+      expect(record.pageId).to.equal(PAGE_ID);
     });
 
     context('when requested record does not exist', () => {
-      it('returns an empty object', async () => {
-        expect(await subject.findById('inexistantID')).to.deep.equal({});
+      it('returns null', async () => {
+        expect(await subject.findById('inexistantID')).to.equal(null);
       });
     });
   });
@@ -385,7 +475,7 @@ describe('MongoRepository', () => {
         documentType: DOCUMENT_TYPE,
         content: CONTENT,
         fetchDate: FETCH_DATE,
-        snapshotId: SNAPSHOT_ID,
+        snapshotIds: [SNAPSHOT_ID],
         mimeType: MIME_TYPE,
       }));
 
@@ -396,7 +486,7 @@ describe('MongoRepository', () => {
         documentType: DOCUMENT_TYPE,
         content: `${CONTENT} - updated`,
         fetchDate: FETCH_DATE_LATER,
-        snapshotId: SNAPSHOT_ID,
+        snapshotIds: [SNAPSHOT_ID],
         mimeType: MIME_TYPE,
       }));
 
@@ -408,7 +498,7 @@ describe('MongoRepository', () => {
         content: `${CONTENT} - updated 2`,
         isRefilter: true,
         fetchDate: FETCH_DATE_EARLIER,
-        snapshotId: SNAPSHOT_ID,
+        snapshotIds: [SNAPSHOT_ID],
         mimeType: MIME_TYPE,
       }));
 
@@ -443,7 +533,7 @@ describe('MongoRepository', () => {
         documentType: DOCUMENT_TYPE,
         content: CONTENT,
         fetchDate: FETCH_DATE,
-        snapshotId: SNAPSHOT_ID,
+        snapshotIds: [SNAPSHOT_ID],
         mimeType: MIME_TYPE,
       }));
       await subject.save(new Record({
@@ -451,7 +541,7 @@ describe('MongoRepository', () => {
         documentType: DOCUMENT_TYPE,
         content: `${CONTENT} - updated`,
         fetchDate: FETCH_DATE_LATER,
-        snapshotId: SNAPSHOT_ID,
+        snapshotIds: [SNAPSHOT_ID],
         mimeType: MIME_TYPE,
       }));
       await subject.save(new Record({
@@ -460,7 +550,7 @@ describe('MongoRepository', () => {
         content: `${CONTENT} - updated 2`,
         isRefilter: true,
         fetchDate: FETCH_DATE_EARLIER,
-        snapshotId: SNAPSHOT_ID,
+        snapshotIds: [SNAPSHOT_ID],
         mimeType: MIME_TYPE,
       }));
 
@@ -566,8 +656,8 @@ describe('MongoRepository', () => {
         latestRecord = await subject.findLatest(SERVICE_PROVIDER_ID, DOCUMENT_TYPE);
       });
 
-      it('returns an empty object', async () => {
-        expect(latestRecord).to.deep.equal({});
+      it('returns null', async () => {
+        expect(latestRecord).to.equal(null);
       });
     });
   });
@@ -583,7 +673,7 @@ describe('MongoRepository', () => {
         documentType: DOCUMENT_TYPE,
         content: CONTENT,
         fetchDate: FETCH_DATE,
-        snapshotId: SNAPSHOT_ID,
+        snapshotIds: [SNAPSHOT_ID],
         mimeType: MIME_TYPE,
       }));
 
@@ -594,7 +684,7 @@ describe('MongoRepository', () => {
         documentType: DOCUMENT_TYPE,
         content: `${CONTENT} - updated`,
         fetchDate: FETCH_DATE_LATER,
-        snapshotId: SNAPSHOT_ID,
+        snapshotIds: [SNAPSHOT_ID],
         mimeType: MIME_TYPE,
       }));
 
@@ -606,7 +696,7 @@ describe('MongoRepository', () => {
         content: `${CONTENT} - updated 2`,
         isRefilter: true,
         fetchDate: FETCH_DATE_EARLIER,
-        snapshotId: SNAPSHOT_ID,
+        snapshotIds: [SNAPSHOT_ID],
         mimeType: MIME_TYPE,
       }));
 

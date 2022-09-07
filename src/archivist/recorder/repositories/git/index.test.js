@@ -8,6 +8,7 @@ import mime from 'mime';
 
 import Record from '../../record.js';
 
+import { DOCUMENT_TYPE_AND_PAGE_ID_SEPARATOR, SNAPSHOT_ID_MARKER } from './dataMapper.js';
 import Git from './git.js';
 
 import GitRepository from './index.js';
@@ -19,8 +20,10 @@ const RECORDER_PATH = path.resolve(__dirname, '../../../', config.get('recorder.
 
 const SERVICE_PROVIDER_ID = 'test_service';
 const DOCUMENT_TYPE = 'Terms of Service';
+const PAGE_ID = 'community-standards-hate-speech';
 const CONTENT = 'ToS fixture data with UTF-8 çhãràčtęrs';
 const EXPECTED_FILE_PATH = `${RECORDER_PATH}/${SERVICE_PROVIDER_ID}/${DOCUMENT_TYPE}.html`;
+const EXPECTED_FILE_PATH_WITH_PAGE_ID = `${RECORDER_PATH}/${SERVICE_PROVIDER_ID}/${DOCUMENT_TYPE}${DOCUMENT_TYPE_AND_PAGE_ID_SEPARATOR}${PAGE_ID}.html`;
 const EXPECTED_PDF_FILE_PATH = EXPECTED_FILE_PATH.replace('html', 'pdf');
 const FETCH_DATE = new Date('2000-01-01T12:00:00.000Z');
 const FETCH_DATE_LATER = new Date('2000-01-02T12:00:00.000Z');
@@ -68,9 +71,10 @@ describe('GitRepository', () => {
         ({ id, isFirstRecord } = await subject.save(new Record({
           serviceId: SERVICE_PROVIDER_ID,
           documentType: DOCUMENT_TYPE,
+          pageId: PAGE_ID,
           content: CONTENT,
           fetchDate: FETCH_DATE,
-          snapshotId: SNAPSHOT_ID,
+          snapshotIds: [SNAPSHOT_ID],
           mimeType: MIME_TYPE,
         })));
 
@@ -93,7 +97,7 @@ describe('GitRepository', () => {
         expect(isFirstRecord).to.be.true;
       });
 
-      it('stores the service id', () => {
+      it('stores the service ID', () => {
         expect(commit.message).to.include(SERVICE_PROVIDER_ID);
       });
 
@@ -106,7 +110,7 @@ describe('GitRepository', () => {
       });
 
       it('stores the proper content', () => {
-        expect(fs.readFileSync(EXPECTED_FILE_PATH, { encoding: 'utf8' })).to.equal(CONTENT);
+        expect(fs.readFileSync(EXPECTED_FILE_PATH_WITH_PAGE_ID, { encoding: 'utf8' })).to.equal(CONTENT);
       });
 
       context('when provided', () => {
@@ -115,11 +119,15 @@ describe('GitRepository', () => {
         });
 
         it('stores the MIME type', () => {
-          expect(mime.getType(EXPECTED_FILE_PATH)).to.equal(MIME_TYPE);
+          expect(mime.getType(EXPECTED_FILE_PATH_WITH_PAGE_ID)).to.equal(MIME_TYPE);
         });
 
         it('stores the snapshot ID', () => {
           expect(commit.body).to.include(SNAPSHOT_ID);
+        });
+
+        it('stores the page ID', () => {
+          expect(commit.body).to.include(PAGE_ID);
         });
       });
     });
@@ -143,7 +151,7 @@ describe('GitRepository', () => {
           documentType: DOCUMENT_TYPE,
           content: UPDATED_CONTENT,
           fetchDate: FETCH_DATE,
-          snapshotId: SNAPSHOT_ID,
+          snapshotIds: [SNAPSHOT_ID],
           mimeType: MIME_TYPE,
         })));
 
@@ -221,7 +229,7 @@ describe('GitRepository', () => {
           content: REFILTERED_CONTENT,
           fetchDate: FETCH_DATE,
           isRefilter: true,
-          snapshotId: SNAPSHOT_ID,
+          snapshotIds: [SNAPSHOT_ID],
           mimeType: MIME_TYPE,
         })));
 
@@ -254,7 +262,7 @@ describe('GitRepository', () => {
           documentType: DOCUMENT_TYPE,
           content: PDF_CONTENT,
           fetchDate: FETCH_DATE,
-          snapshotId: SNAPSHOT_ID,
+          snapshotIds: [SNAPSHOT_ID],
           mimeType: PDF_MIME_TYPE,
         })));
 
@@ -281,6 +289,119 @@ describe('GitRepository', () => {
         expect(mime.getType(EXPECTED_PDF_FILE_PATH)).to.equal(PDF_MIME_TYPE);
       });
     });
+
+    context('when there is no snapshots IDs specified', () => {
+      before(async () => {
+        ({ id, isFirstRecord } = await subject.save(new Record({
+          serviceId: SERVICE_PROVIDER_ID,
+          documentType: DOCUMENT_TYPE,
+          pageId: PAGE_ID,
+          content: CONTENT,
+          fetchDate: FETCH_DATE,
+          mimeType: MIME_TYPE,
+        })));
+
+        ([commit] = await git.log());
+      });
+
+      after(async () => subject.removeAll());
+
+      it('does not store snapshots IDs', () => {
+        expect(commit.body).to.be.equal(`Page ID ${PAGE_ID}\n`);
+      });
+
+      it('stores the service ID', () => {
+        expect(commit.message).to.include(SERVICE_PROVIDER_ID);
+      });
+
+      it('stores the document type', () => {
+        expect(commit.message).to.include(DOCUMENT_TYPE);
+      });
+
+      it('stores the page ID', () => {
+        expect(commit.body).to.include(PAGE_ID);
+      });
+    });
+
+    context('when one snapshot ID is specified', () => {
+      const SNAPSHOT_ID = 'c01533c0e546ef430eea84d23c1b18a2b8420dfb';
+      const snapshotIds = [SNAPSHOT_ID];
+
+      before(async () => {
+        ({ id, isFirstRecord } = await subject.save(new Record({
+          serviceId: SERVICE_PROVIDER_ID,
+          documentType: DOCUMENT_TYPE,
+          pageId: PAGE_ID,
+          content: CONTENT,
+          fetchDate: FETCH_DATE,
+          mimeType: MIME_TYPE,
+          snapshotIds,
+        })));
+
+        ([commit] = await git.log());
+      });
+
+      after(async () => subject.removeAll());
+
+      it('stores snapshot ID', () => {
+        expect(commit.body).to.include(config.get('recorder.versions.storage.git.snapshotIdentiferTemplate').replace(SNAPSHOT_ID_MARKER, SNAPSHOT_ID));
+      });
+
+      it('stores the service ID', () => {
+        expect(commit.message).to.include(SERVICE_PROVIDER_ID);
+      });
+
+      it('stores the document type', () => {
+        expect(commit.message).to.include(DOCUMENT_TYPE);
+      });
+
+      it('stores the page ID', () => {
+        expect(commit.body).to.include(PAGE_ID);
+      });
+    });
+
+    context('when there are many snapshots IDs specified', () => {
+      const SNAPSHOT_ID_1 = 'c01533c0e546ef430eea84d23c1b18a2b8420dfb';
+      const SNAPSHOT_ID_2 = '0fd16cca9e1a86a2267bd587107c485f06099d7d';
+      const snapshotIds = [ SNAPSHOT_ID_1, SNAPSHOT_ID_2 ];
+
+      before(async () => {
+        ({ id, isFirstRecord } = await subject.save(new Record({
+          serviceId: SERVICE_PROVIDER_ID,
+          documentType: DOCUMENT_TYPE,
+          pageId: PAGE_ID,
+          content: CONTENT,
+          fetchDate: FETCH_DATE,
+          mimeType: MIME_TYPE,
+          snapshotIds,
+        })));
+
+        ([commit] = await git.log());
+      });
+
+      after(async () => subject.removeAll());
+
+      it('stores snapshots IDs', () => {
+        expect(commit.body).to.include(config.get('recorder.versions.storage.git.snapshotIdentiferTemplate').replace(SNAPSHOT_ID_MARKER, SNAPSHOT_ID_1));
+        expect(commit.body).to.include(config.get('recorder.versions.storage.git.snapshotIdentiferTemplate').replace(SNAPSHOT_ID_MARKER, SNAPSHOT_ID_2));
+      });
+
+      it('stores number of pages', () => {
+        expect(commit.body).to.include(`${snapshotIds.length} pages`);
+      });
+
+      it('stores the service ID', () => {
+        expect(commit.message).to.include(SERVICE_PROVIDER_ID);
+      });
+
+      it('stores the document type', () => {
+        expect(commit.message).to.include(DOCUMENT_TYPE);
+      });
+
+      it('stores the page ID', () => {
+        expect(commit.body).to.include(PAGE_ID);
+      });
+    });
   });
 
   describe('#findById', () => {
@@ -291,9 +412,10 @@ describe('GitRepository', () => {
       ({ id } = await subject.save(new Record({
         serviceId: SERVICE_PROVIDER_ID,
         documentType: DOCUMENT_TYPE,
+        pageId: PAGE_ID,
         content: CONTENT,
         fetchDate: FETCH_DATE,
-        snapshotId: SNAPSHOT_ID,
+        snapshotIds: [SNAPSHOT_ID],
         mimeType: MIME_TYPE,
       })));
 
@@ -310,7 +432,7 @@ describe('GitRepository', () => {
       expect(record.isFirstRecord).to.be.true;
     });
 
-    it('returns the service id', () => {
+    it('returns the service ID', () => {
       expect(record.serviceId).to.equal(SERVICE_PROVIDER_ID);
     });
 
@@ -322,21 +444,25 @@ describe('GitRepository', () => {
       expect(record.content).to.equal(CONTENT);
     });
 
-    it('stores the fetch date', () => {
+    it('returns the fetch date', () => {
       expect(new Date(record.fetchDate).getTime()).to.equal(FETCH_DATE.getTime());
     });
 
-    it('stores the MIME type', () => {
+    it('returns the MIME type', () => {
       expect(record.mimeType).to.equal(MIME_TYPE);
     });
 
-    it('stores the snapshot ID', () => {
-      expect(record.snapshotId).to.equal(SNAPSHOT_ID);
+    it('returns the snapshot ID', () => {
+      expect(record.snapshotIds).to.deep.equal([SNAPSHOT_ID]);
+    });
+
+    it('returns the page ID', () => {
+      expect(record.pageId).to.equal(PAGE_ID);
     });
 
     context('when requested record does not exist', () => {
-      it('returns an empty object', async () => {
-        expect(await subject.findById('inexistantID')).to.deep.equal({});
+      it('returns null', async () => {
+        expect(await subject.findById('inexistantID')).to.equal(null);
       });
     });
   });
@@ -351,7 +477,7 @@ describe('GitRepository', () => {
         documentType: DOCUMENT_TYPE,
         content: CONTENT,
         fetchDate: FETCH_DATE,
-        snapshotId: SNAPSHOT_ID,
+        snapshotIds: [SNAPSHOT_ID],
         mimeType: MIME_TYPE,
       }));
 
@@ -362,7 +488,7 @@ describe('GitRepository', () => {
         documentType: DOCUMENT_TYPE,
         content: `${CONTENT} - updated`,
         fetchDate: FETCH_DATE_LATER,
-        snapshotId: SNAPSHOT_ID,
+        snapshotIds: [SNAPSHOT_ID],
         mimeType: MIME_TYPE,
       }));
 
@@ -374,7 +500,7 @@ describe('GitRepository', () => {
         content: `${CONTENT} - updated 2`,
         isRefilter: true,
         fetchDate: FETCH_DATE_EARLIER,
-        snapshotId: SNAPSHOT_ID,
+        snapshotIds: [SNAPSHOT_ID],
         mimeType: MIME_TYPE,
       }));
 
@@ -409,7 +535,7 @@ describe('GitRepository', () => {
         documentType: DOCUMENT_TYPE,
         content: CONTENT,
         fetchDate: FETCH_DATE,
-        snapshotId: SNAPSHOT_ID,
+        snapshotIds: [SNAPSHOT_ID],
         mimeType: MIME_TYPE,
       }));
       await subject.save(new Record({
@@ -417,7 +543,7 @@ describe('GitRepository', () => {
         documentType: DOCUMENT_TYPE,
         content: `${CONTENT} - updated`,
         fetchDate: FETCH_DATE_LATER,
-        snapshotId: SNAPSHOT_ID,
+        snapshotIds: [SNAPSHOT_ID],
         mimeType: MIME_TYPE,
       }));
       await subject.save(new Record({
@@ -426,7 +552,7 @@ describe('GitRepository', () => {
         content: `${CONTENT} - updated 2`,
         isRefilter: true,
         fetchDate: FETCH_DATE_EARLIER,
-        snapshotId: SNAPSHOT_ID,
+        snapshotIds: [SNAPSHOT_ID],
         mimeType: MIME_TYPE,
       }));
 
@@ -519,8 +645,8 @@ describe('GitRepository', () => {
         latestRecord = await subject.findLatest(SERVICE_PROVIDER_ID, DOCUMENT_TYPE);
       });
 
-      it('returns an empty object', async () => {
-        expect(latestRecord).to.deep.equal({});
+      it('returns null', async () => {
+        expect(latestRecord).to.equal(null);
       });
     });
   });
@@ -536,7 +662,7 @@ describe('GitRepository', () => {
         documentType: DOCUMENT_TYPE,
         content: CONTENT,
         fetchDate: FETCH_DATE,
-        snapshotId: SNAPSHOT_ID,
+        snapshotIds: [SNAPSHOT_ID],
         mimeType: MIME_TYPE,
       }));
 
@@ -547,7 +673,7 @@ describe('GitRepository', () => {
         documentType: DOCUMENT_TYPE,
         content: `${CONTENT} - updated`,
         fetchDate: FETCH_DATE_LATER,
-        snapshotId: SNAPSHOT_ID,
+        snapshotIds: [SNAPSHOT_ID],
         mimeType: MIME_TYPE,
       }));
 
@@ -559,7 +685,7 @@ describe('GitRepository', () => {
         content: `${CONTENT} - updated 2`,
         isRefilter: true,
         fetchDate: FETCH_DATE_EARLIER,
-        snapshotId: SNAPSHOT_ID,
+        snapshotIds: [SNAPSHOT_ID],
         mimeType: MIME_TYPE,
       }));
 

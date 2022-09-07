@@ -39,10 +39,9 @@ export default class MongoRepository extends RepositoryInterface {
     }
 
     const documentFields = await this.#toPersistence(record);
+    const previousRecord = await this.findLatest(serviceId, documentType);
 
-    const { content: previousRecordContent } = await this.findLatest(serviceId, documentType);
-
-    if (previousRecordContent == documentFields.content) {
+    if (previousRecord?.content == documentFields.content) {
       return Object(null);
     }
 
@@ -98,7 +97,7 @@ export default class MongoRepository extends RepositoryInterface {
 
   async #toDomain(document, { deferContentLoading } = {}) {
     if (!document) {
-      return Object(null);
+      return null;
     }
 
     const record = DataMapper.toDomain(document);

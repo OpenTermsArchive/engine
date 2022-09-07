@@ -111,90 +111,83 @@ let servicesToValidate = args;
         if (!schemaOnly) {
           service.getDocumentTypes().forEach(type => {
             describe(type, () => {
-              let content;
-              let filteredContent;
-              let mimeType;
               const documentDeclaration = service.getDocumentDeclaration(type);
 
-              before(async function () {
-                if (!documentDeclaration) {
-                  console.log('      (Tests skipped as declaration has been archived)');
-                  this.skip();
-                }
-              });
+              documentDeclaration.pages.forEach(page => {
+                let content;
+                let filteredContent;
+                let mimeType;
 
-              it('fetchable URL', async () => {
-                const { location, executeClientScripts } = documentDeclaration;
-                const document = await fetch({
-                  url: location,
-                  executeClientScripts,
-                  cssSelectors: documentDeclaration.getCssSelectors(),
-                  config: config.get('fetcher'),
+                context(page.location, () => {
+                  before(async function () {
+                    if (!documentDeclaration) {
+                      console.log('      (Tests skipped as declaration has been archived)');
+                      this.skip();
+                    }
+                  });
+
+                  it('fetchable URL', async () => {
+                    const { location, executeClientScripts } = page;
+                    const document = await fetch({
+                      url: location,
+                      executeClientScripts,
+                      cssSelectors: page.cssSelectors,
+                      config: config.get('fetcher'),
+                    });
+
+                    content = document.content;
+                    mimeType = document.mimeType;
+                  });
+
+                  it('selector matches an element in the web page', async function checkSelector() {
+                    if (!content) {
+                      console.log('          [Tests skipped as URL is not fetchable]');
+                      this.skip();
+                    }
+
+                    filteredContent = await filter({ content, pageDeclaration: page, mimeType });
+
+                    expect(filteredContent).to.not.be.empty;
+                  });
+
+                  it(`filtered content has at least ${MIN_DOC_LENGTH} characters`, async function checkContentLength() {
+                    if (!content) {
+                      console.log('          [Tests skipped as URL is not fetchable]');
+                      this.skip();
+                    }
+
+                    if (!filteredContent) {
+                      console.log('          [Tests skipped as content cannot be filtered]');
+                      this.skip();
+                    }
+
+                    expect(filteredContent.length).to.be.greaterThan(MIN_DOC_LENGTH);
+                  });
+
+                  it('content is consistent when fetched and filtered twice in a row', async function checkContentConsistency() {
+                    this.slow(SLOW_DOCUMENT_THRESHOLD * 2);
+
+                    if (!content) {
+                      console.log('          [Tests skipped as URL is not fetchable]');
+                      this.skip();
+                    }
+
+                    if (!filteredContent) {
+                      console.log('          [Tests skipped as content cannot be filtered]');
+                      this.skip();
+                    }
+
+                    const document = await fetch({
+                      url: page.location,
+                      executeClientScripts: page.executeClientScripts,
+                      cssSelectors: page.cssSelectors,
+                      config: config.get('fetcher'),
+                    });
+                    const secondFilteredContent = await filter({ content: document.content, pageDeclaration: page, mimeType: document.mimeType });
+
+                    expect(secondFilteredContent).to.equal(filteredContent);
+                  });
                 });
-
-                content = document.content;
-                mimeType = document.mimeType;
-              });
-
-              it('selector matches an element in the web page', async function checkSelector() {
-                if (!content) {
-                  console.log('      (Tests skipped as url is not fetchable)');
-                  this.skip();
-                }
-
-                filteredContent = await filter({
-                  content,
-                  documentDeclaration,
-                  mimeType,
-                });
-
-                expect(filteredContent).to.not.be.empty;
-              });
-
-              it(`filtered content has at least ${MIN_DOC_LENGTH} characters`, async function checkContentLength() {
-                if (!content) {
-                  console.log('      (Tests skipped as url is not fetchable)');
-                  this.skip();
-                }
-
-                if (!filteredContent) {
-                  console.log('      (Tests skipped as content cannot be filtered)');
-                  this.skip();
-                }
-
-                expect(filteredContent.length).to.be.greaterThan(MIN_DOC_LENGTH);
-              });
-
-              it('content is consistent when fetched and filtered twice in a row', async function checkContentConsistency() {
-                this.slow(SLOW_DOCUMENT_THRESHOLD * 2);
-
-                if (!content) {
-                  console.log('      (Tests skipped as url is not fetchable)');
-                  this.skip();
-                }
-
-                if (!filteredContent) {
-                  console.log('      (Tests skipped as content cannot be filtered)');
-                  this.skip();
-                }
-
-                const {
-                  location,
-                  executeClientScripts,
-                } = documentDeclaration;
-                const document = await fetch({
-                  url: location,
-                  executeClientScripts,
-                  cssSelectors: documentDeclaration.getCssSelectors(),
-                  config: config.get('fetcher'),
-                });
-                const secondFilteredContent = await filter({
-                  content: document.content,
-                  documentDeclaration,
-                  mimeType: document.mimeType,
-                });
-
-                expect(secondFilteredContent).to.equal(filteredContent);
               });
             });
           });
@@ -221,6 +214,7 @@ function assertValid(schema, subject) {
     const jsonLines = sourceMap.json.split('\n');
 
     validator.errors.forEach(error => {
+      console.log('error', error);
       errorMessage += `\n\n${validator.errorsText([error])}`;
       const errorPointer = sourceMap.pointers[error.dataPath];
 

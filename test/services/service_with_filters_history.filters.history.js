@@ -1,15 +1,15 @@
-export const removeSharesButton = [
+export const removeShareButton = [
   {
     validUntil: '2020-09-30T21:30:21.000Z',
-    filter: async () => 'second-removeSharesButton',
+    filter: async () => 'second-removeShareButton',
   },
   {
     validUntil: '2020-08-22T11:30:21.000Z',
-    filter: async () => 'first-removeSharesButton',
+    filter: async () => 'first-removeShareButton',
   },
   {
     validUntil: '2020-11-01T12:30:21.000Z',
-    filter: async () => 'third-removeSharesButton',
+    filter: async () => 'third-removeShareButton',
   },
 ];
 

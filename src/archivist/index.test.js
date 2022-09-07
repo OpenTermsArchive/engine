@@ -159,7 +159,7 @@ describe('Archivist', function () {
 
           serviceBCommits = await gitVersion.log({ file: SERVICE_B_EXPECTED_VERSION_FILE_PATH });
 
-          app.serviceDeclarations[SERVICE_A_ID].getDocumentDeclaration(SERVICE_A_TYPE).contentSelectors = 'h1';
+          app.serviceDeclarations[SERVICE_A_ID].getDocumentDeclaration(SERVICE_A_TYPE).pages[0].contentSelectors = 'h1';
 
           await app.refilterAndRecord([ 'service_A', 'service_B' ]);
 
@@ -210,7 +210,7 @@ describe('Archivist', function () {
           await app.initialize();
           await app.trackChanges(serviceIds);
 
-          app.serviceDeclarations[SERVICE_A_ID].getDocumentDeclaration(SERVICE_A_TYPE).contentSelectors = 'inexistant-selector';
+          app.serviceDeclarations[SERVICE_A_ID].getDocumentDeclaration(SERVICE_A_TYPE).pages[0].contentSelectors = 'inexistant-selector';
           inaccessibleContentSpy = sinon.spy();
           versionNotChangedSpy = sinon.spy();
           app.on('inaccessibleContent', inaccessibleContentSpy);
@@ -233,8 +233,6 @@ describe('Archivist', function () {
 
   describe('events', () => {
     const spies = {};
-    let app;
-    let documentADeclaration;
 
     function resetSpiesHistory() {
       Object.keys(spies).forEach(spyName => spies[spyName].resetHistory());
@@ -260,15 +258,14 @@ describe('Archivist', function () {
         spies[handlerName] = sinon.spy();
         app.on(event, spies[handlerName]);
       });
-
-      documentADeclaration = app.serviceDeclarations[SERVICE_A_ID].getDocumentDeclaration(SERVICE_A_TYPE);
     });
 
     describe('#recordSnapshot', () => {
       context('when it is the first record', () => {
         before(async () => app.recordSnapshot({
-          content: 'document content',
-          documentDeclaration: documentADeclaration,
+          content: 'document content 3',
+          serviceId: SERVICE_A_ID,
+          documentType: SERVICE_A_TYPE,
           mimeType: MIME_TYPE,
           fetchDate: FETCH_DATE,
         }));
@@ -291,16 +288,18 @@ describe('Archivist', function () {
           before(async () => {
             await app.recordSnapshot({
               content: 'document content',
+              serviceId: SERVICE_A_ID,
+              documentType: SERVICE_A_TYPE,
               mimeType: MIME_TYPE,
               fetchDate: FETCH_DATE,
-              documentDeclaration: documentADeclaration,
             });
             resetSpiesHistory();
             await app.recordSnapshot({
               content: 'document content modified',
+              serviceId: SERVICE_A_ID,
+              documentType: SERVICE_A_TYPE,
               mimeType: MIME_TYPE,
               fetchDate: FETCH_DATE,
-              documentDeclaration: documentADeclaration,
             });
           });
 
@@ -321,16 +320,18 @@ describe('Archivist', function () {
           before(async () => {
             await app.recordSnapshot({
               content: 'document content',
+              serviceId: SERVICE_A_ID,
+              documentType: SERVICE_A_TYPE,
               mimeType: MIME_TYPE,
               fetchDate: FETCH_DATE,
-              documentDeclaration: documentADeclaration,
             });
             resetSpiesHistory();
             await app.recordSnapshot({
               content: 'document content',
+              serviceId: SERVICE_A_ID,
+              documentType: SERVICE_A_TYPE,
               mimeType: MIME_TYPE,
               fetchDate: FETCH_DATE,
-              documentDeclaration: documentADeclaration,
             });
           });
 
@@ -353,11 +354,12 @@ describe('Archivist', function () {
       context('when it is the first record', () => {
         before(async () =>
           app.recordVersion({
-            snapshotContent: serviceASnapshotExpectedContent,
-            snapshotId: 'sha',
+            content: serviceASnapshotExpectedContent,
+            snapshotIds: ['sha'],
             mimeType: MIME_TYPE,
             fetchDate: FETCH_DATE,
-            documentDeclaration: documentADeclaration,
+            serviceId: SERVICE_A_ID,
+            documentType: SERVICE_A_TYPE,
           }));
 
         after(() => {
@@ -377,19 +379,21 @@ describe('Archivist', function () {
         context('when there are changes', () => {
           before(async () => {
             await app.recordVersion({
-              snapshotContent: serviceASnapshotExpectedContent,
+              content: serviceASnapshotExpectedContent,
               mimeType: MIME_TYPE,
               fetchDate: FETCH_DATE,
-              snapshotId: 'sha',
-              documentDeclaration: documentADeclaration,
+              snapshotIds: ['sha'],
+              serviceId: SERVICE_A_ID,
+              documentType: SERVICE_A_TYPE,
             });
             resetSpiesHistory();
             await app.recordVersion({
-              snapshotContent: serviceBSnapshotExpectedContent,
+              content: serviceBSnapshotExpectedContent,
               mimeType: MIME_TYPE,
               fetchDate: FETCH_DATE,
-              snapshotId: 'sha',
-              documentDeclaration: documentADeclaration,
+              snapshotIds: ['sha'],
+              serviceId: SERVICE_A_ID,
+              documentType: SERVICE_A_TYPE,
             });
           });
 
@@ -409,19 +413,21 @@ describe('Archivist', function () {
         context('when there are no changes', () => {
           before(async () => {
             await app.recordVersion({
-              snapshotContent: serviceASnapshotExpectedContent,
-              snapshotId: 'sha',
+              content: serviceASnapshotExpectedContent,
+              snapshotIds: ['sha'],
               mimeType: MIME_TYPE,
               fetchDate: FETCH_DATE,
-              documentDeclaration: documentADeclaration,
+              serviceId: SERVICE_A_ID,
+              documentType: SERVICE_A_TYPE,
             });
             resetSpiesHistory();
             await app.recordVersion({
-              snapshotContent: serviceASnapshotExpectedContent,
-              snapshotId: 'sha',
+              content: serviceASnapshotExpectedContent,
+              snapshotIds: ['sha'],
               mimeType: MIME_TYPE,
               fetchDate: FETCH_DATE,
-              documentDeclaration: documentADeclaration,
+              serviceId: SERVICE_A_ID,
+              documentType: SERVICE_A_TYPE,
             });
           });
 
@@ -476,7 +482,6 @@ describe('Archivist', function () {
 
       emitsOnly([
         'firstSnapshotRecorded',
-        'onFirstSnapshotRecorded',
         'firstVersionRecorded',
         'trackingStarted',
         'trackingCompleted',
@@ -528,7 +533,6 @@ describe('Archivist', function () {
         emitsOnly([
           'snapshotNotChanged',
           'versionNotChanged',
-          'snapshotRecorded',
           'trackingStarted',
           'trackingCompleted',
         ]);
@@ -558,19 +562,19 @@ describe('Archivist', function () {
           expect(spies.onTrackingStarted).to.have.been.calledOnce;
         });
 
-        it('emits "snapshotNotChanged" events', async () => {
+        it('emits "snapshotNotChanged" event for the service that was not changed', async () => {
           expect(spies.onSnapshotNotChanged).to.have.been.calledOnceWith(SERVICE_B_ID, SERVICE_B_TYPE);
         });
 
-        it('emits "snapshotRecorded" event for service which changed', async () => {
+        it('emits "snapshotRecorded" event for the service that was changed', async () => {
           expect(spies.onSnapshotRecorded).to.have.been.calledOnceWith(SERVICE_A_ID, SERVICE_A_TYPE);
         });
 
-        it('emits "versionNotChanged" events', async () => {
+        it('emits "versionNotChanged" events for the service that was not changed', async () => {
           expect(spies.onVersionNotChanged).to.have.been.calledOnceWith(SERVICE_B_ID, SERVICE_B_TYPE);
         });
 
-        it('emits "versionRecorded" event for service which changed', async () => {
+        it('emits "versionRecorded" event for the service that was changed', async () => {
           expect(spies.onVersionRecorded).to.have.been.calledOnceWith(SERVICE_A_ID, SERVICE_A_TYPE);
         });
 

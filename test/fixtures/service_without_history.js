@@ -1,4 +1,5 @@
 import DocumentDeclaration from '../../src/archivist/services/documentDeclaration.js';
+import PageDeclaration from '../../src/archivist/services/pageDeclaration.js';
 import Service from '../../src/archivist/services/service.js';
 
 const service = new Service({
@@ -7,24 +8,24 @@ const service = new Service({
 });
 
 const filters = [
-  async function removeSharesButton() {
-    return 'last-removeSharesButton';
+  async function removeShareButton() {
+    return 'last-removeShareButton';
   },
   async function removePrintButton() {
     return 'last-removePrintButton';
   },
 ];
 
-const latest = new DocumentDeclaration({
+service.addDocumentDeclaration(new DocumentDeclaration({
   service,
   type: 'Terms of Service',
-  location: 'https://www.service-without-history.example/tos',
-  contentSelectors: 'body',
-  noiseSelectors: undefined,
-  filters,
+  pages: [new PageDeclaration({
+    location: 'https://www.service-without-history.example/tos',
+    contentSelectors: 'body',
+    noiseSelectors: undefined,
+    filters,
+  })],
   validUntil: null,
-});
-
-service._documents = { 'Terms of Service': { _latest: latest } };
+}));
 
 export default service;

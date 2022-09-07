@@ -4,7 +4,10 @@
     "Terms of Service": {
       "fetch": "https://www.service-without-history.example/tos",
       "select": "body",
-      "filter": ["removeSharesButton", "removePrintButton"]
+      "filter": [
+        "removeShareButton",
+        "removePrintButton"
+      ]
     }
   }
 }

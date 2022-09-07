@@ -116,7 +116,7 @@ For example:
 
 ## Importing as a module
 
-Open Terms Archive exposes a JavaScript API to make some of its capabilities available in NodeJS. You can install it as an NPM module: 
+Open Terms Archive exposes a JavaScript API to make some of its capabilities available in NodeJS. You can install it as an NPM module:
 
 ```
 npm install "ambanum/OpenTermsArchive#main"
@@ -309,7 +309,7 @@ Two storage repositories are currently supported: Git and MongoDB. Each one can 
     "git": {
       "path": "Versions database directory path, relative to the root of this project",
       "publish": "Boolean. Set to true to push changes to the origin of the cloned repository at the end of every run. Recommended for production only.",
-      "prefixMessageToSnapshotId": "Text. Prefix used to explicit where to find the referenced snapshot id. Only useful for versions",
+      "snapshotIdentiferTemplate": "Text. Template used to explicit where to find the referenced snapshot id. Must contain a %SNAPSHOT_ID that will be replaced by the snapshot ID. Only useful for versions",
       "author": {
         "name": "Name to which changes in tracked documents will be credited",
         "email": "Email to which changes in tracked documents will be credited"

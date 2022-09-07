@@ -43,6 +43,8 @@ export default class Archivist extends events.EventEmitter {
   constructor({ recorderConfig }) {
     super();
     this.recorder = new Recorder(recorderConfig);
+    this.fetch = params => fetch({ ...params, config: config.get('fetcher') });
+    this.filter = filter;
   }
 
   async initialize() {
@@ -96,7 +98,7 @@ export default class Archivist extends events.EventEmitter {
 
   attach(listener) {
     AVAILABLE_EVENTS.forEach(event => {
-      const handlerName = `on${event[0].toUpperCase()}${event.substr(1)}`;
+      const handlerName = `on${event[0].toUpperCase()}${event.substring(1)}`;
 
       if (listener[handlerName]) {
         this.on(event, listener[handlerName].bind(listener));
@@ -105,8 +107,6 @@ export default class Archivist extends events.EventEmitter {
   }
 
   async trackChanges(servicesIds = this.serviceIds) {
-    servicesIds.sort((a, b) => a.localeCompare(b)); // Sort service ids by lowercase name to have more intuitive logs
-
     this.emit('trackingStarted', servicesIds.length, this.getNumberOfDocuments(servicesIds));
 
     await Promise.all([ launchHeadlessBrowser(), this.recorder.initialize() ]);
@@ -114,67 +114,12 @@ export default class Archivist extends events.EventEmitter {
     this.#forEachDocumentOf(servicesIds, documentDeclaration => this.trackDocumentChangesQueue.push(documentDeclaration));
 
     await this.trackDocumentChangesQueue.drain();
-
     await Promise.all([ stopHeadlessBrowser(), this.recorder.finalize() ]);
 
     this.emit('trackingCompleted', servicesIds.length, this.getNumberOfDocuments(servicesIds));
   }
 
-  async trackDocumentChanges(documentDeclaration) {
-    const { location, executeClientScripts } = documentDeclaration;
-
-    let mimeType;
-    let content;
-
-    try {
-      ({ mimeType, content } = await fetch({
-        url: location,
-        executeClientScripts,
-        cssSelectors: documentDeclaration.getCssSelectors(),
-        config: config.get('fetcher'),
-      }));
-    } catch (error) {
-      if (error instanceof FetchDocumentError) {
-        if (error.message.includes('EAI_AGAIN')) {
-          // EAI_AGAIN is a DNS lookup timed out error, which means it is a network connectivity error or proxy related error.
-          // This operational error is mostly transient and should be handled by retrying the operation.
-          // As there is no retry mechanism in the engine yet, crash the engine and leave it to the process
-          // manager to handle the retries and the delay between them.
-          throw error;
-        } else {
-          throw new InaccessibleContentError(error.message);
-        }
-      }
-
-      throw error;
-    }
-
-    const fetchDate = new Date();
-    const snapshotId = await this.recordSnapshot({
-      content,
-      mimeType,
-      documentDeclaration,
-      fetchDate,
-    });
-
-    if (!snapshotId) {
-      return;
-    }
-
-    const recordedVersion = await this.recordVersion({
-      snapshotContent: content,
-      mimeType,
-      snapshotId,
-      documentDeclaration,
-      fetchDate,
-    });
-
-    return recordedVersion;
-  }
-
   async refilterAndRecord(servicesIds = this.serviceIds) {
-    servicesIds.sort((a, b) => a.localeCompare(b)); // Sort service ids by lowercase name to have more intuitive logs
-
     this.emit('refilteringStarted', servicesIds.length, this.getNumberOfDocuments(servicesIds));
 
     await this.recorder.initialize();
@@ -187,80 +132,141 @@ export default class Archivist extends events.EventEmitter {
     this.emit('refilteringCompleted', servicesIds.length, this.getNumberOfDocuments(servicesIds));
   }
 
+  async trackDocumentChanges(documentDeclaration) {
+    await Promise.all((await this.fetchDocumentPages(documentDeclaration)).map(params => this.recordSnapshot(params)));
+
+    return this.generateDocumentVersion(documentDeclaration);
+  }
+
   async refilterAndRecordDocument(documentDeclaration) {
-    const { type, service } = documentDeclaration;
+    return this.generateDocumentVersion(documentDeclaration, { isRefiltering: true });
+  }
 
-    const { id: snapshotId, content: snapshotContent, mimeType, fetchDate } = await this.recorder.getLatestSnapshot(
-      service.id,
-      type,
-    );
+  async generateDocumentVersion(documentDeclaration, { isRefiltering = false } = {}) {
+    const { service: { id: serviceId }, type: documentType, pages } = documentDeclaration;
 
-    if (!snapshotId) {
+    const snapshots = await this.getDocumentSnapshots(documentDeclaration);
+
+    if (!snapshots.length) {
       return;
     }
 
+    const [{ fetchDate }] = snapshots; // In case of multipage document, use the first snapshot fetch date
+
     return this.recordVersion({
-      snapshotContent,
-      mimeType,
-      snapshotId,
-      documentDeclaration,
-      isRefiltering: true,
+      content: await this.generateDocumentFilteredContent(snapshots, pages),
+      snapshotIds: snapshots.map(({ id }) => id),
+      serviceId,
+      documentType,
       fetchDate,
+      isRefiltering,
     });
   }
 
+  async fetchDocumentPages({ service: { id: serviceId }, type: documentType, pages, isMultiPage }) {
+    const inaccessibleContentErrors = [];
+
+    const result = await Promise.all(pages.map(async ({ location: url, executeClientScripts, cssSelectors, id: pageId }) => {
+      try {
+        const { mimeType, content } = await this.fetch({ url, executeClientScripts, cssSelectors });
+
+        return {
+          content,
+          mimeType,
+          serviceId,
+          documentType,
+          pageId: isMultiPage && pageId,
+          fetchDate: new Date(),
+        };
+      } catch (error) {
+        if (!(error instanceof FetchDocumentError)) {
+          throw error;
+        }
+
+        if (error.message.includes('EAI_AGAIN')) {
+          // EAI_AGAIN is a DNS lookup timed out error, which means it is a network connectivity error or proxy related error.
+          // This operational error is mostly transient and should be handled by retrying the operation.
+          // As there is no retry mechanism in the engine yet, crash the engine and leave it to the process
+          // manager to handle the retries and the delay between them.
+          throw error;
+        }
+
+        inaccessibleContentErrors.push(error.message);
+      }
+    }));
+
+    if (inaccessibleContentErrors.length) {
+      throw new InaccessibleContentError(inaccessibleContentErrors);
+    }
+
+    return result;
+  }
+
+  async getDocumentSnapshots({ service: { id: serviceId }, type: documentType, pages, isMultiPage }) {
+    return (await Promise.all(pages.map(async page => this.recorder.getLatestSnapshot(serviceId, documentType, isMultiPage && page.id)))).filter(Boolean);
+  }
+
+  async generateDocumentFilteredContent(snapshots, pages) {
+    return (
+      await Promise.all(snapshots.map(async ({ pageId, content, mimeType }) => {
+        const pageDeclaration = pageId ? pages.find(({ id }) => pageId == id) : pages[0];
+
+        return this.filter({ content, mimeType, pageDeclaration });
+      }))
+    ).join('\n\n');
+  }
+
+  async recordSnapshot({ content, mimeType, fetchDate, serviceId, documentType, pageId }) {
+    const { id: snapshotId, isFirstRecord } = await this.recorder.recordSnapshot({
+      serviceId,
+      documentType,
+      pageId,
+      content,
+      mimeType,
+      fetchDate,
+    });
+
+    if (!snapshotId) {
+      this.emit('snapshotNotChanged', serviceId, documentType, pageId);
+
+      return;
+    }
+
+    this.emit(isFirstRecord ? 'firstSnapshotRecorded' : 'snapshotRecorded', serviceId, documentType, pageId, snapshotId);
+
+    return snapshotId;
+  }
+
+  async recordVersion({ content, fetchDate, snapshotIds, serviceId, documentType, isRefiltering }) {
+    const recordFunction = !isRefiltering ? 'recordVersion' : 'recordRefilter';
+
+    const { id: versionId, isFirstRecord } = await this.recorder[recordFunction]({
+      serviceId,
+      documentType,
+      content,
+      fetchDate,
+      snapshotIds,
+    });
+
+    if (!versionId) {
+      this.emit('versionNotChanged', serviceId, documentType);
+
+      return;
+    }
+
+    this.emit(isFirstRecord ? 'firstVersionRecorded' : 'versionRecorded', serviceId, documentType, versionId);
+  }
+
+  getNumberOfDocuments(serviceIds = this.serviceIds) {
+    return serviceIds.reduce((acc, serviceId) => acc + this.services[serviceId].getNumberOfDocuments(), 0);
+  }
+
   async #forEachDocumentOf(servicesIds = [], callback) { // eslint-disable-line default-param-last
+    servicesIds.sort((a, b) => a.localeCompare(b)); // Sort service IDs by lowercase name to have more intuitive logs
     servicesIds.forEach(serviceId => {
       this.services[serviceId].getDocumentTypes().forEach(documentType => {
         callback(this.services[serviceId].getDocumentDeclaration(documentType));
       });
     });
-  }
-
-  async recordSnapshot({ content, mimeType, fetchDate, documentDeclaration: { service, type } }) {
-    const { id: snapshotId, isFirstRecord } = await this.recorder.recordSnapshot({
-      serviceId: service.id,
-      documentType: type,
-      content,
-      mimeType,
-      fetchDate,
-    });
-
-    if (!snapshotId) {
-      return this.emit('snapshotNotChanged', service.id, type);
-    }
-
-    this.emit(isFirstRecord ? 'firstSnapshotRecorded' : 'snapshotRecorded', service.id, type, snapshotId);
-
-    return snapshotId;
-  }
-
-  async recordVersion({ snapshotContent, mimeType, fetchDate, snapshotId, documentDeclaration, isRefiltering }) {
-    const { service, type } = documentDeclaration;
-    const content = await filter({
-      content: snapshotContent,
-      mimeType,
-      documentDeclaration,
-    });
-
-    const recordFunction = !isRefiltering ? 'recordVersion' : 'recordRefilter';
-
-    const { id: versionId, isFirstRecord } = await this.recorder[recordFunction]({
-      serviceId: service.id,
-      documentType: type,
-      content,
-      fetchDate,
-      snapshotId,
-    });
-
-    if (!versionId) {
-      return this.emit('versionNotChanged', service.id, type);
-    }
-
-    this.emit(isFirstRecord ? 'firstVersionRecorded' : 'versionRecorded', service.id, type, versionId);
-  }
-
-  getNumberOfDocuments(serviceIds = this.serviceIds) {
-    return serviceIds.reduce((acc, serviceId) => acc + this.services[serviceId].getNumberOfDocuments(), 0);
   }
 }

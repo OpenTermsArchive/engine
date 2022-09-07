@@ -10,7 +10,7 @@ import Git from './git.js';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const RECORDER_PATH = path.resolve(__dirname, '../../../../../', config.get('recorder.versions.storage.git.path'));
 
-describe('GitRepository', () => {
+describe('Git', () => {
   const DEFAULT_CONTENT = 'default content';
   const DEFAULT_COMMIT_MESSAGE = 'default commit message';
   let subject;
