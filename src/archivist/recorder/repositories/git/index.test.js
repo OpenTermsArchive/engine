@@ -97,7 +97,7 @@ describe('GitRepository', () => {
         expect(isFirstRecord).to.be.true;
       });
 
-      it('stores the service id', () => {
+      it('stores the service ID', () => {
         expect(commit.message).to.include(SERVICE_PROVIDER_ID);
       });
 
@@ -310,7 +310,7 @@ describe('GitRepository', () => {
         expect(commit.body).to.be.equal(`Page ID ${PAGE_ID}\n`);
       });
 
-      it('stores the service id', () => {
+      it('stores the service ID', () => {
         expect(commit.message).to.include(SERVICE_PROVIDER_ID);
       });
 
@@ -347,7 +347,7 @@ describe('GitRepository', () => {
         expect(commit.body).to.include(config.get('recorder.versions.storage.git.snapshotIdentiferTemplate').replace(SNAPSHOT_ID_MARKER, SNAPSHOT_ID));
       });
 
-      it('stores the service id', () => {
+      it('stores the service ID', () => {
         expect(commit.message).to.include(SERVICE_PROVIDER_ID);
       });
 
@@ -390,7 +390,7 @@ describe('GitRepository', () => {
         expect(commit.body).to.include(`${snapshotIds.length} pages`);
       });
 
-      it('stores the service id', () => {
+      it('stores the service ID', () => {
         expect(commit.message).to.include(SERVICE_PROVIDER_ID);
       });
 
@@ -432,7 +432,7 @@ describe('GitRepository', () => {
       expect(record.isFirstRecord).to.be.true;
     });
 
-    it('returns the service id', () => {
+    it('returns the service ID', () => {
       expect(record.serviceId).to.equal(SERVICE_PROVIDER_ID);
     });
 

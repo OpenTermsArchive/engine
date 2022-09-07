@@ -262,7 +262,7 @@ export default class Archivist extends events.EventEmitter {
   }
 
   async #forEachDocumentOf(servicesIds = [], callback) { // eslint-disable-line default-param-last
-    servicesIds.sort((a, b) => a.localeCompare(b)); // Sort service ids by lowercase name to have more intuitive logs
+    servicesIds.sort((a, b) => a.localeCompare(b)); // Sort service IDs by lowercase name to have more intuitive logs
     servicesIds.forEach(serviceId => {
       this.services[serviceId].getDocumentTypes().forEach(documentType => {
         callback(this.services[serviceId].getDocumentDeclaration(documentType));

@@ -91,7 +91,7 @@ describe('MongoRepository', () => {
         expect(record.isFirstRecord).to.be.true;
       });
 
-      it('stores the service id', () => {
+      it('stores the service ID', () => {
         expect(mongoDocument.serviceId).to.include(SERVICE_PROVIDER_ID);
       });
 
@@ -345,7 +345,7 @@ describe('MongoRepository', () => {
         expect(mongoDocument.snapshotIds).to.be.undefined;
       });
 
-      it('stores the service id', () => {
+      it('stores the service ID', () => {
         expect(mongoDocument.serviceId).to.include(SERVICE_PROVIDER_ID);
       });
 
@@ -388,7 +388,7 @@ describe('MongoRepository', () => {
         expect(snapshotIds).to.include(SNAPSHOT_ID_2);
       });
 
-      it('stores the service id', () => {
+      it('stores the service ID', () => {
         expect(mongoDocument.serviceId).to.include(SERVICE_PROVIDER_ID);
       });
 
@@ -430,7 +430,7 @@ describe('MongoRepository', () => {
       expect(record.isFirstRecord).to.be.true;
     });
 
-    it('returns the service id', () => {
+    it('returns the service ID', () => {
       expect(record.serviceId).to.equal(SERVICE_PROVIDER_ID);
     });
 
