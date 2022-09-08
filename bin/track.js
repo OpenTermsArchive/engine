@@ -25,8 +25,6 @@ config.util.setModuleDefaults('tracker', {});
 
 const servicesToValidate = process.argv.slice(2);
 
-(async () => {
-  const track = (await import(pathToFileURL(path.resolve(__dirname, '../src/index.js')))).default;
+const track = (await import(pathToFileURL(path.resolve(__dirname, '../src/index.js')))).default;
 
-  await track({ services: servicesToValidate, refilterOnly: false, schedule: false });
-})();
+await track({ services: servicesToValidate, refilterOnly: false, schedule: false });
