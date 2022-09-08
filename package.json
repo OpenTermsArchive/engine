@@ -20,7 +20,8 @@
   },
   "bin": {
     "ota-lint-declarations": "./bin/lint-declarations.js",
-    "ota-validate-declarations": "./bin/validate-declarations.js"
+    "ota-validate-declarations": "./bin/validate-declarations.js",
+    "ota-track": "./bin/track.js"
   },
   "scripts": {
     "dataset:generate": "node scripts/dataset/main.js",
