@@ -12,7 +12,7 @@ export const COMMIT_MESSAGE_PREFIX = {
   update: 'Update',
 };
 
-export const DOCUMENT_TYPE_AND_PAGE_ID_SEPARATOR = ' - ';
+export const DOCUMENT_TYPE_AND_PAGE_ID_SEPARATOR = ' #';
 export const SNAPSHOT_ID_MARKER = '%SNAPSHOT_ID';
 const SINGLE_SNAPSHOT_PREFIX = 'This version was recorded after filtering snapshot';
 const MULTIPLE_SNAPSHOT_PREFIX = 'This version was recorded after filtering and assembling the following snapshots from %NUMBER pages:';
