@@ -5,6 +5,7 @@ import { fileURLToPath } from 'url';
 
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
+import iconv from 'iconv-lite';
 
 import fetch, { launchHeadlessBrowser, stopHeadlessBrowser, FetchDocumentError } from './index.js';
 
@@ -16,6 +17,7 @@ const SERVER_PORT = 8976;
 chai.use(chaiAsPromised);
 
 const termsHTML = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>First provider TOS</title></head><body><h1>Terms of service</h1><p>Dapibus quis diam sagittis</p></body></html>';
+const termsWithOtherCharsetHTML = '<!DOCTYPE html><html><head><meta http-equiv="Content-Type" content="text/html; charset=windows-1251"><title>TOS на първия доставчик</title></head><body><h1>Условия за ползване</h1><p>Dapibus quis diam sagittis</p></body></html>';
 
 describe('Fetcher', function () {
   this.timeout(10000);
@@ -32,6 +34,9 @@ describe('Fetcher', function () {
       temporaryServer = http.createServer((request, response) => {
         if (request.url === '/') {
           response.writeHead(200, { 'Content-Type': 'text/html' }).write(termsHTML);
+        }
+        if (request.url === '/other-charset') {
+          response.writeHead(200, { 'Content-Type': 'text/html' }).write(iconv.encode(termsWithOtherCharsetHTML, 'windows-1251'));
         }
         if (request.url == '/404') {
           response.writeHead(404, { 'Content-Type': 'text/html' }).write('<!DOCTYPE html><html><body>404</body></html>');
@@ -115,6 +120,21 @@ describe('Fetcher', function () {
             it('returns the MIME type of the given URL', async () => {
               expect(mimeType).to.equal('text/html');
             });
+          });
+        });
+      });
+
+      context('when html page is in different charset', () => {
+        let content;
+        const url = `http://127.0.0.1:${SERVER_PORT}/other-charset`;
+
+        context('when expected selectors are present', () => {
+          before(async () => {
+            ({ content } = await fetch({ url, selectors: 'body' }));
+          });
+
+          it('returns the web page content of the given URL', async () => {
+            expect(content).to.equal(termsWithOtherCharsetHTML);
           });
         });
       });
