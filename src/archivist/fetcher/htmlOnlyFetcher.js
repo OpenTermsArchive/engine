@@ -1,4 +1,5 @@
 import AbortController from 'abort-controller';
+import convertBody from 'fetch-charset-detection';
 import HttpProxyAgent from 'http-proxy-agent';
 import HttpsProxyAgent from 'https-proxy-agent';
 import nodeFetch, { AbortError } from 'node-fetch';
@@ -31,13 +32,13 @@ export default async function fetch(url, configuration) {
     }
 
     const mimeType = response.headers.get('content-type');
-
+    const responseBuffer = await response.arrayBuffer();
     let content;
 
     if (mimeType.startsWith('text/')) {
-      content = await response.text();
+      content = convertBody(responseBuffer, response.headers);
     } else {
-      content = Buffer.from(await response.arrayBuffer());
+      content = Buffer.from(responseBuffer);
     }
 
     if (!content) {
