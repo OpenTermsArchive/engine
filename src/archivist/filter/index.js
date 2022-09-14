@@ -13,7 +13,7 @@ const turndownService = new TurndownService();
 
 turndownService.use(turndownPluginGithubFlavouredMarkdown.gfm);
 
-export const LINKS_TO_CONVERT_SELECTOR = 'a[href]:not([href^="#"])';
+export const LINKS_TO_CONVERT_SELECTOR = 'a[href]:not([href^="#"]):not([href=""])';
 
 const { PdfTransformer } = mardownPdf;
 const { CiceroMarkTransformer } = ciceroMark;
