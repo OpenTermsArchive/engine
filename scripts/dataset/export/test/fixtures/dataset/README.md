@@ -8,7 +8,13 @@ It has been generated with [Open Terms Archive](https://opentermsarchive.org).
 
 ### Dataset format
 
-This dataset represents each version of a document as a separate [Markdown](https://spec.commonmark.org/0.30/) file, nested in a directory with the name of the service provider and in a directory with the name of the document type. The filesystem layout will look like below.
+This dataset represents each version of a document as a separate [Markdown](https://spec.commonmark.org/0.30/) file. These files are:
+
+- named after the date and time at which they were recorded, in the [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) format, always in UTC;
+- in a directory named after the [document type](https://github.com/ambanum/OpenTermsArchive/blob/main/src/archivist/services/documentTypes.json);
+- in a directory named after the service provider.
+
+The filesystem layout will look like below.
 
 ```
 ├ README.md
