@@ -26,8 +26,7 @@ export default async function generate({ archivePath, releaseDate }) {
   const services = new Set();
   let firstVersionDate = new Date();
   let lastVersionDate = new Date(0);
-
-  let index = 1;
+  let versionsCount = 1;
 
   for await (const version of versionsRepository.iterate()) {
     const { content, fetchDate } = version;
@@ -45,24 +44,25 @@ export default async function generate({ archivePath, releaseDate }) {
 
     const versionPath = generateVersionPath({ serviceId, documentType, fetchDate });
 
-    logger.info({ message: versionPath, counter: index, hash: version.id });
+    logger.info({ message: versionPath, counter: versionsCount, hash: version.id });
 
     archive.stream.append(
       content,
       { name: `${archive.basename}/${versionPath}` },
     );
-    index++;
+    versionsCount++;
   }
 
-  archive.stream.append(
-    readme({
-      servicesCount: services.size,
-      releaseDate,
-      firstVersionDate,
-      lastVersionDate,
-    }),
-    { name: `${archive.basename}/README.md` },
-  );
+  const stats = {
+    servicesCount: services.size,
+    versionsCount,
+    releaseDate,
+    firstVersionDate,
+    lastVersionDate,
+  };
+
+  archive.stream.append(readme(stats), { name: `${archive.basename}/README.md` });
+
   archive.stream.append(
     fsApi.readFileSync(path.resolve(__dirname, '../assets/LICENSE')),
     { name: `${archive.basename}/LICENSE` },
@@ -73,11 +73,7 @@ export default async function generate({ archivePath, releaseDate }) {
   await archive.done;
   await versionsRepository.finalize();
 
-  return {
-    servicesCount: services.size,
-    firstVersionDate,
-    lastVersionDate,
-  };
+  return stats;
 }
 
 async function initializeArchive(targetPath) {

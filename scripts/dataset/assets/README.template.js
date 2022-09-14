@@ -17,13 +17,13 @@ export function title({ releaseDate }) {
   return `${title} — ${releaseDate} dataset`;
 }
 
-export function body({ servicesCount, firstVersionDate, lastVersionDate }) {
+export function body({ servicesCount, versionsCount, firstVersionDate, lastVersionDate }) {
   firstVersionDate = firstVersionDate.toLocaleDateString(LOCALE, DATE_OPTIONS);
   lastVersionDate = lastVersionDate.toLocaleDateString(LOCALE, DATE_OPTIONS);
 
   const versionsRepositoryURL = config.get('dataset.versionsRepositoryURL');
 
-  return `This dataset consolidates the contractual documents of ${servicesCount} service providers, in all their versions that were accessible online between ${firstVersionDate} and ${lastVersionDate}.
+  return `This dataset consolidates the contractual documents of ${servicesCount} service providers, in all their ${versionsCount} versions that were accessible online between ${firstVersionDate} and ${lastVersionDate}.
 
 This dataset is tailored for datascientists and other analysts. You can also explore all these versions interactively on [${versionsRepositoryURL}](${versionsRepositoryURL}).
 
