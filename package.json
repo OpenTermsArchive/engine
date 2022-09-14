@@ -59,6 +59,7 @@
     "eslint-plugin-chai-friendly": "^0.7.2",
     "eslint-plugin-import": "^2.25.3",
     "eslint-plugin-json-format": "^2.0.1",
+    "fetch-charset-detection": "^1.0.0",
     "fs-extra": "^10.0.0",
     "http-proxy-agent": "^5.0.0",
     "https": "^1.0.0",
