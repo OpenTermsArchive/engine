@@ -1,5 +1,6 @@
 import AbortController from 'abort-controller';
-import convertBody from 'fetch-charset-detection';
+// https://github.com/node-fetch/fetch-charset-detection/issues/247
+import convertBody from 'fetch-charset-detection'; // eslint-disable-line import/no-unresolved
 import HttpProxyAgent from 'http-proxy-agent';
 import HttpsProxyAgent from 'https-proxy-agent';
 import nodeFetch, { AbortError } from 'node-fetch';
