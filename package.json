@@ -16,7 +16,8 @@
   "exports": {
     "./fetch": "./src/archivist/fetcher/exports.js",
     "./filter": "./src/archivist/filter/exports.js",
-    "./document-declaration": "./src/archivist/services/documentDeclaration.js"
+    "./document-declaration": "./src/archivist/services/documentDeclaration.js",
+    "./page-declaration": "./src/archivist/services/pageDeclaration.js"
   },
   "bin": {
     "ota-lint-declarations": "./bin/lint-declarations.js",
