@@ -350,5 +350,16 @@
     "references": {
       "Open Terms Archive Discussion": "https://github.com/ambanum/OpenTermsArchive/discussions/922"
     }
+  },
+  "Platform-to-Business Notice": {
+    "commitment": {
+      "writer": "search engine or intermediation service provider",
+      "audience": "business user",
+      "object": "complaints handling, mediation, transparency and other rights and information mandated by the P2B regulation"
+    },
+    "references": {
+      "Open Terms Archive Discussion": "https://github.com/ambanum/OpenTermsArchive/discussions/940",
+      "P2B Regulation 2019/1150": "https://eur-lex.europa.eu/eli/reg/2019/1150/oj"
+    }
   }
 }
