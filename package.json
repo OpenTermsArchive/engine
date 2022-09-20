@@ -42,6 +42,7 @@
   "dependencies": {
     "@accordproject/markdown-cicero": "^0.15.2",
     "@accordproject/markdown-pdf": "^0.15.2",
+    "@opentermsarchive/fetch-charset-detection": "^1.0.1",
     "abort-controller": "^3.0.0",
     "ajv": "^6.12.6",
     "archiver": "^5.3.0",
@@ -59,7 +60,6 @@
     "eslint-plugin-chai-friendly": "^0.7.2",
     "eslint-plugin-import": "^2.25.3",
     "eslint-plugin-json-format": "^2.0.1",
-    "fetch-charset-detection": "^1.0.0",
     "fs-extra": "^10.0.0",
     "http-proxy-agent": "^5.0.0",
     "https": "^1.0.0",
