@@ -169,6 +169,12 @@ You can use the filter in your code by using `import filter from 'open-terms-arc
 
 The `filter` function documentation is available as JSDoc within [./src/archivist/filter/index.js](./src/archivist/filter/index.js).
 
+#### page-declaration
+
+PageDeclaration object is used to describe a page to be tracked by Open Terms Archive.
+
+You can use the page-declaration in your code by using `import pageDeclaration from 'open-terms-archive/page-declaration';`.
+
 ## Using locally
 
 ### Installing
