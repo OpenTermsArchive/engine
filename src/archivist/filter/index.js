@@ -2,9 +2,9 @@ import url from 'url';
 
 import ciceroMark from '@accordproject/markdown-cicero';
 import mardownPdf from '@accordproject/markdown-pdf';
+import TurndownService from '@opentermsarchive/turndown';
 import turndownPluginGithubFlavouredMarkdown from 'joplin-turndown-plugin-gfm';
 import jsdom from 'jsdom';
-import TurndownService from 'turndown';
 
 import { InaccessibleContentError } from '../errors.js';
 
