@@ -378,6 +378,9 @@
       "writer": "intermediation service provider",
       "audience": "business user",
       "object": "personal data of business users and of people acting on their behalf"
+    },
+    "references": {
+      "Open Terms Archive discussion": "https://github.com/ambanum/OpenTermsArchive/discussions/923"
     }
   }
 }
