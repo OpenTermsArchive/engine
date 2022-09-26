@@ -158,4 +158,66 @@ describe('PageDeclaration', () => {
       });
     });
   });
+
+  describe('toJSON', () => {
+    it('convert noise and content semectors to JSON', async () => {
+      const result = new PageDeclaration({
+        location: URL,
+        contentSelectors: [
+          {
+            startBefore: '#startBefore',
+            endBefore: '#endBefore',
+          },
+          'body',
+        ],
+        noiseSelectors: [
+          {
+            startBefore: '#startBefore',
+            endBefore: '#endBefore',
+          },
+          'body',
+        ],
+      }).toJSON();
+
+      const expectedResult = {
+        fetch: URL,
+        select: [
+          {
+            startBefore: '#startBefore',
+            endBefore: '#endBefore',
+          },
+          'body',
+        ],
+        remove: [
+          {
+            startBefore: '#startBefore',
+            endBefore: '#endBefore',
+          },
+          'body',
+        ],
+        filter: undefined,
+        executeClientScripts: undefined,
+      };
+
+      expect(result).to.deep.equal(expectedResult);
+    });
+
+    it('convert filter functions to JSON', async () => {
+      const result = new PageDeclaration({
+        location: URL,
+        contentSelectors: 'body',
+        filters: [function filterSomething() {}],
+      }).toJSON();
+
+      const expectedResult = {
+        fetch: URL,
+        select: 'body',
+        remove: undefined,
+        filter: ['filterSomething'],
+        executeClientScripts: undefined,
+      };
+
+      expect(result).to.deep.equal(expectedResult);
+    });
+  });
 });
