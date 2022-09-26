@@ -159,8 +159,8 @@ describe('PageDeclaration', () => {
     });
   });
 
-    it('convert noise and content semectors to JSON', async () => {
   describe('toPersistence', () => {
+    it('converts noise and content selectors to JSON representation', async () => {
       const result = new PageDeclaration({
         location: URL,
         contentSelectors: [
@@ -202,7 +202,7 @@ describe('PageDeclaration', () => {
       expect(result).to.deep.equal(expectedResult);
     });
 
-    it('convert filter functions to JSON', async () => {
+    it('converts filter functions to JSON representation', async () => {
       const result = new PageDeclaration({
         location: URL,
         contentSelectors: 'body',

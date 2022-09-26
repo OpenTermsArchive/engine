@@ -5,7 +5,7 @@ import PageDeclaration from './pageDeclaration.js';
 
 const { expect } = chai;
 
-describe('PageDeclaration', () => {
+describe('DocumentDeclaration', () => {
   const service = { name: 'Service' };
   const type = 'Terms of Service';
   const URL = 'https://www.service.example/terms';
@@ -59,8 +59,8 @@ describe('PageDeclaration', () => {
     executeClientScripts: undefined,
   };
 
-    it('convert one page document to JSON', async () => {
   describe('toPersistence', () => {
+    it('converts one page document to JSON representation', async () => {
       const result = new DocumentDeclaration({ service, type, pages: [page1] }).toPersistence();
 
       const expectedResult = {
@@ -71,7 +71,7 @@ describe('PageDeclaration', () => {
       expect(result).to.deep.equal(expectedResult);
     });
 
-    it('convert multi page document to JSON', async () => {
+    it('converts multi page document to JSON representation', async () => {
       const result = new DocumentDeclaration({ service, type, pages: [ page1, page2 ] }).toPersistence();
 
       const expectedResult = {
