@@ -39,7 +39,7 @@ export default class PageDeclaration {
     return [selector];
   }
 
-  toJSON() {
+  toPersistence() {
     return {
       fetch: this.location,
       select: this.contentSelectors,

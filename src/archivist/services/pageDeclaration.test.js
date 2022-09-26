@@ -159,8 +159,8 @@ describe('PageDeclaration', () => {
     });
   });
 
-  describe('toJSON', () => {
     it('convert noise and content semectors to JSON', async () => {
+  describe('toPersistence', () => {
       const result = new PageDeclaration({
         location: URL,
         contentSelectors: [
@@ -177,7 +177,7 @@ describe('PageDeclaration', () => {
           },
           'body',
         ],
-      }).toJSON();
+      }).toPersistence();
 
       const expectedResult = {
         fetch: URL,
@@ -207,7 +207,7 @@ describe('PageDeclaration', () => {
         location: URL,
         contentSelectors: 'body',
         filters: [function filterSomething() {}],
-      }).toJSON();
+      }).toPersistence();
 
       const expectedResult = {
         fetch: URL,

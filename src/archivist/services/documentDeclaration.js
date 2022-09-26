@@ -13,13 +13,13 @@ export default class DocumentDeclaration {
     return this.pages.length > 1;
   }
 
-  toJSON() {
+  toPersistence() {
     return {
       name: this.service.name,
       documents: {
         [this.type]: this.pages.length === 1
-          ? this.pages[0].toJSON()
-          : { combine: this.pages.map(page => page.toJSON()) },
+          ? this.pages[0].toPersistence()
+          : { combine: this.pages.map(page => page.toPersistence()) },
       },
     };
   }

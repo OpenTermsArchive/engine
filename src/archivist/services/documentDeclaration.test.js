@@ -59,9 +59,9 @@ describe('PageDeclaration', () => {
     executeClientScripts: undefined,
   };
 
-  describe('toJSON', () => {
     it('convert one page document to JSON', async () => {
-      const result = new DocumentDeclaration({ service, type, pages: [page1] }).toJSON();
+  describe('toPersistence', () => {
+      const result = new DocumentDeclaration({ service, type, pages: [page1] }).toPersistence();
 
       const expectedResult = {
         name: service.name,
@@ -72,7 +72,7 @@ describe('PageDeclaration', () => {
     });
 
     it('convert multi page document to JSON', async () => {
-      const result = new DocumentDeclaration({ service, type, pages: [ page1, page2 ] }).toJSON();
+      const result = new DocumentDeclaration({ service, type, pages: [ page1, page2 ] }).toPersistence();
 
       const expectedResult = {
         name: service.name,
