@@ -71,7 +71,7 @@ describe('DocumentDeclaration', () => {
       expect(result).to.deep.equal(expectedResult);
     });
 
-    it('converts multi page document to JSON representation', async () => {
+    it('converts multipage document to JSON representation', async () => {
       const result = new DocumentDeclaration({ service, type, pages: [ page1, page2 ] }).toPersistence();
 
       const expectedResult = {
