@@ -12,4 +12,15 @@ export default class DocumentDeclaration {
   get isMultiPage() {
     return this.pages.length > 1;
   }
+
+  toPersistence() {
+    return {
+      name: this.service.name,
+      documents: {
+        [this.type]: this.isMultiPage
+          ? { combine: this.pages.map(page => page.toPersistence()) }
+          : this.pages[0].toPersistence(),
+      },
+    };
+  }
 }

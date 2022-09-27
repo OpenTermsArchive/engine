@@ -158,4 +158,67 @@ describe('PageDeclaration', () => {
       });
     });
   });
+
+  describe('#toPersistence', () => {
+    it('converts basic page declaration into JSON representation', async () => {
+      const result = new PageDeclaration({
+        location: URL,
+        contentSelectors: 'body',
+      }).toPersistence();
+
+      const expectedResult = {
+        fetch: URL,
+        select: 'body',
+        remove: undefined,
+        filter: undefined,
+        executeClientScripts: undefined,
+      };
+
+      expect(result).to.deep.equal(expectedResult);
+    });
+
+    it('converts page declaration with all fields to JSON representation', async () => {
+      const result = new PageDeclaration({
+        location: URL,
+        contentSelectors: [
+          {
+            startBefore: '#startBefore',
+            endBefore: '#endBefore',
+          },
+          'body',
+        ],
+        noiseSelectors: [
+          {
+            startBefore: '#startBefore',
+            endBefore: '#endBefore',
+          },
+          'body',
+        ],
+        filters: [function filterSomething() {}],
+        executeClientScripts: true,
+      }).toPersistence();
+
+      const expectedResult = {
+        fetch: URL,
+        select: [
+          {
+            startBefore: '#startBefore',
+            endBefore: '#endBefore',
+          },
+          'body',
+        ],
+        remove: [
+          {
+            startBefore: '#startBefore',
+            endBefore: '#endBefore',
+          },
+          'body',
+        ],
+        filter: ['filterSomething'],
+        executeClientScripts: true,
+      };
+
+      expect(result).to.deep.equal(expectedResult);
+    });
+  });
 });

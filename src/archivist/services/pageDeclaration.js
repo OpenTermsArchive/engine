@@ -38,4 +38,14 @@ export default class PageDeclaration {
 
     return [selector];
   }
+
+  toPersistence() {
+    return {
+      fetch: this.location,
+      select: this.contentSelectors,
+      remove: this.noiseSelectors,
+      filter: this.filters ? this.filters.map(filter => filter.name) : undefined,
+      executeClientScripts: this.executeClientScripts,
+    };
+  }
 }
