@@ -160,7 +160,24 @@ describe('PageDeclaration', () => {
   });
 
   describe('toPersistence', () => {
-    it('converts noise and content selectors to JSON representation', async () => {
+    it('converts basic page declaration into JSON representation', async () => {
+      const result = new PageDeclaration({
+        location: URL,
+        contentSelectors: 'body',
+      }).toPersistence();
+
+      const expectedResult = {
+        fetch: URL,
+        select: 'body',
+        remove: undefined,
+        filter: undefined,
+        executeClientScripts: undefined,
+      };
+
+      expect(result).to.deep.equal(expectedResult);
+    });
+
+    it('converts page declaration with all fields to JSON representation', async () => {
       const result = new PageDeclaration({
         location: URL,
         contentSelectors: [
@@ -177,6 +194,8 @@ describe('PageDeclaration', () => {
           },
           'body',
         ],
+        filters: [function filterSomething() {}],
+        executeClientScripts: true,
       }).toPersistence();
 
       const expectedResult = {
@@ -195,26 +214,8 @@ describe('PageDeclaration', () => {
           },
           'body',
         ],
-        filter: undefined,
-        executeClientScripts: undefined,
-      };
-
-      expect(result).to.deep.equal(expectedResult);
-    });
-
-    it('converts filter functions to JSON representation', async () => {
-      const result = new PageDeclaration({
-        location: URL,
-        contentSelectors: 'body',
-        filters: [function filterSomething() {}],
-      }).toPersistence();
-
-      const expectedResult = {
-        fetch: URL,
-        select: 'body',
-        remove: undefined,
         filter: ['filterSomething'],
-        executeClientScripts: undefined,
+        executeClientScripts: true,
       };
 
       expect(result).to.deep.equal(expectedResult);
