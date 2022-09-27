@@ -17,9 +17,9 @@ export default class DocumentDeclaration {
     return {
       name: this.service.name,
       documents: {
-        [this.type]: this.pages.length === 1
-          ? this.pages[0].toPersistence()
-          : { combine: this.pages.map(page => page.toPersistence()) },
+        [this.type]: this.isMultiPage
+          ? { combine: this.pages.map(page => page.toPersistence()) }
+          : this.pages[0].toPersistence(),
       },
     };
   }
