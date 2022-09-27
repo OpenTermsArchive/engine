@@ -159,7 +159,7 @@ describe('PageDeclaration', () => {
     });
   });
 
-  describe('toPersistence', () => {
+  describe('#toPersistence', () => {
     it('converts basic page declaration into JSON representation', async () => {
       const result = new PageDeclaration({
         location: URL,

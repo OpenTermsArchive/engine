@@ -59,7 +59,7 @@ describe('DocumentDeclaration', () => {
     executeClientScripts: undefined,
   };
 
-  describe('toPersistence', () => {
+  describe('#toPersistence', () => {
     it('converts one page document to JSON representation', async () => {
       const result = new DocumentDeclaration({ service, type, pages: [page1] }).toPersistence();
 
