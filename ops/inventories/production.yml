@@ -10,11 +10,6 @@ france:
   hosts:
     198.244.142.9:
       ed25519_fingerprint: AAAAC3NzaC1lZDI1NTE5AAAAIKH7P9SCnnSiVOhGMNvHIjWw5+3TYlmgmTK45Y9d1aCu
-france_elections:
-  hosts:
-    198.244.140.194:
-      ed25519_fingerprint: AAAAC3NzaC1lZDI1NTE5AAAAINVdbg1Xualy2P6VB4mTMDGpUlKe9p+J8PViDAK08l7L
-      config_file_name: france-elections
 pga:
   hosts:
     134.102.58.70:
