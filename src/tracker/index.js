@@ -70,17 +70,7 @@ export default class Tracker {
   }
 
   async onInaccessibleContent(error, serviceId, type, documentDeclaration) {
-    const { location, contentSelectors, noiseSelectors } = documentDeclaration;
-
-    const { title, body } = Tracker.formatIssueTitleAndBody({
-      contentSelectors,
-      noiseSelectors,
-      url: location,
-      name: serviceId,
-      documentType: type,
-      message: error.toString(),
-      repository: this.repository,
-    });
+    const { title, body } = Tracker.formatIssueTitleAndBody({ message: error.toString(), repository: this.repository, documentDeclaration });
 
     await this.createIssueIfNotExists({
       title,
@@ -189,37 +179,20 @@ export default class Tracker {
     }
   }
 
-  static formatIssueTitleAndBody(messageOrObject) {
-    const { message, contentSelectors, noiseSelectors, url, name, documentType, repository } = messageOrObject;
-    let contentSelectorsAsArray = contentSelectors;
-    let noiseSelectorsAsArray = noiseSelectors;
-
-    if (typeof contentSelectors === 'string') {
-      contentSelectorsAsArray = contentSelectors.split(',');
-    } else if (!Array.isArray(contentSelectors)) {
-      contentSelectorsAsArray = [];
-    }
-
-    if (typeof noiseSelectors === 'string') {
-      noiseSelectorsAsArray = noiseSelectors.split(',');
-    } else if (!Array.isArray(noiseSelectors)) {
-      noiseSelectorsAsArray = [];
-    }
-
-    const contentSelectorsAsArrayEncoded = contentSelectorsAsArray.map(encodeURIComponent);
-    const noiseSelectorsAsArrayEncoded = noiseSelectorsAsArray.map(encodeURIComponent);
-
-    const contentSelectorsQueryString = contentSelectorsAsArrayEncoded.length ? `&selectedCss[]=${contentSelectorsAsArrayEncoded.join('&selectedCss[]=')}` : '';
-    const noiseSelectorsQueryString = noiseSelectorsAsArrayEncoded.length ? `&removedCss[]=${noiseSelectorsAsArrayEncoded.join('&removedCss[]=')}` : '';
+  static formatIssueTitleAndBody({ message, repository, documentDeclaration }) {
+    const { service: { name }, type } = documentDeclaration;
+    const json = documentDeclaration.toPersistence();
+    const title = `Fix ${name} - ${type}`;
 
     const encodedName = encodeURIComponent(name);
-    const encodedType = encodeURIComponent(documentType);
-    const encodedUrl = encodeURIComponent(url);
-    const encodedDestination = encodeURIComponent(repository);
+    const encodedType = encodeURIComponent(type);
 
-    const urlQueryParams = `destination=${encodedDestination}&step=2&url=${encodedUrl}&name=${encodedName}&documentType=${encodedType}${noiseSelectorsQueryString}${contentSelectorsQueryString}&expertMode=true`;
-
-    const title = `Fix ${name} - ${documentType}`;
+    const urlQueryParams = new URLSearchParams({
+      json: JSON.stringify(json),
+      destination: repository,
+      expertMode: 'true',
+      step: '2',
+    });
 
     const body = `
 This document is no longer properly tracked.
