@@ -30,6 +30,7 @@ export default async function generate({ archivePath, releaseDate }) {
   let index = 1;
 
   for await (const version of versionsRepository.iterate()) {
+    await versionsRepository.loadRecordContent(version);
     const { content, fetchDate } = version;
     const { serviceId, documentType } = renamer.applyRules(version.serviceId, version.documentType);
 
