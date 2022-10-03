@@ -57,7 +57,6 @@
     "chai": "^4.3.4",
     "chai-as-promised": "^7.1.1",
     "chai-exclude": "^2.1.0",
-    "commander": "^9.4.1",
     "config": "^3.3.6",
     "croner": "^4.3.6",
     "cross-env": "^7.0.3",
@@ -74,8 +73,9 @@
     "https": "^1.0.0",
     "https-proxy-agent": "^5.0.0",
     "iconv-lite": "^0.6.3",
+    "inquirer": "^9.1.1",
     "joplin-turndown-plugin-gfm": "^1.0.12",
-    "jsdom": "^18.1.0",
+    "jsdom": "^20.0.0",
     "json-source-map": "^0.6.1",
     "lodash": "^4.17.21",
     "mime": "^2.5.2",
@@ -93,6 +93,8 @@
     "winston-mail": "^2.0.0"
   },
   "devDependencies": {
+    "commander": "^9.4.1",
+    "colors": "^1.4.0",
     "dir-compare": "^4.0.0",
     "nock": "^13.2.1",
     "node-stream-zip": "^1.15.0",

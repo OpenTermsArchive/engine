@@ -96,6 +96,10 @@ export default class Git {
     return this.git.show(options);
   }
 
+  async diff(options) {
+    return this.git.diff(options);
+  }
+
   async cleanUp() {
     await this.git.reset('hard');
 
