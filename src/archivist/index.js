@@ -106,12 +106,12 @@ export default class Archivist extends events.EventEmitter {
     });
   }
 
-  async trackChanges(servicesIds = this.serviceIds) {
+  async trackChanges(servicesIds = this.serviceIds, documentTypes = []) {
     this.emit('trackingStarted', servicesIds.length, this.getNumberOfDocuments(servicesIds));
 
     await Promise.all([ launchHeadlessBrowser(), this.recorder.initialize() ]);
 
-    this.#forEachDocumentOf(servicesIds, documentDeclaration => this.trackDocumentChangesQueue.push(documentDeclaration));
+    this.#forEachDocumentOf(servicesIds, documentTypes, documentDeclaration => this.trackDocumentChangesQueue.push(documentDeclaration));
 
     await this.trackDocumentChangesQueue.drain();
     await Promise.all([ stopHeadlessBrowser(), this.recorder.finalize() ]);
@@ -119,12 +119,12 @@ export default class Archivist extends events.EventEmitter {
     this.emit('trackingCompleted', servicesIds.length, this.getNumberOfDocuments(servicesIds));
   }
 
-  async refilterAndRecord(servicesIds = this.serviceIds) {
+  async refilterAndRecord(servicesIds = this.serviceIds, documentTypes = []) {
     this.emit('refilteringStarted', servicesIds.length, this.getNumberOfDocuments(servicesIds));
 
     await this.recorder.initialize();
 
-    this.#forEachDocumentOf(servicesIds, documentDeclaration => this.refilterDocumentsQueue.push(documentDeclaration));
+    this.#forEachDocumentOf(servicesIds, documentTypes, documentDeclaration => this.refilterDocumentsQueue.push(documentDeclaration));
 
     await this.refilterDocumentsQueue.drain();
     await this.recorder.finalize();
@@ -261,10 +261,14 @@ export default class Archivist extends events.EventEmitter {
     return serviceIds.reduce((acc, serviceId) => acc + this.services[serviceId].getNumberOfDocuments(), 0);
   }
 
-  async #forEachDocumentOf(servicesIds = [], callback) { // eslint-disable-line default-param-last
+  async #forEachDocumentOf(servicesIds = [], documentTypes = [], callback) { // eslint-disable-line default-param-last
     servicesIds.sort((a, b) => a.localeCompare(b)); // Sort service IDs by lowercase name to have more intuitive logs
     servicesIds.forEach(serviceId => {
       this.services[serviceId].getDocumentTypes().forEach(documentType => {
+        if (documentTypes.length && !documentTypes.includes(documentType)) {
+          return;
+        }
+
         callback(this.services[serviceId].getDocumentDeclaration(documentType));
       });
     });
