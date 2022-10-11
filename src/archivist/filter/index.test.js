@@ -61,6 +61,7 @@ const rawHTMLWithCommonChangingItems = `
     <p><a id="link1" href="/relative/link">link 1</a></p>
     <p><a id="link2" href="#anchor">link 2</a></p>
     <p><a id="link3" href="http://absolute.url/link">link 3</a></p>
+    <p><a id="link4" href="">link 4</a></p>
     <a href="/cdn-cgi/l/email-protection#3b4c52555f484f495e5a56154b49524d5a584215484f5a4f5e565e554f7b4c52555f484f495e5a5615585456">[email&#160;protected]</a>
   </body>
 </html>`;
@@ -74,6 +75,8 @@ const expectedFilteredWithCommonChangingItems = `Title
 [link 2](#anchor)
 
 [link 3](http://absolute.url/link)
+
+link 4
 
 [\\[email protected\\]](https://exemple.com/cdn-cgi/l/email-protection#removed)`;
 /* eslint-enable no-irregular-whitespace */
