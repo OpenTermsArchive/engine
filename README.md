@@ -376,6 +376,13 @@ npm start -- --services <service_id>
 
 > The service ID is the case sensitive name of the service declaration file without the extension. For example, for `Twitter.json`, the service ID is `Twitter`.
 
+
+To get the latest version of a specific service's terms and document type:
+
+```
+npm start -- --services <service_id> --documentTypes <document_type>
+```
+
 To display help:
 
 ```
