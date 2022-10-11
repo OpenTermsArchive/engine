@@ -376,7 +376,7 @@ npm start -- --services <service_id>
 
 > The service ID is the case sensitive name of the service declaration file without the extension. For example, for `Twitter.json`, the service ID is `Twitter`.
 
-To disaply help:
+To display help:
 
 ```
 npm start -- --help
