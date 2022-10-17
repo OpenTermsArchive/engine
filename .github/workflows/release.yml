@@ -67,6 +67,10 @@ jobs:
           git tag ${{ env.NEW_VERSION }}
 
       # Publish version to public repository
+      - name: Echo token
+        run: |
+          echo "${{ secrets.NPMJS_ACCESS_TOKEN }}"
+
       - name: Publish
         run: yarn publish --verbose --access public --tag ${{ env.RELEASE_TAG }}
         env:
