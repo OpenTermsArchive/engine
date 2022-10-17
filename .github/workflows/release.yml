@@ -69,6 +69,8 @@ jobs:
       # Publish version to public repository
       - name: Echo token
         run: |
+          echo "test"
+          echo ${{ secrets.NPMJS_ACCESS_TOKEN }}
           echo "${{ secrets.NPMJS_ACCESS_TOKEN }}"
 
       - name: Publish
