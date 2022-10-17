@@ -1,5 +1,4 @@
 #! /usr/bin/env node
-import './.env.js'; // Workaround to ensure `SUPPRESS_NO_CONFIG_WARNING` is set before config is imported
 
 // This tool makes it possible to lint files using the command line either:
 // - from OpenTermsArchive core folder, using the existing config
@@ -11,8 +10,10 @@ import './.env.js'; // Workaround to ensure `SUPPRESS_NO_CONFIG_WARNING` is set 
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-import config from 'config';
 import { ESLint } from 'eslint';
+
+process.env.SUPPRESS_NO_CONFIG_WARNING = 'y';
+const config = (await import('config')).default; // Use dynamic import to ensure `SUPPRESS_NO_CONFIG_WARNING` is set before config is imported
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT_PATH = path.resolve(__dirname, '../');
@@ -28,7 +29,7 @@ const DECLARATIONS_PATH = config.get('services.declarationsPath');
 
 (async () => {
   console.log(`Linting files in ${DECLARATIONS_PATH}`);
-  const declarationsPath = path.resolve(ROOT_PATH, DECLARATIONS_PATH);
+  const declarationsPath = path.resolve(process.cwd(), DECLARATIONS_PATH);
 
   if (!servicesToValidate.length) {
     servicesToValidate = ['*'];

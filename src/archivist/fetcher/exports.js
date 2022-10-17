@@ -1,12 +1,11 @@
-import '../../../bin/.env.js'; // Workaround to ensure `SUPPRESS_NO_CONFIG_WARNING` is set before config is imported
-
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-import config from 'config';
-
 import fetcher from './index.js';
+
+process.env.SUPPRESS_NO_CONFIG_WARNING = 'y';
+const config = (await import('config')).default; // Use dynamic import to ensure `SUPPRESS_NO_CONFIG_WARNING` is set before config is imported
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const defaultConfigs = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../../../config/default.json')));

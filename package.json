@@ -19,6 +19,7 @@
     "./page-declaration": "./src/archivist/services/pageDeclaration.js"
   },
   "bin": {
+    "ota-deploy": "./bin/deploy.js",
     "ota-lint-declarations": "./bin/lint-declarations.js",
     "ota-track": "./bin/track.js",
     "ota-validate-declarations": "./bin/validate-declarations.js"

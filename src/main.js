@@ -1,8 +1,14 @@
 import fs from 'fs';
+import path from 'path';
+import { fileURLToPath, pathToFileURL } from 'url';
 
 import { program } from 'commander';
+import dotenv from 'dotenv';
 
-import track from './index.js';
+dotenv.config();
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const track = (await import(pathToFileURL(path.resolve(__dirname, './index.js')))).default; // Dynamic import to ensure `dotenv` loads the `.env` file before
 
 const { name, description, version } = JSON.parse(fs.readFileSync(new URL('../package.json', import.meta.url)).toString());
 
@@ -15,4 +21,4 @@ program
   .option('-r, --refilter-only', 'only refilter exisiting snapshots with last declarations and engine\'s updates')
   .option('--schedule', 'schedule automatic document tracking');
 
-track(program.parse(process.argv).opts());
+track(program.parse().opts());

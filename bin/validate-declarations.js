@@ -1,12 +1,13 @@
 #! /usr/bin/env node
-import './.env.js'; // Workaround to ensure `SUPPRESS_NO_CONFIG_WARNING` is set before config is imported
 
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-import config from 'config';
 import Mocha from 'mocha';
+
+process.env.SUPPRESS_NO_CONFIG_WARNING = 'y';
+const config = (await import('config')).default; // Use dynamic import to ensure `SUPPRESS_NO_CONFIG_WARNING` is set before config is imported
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 

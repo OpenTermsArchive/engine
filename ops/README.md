@@ -178,19 +178,19 @@ ansible-playbook --inventory ops/inventories/production.yml ops/app.yml --limit 
 - Update the Open Terms Archive application only on the `dating` instance, without applying changes to the infrastructure:
 
 ```
-ansible-playbook --inventory ops/inventories/production.yml ops/app.yml --limit dating --tag update
+ansible-playbook --inventory ops/inventories/production.yml ops/app.yml --limit dating --tags update
 ```
 
 - Update services declarations only on the `france` instance:
 
 ```
-ansible-playbook --inventory ops/inventories/production.yml ops/app.yml --limit france --tag update-declarations
+ansible-playbook --inventory ops/inventories/production.yml ops/app.yml --limit france --tags update-declarations
 ```
 
 - Stop the Open Terms Archive application only on the `france` instance:
 
 ```
-ansible-playbook --inventory ops/inventories/production.yml ops/app.yml --limit france --tag stop
+ansible-playbook --inventory ops/inventories/production.yml ops/app.yml --limit france --tags stop
 ```
 
 - Update the infrastructure and the Open Terms Archive application on all servers:
