@@ -66,13 +66,9 @@ jobs:
           git commit -m "Release ${{ env.NEW_VERSION }}"
           git tag ${{ env.NEW_VERSION }}
 
+      - run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPMJS_ACCESS_TOKEN }}" > ~/.npmrc
+      
       # Publish version to public repository
-      - name: Echo token
-        run: |
-          echo "test"
-          echo ${{ secrets.NPMJS_ACCESS_TOKEN }}
-          echo "${{ secrets.NPMJS_ACCESS_TOKEN }}"
-
       - name: Publish
         run: yarn publish --verbose --access public --tag ${{ env.RELEASE_TAG }}
         env:
