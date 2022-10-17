@@ -1,7 +1,7 @@
 {
   "name": "open-terms-archive",
   "version": "0.15.0",
-  "description": "Tracks and makes visible all changes to the Terms Of Service of online service providers.",
+  "description": "Tracks and makes visible changes to the Terms of Service of online service",
   "homepage": "https://github.com/ambanum/OpenTermsArchive#readme",
   "bugs": {
     "url": "https://github.com/ambanum/OpenTermsArchive/issues"
