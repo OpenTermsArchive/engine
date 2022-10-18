@@ -1,8 +1,18 @@
+import fs from 'fs';
+
+import { program } from 'commander';
+
 import track from './index.js';
 
-const args = process.argv.slice(2);
-const refilterOnly = args.includes('--refilter-only');
-const schedule = args.includes('--schedule');
-const extraArgs = args.filter(arg => !arg.startsWith('--'));
+const { name, description, version } = JSON.parse(fs.readFileSync(new URL('../package.json', import.meta.url)).toString());
 
-track({ services: extraArgs, schedule, refilterOnly });
+program
+  .name(name)
+  .description(description)
+  .version(version)
+  .option('-s, --services [serviceId...]', 'service IDs of services to handle')
+  .option('-d, --documentTypes [documentType...]', 'document types to handle')
+  .option('-r, --refilter-only', 'only refilter exisiting snapshots with last declarations and engine\'s updates')
+  .option('--schedule', 'schedule automatic document tracking');
+
+track(program.parse(process.argv).opts());

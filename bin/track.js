@@ -23,8 +23,4 @@ config.util.setModuleDefaults('logger', defaultConfigs.logger);
 // we do not want any tracker when launching through this command line
 config.util.setModuleDefaults('tracker', {});
 
-const servicesToValidate = process.argv.slice(2);
-
-const track = (await import(pathToFileURL(path.resolve(__dirname, '../src/index.js')))).default;
-
-await track({ services: servicesToValidate, refilterOnly: false, schedule: false });
+import(pathToFileURL(path.resolve(__dirname, '../src/main.js')));
