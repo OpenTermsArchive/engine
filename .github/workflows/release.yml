@@ -16,22 +16,14 @@ on:
         - prerelease
         
 jobs:
+  test:
+    uses: "ambanum/OpenTermsArchive/.github/workflows/test.yml@main"
   release:
+    needs: [ test ]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v2
-        with:
-          node-version: 16
-      
-      # - name: Install dependencies
-      #   run: npm ci
-
-      # - name: Run tests
-      #   run: npm test
 
       - name: Git configuration
         run: |
