@@ -31,7 +31,6 @@ jobs:
           git config --global user.email "github-action@users.noreply.github.com"
 
       - name: Bump package version
-        # Use tag latest
         if: startsWith(github.event.inputs.release-type, 'pre') != true
         run: |
           echo "NEW_VERSION=$(npm --no-git-tag-version version $RELEASE_TYPE)" >> $GITHUB_ENV
@@ -40,7 +39,7 @@ jobs:
           RELEASE_TYPE: ${{ github.event.inputs.release-type }}
 
       - name: Bump package pre-release version
-        # Use tag beta for pre-release versions
+        # Use tag "beta" for pre-release versions
         if: startsWith(github.event.inputs.release-type, 'pre')
         run: |
           echo "NEW_VERSION=$(npm --no-git-tag-version --preid=beta version $RELEASE_TYPE)" >> $GITHUB_ENV
@@ -63,7 +62,8 @@ jobs:
           git commit -m "Release ${{ env.NEW_VERSION }}"
           git tag ${{ env.NEW_VERSION }}
 
-      - run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPMJS_ACCESS_TOKEN }}" > ~/.npmrc
+      - name: Add authentication token for NPM
+        run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPMJS_ACCESS_TOKEN }}" > ~/.npmrc
       
       - name: Publish version to public repository
         run: npm publish --verbose --access public --tag ${{ env.RELEASE_TAG }}
@@ -71,14 +71,13 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPMJS_ACCESS_TOKEN }}
 
       - name: Push changes to repository
+        run: git push origin && git push --tags
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          git push origin && git push --tags
 
-      - id: get-changelog
-        name: Read version changelog
+      - name: Read version changelog
         uses: superfaceai/release-changelog-action@v1
+        id: get-changelog
         with:
           path-to-changelog: CHANGELOG.md
           version: ${{ env.NEW_VERSION }}
