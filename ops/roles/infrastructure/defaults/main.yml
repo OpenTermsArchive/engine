@@ -1,2 +1,0 @@
-instance_name: '{{ group_names[0] }}'
-config_file_name: '{{ instance_name }}'
