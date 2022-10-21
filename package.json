@@ -19,7 +19,6 @@
     "./page-declaration": "./src/archivist/services/pageDeclaration.js"
   },
   "bin": {
-    "ota-deploy": "./bin/deploy.js",
     "ota-lint-declarations": "./bin/lint-declarations.js",
     "ota-track": "./bin/track.js",
     "ota-validate-declarations": "./bin/validate-declarations.js"
@@ -35,7 +34,9 @@
     "lint:fix": "npm run lint -- --fix",
     "refilter": "npm start -- --refilter-only",
     "start": "node --max-http-header-size=32768 src/main.js",
+    "start:production": "NODE_ENV=production pm2 startOrRestart pm2.config.cjs",
     "start:scheduler": "npm start -- --schedule",
+    "stop:production": "NODE_ENV=production pm2 stop pm2.config.cjs",
     "test": "cross-env NODE_ENV=test mocha --recursive \"./src/**/*.test.js\" \"./scripts/**/*.test.js\" --exit",
     "posttest": "npm run lint",
     "test:debug": "npm run test -- --inspect-brk --exit"
@@ -78,6 +79,7 @@
     "node-fetch": "^3.1.0",
     "octokit": "^1.7.0",
     "pdfjs-dist": "^2.9.359",
+    "pm2": "^5.2.2",
     "puppeteer": "14.3.0",
     "puppeteer-extra": "^3.2.3",
     "puppeteer-extra-plugin-stealth": "^2.9.0",
