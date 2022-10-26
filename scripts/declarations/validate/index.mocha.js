@@ -8,9 +8,9 @@ import config from 'config';
 import { ESLint } from 'eslint';
 import jsonSourceMap from 'json-source-map';
 
-import fetch, { launchHeadlessBrowser, stopHeadlessBrowser } from '../../src/archivist/fetcher/index.js';
-import filter from '../../src/archivist/filter/index.js';
-import * as services from '../../src/archivist/services/index.js';
+import fetch, { launchHeadlessBrowser, stopHeadlessBrowser } from '../../../src/archivist/fetcher/index.js';
+import filter from '../../../src/archivist/filter/index.js';
+import * as services from '../../../src/archivist/services/index.js';
 
 import serviceHistorySchema from './service.history.schema.js';
 import serviceSchema from './service.schema.js';

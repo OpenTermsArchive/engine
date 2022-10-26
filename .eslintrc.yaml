@@ -98,7 +98,7 @@ rules:
 overrides:
   - files:
       - src/**/*test.js
-      - scripts/validate/*.js
+      - scripts/declarations/validate/*.js
     rules:
       func-names: 0
   - files:
