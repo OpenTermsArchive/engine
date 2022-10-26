@@ -4,15 +4,21 @@ import { fileURLToPath } from 'url';
 import config from 'config';
 import { ESLint } from 'eslint';
 
+import { getModifiedServices } from '../utils/index.js';
+
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const declarationsPath = config.get('services.declarationsPath');
 const instancePath = path.resolve(declarationsPath, '../');
 const ESLINT_CONFIG_PATH = path.join(__dirname, '../../../.eslintrc.yaml');
 
-const lintDeclarations = async ({ services }) => {
+const lintDeclarations = async ({ services, modified }) => {
   console.log(`Linting declaration files in ${instancePath}`);
-  const servicesToValidate = services || ['*'];
+  let servicesToValidate = services || ['*'];
+
+  if (modified) {
+    servicesToValidate = await getModifiedServices(instancePath);
+  }
 
   for (const service of servicesToValidate) {
     /* eslint-disable no-await-in-loop */

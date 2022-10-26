@@ -25,6 +25,7 @@ Using this tool also makes it easy to lint all files relative to one service ID,
 more difficult to achieve using an eslint based command directly defined in the package.json.
 It also ensures that the same version of eslint is used in the OpenTermsArchive core and declarations repositories.`)
   .version(version)
-  .option('-s, --services [serviceId...]', 'service IDs of services to handle');
+  .option('-s, --services [serviceId...]', 'service IDs of services to handle')
+  .option('-m, --modified', 'to only lint modified services already commited to git');
 
 lintDeclarations(program.parse(process.argv).opts());
