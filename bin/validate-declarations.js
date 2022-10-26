@@ -27,7 +27,7 @@ const mocha = new Mocha({
   delay: true, // as the validation script performs an asynchronous load before running the tests, the execution of the tests are delayed until run() is called
   failZero: true, // consider that being called with no service to validate is a failure
 });
-const VALIDATE_PATH = path.resolve(__dirname, '../scripts/validate/validate.js');
+const VALIDATE_PATH = path.resolve(__dirname, '../scripts/validate/index.mocha.js');
 
 (async () => {
   mocha.addFile(VALIDATE_PATH); // As `delay` has been called, this statement will not load the file directly, `loadFilesAsync` is required.
