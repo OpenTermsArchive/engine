@@ -16,13 +16,10 @@ config.util.setModuleDefaults('services', { declarationsPath: path.resolve(proce
 const { version } = JSON.parse(fs.readFileSync(new URL('../package.json', import.meta.url)).toString());
 
 program
-  .name('Lint declaration files')
-  .description(`lint files using the command line either:
-- from OpenTermsArchive core folder, using the existing config
-- from any declaration repository, using a package.json script
-
-Using this tool also makes it easy to lint all files relative to one service ID, which would have been
+  .name('lint declaration files')
+  .description(`makes it easy to lint all files relative to one service ID, which would have been
 more difficult to achieve using an eslint based command directly defined in the package.json.
+
 It also ensures that the same version of eslint is used in the OpenTermsArchive core and declarations repositories.`)
   .version(version)
   .option('-s, --services [serviceId...]', 'service IDs of services to handle')
