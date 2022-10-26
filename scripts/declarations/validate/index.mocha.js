@@ -18,7 +18,7 @@ import serviceSchema from './service.schema.js';
 const fs = fsApi.promises;
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const ROOT_PATH = path.resolve(__dirname, '../../');
+const ROOT_PATH = path.resolve(__dirname, '../../../');
 const ESLINT_CONFIG_PATH = path.join(ROOT_PATH, '.eslintrc.yaml');
 
 const MIN_DOC_LENGTH = 100;
