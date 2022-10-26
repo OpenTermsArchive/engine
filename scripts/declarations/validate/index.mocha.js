@@ -24,27 +24,14 @@ const ESLINT_CONFIG_PATH = path.join(ROOT_PATH, '.eslintrc.yaml');
 const MIN_DOC_LENGTH = 100;
 const SLOW_DOCUMENT_THRESHOLD = 10 * 1000; // number of milliseconds after which a document fetch is considered slow
 
-const args = process.argv.slice(2); // Keep only args that are after the script filename
-
-let schemaOnly = false;
-
 const eslint = new ESLint({ overrideConfigFile: ESLINT_CONFIG_PATH, fix: false });
 const eslintWithFix = new ESLint({ overrideConfigFile: ESLINT_CONFIG_PATH, fix: true });
 
-if (args.includes('--schema-only')) {
-  schemaOnly = true;
-  args.splice(args.indexOf('--schema-only'), 1);
-}
+const declarationsPath = path.resolve(ROOT_PATH, config.get('services.declarationsPath'));
 
-let servicesToValidate = args;
-
-(async () => {
-  const declarationsPath = path.resolve(ROOT_PATH, config.get('services.declarationsPath'));
-
-  // If services to validate are passed as a string with services id separated by a newline character
-  if (servicesToValidate.length == 1 && servicesToValidate[0].includes('\n')) {
-    servicesToValidate = servicesToValidate[0].split('\n').filter(value => value);
-  }
+export default async options => {
+  const schemaOnly = options.schemaOnly || false;
+  let servicesToValidate = options.services || [];
 
   const serviceDeclarations = await services.loadWithHistory(servicesToValidate);
 
@@ -109,95 +96,96 @@ let servicesToValidate = args;
         }
 
         if (!schemaOnly) {
-          service.getDocumentTypes().forEach(type => {
-            describe(type, () => {
-              const documentDeclaration = service.getDocumentDeclaration(type);
+          service.getDocumentTypes()
+            .forEach(type => {
+              describe(type, () => {
+                const documentDeclaration = service.getDocumentDeclaration(type);
 
-              documentDeclaration.pages.forEach(page => {
-                let content;
-                let filteredContent;
-                let mimeType;
+                documentDeclaration.pages.forEach(page => {
+                  let content;
+                  let filteredContent;
+                  let mimeType;
 
-                context(page.location, () => {
-                  before(async function () {
-                    if (!documentDeclaration) {
-                      console.log('      (Tests skipped as declaration has been archived)');
-                      this.skip();
-                    }
-                  });
-
-                  it('fetchable URL', async () => {
-                    const { location, executeClientScripts } = page;
-                    const document = await fetch({
-                      url: location,
-                      executeClientScripts,
-                      cssSelectors: page.cssSelectors,
-                      config: config.get('fetcher'),
+                  context(page.location, () => {
+                    before(async function () {
+                      if (!documentDeclaration) {
+                        console.log('      (Tests skipped as declaration has been archived)');
+                        this.skip();
+                      }
                     });
 
-                    content = document.content;
-                    mimeType = document.mimeType;
-                  });
+                    it('fetchable URL', async () => {
+                      const { location, executeClientScripts } = page;
+                      const document = await fetch({
+                        url: location,
+                        executeClientScripts,
+                        cssSelectors: page.cssSelectors,
+                        config: config.get('fetcher'),
+                      });
 
-                  it('selector matches an element in the web page', async function checkSelector() {
-                    if (!content) {
-                      console.log('          [Tests skipped as URL is not fetchable]');
-                      this.skip();
-                    }
-
-                    filteredContent = await filter({ content, pageDeclaration: page, mimeType });
-
-                    expect(filteredContent).to.not.be.empty;
-                  });
-
-                  it(`filtered content has at least ${MIN_DOC_LENGTH} characters`, async function checkContentLength() {
-                    if (!content) {
-                      console.log('          [Tests skipped as URL is not fetchable]');
-                      this.skip();
-                    }
-
-                    if (!filteredContent) {
-                      console.log('          [Tests skipped as content cannot be filtered]');
-                      this.skip();
-                    }
-
-                    expect(filteredContent.length).to.be.greaterThan(MIN_DOC_LENGTH);
-                  });
-
-                  it('content is consistent when fetched and filtered twice in a row', async function checkContentConsistency() {
-                    this.slow(SLOW_DOCUMENT_THRESHOLD * 2);
-
-                    if (!content) {
-                      console.log('          [Tests skipped as URL is not fetchable]');
-                      this.skip();
-                    }
-
-                    if (!filteredContent) {
-                      console.log('          [Tests skipped as content cannot be filtered]');
-                      this.skip();
-                    }
-
-                    const document = await fetch({
-                      url: page.location,
-                      executeClientScripts: page.executeClientScripts,
-                      cssSelectors: page.cssSelectors,
-                      config: config.get('fetcher'),
+                      content = document.content;
+                      mimeType = document.mimeType;
                     });
-                    const secondFilteredContent = await filter({ content: document.content, pageDeclaration: page, mimeType: document.mimeType });
 
-                    expect(secondFilteredContent).to.equal(filteredContent);
+                    it('selector matches an element in the web page', async function checkSelector() {
+                      if (!content) {
+                        console.log('          [Tests skipped as URL is not fetchable]');
+                        this.skip();
+                      }
+
+                      filteredContent = await filter({ content, pageDeclaration: page, mimeType });
+
+                      expect(filteredContent).to.not.be.empty;
+                    });
+
+                    it(`filtered content has at least ${MIN_DOC_LENGTH} characters`, async function checkContentLength() {
+                      if (!content) {
+                        console.log('          [Tests skipped as URL is not fetchable]');
+                        this.skip();
+                      }
+
+                      if (!filteredContent) {
+                        console.log('          [Tests skipped as content cannot be filtered]');
+                        this.skip();
+                      }
+
+                      expect(filteredContent.length).to.be.greaterThan(MIN_DOC_LENGTH);
+                    });
+
+                    it('content is consistent when fetched and filtered twice in a row', async function checkContentConsistency() {
+                      this.slow(SLOW_DOCUMENT_THRESHOLD * 2);
+
+                      if (!content) {
+                        console.log('          [Tests skipped as URL is not fetchable]');
+                        this.skip();
+                      }
+
+                      if (!filteredContent) {
+                        console.log('          [Tests skipped as content cannot be filtered]');
+                        this.skip();
+                      }
+
+                      const document = await fetch({
+                        url: page.location,
+                        executeClientScripts: page.executeClientScripts,
+                        cssSelectors: page.cssSelectors,
+                        config: config.get('fetcher'),
+                      });
+                      const secondFilteredContent = await filter({ content: document.content, pageDeclaration: page, mimeType: document.mimeType });
+
+                      expect(secondFilteredContent).to.equal(filteredContent);
+                    });
                   });
                 });
               });
             });
-          });
         }
       });
     });
   });
 
   run();
-})();
+};
 
 const validator = new Ajv({
   allErrors: true,
