@@ -36,6 +36,7 @@ program
   .version(version)
   .option('-s, --services [serviceId...]', 'service IDs of services to handle')
   .option('-d, --documentTypes [documentType...]', 'document types to handle')
+  .option('-m, --modified', 'to only lint modified services already commited to git')
   .option('-so, --schema-only', 'only refilter exisiting snapshots with last declarations and engine\'s updates');
 
 const mocha = new Mocha({

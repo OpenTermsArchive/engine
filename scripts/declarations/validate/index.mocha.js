@@ -11,6 +11,7 @@ import jsonSourceMap from 'json-source-map';
 import fetch, { launchHeadlessBrowser, stopHeadlessBrowser } from '../../../src/archivist/fetcher/index.js';
 import filter from '../../../src/archivist/filter/index.js';
 import * as services from '../../../src/archivist/services/index.js';
+import { getModifiedServiceDocumentTypes } from '../utils/index.js';
 
 import serviceHistorySchema from './service.history.schema.js';
 import serviceSchema from './service.schema.js';
@@ -28,16 +29,22 @@ const eslint = new ESLint({ overrideConfigFile: ESLINT_CONFIG_PATH, fix: false }
 const eslintWithFix = new ESLint({ overrideConfigFile: ESLINT_CONFIG_PATH, fix: true });
 
 const declarationsPath = path.resolve(ROOT_PATH, config.get('services.declarationsPath'));
+const instancePath = path.resolve(declarationsPath, '../');
 
 export default async options => {
   const schemaOnly = options.schemaOnly || false;
   let servicesToValidate = options.services || [];
   const documentTypes = options.documentTypes || [];
+  let servicesDocumentTypes = {};
 
   const serviceDeclarations = await services.loadWithHistory(servicesToValidate);
 
   if (!servicesToValidate.length) {
     servicesToValidate = Object.keys(serviceDeclarations);
+  }
+
+  if (options.modified) {
+    ({ services: servicesToValidate, servicesDocumentTypes } = await getModifiedServiceDocumentTypes(instancePath));
   }
 
   describe('Service declarations validation', async function () {
@@ -99,6 +106,10 @@ export default async options => {
         if (!schemaOnly) {
           service.getDocumentTypes()
             .filter(documentType => {
+              if (servicesDocumentTypes[serviceId] && servicesDocumentTypes[serviceId].length > 0) {
+                return servicesDocumentTypes[serviceId].includes(documentType);
+              }
+
               if (documentTypes.length > 0) {
                 return documentTypes.includes(documentType);
               }
