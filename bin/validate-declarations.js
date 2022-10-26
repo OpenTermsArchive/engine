@@ -35,6 +35,7 @@ program
   .description('check if document declarations are valid and linted properly')
   .version(version)
   .option('-s, --services [serviceId...]', 'service IDs of services to handle')
+  .option('-d, --documentTypes [documentType...]', 'document types to handle')
   .option('-so, --schema-only', 'only refilter exisiting snapshots with last declarations and engine\'s updates');
 
 const mocha = new Mocha({

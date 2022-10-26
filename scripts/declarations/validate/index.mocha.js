@@ -32,6 +32,7 @@ const declarationsPath = path.resolve(ROOT_PATH, config.get('services.declaratio
 export default async options => {
   const schemaOnly = options.schemaOnly || false;
   let servicesToValidate = options.services || [];
+  const documentTypes = options.documentTypes || [];
 
   const serviceDeclarations = await services.loadWithHistory(servicesToValidate);
 
@@ -97,6 +98,13 @@ export default async options => {
 
         if (!schemaOnly) {
           service.getDocumentTypes()
+            .filter(documentType => {
+              if (documentTypes.length > 0) {
+                return documentTypes.includes(documentType);
+              }
+
+              return true;
+            })
             .forEach(type => {
               describe(type, () => {
                 const documentDeclaration = service.getDocumentDeclaration(type);
