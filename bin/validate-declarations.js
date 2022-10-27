@@ -10,10 +10,16 @@ import config from 'config';
 import Mocha from 'mocha';
 
 import addValidationTestSuite from '../scripts/declarations/validate/index.mocha.js';
+const { version } = JSON.parse(fs.readFileSync(new URL('../package.json', import.meta.url)).toString());
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const defaultConfigs = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../config/default.json')));
+
+// Initialise configs to allow clients of this module to use it without requiring node-config in their own application.
+// see https://github.com/lorenwest/node-config/wiki/Sub-Module-Configuration
+config.util.setModuleDefaults('services', { declarationsPath: path.resolve(process.cwd(), './declarations') });
+config.util.setModuleDefaults('fetcher', defaultConfigs.fetcher);
 
 const VALIDATE_PATH = path.resolve(__dirname, '../scripts/declarations/validate/index.mocha.js');
 
@@ -22,13 +28,6 @@ process.on('unhandledRejection', reason => {
   // Re-throw them so that the validation command fails in these cases (for example, if there is a syntax error when parsing JSON declaration files)
   throw reason;
 });
-
-// Initialise configs to allow clients of this module to use it without requiring node-config in their own application.
-// see https://github.com/lorenwest/node-config/wiki/Sub-Module-Configuration
-config.util.setModuleDefaults('services', { declarationsPath: path.resolve(process.cwd(), './declarations') });
-config.util.setModuleDefaults('fetcher', defaultConfigs.fetcher);
-
-const { version } = JSON.parse(fs.readFileSync(new URL('../package.json', import.meta.url)).toString());
 
 program
   .name('validate declaration files')
