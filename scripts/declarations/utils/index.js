@@ -52,6 +52,11 @@ export const getModifiedServiceDocumentTypes = async instancePath => {
 
     const diff = DeepDiff.diff(defaultFile, modifiedFile);
 
+    if (!diff) {
+      // This can happen if only a lint has been applied to a document
+      return;
+    }
+
     const modifiedDocumentTypes = diff.reduce((acc, { path }) => {
       if (modifiedFilePath.includes('.history')) {
         acc.add(path[0]);
