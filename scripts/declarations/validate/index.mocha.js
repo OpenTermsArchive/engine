@@ -56,15 +56,18 @@ export default async options => {
       const filePath = path.join(declarationsPath, `${serviceId}.json`);
       const historyFilePath = path.join(declarationsPath, `${serviceId}.history.json`);
 
-      if (!service) {
-        throw new Error(`Could not find any service with id "${serviceId}"`);
-      }
-
       before(launchHeadlessBrowser);
 
       after(stopHeadlessBrowser);
 
-      describe(serviceId, async () => {
+      context(serviceId, async () => {
+        before(async function () {
+          if (!service) {
+            console.log('      (Tests skipped as declaration has been archived)');
+            this.skip();
+          }
+        });
+
         it('valid declaration schema', async () => {
           const declaration = JSON.parse(await fs.readFile(filePath));
 
@@ -75,7 +78,7 @@ export default async options => {
           await lintFile(filePath);
         });
 
-        if (service.hasHistory()) {
+        if (service && service.hasHistory()) {
           it('valid history declaration schema', async () => {
             const declarationHistory = JSON.parse(await fs.readFile(historyFilePath));
 
@@ -103,7 +106,7 @@ export default async options => {
           });
         }
 
-        if (!schemaOnly) {
+        if (!schemaOnly && service) {
           service.getDocumentTypes()
             .filter(documentType => {
               if (servicesDocumentTypes[serviceId] && servicesDocumentTypes[serviceId].length > 0) {
