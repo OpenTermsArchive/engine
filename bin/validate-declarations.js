@@ -9,7 +9,6 @@ import { program } from 'commander';
 import config from 'config';
 import Mocha from 'mocha';
 
-import addValidationTestSuite from '../scripts/declarations/validate/index.mocha.js';
 const { version } = JSON.parse(fs.readFileSync(new URL('../package.json', import.meta.url)).toString());
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -52,6 +51,8 @@ const mocha = new Mocha({
     });
 
   let hasFailedTests = false;
+
+  const addValidationTestSuite = (await import('../scripts/declarations/validate/index.mocha.js')).default;
 
   addValidationTestSuite(program.parse(process.argv).opts());
 
