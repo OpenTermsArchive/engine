@@ -20,7 +20,7 @@ export default class DeclarationUtils {
   }
 
   async getModifiedData() {
-    const modifiedFilePathsAsString = (await this.git.diff([ '--name-only', 'HEAD', this.defaultBranch, '--', './declarations' ])).trim();
+    const modifiedFilePathsAsString = (await this.git.diff([ '--name-only', this.defaultBranch, 'HEAD', '--', './declarations' ])).trim();
 
     const modifiedFilePaths = modifiedFilePathsAsString ? modifiedFilePathsAsString.split('\n') : [];
 
