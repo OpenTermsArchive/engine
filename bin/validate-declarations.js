@@ -52,9 +52,9 @@ const mocha = new Mocha({
 
   let hasFailedTests = false;
 
-  const addValidationTestSuite = (await import('../scripts/declarations/validate/index.mocha.js')).default;
+  const generateValidationTestSuite = (await import('../scripts/declarations/validate/index.mocha.js')).default;
 
-  addValidationTestSuite(program.parse().opts());
+  generateValidationTestSuite(program.parse().opts());
 
   mocha.run()
     .on('fail', () => { hasFailedTests = true; })
