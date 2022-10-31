@@ -11,7 +11,7 @@ import jsonSourceMap from 'json-source-map';
 import fetch, { launchHeadlessBrowser, stopHeadlessBrowser } from '../../../src/archivist/fetcher/index.js';
 import filter from '../../../src/archivist/filter/index.js';
 import * as services from '../../../src/archivist/services/index.js';
-import { getModifiedServiceDocumentTypes } from '../utils/index.js';
+import DeclarationUtils from '../utils/index.js';
 
 import serviceHistorySchema from './service.history.schema.js';
 import serviceSchema from './service.schema.js';
@@ -44,7 +44,9 @@ export default async options => {
   }
 
   if (options.modified) {
-    ({ services: servicesToValidate, servicesDocumentTypes } = await getModifiedServiceDocumentTypes(instancePath));
+    const declarationUtils = new DeclarationUtils(instancePath);
+
+    ({ services: servicesToValidate, servicesDocumentTypes } = await declarationUtils.getModifiedServiceDocumentTypes());
   }
 
   describe('Service declarations validation', async function () {

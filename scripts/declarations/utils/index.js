@@ -3,72 +3,76 @@ import path from 'path';
 import DeepDiff from 'deep-diff';
 import simpleGit from 'simple-git';
 
-const filePathToServiceId = filePath => path.parse(filePath.replace(/\.history|\.filters/, '')).name;
-
-const getModifiedData = async instancePath => {
-  const git = simpleGit(instancePath, { maxConcurrentProcesses: 1 });
-
-  const modifiedFilePathsAsString = (await git.diff([ '--name-only', 'HEAD', 'main', '--', './declarations' ])).trim();
-
-  const modifiedFilePaths = modifiedFilePathsAsString ? modifiedFilePathsAsString.split('\n') : [];
-
-  return { git, modifiedFilePaths, modifiedServiceIds: new Set(modifiedFilePaths.map(filePathToServiceId)) };
-};
-
-export const getModifiedServices = async instancePath => {
-  const { modifiedServiceIds } = await getModifiedData(instancePath);
-
-  return modifiedServiceIds;
-};
-
-const getJSONFile = async (git, path, ref) => {
-  try {
-    return JSON.parse(await git.show([`${ref}:${path}`]));
-  } catch (e) {
-    return {};
+export default class DeclarationUtils {
+  constructor(instancePath) {
+    this.git = simpleGit(instancePath, { maxConcurrentProcesses: 1 });
   }
-};
 
-export const getModifiedServiceDocumentTypes = async instancePath => {
-  const { git, modifiedFilePaths, modifiedServiceIds } = await getModifiedData(instancePath);
-  const defaultBranch = 'main'; // could be retrieved from git
-  const servicesDocumentTypes = {};
+  static filePathToServiceId = filePath => path.parse(filePath.replace(/\.history|\.filters/, '')).name;
 
-  await Promise.all(modifiedFilePaths.map(async modifiedFilePath => {
-    const serviceId = filePathToServiceId(modifiedFilePath);
-
-    if (!modifiedFilePath.endsWith('.json')) {
-      // Here we should compare AST of both files to detect on which function
-      // change has been made, and then find which document type depends on this
-      // function.
-      // As this is a complicated process, we will just send back all document types
-      const declaration = JSON.parse(await git.show([`${defaultBranch}:declarations/${serviceId}.json`]));
-
-      return Object.keys(declaration.documents);
+  async getJSONFile(path, ref) {
+    try {
+      return JSON.parse(await this.git.show([`${ref}:${path}`]));
+    } catch (e) {
+      return {};
     }
+  }
 
-    const defaultFile = await getJSONFile(git, modifiedFilePath, defaultBranch);
-    const modifiedFile = await getJSONFile(git, modifiedFilePath, 'HEAD');
+  async getModifiedData() {
+    const modifiedFilePathsAsString = (await this.git.diff([ '--name-only', 'HEAD', 'main', '--', './declarations' ])).trim();
 
-    const diff = DeepDiff.diff(defaultFile, modifiedFile);
+    const modifiedFilePaths = modifiedFilePathsAsString ? modifiedFilePathsAsString.split('\n') : [];
 
-    if (!diff) {
-      // This can happen if only a lint has been applied to a document
-      return;
-    }
+    return { modifiedFilePaths, modifiedServiceIds: new Set(modifiedFilePaths.map(DeclarationUtils.filePathToServiceId)) };
+  }
 
-    const modifiedDocumentTypes = diff.reduce((acc, { path }) => {
-      if (modifiedFilePath.includes('.history')) {
-        acc.add(path[0]);
-      } else if (path[0] == 'documents') {
-        acc.add(path[1]);
+  async getModifiedServices() {
+    const { modifiedServiceIds } = await this.getModifiedData();
+
+    return modifiedServiceIds;
+  }
+
+  async getModifiedServiceDocumentTypes() {
+    const { modifiedFilePaths, modifiedServiceIds } = await this.getModifiedData();
+    const defaultBranch = 'main'; // could be retrieved from git
+    const servicesDocumentTypes = {};
+
+    await Promise.all(modifiedFilePaths.map(async modifiedFilePath => {
+      const serviceId = DeclarationUtils.filePathToServiceId(modifiedFilePath);
+
+      if (!modifiedFilePath.endsWith('.json')) {
+        // Here we should compare AST of both files to detect on which function
+        // change has been made, and then find which document type depends on this
+        // function.
+        // As this is a complicated process, we will just send back all document types
+        const declaration = await this.getJSONFile(`declarations/${serviceId}.json`, defaultBranch);
+
+        return Object.keys(declaration.documents);
       }
 
-      return acc;
-    }, new Set());
+      const defaultFile = await this.getJSONFile(modifiedFilePath, defaultBranch);
+      const modifiedFile = await this.getJSONFile(modifiedFilePath, 'HEAD');
 
-    servicesDocumentTypes[serviceId] = new Set([ ...servicesDocumentTypes[serviceId] || [], ...modifiedDocumentTypes ]);
-  }));
+      const diff = DeepDiff.diff(defaultFile, modifiedFile);
 
-  return { services: modifiedServiceIds, servicesDocumentTypes };
-};
+      if (!diff) {
+        // This can happen if only a lint has been applied to a document
+        return;
+      }
+
+      const modifiedDocumentTypes = diff.reduce((acc, { path }) => {
+        if (modifiedFilePath.includes('.history')) {
+          acc.add(path[0]);
+        } else if (path[0] == 'documents') {
+          acc.add(path[1]);
+        }
+
+        return acc;
+      }, new Set());
+
+      servicesDocumentTypes[serviceId] = new Set([ ...servicesDocumentTypes[serviceId] || [], ...modifiedDocumentTypes ]);
+    }));
+
+    return { services: modifiedServiceIds, servicesDocumentTypes };
+  }
+}

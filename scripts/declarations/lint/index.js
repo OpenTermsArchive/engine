@@ -4,7 +4,7 @@ import { fileURLToPath } from 'url';
 import config from 'config';
 import { ESLint } from 'eslint';
 
-import { getModifiedServices } from '../utils/index.js';
+import DeclarationUtils from '../utils/index.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -17,7 +17,9 @@ const lintDeclarations = async ({ services, modified }) => {
   let servicesToValidate = services || ['*'];
 
   if (modified) {
-    servicesToValidate = await getModifiedServices(instancePath);
+    const declarationUtils = new DeclarationUtils(instancePath);
+
+    servicesToValidate = await declarationUtils.getModifiedServices();
   }
 
   for (const service of servicesToValidate) {
