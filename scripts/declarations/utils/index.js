@@ -4,8 +4,9 @@ import DeepDiff from 'deep-diff';
 import simpleGit from 'simple-git';
 
 export default class DeclarationUtils {
-  constructor(instancePath) {
+  constructor(instancePath, defaultBranch = 'main') {
     this.git = simpleGit(instancePath, { maxConcurrentProcesses: 1 });
+    this.defaultBranch = defaultBranch;
   }
 
   static filePathToServiceId = filePath => path.parse(filePath.replace(/\.history|\.filters/, '')).name;
@@ -19,7 +20,7 @@ export default class DeclarationUtils {
   }
 
   async getModifiedData() {
-    const modifiedFilePathsAsString = (await this.git.diff([ '--name-only', 'HEAD', 'main', '--', './declarations' ])).trim();
+    const modifiedFilePathsAsString = (await this.git.diff([ '--name-only', 'HEAD', this.defaultBranch, '--', './declarations' ])).trim();
 
     const modifiedFilePaths = modifiedFilePathsAsString ? modifiedFilePathsAsString.split('\n') : [];
 
@@ -34,7 +35,6 @@ export default class DeclarationUtils {
 
   async getModifiedServiceDocumentTypes() {
     const { modifiedFilePaths, modifiedServiceIds } = await this.getModifiedData();
-    const defaultBranch = 'main'; // could be retrieved from git
     const servicesDocumentTypes = {};
 
     await Promise.all(modifiedFilePaths.map(async modifiedFilePath => {
@@ -45,12 +45,12 @@ export default class DeclarationUtils {
         // change has been made, and then find which document type depends on this
         // function.
         // As this is a complicated process, we will just send back all document types
-        const declaration = await this.getJSONFile(`declarations/${serviceId}.json`, defaultBranch);
+        const declaration = await this.getJSONFile(`declarations/${serviceId}.json`, this.defaultBranch);
 
         return Object.keys(declaration.documents);
       }
 
-      const defaultFile = await this.getJSONFile(modifiedFilePath, defaultBranch);
+      const defaultFile = await this.getJSONFile(modifiedFilePath, this.defaultBranch);
       const modifiedFile = await this.getJSONFile(modifiedFilePath, 'HEAD');
 
       const diff = DeepDiff.diff(defaultFile, modifiedFile);
