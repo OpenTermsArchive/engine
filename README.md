@@ -126,9 +126,9 @@ npm install "ambanum/OpenTermsArchive#main"
 
 The following commands are available where the package is installed:
 
-- `./node_modules/.bin/ota-lint-declarations -h`: check and normalise the format of declarations.
-- `./node_modules/.bin/ota-validate-declarations -h`: validate declarations.
-- `./node_modules/.bin/ota-track -h`: track services. Recorded snapshots and versions will be stored in the `data` folder at the root of the module where the package is installed.
+- `./node_modules/.bin/ota-lint-declarations`: check and normalise the format of declarations.
+- `./node_modules/.bin/ota-validate-declarations`: validate declarations.
+- `./node_modules/.bin/ota-track`: track services. Recorded snapshots and versions will be stored in the `data` folder at the root of the module where the package is installed.
 
 In order to have them available globally in your command line, install it with the `--global` option.
 
