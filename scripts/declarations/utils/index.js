@@ -38,7 +38,7 @@ export const getModifiedServiceDocumentTypes = async instancePath => {
     const serviceId = filePathToServiceId(modifiedFilePath);
 
     if (!modifiedFilePath.endsWith('.json')) {
-      // here we should compare AST of both files to detect on which function
+      // Here we should compare AST of both files to detect on which function
       // change has been made, and then find which document type depends on this
       // function.
       // As this is a complicated process, we will just send back all document types
