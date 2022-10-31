@@ -29,8 +29,8 @@ process.on('unhandledRejection', reason => {
 });
 
 program
-  .name('validate declaration files')
-  .description('check if document declarations are valid and linted properly')
+  .name('ota-validate-declarations')
+  .description('Run a series of tests to check the validity of document declarations')
   .version(version)
   .option('-s, --services [serviceId...]', 'service IDs of services to handle')
   .option('-d, --documentTypes [documentType...]', 'document types to handle')
