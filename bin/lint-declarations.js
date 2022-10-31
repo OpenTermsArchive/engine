@@ -25,4 +25,4 @@ program
   .option('-s, --services [serviceId...]', 'service IDs of services to handle')
   .option('-m, --modified', 'to only lint modified services already commited to git');
 
-lintDeclarations(program.parse(process.argv).opts());
+lintDeclarations(program.parse().opts());

@@ -54,7 +54,7 @@ const mocha = new Mocha({
 
   const addValidationTestSuite = (await import('../scripts/declarations/validate/index.mocha.js')).default;
 
-  addValidationTestSuite(program.parse(process.argv).opts());
+  addValidationTestSuite(program.parse().opts());
 
   mocha.run()
     .on('fail', () => { hasFailedTests = true; })
