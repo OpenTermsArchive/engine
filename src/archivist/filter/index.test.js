@@ -62,7 +62,7 @@ const rawHTMLWithCommonChangingItems = `
     <p><a id="link2" href="#anchor">link 2</a></p>
     <p><a id="link3" href="http://absolute.url/link">link 3</a></p>
     <p><a id="link4" href="">link 4</a></p>
-    <a href="/cdn-cgi/l/email-protection#3b4c52555f484f495e5a56154b49524d5a584215484f5a4f5e565e554f7b4c52555f484f495e5a5615585456">[email&#160;protected]</a>
+    <p><a href="/cdn-cgi/l/email-protection#3b4c52555f484f495e5a56154b49524d5a584215484f5a4f5e565e554f7b4c52555f484f495e5a5615585456">[email&#160;protected]</a></p>
   </body>
 </html>`;
 
@@ -78,7 +78,7 @@ const expectedFilteredWithCommonChangingItems = `Title
 
 link 4
 
-[\\[email protected\\]](https://exemple.com/cdn-cgi/l/email-protection#removed)`;
+[\\[email protected\\]](https://exemple.com/cdn-cgi/l/email-protection)`;
 /* eslint-enable no-irregular-whitespace */
 
 const additionalFilter = {
