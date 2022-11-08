@@ -6,16 +6,17 @@ import './.env.js'; // Workaround to ensure `SUPPRESS_NO_CONFIG_WARNING` is set 
 
 import fs from 'fs';
 import path from 'path';
+import { fileURLToPath, pathToFileURL } from 'url';
 
 import { program } from 'commander';
 import config from 'config';
 
-import lintDeclarations from '../scripts/declarations/lint/index.js';
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // Initialise configs to allow clients of this module to use it without requiring node-config in their own application.
 // see https://github.com/lorenwest/node-config/wiki/Sub-Module-Configuration
-config.util.setModuleDefaults('services', { declarationsPath: path.resolve(process.cwd(), './declarations') });
 
+config.util.setModuleDefaults('services', { declarationsPath: path.resolve(process.cwd(), './declarations') });
 const { version } = JSON.parse(fs.readFileSync(new URL('../package.json', import.meta.url)).toString());
 
 program
@@ -24,5 +25,7 @@ program
   .version(version)
   .option('-s, --services [serviceId...]', 'service IDs of services to handle')
   .option('-m, --modified', 'to only lint modified services already commited to git');
+
+const lintDeclarations = (await import(pathToFileURL(path.resolve(__dirname, '../scripts/declarations/lint/index.js')))).default;
 
 lintDeclarations(program.parse().opts());
