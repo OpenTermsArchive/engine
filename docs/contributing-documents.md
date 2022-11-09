@@ -200,18 +200,45 @@ Each filter is exposed as a named function export that takes a `document` parame
 
 > The `document` parameter is actually a [JSDOM](https://github.com/jsdom/jsdom) document instance.
 
-The second parameter contains the whole document declaration. It can be useful if you need to access the defined document URL or selector inside your filter.
-
-For example, you can scope the selection in your filter with the `selector` defined in the document declaration:
-
 ```js
-export function removeImages(document, { select: selector }) {
-  const images = document.querySelectorAll(`${selector} img`);
-  images.forEach((el) => el.remove());
+function removeTrackingIdsQueryParam(document) {
+  const trackingIdQueryParam = 'clickId';
+
+  document.querySelectorAll('a').forEach(link => {
+    const url = new URL(link.getAttribute('href'), document.location);
+    const params = new URLSearchParams(url.search);
+
+    params.delete(trackingIdQueryParam);
+    url.search = params.toString();
+    link.setAttribute('href', url.toString());
+  });
 }
 ```
 
-You can find examples of filters in [`/declarations/*.filters.js`](./declarations) files.
+The whole document declaration is passed as second parameter. 
+
+For example, it can be used to access the defined document URL or selector inside the filter:
+
+```js
+import fetch from 'isomorphic-fetch';
+
+export async function convertImagesToBase64(document, documentDeclaration) {
+  const { fetch: baseUrl, select: selector } = documentDeclaration;
+  
+  const images = Array.from(document.querySelectorAll(`${selector} img`));
+
+  return Promise.all(images.map(async ({ src }, index) => {
+    const imageAbsoluteUrl = new URL(src, baseUrl).href;
+    const response = await fetch(imageAbsoluteUrl);
+    const mimeType = response.headers.get('content-type');
+    const content = await response.arrayBuffer();
+
+    const base64Image = btoa(String.fromCharCode(...new Uint8Array(content)));
+
+    images[index].src = `data:${mimeType};base64,${base64Image}`;
+  }));
+}
+```
 
 You can also learn more about [usual noise](declarations-guidelines.md#Usual-noise) and ways to handle it on the guidelines, and share your own learnings there.
 
