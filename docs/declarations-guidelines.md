@@ -11,7 +11,8 @@ This document presents practical guidelines, is edited collaboratively and is no
   - [Irrelevant content](#irrelevant-content)
   - [Invisible HTML elements](#invisible-html-elements)
   - [Content generating frequent and legally irrelevant changes](#content-generating-frequent-and-legally-irrelevant-changes)
----
+
+- - -
 
 ## Service name
 
