@@ -5,12 +5,22 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
+import { program } from 'commander';
 import config from 'config';
 import Mocha from 'mocha';
+
+const { version } = JSON.parse(fs.readFileSync(new URL('../package.json', import.meta.url)).toString());
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const defaultConfigs = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../config/default.json')));
+
+// Initialise configs to allow clients of this module to use it without requiring node-config in their own application.
+// see https://github.com/lorenwest/node-config/wiki/Sub-Module-Configuration
+config.util.setModuleDefaults('services', { declarationsPath: path.resolve(process.cwd(), './declarations') });
+config.util.setModuleDefaults('fetcher', defaultConfigs.fetcher);
+
+const VALIDATE_PATH = path.resolve(__dirname, '../scripts/declarations/validate/index.mocha.js');
 
 // Mocha catches unhandled rejection from the user code and re-emits them to the process (see https://github.com/mochajs/mocha/blob/master/lib/runner.js#L198)
 process.on('unhandledRejection', reason => {
@@ -18,16 +28,19 @@ process.on('unhandledRejection', reason => {
   throw reason;
 });
 
-// Initialise configs to allow clients of this module to use it without requiring node-config in their own application.
-// see https://github.com/lorenwest/node-config/wiki/Sub-Module-Configuration
-config.util.setModuleDefaults('services', { declarationsPath: path.resolve(process.cwd(), './declarations') });
-config.util.setModuleDefaults('fetcher', defaultConfigs.fetcher);
+program
+  .name('ota-validate-declarations')
+  .description('Run a series of tests to check the validity of document declarations')
+  .version(version)
+  .option('-s, --services [serviceId...]', 'service IDs of services to handle')
+  .option('-d, --documentTypes [documentType...]', 'document types to handle')
+  .option('-m, --modified', 'to only lint modified services already commited to git')
+  .option('-so, --schema-only', 'only refilter exisiting snapshots with last declarations and engine\'s updates');
 
 const mocha = new Mocha({
   delay: true, // as the validation script performs an asynchronous load before running the tests, the execution of the tests are delayed until run() is called
   failZero: true, // consider that being called with no service to validate is a failure
 });
-const VALIDATE_PATH = path.resolve(__dirname, '../scripts/validation/validate.js');
 
 (async () => {
   mocha.addFile(VALIDATE_PATH); // As `delay` has been called, this statement will not load the file directly, `loadFilesAsync` is required.
@@ -38,6 +51,10 @@ const VALIDATE_PATH = path.resolve(__dirname, '../scripts/validation/validate.js
     });
 
   let hasFailedTests = false;
+
+  const generateValidationTestSuite = (await import('../scripts/declarations/validate/index.mocha.js')).default;
+
+  generateValidationTestSuite(program.parse().opts());
 
   mocha.run()
     .on('fail', () => { hasFailedTests = true; })
