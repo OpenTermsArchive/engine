@@ -30,7 +30,7 @@ The service name is exposed to end users. It should reflect as closely as possib
   - _Example: `Firebase` (by Google) → `Firebase`_.
   - _Example: `App Store` (by Apple) → `App Store`_.
 
-> If you have a hard time finding the service name, check out the [practical guidelines to find the service name](Guidelines.md#service-name), and feel free to mention your uncertainties in the pull request! We will help you improve the service name if necessary 🙂
+> If you have a hard time finding the service name, check out the [practical guidelines to find the service name](declarations-guidelines.md#service-name), and feel free to mention your uncertainties in the pull request! We will help you improve the service name if necessary 🙂
 
 ### Service ID
 
@@ -50,7 +50,7 @@ The service ID is exposed to developers. It should be easy to handle with script
   - _Example: `App Store` → `App Store`_.
   - _Example: `DeviantArt` → `DeviantArt`_.
 
-> If you have a hard time defining the service ID, check out the [practical guidelines to derive the ID from the service name](Guidelines.md#service-id), and feel free to mention your uncertainties in the pull request! We will help you improve the service ID if necessary 🙂
+> If you have a hard time defining the service ID, check out the [practical guidelines to derive the ID from the service name](declarations-guidelines.md#service-id), and feel free to mention your uncertainties in the pull request! We will help you improve the service ID if necessary 🙂
 
 > More details on the ID and naming constraints and recommendations can be found in the relevant [decision record](https://github.com/ambanum/OpenTermsArchive/blob/main/decision-records/0001-service-name-and-id.md).
 
@@ -85,30 +85,22 @@ Documents are declared in a service declaration file, under the `documents` prop
   …
 ```
 
-> It is worth noting that documents can be tracked as soon as they are _potentially applicable_, even if they are not necessarily _applied_. For example, documents that would start applying at date in the future are legitimate candidates for tracking.
+- For HTML files, `fetch` and `select` are mandatory.
+- For PDF files, only `fetch` is mandatory.
 
-The only mandatory keys are `fetch` and `select` (except for PDF files, for which only `fetch` is needed). Let’s start by defining these keys!
+Let’s start by defining these keys!
 
 #### `fetch`
 
 This property should simply contain the URL at which the document you want to track can be downloaded. HTML and PDF files are supported.
 
-When multiple versions coexist, **terms are only tracked in their English version and for the European (EEA) jurisdiction**.
-
-> We intend to expand coverage, but we focus for the moment on this subset of documents to fine-tune the system.
-
-#### `executeClientScripts`
-
-In some cases, the content of the document is only loaded (or is modified dynamically) by client scripts.
-When set to `true`, this boolean property loads the page in a headless browser to load all assets and execute client scripts before trying to get document content.
-
-Since the performance cost of this approach is high, it is set to `false` by default, relying on the HTML content only.
+When documents coexist in different languages and jurisdictions, please refer to the scope of the collection to which you are contributing. This scope is usually defined in the README.
 
 #### `select`
 
 _This property is not needed for PDF documents._
 
-Most of the time, contractual documents are exposed as web pages, with a header, a footer, navigation menus, possibly ads… We aim at tracking only the significant parts of the document. In order to achieve that, the `select` property allows to extract only those parts in the process of [converting from snapshot to version](https://github.com/ambanum/OpenTermsArchive/blob/main/README.md#how-it-works).
+Most of the time, contractual documents are exposed as web pages, with a header, a footer, navigation menus, possibly ads… We aim at tracking only the significant parts of the document. In order to achieve that, the `select` property allows to extract only those parts in the process of [converting from snapshot to version](../README.md#how-it-works).
 
 The `select` value can be of two types: either a [CSS selector](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors) or a [range selector](#range-selectors).
 
@@ -125,12 +117,12 @@ To that end, a range selector is a JSON object containing two keys out of the fo
 }
 ```
 
-> For example, the following selector will select the content between the element targeted by the CSS selector `#privacy-eea`, including it, and the element targeted by the CSS selector `#privacy-row`, excluding it:
+> For example, the following selector will select the content between the element targeted by the CSS selector `#privacy-eea`, including it, and the element targeted by the CSS selector `footer`, excluding it:
 >
 > ```json
 > {
 >   "startBefore": "#privacy-eea",
->   "endBefore": "#privacy-row"
+>   "endBefore": "footer"
 > }
 > ```
 
@@ -146,7 +138,7 @@ Beyond [selecting a subset of a web page](#select), some documents will have non
 > {
 >   "fetch": "https://support.google.com/adsense/answer/48182",
 >   "select": ".article-container",
->   "remove": ".action-button, .zippy"
+>   "remove": ".print-button, .go-to-top"
 > }
 > ```
 >
@@ -160,6 +152,30 @@ Beyond [selecting a subset of a web page](#select), some documents will have non
 >   }
 > }
 > ```
+>
+> ```json
+> {
+>   "fetch": "https://fr-fr.facebook.com/legal/terms/plain_text_terms",
+>   "select": "div[role=main]",
+>   "remove": [
+>     {
+>       "startBefore": "[role=\"separator\"]",
+>       "endAfter": "body"
+>     },
+>     "[style=\"display:none\"]"
+>   ]
+> }
+> ```
+>
+
+#### `executeClientScripts`
+
+_This property is optional._
+
+In some cases, the content of the document is only loaded (or is modified dynamically) by client scripts.
+When set to `true`, this boolean property loads the page in a headless browser to load all assets and execute client scripts before trying to get the document contents.
+
+Since the performance cost of this approach is high, it is set to `false` by default, relying on the HTML content only.
 
 #### `filter`
 
@@ -197,10 +213,7 @@ export function removeImages(document, { select: selector }) {
 
 You can find examples of filters in [`/declarations/*.filters.js`](./declarations) files.
 
-Also, filters used on many services has been extracted for better reusability in `declarations/_common.filters.js`.
-You can use them in your filters file with `import { removeSIDfromUrls } from './_common.filters.js';`
-
-You can also learn more about [usual noise](Guidelines.md#Usual-noise) and ways to handle it on the guidelines, and share your own learnings there.
+You can also learn more about [usual noise](declarations-guidelines.md#Usual-noise) and ways to handle it on the guidelines, and share your own learnings there.
 
 #### Document type
 
@@ -212,7 +225,7 @@ If the document you want to add matches no existing document type, you can creat
 
 ##### Defining a new document type
 
-Before defining a new document type, please note that wanting to multiply documents types is usually a symptom that the service needs to be broken down into several services. For example, rather than considering that Facebook has several specific variations of “Terms of Service”, it is more accurate to declare “Terms of Service” documents for the “Facebook” (social network service for the general public), “Facebook Ads” (ads service for advertisers) and “Facebook Payments” (payment service for developers) services. On the other hand, the “Google Ads” service is a commercial suite acting as an umbrella for several pieces of software that all share the same contractual documents, and there is thus no need to separate each of them. See practical guidelines for [provider prefixing](Guidelines.md##provider-prefixing).
+Before defining a new document type, please note that wanting to multiply documents types is usually a symptom that the service needs to be broken down into several services. For example, rather than considering that Facebook has several specific variations of “Terms of Service”, it is more accurate to declare “Terms of Service” documents for the “Facebook” (social network service for the general public), “Facebook Ads” (ads service for advertisers) and “Facebook Payments” (payment service for developers) services. On the other hand, the “Google Ads” service is a commercial suite acting as an umbrella for several pieces of software that all share the same contractual documents, and there is thus no need to separate each of them. See practical guidelines for [provider prefixing](declarations-guidelines.md#provider-prefixing).
 
 In order to guide usage and disambiguate synonyms, we characterise each document type along three dimensions of the commitment that is being taken in it:
 

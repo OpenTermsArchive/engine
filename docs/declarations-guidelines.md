@@ -1,4 +1,4 @@
-This document presents practical guidelines, is edited collaboratively and is not normative. Normative constraints are exposed in the `CONTRIBUTING.md` file.
+This document presents practical guidelines, is edited collaboratively and is not normative. Normative constraints are exposed in [Contributing Documents](./contributing-documents.md).
 
 ## Table of Contents
 
