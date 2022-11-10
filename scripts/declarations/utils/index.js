@@ -70,9 +70,12 @@ export default class DeclarationUtils {
         return acc;
       }, new Set());
 
-      servicesDocumentTypes[serviceId] = new Set([ ...servicesDocumentTypes[serviceId] || [], ...modifiedDocumentTypes ]);
+      servicesDocumentTypes[serviceId] = Array.from(new Set([ ...servicesDocumentTypes[serviceId] || [], ...modifiedDocumentTypes ]));
     }));
 
-    return { services: modifiedServiceIds, servicesDocumentTypes };
+    return {
+      services: Array.from(modifiedServiceIds),
+      servicesDocumentTypes,
+    };
   }
 }
