@@ -4,7 +4,7 @@ import DeepDiff from 'deep-diff';
 import simpleGit from 'simple-git';
 
 export default class DeclarationUtils {
-  constructor(instancePath, defaultBranch = 'main') {
+  constructor(instancePath, defaultBranch = 'remotes/origin/main') {
     this.git = simpleGit(instancePath, { maxConcurrentProcesses: 1 });
     this.defaultBranch = defaultBranch;
   }
