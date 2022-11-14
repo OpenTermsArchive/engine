@@ -24,7 +24,7 @@ export default class DeclarationUtils {
 
     const modifiedFilePaths = modifiedFilePathsAsString ? modifiedFilePathsAsString.split('\n') : [];
 
-    return { modifiedFilePaths, modifiedServiceIds: new Set(modifiedFilePaths.map(DeclarationUtils.filePathToServiceId)) };
+    return { modifiedFilePaths, modifiedServiceIds: Array.from(new Set(modifiedFilePaths.map(DeclarationUtils.filePathToServiceId))) };
   }
 
   async getModifiedServices() {
@@ -74,7 +74,7 @@ export default class DeclarationUtils {
     }));
 
     return {
-      services: Array.from(modifiedServiceIds),
+      services: modifiedServiceIds,
       servicesDocumentTypes,
     };
   }
