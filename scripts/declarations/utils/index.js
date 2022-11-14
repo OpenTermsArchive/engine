@@ -4,7 +4,7 @@ import DeepDiff from 'deep-diff';
 import simpleGit from 'simple-git';
 
 export default class DeclarationUtils {
-  constructor(instancePath, defaultBranch = 'main') {
+  constructor(instancePath, defaultBranch = 'remotes/origin/main') {
     this.git = simpleGit(instancePath, { maxConcurrentProcesses: 1 });
     this.defaultBranch = defaultBranch;
   }
@@ -24,7 +24,7 @@ export default class DeclarationUtils {
 
     const modifiedFilePaths = modifiedFilePathsAsString ? modifiedFilePathsAsString.split('\n') : [];
 
-    return { modifiedFilePaths, modifiedServiceIds: new Set(modifiedFilePaths.map(DeclarationUtils.filePathToServiceId)) };
+    return { modifiedFilePaths, modifiedServiceIds: Array.from(new Set(modifiedFilePaths.map(DeclarationUtils.filePathToServiceId))) };
   }
 
   async getModifiedServices() {
@@ -70,9 +70,12 @@ export default class DeclarationUtils {
         return acc;
       }, new Set());
 
-      servicesDocumentTypes[serviceId] = new Set([ ...servicesDocumentTypes[serviceId] || [], ...modifiedDocumentTypes ]);
+      servicesDocumentTypes[serviceId] = Array.from(new Set([ ...servicesDocumentTypes[serviceId] || [], ...modifiedDocumentTypes ]));
     }));
 
-    return { services: modifiedServiceIds, servicesDocumentTypes };
+    return {
+      services: modifiedServiceIds,
+      servicesDocumentTypes,
+    };
   }
 }
