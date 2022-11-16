@@ -1,16 +1,9 @@
 name: Release
 
 on:
-  workflow_dispatch:
-    inputs:
-      release-type:
-        type: choice
-        description: Release type
-        options:
-        - patch
-        - minor
-        - major
-        
+  push:
+    branches: [ main ]
+
 jobs:
   release:
     runs-on: ubuntu-latest
@@ -23,12 +16,14 @@ jobs:
           git config --global user.name "GitHub Actions"
           git config --global user.email "github-actions@users.noreply.github.com"
 
+      - name: Get release type
+        run: echo "RELEASE_TYPE=$(cat CHANGELOG.md | grep '## Unreleased' | sed -r 's/^## Unreleased \[(patch|minor|major)\]/\1/g')" >> $GITHUB_ENV
+          
+
       - name: Bump package version
         run: |
-          echo "NEW_VERSION=$(npm --no-git-tag-version version $RELEASE_TYPE)" >> $GITHUB_ENV
+          echo "NEW_VERSION=$(npm --no-git-tag-version version ${{ env.RELEASE_TYPE }})" >> $GITHUB_ENV
           echo "RELEASE_TAG=latest" >> $GITHUB_ENV
-        env:
-          RELEASE_TYPE: ${{ github.event.inputs.release-type }}
 
       - name: Update changelog unreleased section with new version
         uses: superfaceai/release-changelog-action@v1
