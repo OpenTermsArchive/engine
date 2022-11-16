@@ -70,6 +70,7 @@
     "joplin-turndown-plugin-gfm": "^1.0.12",
     "jsdom": "^18.1.0",
     "json-source-map": "^0.6.1",
+    "keep-a-changelog": "^2.1.0",
     "lodash": "^4.17.21",
     "mime": "^2.5.2",
     "mocha": "^9.1.3",
