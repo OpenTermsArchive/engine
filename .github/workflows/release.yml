@@ -1,20 +1,9 @@
 name: Release
 
 on:
-  workflow_dispatch:
-    inputs:
-      release-type:
-        type: choice
-        description: Release type
-        options:
-        - patch
-        - minor
-        - major
-        - prepatch
-        - preminor
-        - premajor
-        - prerelease
-        
+  push:
+    branches: [ main ]
+
 jobs:
   test:
     uses: "ambanum/OpenTermsArchive/.github/workflows/test.yml@main"
@@ -28,24 +17,16 @@ jobs:
       - name: Git configuration
         run: |
           git config --global user.name "GitHub Actions"
-          git config --global user.email "github-action@users.noreply.github.com"
+          git config --global user.email "github-actions@users.noreply.github.com"
+
+      - name: Get release type
+        run: echo "RELEASE_TYPE=$(cat CHANGELOG.md | grep '## Unreleased' | sed -r 's/^## Unreleased \[(patch|minor|major)\]/\1/g')" >> $GITHUB_ENV
+          
 
       - name: Bump package version
-        if: startsWith(github.event.inputs.release-type, 'pre') != true
         run: |
-          echo "NEW_VERSION=$(npm --no-git-tag-version version $RELEASE_TYPE)" >> $GITHUB_ENV
+          echo "NEW_VERSION=$(npm --no-git-tag-version version ${{ env.RELEASE_TYPE }})" >> $GITHUB_ENV
           echo "RELEASE_TAG=latest" >> $GITHUB_ENV
-        env:
-          RELEASE_TYPE: ${{ github.event.inputs.release-type }}
-
-      - name: Bump package pre-release version
-        # Use tag "beta" for pre-release versions
-        if: startsWith(github.event.inputs.release-type, 'pre')
-        run: |
-          echo "NEW_VERSION=$(npm --no-git-tag-version --preid=beta version $RELEASE_TYPE)" >> $GITHUB_ENV
-          echo "RELEASE_TAG=beta" >> $GITHUB_ENV
-        env:
-          RELEASE_TYPE: ${{ github.event.inputs.release-type }}
 
       - name: Update changelog unreleased section with new version
         uses: superfaceai/release-changelog-action@v1
@@ -64,16 +45,6 @@ jobs:
 
       - name: Add authentication token for NPM
         run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPMJS_ACCESS_TOKEN }}" > ~/.npmrc
-      
-      - name: Publish version to public repository
-        run: npm publish --verbose --access public --tag ${{ env.RELEASE_TAG }}
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPMJS_ACCESS_TOKEN }}
-
-      - name: Push changes to repository
-        run: git push origin && git push --tags
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Read version changelog
         uses: superfaceai/release-changelog-action@v1
@@ -83,11 +54,20 @@ jobs:
           version: ${{ env.NEW_VERSION }}
           operation: read
 
+      - name: Push changes to repository
+        run: git push origin && git push --tags
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Update GitHub release with changelog
         uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ env.NEW_VERSION }}
           body: ${{ steps.get-changelog.outputs.changelog }}
-          prerelease: ${{ startsWith(github.event.inputs.release-type, 'pre') }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publish version to public repository
+        run: npm publish --verbose --access public --tag ${{ env.RELEASE_TAG }}
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPMJS_ACCESS_TOKEN }}
