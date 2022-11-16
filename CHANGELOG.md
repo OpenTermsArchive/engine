@@ -6,8 +6,10 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Keep unreleased section as discussion point inside PRs but with the idea that CD will always convert it into a release.
 - Add a tag in the unreleased section title to specify which type of version should be deployed and to allow discussion about this type inside PRs. This tag should be one of `[patch]`, `[minor]`, `[major]`.
 
-## Unreleased
+## Unreleased [minor]
 
+### Added
+- Patch auto test again
 ## 1.0.1 - 2022-11-16
 ### Added
 - Patch auto
