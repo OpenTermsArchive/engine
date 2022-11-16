@@ -6,6 +6,7 @@ First of all, thanks for taking the time to contribute! 🎉👍
   - [Pull requests](#pull-requests)
   - [Commit messages](#commit-messages)
   - [Continuous delivery](#continuous-delivery)
+  - [Changelog](#changelog)
 - [Development](#development)
   - [Documentation](#documentation)
 - [Naming](#naming)
@@ -51,6 +52,10 @@ We strive to follow this [recommendation](https://chris.beams.io/posts/git-commi
 We add this additional rule:
 
 - Do not rely on GitHub issue reference numbers in commit messages, as we have no guarantee the host system and its autolinking will be stable in time. Make sure the context is self-explanatory. If an external reference is given, use its full URL.
+
+### Changelog
+
+All notable changes to this project must be documented in the [`CHANGELOG.md`](./CHANGELOG.md) file.
 
 ## Development
 
