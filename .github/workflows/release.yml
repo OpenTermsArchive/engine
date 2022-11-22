@@ -5,7 +5,10 @@ on:
     branches: [ main ]
 
 jobs:
+  test:
+    uses: "Ndpnt/OpenTermsArchive/.github/workflows/test.yml@main"
   release:
+    needs: [ test ]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -26,7 +29,7 @@ jobs:
           echo "RELEASE_TAG=latest" >> $GITHUB_ENV
 
       - name: Update changelog unreleased section with new version
-        uses: superfaceai/release-changelog-action@v1.0.1
+        uses: superfaceai/release-changelog-action@v1
         with:
           path-to-changelog: CHANGELOG.md
           version: ${{ env.NEW_VERSION }}
@@ -44,7 +47,7 @@ jobs:
       #   run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPMJS_ACCESS_TOKEN }}" > ~/.npmrc
 
       - name: Read version changelog
-        uses: superfaceai/release-changelog-action@v1.0.1
+        uses: superfaceai/release-changelog-action@v1
         id: get-changelog
         with:
           path-to-changelog: CHANGELOG.md
