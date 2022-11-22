@@ -5,7 +5,7 @@ on:
     branches: [ main ]
 
 jobs:
-  test:
+  check_changelog:
     uses: "Ndpnt/OpenTermsArchive/.github/workflows/test.yml@main"
   release:
     needs: [ check_changelog ]
