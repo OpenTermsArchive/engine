@@ -14,7 +14,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Check for proper release type in changelog
-        run: $(cat CHANGELOG.md | grep '## Unreleased \[.*\]' | grep -E -w -o -q "patch|minor|major") || echo "No valid release type found in changelog. The title of the 'Unreleased' section must contain one of the following tag [patch], [minor], [major]. Ex Unreleased [minor]."; exit 1
+        run: $(cat CHANGELOG.md | grep '## Unreleased \[.*\]' | grep -E -w -o -q "patch|minor|major") || (echo "No valid release type found in changelog. The title of the 'Unreleased' section must contain one of the following tag [patch], [minor], [major]. Ex Unreleased [minor]."; exit 1)
 
   test:
     strategy:
