@@ -19,5 +19,5 @@ jobs:
         if: env.RELEASE_TYPE
         run: echo "RELEASE_TYPE is defined and equal ${{ env.RELEASE_TYPE }}"
       - name: Fail and display error is proper release type is not found in changelog
-        if: !env.RELEASE_TYPE
+        if: env.RELEASE_TYPE == ''
         run: echo "No valid release type found in changelog. The title of the 'Unreleased' section must contain one of the following tag [patch], [minor], [major]. Ex Unreleased [minor]."; exit 1
