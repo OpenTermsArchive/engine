@@ -26,7 +26,7 @@ jobs:
           echo "RELEASE_TAG=latest" >> $GITHUB_ENV
 
       - name: Update changelog unreleased section with new version
-        uses: superfaceai/release-changelog-action@v1
+        uses: superfaceai/release-changelog-action@v2
         with:
           path-to-changelog: CHANGELOG.md
           version: ${{ env.NEW_VERSION }}
@@ -41,7 +41,7 @@ jobs:
           git tag ${{ env.NEW_VERSION }}
 
       - name: Read version changelog
-        uses: superfaceai/release-changelog-action@v1
+        uses: superfaceai/release-changelog-action@v2
         id: get-changelog
         with:
           path-to-changelog: CHANGELOG.md
