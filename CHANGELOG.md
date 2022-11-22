@@ -9,4 +9,6 @@ Unlike Common Changelog, the `unreleased` section of [Keep a Changelog](https://
 
 ### Added
 
-- Automate release with GitHub Actions
+- Publish package on NPM under name `opentermsarchive`.
+- Export `filter`, `pageDeclaration` and `fetch` in NPM module.
+- Add changelog.
