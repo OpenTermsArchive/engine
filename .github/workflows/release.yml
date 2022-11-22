@@ -21,7 +21,7 @@ jobs:
           git config --global user.name "GitHub Actions"
           git config --global user.email "github-actions@users.noreply.github.com"
 
-      - run: echo ${{needs.job1.outputs.output1}} ${{needs.job1.outputs.output2}}
+      - run: echo "job1 ${{needs.job1.outputs.output1}} job2 ${{needs.job1.outputs.output2}}"
 
       # - name: Bump package version
       #   run: |
