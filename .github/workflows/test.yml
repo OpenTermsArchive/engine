@@ -9,6 +9,11 @@ on:
   workflow_call:
 
 jobs:
+  check_changelog:
+    steps:
+      - name: Check for proper release type in changelog
+        run: $(cat CHANGELOG.md | grep '## Unreleased \[.*\]' | grep -E -w -o -q "patch|minor|major") || echo "No valid release type found"; exit 1
+
   test:
     strategy:
       matrix:
@@ -49,8 +54,6 @@ jobs:
       - uses: actions/setup-node@v2
         with:
           node-version: 16.x
-      - name: Check for proper release type in changelog
-        run: $(cat CHANGELOG.md | grep '## Unreleased \[.*\]' | grep -E -w -o -q "patch|minor|major") || echo "No valid release type found"; exit 1
       - run: cd ./contrib-declarations && npm install
       - run: npm ci
       - run: ./node_modules/.bin/cross-env NODE_ENV=ci npm run declarations:validate:schema
