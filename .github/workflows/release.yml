@@ -7,6 +7,8 @@ on:
 jobs:
   check_changelog:
     uses: "Ndpnt/OpenTermsArchive/.github/workflows/test.yml@main"
+  job1:
+    uses: "Ndpnt/OpenTermsArchive/.github/workflows/test.yml@main"
   release:
     needs: [ check_changelog, job1 ]
     runs-on: ubuntu-latest
