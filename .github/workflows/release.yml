@@ -64,13 +64,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Setup Node to allow publishing to NPM
-        uses: actions/setup-node@v1
-        with:
-          node-version: 16
-          registry-url: 'https://registry.npmjs.org'
-
       - name: Publish version to NPM public repository
-        run: npm publish --verbose --access public --tag ${{ env.RELEASE_TAG }}
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPMJS_ACCESS_TOKEN }}
+        uses: JS-DevTools/npm-publish@v1
+        with:
+          token: ${{ secrets.NPMJS_ACCESS_TOKEN }}
