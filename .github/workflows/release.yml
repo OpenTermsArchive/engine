@@ -6,11 +6,25 @@ on:
 
 jobs:
   check_changelog:
-    uses: "Ndpnt/OpenTermsArchive/.github/workflows/test.yml@main"
-  job1:
-    uses: "Ndpnt/OpenTermsArchive/.github/workflows/test.yml@main"
+    runs-on: ubuntu-latest
+    outputs:
+      release_type: ${{ steps.set_release_type_output.outputs.release_type }}
+    steps:
+      - uses: actions/checkout@v2
+      - name: Get release type in changelog
+        run: echo "RELEASE_TYPE=$(cat CHANGELOG.md | grep -E '^## Unreleased \[(patch|minor|major)\]$' | grep -E -w -o "patch|minor|major" | tr -d '\n')" >> $GITHUB_ENV
+      - name: Make release type available to subsequent jobs
+        if: env.RELEASE_TYPE
+        id: set_release_type_output
+        run: |
+          echo "Found release type '${{ env.RELEASE_TYPE }}'"
+          echo "release_type=${{ env.RELEASE_TYPE }}" >> $GITHUB_OUTPUT
+      - name: Fail and display error is proper release type is not found in changelog
+        if: env.RELEASE_TYPE == ''
+        run: echo "No valid release type found in changelog. The title of the 'Unreleased' section must contain one of the following tag [patch], [minor], [major]. Ex Unreleased [minor]."; exit 1
+  
   release:
-    needs: [ check_changelog, job1 ]
+    needs: [ check_changelog ]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -21,13 +35,11 @@ jobs:
           git config --global user.name "GitHub Actions"
           git config --global user.email "github-actions@users.noreply.github.com"
 
-      - run: echo "job1 ${{needs.job1.outputs.output1}} job2 ${{needs.job1.outputs.output2}}"
-
-      # - name: Bump package version
-      #   run: |
-      #     echo "Release type from previous job ${{needs.check_changelog.outputs.release_type}}"
-      #     echo "NEW_VERSION=$(npm --no-git-tag-version version ${{needs.check_changelog.outputs.release_type}})" >> $GITHUB_ENV
-      #     echo "RELEASE_TAG=latest" >> $GITHUB_ENV
+      - name: Bump package version
+        run: |
+          echo "Release type from previous job ${{needs.check_changelog.outputs.release_type}}"
+          echo "NEW_VERSION=$(npm --no-git-tag-version version ${{needs.check_changelog.outputs.release_type}})" >> $GITHUB_ENV
+          echo "RELEASE_TAG=latest" >> $GITHUB_ENV
 
       # - name: Update changelog unreleased section with new version
       #   uses: superfaceai/release-changelog-action@v2
