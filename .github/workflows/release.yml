@@ -24,7 +24,7 @@ jobs:
         run: echo "No valid release type found in changelog. The title of the 'Unreleased' section must contain one of the following tag [patch], [minor], [major]. Ex Unreleased [minor]."; exit 1
   
   release:
-    needs: [ check_changelog ]
+    needs: [ test, check_changelog ]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -37,9 +37,8 @@ jobs:
 
       - name: Bump package version
         run: |
-          echo "Release type from previous job ${{needs.check_changelog.outputs.release_type}}"
+          echo "Release type from previous job '${{needs.check_changelog.outputs.release_type}}'"
           echo "NEW_VERSION=$(npm --no-git-tag-version version ${{needs.check_changelog.outputs.release_type}})" >> $GITHUB_ENV
-          echo "RELEASE_TAG=latest" >> $GITHUB_ENV
 
       # - name: Update changelog unreleased section with new version
       #   uses: superfaceai/release-changelog-action@v2
