@@ -5,6 +5,9 @@ on:
     branches: [ main ]
 
 jobs:
+  test:
+    uses: "Ndpnt/OpenTermsArchive/.github/workflows/test.yml@main"
+
   check_changelog:
     runs-on: ubuntu-latest
     outputs:
