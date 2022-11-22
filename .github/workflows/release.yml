@@ -6,7 +6,7 @@ on:
 
 jobs:
   test:
-    uses: "ambanum/OpenTermsArchive/.github/workflows/test.yml@main"
+    uses: "Ndpnt/OpenTermsArchive/.github/workflows/test.yml@main"
   release:
     needs: [ check_changelog ]
     runs-on: ubuntu-latest
