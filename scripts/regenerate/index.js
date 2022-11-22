@@ -4,9 +4,9 @@ import os from 'node:os';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-import colors from 'colors';
 import { program } from 'commander';
 import config from 'config';
+import DeepDiff from 'deep-diff';
 import inquirer from 'inquirer';
 import jsdom from 'jsdom';
 
@@ -16,13 +16,101 @@ import Record from '../../src/archivist/recorder/record.js';
 import RepositoryFactory from '../../src/archivist/recorder/repositories/factory.js';
 import * as services from '../../src/archivist/services/index.js';
 
+import logger, { colors } from './logger.js';
+
 const { JSDOM } = jsdom;
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
+const DECLARATIONS_PATH = config.services.declarationsPath;
+
 const ROOT_OUTPUT = path.resolve(__dirname, 'output');
 const SKIPPED_OUTPUT = path.join(ROOT_OUTPUT, 'skipped');
 const TO_CHECK_OUTPUT = path.join(ROOT_OUTPUT, 'to-check');
+const CLEANING_FOLDER = path.join(DECLARATIONS_PATH, '../cleaning');
+
+const INSTANCE_NAME = DECLARATIONS_PATH.split('/').reverse()[1].replace('-declarations', '');
+
+const SNAPSHOTS_REPOSITORY_URL = `https://github.com/OpenTermsArchive/${INSTANCE_NAME}-snapshots`;
+const VERSIONS_REPOSITORY_URL = `https://github.com/OpenTermsArchive/${INSTANCE_NAME}-versions`;
+
+await fs.mkdir(CLEANING_FOLDER, { recursive: true });
+const cleaningFilePath = path.join(CLEANING_FOLDER, 'index.json');
+
+if (!fsApi.existsSync(cleaningFilePath)) {
+  fsApi.writeFileSync(cleaningFilePath, `${JSON.stringify({
+    documents: {},
+    documentTypes: { },
+  }, null, 2)}\n`);
+}
+
+const cleaning = JSON.parse(fsApi.readFileSync(cleaningFilePath));
+
+const updateCleaningFile = (serviceId, documentType, field, value) => {
+  const service = cleaning.documents[serviceId] || {};
+  const document = service[documentType] || {};
+
+  let updatedValue;
+
+  if (field == 'skipContent') {
+    updatedValue = { ...document[field] || {}, ...value };
+  } else if ([ 'skipCommit', 'skipSelector', 'skipMissingSelector' ].includes(field)) {
+    updatedValue = [ ...document[field] || [], value ];
+  } else if (field == 'done') {
+    updatedValue = value;
+  }
+
+  cleaning.documents = {
+    ...cleaning.documents,
+    [serviceId]: {
+      ...service,
+      [documentType]: {
+        ...document,
+        [field]: updatedValue,
+      },
+    },
+  };
+  logger.debug(`${value} appended to ${field}`);
+  fsApi.writeFileSync(cleaningFilePath, `${JSON.stringify(cleaning, null, 2)}\n`);
+};
+
+const updateHistory = async (serviceId, documentType, documentDeclaration, { previousValidUntil }) => {
+  const historyFullPath = `${DECLARATIONS_PATH}/${serviceId}.history.json`;
+
+  if (!fsApi.existsSync(historyFullPath)) {
+    fsApi.writeFileSync(historyFullPath, `${JSON.stringify({ [documentType]: [] }, null, 2)}\n`);
+  }
+
+  const currentJSONDeclaration = { ...declarationToJSON(documentDeclaration).documents[documentType] };
+
+  const existingHistory = JSON.parse(fsApi.readFileSync(historyFullPath).toString());
+
+  const historyEntries = existingHistory[documentType] || [];
+
+  let entryAlreadyExists = false;
+
+  existingHistory[documentType] = [...existingHistory[documentType] || []];
+
+  historyEntries.map(({ validUntil, ...historyEntry }) => {
+    const diff = DeepDiff.diff(historyEntry, currentJSONDeclaration);
+
+    if (!diff) {
+      return { ...historyEntry, validUntil };
+    }
+
+    entryAlreadyExists = true;
+    logger.info(`History entry is already present, updating validUntil to ${previousValidUntil}`);
+
+    return { ...historyEntry, validUntil: previousValidUntil };
+  });
+
+  if (!entryAlreadyExists) {
+    logger.info('History entry does not exist, creating one');
+    existingHistory[documentType] = [ ...existingHistory[documentType], { ...currentJSONDeclaration, validUntil: previousValidUntil }];
+  }
+
+  fsApi.writeFileSync(historyFullPath, `${JSON.stringify(existingHistory, null, 2)}\n`);
+};
 
 program
   .name('regenerate')
@@ -30,95 +118,13 @@ program
   .version('0.0.1');
 
 program
+  .option('-l, --list', 'lists all services to be handled')
   .option('-s, --serviceId [serviceId]', 'service ID of service to handle')
   .option('-d, --documentType [documentType]', 'document type to handle')
   .option('-i, --interactive', 'Enable interactive mode to validate each version and choose if snapshot should be skipped');
 
 program.parse(process.argv);
 const options = program.opts();
-
-const contentSkippingRules = {
-  YouTube: { 'Terms of Service': { 'h1.title': 'Terms of Service' } },
-  Instagram: {
-    'Terms of Service': { 'h1 span': 'Terms of Use' },
-    'Copyright Claims Policy': { '[role="main"] span:not(:empty)': 'Sorry! Something went wrong :(' },
-  },
-};
-
-const selectorSkippingRules = {
-  Facebook: {
-    'Terms of Service': ['body.touch'],
-    'Privacy Policy': ['body.touch'],
-  },
-  Instagram: {
-    'Terms of Service': ['body.touch'],
-    'Copyright Claims Policy': ['body.touch'],
-    'Community Guidelines - Intellectual Property': ['body.touch'],
-  },
-};
-
-const missingRequiredSelectorSkippingRules = {
-  Facebook: {
-    'Terms of Service': ['[href="https://www.facebook.com/legal/terms/eecc/flyout"]'],
-    'Privacy Policy': ['[href*="https://www.facebook.com/help/contact/540977946302970"]'],
-  },
-  Instagram: {
-    'Terms of Service': ['[href*="http://help.instagram.com/430517971668717"]'],
-    'Copyright Claims Policy': ['[lang="fr"]'],
-    'Privacy Policy': ['[href*="https://www.facebook.com/help/contact/540977946302970"]'],
-  },
-};
-
-const snapshotsIdsWithContentToSkip = [
-  '2ac6866668843e95d3244ef951aec80ac2a04d81',
-  'cf212038db60cade3dc626b0c0bfa0050f937b3c',
-  'e3c5d043231109859b20b6654a9b7386a6666482',
-  '8440dae9d0332deb20c897d79f05ec13ba2ac56e',
-  '4c7e6839f22f0e2c3337406dc2d5318122971443',
-  'e58876806378bf5f97e114f0121f54ee44f10453',
-  'd2ae49e6aa3b64b3ead538349a4a4e8d73bee58a',
-  'b8ed9ebf5fa45d8884d4b427ed013ba81011ea53',
-  '0d8cf493a4e2b6588c2a348a2c04191b605e867f',
-  '654f583fa7f05094b83b9a2e89788697fafc0d7b',
-  'a2e0702e3811d2058f11fb4e9804c5174cc9a759',
-  '498e1a625f9c9c97d15e20428392d4e2ab64f938',
-  '6c5f1aaaee985877fd583a8068cf87b52d176f79',
-  '8cc9d13cddba1b4685a462e85c80ce0cf5dab175',
-  'e727fc5d5ece297cf48f9ac3a5b608e1b30079d4',
-  'cd20e0a866219a66a358b722a51bf668f433bbc4',
-  '0ccc18b69f329f9b1621a42545f5bd111fe641a0',
-  '39321b46fb9b834be114748198f0702448547fdc',
-  '1c4ec7c73fef93084c077e75a21f5dac9c921370',
-  '92e15535ff540b5652e5b3b0d1294de0f80f2302',
-  'e6e468aa833da9f2b56f1190887eda7b817a35e7',
-  'f30ddd1f6f1f59e6bc9e5d65465a9b94a9255976',
-  '3f12b8f71b6ea942bc05ed316c420cfadb7abd0e',
-  '6db14f8cf8191635d431936b34d971c1e35ca455',
-  '2f3ecc3d57a1aaebe703961eab518b596a9b986b',
-  '23c28b33f408bf2c60e6e72a948a6d5a5d68273d',
-  '683d259252fe0f17c996085e077c55af4ccc1ffb',
-  '589ef95adcda7fc64e9f3e562823ae338b651216',
-  '9184bc42c5672c14d23e84708db936522588ab5b',
-  '11779221c60f0cbddbe7831b228bdbf68f8e60bd',
-  'fa7f59d3cd60afcefaf0b556d08986b96a99eafd',
-  '80f5d1079c8d8e84a00201b1e3e42c14a07a58e5',
-  '545087f8a6251e1b75cc72657f8f82d91e3de985',
-  '09b2f505c8a81c599251165d4ae260b2d6fdff5d',
-  'e9f342120f746def8cc003120999b70cad3bf789',
-  '041ef83e663359d8ee2436ee43907a737f038f4c',
-  '527d5e26ef2bea2cef2a148b76f967f6769b9048',
-  '249e02ad7aad85be77ab4df396b00a59038e9891',
-  'fe0c33f3a64e89d3f899753d1017360ab4412199',
-  'c9388a9d9509c961acfae12918df13101c49f508',
-  '9159d1cb40428f16c1fc21991de1b039bd203cbd',
-];
-
-const renamingRules = {
-  'Community Guidelines - Child Sexual Exploitation': 'Community Guidelines - Child Exploitation',
-  'Community Guidelines - Inauthentic Behaviour and Platform Manipulation': 'Community Guidelines - Platform Manipulation',
-  'Community Guidelines - Deceased Users': 'Deceased Users',
-  'Community Guidelines - Violent Incitement': 'Community Guidelines - Violence Incitement',
-};
 
 const genericPageDeclaration = {
   location: 'http://service.example',
@@ -133,43 +139,339 @@ const genericPageDeclaration = {
   }],
 };
 
-let servicesDeclarations = await services.loadWithHistory();
+const pageToJSON = page => ({
+  fetch: page.location,
+  select: page.contentSelectors,
+  remove: page.noiseSelectors,
+  filter: page.filters ? page.filters.map(filter => filter.name) : undefined,
+  executeClientScripts: page.executeClientScripts,
+});
 
-await initializeFolders(servicesDeclarations);
+const declarationToJSON = declaration => ({
+  name: declaration.service.name,
+  documents: {
+    [declaration.type]: declaration.isMultiPage
+      ? { combine: declaration.pages.map(page => pageToJSON(page)) }
+      : pageToJSON(declaration.pages[0]),
+  },
+});
 
-const { versionsRepository, snapshotsRepository } = await initializeRepositories();
+const main = async () => {
+  let servicesDeclarations = await services.loadWithHistory();
 
-const contentsToSkip = await initializeSnapshotContentToSkip(snapshotsIdsWithContentToSkip, snapshotsRepository);
+  if (options.list) {
+    Object.entries(servicesDeclarations).forEach(([ listServiceId, { documents }]) => Object.keys(documents).forEach(listDocumentType => {
+      const isDone = cleaning.documents[listServiceId] && cleaning.documents[listServiceId][listDocumentType] && cleaning.documents[listServiceId][listDocumentType].done;
 
-info('Number of snapshot in the repository', await snapshotsRepository.count());
+      console.log(isDone ? '✅' : '❌', `-s ${listServiceId} -d "${listDocumentType}" -i`);
+    }));
 
-const serviceId = options.serviceId || '*';
-const documentType = options.documentType || '*';
+    process.exit();
+  }
 
-if (serviceId != '*' || documentType != '*') {
-  info('Number of snapshot for the specified service', (await snapshotsRepository.findAll()).filter(s => s.serviceId == serviceId && s.documentType == documentType).length);
-}
+  await initializeDirectories(servicesDeclarations);
 
-if (options.interactive) {
-  info('Interactive mode enabled');
-}
+  const { versionsRepository, snapshotsRepository } = await initializeRepositories();
 
-console.log('options', options);
+  async function handleSnapshot(snapshot, options, params) {
+    const { serviceId, documentType } = snapshot;
+    const documentDeclaration = servicesDeclarations[serviceId].getDocumentDeclaration(documentType, snapshot.fetchDate);
 
-let index = 1;
+    const { validUntil, pages: [pageDeclaration] } = documentDeclaration;
 
-console.time('Total time');
-for await (const snapshot of snapshotsRepository.iterate([`${serviceId}/${documentType}.*`])) {
-  applyDocumentTypeRenaming(renamingRules, snapshot); // Modifies snapshot in place
+    logger.debug(`${params.index}`.padStart(5, ' '), serviceId, '-', documentType, '  ', 'Snapshot', snapshot.id, 'fetched at', snapshot.fetchDate.toISOString(), 'with declaration valid until', validUntil || 'now');
 
-  await handleSnapshot(snapshot, options, index);
-  index++;
-}
-console.timeEnd('Total time');
+    const { shouldSkip, reason } = checkIfSnapshotShouldBeSkipped(snapshot, pageDeclaration);
 
-await cleanupEmptyDirectories();
+    if (shouldSkip) {
+      logger.debug(`    ↳ Skip: ${reason}`);
+      fs.writeFile(path.join(SKIPPED_OUTPUT, serviceId, documentType, generateFileName(snapshot)), snapshot.content);
 
-async function initializeFolders(servicesDeclarations) {
+      return;
+    }
+
+    const snapshotFolder = path.join(TO_CHECK_OUTPUT, serviceId, documentType);
+    const snapshotFilename = generateFileName(snapshot);
+    const snapshotPath = path.join(snapshotFolder, snapshotFilename);
+
+    try {
+      const version = await filter({
+        pageDeclaration,
+        content: snapshot.content,
+        mimeType: snapshot.mimeType,
+      });
+
+      const record = new Record({
+        content: version,
+        serviceId,
+        documentType,
+        snapshotId: snapshot.id,
+        fetchDate: snapshot.fetchDate,
+        mimeType: 'text/markdown',
+        snapshotIds: [snapshot.id],
+      });
+
+      const tmpFilePath = path.join(os.tmpdir(), 'regenerated-version.md');
+
+      await fs.writeFile(tmpFilePath, version);
+
+      const diffArgs = [ '--minimal', '--color=always', '--color-moved=zebra', `${serviceId}/${documentType}.md`, tmpFilePath ];
+
+      const diffString = await versionsRepository.git.diff(diffArgs).catch(async error => {
+        if (!error.message.includes('Could not access')) {
+          throw error;
+        }
+
+        const { id } = await versionsRepository.save(record);
+
+        logger.info(`    ↳ Generated first version: ${id}`);
+      });
+
+      if (!diffString) {
+        return;
+      }
+
+      console.log(diffString);
+      logger.debug('Generated with the following command');
+      logger.debug(`git diff ${diffArgs.map(arg => arg.replace(' ', '\\ ')).join(' ')}`);
+
+      fs.writeFile(snapshotPath, snapshot.content);
+
+      if (options.interactive) {
+        const DECISION_KEEP = 'Yes, keep it!';
+        const DECISION_SKIP_CONTENT = 'Skip this snapshot based on a content';
+        const DECISION_SKIP_SELECTOR = 'Skip this snapshot based on a selector';
+        const DECISION_SKIP_MISSING_SELECTOR = 'Skip this snapshot if selector does not exist';
+        const DECISION_SNAPSHOT = 'Not sure, show me the snapshot';
+        const DECISION_DECLARATION = 'Not sure, show me the current declaration used';
+        const DECISION_RETRY = 'No, but I updated the declaration, let\'s retry';
+
+        const { decision } = await inquirer.prompt([{
+          message: 'Is this version valid?',
+          type: 'list',
+          choices: [
+            DECISION_KEEP, new inquirer.Separator('Analyze'), DECISION_SNAPSHOT, DECISION_DECLARATION, new inquirer.Separator('Update'), DECISION_SKIP_CONTENT, DECISION_SKIP_SELECTOR, DECISION_SKIP_MISSING_SELECTOR, DECISION_RETRY ],
+          name: 'decision',
+        }]);
+
+        if (decision == DECISION_RETRY) {
+          logger.debug('Reloading declarations…');
+          servicesDeclarations = await services.loadWithHistory();
+
+          return handleSnapshot(snapshot, options, params);
+        }
+
+        if (decision == DECISION_SNAPSHOT) {
+          logger.info('');
+          logger.info('- Open it in your IDE');
+          logger.info(`open -a "Google Chrome" "${snapshotPath}"`);
+          logger.info('');
+          logger.info('- Or see it online');
+          logger.info(`${SNAPSHOTS_REPOSITORY_URL}/commit/${snapshot.id}`);
+          await inquirer.prompt({ type: 'confirm', name: 'Click on the link above to see the snapshot and then click to continue' });
+
+          return handleSnapshot(snapshot, options, params);
+        }
+
+        if (decision == DECISION_DECLARATION) {
+          logger.info(JSON.stringify(declarationToJSON(documentDeclaration), null, 2));
+          await inquirer.prompt({ type: 'confirm', name: 'Continue' });
+
+          return handleSnapshot(snapshot, options, params);
+        }
+
+        if (decision == DECISION_SKIP_CONTENT) {
+          const { skipContentSelector } = await inquirer.prompt({ type: 'input', name: 'skipContentSelector', message: 'The selector you will test the content of' });
+          const { skipContentValue } = await inquirer.prompt({ type: 'input', name: 'skipContentValue', message: 'The value which, if present, will make the snapshot skipped' });
+
+          updateCleaningFile(serviceId, documentType, 'skipContent', { [skipContentSelector]: skipContentValue });
+
+          return handleSnapshot(snapshot, options, params);
+        }
+        if (decision == DECISION_SKIP_SELECTOR) {
+          const { skipSelector } = await inquirer.prompt({ type: 'input', name: 'skipSelector', message: 'The selector which, if present, will make the snapshot skipped' });
+
+          updateCleaningFile(serviceId, documentType, 'skipSelector', skipSelector);
+
+          return handleSnapshot(snapshot, options, params);
+        }
+
+        if (decision == DECISION_SKIP_MISSING_SELECTOR) {
+          const { skipMissingSelector } = await inquirer.prompt({ type: 'input', name: 'skipMissingSelector', message: 'The selector which, if present, will make the snapshot skipped' });
+
+          updateCleaningFile(serviceId, documentType, 'skipMissingSelector', skipMissingSelector);
+
+          return handleSnapshot(snapshot, options, params);
+        }
+      }
+
+      const { id } = await versionsRepository.save(record);
+
+      logger.info(`    ↳ Generated new version: ${id}`);
+    } catch (error) {
+      if (!(error instanceof InaccessibleContentError)) {
+        throw error;
+      }
+
+      const filteredSnapshotContent = await filter({ pageDeclaration: genericPageDeclaration, content: snapshot.content, mimeType: snapshot.mimeType });
+
+      if (contentsToSkip.find(contentToSkip => contentToSkip == filteredSnapshotContent)) {
+        logger.debug(`    ↳ Skip ${snapshot.id} as its content matches a content to skip`);
+
+        return;
+      }
+
+      logger.error('    ↳ An error occured while filtering:', error.message);
+
+      if (options.interactive) {
+        fs.writeFile(snapshotPath, snapshot.content);
+
+        const DECISION2_BYPASS = 'Take care of it later';
+        const DECISION2_SKIP = 'This snapshot is not useable, skip it!';
+        const DECISION2_SNAPSHOT = 'Not sure, show me the snapshot';
+        const DECISION2_DECLARATION = 'Not sure, show me the current declaration used';
+        const DECISION2_SNAPSHOT_CONTENT = 'Not sure, show me the snapshot content';
+        const DECISION2_RETRY = 'Retry, I updated the declaration';
+        const DECISION2_UPDATE = 'Update the declaration';
+
+        const { decision2 } = await inquirer.prompt([{
+          message: 'What do you want to do?',
+          type: 'list',
+          choices: [
+            DECISION2_BYPASS, DECISION2_SKIP, DECISION2_SNAPSHOT, DECISION2_SNAPSHOT_CONTENT, DECISION2_DECLARATION, DECISION2_UPDATE, DECISION2_RETRY ],
+          name: 'decision2',
+        }]);
+
+        if (decision2 == DECISION2_RETRY) {
+          logger.debug('Reloading declarations…');
+          servicesDeclarations = await services.loadWithHistory();
+
+          return handleSnapshot(snapshot, options, params);
+        }
+
+        if (decision2 == DECISION2_DECLARATION) {
+          logger.info(JSON.stringify(declarationToJSON(documentDeclaration), null, 2));
+          await inquirer.prompt({ type: 'confirm', name: 'Continue' });
+
+          return handleSnapshot(snapshot, options, params);
+        }
+
+        if (decision2 == DECISION2_SNAPSHOT_CONTENT) {
+          const line = colors.grey(colors.underline(`${' '.repeat(process.stdout.columns)}`));
+
+          console.log(`\n\n${line}\n${colors.cyan(filteredSnapshotContent)}\n${line}\n\n`);
+          await inquirer.prompt({ type: 'confirm', name: 'Continue' });
+
+          return handleSnapshot(snapshot, options, params);
+        }
+
+        if (decision2 == DECISION2_UPDATE) {
+          await updateHistory(serviceId, documentType, documentDeclaration, params);
+
+          logger.warn('History has been updated, you now need to fix the current declaration');
+
+          return handleSnapshot(snapshot, options, params);
+        }
+
+        if (decision2 == DECISION2_SNAPSHOT) {
+          logger.info('- Open it in your IDE');
+          logger.info(`open -a "Google Chrome" "${snapshotPath}"`);
+          logger.info('- Or see it online');
+          logger.info(`${SNAPSHOTS_REPOSITORY_URL}/commit/${snapshot.id}`);
+          await inquirer.prompt({ type: 'confirm', name: 'Click on the link above to see the snapshot and then click to continue' });
+
+          return handleSnapshot(snapshot, options, params);
+        }
+
+        if (decision2 == DECISION2_SKIP) {
+          logger.info(JSON.stringify(declarationToJSON(documentDeclaration), null, 2));
+          updateCleaningFile(serviceId, documentType, 'skipCommit', snapshot.id);
+        }
+
+        if (decision2 == DECISION2_BYPASS) {
+          // Pass to next snapshot
+        }
+      }
+    }
+  }
+
+  logger.debug('Number of snapshot in the repository', colors.info(await snapshotsRepository.count()));
+
+  const serviceId = options.serviceId || '*';
+  const documentType = options.documentType || '*';
+
+  if (serviceId != '*' || documentType != '*') {
+    logger.debug('Number of snapshot for the specified service', colors.info((await snapshotsRepository.findAll()).filter(s => s.serviceId == serviceId && s.documentType == documentType).length));
+  }
+  if (serviceId != '*' && documentType != '*') {
+    const isDone = cleaning && cleaning.documents[serviceId] && cleaning.documents[serviceId][documentType] && cleaning.documents[serviceId][documentType].done;
+
+    if (isDone) {
+      logger.error(`${serviceId} - ${documentType} has already been marked as done. If you're sure of what you're doing, manually remove "done" from the cleaning file`);
+      process.exit();
+    }
+  }
+
+  if (options.interactive) {
+    logger.info('Interactive mode enabled');
+  }
+
+  logger.info('options', options);
+
+  const contentsToSkip = await initializeSnapshotContentToSkip(serviceId, documentType, snapshotsRepository);
+
+  let index = 1;
+
+  let previousValidUntil = null;
+
+  console.time('Total time');
+  for await (const snapshot of snapshotsRepository.iterate([`${serviceId}/${documentType}.*`])) {
+    if (!previousValidUntil) {
+      previousValidUntil = snapshot.fetchDate.toISOString();
+    }
+    // Modifies snapshot in place
+    snapshot.documentType = (cleaning.documentTypes || {})[snapshot.documentType] || snapshot.documentType;
+
+    await handleSnapshot(snapshot, options, { index, previousValidUntil });
+    index++;
+    previousValidUntil = snapshot.fetchDate.toISOString();
+  }
+  console.timeEnd('Total time');
+
+  if (serviceId != '*' || documentType != '*') {
+    if (options.interactive) {
+      const DECISION3_DONE = 'All is ok, mark it as done';
+      const DECISION3_RETRY = 'I want to relaunch it in non interactive mode to be sure';
+
+      const { decision3 } = await inquirer.prompt([{
+        message: 'What do you want to do?',
+        type: 'list',
+        choices: [
+          DECISION3_DONE, DECISION3_RETRY ],
+        name: 'decision3',
+      }]);
+
+      if (decision3 == DECISION3_DONE) {
+        updateCleaningFile(serviceId, documentType, 'done', true);
+        logger.info(`${serviceId} - ${documentType} has been marked as done`);
+        logger.warn("Don't forget to commit the changes with the following message");
+        logger.info(`git add declarations/${serviceId}.json`);
+        logger.info('git add cleaning/index.json');
+        logger.info(`git c -m "Clean ${serviceId} ${documentType}"`);
+      }
+
+      if (decision3 == DECISION3_RETRY) {
+        // Pass to next snapshot
+        logger.warn('');
+        logger.warn('Launch this command again without the -i to mark it as done');
+      }
+    }
+  }
+
+  await cleanupEmptyDirectories();
+};
+
+async function initializeDirectories(servicesDeclarations) {
   return Promise.all([ TO_CHECK_OUTPUT, SKIPPED_OUTPUT ].map(async folder =>
     Promise.all(Object.entries(servicesDeclarations).map(([ key, value ]) =>
       Promise.all(Object.keys(value.documents).map(documentName => {
@@ -226,121 +528,20 @@ async function copyReadme(sourceRepository, targetRepository) {
   });
 }
 
-async function initializeSnapshotContentToSkip(snapshotsIds, repository) {
+async function initializeSnapshotContentToSkip(serviceId, documentType, repository) {
+  const snapshotsIds = Object.entries(cleaning.documents)
+    .filter(([cleaningServiceId]) => [ '*', serviceId ].includes(cleaningServiceId))
+    .map(([ , cleaningDocumentTypes ]) => Object.entries(cleaningDocumentTypes)
+      .filter(([cleaningDocumentType]) => [ '*', documentType ].includes(cleaningDocumentType))
+      .map(([ , { skipCommit }]) => skipCommit)
+      .filter(skippedCommit => !!skippedCommit)
+      .flat()).flat();
+
   return Promise.all(snapshotsIds.map(async snapshotsId => {
     const { content, mimeType } = await repository.findById(snapshotsId);
 
     return filter({ pageDeclaration: genericPageDeclaration, content, mimeType });
   }));
-}
-
-function info(...args) {
-  console.log(colors.grey(...args));
-}
-
-function applyDocumentTypeRenaming(rules, snapshot) {
-  snapshot.documentType = rules[snapshot.documentType] || snapshot.documentType;
-}
-
-async function handleSnapshot(snapshot, options, index) {
-  const { serviceId, documentType } = snapshot;
-  const { validUntil, pages: [pageDeclaration] } = servicesDeclarations[serviceId].getDocumentDeclaration(documentType, snapshot.fetchDate);
-
-  info(`${index}`.padStart(5, ' '), serviceId, '-', documentType, '  ', 'Snapshot', snapshot.id, 'fetched at', snapshot.fetchDate.toISOString(), 'with declaration valid until', validUntil || 'now');
-
-  const { shouldSkip, reason } = checkIfSnapshotShouldBeSkipped(snapshot, pageDeclaration);
-
-  if (shouldSkip) {
-    console.log(`    ↳ Skip: ${reason}`);
-    fs.writeFile(path.join(SKIPPED_OUTPUT, serviceId, documentType, generateFileName(snapshot)), snapshot.content);
-
-    return;
-  }
-
-  try {
-    const version = await filter({
-      pageDeclaration,
-      content: snapshot.content,
-      mimeType: snapshot.mimeType,
-    });
-
-    const record = new Record({
-      content: version,
-      serviceId,
-      documentType,
-      snapshotId: snapshot.id,
-      fetchDate: snapshot.fetchDate,
-      mimeType: 'text/markdown',
-      snapshotIds: [snapshot.id],
-    });
-
-    const tmpFilePath = path.join(os.tmpdir(), 'regenerated-version.md');
-
-    await fs.writeFile(tmpFilePath, version);
-    const diffString = await versionsRepository.git.diff([ '--word-diff=color', `${serviceId}/${documentType}.md`, tmpFilePath ]).catch(async error => {
-      if (!error.message.includes('Could not access')) {
-        throw error;
-      }
-
-      const { id } = await versionsRepository.save(record);
-
-      console.log(`    ↳ Generated first version: ${id}`);
-    });
-
-    if (!diffString) {
-      return;
-    }
-
-    console.log(diffString);
-
-    fs.writeFile(path.join(TO_CHECK_OUTPUT, serviceId, documentType, generateFileName(snapshot)), snapshot.content);
-
-    if (options.interactive) {
-      const { validVersion } = await inquirer.prompt([{ message: 'Is this version valid?', type: 'list', choices: [ 'Yes, keep it!', 'No, I updated the declaration, let\'s retry' ], name: 'validVersion' }]);
-
-      if (validVersion == 'No, I updated the declaration, let\'s retry') {
-        console.log('Reloading declarations…');
-        servicesDeclarations = await services.loadWithHistory();
-
-        return handleSnapshot(snapshot, options, index);
-      }
-    }
-
-    const { id } = await versionsRepository.save(record);
-
-    console.log(`    ↳ Generated new version: ${id}`);
-  } catch (error) {
-    if (!(error instanceof InaccessibleContentError)) {
-      throw error;
-    }
-
-    const filteredSnapshotContent = await filter({ pageDeclaration: genericPageDeclaration, content: snapshot.content, mimeType: snapshot.mimeType });
-
-    if (contentsToSkip.find(contentToSkip => contentToSkip == filteredSnapshotContent)) {
-      console.log(`    ↳ Skip ${snapshot.id} as its content matches a content to skip`);
-
-      return;
-    }
-
-    console.log('    ↳ An error occured while filtering:', error.message);
-
-    const line = colors.grey(colors.underline(`${' '.repeat(process.stdout.columns)}`));
-
-    console.log(`\n${line}\n${colors.cyan(filteredSnapshotContent)}\n${line}\n`);
-
-    const { skip } = await inquirer.prompt([{ message: 'Should this snapshot be skipped?', type: 'list', name: 'skip', choices: [ 'Yes, skip it!', 'No, I updated the declaration, let\'s retry' ] }]);
-
-    if (skip == 'Yes, skip it!') {
-      contentsToSkip.push(filteredSnapshotContent);
-
-      console.log('Do not forget to append "{snapshot.id}" in "snapshotsIdsWithContentToSkip" array');
-    } else {
-      console.log('Reloading declarations…');
-      servicesDeclarations = await services.loadWithHistory();
-
-      return handleSnapshot(snapshot, options, index);
-    }
-  }
 }
 
 function generateFileName(snapshot) {
@@ -350,9 +551,11 @@ function generateFileName(snapshot) {
 function checkIfSnapshotShouldBeSkipped(snapshot, pageDeclaration) {
   const { serviceId, documentType } = snapshot;
 
-  const contentsToSkip = contentSkippingRules[serviceId] && contentSkippingRules[serviceId][documentType];
-  const selectorsToSkip = selectorSkippingRules[serviceId] && selectorSkippingRules[serviceId][documentType];
-  const missingRequiredSelectors = missingRequiredSelectorSkippingRules[serviceId] && missingRequiredSelectorSkippingRules[serviceId][documentType];
+  const cleaner = (cleaning.documents[serviceId] || {})[documentType];
+
+  const contentsToSkip = (cleaner && cleaner.skipContent) || [];
+  const selectorsToSkip = (cleaner && cleaner.skipSelector) || [];
+  const missingRequiredSelectors = (cleaner && cleaner.skipIfMissingSelector) || [];
 
   if (!(contentsToSkip || selectorsToSkip || missingRequiredSelectors)) {
     return { shouldSkip: false };
@@ -413,3 +616,5 @@ async function cleanupEmptyDirectories() {
   }));
   /* eslint-enable no-await-in-loop */
 }
+
+main();

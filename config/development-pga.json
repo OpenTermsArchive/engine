@@ -1,0 +1,40 @@
+{
+    "services": {
+      "declarationsPath": "../pga-declarations/declarations"
+    },
+    "recorder": {
+      "versions": {
+        "storage": {
+          "type": "git",
+          "git": {
+            "path": "../pga-versions",
+            "publish": false,
+            "snapshotIdentiferTemplate": "https://github.com/OpenTermsArchive/pga-snapshots/commit/%SNAPSHOT_ID",
+            "author": {
+              "name": "Open Terms Archive Bot",
+              "email": "bot@opentermsarchive.org"
+            }
+          }
+        }
+      },
+      "snapshots": {
+        "storage": {
+          "type": "git",
+          "git": {
+            "path": "../pga-snapshots",
+            "publish": false,
+            "repository": "git@github.com:OpenTermsArchive/pga-snapshots.git",
+            "author": {
+              "name": "Open Terms Archive Bot",
+              "email": "bot@opentermsarchive.org"
+            }
+          }
+        }
+      }
+    },
+    "tracker": {
+        "githubIssues": {
+            "repository": "OpenTermsArchive/sandbox-declarations"
+        }
+    }
+}
