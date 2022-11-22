@@ -21,6 +21,7 @@ jobs:
 
       - name: Bump package version
         run: |
+          echo "Release type from previous job ${{ needs.check_changelog.outputs.release_type }})"
           echo "NEW_VERSION=$(npm --no-git-tag-version version ${{ needs.check_changelog.outputs.release_type }})" >> $GITHUB_ENV
           echo "RELEASE_TAG=latest" >> $GITHUB_ENV
 
