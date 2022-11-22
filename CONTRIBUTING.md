@@ -55,7 +55,7 @@ We add this additional rule:
 
 ### Changelog
 
-All notable changes to this project must be documented in the [`CHANGELOG.md`](./CHANGELOG.md) file.
+All changes to the codebase that impact users must be documented in the [`CHANGELOG.md`](./CHANGELOG.md) file. The format to use is documented in the file itself.
 
 ## Development
 
