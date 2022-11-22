@@ -16,7 +16,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Get release type in changelog
-        run: echo "RELEASE_TYPE=$(cat CHANGELOG.md | grep -E '^## Unreleased \[(patch|minor|major)\]$' | grep -E -w -o "patch|minor|major")" >> $GITHUB_ENV
+        run: echo "RELEASE_TYPE=$(cat CHANGELOG.md | grep -E '^## Unreleased \[(patch|minor|major)\]$' | grep -E -w -o "patch|minor|major" | tr -d '\n')" >> $GITHUB_ENV
       - name: Make release type available to subsequent jobs
         if: env.RELEASE_TYPE
         id: set_release_type_output
