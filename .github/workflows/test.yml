@@ -22,46 +22,46 @@ jobs:
         if: !env.RELEASE_TYPE
         run: echo "No valid release type found in changelog. The title of the 'Unreleased' section must contain one of the following tag [patch], [minor], [major]. Ex Unreleased [minor]."; exit 1
 
-  test:
-    strategy:
-      matrix:
-        operating_system: [ ubuntu-latest, windows-latest, macos-latest ]
-      fail-fast: false # run tests on other operating systems even if one fails
+  # test:
+  #   strategy:
+  #     matrix:
+  #       operating_system: [ ubuntu-latest, windows-latest, macos-latest ]
+  #     fail-fast: false # run tests on other operating systems even if one fails
 
-    runs-on: ${{ matrix.operating_system }}
+  #   runs-on: ${{ matrix.operating_system }}
 
-    steps:
-      - run: |
-          git config --global core.autocrlf false
-      - uses: actions/checkout@v2
-      - uses: ankane/setup-mongodb@ce30d9041565cb469945895d5bde3384a254dd2e # use commit ID until action is versioned, see https://github.com/ankane/setup-mongodb/issues/2
-        with:
-          mongodb-version: 5.0
-      - uses: actions/setup-node@v2
-        with:
-          node-version: 16
-      - run: npm ci
-      - run: npm test
+  #   steps:
+  #     - run: |
+  #         git config --global core.autocrlf false
+  #     - uses: actions/checkout@v2
+  #     - uses: ankane/setup-mongodb@ce30d9041565cb469945895d5bde3384a254dd2e # use commit ID until action is versioned, see https://github.com/ankane/setup-mongodb/issues/2
+  #       with:
+  #         mongodb-version: 5.0
+  #     - uses: actions/setup-node@v2
+  #       with:
+  #         node-version: 16
+  #     - run: npm ci
+  #     - run: npm test
 
-  validate_declarations:
-    strategy:
-      matrix:
-        operating_system: [ ubuntu-latest, windows-latest, macos-latest ]
-      fail-fast: false # run tests on other operating systems even if one fails
+  # validate_declarations:
+  #   strategy:
+  #     matrix:
+  #       operating_system: [ ubuntu-latest, windows-latest, macos-latest ]
+  #     fail-fast: false # run tests on other operating systems even if one fails
 
-    runs-on: ${{ matrix.operating_system }}
+  #   runs-on: ${{ matrix.operating_system }}
 
-    steps:
-      - run: |
-          git config --global core.autocrlf false
-      - uses: actions/checkout@v2
-      - uses: actions/checkout@v2
-        with:
-          repository: OpenTermsArchive/contrib-declarations
-          path: ./contrib-declarations
-      - uses: actions/setup-node@v2
-        with:
-          node-version: 16.x
-      - run: cd ./contrib-declarations && npm install
-      - run: npm ci
-      - run: ./node_modules/.bin/cross-env NODE_ENV=ci npm run declarations:validate:schema
+  #   steps:
+  #     - run: |
+  #         git config --global core.autocrlf false
+  #     - uses: actions/checkout@v2
+  #     - uses: actions/checkout@v2
+  #       with:
+  #         repository: OpenTermsArchive/contrib-declarations
+  #         path: ./contrib-declarations
+  #     - uses: actions/setup-node@v2
+  #       with:
+  #         node-version: 16.x
+  #     - run: cd ./contrib-declarations && npm install
+  #     - run: npm ci
+  #     - run: ./node_modules/.bin/cross-env NODE_ENV=ci npm run declarations:validate:schema

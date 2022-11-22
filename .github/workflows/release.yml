@@ -5,7 +5,10 @@ on:
     branches: [ main ]
 
 jobs:
+  test:
+    uses: "ambanum/OpenTermsArchive/.github/workflows/test.yml@main"
   release:
+    needs: [ test ]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
