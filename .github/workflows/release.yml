@@ -11,7 +11,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Git configuration
+      - name: Configure Git author
         run: |
           git config --global user.name "GitHub Actions"
           git config --global user.email "github-actions@users.noreply.github.com"
@@ -40,8 +40,8 @@ jobs:
           git commit -m "Release ${{ env.NEW_VERSION }}"
           git tag ${{ env.NEW_VERSION }}
 
-      - name: Add authentication token for NPM
-        run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPMJS_ACCESS_TOKEN }}" > ~/.npmrc
+      # - name: Add authentication token for NPM
+      #   run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPMJS_ACCESS_TOKEN }}" > ~/.npmrc
 
       - name: Read version changelog
         uses: superfaceai/release-changelog-action@v1
