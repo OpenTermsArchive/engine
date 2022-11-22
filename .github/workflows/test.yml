@@ -12,6 +12,7 @@ jobs:
   check_changelog:
     runs-on: [ubuntu-latest]
     steps:
+      - uses: actions/checkout@v2
       - name: Check for proper release type in changelog
         run: $(cat CHANGELOG.md | grep '## Unreleased \[.*\]' | grep -E -w -o -q "patch|minor|major") || echo "No valid release type found"; exit 1
 
