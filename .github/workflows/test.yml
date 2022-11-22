@@ -13,12 +13,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+        with:
+          node-version: 16
       - name: Get release type in changelog
         run: echo "RELEASE_TYPE=$(cat CHANGELOG.md | grep -E '^## Unreleased \[(patch|minor|major)\]$' | grep -E -w -o "patch|minor|major" | tr -d '\n')" >> $GITHUB_ENV
       - name: Fail and display error is proper release type is not found in changelog
         if: env.RELEASE_TYPE == ''
         run: echo "No valid release type found in changelog. The title of the 'Unreleased' section must contain one of the following tag [patch], [minor], [major]. Ex Unreleased [minor]."; exit 1
-        
+
   test:
     strategy:
       matrix:
