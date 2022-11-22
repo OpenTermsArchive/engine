@@ -61,15 +61,11 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Publish new version to NPM
+      - name: Setup Node
         uses: actions/setup-node@v1
         with:
           node-version: 16
           registry-url: 'https://registry.npmjs.org'
-          always-auth: true
-
-      # - name: Add authentication token for NPM
-      #   run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPMJS_ACCESS_TOKEN }}" > ~/.npmrc
 
       - name: Publish version to public repository
         run: npm publish --verbose --access public --tag ${{ env.RELEASE_TAG }}
