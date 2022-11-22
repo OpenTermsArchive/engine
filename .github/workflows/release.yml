@@ -8,7 +8,7 @@ jobs:
   test:
     uses: "ambanum/OpenTermsArchive/.github/workflows/test.yml@main"
   release:
-    needs: [ check_changelog, test ]
+    needs: [ check_changelog ]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
