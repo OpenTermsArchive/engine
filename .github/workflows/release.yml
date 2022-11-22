@@ -19,51 +19,48 @@ jobs:
           git config --global user.name "GitHub Actions"
           git config --global user.email "github-actions@users.noreply.github.com"
 
-      - name: Get release type
-        run: echo ${{needs.check_changelog.outputs.release_type}}
+      - name: Bump package version
+        run: |
+          echo "NEW_VERSION=$(npm --no-git-tag-version version ${{ needs.check_changelog.outputs.release_type }})" >> $GITHUB_ENV
+          echo "RELEASE_TAG=latest" >> $GITHUB_ENV
 
-      # - name: Bump package version
-      #   run: |
-      #     echo "NEW_VERSION=$(npm --no-git-tag-version version ${{ env.RELEASE_TYPE }})" >> $GITHUB_ENV
-      #     echo "RELEASE_TAG=latest" >> $GITHUB_ENV
+      - name: Update changelog unreleased section with new version
+        uses: superfaceai/release-changelog-action@v2
+        with:
+          path-to-changelog: CHANGELOG.md
+          version: ${{ env.NEW_VERSION }}
+          operation: release
 
-      # - name: Update changelog unreleased section with new version
-      #   uses: superfaceai/release-changelog-action@v2
-      #   with:
-      #     path-to-changelog: CHANGELOG.md
-      #     version: ${{ env.NEW_VERSION }}
-      #     operation: release
+      - name: Commit CHANGELOG.md and package.json changes and create tag
+        run: |
+          git add "package.json"
+          git add "package-lock.json"
+          git add "CHANGELOG.md"
+          git commit -m "Release ${{ env.NEW_VERSION }}"
+          git tag ${{ env.NEW_VERSION }}
 
-      # - name: Commit CHANGELOG.md and package.json changes and create tag
-      #   run: |
-      #     git add "package.json"
-      #     git add "package-lock.json"
-      #     git add "CHANGELOG.md"
-      #     git commit -m "Release ${{ env.NEW_VERSION }}"
-      #     git tag ${{ env.NEW_VERSION }}
+      - name: Read version changelog
+        uses: superfaceai/release-changelog-action@v2
+        id: get-changelog
+        with:
+          path-to-changelog: CHANGELOG.md
+          version: ${{ env.NEW_VERSION }}
+          operation: read
 
-      # - name: Read version changelog
-      #   uses: superfaceai/release-changelog-action@v2
-      #   id: get-changelog
-      #   with:
-      #     path-to-changelog: CHANGELOG.md
-      #     version: ${{ env.NEW_VERSION }}
-      #     operation: read
+      - name: Push changes to repository
+        run: git push origin && git push --tags
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # - name: Push changes to repository
-      #   run: git push origin && git push --tags
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Update GitHub release with changelog
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ env.NEW_VERSION }}
+          body: ${{ steps.get-changelog.outputs.changelog }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # - name: Update GitHub release with changelog
-      #   uses: softprops/action-gh-release@v1
-      #   with:
-      #     tag_name: ${{ env.NEW_VERSION }}
-      #     body: ${{ steps.get-changelog.outputs.changelog }}
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      # - name: Publish version to NPM public repository
-      #   uses: JS-DevTools/npm-publish@v1
-      #   with:
-      #     token: ${{ secrets.NPMJS_ACCESS_TOKEN }}
+      - name: Publish version to NPM public repository
+        uses: JS-DevTools/npm-publish@v1
+        with:
+          token: ${{ secrets.NPMJS_ACCESS_TOKEN }}
