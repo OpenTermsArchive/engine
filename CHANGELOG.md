@@ -8,6 +8,9 @@ Unlike Common Changelog, the `unreleased` section of [Keep a Changelog](https://
 
 ## Unreleased [patch]
 
+### Added
+- Patch auto test again
+
 ## 1.1.0 - 2022-11-16
 ### Added
 - Patch auto test again
