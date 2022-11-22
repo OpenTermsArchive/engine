@@ -13,7 +13,6 @@ jobs:
     uses: "Ndpnt/OpenTermsArchive/.github/workflows/release.yml@main"
 
   test:
-    needs: check_changelog
     strategy:
       matrix:
         operating_system: [ ubuntu-latest, windows-latest, macos-latest ]
