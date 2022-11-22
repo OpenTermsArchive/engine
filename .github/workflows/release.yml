@@ -19,9 +19,8 @@ jobs:
           git config --global user.name "GitHub Actions"
           git config --global user.email "github-actions@users.noreply.github.com"
 
-      - name: Get release type
-        run: echo "RELEASE_TYPE=$(cat CHANGELOG.md | grep '## Unreleased' | sed -r 's/^## Unreleased \[(patch|minor|major)\]/\1/g')" >> $GITHUB_ENV
-          
+      - name: Get release type from the changelog
+        run: echo "RELEASE_TYPE=$(cat CHANGELOG.md | grep -E '^## Unreleased \[(patch|minor|major)\]$' | grep -E -w -o "patch|minor|major")" >> $GITHUB_ENV
 
       - name: Bump package version
         run: |
