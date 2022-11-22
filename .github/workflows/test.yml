@@ -26,3 +26,14 @@ jobs:
       - name: Fail and display error is proper release type is not found in changelog
         if: env.RELEASE_TYPE == ''
         run: echo "No valid release type found in changelog. The title of the 'Unreleased' section must contain one of the following tag [patch], [minor], [major]. Ex Unreleased [minor]."; exit 1
+  job1:
+    runs-on: ubuntu-latest
+    # Map a step output to a job output
+    outputs:
+      output1: ${{ steps.step1.outputs.test }}
+      output2: ${{ steps.step2.outputs.test }}
+    steps:
+      - id: step1
+        run: echo "test=hello" >> $GITHUB_OUTPUT
+      - id: step2
+        run: echo "test=world" >> $GITHUB_OUTPUT
