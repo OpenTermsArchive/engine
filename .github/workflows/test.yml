@@ -13,8 +13,14 @@ jobs:
     runs-on: [ubuntu-latest]
     steps:
       - uses: actions/checkout@v2
-      - name: Check for proper release type in changelog
-        run: $(cat CHANGELOG.md | grep '## Unreleased \[.*\]' | grep -E -w -o -q "patch|minor|major") || (echo "No valid release type found in changelog. The title of the 'Unreleased' section must contain one of the following tag [patch], [minor], [major]. Ex Unreleased [minor]."; exit 1)
+      - name: Get release type in changelog
+        run: echo "RELEASE_TYPE=$(cat CHANGELOG.md | grep -E '^## Unreleased \[(patch|minor|major)\]$' | grep -E -w -o "patch|minor|major")" >> $GITHUB_ENV
+      - name: Make release type available to subsequent jobs
+        if: env.RELEASE_TYPE
+        run: echo "RELEASE_TYPE is defined and equal ${{ env.RELEASE_TYPE }}"
+      - name: Fail and display error is proper release type is not found in changelog
+        if: !env.RELEASE_TYPE
+        run: echo "No valid release type found in changelog. The title of the 'Unreleased' section must contain one of the following tag [patch], [minor], [major]. Ex Unreleased [minor]."; exit 1
 
   test:
     strategy:
