@@ -23,9 +23,7 @@ jobs:
         run: echo "RELEASE_TYPE=$(cat CHANGELOG.md | grep -E '^## Unreleased \[(patch|minor|major)\]$' | grep -E -w -o "patch|minor|major")" >> $GITHUB_ENV
 
       - name: Bump package version
-        run: |
-          echo "NEW_VERSION=$(npm --no-git-tag-version version ${{ env.RELEASE_TYPE }})" >> $GITHUB_ENV
-          echo "RELEASE_TAG=latest" >> $GITHUB_ENV
+        run: echo "NEW_VERSION=$(npm --no-git-tag-version version ${{ env.RELEASE_TYPE }})" >> $GITHUB_ENV
 
       - name: Update changelog unreleased section with new version
         uses: superfaceai/release-changelog-action@v2
