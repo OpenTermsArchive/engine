@@ -130,17 +130,15 @@ const main = async options => {
         if (!error.message.includes('Could not access')) {
           throw error;
         }
-
-        const { id } = await versionsRepository.save(record);
-
-        logger.info(`    ↳ Generated first version: ${id}`);
       });
 
-      if (!diffString) {
+      if (!diffString && params.index > 1) {
+        logger.debug('    ↳ Skipped: version is identical to previous');
+
         return;
       }
 
-      console.log(diffString);
+      console.log(params.index === 1 ? colors.green(version) : diffString);
       logger.debug('Generated with the following command');
       logger.debug(`git diff ${diffArgs.map(arg => arg.replace(' ', '\\ ')).join(' ')}`);
 
