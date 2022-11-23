@@ -6,7 +6,6 @@ import { fileURLToPath } from 'url';
 
 import { program } from 'commander';
 import config from 'config';
-import DeepDiff from 'deep-diff';
 import inquirer from 'inquirer';
 import jsdom from 'jsdom';
 
@@ -16,6 +15,7 @@ import Record from '../../src/archivist/recorder/record.js';
 import * as services from '../../src/archivist/services/index.js';
 
 import Cleaner from './Cleaner.js';
+import DeclarationUtils from './DeclarationUtils';
 import FilesystemStructure from './FilesystemStructure.js';
 import logger, { colors } from './logger.js';
 
@@ -34,46 +34,8 @@ const SNAPSHOTS_REPOSITORY_URL = `https://github.com/OpenTermsArchive/${INSTANCE
 // const VERSIONS_REPOSITORY_URL = `https://github.com/OpenTermsArchive/${INSTANCE_NAME}-versions`;
 
 const cleaner = new Cleaner(CLEANING_FOLDER);
-
 const fileStructure = new FilesystemStructure(ROOT_OUTPUT, { snapshotRepoConfig: config.recorder.snapshots.storage, versionRepoConfig: config.recorder.versions.storage });
-
-const updateHistory = async (serviceId, documentType, documentDeclaration, { previousValidUntil }) => {
-  const historyFullPath = `${DECLARATIONS_PATH}/${serviceId}.history.json`;
-
-  if (!fsApi.existsSync(historyFullPath)) {
-    fsApi.writeFileSync(historyFullPath, `${JSON.stringify({ [documentType]: [] }, null, 2)}\n`);
-  }
-
-  const currentJSONDeclaration = { ...declarationToJSON(documentDeclaration).documents[documentType] };
-
-  const existingHistory = JSON.parse(fsApi.readFileSync(historyFullPath).toString());
-
-  const historyEntries = existingHistory[documentType] || [];
-
-  let entryAlreadyExists = false;
-
-  existingHistory[documentType] = [...existingHistory[documentType] || []];
-
-  historyEntries.map(({ validUntil, ...historyEntry }) => {
-    const diff = DeepDiff.diff(historyEntry, currentJSONDeclaration);
-
-    if (!diff) {
-      return { ...historyEntry, validUntil };
-    }
-
-    entryAlreadyExists = true;
-    logger.info(`History entry is already present, updating validUntil to ${previousValidUntil}`);
-
-    return { ...historyEntry, validUntil: previousValidUntil };
-  });
-
-  if (!entryAlreadyExists) {
-    logger.info('History entry does not exist, creating one');
-    existingHistory[documentType] = [ ...existingHistory[documentType], { ...currentJSONDeclaration, validUntil: previousValidUntil }];
-  }
-
-  fsApi.writeFileSync(historyFullPath, `${JSON.stringify(existingHistory, null, 2)}\n`);
-};
+const declarationUtils = new DeclarationUtils(DECLARATIONS_PATH, { logger });
 
 program
   .name('regenerate')
@@ -89,35 +51,11 @@ program
 program.parse(process.argv);
 const options = program.opts();
 
-const genericPageDeclaration = {
-  location: 'http://service.example',
-  contentSelectors: 'html',
-  filters: [document => {
-    document.querySelectorAll('a').forEach(el => {
-      const url = new URL(el.getAttribute('href'), document.location);
+if (options.interactive) {
+  logger.info('Interactive mode enabled');
+}
 
-      url.search = '';
-      el.setAttribute('href', url.toString());
-    });
-  }],
-};
-
-const pageToJSON = page => ({
-  fetch: page.location,
-  select: page.contentSelectors,
-  remove: page.noiseSelectors,
-  filter: page.filters ? page.filters.map(filter => filter.name) : undefined,
-  executeClientScripts: page.executeClientScripts,
-});
-
-const declarationToJSON = declaration => ({
-  name: declaration.service.name,
-  documents: {
-    [declaration.type]: declaration.isMultiPage
-      ? { combine: declaration.pages.map(page => pageToJSON(page)) }
-      : pageToJSON(declaration.pages[0]),
-  },
-});
+logger.info('options', options);
 
 const main = async () => {
   let servicesDeclarations = await services.loadWithHistory();
@@ -232,7 +170,7 @@ const main = async () => {
         }
 
         if (decision == DECISION_DECLARATION) {
-          logger.info(JSON.stringify(declarationToJSON(documentDeclaration), null, 2));
+          declarationUtils.logDeclaration(documentDeclaration);
           await inquirer.prompt({ type: 'confirm', name: 'Continue' });
 
           return handleSnapshot(snapshot, options, params);
@@ -271,7 +209,7 @@ const main = async () => {
         throw error;
       }
 
-      const filteredSnapshotContent = await filter({ pageDeclaration: genericPageDeclaration, content: snapshot.content, mimeType: snapshot.mimeType });
+      const filteredSnapshotContent = await filter({ pageDeclaration: DeclarationUtils.genericPageDeclaration, content: snapshot.content, mimeType: snapshot.mimeType });
 
       if (contentsToSkip.find(contentToSkip => contentToSkip == filteredSnapshotContent)) {
         logger.debug(`    ↳ Skip ${snapshot.id} as its content matches a content to skip`);
@@ -296,7 +234,7 @@ const main = async () => {
           message: 'What do you want to do?',
           type: 'list',
           choices: [
-            DECISION2_BYPASS, DECISION2_SKIP, DECISION2_SNAPSHOT, DECISION2_SNAPSHOT_CONTENT, DECISION2_DECLARATION, DECISION2_UPDATE, DECISION2_RETRY ],
+            DECISION2_BYPASS, DECISION2_SKIP, new inquirer.Separator('Analyze'), DECISION2_SNAPSHOT, new inquirer.Separator('Update'), DECISION2_SNAPSHOT_CONTENT, DECISION2_DECLARATION, DECISION2_UPDATE, DECISION2_RETRY ],
           name: 'decision2',
         }]);
 
@@ -308,7 +246,7 @@ const main = async () => {
         }
 
         if (decision2 == DECISION2_DECLARATION) {
-          logger.info(JSON.stringify(declarationToJSON(documentDeclaration), null, 2));
+          declarationUtils.logDeclaration(documentDeclaration);
           await inquirer.prompt({ type: 'confirm', name: 'Continue' });
 
           return handleSnapshot(snapshot, options, params);
@@ -324,7 +262,7 @@ const main = async () => {
         }
 
         if (decision2 == DECISION2_UPDATE) {
-          await updateHistory(serviceId, documentType, documentDeclaration, params);
+          await declarationUtils.updateHistory(serviceId, documentType, documentDeclaration, params);
 
           logger.warn('History has been updated, you now need to fix the current declaration');
 
@@ -342,7 +280,7 @@ const main = async () => {
         }
 
         if (decision2 == DECISION2_SKIP) {
-          logger.info(JSON.stringify(declarationToJSON(documentDeclaration), null, 2));
+          declarationUtils.logDeclaration(documentDeclaration);
           cleaner.updateDocument(serviceId, documentType, 'skipCommit', snapshot.id);
         }
 
@@ -368,12 +306,6 @@ const main = async () => {
     }
   }
 
-  if (options.interactive) {
-    logger.info('Interactive mode enabled');
-  }
-
-  logger.info('options', options);
-
   const contentsToSkip = await initializeSnapshotContentToSkip(serviceId, documentType, snapshotsRepository);
 
   let index = 1;
@@ -396,18 +328,18 @@ const main = async () => {
 
   if (serviceId != '*' || documentType != '*') {
     if (options.interactive) {
-      const DECISION3_DONE = 'All is ok, mark it as done';
-      const DECISION3_RETRY = 'I want to relaunch it in non interactive mode to be sure';
+      const DECISION_END_DONE = 'All is ok, mark it as done';
+      const DECISION_END_RETRY = 'I want to relaunch it in non interactive mode to be sure';
 
-      const { decision3 } = await inquirer.prompt([{
+      const { decisionEnd } = await inquirer.prompt([{
         message: 'What do you want to do?',
         type: 'list',
         choices: [
-          DECISION3_DONE, DECISION3_RETRY ],
-        name: 'decision3',
+          DECISION_END_DONE, DECISION_END_RETRY ],
+        name: 'decisionEnd',
       }]);
 
-      if (decision3 == DECISION3_DONE) {
+      if (decisionEnd == DECISION_END_DONE) {
         cleaner.updateDocument(serviceId, documentType, 'done', true);
         logger.info(`${serviceId} - ${documentType} has been marked as done`);
         logger.warn("Don't forget to commit the changes with the following message");
@@ -416,7 +348,7 @@ const main = async () => {
         logger.info(`git c -m "Clean ${serviceId} ${documentType}"`);
       }
 
-      if (decision3 == DECISION3_RETRY) {
+      if (decisionEnd == DECISION_END_RETRY) {
         // Pass to next snapshot
         logger.warn('');
         logger.warn('Launch this command again without the -i to mark it as done');
@@ -433,7 +365,7 @@ async function initializeSnapshotContentToSkip(serviceId, documentType, reposito
   return Promise.all(snapshotsIds.map(async snapshotsId => {
     const { content, mimeType } = await repository.findById(snapshotsId);
 
-    return filter({ pageDeclaration: genericPageDeclaration, content, mimeType });
+    return filter({ pageDeclaration: DeclarationUtils.genericPageDeclaration, content, mimeType });
   }));
 }
 
