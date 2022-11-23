@@ -57,6 +57,7 @@ if (programOptions.interactive) {
 logger.info('programOptions', programOptions);
 
 const main = async options => {
+  logger.info('options', options);
   const serviceId = options.serviceId || '*';
   const documentType = options.documentType || '*';
   const hasFilter = serviceId != '*' || documentType != '*';
@@ -70,9 +71,12 @@ const main = async options => {
 
   const { versionsRepository, snapshotsRepository } = await fileStructure.initRepositories();
 
-  logger.debug('Number of snapshot in the repository', logColors.info(await snapshotsRepository.count()));
+  const totalNbSnapshots = await snapshotsRepository.count();
+  const nbSnapshotsToProcess = (await snapshotsRepository.findAll()).filter(s => s.serviceId == serviceId && s.documentType == documentType).length;
+
+  logger.debug('Number of snapshot in the repository', logColors.info(totalNbSnapshots));
   if (hasFilter) {
-    logger.debug('Number of snapshot for the specified service', logColors.info((await snapshotsRepository.findAll()).filter(s => s.serviceId == serviceId && s.documentType == documentType).length));
+    logger.debug('Number of snapshot for the specified service', logColors.info((nbSnapshotsToProcess)));
   }
 
   if (hasDocumentType && cleaner.isDocumentDone(serviceId, documentType)) {
@@ -88,7 +92,7 @@ const main = async options => {
 
     const { validUntil, pages: [pageDeclaration] } = documentDeclaration;
 
-    logger.debug(`${params.index}`.padStart(5, ' '), serviceId, '-', documentType, '  ', 'Snapshot', snapshot.id, 'fetched at', snapshot.fetchDate.toISOString(), 'with declaration valid until', validUntil || 'now');
+    logger.debug(colors.white(`${params.index}`.padStart(5, ' ')), '/', nbSnapshotsToProcess, colors.white(serviceId), '-', colors.white(documentType), '  ', 'Snapshot', snapshot.id, 'fetched at', snapshot.fetchDate.toISOString(), 'valid until', validUntil || 'now');
 
     const { shouldSkip, reason } = checkIfSnapshotShouldBeSkipped(snapshot, pageDeclaration);
 
@@ -143,17 +147,17 @@ const main = async options => {
       const toCheckSnapshotPath = fileStructure.writeToCheckSnapshot(serviceId, documentType, snapshot);
 
       if (options.interactive) {
-        const DECISION_VERSION_KEEP = 'Yes, keep it!';
-        const DECISION_VERSION_SKIP_CONTENT = 'Skip this snapshot based on a content';
-        const DECISION_VERSION_SKIP_SELECTOR = 'Skip this snapshot based on a selector';
-        const DECISION_VERSION_SKIP_MISSING_SELECTOR = 'Skip this snapshot if selector does not exist';
-        const DECISION_VERSION_SNAPSHOT = 'Not sure, show snapshot';
-        const DECISION_VERSION_DECLARATION = 'Not sure, show current declaration used';
-        const DECISION_VERSION_UPDATE = 'Add an entry in the history, I will fix the declaration';
-        const DECISION_VERSION_RETRY = 'No, but I updated the declaration, let\'s retry';
+        const DECISION_VERSION_KEEP = 'Keep it';
+        const DECISION_VERSION_SKIP_CONTENT = 'Skip: define content to be skipped';
+        const DECISION_VERSION_SKIP_SELECTOR = 'Skip: define selector to be skipped';
+        const DECISION_VERSION_SKIP_MISSING_SELECTOR = 'Skip: define selector that should not exist to be skipped';
+        const DECISION_VERSION_SNAPSHOT = 'Show snapshot';
+        const DECISION_VERSION_DECLARATION = 'Show current declaration used';
+        const DECISION_VERSION_UPDATE = 'Add entry in history: I will fix the declaration';
+        const DECISION_VERSION_RETRY = 'Retry: I updated the declaration';
 
         const { decision } = await inquirer.prompt([{
-          message: 'Is this version valid?',
+          message: 'A new version is available, is it valid?',
           type: 'list',
           choices: [
             new inquirer.Separator('Decide'), DECISION_VERSION_KEEP, DECISION_VERSION_RETRY, new inquirer.Separator('Analyze'), DECISION_VERSION_SNAPSHOT, DECISION_VERSION_DECLARATION, new inquirer.Separator('Update'), DECISION_VERSION_SKIP_CONTENT, DECISION_VERSION_SKIP_SELECTOR, DECISION_VERSION_SKIP_MISSING_SELECTOR, DECISION_VERSION_UPDATE ],
@@ -191,8 +195,8 @@ const main = async options => {
         }
 
         if (decision == DECISION_VERSION_SKIP_CONTENT) {
-          const { skipContentSelector } = await inquirer.prompt({ type: 'input', name: 'skipContentSelector', message: 'The selector you will test the content of' });
-          const { skipContentValue } = await inquirer.prompt({ type: 'input', name: 'skipContentValue', message: 'The value which, if present, will make the snapshot skipped' });
+          const { skipContentSelector } = await inquirer.prompt({ type: 'input', name: 'skipContentSelector', message: 'CSS selector content will be selected from:' });
+          const { skipContentValue } = await inquirer.prompt({ type: 'input', name: 'skipContentValue', message: 'innerHTML which, if exactly the same as the content of the selector above, will have the snapshot skipped:' });
 
           snapshotContentToSkip.push(version);
           cleaner.updateDocument(serviceId, documentType, 'skipContent', { [skipContentSelector]: skipContentValue });
@@ -200,7 +204,7 @@ const main = async options => {
           return handleSnapshot(snapshot, options, params);
         }
         if (decision == DECISION_VERSION_SKIP_SELECTOR) {
-          const { skipSelector } = await inquirer.prompt({ type: 'input', name: 'skipSelector', message: 'The selector which, if present, will make the snapshot skipped' });
+          const { skipSelector } = await inquirer.prompt({ type: 'input', name: 'skipSelector', message: 'CSS selector which, if present in the snasphot, will have it skipped:' });
 
           cleaner.updateDocument(serviceId, documentType, 'skipSelector', skipSelector);
 
@@ -216,7 +220,7 @@ const main = async options => {
         }
 
         if (decision == DECISION_VERSION_SKIP_MISSING_SELECTOR) {
-          const { skipMissingSelector } = await inquirer.prompt({ type: 'input', name: 'skipMissingSelector', message: 'The selector which, if present, will make the snapshot skipped' });
+          const { skipMissingSelector } = await inquirer.prompt({ type: 'input', name: 'skipMissingSelector', message: 'CSS selector which, if present in the snasphot, will have it skipped' });
 
           cleaner.updateDocument(serviceId, documentType, 'skipMissingSelector', skipMissingSelector);
 
@@ -235,7 +239,7 @@ const main = async options => {
       const filteredSnapshotContent = await filter({ pageDeclaration: DeclarationUtils.genericPageDeclaration, content: snapshot.content, mimeType: snapshot.mimeType });
 
       if (snapshotContentToSkip.find(contentToSkip => contentToSkip == filteredSnapshotContent)) {
-        logger.debug(`    ↳ Skip ${snapshot.id} as its content matches a content to skip`);
+        logger.debug('    ↳ Skipped: snapshot content is identical to one already skipped');
 
         return;
       }
@@ -245,15 +249,15 @@ const main = async options => {
       if (options.interactive) {
         const toCheckSnapshotPath = fileStructure.writeToCheckSnapshot(serviceId, documentType, snapshot);
 
-        const DECISION_ON_ERROR_BYPASS = 'Take care of it later';
-        const DECISION_ON_ERROR_SKIP = 'This snapshot is not useable, skip it!';
-        const DECISION_ON_ERROR_DECLARATION = 'Not sure, show current declaration used';
-        const DECISION_ON_ERROR_SNAPSHOT = 'Not sure, show snapshot';
-        const DECISION_ON_ERROR_UPDATE = 'Add an entry in the history, I will fix the declaration';
-        const DECISION_ON_ERROR_RETRY = 'Retry, I updated the declaration';
+        const DECISION_ON_ERROR_BYPASS = 'Bypass: I don\'t know yet';
+        const DECISION_ON_ERROR_SKIP = 'Skip: content of this snapshot is unprocessable';
+        const DECISION_ON_ERROR_DECLARATION = 'Show current declaration used';
+        const DECISION_ON_ERROR_SNAPSHOT = 'Show snapshot';
+        const DECISION_ON_ERROR_UPDATE = 'Add entry in history: I will fix the declaration';
+        const DECISION_ON_ERROR_RETRY = 'Retry: I updated the declaration';
 
         const { decisionOnError } = await inquirer.prompt([{
-          message: 'What do you want to do?',
+          message: 'A version can not be created from this snapshot. What do you want to do?',
           type: 'list',
           choices: [
             new inquirer.Separator('Decide'), DECISION_ON_ERROR_BYPASS, DECISION_ON_ERROR_SKIP, new inquirer.Separator('Analyze'), DECISION_ON_ERROR_DECLARATION, DECISION_ON_ERROR_SNAPSHOT, new inquirer.Separator('Update'), DECISION_ON_ERROR_UPDATE, DECISION_ON_ERROR_RETRY ],
@@ -325,31 +329,34 @@ const main = async options => {
   }
   console.timeEnd('Total execution time');
 
-  if (hasDocumentType && options.interactive) {
+  if (hasDocumentType) {
     const DECISION_END_DONE = 'All is ok, mark it as done';
-    const DECISION_END_RETRY = 'I want to relaunch it in non interactive mode to be sure';
+    const DECISION_END_RETRY = 'Restart in non interactive mode';
+    const DECISION_END_QUIT = 'Quit';
 
     const { decisionEnd } = await inquirer.prompt([{
-      message: 'What do you want to do?',
+      message: 'All snapshots have been analyzed. What do you want to do?',
       type: 'list',
       choices: [
-        DECISION_END_DONE, DECISION_END_RETRY ],
+        DECISION_END_DONE, DECISION_END_RETRY, DECISION_END_QUIT ],
       name: 'decisionEnd',
     }]);
 
     if (decisionEnd == DECISION_END_DONE) {
       cleaner.updateDocument(serviceId, documentType, 'done', true);
       logger.info(`${serviceId} - ${documentType} has been marked as done`);
-      logger.warn("Don't forget to commit the changes with the following message");
-      logger.info(`git add declarations/${serviceId}.json`);
+      logger.warn("Don't forget to commit the changes");
+      logger.info();
+      logger.info(`git add declarations/${serviceId}*`);
       logger.info('git add cleaning/index.json');
       logger.info(`git c -m "Clean ${serviceId} ${documentType}"`);
     }
 
     if (decisionEnd == DECISION_END_RETRY) {
-      // Pass to next snapshot
-      logger.warn('');
-      logger.warn('Launch this command again without the -i to mark it as done');
+      await main({ serviceId, documentType });
+    }
+    if (decisionEnd == DECISION_END_QUIT) {
+      process.exit();
     }
   }
 
