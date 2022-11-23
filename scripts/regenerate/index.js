@@ -16,6 +16,7 @@ import Record from '../../src/archivist/recorder/record.js';
 import RepositoryFactory from '../../src/archivist/recorder/repositories/factory.js';
 import * as services from '../../src/archivist/services/index.js';
 
+import Cleaner from './Cleaner.js';
 import logger, { colors } from './logger.js';
 
 const { JSDOM } = jsdom;
@@ -34,45 +35,7 @@ const INSTANCE_NAME = DECLARATIONS_PATH.split('/').reverse()[1].replace('-declar
 const SNAPSHOTS_REPOSITORY_URL = `https://github.com/OpenTermsArchive/${INSTANCE_NAME}-snapshots`;
 const VERSIONS_REPOSITORY_URL = `https://github.com/OpenTermsArchive/${INSTANCE_NAME}-versions`;
 
-await fs.mkdir(CLEANING_FOLDER, { recursive: true });
-const cleaningFilePath = path.join(CLEANING_FOLDER, 'index.json');
-
-if (!fsApi.existsSync(cleaningFilePath)) {
-  fsApi.writeFileSync(cleaningFilePath, `${JSON.stringify({
-    documents: {},
-    documentTypes: { },
-  }, null, 2)}\n`);
-}
-
-const cleaning = JSON.parse(fsApi.readFileSync(cleaningFilePath));
-
-const updateCleaningFile = (serviceId, documentType, field, value) => {
-  const service = cleaning.documents[serviceId] || {};
-  const document = service[documentType] || {};
-
-  let updatedValue;
-
-  if (field == 'skipContent') {
-    updatedValue = { ...document[field] || {}, ...value };
-  } else if ([ 'skipCommit', 'skipSelector', 'skipMissingSelector' ].includes(field)) {
-    updatedValue = [ ...document[field] || [], value ];
-  } else if (field == 'done') {
-    updatedValue = value;
-  }
-
-  cleaning.documents = {
-    ...cleaning.documents,
-    [serviceId]: {
-      ...service,
-      [documentType]: {
-        ...document,
-        [field]: updatedValue,
-      },
-    },
-  };
-  logger.debug(`${value} appended to ${field}`);
-  fsApi.writeFileSync(cleaningFilePath, `${JSON.stringify(cleaning, null, 2)}\n`);
-};
+const cleaner = new Cleaner(CLEANING_FOLDER);
 
 const updateHistory = async (serviceId, documentType, documentDeclaration, { previousValidUntil }) => {
   const historyFullPath = `${DECLARATIONS_PATH}/${serviceId}.history.json`;
@@ -161,11 +124,10 @@ const main = async () => {
 
   if (options.list) {
     Object.entries(servicesDeclarations).forEach(([ listServiceId, { documents }]) => Object.keys(documents).forEach(listDocumentType => {
-      const isDone = cleaning.documents[listServiceId] && cleaning.documents[listServiceId][listDocumentType] && cleaning.documents[listServiceId][listDocumentType].done;
+      const isDone = cleaner.isDocumentDone(listServiceId, listDocumentType);
 
       console.log(isDone ? '✅' : '❌', `-s ${listServiceId} -d "${listDocumentType}" -i`);
     }));
-
     process.exit();
   }
 
@@ -284,14 +246,14 @@ const main = async () => {
           const { skipContentSelector } = await inquirer.prompt({ type: 'input', name: 'skipContentSelector', message: 'The selector you will test the content of' });
           const { skipContentValue } = await inquirer.prompt({ type: 'input', name: 'skipContentValue', message: 'The value which, if present, will make the snapshot skipped' });
 
-          updateCleaningFile(serviceId, documentType, 'skipContent', { [skipContentSelector]: skipContentValue });
+          cleaner.updateDocument(serviceId, documentType, 'skipContent', { [skipContentSelector]: skipContentValue });
 
           return handleSnapshot(snapshot, options, params);
         }
         if (decision == DECISION_SKIP_SELECTOR) {
           const { skipSelector } = await inquirer.prompt({ type: 'input', name: 'skipSelector', message: 'The selector which, if present, will make the snapshot skipped' });
 
-          updateCleaningFile(serviceId, documentType, 'skipSelector', skipSelector);
+          cleaner.updateDocument(serviceId, documentType, 'skipSelector', skipSelector);
 
           return handleSnapshot(snapshot, options, params);
         }
@@ -299,7 +261,7 @@ const main = async () => {
         if (decision == DECISION_SKIP_MISSING_SELECTOR) {
           const { skipMissingSelector } = await inquirer.prompt({ type: 'input', name: 'skipMissingSelector', message: 'The selector which, if present, will make the snapshot skipped' });
 
-          updateCleaningFile(serviceId, documentType, 'skipMissingSelector', skipMissingSelector);
+          cleaner.updateDocument(serviceId, documentType, 'skipMissingSelector', skipMissingSelector);
 
           return handleSnapshot(snapshot, options, params);
         }
@@ -385,7 +347,7 @@ const main = async () => {
 
         if (decision2 == DECISION2_SKIP) {
           logger.info(JSON.stringify(declarationToJSON(documentDeclaration), null, 2));
-          updateCleaningFile(serviceId, documentType, 'skipCommit', snapshot.id);
+          cleaner.updateDocument(serviceId, documentType, 'skipCommit', snapshot.id);
         }
 
         if (decision2 == DECISION2_BYPASS) {
@@ -404,9 +366,7 @@ const main = async () => {
     logger.debug('Number of snapshot for the specified service', colors.info((await snapshotsRepository.findAll()).filter(s => s.serviceId == serviceId && s.documentType == documentType).length));
   }
   if (serviceId != '*' && documentType != '*') {
-    const isDone = cleaning && cleaning.documents[serviceId] && cleaning.documents[serviceId][documentType] && cleaning.documents[serviceId][documentType].done;
-
-    if (isDone) {
+    if (cleaner.isDocumentDone(serviceId, documentType)) {
       logger.error(`${serviceId} - ${documentType} has already been marked as done. If you're sure of what you're doing, manually remove "done" from the cleaning file`);
       process.exit();
     }
@@ -430,7 +390,7 @@ const main = async () => {
       previousValidUntil = snapshot.fetchDate.toISOString();
     }
     // Modifies snapshot in place
-    snapshot.documentType = (cleaning.documentTypes || {})[snapshot.documentType] || snapshot.documentType;
+    snapshot.documentType = cleaner.getDocumentTypesRules()[snapshot.documentType] || snapshot.documentType;
 
     await handleSnapshot(snapshot, options, { index, previousValidUntil });
     index++;
@@ -452,7 +412,7 @@ const main = async () => {
       }]);
 
       if (decision3 == DECISION3_DONE) {
-        updateCleaningFile(serviceId, documentType, 'done', true);
+        cleaner.updateDocument(serviceId, documentType, 'done', true);
         logger.info(`${serviceId} - ${documentType} has been marked as done`);
         logger.warn("Don't forget to commit the changes with the following message");
         logger.info(`git add declarations/${serviceId}.json`);
@@ -529,13 +489,7 @@ async function copyReadme(sourceRepository, targetRepository) {
 }
 
 async function initializeSnapshotContentToSkip(serviceId, documentType, repository) {
-  const snapshotsIds = Object.entries(cleaning.documents)
-    .filter(([cleaningServiceId]) => [ '*', serviceId ].includes(cleaningServiceId))
-    .map(([ , cleaningDocumentTypes ]) => Object.entries(cleaningDocumentTypes)
-      .filter(([cleaningDocumentType]) => [ '*', documentType ].includes(cleaningDocumentType))
-      .map(([ , { skipCommit }]) => skipCommit)
-      .filter(skippedCommit => !!skippedCommit)
-      .flat()).flat();
+  const snapshotsIds = cleaner.getSnapshotIdsToSkip(serviceId, documentType);
 
   return Promise.all(snapshotsIds.map(async snapshotsId => {
     const { content, mimeType } = await repository.findById(snapshotsId);
@@ -551,11 +505,7 @@ function generateFileName(snapshot) {
 function checkIfSnapshotShouldBeSkipped(snapshot, pageDeclaration) {
   const { serviceId, documentType } = snapshot;
 
-  const cleaner = (cleaning.documents[serviceId] || {})[documentType];
-
-  const contentsToSkip = (cleaner && cleaner.skipContent) || [];
-  const selectorsToSkip = (cleaner && cleaner.skipSelector) || [];
-  const missingRequiredSelectors = (cleaner && cleaner.skipIfMissingSelector) || [];
+  const { contentsToSkip, selectorsToSkip, missingRequiredSelectors } = cleaner.getDocumentRules(serviceId, documentType);
 
   if (!(contentsToSkip || selectorsToSkip || missingRequiredSelectors)) {
     return { shouldSkip: false };
