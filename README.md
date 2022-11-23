@@ -147,20 +147,18 @@ The following commands are available where the package is installed:
 
 In order to have them available globally in your command line, install it with the `--global` option.
 
-### Features exposed
+### API
 
-#### fetch
+#### `fetch`
 
-The `fetch` module gets the MIME type and content of a document from its URL.
+The `fetch` module gets the MIME type and content of a document from its URL. You can use it in your code with `import fetch from 'open-terms-archive/fetch';`.
 
-You can use it in your code by using `import fetch from 'open-terms-archive/fetch';`.
+Documentation on how to use `fetch` is provided [as JSDoc](./src/archivist/fetcher/index.js).
 
-Documentation on how to use `fetch` is provided as JSDoc within [./src/archivist/fetcher/index.js](./src/archivist/fetcher/index.js).
 
-If you plan to use `executeClientScripts` as a parameter of `fetch`, the fetching will be done using a headless browser.
-In order to not instantiate this browser at each fetch, the starting and stopping of the browser is your responsibility.
+##### `executeClientScripts`
 
-Here is an example on how to use it:
+If you pass the `executeClientScripts` option to `fetch`, a headless browser will be used to download and execute the page before serialising its DOM. For performance reasons, the starting and stopping of the browser is your responsibility to avoid instantiating a browser on each fetch. Here is an example on how to use this feature:
 
 ```js
 import fetch, { launchHeadlessBrowser, stopHeadlessBrowser } from 'open-terms-archive/fetch';
@@ -172,23 +170,17 @@ await fetch({ executeClientScripts: true, ... });
 await stopHeadlessBrowser();
 ```
 
-The `fetch` module can also be configured as a [`node-config` submodule](https://github.com/node-config/node-config/wiki/Sub-Module-Configuration).
-If [`node-config`](https://github.com/node-config/node-config) is used in the project, the default `fetcher` configuration can be overridden by adding a `fetcher` object to the local config. See [Configuration file](#configuration-file) for full reference.
+The `fetch` module options are defined as a [`node-config` submodule](https://github.com/node-config/node-config/wiki/Sub-Module-Configuration). If [`node-config`](https://github.com/node-config/node-config) is used in the project, the default `fetcher` configuration can be overridden by adding a `fetcher` object to the [local configuration file](#configuration-file).
 
-#### filter
+#### `filter`
 
-The `filter` module transforms HTML or PDF content into a Markdown string.
-It will filter content based on the [document declaration](https://github.com/OpenTermsArchive/contrib-declarations/blob/main/CONTRIBUTING.md#declaring-a-new-service).
+The `filter` module transforms HTML or PDF content into a Markdown string according to a [document declaration](https://github.com/OpenTermsArchive/contrib-declarations/blob/main/CONTRIBUTING.md#declaring-a-new-service). You can use it in your code with `import filter from 'open-terms-archive/filter';`.
 
-You can use the filter in your code by using `import filter from 'open-terms-archive/filter';`.
+The `filter` function documentation is available [as JSDoc](./src/archivist/filter/index.js).
 
-The `filter` function documentation is available as JSDoc within [./src/archivist/filter/index.js](./src/archivist/filter/index.js).
+#### `PageDeclaration`
 
-#### page-declaration
-
-PageDeclaration object is used to describe a page to be tracked by Open Terms Archive.
-
-You can use the page-declaration in your code by using `import pageDeclaration from 'open-terms-archive/page-declaration';`.
+The `PageDeclaration` class encapsulates information about a page tracked by Open Terms Archive. You can use it in your code by using `import pageDeclaration from 'open-terms-archive/page-declaration';`.
 
 ## Using locally
 
