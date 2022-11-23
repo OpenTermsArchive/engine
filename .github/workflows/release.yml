@@ -19,11 +19,10 @@ jobs:
           git config --global user.name "GitHub Actions"
           git config --global user.email "github-actions@users.noreply.github.com"
 
-      - name: Get release type from the changelog
-        run: echo "RELEASE_TYPE=$(cat CHANGELOG.md | grep -E '^## Unreleased \[(patch|minor|major)\]$' | grep -E -w -o "patch|minor|major")" >> $GITHUB_ENV
-
       - name: Bump package version
-        run: echo "NEW_VERSION=$(npm --no-git-tag-version version ${{ env.RELEASE_TYPE }})" >> $GITHUB_ENV
+        run: |
+          echo "Release type obtained from the previous job: '${{ needs.test.outputs.release_type }}'"
+          echo "NEW_VERSION=$(npm --no-git-tag-version version ${{ needs.test.outputs.release_type }})" >> $GITHUB_ENV
 
       - name: Update changelog unreleased section with new version
         uses: superfaceai/release-changelog-action@v2
