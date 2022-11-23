@@ -155,7 +155,6 @@ The `fetch` module gets the MIME type and content of a document from its URL. Yo
 
 Documentation on how to use `fetch` is provided [as JSDoc](./src/archivist/fetcher/index.js).
 
-
 ##### `executeClientScripts`
 
 If you pass the `executeClientScripts` option to `fetch`, a headless browser will be used to download and execute the page before serialising its DOM. For performance reasons, the starting and stopping of the browser is your responsibility to avoid instantiating a browser on each fetch. Here is an example on how to use this feature:
@@ -333,11 +332,12 @@ Two storage repositories are currently supported: Git and MongoDB. Each one can 
   …
 }
 ```
+
 ###### MongoDB
 
 ```json
 {
-    …
+  …
   "storage": {
     "mongo": {
       "connectionURI": "URI for defining connection to the MongoDB instance. See https://docs.mongodb.com/manual/reference/connection-string/",
