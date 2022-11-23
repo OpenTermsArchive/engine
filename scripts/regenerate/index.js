@@ -157,6 +157,7 @@ const main = async options => {
         const { decision } = await inquirer.prompt([{
           message: 'A new version is available, is it valid?',
           type: 'list',
+          pageSize: 20,
           choices: [
             new inquirer.Separator('Decide'), DECISION_VERSION_KEEP, DECISION_VERSION_RETRY, new inquirer.Separator('Analyze'), DECISION_VERSION_SNAPSHOT, DECISION_VERSION_DECLARATION, new inquirer.Separator('Update'), DECISION_VERSION_SKIP_CONTENT, DECISION_VERSION_SKIP_SELECTOR, DECISION_VERSION_SKIP_MISSING_SELECTOR, DECISION_VERSION_UPDATE ],
           name: 'decision',
@@ -335,6 +336,7 @@ const main = async options => {
     const { decisionEnd } = await inquirer.prompt([{
       message: 'All snapshots have been analyzed. What do you want to do?',
       type: 'list',
+      pageSize: 20,
       choices: [
         DECISION_END_DONE, DECISION_END_RETRY, DECISION_END_QUIT ],
       name: 'decisionEnd',
@@ -422,6 +424,7 @@ if (programOptions.list) {
   const { serviceToClean } = await inquirer.prompt([{
     message: 'Choose a document to clean',
     type: 'list',
+    pageSize: 20,
     choices,
     name: 'serviceToClean',
   }]);
