@@ -436,8 +436,7 @@ To contribute to the core engine of Open Terms Archive, see the [CONTRIBUTING](C
 
 Beyond individual contributions, we need funds and committed partners to pay for a core team to maintain and grow Open Terms Archive. If you know of opportunities, please let us know! You can find [on our website](https://opentermsarchive.org/en/about) an up-to-date list of the partners and funders that make Open Terms Archive possible.
 
-
----
+- - -
 
 ## License
 
