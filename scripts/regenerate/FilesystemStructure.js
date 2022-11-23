@@ -76,16 +76,16 @@ export default class FilesystemStructure {
     });
   }
 
-  writeSkippedSnapshot(serviceId, documentType, snapshot) {
-    fs.writeFileSync(path.join(this.skippedPath, serviceId, documentType, FilesystemStructure.generateFileName(snapshot)), snapshot.content);
+  async writeSkippedSnapshot(serviceId, documentType, snapshot) {
+    await fsPromise.writeFile(path.join(this.skippedPath, serviceId, documentType, FilesystemStructure.generateFileName(snapshot)), snapshot.content);
   }
 
-  writeToCheckSnapshot(serviceId, documentType, snapshot) {
+  async writeToCheckSnapshot(serviceId, documentType, snapshot) {
     const snapshotFolder = path.join(this.toCheckPath, serviceId, documentType);
     const snapshotFilename = FilesystemStructure.generateFileName(snapshot);
     const snapshotPath = path.join(snapshotFolder, snapshotFilename);
 
-    fs.writeFileSync(snapshotPath, snapshot.content);
+    await fsPromise.writeFile(snapshotPath, snapshot.content);
 
     return snapshotPath;
   }
