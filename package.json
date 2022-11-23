@@ -31,6 +31,7 @@
     "declarations:validate": "node ./bin/validate-declarations.js",
     "declarations:validate:schema": "npm run declarations:validate -- --schema-only",
     "lint": "eslint src test scripts bin",
+    "lint:doc": "markdownlint *.md src/**/*.md docs/**/*.md decision-records/*.md",
     "lint:fix": "npm run lint -- --fix",
     "refilter": "npm start -- --refilter-only",
     "start": "node --max-http-header-size=32768 src/main.js",
@@ -87,6 +88,7 @@
   },
   "devDependencies": {
     "dir-compare": "^4.0.0",
+    "markdownlint-cli": "^0.32.2",
     "nock": "^13.2.1",
     "node-stream-zip": "^1.15.0",
     "prettier": "^2.2.1",

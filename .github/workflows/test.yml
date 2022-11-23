@@ -9,6 +9,16 @@ on:
   workflow_call:
 
 jobs:
+  lint_doc:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          cache: npm
+      - run: npm ci
+      - run: npm run lint:doc
+
   test:
     strategy:
       matrix:
