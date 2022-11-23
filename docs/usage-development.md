@@ -1,4 +1,4 @@
-# Development
+# Contributing to Open Terms Archive engine
 
 ## Installation
 
