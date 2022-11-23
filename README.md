@@ -129,50 +129,6 @@ A **collection** can be **referenced** in the Open Terms Archive **federation** 
 7. Public and open-licensed **versions**.
 8. Regular, public, and open-licensed **dataset** releases.
 
-## Be notified
-
-### By email
-
-#### Document per document
-
-You can go on the official front website [opentermsarchive.org](https://opentermsarchive.org). From there, you can select a service and then the corresponding document type.
-After you enter your email and click on subscribe, we will add your email to the correspondning mailing list in [SendInBlue](https://www.sendinblue.com/) and will not store your email anywhere else.
-Then, everytime a modification is found on the correspondning document, we will send you an email.
-
-You can unsubscribe at any moment by clicking on the `unsubscribe` link at the bottom of the received email.
-
-#### For all documents at once
-
-You can [subscribe](https://59692a77.sibforms.com/serve/MUIEAKuTv3y67e27PkjAiw7UkHCn0qVrcD188cQb-ofHVBGpvdUWQ6EraZ5AIb6vJqz3L8LDvYhEzPb2SE6eGWP35zXrpwEFVJCpGuER9DKPBUrifKScpF_ENMqwE_OiOZ3FdCV2ra-TXQNxB2sTEL13Zj8HU7U0vbbeF7TnbFiW8gGbcOa5liqmMvw_rghnEB2htMQRCk6A3eyj) to receive an email whenever a document is updated in the database.
-
-**Beware, you are likely to receive a large amount of notifications!** You can unsubscribe by replying to any email you will receive.
-
-### By RSS
-
-You can receive notification for a specific service or document by subscribing to RSS feeds.
-
-> An RSS feed is a type of web page that contains information about the latest content published by a website, such as the date of publication and the address where you can view it. When this resource is updated, a feed reader app automatically notifies you and you can see the update.
-
-To find out the address of the RSS feed you want to subscribe to:
-
-1. [Navigate](#exploring-the-versions-history) to the page with the history of changes you are interested in. _In the WhatsApp example above, this would be [this page](https://github.com/OpenTermsArchive/contrib-versions/commits/main/WhatsApp/Privacy%20Policy.md)._
-2. Copy the address of that page from your browser’s address bar. _In the WhatsApp example, this would be `https://github.com/OpenTermsArchive/contrib-versions/commits/main/WhatsApp/Privacy%20Policy.md`._
-3. Append `.atom` at the end of this address. _In the WhatsApp example, this would become `https://github.com/OpenTermsArchive/contrib-versions/commits/main/WhatsApp/Privacy%20Policy.md.atom`._
-4. Subscribe your RSS feed reader to the resulting address.
-
-#### Recap of available RSS feeds
-
-| Updated for                         | URL                                                                                                                                                                                            |
-| ----------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| all services and documents          | `https://github.com/OpenTermsArchive/contrib-versions/commits.atom`                                                                                                                            |
-| all the documents of a service      | Replace `$serviceId` with the service ID:<br>`https://github.com/OpenTermsArchive/contrib-versions/commits/main/$serviceId.atom.`                                                            |
-| a specific document of a service | Replace `$serviceId` with the service ID and `$documentType` with the document type:<br>`https://github.com/OpenTermsArchive/contrib-versions/commits/main/$serviceId/$documentType.md.atom` |
-
-For example:
-
-- To receive all updates of `Facebook` documents, the URL is `https://github.com/OpenTermsArchive/contrib-versions/commits/main/Facebook.atom`.
-- To receive all updates of the `Privacy Policy` from `Google`, the URL is `https://github.com/OpenTermsArchive/contrib-versions/commits/main/Google/Privacy%20Policy.md.atom`.
-
 ## Importing as a module
 
 Open Terms Archive exposes a JavaScript API to make some of its capabilities available in NodeJS. You can install it as an NPM module:
