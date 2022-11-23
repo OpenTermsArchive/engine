@@ -4,7 +4,7 @@ import path from 'path';
 import DeepDiff from 'deep-diff';
 
 export default class DeclarationUtils {
-  genericPageDeclaration = {
+  static genericPageDeclaration = {
     location: 'http://service.example',
     contentSelectors: 'html',
     filters: [document => {
@@ -65,7 +65,7 @@ export default class DeclarationUtils {
     historyEntries.map(({ validUntil, ...historyEntry }) => {
       const diff = DeepDiff.diff(historyEntry, currentJSONDeclaration);
 
-      if (!diff) {
+      if (diff) {
         return { ...historyEntry, validUntil };
       }
 
@@ -75,9 +75,11 @@ export default class DeclarationUtils {
       return { ...historyEntry, validUntil: previousValidUntil };
     });
 
-    if (!entryAlreadyExists) {
+    if (entryAlreadyExists) {
+      existingHistory[documentType] = historyEntries;
+    } else {
       this.logger.info('History entry does not exist, creating one');
-      existingHistory[documentType] = [ ...existingHistory[documentType], { ...currentJSONDeclaration, validUntil: previousValidUntil }];
+      existingHistory[documentType] = [ ...historyEntries, { ...currentJSONDeclaration, validUntil: previousValidUntil }];
     }
 
     fs.writeFileSync(historyFullPath, `${JSON.stringify(existingHistory, null, 2)}\n`);

@@ -1,16 +1,17 @@
 import colorsLib from 'colors';
 
-export const colors = {
+export const logColors = {
   debug: colorsLib.grey,
   info: colorsLib.cyan,
   error: colorsLib.red,
   warn: colorsLib.yellow,
-  ...colorsLib,
 };
 
+export const colors = colorsLib;
+
 export default {
-  debug: (...args) => console.log(colors.debug(...args)),
-  info: (...args) => console.log(colors.info(...args)),
-  error: (...args) => console.log(colors.error(...args)),
-  warn: (...args) => console.log(colors.warn(...args)),
+  debug: (...args) => console.log(logColors.debug(...args)),
+  info: (...args) => console.log(logColors.info(...args)),
+  error: (...args) => console.log(logColors.error(...args)),
+  warn: (...args) => console.log(logColors.warn(...args)),
 };
