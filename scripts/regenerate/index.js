@@ -13,10 +13,10 @@ import jsdom from 'jsdom';
 import { InaccessibleContentError } from '../../src/archivist/errors.js';
 import filter from '../../src/archivist/filter/exports.js';
 import Record from '../../src/archivist/recorder/record.js';
-import RepositoryFactory from '../../src/archivist/recorder/repositories/factory.js';
 import * as services from '../../src/archivist/services/index.js';
 
 import Cleaner from './Cleaner.js';
+import FilesystemStructure from './FilesystemStructure.js';
 import logger, { colors } from './logger.js';
 
 const { JSDOM } = jsdom;
@@ -26,16 +26,16 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const DECLARATIONS_PATH = config.services.declarationsPath;
 
 const ROOT_OUTPUT = path.resolve(__dirname, 'output');
-const SKIPPED_OUTPUT = path.join(ROOT_OUTPUT, 'skipped');
-const TO_CHECK_OUTPUT = path.join(ROOT_OUTPUT, 'to-check');
 const CLEANING_FOLDER = path.join(DECLARATIONS_PATH, '../cleaning');
 
 const INSTANCE_NAME = DECLARATIONS_PATH.split('/').reverse()[1].replace('-declarations', '');
 
 const SNAPSHOTS_REPOSITORY_URL = `https://github.com/OpenTermsArchive/${INSTANCE_NAME}-snapshots`;
-const VERSIONS_REPOSITORY_URL = `https://github.com/OpenTermsArchive/${INSTANCE_NAME}-versions`;
+// const VERSIONS_REPOSITORY_URL = `https://github.com/OpenTermsArchive/${INSTANCE_NAME}-versions`;
 
 const cleaner = new Cleaner(CLEANING_FOLDER);
+
+const fileStructure = new FilesystemStructure(ROOT_OUTPUT, { snapshotRepoConfig: config.recorder.snapshots.storage, versionRepoConfig: config.recorder.versions.storage });
 
 const updateHistory = async (serviceId, documentType, documentDeclaration, { previousValidUntil }) => {
   const historyFullPath = `${DECLARATIONS_PATH}/${serviceId}.history.json`;
@@ -131,9 +131,9 @@ const main = async () => {
     process.exit();
   }
 
-  await initializeDirectories(servicesDeclarations);
+  await fileStructure.init(servicesDeclarations);
 
-  const { versionsRepository, snapshotsRepository } = await initializeRepositories();
+  const { versionsRepository, snapshotsRepository } = await fileStructure.initRepositories();
 
   async function handleSnapshot(snapshot, options, params) {
     const { serviceId, documentType } = snapshot;
@@ -147,14 +147,10 @@ const main = async () => {
 
     if (shouldSkip) {
       logger.debug(`    ↳ Skip: ${reason}`);
-      fs.writeFile(path.join(SKIPPED_OUTPUT, serviceId, documentType, generateFileName(snapshot)), snapshot.content);
+      fileStructure.writeSkippedSnapshot(serviceId, documentType, snapshot);
 
       return;
     }
-
-    const snapshotFolder = path.join(TO_CHECK_OUTPUT, serviceId, documentType);
-    const snapshotFilename = generateFileName(snapshot);
-    const snapshotPath = path.join(snapshotFolder, snapshotFilename);
 
     try {
       const version = await filter({
@@ -197,7 +193,7 @@ const main = async () => {
       logger.debug('Generated with the following command');
       logger.debug(`git diff ${diffArgs.map(arg => arg.replace(' ', '\\ ')).join(' ')}`);
 
-      fs.writeFile(snapshotPath, snapshot.content);
+      const toCheckSnapshotPath = fileStructure.writeToCheckSnapshot(serviceId, documentType, snapshot);
 
       if (options.interactive) {
         const DECISION_KEEP = 'Yes, keep it!';
@@ -226,7 +222,7 @@ const main = async () => {
         if (decision == DECISION_SNAPSHOT) {
           logger.info('');
           logger.info('- Open it in your IDE');
-          logger.info(`open -a "Google Chrome" "${snapshotPath}"`);
+          logger.info(`open -a "Google Chrome" "${toCheckSnapshotPath}"`);
           logger.info('');
           logger.info('- Or see it online');
           logger.info(`${SNAPSHOTS_REPOSITORY_URL}/commit/${snapshot.id}`);
@@ -286,7 +282,7 @@ const main = async () => {
       logger.error('    ↳ An error occured while filtering:', error.message);
 
       if (options.interactive) {
-        fs.writeFile(snapshotPath, snapshot.content);
+        const toCheckSnapshotPath = fileStructure.writeToCheckSnapshot(serviceId, documentType, snapshot);
 
         const DECISION2_BYPASS = 'Take care of it later';
         const DECISION2_SKIP = 'This snapshot is not useable, skip it!';
@@ -337,7 +333,7 @@ const main = async () => {
 
         if (decision2 == DECISION2_SNAPSHOT) {
           logger.info('- Open it in your IDE');
-          logger.info(`open -a "Google Chrome" "${snapshotPath}"`);
+          logger.info(`open -a "Google Chrome" "${toCheckSnapshotPath}"`);
           logger.info('- Or see it online');
           logger.info(`${SNAPSHOTS_REPOSITORY_URL}/commit/${snapshot.id}`);
           await inquirer.prompt({ type: 'confirm', name: 'Click on the link above to see the snapshot and then click to continue' });
@@ -428,65 +424,8 @@ const main = async () => {
     }
   }
 
-  await cleanupEmptyDirectories();
+  await fileStructure.finalize();
 };
-
-async function initializeDirectories(servicesDeclarations) {
-  return Promise.all([ TO_CHECK_OUTPUT, SKIPPED_OUTPUT ].map(async folder =>
-    Promise.all(Object.entries(servicesDeclarations).map(([ key, value ]) =>
-      Promise.all(Object.keys(value.documents).map(documentName => {
-        const folderPath = path.join(folder, key, documentName);
-
-        if (fsApi.existsSync(folderPath)) {
-          return;
-        }
-
-        return fs.mkdir(folderPath, { recursive: true });
-      }))))));
-}
-
-async function initializeRepositories() {
-  const snapshotsRepository = RepositoryFactory.create(config.recorder.snapshots.storage);
-  const sourceVersionsRepository = RepositoryFactory.create(config.recorder.versions.storage);
-  const targetRepositoryConfig = config.util.cloneDeep(config.recorder.versions.storage);
-
-  targetRepositoryConfig.git.path = path.join(ROOT_OUTPUT, 'resulting-versions');
-  const targetVersionsRepository = RepositoryFactory.create(targetRepositoryConfig);
-
-  await Promise.all([
-    sourceVersionsRepository.initialize(),
-    targetVersionsRepository.initialize().then(() => targetVersionsRepository.removeAll()),
-    snapshotsRepository.initialize(),
-  ]);
-
-  await copyReadme(sourceVersionsRepository, targetVersionsRepository);
-
-  return {
-    versionsRepository: targetVersionsRepository,
-    snapshotsRepository,
-  };
-}
-
-async function copyReadme(sourceRepository, targetRepository) {
-  const sourceRepositoryReadmePath = `${sourceRepository.path}/README.md`;
-  const targetRepositoryReadmePath = `${targetRepository.path}/README.md`;
-
-  const [firstReadmeCommit] = await sourceRepository.git.log(['README.md']);
-
-  if (!firstReadmeCommit) {
-    console.warn(`No commit found for README in ${sourceRepository.path}`);
-
-    return;
-  }
-
-  await fs.copyFile(sourceRepositoryReadmePath, targetRepositoryReadmePath);
-  await targetRepository.git.add(targetRepositoryReadmePath);
-  await targetRepository.git.commit({
-    filePath: targetRepositoryReadmePath,
-    message: firstReadmeCommit.message,
-    date: firstReadmeCommit.date,
-  });
-}
 
 async function initializeSnapshotContentToSkip(serviceId, documentType, repository) {
   const snapshotsIds = cleaner.getSnapshotIdsToSkip(serviceId, documentType);
@@ -496,10 +435,6 @@ async function initializeSnapshotContentToSkip(serviceId, documentType, reposito
 
     return filter({ pageDeclaration: genericPageDeclaration, content, mimeType });
   }));
-}
-
-function generateFileName(snapshot) {
-  return `${snapshot.fetchDate.toISOString().replace(/\.\d{3}/, '').replace(/:|\./g, '-')}-${snapshot.id}.html`;
 }
 
 function checkIfSnapshotShouldBeSkipped(snapshot, pageDeclaration) {
@@ -539,32 +474,6 @@ function checkIfSnapshotShouldBeSkipped(snapshot, pageDeclaration) {
     shouldSkip: true,
     reason,
   };
-}
-
-async function cleanupEmptyDirectories() {
-  /* eslint-disable no-await-in-loop */
-  return Promise.all([ TO_CHECK_OUTPUT, SKIPPED_OUTPUT ].map(async folder => {
-    const servicesDirectories = (await fs.readdir(folder, { withFileTypes: true })).filter(dirent => dirent.isDirectory()).map(dirent => dirent.name);
-
-    for (const servicesDirectory of servicesDirectories) {
-      const documentTypeDirectories = (await fs.readdir(path.join(folder, servicesDirectory), { withFileTypes: true })).filter(dirent => dirent.isDirectory()).map(dirent => dirent.name);
-
-      for (const documentTypeDirectory of documentTypeDirectories) {
-        const files = await fs.readdir(path.join(folder, servicesDirectory, documentTypeDirectory));
-
-        if (!files.length) {
-          await fs.rmdir(path.join(folder, servicesDirectory, documentTypeDirectory));
-        }
-      }
-
-      const cleanedDocumentTypeDirectories = (await fs.readdir(path.join(folder, servicesDirectory), { withFileTypes: true })).filter(dirent => dirent.isDirectory()).map(dirent => dirent.name);
-
-      if (!cleanedDocumentTypeDirectories.length) {
-        await fs.rmdir(path.join(folder, servicesDirectory));
-      }
-    }
-  }));
-  /* eslint-enable no-await-in-loop */
 }
 
 main();
