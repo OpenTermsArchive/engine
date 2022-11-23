@@ -422,7 +422,7 @@ npm run dataset:scheduler
 
 ## Contributing
 
-Thanks for wanting to contribute! There are different ways to contribute to Open Terms Archive. We describe the most common below. If you want to explore other venues for contributing, please contact us over email (contact@[our domain name]) or [Twitter](https://twitter.com/OpenTerms).
+Thanks for wanting to contribute! There are different ways to contribute to Open Terms Archive. We describe the most common below. If you want to explore other venues for contributing, please contact the Core team over email at `contact@[project name without spaces].org`.
 
 ### Adding a new service or updating an existing service
 
