@@ -426,7 +426,7 @@ Thanks for wanting to contribute! There are different ways to contribute to Open
 
 ### Adding a new service or updating an existing service
 
-See the [CONTRIBUTING](https://github.com/OpenTermsArchive/contrib-declarations/blob/main/CONTRIBUTING.md) of repository [`OpenTermsArchive/contrib-declarations`](https://github.com/OpenTermsArchive/contrib-declarations). You will need knowledge of JSON and web DOM.
+See [Contributing a document to Open Terms Archive](./docs/doc-contributing.md). You will need knowledge of JSON and web DOM.
 
 ### Core engine
 
