@@ -351,7 +351,7 @@ Two storage repositories are currently supported: Git and MongoDB. Each one can 
 
 #### Environment variables
 
-Environment variables can be passed in the command-line or provided in a `.env` file at the root of the repository. See `.env.example` for an example of such a file.
+Environment variables can be passed in the command-line or provided in a `.env` file at the root of the repository. See [`.env.example`](./.env.example) for an example of such a file.
 
 - `SMTP_PASSWORD`: a password for email server authentication, in order to send email notifications.
 - `SENDINBLUE_API_KEY`: a SendInBlue API key, in order to send email notifications with that service.
