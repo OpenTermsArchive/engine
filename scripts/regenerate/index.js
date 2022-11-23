@@ -349,7 +349,7 @@ const main = async options => {
       logger.info();
       logger.info(`git add declarations/${serviceId}*`);
       logger.info('git add cleaning/index.json');
-      logger.info(`git c -m "Clean ${serviceId} ${documentType}"`);
+      logger.info(`git commit -m "Clean ${serviceId} ${documentType}"`);
     }
 
     if (decisionEnd == DECISION_END_RETRY) {
