@@ -58,7 +58,7 @@ To distinguish between the different **terms** of a **service**, each **document
 
 #### Declarations
 
-The **documents** that constitute a **collection** are defined in simple JSON files called **declarations**.
+The **documents** that constitute a **collection** are defined, along with some metadata on the **service** they relate to, in simple JSON files called **declarations**.
 
 > Here is an example declaration tracking the Privacy Policy of the Open Terms Archive
 >
@@ -83,7 +83,7 @@ Open Terms Archive **acquires** **documents** to deliver an explorable **history
 1. For the present and future, by **tracking** **documents**.
 2. For the past, by **importing** from an existing **fonds** such as [ToSBack](https://tosback.org), the [Internet Archive](https://archive.org/web/), [Common Crawl](https://commoncrawl.org) or any other in-house format.
 
-#### Tracking terms
+#### Tracking documents
 
 The **engine** **reads** these **declarations** to **record** a **snapshot** by **fetching** the declared web **location** periodically. The **engine** then **extracts** a **version** from this **snapshot** by:
 
@@ -95,14 +95,14 @@ After these steps, if **changes** are spotted in the resulting **document**, a n
 
 Preserving **snapshots** enables recovering after the fact information potentially lost in the **extraction** step: if **declarations** were wrong, they can be **maintained** and corrected **versions** can be **extracted** from the original **snapshots**.
 
-### Importing documents
+#### Importing documents
 
 Existing **fonds** can be prepared for easier analysis by unifying their format to the **Open Terms Archive dataset format**. This unique format enables building interoperable tools, fostering collaboration across reusers.
 Such a dataset can be generated from **versions** alone. If **snapshots** and **declarations** can be retrieved from the **fonds** too, then a full-fledged **collection** can be created.
 
-### Maintaining declarations
+#### Maintaining declarations
 
-All parts of a **declaration** (web location, selection, noise removal, single or multiple pages distribution…) can change over time. The process of updating these elements to enable continued **tracking** is called **maintenance**. Without it, **documents** can become:
+All parts of a **document** **declaration** (web location, selection, noise removal, single or multiple pages distribution…) can change over time. The process of updating these elements to enable continued **tracking** is called **maintenance**. Without it, **documents** can become:
 
 - **unreachable**: no **snapshot** can be **recorded** at all, because the **location** changed or the **service** denies access;
 - **unextractable**: no **version** can be **extracted** from the **snapshot**, because the selection of content or some **filter** fails;
