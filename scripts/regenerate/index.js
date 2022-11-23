@@ -97,8 +97,8 @@ const main = async options => {
     const { shouldSkip, reason } = checkIfSnapshotShouldBeSkipped(snapshot, pageDeclaration);
 
     if (shouldSkip) {
-      logger.debug(`    ↳ Skip: ${reason}`);
-      fileStructure.writeSkippedSnapshot(serviceId, documentType, snapshot);
+      logger.debug(`    ↳ Skipped: ${reason}`);
+      await fileStructure.writeSkippedSnapshot(serviceId, documentType, snapshot);
 
       return;
     }
@@ -142,7 +142,7 @@ const main = async options => {
       logger.debug('Generated with the following command');
       logger.debug(`git diff ${diffArgs.map(arg => arg.replace(' ', '\\ ')).join(' ')}`);
 
-      const toCheckSnapshotPath = fileStructure.writeToCheckSnapshot(serviceId, documentType, snapshot);
+      const toCheckSnapshotPath = await fileStructure.writeToCheckSnapshot(serviceId, documentType, snapshot);
 
       if (options.interactive) {
         const DECISION_VERSION_KEEP = 'Keep it';
@@ -246,7 +246,7 @@ const main = async options => {
       logger.error('    ↳ An error occured while filtering:', error.message);
 
       if (options.interactive) {
-        const toCheckSnapshotPath = fileStructure.writeToCheckSnapshot(serviceId, documentType, snapshot);
+        const toCheckSnapshotPath = await fileStructure.writeToCheckSnapshot(serviceId, documentType, snapshot);
 
         const DECISION_ON_ERROR_BYPASS = 'Bypass: I don\'t know yet';
         const DECISION_ON_ERROR_SKIP = 'Skip: content of this snapshot is unprocessable';
