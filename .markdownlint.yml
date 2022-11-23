@@ -1,0 +1,23 @@
+# These rules are documented on https://github.com/DavidAnson/markdownlint/blob/main/doc/Rules.md
+
+header-style:
+  style: atx  # use the hash style headers instead of the underlined one
+
+ul: # unordered list style
+  style: dash
+
+line_length: false  # do not check for line length; rely on editor wrapping
+
+no-inline-html:
+  allowed_elements:
+    - abbr
+    - i
+
+no-duplicate-header:
+  siblings_only: true
+
+emphasis-style:
+  style: underscore
+
+strong-style:
+  style: asterisk
