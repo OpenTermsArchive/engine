@@ -39,4 +39,3 @@ To reflect this change, if you already have this project locally, execute:
     cd OpenTermsArchive
     git remote set-url origin https://github.com/ambanum/OpenTermsArchive.git
 ```
-

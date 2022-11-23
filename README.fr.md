@@ -62,7 +62,7 @@ Vous pouvez [vous abonner](https://59692a77.sibforms.com/serve/MUIEAKuTv3y67e27P
 
 #### Recevoir les mises à jour de services ou documents spécifiques
 
-Vous pouvez vous rendre sur le site officiel [opentermsarchive.org] (https://opentermsarchive.org). De là, vous pouvez sélectionner un service, puis le type de document correspondant.
+Vous pouvez vous rendre sur le site officiel [opentermsarchive.org](<https://opentermsarchive.org>). De là, vous pouvez sélectionner un service, puis le type de document correspondant.
 Après avoir entré votre adresse électronique et cliqué sur "S'inscrire", nous ajouterons votre adresse à la liste de diffusion correspondante dans [SendInBlue](https://www.sendinblue.com/) et nous ne la conserverons nulle part ailleurs.
 Ensuite, chaque fois qu'une modification sera trouvée sur le document correspondant, nous vous enverrons un e-mail.
 

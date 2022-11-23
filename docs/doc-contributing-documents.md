@@ -215,7 +215,7 @@ function removeTrackingIdsQueryParam(document) {
 }
 ```
 
-The whole document declaration is passed as second parameter. 
+The whole document declaration is passed as second parameter.
 
 For example, it can be used to access the defined document URL or selector inside the filter:
 

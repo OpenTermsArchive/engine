@@ -73,7 +73,6 @@ For command-line examples and documentation, we follow the [docopt usage pattern
 
 In order to improve the understandability of commands, we document all CLI options and examples with the long version of the options.
 
-
 ```diff
 - ansible-playbook -i production.yml app.yml -l france -t stop
 + ansible-playbook --inventory production.yml app.yml --limit france --tag stop
@@ -112,6 +111,7 @@ Also noteworthy, failure to handle an operational error is itself a programmer e
 #### Handling operational errors
 
 There are five ways to handle operational errors:
+
 - **Deal with the failure directly**. For example, create directory if it's missing.
 - **Propagate the failure**. If you don’t know how to deal with the error, the simplest thing to do is to abort whatever operation you’re trying to do, clean up whatever you’ve started, and propagate the error.
 - **Retry the operation**. For example, try to reconnect if the connection is lost.

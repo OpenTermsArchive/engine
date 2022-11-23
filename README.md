@@ -214,6 +214,7 @@ When refering to the base folder, it means the folder where you will be `git pul
 3. Go into the cloned folder and install dependencies: `cd contrib-declarations; npm install`.
 4. If you are using the main repo, you are done, go to step 6.
 5. If you are using a special repo instance (e.g., `dating-declarations`), create a new [config file](#configuring), `config/development.json`, and add:
+
     ```json
     {
 
@@ -222,7 +223,9 @@ When refering to the base folder, it means the folder where you will be `git pul
       }
     }
     ```
+
     e.g.,
+
     ```json
     {
       "services": {
@@ -230,6 +233,7 @@ When refering to the base folder, it means the folder where you will be `git pul
       }
     }
     ```
+
 6. In the folder of the repo (i.e., `OpenTermsArchive`), use `npm start`.
     - It will first do a refiltering to check whenever everything works properly.
     - You will then start to see everything being downloaded under `data/`.
@@ -382,7 +386,6 @@ npm start -- --services <service_id>
 ```
 
 > The service ID is the case sensitive name of the service declaration file without the extension. For example, for `Twitter.json`, the service ID is `Twitter`.
-
 
 To get the latest version of a specific service's terms and document type:
 

@@ -7,11 +7,17 @@ An RSS feed is a type of web page that contains information about the latest con
 To find out the address of the RSS feed you want to subscribe to:
 
 1. [Navigate](#exploring-the-versions-history) to the page with the history of changes you are interested in.
-	- For example, for the WhatsApp Privacy Policy of the Contrib instance, this would be [this page](https://github.com/OpenTermsArchive/contrib-versions/commits/main/WhatsApp/Privacy%20Policy.md).
+
+- For example, for the WhatsApp Privacy Policy of the Contrib instance, this would be [this page](https://github.com/OpenTermsArchive/contrib-versions/commits/main/WhatsApp/Privacy%20Policy.md).
+
 2. Copy the address of that page from your browser’s address bar.
-	- For example, for the WhatsApp Privacy Policy of the Contrib instance, this would be `https://github.com/OpenTermsArchive/contrib-versions/commits/main/WhatsApp/Privacy%20Policy.md`.
+
+- For example, for the WhatsApp Privacy Policy of the Contrib instance, this would be `https://github.com/OpenTermsArchive/contrib-versions/commits/main/WhatsApp/Privacy%20Policy.md`.
+
 3. Append `.atom` at the end of this address.
-	- For example, for the WhatsApp Privacy Policy of the Contrib instance, this would become `https://github.com/OpenTermsArchive/contrib-versions/commits/main/WhatsApp/Privacy%20Policy.md.atom`.
+
+- For example, for the WhatsApp Privacy Policy of the Contrib instance, this would become `https://github.com/OpenTermsArchive/contrib-versions/commits/main/WhatsApp/Privacy%20Policy.md.atom`.
+
 4. Subscribe your RSS feed reader to the resulting address.
 
 ## For all the documents of a service

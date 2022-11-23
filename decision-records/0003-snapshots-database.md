@@ -35,7 +35,7 @@ The solution considered in order to provide a quality dataset therefore consists
 To rewrite history, we go through the snapshot commits one by one after reordering them (in memory) and we create a version commit each time, avoiding commits corresponding to noise and performing any renaming.
 
 This implies being able to version the service filters (used to generate the version from the snapshot).
-See https://github.com/ambanum/OpenTermsArchive/issues/156.
+See <https://github.com/ambanum/OpenTermsArchive/issues/156>.
 
 ### Problem
 
@@ -48,7 +48,6 @@ It also appears that the older the commit is in the git history, the longer this
 > For example, on a history containing about 100,000 commits, accessing the contents of the oldest commit takes about 1,000 ms while accessing the most recent commit takes only 100 ms.
 
 At the date of this document, the number of commits entries approaches the million and to iterate over these snapshots, to rewrite versions history, it currently takes more or less 3 months.
-
 
 Also, `git` implies to store data in a hash tree in the form of chronologically ordered commits. So to insert snapshots in the history, it implies to rewrite the whole snapshots history which also takes the same time as reading them.
 
@@ -74,6 +73,7 @@ Since accessing the contents of a commit takes longer the older it is in the his
 This means truncating the history, browsing the remaining commits and regenerating the corresponding versions. Then creating another subset of the history which contains an arbitrary number of commits following the commits already browsed and perform the processing.
 
 To create a history subset with git :
+
 - Create a clone of a subset of N commits from the local snapshot: `git clone --depth <N> "file://local/path/snapshots" snapshots-tmp` with `N` corresponding to the position of the first commit you want in the block relative to the last commit in the history
 - Remove all commits older than the last commit you want to keep in the block: `git reset --hard <sha>` with `sha` corresponding to the id of the last commit you want to have in the block.
 - Clean up git to ensure that history navigation is efficient: `git gc`.
