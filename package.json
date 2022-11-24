@@ -17,6 +17,10 @@
     ".": "./src/exports.js",
     "./fetch": "./src/archivist/fetcher/exports.js",
     "./filter": "./src/archivist/filter/exports.js",
+    "./services": "./src/archivist/services/exports.js",
+    "./record": "./src/archivist/recorder/record.js",
+    "./repository-factory": "./src/archivist/recorder/repositories/factory.js",
+    "./errors": "./src/archivist/errors.js",
     "./page-declaration": "./src/archivist/services/pageDeclaration.js"
   },
   "bin": {
