@@ -27,9 +27,9 @@ jobs:
         run: |
           echo "Found release type '${{ env.RELEASE_TYPE }}'"
           echo "release_type=${{ env.RELEASE_TYPE }}" >> $GITHUB_OUTPUT
-      - name: Fail and display error is proper release type is not found in changelog
+      - name: Fail and display error if no proper release type is found in changelog
         if: env.RELEASE_TYPE == ''
-        run: echo "No valid release type found in changelog. The title of the 'Unreleased' section must contain one of the following tag [patch], [minor], [major]. Ex Unreleased [minor]."; exit 1
+        run: echo "No valid release type found in changelog. The title of the 'Unreleased' section must contain one of the following tags '[patch]', '[minor]', '[major]'. For example, '## Unreleased [minor]'."; exit 1
 
 
   test:
