@@ -1,4 +1,37 @@
-# Open Terms Archive
+<div align="center">
+  <a href="http://opentermsarchive.org">
+    <img width="500" src="http://opentermsarchive.org/images/logo/logo-open-terms-archive-black.png"/>
+  </a>
+</div>
+
+<br >
+
+<div align="center">
+  <strong>Tracks and makes visible changes to the terms of online services</strong>
+</div>
+
+<br >
+
+<div align="center">
+  <img src="https://github.com/ambanum/OpenTermsArchive/actions/workflows/test.yml/badge.svg"/>
+  <img src="https://img.shields.io/npm/v/open-terms-archive?color=blue"/>
+  <img src="https://img.shields.io/github/license/ambanum/opentermsarchive?color=lightgrey"/>
+</div>
+
+
+<div align="center">
+  <h4>
+    <a href="http://opentermsarchive.org">
+      Website
+    </a>
+    <span> | </span>
+    <a href="https://twitter.com/openterms">
+      Twitter
+    </a>
+  </h4>
+</div>
+
+- - -
 
 **Services** have **terms** written in **documents**, contractual (Terms of Services, Privacy Policy…) or not (Community Guidelines, Deceased User Policy…), that can change over time. Open Terms Archive enables users rights advocates, regulatory bodies and interested citizens to follow the **changes** to these **terms**, to be notified whenever a new **version** is published, to explore their entire **history** and to collaborate in analysing them.
 
