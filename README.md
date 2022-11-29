@@ -1,56 +1,14 @@
-<div align="center">
-  <a href="http://opentermsarchive.org">
-    <img width="500" src="https://user-images.githubusercontent.com/1098708/204466564-9acda570-e5a0-49b1-8397-7d29d473334c.svg"/>
-  </a>
-</div>
+# Open Terms Archive Engine
 
-<br >
+This repository contains the code and documentation of the engine of the [Open Terms Archive](https://opentermsarchive.org) project, which enables downloading, archiving and publishing versions of documents obtained online. It can be used independently from the Open Terms Archive ecosystem.
 
-<div align="center">
-  <strong>Tracks and makes visible changes to the terms of online services</strong>
-</div>
+The document you are reading now is targeted at developers wanting to use or contribute to the engine. For a high-level overview of Open Terms Archive’s wider goals and processes, please read its [public homepage](https://opentermsarchive.org).
 
-<br >
-
-<div align="center">
-  <h4>
-    <a href="http://opentermsarchive.org">
-      Website
-    </a>
-    <span> | </span>
-    <a href="https://twitter.com/openterms">
-      Twitter
-    </a>
-  </h4>
-</div>
-
-- - -
-
-**Services** have **terms** written in **documents**, contractual (Terms of Services, Privacy Policy…) or not (Community Guidelines, Deceased User Policy…), that can change over time. Open Terms Archive enables users rights advocates, regulatory bodies and interested citizens to follow the **changes** to these **terms**, to be notified whenever a new **version** is published, to explore their entire **history** and to collaborate in analysing them.
+## Context
 
 _Note: words in bold are [business domain names](https://en.wikipedia.org/wiki/Domain-driven_design)._
 
-## Table of Contents
-
-- [How it works](#how-it-works)
-  - [Vocabulary](#vocabulary)
-    - [Instances](#instances)
-    - [Collections](#collections)
-    - [Declarations](#declarations)
-  - [Processes](#processes)
-    - [Acquiring documents](#acquiring-documents)
-    - [Tracking documents](#tracking-documents)
-    - [Importing documents](#importing-documents)
-    - [Maintaining declarations](#maintaining-declarations)
-  - [Governance](#governance)
-    - [Creating an instance](#creating-an-instance)
-    - [Referencing an instance](#referencing-an-instance)
-- [Usage](#usage)
-- [Contributing](#contributing)
-  - [Adding a new service or updating an existing service](#adding-a-new-service-or-updating-an-existing-service)
-  - [Core engine](#core-engine)
-  - [Funding and partnerships](#funding-and-partnerships)
-- [License](#license)
+**Services** have **terms** written in **documents**, contractual (Terms of Services, Privacy Policy…) or not (Community Guidelines, Deceased User Policy…), that can change over time. Open Terms Archive enables users rights advocates, regulatory bodies and interested citizens to follow the **changes** to these **terms**, to be notified whenever a new **version** is published, to explore their entire **history** and to collaborate in analysing them. This free and open-source engine has been developed to that end.
 
 ## How it works
 
@@ -137,19 +95,11 @@ There are different ways to use Open Terms Archive:
 
 ## Contributing
 
-Thanks for wanting to contribute! There are different ways to contribute to Open Terms Archive. We describe the most common below. If you want to explore other venues for contributing, please contact the core team over email at `contact@[project name without spaces].org`.
-
-### Adding a new service or updating an existing service
-
-See [Contributing a document to Open Terms Archive](./docs/doc-contributing.md). You will need knowledge of JSON and web DOM.
-
-### Core engine
-
 To contribute to the core engine of Open Terms Archive, see the [CONTRIBUTING](CONTRIBUTING.md) file of this repository. You will need knowledge of JavaScript and NodeJS.
 
-### Funding and partnerships
+### Sponsorship and partnerships
 
-Beyond individual contributions, we need funds and committed partners to pay for a core team to maintain and grow Open Terms Archive. If you know of opportunities, please let us know! You can find [on our website](https://opentermsarchive.org/en/about) an up-to-date list of the partners and funders that make Open Terms Archive possible.
+Beyond individual contributions, we need funds and committed partners to pay for a core team to maintain and grow Open Terms Archive. If you know of opportunities, please let us know over email at `contact@[project name without spaces].org`!
 
 - - -
 
