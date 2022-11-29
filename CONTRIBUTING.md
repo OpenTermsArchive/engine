@@ -12,7 +12,7 @@ First of all, thanks for taking the time to contribute! 🎉👍
 - [Practices](#practices)
   - [Errors handling](#errors-handling)
 
----
+- - -
 
 ## Workflow
 
