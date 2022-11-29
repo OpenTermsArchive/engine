@@ -77,14 +77,6 @@ Preserving **snapshots** enables recovering after the fact information potential
 Existing **fonds** can be prepared for easier analysis by unifying their format to the **Open Terms Archive dataset format**. This unique format enables building interoperable tools, fostering collaboration across reusers.
 Such a dataset can be generated from **versions** alone. If **snapshots** and **declarations** can be retrieved from the **fonds** too, then a full-fledged **collection** can be created.
 
-#### Maintaining declarations
-
-All parts of a **document** **declaration** (web location, selection, noise removal, single or multiple pages distribution…) can change over time. The process of updating these elements to enable continued **tracking** is called **maintenance**. Without it, **documents** can become:
-
-- **unreachable**: no **snapshot** can be **recorded** at all, because the **location** changed or the **service** denies access;
-- **unextractable**: no **version** can be **extracted** from the **snapshot**, because the selection of content or some **filter** fails;
-- **noisy**: both **snapshots** and **versions** are **recorded** but the **changes** contain **noise** that should have been **filtered out**.
-
 ## Usage
 
 There are different ways to use Open Terms Archive:

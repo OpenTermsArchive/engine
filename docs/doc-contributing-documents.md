@@ -302,10 +302,15 @@ In order to achieve this, you can use the following command:
 npm run lint [$service_id [$another_service_id …]]
 ```
 
-## Editing existing documents
+## Maintaining declarations
 
-As services evolve, document declarations are also expected to change over time. The service provider can change the document's URL or the document's HTML structure, thus their fetch location, selectors or filters can change.
-OpenTermsArchive needs to keep track of this changes in order to regenerate versions history from snapshots history.
+All parts of a **document** **declaration** (web location, selection, noise removal, single or multiple pages distribution…) can change over time. The process of updating these elements to enable continued **tracking** is called **maintenance**. Without it, **documents** can become:
+
+- **unreachable**: no **snapshot** can be **recorded** at all, because the **location** changed or the **service** denies access;
+- **unextractable**: no **version** can be **extracted** from the **snapshot**, because the selection of content or some **filter** fails;
+- **noisy**: both **snapshots** and **versions** are **recorded** but the **changes** contain **noise** that should have been **filtered out**.
+
+Open Terms Archive needs to keep track of this changes in order to regenerate versions history from snapshots history.
 
 ### Service history
 
