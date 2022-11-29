@@ -25,6 +25,8 @@ An **instance** **tracks** **documents** of a single **collection**.
 
 A **collection** is characterised by a **scope** across **dimensions** such as **language**, **jurisdiction** and **industry**.
 
+> Federated public collections can be found on [GitHub](https://github.com/OpenTermsArchive?q=versions).
+
 ### Terms types
 
 To distinguish between the different **terms** of a **service**, each has a **type**, such as “Terms of Service”, “Privacy Policy”, “Developer Agreement”… It matches the topic, but not necessarily the title the **service** gives them. Unifying the **types** enables comparing **terms** across **services**.
