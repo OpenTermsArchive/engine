@@ -54,6 +54,15 @@ We add this additional rule:
 
 ### Documentation
 
+#### Copywriting
+
+Avoid “you” and “we” (who is “we” in a common anyway?). Use neutral or passive wordings.
+
+```diff
+- You can find federated public instances on GitHub.
++ Federated public instances can be found on GitHub.
+```
+
 #### CLI
 
 ##### docopt
