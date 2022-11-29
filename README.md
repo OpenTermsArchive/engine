@@ -25,11 +25,11 @@ An **instance** **tracks** **documents** of a single **collection**.
 
 A **collection** is characterised by a **scope** across **dimensions** such as **language**, **jurisdiction** and **industry**.
 
-### Document types
+### Terms types
 
-To distinguish between the different **terms** of a **service**, each **document** has a **type**, such as “Terms of Service”, “Privacy Policy”, “Developer Agreement”… These **types** match the topic, but not necessarily the title the **service** gives them. Unifying the **types** enables comparing **terms** across **services**.
+To distinguish between the different **terms** of a **service**, each has a **type**, such as “Terms of Service”, “Privacy Policy”, “Developer Agreement”… It matches the topic, but not necessarily the title the **service** gives them. Unifying the **types** enables comparing **terms** across **services**.
 
-> The terms types are made available in a [dedicated database](https://github.com/OpenTermsArchive/terms-types) and published on NPM under [`@opentermsarchive/terms-types`](https://www.npmjs.com/package/@opentermsarchive/terms-types), enabling standardisation and interoperability beyond the Open Terms Archive engine.
+> More information on terms types can be found in the [dedicated repository](https://github.com/OpenTermsArchive/terms-types). They are published on NPM under [`@opentermsarchive/terms-types`](https://www.npmjs.com/package/@opentermsarchive/terms-types), enabling standardisation and interoperability beyond the Open Terms Archive engine.
 
 ### Declarations
 
