@@ -1,6 +1,6 @@
 <div align="center">
   <a href="http://opentermsarchive.org">
-    <img width="500" src="http://opentermsarchive.org/images/logo/logo-open-terms-archive-black.png"/>
+    <img width="500" src="https://user-images.githubusercontent.com/1098708/204466564-9acda570-e5a0-49b1-8397-7d29d473334c.svg"/>
   </a>
 </div>
 
@@ -11,13 +11,6 @@
 </div>
 
 <br >
-
-<div align="center">
-  <img src="https://github.com/ambanum/OpenTermsArchive/actions/workflows/test.yml/badge.svg"/>
-  <img src="https://img.shields.io/npm/v/open-terms-archive?color=blue"/>
-  <img src="https://img.shields.io/github/license/ambanum/opentermsarchive?color=lightgrey"/>
-</div>
-
 
 <div align="center">
   <h4>
@@ -155,8 +148,13 @@ A **collection** can be **referenced** in the Open Terms Archive **federation** 
 7. Public and open-licensed **versions**.
 8. Regular, public, and open-licensed **dataset** releases.
 
+## Usage
 
+There are different ways to use Open Terms Archive:
 
+- Contributing to the engine
+- Using as dependency
+- Creating a new instance
 
 ## Contributing
 
