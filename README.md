@@ -10,34 +10,32 @@ _Note: words in bold are [business domain names](https://en.wikipedia.org/wiki/D
 
 **Services** have **terms** written in **documents**, contractual (Terms of Services, Privacy Policy…) or not (Community Guidelines, Deceased User Policy…), that can change over time. Open Terms Archive enables users rights advocates, regulatory bodies and interested citizens to follow the **changes** to these **terms**, to be notified whenever a new **version** is published, to explore their entire **history** and to collaborate in analysing them. This free and open-source engine has been developed to that end.
 
-## How it works
+## Main concepts
 
-The document you are reading now is targeted at developers wanting to understand the technicalities and contribute to the project. For a high-level overview of the process, please look at the [public homepage](https://opentermsarchive.org).
+### Instances
 
-### Vocabulary
+Open Terms Archive is a decentralised system. It aims at enabling any entity to **track** **terms** on their own and at federating a number of public **instances** in a single ecosystem to maximise discoverability, collaboration and political power. To that end, the Open Terms Archive **engine** can be run on any server that then becomes a dedicated **instance**.
 
-#### Instances
-
-Open Terms Archive is a decentralised system. It aims at enabling any entity to **track** **terms** on their own and at federating a number of public **instances** in a single ecosystem to maximise discoverability, collaboration and political power.
-
-To that end, the Open Terms Archive **engine** is free and open-source software that can be deployed on any server, making it a dedicated **instance**.
-
-> You can find existing federated public instances on [GitHub](
+> Federated public instances can be found on [GitHub](
 https://github.com/OpenTermsArchive?q=declarations).
 
-#### Collections
+### Collections
 
-An **instance** **tracks** **documents** of a single **collection**. A **collection** is characterised by a **scope** across **dimensions** such as **language**, **jurisdiction** and **industry**.
+An **instance** **tracks** **documents** of a single **collection**.
+
+A **collection** is characterised by a **scope** across **dimensions** such as **language**, **jurisdiction** and **industry**.
+
+### Document types
 
 To distinguish between the different **terms** of a **service**, each **document** has a **type**, such as “Terms of Service”, “Privacy Policy”, “Developer Agreement”… These **types** match the topic, but not necessarily the title the **service** gives them. Unifying the **types** enables comparing **terms** across **services**.
 
 > The terms types are made available in a [dedicated database](https://github.com/OpenTermsArchive/terms-types) and published on NPM under [`@opentermsarchive/terms-types`](https://www.npmjs.com/package/@opentermsarchive/terms-types), enabling standardisation and interoperability beyond the Open Terms Archive engine.
 
-#### Declarations
+### Declarations
 
 The **documents** that constitute a **collection** are defined, along with some metadata on the **service** they relate to, in simple JSON files called **declarations**.
 
-> Here is an example declaration tracking the Privacy Policy of the Open Terms Archive
+> Here is an example declaration tracking the Privacy Policy of Open Terms Archive:
 >
 > ```json
 > {
@@ -51,18 +49,16 @@ The **documents** that constitute a **collection** are defined, along with some 
 > }
 > ```
 
-### Processes
-
-#### Acquiring documents
+## How to add documents to a collection
 
 Open Terms Archive **acquires** **documents** to deliver an explorable **history** of **changes**. This can be done in two ways:
 
 1. For the present and future, by **tracking** **documents**.
 2. For the past, by **importing** from an existing **fonds** such as [ToSBack](https://tosback.org), the [Internet Archive](https://archive.org/web/), [Common Crawl](https://commoncrawl.org) or any other in-house format.
 
-#### Tracking documents
+### Tracking documents
 
-The **engine** **reads** these **declarations** to **record** a **snapshot** by **fetching** the declared web **location** periodically. The **engine** then **extracts** a **version** from this **snapshot** by:
+The **engine** **reads** **declarations** to **record** a **snapshot** by **fetching** the declared web **location** periodically. The **engine** then **extracts** a **version** from this **snapshot** by:
 
 1. **Selecting** the subset of the **snapshot** that contains the **terms** (instead of navigation menus, footers, cookies banners…).
 2. **Removing** residual content in this subset that is not part of the **terms** (ads, illustrative pictures, internal navigation links…).
@@ -72,12 +68,12 @@ After these steps, if **changes** are spotted in the resulting **document**, a n
 
 Preserving **snapshots** enables recovering after the fact information potentially lost in the **extraction** step: if **declarations** were wrong, they can be **maintained** and corrected **versions** can be **extracted** from the original **snapshots**.
 
-#### Importing documents
+### Importing documents
 
 Existing **fonds** can be prepared for easier analysis by unifying their format to the **Open Terms Archive dataset format**. This unique format enables building interoperable tools, fostering collaboration across reusers.
 Such a dataset can be generated from **versions** alone. If **snapshots** and **declarations** can be retrieved from the **fonds** too, then a full-fledged **collection** can be created.
 
-## Usage
+## Using
 
 There are different ways to use Open Terms Archive:
 
