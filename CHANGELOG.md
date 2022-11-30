@@ -9,6 +9,6 @@ Unlike Common Changelog, the `unreleased` section of [Keep a Changelog](https://
 
 ### Added
 
-- Publish package on NPM under name `opentermsarchive`.
+- Publish package on NPM under name `@opentermsarchive/engine`.
 - Export `filter`, `pageDeclaration` and `fetch` in NPM module.
 - Add changelog.
