@@ -40,6 +40,12 @@
     "posttest": "npm run lint",
     "test:debug": "npm run test -- --inspect-brk --exit"
   },
+  "files": [
+    "bin",
+    "config",
+    "scripts",
+    "src"
+  ],
   "dependencies": {
     "@accordproject/markdown-cicero": "^0.15.2",
     "@accordproject/markdown-pdf": "^0.15.2",
