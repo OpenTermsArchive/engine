@@ -95,13 +95,38 @@ A [Node.js](https://nodejs.org/en/download/) runtime is required to execute this
 
 ![Minimum supported Node.js version can be found in the package.json file](https://img.shields.io/node/v/@opentermsarchive/engine?color=informational&label=Minimum%20supported%20Node.js%20version)
 
+### Getting started
 
+This engine is published as a [module on NPM](https://npmjs.com/package/@opentermsarchive/engine). The recommended install is as a dependency in a `package.json` file, next to a folder containing [declaration files](#declarations).
 
+```sh
+npm install --save @opentermsarchive/engine
+mkdir declarations
+```
+
+In an editor, create the following declaration file in `declarations/Open Terms Archive.json` to track the terms of the Open Terms Archive website:
+
+```json
+{
+  "name": "Open Terms Archive",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://opentermsarchive.org/en/privacy-policy",
+      "select": ".TextContent_textContent__ToW2S"
+    }
+  }
+}
+```
+
+In the terminal:
 
 ```sh
 npx ota-track
 ```
 
+The tracked documents can be found in the `data` folder.
+
+This quick example aimed at letting you try the engine quickly. Most likely, you will simply `npm install` from an existing collection, or create a new collection from the [collection template](https://github.com/OpenTermsArchive/template-declarations).
 
 ### CLI
 
