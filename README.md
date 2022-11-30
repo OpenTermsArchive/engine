@@ -48,7 +48,7 @@ A **declaration** also contains some metadata on the **service** the **documents
 >   "name": "Open Terms Archive",
 >   "documents": {
 >     "Privacy Policy": {
->       "fetch": "https://opentermsarchive.org/privacy-policy",
+>       "fetch": "https://opentermsarchive.org/en/privacy-policy",
 >       "select": ".TextContent_textContent__ToW2S"
 >     }
 >   }
@@ -96,93 +96,150 @@ A [Node.js](https://nodejs.org/en/download/) runtime is required to execute this
 ![Minimum supported Node.js version can be found in the package.json file](https://img.shields.io/node/v/@opentermsarchive/engine?color=informational&label=Minimum%20supported%20Node.js%20version)
 
 
-#### With NPM
 
-This engine is published as a [module on NPM](https://npmjs.com/package/opentermsarchive). It can thus be installed as a dependency in a `package.json` file.
 
 ```sh
-npx opentermsarchive
+npx ota-track
 ```
+
 
 ### CLI
 
-#### Declarations
+The following commands assume an install of the module as a dependency. Within such a module, the following commands are available.
 
-For this walkthrough, let's use existing declarations (e.g. `OpenTermsArchive/contrib-declarations`) by cloning its repository next to the `OpenTermsArchive` project root directory:
+#### `ota-track`
 
-
-```bash
-cd ..
-git clone https://github.com/OpenTermsArchive/contrib-declarations.git declarations
-```
-Go into the declarations folder and install dependencies:
-
-```bash
-cd declarations
-npm install
+```sh
+npx ota-track
 ```
 
-#### Display manual
+[Track](#tracking-documents) the current terms of services according to provided declarations.
 
+The declarations, snapshots and versions paths are defined in the [configuration](#configuring).
+
+> Note that the snapshots and versions will be recorded at the moment the command is executed, on top of the existing local history. If a shared history already exists and the goal is to add on top of it, that history has to be downloaded before executing that command.
+
+##### Recap of available options
+
+```sh
+npx ota-track --help
 ```
-npm start -- --help
-```
 
-#### Track documents
+##### Track terms of specific services
 
-```
-npm start
-```
-
-Snapshots and versions will start to being downloaded under paths defined in the configuration (see [configuration](#configuration)), with `./data` as default path.
-Thus latest version of a document will be available under this path, with the following structure: `$versions_folder/$service_provider_name/$document_type.md`.
-
-> Note that it doesn't download the whole history. Snapshots and versions repositories must be cloned independently to have access to the history.
-
-##### Track a specific service's terms
-
-```
-npm start -- --services <service_id>
+```sh
+npx ota-track --services "<service_id>" ["<service_id>"...]
 ```
 
 > The service ID is the case sensitive name of the service declaration file without the extension. For example, for `Twitter.json`, the service ID is `Twitter`.
 
+##### Track specific terms of specific services
 
-##### Track a specific service's terms and terms type
-
-```
-npm start -- --services <service_id> --documentTypes <terms_type>
-```
-
-##### Schedule documents tracking multiple times a day
-
-```
-npm run start:scheduler
+```sh
+npx ota-track --services "<service_id>" ["<service_id>"...] --documentTypes "<terms_type>" ["<terms_type>"...]
 ```
 
-#### Publish
+> The service ID is the case sensitive name of the service declaration file without the extension. For example, for `Twitter.json`, the service ID is `Twitter`.
 
-Generate a dataset:
+##### Track documents four times a day
 
-```
-npm run dataset:generate
-```
-
-Release a dataset on GitHub:
-
-```
-npm run dataset:release
+```sh
+npx ota-track --schedule
 ```
 
-Schedule a weekly release of the dataset:
+#### `ota-validate-declarations`
 
-```
-npm run dataset:scheduler
+```sh
+npx ota-validate-declarations [<service_id>...]
 ```
 
+Check that all declarations allow recording a snapshot and a version properly.
+
+If one or several `<service_id>` are provided, check only those services.
+
+> The service ID is the case sensitive name of the service declaration file without the extension. For example, for `Twitter.json`, the service ID is `Twitter`.
+
+##### Validate schema only
+
+```sh
+npx ota-validate-declarations --schema-only [<service_id>...]
+```
+
+Check that all declarations are readable by the engine.
+
+Allows for a much faster check of declarations, but does not check that the documents are actually accessible.
+
+If one or several `<service_id>` are provided, check only those services.
+
+> The service ID is the case sensitive name of the service declaration file without the extension. For example, for `Twitter.json`, the service ID is `Twitter`.
+
+#### `ota-lint-declarations`
+
+```sh
+npx ota-lint-declarations [<service_id>...]
+```
+
+Normalise the format of declarations.
+
+Automatically correct formatting mistakes and ensure that all declarations are standardised.
+
+If one or several `<service_id>` are provided, check only those services.
+
+> The service ID is the case sensitive name of the service declaration file without the extension. For example, for `Twitter.json`, the service ID is `Twitter`.
 
 ### API
 
+Once added as a dependency, the engine exposes a JavaScript API that can be called in your own code. The following modules are available.
+
+#### `fetch`
+
+The `fetch` module gets the MIME type and content of a document from its URL
+
+```js
+import fetch from '@opentermsarchive/engine/fetch';
+```
+
+Documentation on how to use `fetch` is provided [as JSDoc](./src/archivist/fetcher/index.js).
+
+##### Headless browser management
+
+If you pass the `executeClientScripts` option to `fetch`, a headless browser will be used to download and execute the page before serialising its DOM. For performance reasons, the starting and stopping of the browser is your responsibility to avoid instantiating a browser on each fetch. Here is an example on how to use this feature:
+
+```js
+import fetch, { launchHeadlessBrowser, stopHeadlessBrowser } from '@opentermsarchive/engine/fetch';
+
+await launchHeadlessBrowser();
+await fetch({ executeClientScripts: true, ... });
+await fetch({ executeClientScripts: true, ... });
+await fetch({ executeClientScripts: true, ... });
+await stopHeadlessBrowser();
+```
+
+The `fetch` module options are defined as a [`node-config` submodule](https://github.com/node-config/node-config/wiki/Sub-Module-Configuration). The default `fetcher` configuration can be overridden by adding a `fetcher` object to the [local configuration file](#configuration-file).
+
+#### `filter`
+
+The `filter` module transforms HTML or PDF content into a Markdown string according to a [declaration](#declarations).
+
+```js
+import filter from '@opentermsarchive/engine/filter';
+```
+
+The `filter` function documentation is available [as JSDoc](./src/archivist/filter/index.js).
+
+#### `PageDeclaration`
+
+The `PageDeclaration` class encapsulates information about a page tracked by Open Terms Archive.
+
+```js
+import pageDeclaration from '@opentermsarchive/engine/page-declaration';
+```
+
+The `PageDeclaration` format is defined [in source code](./src/archivist/services/pageDeclaration.js).
+
+### Dataset generation
+
+See the [`dataset` script documentation](./scripts/dataset/README.md).
 
 ## Configuring
 
