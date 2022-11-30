@@ -93,7 +93,7 @@ This module is tested to work across operating systems (continuous testing on UN
 
 A [Node.js](https://nodejs.org/en/download/) runtime is required to execute this engine.
 
-![Minimum supported Node.js version can be found in the package.json file](https://img.shields.io/node/v/@opentermsarchive/engine?color=informational&label=Minimum%20supported%20Node.js%20version)
+![Supported Node.js version can be found in the package.json file](https://img.shields.io/node/v/@opentermsarchive/engine?color=informational&label=Supported%20Node.js%20version)
 
 ### Getting started
 
