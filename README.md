@@ -1,41 +1,45 @@
 # Open Terms Archive Engine
 
-This repository contains the code and documentation of the engine of the [Open Terms Archive](https://opentermsarchive.org) project, which enables downloading, archiving and publishing versions of documents obtained online. It can be used independently from the Open Terms Archive ecosystem.
+The document you are reading now is targeted at developers wanting to use or contribute to the engine of [Open Terms Archive](https://opentermsarchive.org). This codebase is a Node.js module enabling downloading, archiving and publishing versions of documents obtained online. It can be used independently from the Open Terms Archive ecosystem. For a high-level overview of Open Terms Archive’s wider goals and processes, please read its [public homepage](https://opentermsarchive.org).
 
-The document you are reading now is targeted at developers wanting to use or contribute to the engine. For a high-level overview of Open Terms Archive’s wider goals and processes, please read its [public homepage](https://opentermsarchive.org).
-
-## Context
+## Motivation
 
 _Note: words in bold are [business domain names](https://en.wikipedia.org/wiki/Domain-driven_design)._
 
-**Services** have **terms** written in **documents**, contractual (Terms of Services, Privacy Policy…) or not (Community Guidelines, Deceased User Policy…), that can change over time. Open Terms Archive enables users rights advocates, regulatory bodies and interested citizens to follow the **changes** to these **terms**, to be notified whenever a new **version** is published, to explore their entire **history** and to collaborate in analysing them. This free and open-source engine has been developed to that end.
+**Services** have **terms** written in **documents**, contractual (Terms of Services, Privacy Policy…) or not (Community Guidelines, Deceased User Policy…), that can change over time. Open Terms Archive enables users rights advocates, regulatory bodies and interested citizens to follow the **changes** to these **terms**, to be notified whenever a new **version** is published, to explore their entire **history** and to collaborate in analysing them. This free and open-source engine is developed to support these goals.
 
 ## Main concepts
 
 ### Instances
 
-Open Terms Archive is a decentralised system. It aims at enabling any entity to **track** **terms** on their own and at federating a number of public **instances** in a single ecosystem to maximise discoverability, collaboration and political power. To that end, the Open Terms Archive **engine** can be run on any server that then becomes a dedicated **instance**.
+Open Terms Archive is a decentralised system.
 
-> Federated public instances can be found on [GitHub](
+It aims at enabling any entity to **track** **terms** on its own and at federating a number of public **instances** in a single ecosystem to maximise discoverability, collaboration and political power. To that end, the Open Terms Archive **engine** can be run on any server, thus making it a dedicated **instance**.
+
+> Federated public instances can be [found on GitHub](
 https://github.com/OpenTermsArchive?q=declarations).
 
 ### Collections
 
 An **instance** **tracks** **documents** of a single **collection**.
 
-A **collection** is characterised by a **scope** across **dimensions** such as **language**, **jurisdiction** and **industry**.
+A **collection** is characterised by a **scope** across **dimensions** that describe the **terms** it **tracks**, such as **language**, **jurisdiction** and **industry**.
 
-> Federated public collections can be found on [GitHub](https://github.com/OpenTermsArchive?q=versions).
+> Federated public collections can be [found on GitHub](https://github.com/OpenTermsArchive?q=versions).
 
 ### Terms types
 
-To distinguish between the different **terms** of a **service**, each has a **type**, such as “Terms of Service”, “Privacy Policy”, “Developer Agreement”… It matches the topic, but not necessarily the title the **service** gives them. Unifying the **types** enables comparing **terms** across **services**.
+To distinguish between the different **terms** of a **service**, each has a **type**, such as “Terms of Service”, “Privacy Policy”, “Developer Agreement”…
+
+This **type** matches the topic, but not necessarily the title the **service** gives to it. Unifying the **types** enables comparing **terms** across **services**.
 
 > More information on terms types can be found in the [dedicated repository](https://github.com/OpenTermsArchive/terms-types). They are published on NPM under [`@opentermsarchive/terms-types`](https://www.npmjs.com/package/@opentermsarchive/terms-types), enabling standardisation and interoperability beyond the Open Terms Archive engine.
 
 ### Declarations
 
-The **documents** that constitute a **collection** are defined, along with some metadata on the **service** they relate to, in simple JSON files called **declarations**.
+The **documents** that constitute a **collection** are defined in simple JSON files called **declarations**.
+
+A **declaration** also contains some metadata on the **service** the **documents** relate to.
 
 > Here is an example declaration tracking the Privacy Policy of Open Terms Archive:
 >
@@ -75,23 +79,22 @@ Preserving **snapshots** enables recovering after the fact information potential
 Existing **fonds** can be prepared for easier analysis by unifying their format to the **Open Terms Archive dataset format**. This unique format enables building interoperable tools, fostering collaboration across reusers.
 Such a dataset can be generated from **versions** alone. If **snapshots** and **declarations** can be retrieved from the **fonds** too, then a full-fledged **collection** can be created.
 
-## Using
+## How to use the engine
 
-This documentation describes how to execute the **engine** independently from any specific **instance**.
+This documentation describes how to execute the **engine** independently from any specific **instance**. For other use cases, other parts of the documentation could be more relevant:
 
-- To contribute **declarations** to an existing **instance**, see [how to contribute documents](./docs/doc-contributing-documents.md).
-- To create a new **collection**, see the [collection bootstrap](https://github.com/OpenTermsArchive/template-declarations) script.
-- To create a new public **instance**, see the [governance](./docs/doc-governance.md) documentation.
+- to contribute **declarations** to an existing **instance**, see [how to contribute documents](./docs/doc-contributing-documents.md);
+- to create a new **collection**, see the [collection bootstrap](https://github.com/OpenTermsArchive/template-declarations) script;
+- to create a new public **instance**, see the [governance](./docs/doc-governance.md) documentation.
 
-### Installing
+### Requirements
 
-#### Requirements
+This module is tested to work across operating systems (continuous testing on UNIX, macOS and Windows).
 
 A [Node.js](https://nodejs.org/en/download/) runtime is required to execute this engine.
 
-![Minimum supported Node.js version can be found in the package.json file](https://img.shields.io/node/v/open-terms-archive?color=informational&label=Minimum%20supported%20Node.js%20version)
+![Minimum supported Node.js version can be found in the package.json file](https://img.shields.io/node/v/@opentermsarchive/engine?color=informational&label=Minimum%20supported%20Node.js%20version)
 
-It works across operating systems and is tested on macOS, UNIX and Windows.
 
 #### With NPM
 
