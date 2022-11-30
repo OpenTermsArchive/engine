@@ -1,10 +1,26 @@
+_The document you are reading now is targeted at developers wanting to use or contribute to the engine of [Open Terms Archive](https://opentermsarchive.org)._
+
 # Open Terms Archive Engine
 
-The document you are reading now is targeted at developers wanting to use or contribute to the engine of [Open Terms Archive](https://opentermsarchive.org). This codebase is a Node.js module enabling downloading, archiving and publishing versions of documents obtained online. It can be used independently from the Open Terms Archive ecosystem. For a high-level overview of Open Terms Archive’s wider goals and processes, please read its [public homepage](https://opentermsarchive.org).
+This codebase is a Node.js module enabling downloading, archiving and publishing versions of documents obtained online.\
+It can be used independently from the Open Terms Archive ecosystem.
+
+For a high-level overview of Open Terms Archive’s wider goals and processes, please read its [public homepage](https://opentermsarchive.org).
+
+## Table of content
+
+- [Motivation](#motivation)
+- [Main concepts](#main-concepts)
+- [How to add documents to a collection](#how-to-add-documents-to-a-collection)
+- [How to use the engine](#how-to-use-the-engine)
+- [Configuring](#configuring)
+- [Deploying](#deploying)
+- [Contributing](#contributing)
+- [License](#license)
 
 ## Motivation
 
-_Note: words in bold are [business domain names](https://en.wikipedia.org/wiki/Domain-driven_design)._
+_Words in bold are [business domain names](https://en.wikipedia.org/wiki/Domain-driven_design)._
 
 **Services** have **terms** written in **documents**, contractual (Terms of Services, Privacy Policy…) or not (Community Guidelines, Deceased User Policy…), that can change over time. Open Terms Archive enables users rights advocates, regulatory bodies and interested citizens to follow the **changes** to these **terms**, to be notified whenever a new **version** is published, to explore their entire **history** and to collaborate in analysing them. This free and open-source engine is developed to support these goals.
 
@@ -130,7 +146,12 @@ This quick example aimed at letting you try the engine quickly. Most likely, you
 
 ### CLI
 
-The following commands assume an install of the module as a dependency. Within such a module, the following commands are available.
+Once the engine module is installed as a dependency within another module, the following commands are available.
+
+In these commands:
+
+- **`<service_id>`** is the case sensitive name of the service declaration file without the extension. For example, for `Twitter.json`, the service ID is `Twitter`.
+- **`<terms_type>`** is the property name used under the `documents` property in the declaration to declare a terms. For example, in the getting started declaration, the terms type declared is `Privacy Policy`.
 
 #### `ota-track`
 
@@ -156,15 +177,11 @@ npx ota-track --help
 npx ota-track --services "<service_id>" ["<service_id>"...]
 ```
 
-> The service ID is the case sensitive name of the service declaration file without the extension. For example, for `Twitter.json`, the service ID is `Twitter`.
-
 ##### Track specific terms of specific services
 
 ```sh
 npx ota-track --services "<service_id>" ["<service_id>"...] --documentTypes "<terms_type>" ["<terms_type>"...]
 ```
-
-> The service ID is the case sensitive name of the service declaration file without the extension. For example, for `Twitter.json`, the service ID is `Twitter`.
 
 ##### Track documents four times a day
 
@@ -182,8 +199,6 @@ Check that all declarations allow recording a snapshot and a version properly.
 
 If one or several `<service_id>` are provided, check only those services.
 
-> The service ID is the case sensitive name of the service declaration file without the extension. For example, for `Twitter.json`, the service ID is `Twitter`.
-
 ##### Validate schema only
 
 ```sh
@@ -196,8 +211,6 @@ Allows for a much faster check of declarations, but does not check that the docu
 
 If one or several `<service_id>` are provided, check only those services.
 
-> The service ID is the case sensitive name of the service declaration file without the extension. For example, for `Twitter.json`, the service ID is `Twitter`.
-
 #### `ota-lint-declarations`
 
 ```sh
@@ -209,8 +222,6 @@ Normalise the format of declarations.
 Automatically correct formatting mistakes and ensure that all declarations are standardised.
 
 If one or several `<service_id>` are provided, check only those services.
-
-> The service ID is the case sensitive name of the service declaration file without the extension. For example, for `Twitter.json`, the service ID is `Twitter`.
 
 ### API
 
