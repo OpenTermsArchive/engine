@@ -7,7 +7,7 @@ It can be used independently from the Open Terms Archive ecosystem.
 
 For a high-level overview of Open Terms Archive’s wider goals and processes, please read its [public homepage](https://opentermsarchive.org).
 
-## Table of content
+## Table of contents
 
 - [Motivation](#motivation)
 - [Main concepts](#main-concepts)
