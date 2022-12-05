@@ -35,7 +35,7 @@ jobs:
   test:
     strategy:
       matrix:
-        operating_system: [ ubuntu-latest, windows-latest, macos-latest ]
+        operating_system: [ ubuntu-20.04, windows-latest, macos-latest ]
       fail-fast: false # run tests on other operating systems even if one fails
 
     runs-on: ${{ matrix.operating_system }}
