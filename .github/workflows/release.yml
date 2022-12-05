@@ -2,13 +2,13 @@ name: Release
 
 on:
   push:
-    branches: [ main ]
+    branches: [ packaging ]
 
 jobs:
   changelog:
     uses: "ambanum/OpenTermsArchive/.github/workflows/changelog.yml@packaging"
   test:
-    uses: "ambanum/OpenTermsArchive/.github/workflows/test.yml@main"
+    uses: "ambanum/OpenTermsArchive/.github/workflows/test.yml@packaging"
   release:
     needs: [ changelog, test ]
     runs-on: ubuntu-latest
@@ -70,3 +70,4 @@ jobs:
         uses: JS-DevTools/npm-publish@v1
         with:
           token: ${{ secrets.NPMJS_ACCESS_TOKEN }}
+          dry-run: true
