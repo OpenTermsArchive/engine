@@ -40,15 +40,22 @@ jobs:
           git commit -m "Release ${{ env.NEW_VERSION }}"
           git tag ${{ env.NEW_VERSION }}
 
+      - name: Run status checks for release commit on temporary branch # Use temporary branch to enable pushing commits to this branch protected by required status checks 
+        uses: CasperWA/push-protected@v2
+        with:
+          token: ${{ secrets.RELEASE_BOT_GITHUB_TOKEN }}
+          branch: packaging
+          unprotect_reviews: true
+
+      - name: Push changes to repository
+        run: git push origin && git push --tags
+
       - name: Read version changelog
         uses: superfaceai/release-changelog-action@v2
         id: get-changelog
         with:
           version: ${{ env.NEW_VERSION }}
           operation: read
-
-      - name: Push changes to repository
-        run: git push origin && git push --tags
 
       - name: Create GitHub release
         uses: softprops/action-gh-release@v1
