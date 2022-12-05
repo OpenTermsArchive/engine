@@ -1,8 +1,11 @@
 name: Release
 
 on:
-  push:
-    branches: [ packaging ]
+  pull_request:
+    branches: 
+      - packaging
+    types: [closed]
+
 
 jobs:
   changelog:
@@ -10,6 +13,7 @@ jobs:
   test:
     uses: "ambanum/OpenTermsArchive/.github/workflows/test.yml@packaging"
   release:
+    if: github.event.pull_request.merged == true
     needs: [ changelog, test ]
     runs-on: ubuntu-latest
     steps:
