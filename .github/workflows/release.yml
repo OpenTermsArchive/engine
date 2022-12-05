@@ -5,10 +5,12 @@ on:
     branches: [ main ]
 
 jobs:
+  changelog:
+    uses: "ambanum/OpenTermsArchive/.github/workflows/changelog.yml@packaging"
   test:
     uses: "ambanum/OpenTermsArchive/.github/workflows/test.yml@main"
   release:
-    needs: [ test ]
+    needs: [ changelog, test ]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -23,8 +25,8 @@ jobs:
 
       - name: Bump package version
         run: |
-          echo "Release type obtained from the previous job: '${{ needs.test.outputs.release_type }}'"
-          echo "NEW_VERSION=$(npm --no-git-tag-version version ${{ needs.test.outputs.release_type }})" >> $GITHUB_ENV
+          echo "Release type obtained from the previous job: '${{ needs.changelog.outputs.release_type }}'"
+          echo "NEW_VERSION=$(npm --no-git-tag-version version ${{ needs.changelog.outputs.release_type }})" >> $GITHUB_ENV
 
       - name: Update changelog unreleased section with new version
         uses: superfaceai/release-changelog-action@v2
