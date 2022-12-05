@@ -3,15 +3,15 @@ name: Release
 on:
   pull_request:
     branches: 
-      - packaging
+      - simulated-main-for-testing-packaging
     types: [closed]
 
 
 jobs:
   changelog:
-    uses: "ambanum/OpenTermsArchive/.github/workflows/changelog.yml@packaging"
+    uses: "ambanum/OpenTermsArchive/.github/workflows/changelog.yml@simulated-main-for-testing-packaging"
   test:
-    uses: "ambanum/OpenTermsArchive/.github/workflows/test.yml@packaging"
+    uses: "ambanum/OpenTermsArchive/.github/workflows/test.yml@simulated-main-for-testing-packaging"
   release:
     if: github.event.pull_request.merged == true
     needs: [ changelog, test ]
@@ -50,7 +50,7 @@ jobs:
         uses: CasperWA/push-protected@v2
         with:
           token: ${{ secrets.RELEASE_BOT_GITHUB_TOKEN }}
-          branch: packaging
+          branch: simulated-main-for-testing-packaging
           unprotect_reviews: true
 
       - name: Push changes to repository
