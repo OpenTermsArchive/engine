@@ -1,7 +1,7 @@
 {
-  "name": "open-terms-archive",
-  "version": "0.15.0",
-  "description": "Tracks and makes visible all changes to the Terms Of Service of online service providers.",
+  "name": "@opentermsarchive/engine",
+  "version": "0.16.0",
+  "description": "Tracks and makes visible changes to the terms of online services",
   "homepage": "https://github.com/ambanum/OpenTermsArchive#readme",
   "bugs": {
     "url": "https://github.com/ambanum/OpenTermsArchive/issues"
@@ -14,6 +14,7 @@
   "author": "ambanum",
   "type": "module",
   "exports": {
+    ".": "./src/exports.js",
     "./fetch": "./src/archivist/fetcher/exports.js",
     "./filter": "./src/archivist/filter/exports.js",
     "./page-declaration": "./src/archivist/services/pageDeclaration.js"
@@ -39,6 +40,12 @@
     "posttest": "npm run lint",
     "test:debug": "npm run test -- --inspect-brk --exit"
   },
+  "files": [
+    "bin",
+    "config",
+    "scripts",
+    "src"
+  ],
   "dependencies": {
     "@accordproject/markdown-cicero": "^0.15.2",
     "@accordproject/markdown-pdf": "^0.15.2",

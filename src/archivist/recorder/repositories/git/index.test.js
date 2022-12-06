@@ -471,7 +471,9 @@ describe('GitRepository', () => {
     let records;
     const expectedIds = [];
 
-    before(async () => {
+    before(async function () {
+      this.timeout(5000);
+
       const { id: id1 } = await subject.save(new Record({
         serviceId: SERVICE_PROVIDER_ID,
         documentType: DOCUMENT_TYPE,
@@ -529,7 +531,9 @@ describe('GitRepository', () => {
   describe('#count', () => {
     let count;
 
-    before(async () => {
+    before(async function () {
+      this.timeout(5000);
+
       await subject.save(new Record({
         serviceId: SERVICE_PROVIDER_ID,
         documentType: DOCUMENT_TYPE,
