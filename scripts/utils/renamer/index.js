@@ -26,7 +26,7 @@ export function applyRules(serviceId, documentType) {
   const renamedDocumentType = renamingRules.documentTypes[documentType];
 
   if (renamedDocumentType) {
-    console.log(`⌙ Rename document type "${documentType}" to "${renamedDocumentType}" of "${serviceId}" service`);
+    console.log(`⌙ Rename terms type "${documentType}" to "${renamedDocumentType}" of "${serviceId}" service`);
     documentType = renamedDocumentType;
   }
 
@@ -34,7 +34,7 @@ export function applyRules(serviceId, documentType) {
     && renamingRules.documentTypesByService[serviceId][documentType];
 
   if (renamedServiceDocumentType) {
-    console.log(`⌙ Specific rename document type "${documentType}" to "${renamedServiceDocumentType}" of "${serviceId}" service`);
+    console.log(`⌙ Specific rename terms type "${documentType}" to "${renamedServiceDocumentType}" of "${serviceId}" service`);
     documentType = renamedServiceDocumentType;
   }
 

@@ -27,7 +27,7 @@ export default class Recorder {
     }
 
     if (!documentType) {
-      throw new Error('A document type is required');
+      throw new Error('A terms type is required');
     }
 
     if (!fetchDate) {
@@ -51,7 +51,7 @@ export default class Recorder {
     }
 
     if (!documentType) {
-      throw new Error('A document type is required');
+      throw new Error('A terms type is required');
     }
 
     if (!snapshotIds?.length) {

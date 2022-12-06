@@ -33,9 +33,9 @@ This document presents practical guidelines, is edited collaboratively and is no
 
 ### Provider prefixing
 
-- If you encounter a document you want to add to a service, yet find that it would override an already-declared document for this service such as Terms of Service or Privacy Policy, and that the only solution you see would be to create a new document type that would contain the name of the feature, then it is likely you should declare a new service, potentially duplicating existing documents.
+- If you encounter a document you want to add to a service, yet find that it would override an already-declared document for this service such as Terms of Service or Privacy Policy, and that the only solution you see would be to create a new terms type that would contain the name of the feature, then it is likely you should declare a new service, potentially duplicating existing documents.
 
-> Example: the Facebook Community Payments terms are Terms of Service. The only way to declare them in the Facebook service would be to add a “Community Payments Terms” document type as they would otherwise conflict with Facebook's Terms of Service. It is better to declare a new service called “Facebook Payments” with its own Terms of Service. It turns out that this service also has a developer agreement, independent from the main Facebook service.
+> Example: the Facebook Community Payments terms are Terms of Service. The only way to declare them in the Facebook service would be to add a “Community Payments Terms” terms type as they would otherwise conflict with Facebook's Terms of Service. It is better to declare a new service called “Facebook Payments” with its own Terms of Service. It turns out that this service also has a developer agreement, independent from the main Facebook service.
 
 ![Facebook Community Payments](https://user-images.githubusercontent.com/222463/91419033-3a85d380-e853-11ea-8468-42a536b7e87b.png)
 

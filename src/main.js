@@ -11,7 +11,7 @@ program
   .description(description)
   .version(version)
   .option('-s, --services [serviceId...]', 'service IDs of services to handle')
-  .option('-d, --documentTypes [documentType...]', 'document types to handle')
+  .option('-d, --documentTypes [documentType...]', 'terms types to handle')
   .option('-r, --refilter-only', 'only refilter exisiting snapshots with last declarations and engine\'s updates')
   .option('--schedule', 'schedule automatic document tracking');
 

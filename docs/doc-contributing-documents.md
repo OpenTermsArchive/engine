@@ -74,7 +74,7 @@ Documents are declared in a service declaration file, under the `documents` prop
 ```json
   …
   "documents": {
-    "<document type>": {
+    "<terms type>": {
       "fetch": "The URL where the document can be found",
       "executeClientScripts": "A boolean to execute client-side JavaScript loaded by the document before accessing the content, in case the DOM modifications are needed to access the content; defaults to false (fetch HTML only)",
       "filter": "An array of service specific filter function names",
@@ -265,25 +265,25 @@ export async function convertImagesToBase64(document, documentDeclaration) {
 }
 ```
 
-#### Document type
+#### Terms type
 
-Great, your document declaration is now almost complete! We simply need to write it under the appropriate document type in the `documents` JSON object within the service declaration. In order to distinguish between the many documents that can be associated with a service and enable cross-services comparison of similar documents, we maintain a unique list of document types. You can find the list of allowed values for the `<document type>` key in the file [`src/archivist/services/documentTypes.json`](https://github.com/ambanum/OpenTermsArchive/tree/main/src/archivist/services/documentTypes.json) of the Open Terms Archive repository.
+Great, your document declaration is now almost complete! We simply need to write it under the appropriate terms type in the `documents` JSON object within the service declaration. In order to distinguish between the many documents that can be associated with a service and enable cross-services comparison of similar terms, we maintain a unique list of terms types. You can find the list of allowed values for the `<terms type>` key in the file [`src/archivist/services/documentTypes.json`](https://github.com/ambanum/OpenTermsArchive/tree/main/src/archivist/services/documentTypes.json) of the Open Terms Archive repository.
 
-The types might not always match the exact name given by the service provider. For example, some providers might call their document “Terms and Conditions” or “Terms of Use” instead of “Terms of Service”. The document type does not have to match the exact name, it only has to match the _commitment_ that is taken.
+The types might not always match the exact name given by the service provider. For example, some providers might call their document “Terms and Conditions” or “Terms of Use” instead of “Terms of Service”. The terms type does not have to match the exact name, it only has to match the _commitment_ that is taken.
 
 If the terms you want to add match no existing type, you can [suggest a new one](https://github.com/ambanum/OpenTermsArchive/discussions/categories/document-types).
 
-##### Defining a new document type
+##### Defining new terms types
 
-Before defining a new document type, please note that wanting to multiply documents types is usually a symptom that the service needs to be broken down into several services. For example, rather than considering that Facebook has several specific variations of “Terms of Service”, it is more accurate to declare “Terms of Service” documents for the “Facebook” (social network service for the general public), “Facebook Ads” (ads service for advertisers) and “Facebook Payments” (payment service for developers) services. On the other hand, the “Google Ads” service is a commercial suite acting as an umbrella for several pieces of software that all share the same contractual documents, and there is thus no need to separate each of them. See practical guidelines for [provider prefixing](declarations-guidelines.md#provider-prefixing).
+Before defining a new terms type, please note that wanting to multiply documents types is usually a symptom that the service needs to be broken down into several services. For example, rather than considering that Facebook has several specific variations of “Terms of Service”, it is more accurate to declare “Terms of Service” documents for the services “Facebook” (social network service for the general public), “Facebook Ads” (ads service for advertisers) and “Facebook Payments” (payment service for developers). On the other hand, the “Google Ads” service is a commercial suite acting as an umbrella for several pieces of software that all share the same contractual documents, and there is thus no need to separate each of them. See practical guidelines for [provider prefixing](declarations-guidelines.md#provider-prefixing).
 
-In order to guide usage and disambiguate synonyms, we characterise each document type along three dimensions of the commitment that is being taken in it:
+In order to guide usage and disambiguate synonyms, we characterise each terms type along three dimensions of the commitment that is being taken in it:
 
 1. The `writer` of the document;
 2. the targeted `audience`;
 3. the `object` of the commitment.
 
-A document type thus looks like:
+A terms type thus looks like:
 
 ```json
 {
@@ -299,7 +299,7 @@ A document type thus looks like:
 }
 ```
 
-Please note that we do not want [service-specific types](https://github.com/ambanum/OpenTermsArchive/pull/89) such as “Twitter Privacy Policy”. Document types should be generic, even if only one service uses them at a given time. Otherwise, duplication occurs and [important efforts](https://github.com/ambanum/OpenTermsArchive/pull/88) have to be deployed to deduplicate. The triptych form “writer / audience / object” is precisely used to avoid this sort of duplication.
+Please note that we do not want [service-specific types](https://github.com/ambanum/OpenTermsArchive/pull/89) such as “Twitter Privacy Policy”. Terms types should be generic, even if only one service uses them at a given time. Otherwise, duplication occurs and [important efforts](https://github.com/ambanum/OpenTermsArchive/pull/88) have to be deployed to deduplicate. The triptych form “writer / audience / object” is precisely used to avoid this sort of duplication.
 
 ### Testing your declaration
 
@@ -349,12 +349,12 @@ The current (latest) valid declaration has no date and should not appear in the 
 
 Declarations history are stored in a history JSON file with the following name `declarations/$service_id.history.json`.
 
-The document history contains an object with document types as properties. Each document type property is an array of history entries. Each entry has the same format as a normal document declaration, except there is the **mandatory** extra property `validUntil`.
+The document history contains an object with terms types as properties. Each terms type property is an array of history entries. Each entry has the same format as a normal document declaration, except there is the **mandatory** extra property `validUntil`.
 
 ```json
 {
   …
-  "<document type>": [
+  "<terms type>": [
     {
       "fetch": "The URL where the document can be found",
       "executeClientScripts": "A boolean to execute client-side JavaScript loaded by the document before accessing the content, in case the DOM modifications are needed to access the content; defaults to false (fetch HTML only)",

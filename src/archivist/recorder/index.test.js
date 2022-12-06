@@ -49,7 +49,7 @@ describe('Recorder', () => {
 
           const paramsNameToExpectedTextInError = {
             serviceId: 'service ID',
-            documentType: 'document type',
+            documentType: 'terms type',
             fetchDate: 'fetch date',
             content: 'content',
             mimeType: 'mime type',
@@ -190,7 +190,7 @@ describe('Recorder', () => {
 
           const paramsNameToExpectedTextInError = {
             serviceId: 'service ID',
-            documentType: 'document type',
+            documentType: 'terms type',
             snapshotIds: 'snapshot ID',
             fetchDate: 'fetch date',
             content: 'content',
@@ -335,7 +335,7 @@ describe('Recorder', () => {
 
           const paramsNameToExpectedTextInError = {
             serviceId: 'service ID',
-            documentType: 'document type',
+            documentType: 'terms type',
             snapshotIds: 'snapshot ID',
             fetchDate: 'fetch date',
             content: 'content',
