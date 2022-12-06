@@ -1,4 +1,4 @@
-name: Changelog check
+name: Check changelog
 
 on:
   push:

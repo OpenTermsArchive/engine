@@ -70,7 +70,7 @@ jobs:
           body: ${{ steps.get-changelog.outputs.changelog }}
           token: ${{ secrets.RELEASE_BOT_GITHUB_TOKEN }}
 
-      - name: Publish version to NPM public repository
+      - name: Publish to NPM public repository
         uses: JS-DevTools/npm-publish@v1
         with:
           token: ${{ secrets.NPMJS_ACCESS_TOKEN }}
