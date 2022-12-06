@@ -102,7 +102,17 @@ _This property is not needed for PDF documents._
 
 Most of the time, contractual documents are exposed as web pages, with a header, a footer, navigation menus, possibly ads… We aim at tracking only the significant parts of the document. In order to achieve that, the `select` property allows to extract only those parts in the process of [converting from snapshot to version](../README.md#how-it-works).
 
-The `select` value can be of two types: either a [CSS selector](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors) or a [range selector](#range-selectors).
+The `select` value can be either a [CSS selector](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors), a [range selector](#range-selectors) or an array of those.
+
+##### CSS selectors
+
+CSS selectors should be provided as a string. See the [specification](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors) for how to write CSS selectors.
+
+> For example, the following selector will select the content in the `<main>` tag of the HTML document:
+>
+> ```json
+> "select": "main"
+> ```
 
 ##### Range selectors
 
@@ -130,7 +140,7 @@ To that end, a range selector is a JSON object containing two keys out of the fo
 
 _This property is optional._
 
-Beyond [selecting a subset of a web page](#select), some documents will have non-significant parts in the middle of otherwise significant parts. For example, they can have “go to top” links or banner ads. These can be easily removed by listing [CSS selectors](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors), [range selectors](#range-selectors) or an array of them under the `remove` property.
+Beyond [selecting a subset of a web page](#select), some documents will have non-significant parts in the middle of otherwise significant parts. For example, they can have “go to top” links or banner ads. These can be removed by listing [CSS selectors](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors), [range selectors](#range-selectors) or an array of them under the `remove` property.
 
 > Examples:
 >
@@ -193,31 +203,46 @@ Filters are loaded automatically from files named after the service they operate
 The generic function signature for a filter is:
 
 ```js
-export [async] function filterName(document [, documentDeclaration])
+export [async] function filterName(document, documentDeclaration)
 ```
 
-Each filter is exposed as a named function export that takes a `document` parameter and behaves like the `document` object in a browser DOM. These functions can be `async`, but they will still run sequentially.
+Each filter is exposed as a named function export that takes a `document` parameter and behaves like the `document` object in a browser DOM. These functions can be `async`, but they will still run sequentially. The whole document declaration is passed as second parameter.
 
 > The `document` parameter is actually a [JSDOM](https://github.com/jsdom/jsdom) document instance.
 
+You can learn more about usual noise and ways to handle it [in the guidelines](declarations-guidelines.md#Usual-noise).
+
+##### Example
+
+Let's assume a service adds a unique `clickId` parameter in the query string of all link destinations. These parameters change on each page load, leading to recording noise in versions. Since links should still be recorded, it is not appropriate to use `remove` to remove the links entirely. Instead, a filter will manipulate the links destinations to remove the always-changing parameter. Concretely, the goal is to apply the following filter:
+
+```diff
+- Read the <a href="https://example.com/example-page?clickId=349A2033B&lang=en">list of our affiliates</a>.
++ Read the <a href="https://example.com/example-page?lang=en">list of our affiliates</a>.
+```
+
+The code below implements this filter:
+
 ```js
 function removeTrackingIdsQueryParam(document) {
-  const trackingIdQueryParam = 'clickId';
+  const QUERY_PARAM_TO_REMOVE = 'clickId';
 
-  document.querySelectorAll('a').forEach(link => {
-    const url = new URL(link.getAttribute('href'), document.location);
-    const params = new URLSearchParams(url.search);
+  document.querySelectorAll('a').forEach(link => {  // iterate over every link in the page
+    const url = new URL(link.getAttribute('href'), document.location);  // URL is part of the DOM API, see https://developer.mozilla.org/en-US/docs/Web/API/URL
+    const params = new URLSearchParams(url.search);  // URLSearchParams is part of the DOM API, see https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams
 
-    params.delete(trackingIdQueryParam);
-    url.search = params.toString();
-    link.setAttribute('href', url.toString());
+    params.delete(QUERY_PARAM_TO_REMOVE);  // we use the DOM API instead of RegExp because we can't know in advance in which order parameters will be written
+    url.search = params.toString();  // store the query string without the parameter
+    link.setAttribute('href', url.toString());  // write the destination URL without the parameter
   });
 }
 ```
 
-The whole document declaration is passed as second parameter. 
+##### Example usage of declaration parameter
 
-For example, it can be used to access the defined document URL or selector inside the filter:
+The second parameter can be used to access the defined document URL or selector inside the filter.
+
+Let's assume a service stores some of its legally-binding terms in images. To track these changes properly, images should be stored as part of the terms. By default, images are not stored since they significantly increase the document size. The filter below will store images inline in the terms, encoded in a [data URL](https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URLs). In order to download the images for conversion, the base URL of the web page is needed to resolve relative links. This information is obtained from the declaration.
 
 ```js
 import fetch from 'isomorphic-fetch';
@@ -239,8 +264,6 @@ export async function convertImagesToBase64(document, documentDeclaration) {
   }));
 }
 ```
-
-You can also learn more about [usual noise](declarations-guidelines.md#Usual-noise) and ways to handle it on the guidelines, and share your own learnings there.
 
 #### Document type
 
