@@ -34,4 +34,4 @@ node scripts/dataset/main.js --schedule --publish --remove-local-copy
 
 ## Adding renaming rules
 
-See the [renamer module documentation](../renamer/README.md).
+See the [renamer module documentation](../utils/renamer/README.md).
