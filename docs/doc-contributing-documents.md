@@ -271,7 +271,7 @@ Great, your document declaration is now almost complete! We simply need to write
 
 The types might not always match the exact name given by the service provider. For example, some providers might call their document “Terms and Conditions” or “Terms of Use” instead of “Terms of Service”. The document type does not have to match the exact name, it only has to match the _commitment_ that is taken.
 
-If the document you want to add matches no existing document type, you can create a new one in the same pull request in which you declare the service that would use it. If you're in doubt, please list the potential synonyms you have considered, we will help you find the most appropriate one 🙂
+If the terms you want to add match no existing type, you can [suggest a new one](https://github.com/ambanum/OpenTermsArchive/discussions/categories/document-types).
 
 ##### Defining a new document type
 
