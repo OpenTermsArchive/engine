@@ -367,7 +367,7 @@ Two storage repositories are currently supported: Git and MongoDB. Each one can 
 
 ```json
 {
-    …
+  …
   "storage": {
     "mongo": {
       "connectionURI": "URI for defining connection to the MongoDB instance. See https://docs.mongodb.com/manual/reference/connection-string/",
