@@ -196,7 +196,7 @@ npx ota-track --schedule
 #### `ota-validate-declarations`
 
 ```sh
-npx ota-validate-declarations [<service_id>...]
+npx ota-validate-declarations [--services <service_id>...]
 ```
 
 Check that all declarations allow recording a snapshot and a version properly.
@@ -206,7 +206,7 @@ If one or several `<service_id>` are provided, check only those services.
 ##### Validate schema only
 
 ```sh
-npx ota-validate-declarations --schema-only [<service_id>...]
+npx ota-validate-declarations --schema-only [--services <service_id>...]
 ```
 
 Check that all declarations are readable by the engine.
@@ -218,7 +218,7 @@ If one or several `<service_id>` are provided, check only those services.
 #### `ota-lint-declarations`
 
 ```sh
-npx ota-lint-declarations [<service_id>...]
+npx ota-lint-declarations [--services <service_id>...]
 ```
 
 Normalise the format of declarations.

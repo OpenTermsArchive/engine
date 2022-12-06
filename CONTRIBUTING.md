@@ -6,9 +6,12 @@ First of all, thanks for taking the time to contribute! 🎉👍
   - [Pull requests](#pull-requests)
   - [Commit messages](#commit-messages)
   - [Continuous delivery](#continuous-delivery)
+  - [Changelog](#changelog)
 - [Development](#development)
   - [Documentation](#documentation)
-- [Instances and repositories names](#instances-and-repositories-names)
+- [Naming](#naming)
+  - [Instances and repositories](#instances-and-repositories)
+  - [Namespaces](#namespaces)
 - [Practices](#practices)
   - [Errors handling](#errors-handling)
 
@@ -50,6 +53,10 @@ We add this additional rule:
 
 - Do not rely on GitHub issue reference numbers in commit messages, as we have no guarantee the host system and its autolinking will be stable in time. Make sure the context is self-explanatory. If an external reference is given, use its full URL.
 
+### Changelog
+
+All changes to the codebase that impact users must be documented in the [`CHANGELOG.md`](./CHANGELOG.md) file. The format to use is documented in the file itself.
+
 ## Development
 
 ### Documentation
@@ -88,7 +95,9 @@ In order to improve the understandability of commands, we document all CLI optio
 + ansible-playbook --inventory production.yml app.yml --limit france --tag stop
 ```
 
-## Instances and repositories names
+## Naming
+
+### Instances and repositories
 
 An “instance” of Open Terms Archive is comprised of a server running Open Terms Archive and up to three repositories. An instance has a _name_ describing the scope of services it aims at tracking. This scope is defined by one or several dimensions: jurisdiction, language, industry…
 
@@ -103,6 +112,12 @@ This name is used consistently in all communication, written references, and in 
 - The repository containing the declarations of services to be tracked is named `$instance_name-declarations`. You can [create it from a template](https://github.com/OpenTermsArchive/template-declarations/generate).
 - The repository containing the snapshots of the tracked documents (unless the instance is storing them in an alternative database) is named `$instance_name-snapshots`. You can [create it from a template](https://github.com/OpenTermsArchive/template-snapshots/generate).
 - The repository containing the versions of the tracked documents (unless the instance is storing them in an alternative database) is named `$instance_name-versions`. You can [create it from a template](https://github.com/OpenTermsArchive/template-versions/generate).
+
+### Namespaces
+
+We deploy identifiers for packages and namespaces across different universes: package managers, social networks, URLs… In order to unify these names across constraints, we reserve everywhere the name `opentermsarchive`, with no space, no dash, no underscore, no capital.
+
+> For example, NPM does not allow uppercase and spaces; Ansible does not allow dashes and spaces; Twitter does not allow spaces. The name `ota` is too unlikely to be available everywhere.
 
 ## Practices
 

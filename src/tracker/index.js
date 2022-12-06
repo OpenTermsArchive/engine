@@ -197,7 +197,7 @@ export default class Tracker {
     const body = `
 This document is no longer properly tracked.
 
-\`${message}\`
+${message}
 
 Check what's wrong by:
 - Using the [online contribution tool](${CONTRIBUTE_URL}?${urlQueryParams}).

@@ -1,4 +1,4 @@
-import { DOCUMENT_TYPES } from '../../src/archivist/services/index.js';
+import { DOCUMENT_TYPES } from '../../../src/archivist/services/index.js';
 
 import definitions from './definitions.js';
 

@@ -1,0 +1,33 @@
+name: Check changelog
+
+on:
+  push:
+    branches-ignore:
+      - main
+      - push-action/** # Temporary branches created by CasperWA/push-protected@v2 action on release workflow
+  pull_request:
+    types: [ opened, reopened ]
+  workflow_call:
+    outputs:
+      release_type:
+        description: The release type extracted from changelog
+        value: ${{ jobs.check_changelog.outputs.release_type }}
+
+jobs:
+  check_changelog:
+    runs-on: [ ubuntu-latest ]
+    outputs:
+      release_type: ${{ steps.set_release_type_output.outputs.release_type }}
+    steps:
+      - uses: actions/checkout@v2
+      - name: Get release type in changelog
+        run: echo "RELEASE_TYPE=$(cat CHANGELOG.md | grep -E '^## Unreleased \[(patch|minor|major)\]$' | grep -E -w -o "patch|minor|major" | tr -d '\n')" >> $GITHUB_ENV
+      - name: Make release type available to subsequent jobs
+        if: env.RELEASE_TYPE
+        id: set_release_type_output
+        run: |
+          echo "Found release type '${{ env.RELEASE_TYPE }}'"
+          echo "release_type=${{ env.RELEASE_TYPE }}" >> $GITHUB_OUTPUT
+      - name: Fail and display error if no proper release type is found in changelog
+        if: env.RELEASE_TYPE == ''
+        run: echo "No valid release type found in changelog. The title of the 'Unreleased' section must contain one of the following tags '[patch]', '[minor]', '[major]'. For example, '## Unreleased [minor]'."; exit 1
