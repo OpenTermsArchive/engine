@@ -1,154 +1,252 @@
-# Open Terms Archive
+_The document you are reading now is targeted at developers wanting to use or contribute to the engine of [Open Terms Archive](https://opentermsarchive.org). For a high-level overview of Open Terms Archive’s wider goals and processes, please read its [public homepage](https://opentermsarchive.org)._
 
-**Services** have **terms** that can change over time. _Open Terms Archive_ enables users rights advocates, regulatory bodies and any interested citizen to follow the **changes** to these **terms** by being **notified** whenever a new **version** is published, and exploring their entire **history**.
+# Open Terms Archive Engine
 
-> Les services ont des conditions générales qui évoluent dans le temps. _Open Terms Archive_ permet aux défenseurs des droits des utilisateurs, aux régulateurs et à toute personne intéressée de suivre les évolutions de ces conditions générales en étant notifiée à chaque publication d'une nouvelle version, et en explorant leur historique.
+This codebase is a Node.js module enabling downloading, archiving and publishing versions of documents obtained online. It can be used independently from the Open Terms Archive ecosystem.
 
-[🇫🇷 Manuel en français](README.fr.md).
+## Table of contents
 
-## Table of Contents
-
-- [How it works](#how-it-works)
-- [Exploring the versions history](#exploring-the-versions-history)
-- [Be notified](#be-notified)
-  - [By email](#by-email)
-  - [By RSS](#by-rss)
-- [Importing as a module](#importing-as-a-module)
-  - [CLI](#cli)
-  - [Features exposed](#features-exposed)
-    - [fetch](#fetch)
-    - [filter](#filter)
-- [Using locally](#using-locally)
-  - [Installing](#installing)
-    - [Declarations repository](#declarations-repository)
-    - [Core](#core)
-  - [Configuring](#configuring)
-    - [Configuration file](#configuration-file)
-      - [Storage repositories](#storage-repositories)
-    - [Environment variables](#environment-variables)
-  - [Running](#running)
+- [Motivation](#motivation)
+- [Main concepts](#main-concepts)
+- [How to add documents to a collection](#how-to-add-documents-to-a-collection)
+- [How to use the engine](#how-to-use-the-engine)
+- [Configuring](#configuring)
 - [Deploying](#deploying)
-- [Publishing](#publishing)
 - [Contributing](#contributing)
-  - [Adding or updating a service](#adding-a-new-service-or-updating-an-existing-service)
-  - [Core engine](#core-engine)
-  - [Funding and partnerships](#funding-and-partnerships)
 - [License](#license)
 
-## How it works
+## Motivation
 
-_Note: Words in bold are [business domain names](https://en.wikipedia.org/wiki/Domain-driven_design)._
+_Words in bold are [business domain names](https://en.wikipedia.org/wiki/Domain-driven_design)._
 
-**Services** are **declared** within _Open Terms Archive_ with a **declaration file** listing all the **documents** that, together, constitute the **terms** under which this **service** can be used. These **documents** all have a **type**, such as “terms and conditions”, “privacy policy”, “developer agreement”…
+**Services** have **terms** written in **documents**, contractual (Terms of Services, Privacy Policy…) or not (Community Guidelines, Deceased User Policy…), that can change over time. Open Terms Archive enables users rights advocates, regulatory bodies and interested citizens to follow the **changes** to these **terms**, to be notified whenever a new **version** is published, to explore their entire **history** and to collaborate in analysing them. This free and open-source engine is developed to support these goals.
 
-In order to **track** their **changes**, **documents** are periodically obtained by **fetching** a web **location** and **selecting content** within the **web page** to remove the **noise** (ads, navigation menu, login fields…). Beyond selecting a subset of a page, some **documents** have additional **noise** (hashes in links, CSRF tokens…) that would be false positives for **changes**. _Open Terms Archive_ thus supports specific **filters** for each **document**.
+## Main concepts
 
-However, the shape of that **noise** can change over time. In order to recover in case of information loss during the **noise filtering** step, a **snapshot** is **recorded** every time there is a **change**. After the **noise** is **filtered out** from the **snapshot**, if there are **changes** in the resulting **document**, a new **version** of the **document** is **recorded**.
+### Instances
 
-Anyone can run their own **private** instance and track changes on their own. However, we also **publish** each **version** on a [**public** instance](https://github.com/OpenTermsArchive/contrib-versions) that makes it easy to explore the entire **history** and enables **notifying** over email whenever a new **version** is **recorded**.
-Users can [**subscribe** to **notifications**](#be-notified).
+Open Terms Archive is a decentralised system.
 
-_Note: For now, when multiple versions coexist, **terms** are only **tracked** in their English version and for the European jurisdiction._
+It aims at enabling any entity to **track** **terms** on its own and at federating a number of public **instances** in a single ecosystem to maximise discoverability, collaboration and political power. To that end, the Open Terms Archive **engine** can be run on any server, thus making it a dedicated **instance**.
 
-## Exploring the versions history
+> Federated public instances can be [found on GitHub](
+https://github.com/OpenTermsArchive?q=declarations).
 
-We offer a public database of versions recorded each time there is a change in the terms of service and other contractual documents of tracked services: [contrib-versions](https://github.com/OpenTermsArchive/contrib-versions).
+### Collections
 
-From the **repository homepage** [contrib-versions](https://github.com/OpenTermsArchive/contrib-versions), open the folder of the **service of your choice** (e.g. [WhatsApp](https://github.com/OpenTermsArchive/contrib-versions/tree/main/WhatsApp)).
+An **instance** **tracks** **documents** of a single **collection**.
 
-You will see the **set of documents tracked** for that service, now click **on the document of your choice** (e.g. [WhatsApp's Privacy Policy](https://github.com/OpenTermsArchive/contrib-versions/blob/main/WhatsApp/Privacy%20Policy.md)). The **latest version** (updated hourly) will be displayed.
+A **collection** is characterised by a **scope** across **dimensions** that describe the **terms** it **tracks**, such as **language**, **jurisdiction** and **industry**.
 
-To view the **history of changes** made to this document, click on **History** at the top right of the document (for our previous [example](https://github.com/OpenTermsArchive/contrib-versions/commits/main/WhatsApp/Privacy%20Policy.md)). The **changes** are ordered **by date**, with the latest first.
+> Federated public collections can be [found on GitHub](https://github.com/OpenTermsArchive?q=versions).
 
-Click on a change to see what it consists of (for example [this one](https://github.com/OpenTermsArchive/contrib-versions/commit/58a1d2ae4187a3260ac58f3f3c7dcd3aeacaebcd)). There are **two types of display** you can choose from the icons in the gray bar above the document.
+#### Example scope
 
-- The first one, named _source diff_ (button with chevrons) allows you to **display the old version and the new one side by side** (for our [example](https://github.com/OpenTermsArchive/contrib-versions/commit/58a1d2ae4187a3260ac58f3f3c7dcd3aeacaebcd#diff-e8bdae8692561f60aeac9d27a55e84fc)). This display has the merit of **explicitly showing** all additions and deletions.
-- The second one, named _rich diff_ (button with a document icon) allows you to **unify all the changes in a single document** (for our [example](https://github.com/OpenTermsArchive/contrib-versions/commit/58a1d2ae4187a3260ac58f3f3c7dcd3aeacaebcd?short_path=e8bdae8#diff-e8bdae8692561f60aeac9d27a55e84fc)). The **red** color shows **deleted** elements, the **yellow** color shows **modified** paragraphs, and the **green** color shows **added** elements. Be careful, this display **does not show some changes** such as hyperlinks and text style's changes.
+> The documents declared in this collection are:
+> - Related to dating services used in Europe.
+> - In the European Union and Switzerland jurisdictions.
+> - In English, unless no English version exists, in which case the primary official language of the jurisdiction of incorporation of the service operator will be used.
 
-### Notes
+### Terms types
 
-- For long documents, unchanged **paragraphs will not be displayed by default**. You can manually make them appear by clicking on the small arrows just above or just below the displayed paragraphs.
-- You can use the **History button anywhere** in the repository contrib-versions, which will then display the **history of changes made to all documents in the folder** where you are (including sub-folders).
+To distinguish between the different **terms** of a **service**, each has a **type**, such as “Terms of Service”, “Privacy Policy”, “Developer Agreement”…
 
-## Be notified
+This **type** matches the topic, but not necessarily the title the **service** gives to it. Unifying the **types** enables comparing **terms** across **services**.
 
-### By email
+> More information on terms types can be found in the [dedicated repository](https://github.com/OpenTermsArchive/terms-types). They are published on NPM under [`@opentermsarchive/terms-types`](https://www.npmjs.com/package/@opentermsarchive/terms-types), enabling standardisation and interoperability beyond the Open Terms Archive engine.
 
-#### Document per document
+### Declarations
 
-You can go on the official front website [opentermsarchive.org](https://opentermsarchive.org). From there, you can select a service and then the corresponding document type.
-After you enter your email and click on subscribe, we will add your email to the correspondning mailing list in [SendInBlue](https://www.sendinblue.com/) and will not store your email anywhere else.
-Then, everytime a modification is found on the correspondning document, we will send you an email.
+The **documents** that constitute a **collection** are defined in simple JSON files called **declarations**.
 
-You can unsubscribe at any moment by clicking on the `unsubscribe` link at the bottom of the received email.
+A **declaration** also contains some metadata on the **service** the **documents** relate to.
 
-#### For all documents at once
+> Here is an example declaration tracking the Privacy Policy of Open Terms Archive:
+>
+> ```json
+> {
+>   "name": "Open Terms Archive",
+>   "documents": {
+>     "Privacy Policy": {
+>       "fetch": "https://opentermsarchive.org/en/privacy-policy",
+>       "select": ".TextContent_textContent__ToW2S"
+>     }
+>   }
+> }
+> ```
 
-You can [subscribe](https://59692a77.sibforms.com/serve/MUIEAKuTv3y67e27PkjAiw7UkHCn0qVrcD188cQb-ofHVBGpvdUWQ6EraZ5AIb6vJqz3L8LDvYhEzPb2SE6eGWP35zXrpwEFVJCpGuER9DKPBUrifKScpF_ENMqwE_OiOZ3FdCV2ra-TXQNxB2sTEL13Zj8HU7U0vbbeF7TnbFiW8gGbcOa5liqmMvw_rghnEB2htMQRCk6A3eyj) to receive an email whenever a document is updated in the database.
+## How to add documents to a collection
 
-**Beware, you are likely to receive a large amount of notifications!** You can unsubscribe by replying to any email you will receive.
+Open Terms Archive **acquires** **documents** to deliver an explorable **history** of **changes**. This can be done in two ways:
 
-### By RSS
+1. For the present and future, by **tracking** **documents**.
+2. For the past, by **importing** from an existing **fonds** such as [ToSBack](https://tosback.org), the [Internet Archive](https://archive.org/web/), [Common Crawl](https://commoncrawl.org) or any other in-house format.
 
-You can receive notification for a specific service or document by subscribing to RSS feeds.
+### Tracking documents
 
-> An RSS feed is a type of web page that contains information about the latest content published by a website, such as the date of publication and the address where you can view it. When this resource is updated, a feed reader app automatically notifies you and you can see the update.
+The **engine** **reads** **declarations** to **record** a **snapshot** by **fetching** the declared web **location** periodically. The **engine** then **extracts** a **version** from this **snapshot** by:
 
-To find out the address of the RSS feed you want to subscribe to:
+1. **Selecting** the subset of the **snapshot** that contains the **terms** (instead of navigation menus, footers, cookies banners…).
+2. **Removing** residual content in this subset that is not part of the **terms** (ads, illustrative pictures, internal navigation links…).
+3. **Filtering noise** by preventing parts that change frequently from triggering false positives for **changes** (tracker identifiers in links, relative dates…). The **engine** can execute custom **filters** written in JavaScript to that end.
 
-1. [Navigate](#exploring-the-versions-history) to the page with the history of changes you are interested in. _In the WhatsApp example above, this would be [this page](https://github.com/OpenTermsArchive/contrib-versions/commits/main/WhatsApp/Privacy%20Policy.md)._
-2. Copy the address of that page from your browser’s address bar. _In the WhatsApp example, this would be `https://github.com/OpenTermsArchive/contrib-versions/commits/main/WhatsApp/Privacy%20Policy.md`._
-3. Append `.atom` at the end of this address. _In the WhatsApp example, this would become `https://github.com/OpenTermsArchive/contrib-versions/commits/main/WhatsApp/Privacy%20Policy.md.atom`._
-4. Subscribe your RSS feed reader to the resulting address.
+After these steps, if **changes** are spotted in the resulting **document**, a new **version** is **recorded**.
 
-#### Recap of available RSS feeds
+Preserving **snapshots** enables recovering after the fact information potentially lost in the **extraction** step: if **declarations** were wrong, they can be **maintained** and corrected **versions** can be **extracted** from the original **snapshots**.
 
-| Updated for                         | URL                                                                                                                                                                                            |
-| ----------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| all services and documents          | `https://github.com/OpenTermsArchive/contrib-versions/commits.atom`                                                                                                                            |
-| all the documents of a service      | Replace `$serviceId` with the service ID:<br>`https://github.com/OpenTermsArchive/contrib-versions/commits/main/$serviceId.atom.`                                                            |
-| a specific document of a service | Replace `$serviceId` with the service ID and `$documentType` with the document type:<br>`https://github.com/OpenTermsArchive/contrib-versions/commits/main/$serviceId/$documentType.md.atom` |
+### Importing documents
 
-For example:
+Existing **fonds** can be prepared for easier analysis by unifying their format to the **Open Terms Archive dataset format**. This unique format enables building interoperable tools, fostering collaboration across reusers.
+Such a dataset can be generated from **versions** alone. If **snapshots** and **declarations** can be retrieved from the **fonds** too, then a full-fledged **collection** can be created.
 
-- To receive all updates of `Facebook` documents, the URL is `https://github.com/OpenTermsArchive/contrib-versions/commits/main/Facebook.atom`.
-- To receive all updates of the `Privacy Policy` from `Google`, the URL is `https://github.com/OpenTermsArchive/contrib-versions/commits/main/Google/Privacy%20Policy.md.atom`.
+## How to use the engine
 
-## Importing as a module
+This documentation describes how to execute the **engine** independently from any specific **instance**. For other use cases, other parts of the documentation could be more relevant:
 
-Open Terms Archive exposes a JavaScript API to make some of its capabilities available in NodeJS. You can install it as an NPM module:
+- to contribute **declarations** to an existing **instance**, see [how to contribute documents](./docs/doc-contributing-documents.md);
+- to create a new **collection**, see the [collection bootstrap](https://github.com/OpenTermsArchive/template-declarations) script;
+- to create a new public **instance**, see the [governance](./docs/doc-governance.md) documentation.
 
+### Requirements
+
+This module is tested to work across operating systems (continuous testing on UNIX, macOS and Windows).
+
+A [Node.js](https://nodejs.org/en/download/) runtime is required to execute this engine.
+
+![Supported Node.js version can be found in the package.json file](https://img.shields.io/node/v/@opentermsarchive/engine?color=informational&label=Supported%20Node.js%20version)
+
+### Getting started
+
+This engine is published as a [module on NPM](https://npmjs.com/package/@opentermsarchive/engine). The recommended install is as a dependency in a `package.json` file, next to a folder containing [declaration files](#declarations).
+
+```sh
+npm install --save @opentermsarchive/engine
+mkdir declarations
 ```
-npm install "ambanum/OpenTermsArchive#main"
+
+In an editor, create the following declaration file in `declarations/Open Terms Archive.json` to track the terms of the Open Terms Archive website:
+
+```json
+{
+  "name": "Open Terms Archive",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://opentermsarchive.org/en/privacy-policy",
+      "select": ".TextContent_textContent__ToW2S"
+    }
+  }
+}
 ```
+
+In the terminal:
+
+```sh
+npx ota-track
+```
+
+The tracked documents can be found in the `data` folder.
+
+This quick example aimed at letting you try the engine quickly. Most likely, you will simply `npm install` from an existing collection, or create a new collection from the [collection template](https://github.com/OpenTermsArchive/template-declarations).
 
 ### CLI
 
-The following commands are available where the package is installed:
+Once the engine module is installed as a dependency within another module, the following commands are available.
 
-- `./node_modules/.bin/ota-lint-declarations`: check and normalise the format of declarations.
-- `./node_modules/.bin/ota-validate-declarations`: validate declarations.
-- `./node_modules/.bin/ota-track`: track services. Recorded snapshots and versions will be stored in the `data` folder at the root of the module where the package is installed.
+In these commands:
 
-In order to have them available globally in your command line, install it with the `--global` option.
+- **`<service_id>`** is the case sensitive name of the service declaration file without the extension. For example, for `Twitter.json`, the service ID is `Twitter`.
+- **`<terms_type>`** is the property name used under the `documents` property in the declaration to declare a terms. For example, in the getting started declaration, the terms type declared is `Privacy Policy`.
 
-### Features exposed
+#### `ota-track`
 
-#### fetch
+```sh
+npx ota-track
+```
 
-The `fetch` module gets the MIME type and content of a document from its URL.
+[Track](#tracking-documents) the current terms of services according to provided declarations.
 
-You can use it in your code by using `import fetch from 'open-terms-archive/fetch';`.
+The declarations, snapshots and versions paths are defined in the [configuration](#configuring).
 
-Documentation on how to use `fetch` is provided as JSDoc within [./src/archivist/fetcher/index.js](./src/archivist/fetcher/index.js).
+> Note that the snapshots and versions will be recorded at the moment the command is executed, on top of the existing local history. If a shared history already exists and the goal is to add on top of it, that history has to be downloaded before executing that command.
 
-If you plan to use `executeClientScripts` as a parameter of `fetch`, the fetching will be done using a headless browser.
-In order to not instantiate this browser at each fetch, the starting and stopping of the browser is your responsibility.
+##### Recap of available options
 
-Here is an example on how to use it:
+```sh
+npx ota-track --help
+```
+
+##### Track terms of specific services
+
+```sh
+npx ota-track --services "<service_id>" ["<service_id>"...]
+```
+
+##### Track specific terms of specific services
+
+```sh
+npx ota-track --services "<service_id>" ["<service_id>"...] --documentTypes "<terms_type>" ["<terms_type>"...]
+```
+
+##### Track documents four times a day
+
+```sh
+npx ota-track --schedule
+```
+
+#### `ota-validate-declarations`
+
+```sh
+npx ota-validate-declarations [--services <service_id>...]
+```
+
+Check that all declarations allow recording a snapshot and a version properly.
+
+If one or several `<service_id>` are provided, check only those services.
+
+##### Validate schema only
+
+```sh
+npx ota-validate-declarations --schema-only [--services <service_id>...]
+```
+
+Check that all declarations are readable by the engine.
+
+Allows for a much faster check of declarations, but does not check that the documents are actually accessible.
+
+If one or several `<service_id>` are provided, check only those services.
+
+#### `ota-lint-declarations`
+
+```sh
+npx ota-lint-declarations [--services <service_id>...]
+```
+
+Normalise the format of declarations.
+
+Automatically correct formatting mistakes and ensure that all declarations are standardised.
+
+If one or several `<service_id>` are provided, check only those services.
+
+### API
+
+Once added as a dependency, the engine exposes a JavaScript API that can be called in your own code. The following modules are available.
+
+#### `fetch`
+
+The `fetch` module gets the MIME type and content of a document from its URL
 
 ```js
-import fetch, { launchHeadlessBrowser, stopHeadlessBrowser } from 'open-terms-archive/fetch';
+import fetch from '@opentermsarchive/engine/fetch';
+```
+
+Documentation on how to use `fetch` is provided [as JSDoc](./src/archivist/fetcher/index.js).
+
+##### Headless browser management
+
+If you pass the `executeClientScripts` option to `fetch`, a headless browser will be used to download and execute the page before serialising its DOM. For performance reasons, the starting and stopping of the browser is your responsibility to avoid instantiating a browser on each fetch. Here is an example on how to use this feature:
+
+```js
+import fetch, { launchHeadlessBrowser, stopHeadlessBrowser } from '@opentermsarchive/engine/fetch';
 
 await launchHeadlessBrowser();
 await fetch({ executeClientScripts: true, ... });
@@ -157,89 +255,35 @@ await fetch({ executeClientScripts: true, ... });
 await stopHeadlessBrowser();
 ```
 
-The `fetch` module can also be configured as a [`node-config` submodule](https://github.com/node-config/node-config/wiki/Sub-Module-Configuration).
-If [`node-config`](https://github.com/node-config/node-config) is used in the project, the default `fetcher` configuration can be overridden by adding a `fetcher` object to the local config. See [Configuration file](#configuration-file) for full reference.
+The `fetch` module options are defined as a [`node-config` submodule](https://github.com/node-config/node-config/wiki/Sub-Module-Configuration). The default `fetcher` configuration can be overridden by adding a `fetcher` object to the [local configuration file](#configuration-file).
 
-#### filter
+#### `filter`
 
-The `filter` module transforms HTML or PDF content into a Markdown string.
-It will filter content based on the [document declaration](https://github.com/OpenTermsArchive/contrib-declarations/blob/main/CONTRIBUTING.md#declaring-a-new-service).
+The `filter` module transforms HTML or PDF content into a Markdown string according to a [declaration](#declarations).
 
-You can use the filter in your code by using `import filter from 'open-terms-archive/filter';`.
+```js
+import filter from '@opentermsarchive/engine/filter';
+```
 
-The `filter` function documentation is available as JSDoc within [./src/archivist/filter/index.js](./src/archivist/filter/index.js).
+The `filter` function documentation is available [as JSDoc](./src/archivist/filter/index.js).
 
-#### page-declaration
+#### `PageDeclaration`
 
-PageDeclaration object is used to describe a page to be tracked by Open Terms Archive.
+The `PageDeclaration` class encapsulates information about a page tracked by Open Terms Archive.
 
-You can use the page-declaration in your code by using `import pageDeclaration from 'open-terms-archive/page-declaration';`.
+```js
+import pageDeclaration from '@opentermsarchive/engine/page-declaration';
+```
 
-## Using locally
+The `PageDeclaration` format is defined [in source code](./src/archivist/services/pageDeclaration.js).
 
-### Installing
+### Dataset generation
 
-This module is built with [Node](https://nodejs.org/en/) and is tested on macOS, UNIX and Windows. You will need to [install Node >= v16.x](https://nodejs.org/en/download/) to run it.
+See the [`dataset` script documentation](./scripts/dataset/README.md).
 
-#### Declarations repository
+## Configuring
 
-1. Locally clone your declarations repository, e.g., `git@github.com:OpenTermsArchive/contrib-declarations.git`.
-2. Go into your folder and initialize it, e.g., `cd contrib-declarations; npm install`.
-3. You can now modify your declarations in the `./declarations/` folder, following [these instructions](https://github.com/OpenTermsArchive/contrib-declarations/blob/main/CONTRIBUTING.md).
-4. When you want to test:
-    - If you want to test every declaration, run `npm test`.
-    - If you want to test a specific declaration, run `npm test $serviceId`, e.g., `npm test HER`.
-    - If you want to have faster feedback on the structure of a specific declaration, run `npm run test:schema $serviceId`, e.g., `npm run test:schema HER`.
-5. Once you have done that, if you have any error, it will be prompted and detailed at the end of the test.
-    - E.g., `InaccessibleContentError`: Your selector is wrong and should be fixed.
-    - E.g., `TypeError`: The file declaration is invalid.
-    - E.g., if you have a weird error, you may want to contact OTA, if may be a bug.
-
-##### Note: Testing
-
-Testing works with multiple tests (e.g., checking the validity of the file, that the URL is correct and reachable, that the content is correctly gathered, etc.); as it may take a bit of time, that's why you may want to use `npm run test:schema`.
-
-#### Core
-
-When refering to the base folder, it means the folder where you will be `git pull`ing everything.
-
-1. If not done already, follow the previous part with the repo of your choice.
-2. In the base folder of the previous step (i.e., not _in_ the previous folder, but _where the previous folder is_), clone the core engine: `git clone git@github.com:ambanum/OpenTermsArchive.git`.
-3. Go into the cloned folder and install dependencies: `cd contrib-declarations; npm install`.
-4. If you are using the main repo, you are done, go to step 6.
-5. If you are using a special repo instance (e.g., `dating-declarations`), create a new [config file](#configuring), `config/development.json`, and add:
-    ```json
-    {
-
-      "services": {
-        "declarationsPath": "../<name of the repo>/declarations"
-      }
-    }
-    ```
-    e.g.,
-    ```json
-    {
-      "services": {
-        "declarationsPath": "../dating-declarations/declarations"
-      }
-    }
-    ```
-6. In the folder of the repo (i.e., `OpenTermsArchive`), use `npm start`.
-    - It will first do a refiltering to check whenever everything works properly.
-    - You will then start to see everything being downloaded under `data/`.
-    - More details in [Running](#running).
-
-##### Notes: Tips
-
-- You may want to regularly `git pull` to have the latest updates, both in the core engine and in the declarations repos.
-- You have to `npm install` in the declarations repo at least once, and a least once each time `package.json` changes.
-- Be careful, it doesn't download the history! If you want that, you need to git clone `snapshots` and `versions` in `data/`.
-
-You can clone as many declarations repositories as you want. The one that will be loaded at execution will be defined through configuration.
-
-### Configuring
-
-#### Configuration file
+### Configuration file
 
 The default configuration can be found in `config/default.json`. The full reference is given below. You are unlikely to want to edit all of these elements.
 
@@ -276,7 +320,7 @@ The default configuration can be found in `config/default.json`. The full refere
       "host": "SMTP server hostname",
       "username": "User for server authentication" // Password for server authentication is defined in environment variables, see the “Environment variables” section below
     },
-    "sendMailOnError": { // Can be set to `false` if you do not want to send email on error
+    "sendMailOnError": { // Can be set to `false` if sending email on error is not needed
       "to": "The address to send the email to in case of an error",
       "from": "The address from which to send the email",
       "sendWarnings": "Boolean. Set to true to also send email in case of warning",
@@ -299,15 +343,15 @@ The default configuration can be found in `config/default.json`. The full refere
 }
 ```
 
-The default configuration is merged with (and overridden by) environment-specific configuration that can be specified at startup with the `NODE_ENV` environment variable. For example, you would run `NODE_ENV=development npm start` to load the `development.json` configuration file.
+The default configuration is merged with (and overridden by) environment-specific configuration that can be specified at startup with the `NODE_ENV` environment variable. For example, running `NODE_ENV=vagrant npm start` will load the `vagrant.json` configuration file. See [node-config](https://github.com/node-config/node-config) for more information about configuration files.
 
-If you want to change your local configuration, we suggest you create a `config/development.json` file with overridden values. Example production configuration files can be found in the `config` folder.
+In order to have a local configuration that override all exisiting config, it is recommended to create a `config/development.json` file with overridden values.
 
-##### Storage repositories
+#### Storage repositories
 
 Two storage repositories are currently supported: Git and MongoDB. Each one can be used independently for versions and snapshots.
 
-###### Git
+##### Git
 
 ```json
 {
@@ -326,11 +370,11 @@ Two storage repositories are currently supported: Git and MongoDB. Each one can 
   …
 }
 ```
-###### MongoDB
+##### MongoDB
 
 ```json
 {
-    …
+  …
   "storage": {
     "mongo": {
       "connectionURI": "URI for defining connection to the MongoDB instance. See https://docs.mongodb.com/manual/reference/connection-string/",
@@ -342,7 +386,7 @@ Two storage repositories are currently supported: Git and MongoDB. Each one can 
 }
 ```
 
-#### Environment variables
+### Environment variables
 
 Environment variables can be passed in the command-line or provided in a `.env` file at the root of the repository. See `.env.example` for an example of such a file.
 
@@ -350,89 +394,53 @@ Environment variables can be passed in the command-line or provided in a `.env` 
 - `SENDINBLUE_API_KEY`: a SendInBlue API key, in order to send email notifications with that service.
 - `GITHUB_TOKEN`: a token with repository privileges to access the [GitHub API](https://github.com/settings/tokens).
 
-If your infrastructure requires using an outgoing HTTP/HTTPS proxy to access the Internet, you can provide it through the `HTTP_PROXY` and `HTTPS_PROXY` environment variable.
-
-### Running
-
-To get the latest versions of all documents:
-
-```
-npm start
-```
-
-The latest version of a document will be available in the versions path defined in your configuration, under `$versions_folder/$service_provider_name/$document_type.md`.
-
-To update documents automatically:
-
-```
-npm run start:scheduler
-```
-
-To get the latest version of a specific service's terms:
-
-```
-npm start -- --services <service_id>
-```
-
-> The service ID is the case sensitive name of the service declaration file without the extension. For example, for `Twitter.json`, the service ID is `Twitter`.
-
-
-To get the latest version of a specific service's terms and document type:
-
-```
-npm start -- --services <service_id> --documentTypes <document_type>
-```
-
-To display help:
-
-```
-npm start -- --help
-```
+If an outgoing HTTP/HTTPS proxy to access the Internet is required, it is possible to provide it through the `HTTP_PROXY` and `HTTPS_PROXY` environment variable.
 
 ## Deploying
 
-See [Ops Readme](ops/README.md).
-
-## Publishing
-
-To generate a dataset:
-
-```
-npm run dataset:generate
-```
-
-To release a dataset:
-
-```
-npm run dataset:release
-```
-
-To weekly release a dataset:
-
-```
-npm run dataset:scheduler
-```
+Deployment is managed with [Ansible](https://www.ansible.com). See the [Open Terms Archive deployment Ansible collection](https://github.com/OpenTermsArchive/ota.deployment-ansible-collection).
 
 ## Contributing
 
-Thanks for wanting to contribute! There are different ways to contribute to Open Terms Archive. We describe the most common below. If you want to explore other venues for contributing, please contact us over email (contact@[our domain name]) or [Twitter](https://twitter.com/OpenTerms).
+### Getting a copy
 
-### Adding a new service or updating an existing service
+In order to edit the code of the engine itself, an editable and executable copy is necessary.
 
-See the [CONTRIBUTING](https://github.com/OpenTermsArchive/contrib-declarations/blob/main/CONTRIBUTING.md) of repository [`OpenTermsArchive/contrib-declarations`](https://github.com/OpenTermsArchive/contrib-declarations). You will need knowledge of JSON and web DOM.
+First of all, follow the [requirements](#requirements) above. Then, clone the repository:
 
-### Core engine
+```sh
+git clone https://github.com/ambanum/OpenTermsArchive.git
+cd OpenTermsArchive
+```
 
-To contribute to the core engine of Open Terms Archive, see the [CONTRIBUTING](CONTRIBUTING.md) file of this repository. You will need knowledge of JavaScript and NodeJS.
+Install dependencies:
 
-### Funding and partnerships
+```sh
+npm install
+```
 
-Beyond individual contributions, we need funds and committed partners to pay for a core team to maintain and grow Open Terms Archive. If you know of opportunities, please let us know! You can find [on our website](https://opentermsarchive.org/en/about) an up-to-date list of the partners and funders that make Open Terms Archive possible.
+### Testing
 
+If changes are made to the engine, check that all parts covered by tests still work properly:
 
----
+```sh
+npm test
+```
+
+If existing features are changed or new ones are added, relevant tests must be added too.
+
+### Suggesting changes
+
+To contribute to the core engine of Open Terms Archive, see the [CONTRIBUTING](CONTRIBUTING.md) file of this repository. You will need knowledge of JavaScript and Node.js.
+
+### Sponsorship and partnerships
+
+Beyond individual contributions, we need funds and committed partners to pay for a core team to maintain and grow Open Terms Archive. If you know of opportunities, please let us know over email at `contact@[project name without spaces].org`!
+
+- - -
 
 ## License
 
-The code for this software is distributed under the European Union Public Licence (EUPL) v1.2.
-Contact the author if you have any specific need or question regarding licensing.
+The code for this software is distributed under the [European Union Public Licence (EUPL) v1.2](https://joinup.ec.europa.eu/collection/eupl/eupl-text-eupl-12). In short, this [means](https://choosealicense.com/licenses/eupl-1.2/) you are allowed to read, use, modify and redistribute this source code, as long as you as you credit “Open Terms Archive Contributors” and make available any change you make to it under similar conditions.
+
+Contact the core team over email at `contact@[project name without spaces].org` if you have any specific need or question regarding licensing.

@@ -4,7 +4,7 @@ Export the versions dataset into a ZIP file and publish it to GitHub releases.
 
 ## Configuring
 
-You can change the configuration in the appropriate config file in the `config` folder. See the [main README](https://github.com/ambanum/OpenTermsArchive#configuring) for documentation on using the configuration file.
+You can change the configuration in the appropriate config file in the `config` folder. See the [main README](../../README.md#configuring) for documentation on using the configuration file.
 
 ## Running
 
@@ -34,4 +34,4 @@ node scripts/dataset/main.js --schedule --publish --remove-local-copy
 
 ## Adding renaming rules
 
-See the [renamer module documentation](../renamer/README.md).
+See the [renamer module documentation](../utils/renamer/README.md).

@@ -101,7 +101,7 @@ let recorder;
     );
 
     if (!documentDeclaration) {
-      console.log(`⌙ Skip unknown document type "${documentType}" for service "${serviceId}"`);
+      console.log(`⌙ Skip unknown terms type "${documentType}" for service "${serviceId}"`);
       continue;
     }
 

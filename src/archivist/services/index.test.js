@@ -51,7 +51,7 @@ describe('Services', () => {
                 expect(actualDocumentDeclaration.service.name).to.eql(expectedDocumentDeclaration.service.name);
               });
 
-              it('has the proper document type', () => {
+              it('has the proper terms type', () => {
                 expect(actualDocumentDeclaration.type).to.eql(expectedDocumentDeclaration.type);
               });
 
@@ -170,7 +170,7 @@ describe('Services', () => {
             expect(actualDocumentDeclaration.service.name).to.eql(expectedDocumentDeclaration.service.name);
           });
 
-          it('has the proper document type', () => {
+          it('has the proper terms type', () => {
             expect(actualDocumentDeclaration.type).to.eql(expectedDocumentDeclaration.type);
           });
 

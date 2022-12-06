@@ -15,7 +15,7 @@ First of all, thanks for taking the time to contribute! 🎉👍
 - [Practices](#practices)
   - [Errors handling](#errors-handling)
 
----
+- - -
 
 ## Workflow
 
@@ -60,6 +60,15 @@ All changes to the codebase that impact users must be documented in the [`CHANGE
 ## Development
 
 ### Documentation
+
+#### Copywriting
+
+Avoid “you” and “we” (who is “we” in a common anyway?). Use neutral or passive wordings.
+
+```diff
+- You can find federated public instances on GitHub.
++ Federated public instances can be found on GitHub.
+```
 
 #### CLI
 

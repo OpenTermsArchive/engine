@@ -2,7 +2,7 @@ __:warning: These scripts are no longer up-to-date with the codebase and are not
 
 # Rewrite history
 
-As some document types or service names can change over time or as we need to import history from other tools, provided they have an history with the same structure as Open Terms Archive, we need a way to rewrite, reorder and apply changes to the snapshots or versions history.
+As some terms types or service names can change over time or as we need to import history from other tools, provided they have an history with the same structure as Open Terms Archive, we need a way to rewrite, reorder and apply changes to the snapshots or versions history.
 
 The script works by reading commits from a **source** repository, applying changes and then committing the result in another, empty or not, **target** repository. So a source repository with commits is required.
 
@@ -125,7 +125,7 @@ Currently, the script will:
 
 - Ignore commits which are not a document snapshot (like renaming or documentation commits)
 - Reorder commits according to their author date
-- Rename document types according to declared rules
+- Rename terms types according to declared rules
 - Rename services according to declared rules
 - Skip commits with empty content
 - Skip commits which do not change the document

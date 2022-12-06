@@ -101,7 +101,7 @@ describe('GitRepository', () => {
         expect(commit.message).to.include(SERVICE_PROVIDER_ID);
       });
 
-      it('stores the document type', () => {
+      it('stores the terms type', () => {
         expect(commit.message).to.include(DOCUMENT_TYPE);
       });
 
@@ -314,7 +314,7 @@ describe('GitRepository', () => {
         expect(commit.message).to.include(SERVICE_PROVIDER_ID);
       });
 
-      it('stores the document type', () => {
+      it('stores the terms type', () => {
         expect(commit.message).to.include(DOCUMENT_TYPE);
       });
 
@@ -351,7 +351,7 @@ describe('GitRepository', () => {
         expect(commit.message).to.include(SERVICE_PROVIDER_ID);
       });
 
-      it('stores the document type', () => {
+      it('stores the terms type', () => {
         expect(commit.message).to.include(DOCUMENT_TYPE);
       });
 
@@ -394,7 +394,7 @@ describe('GitRepository', () => {
         expect(commit.message).to.include(SERVICE_PROVIDER_ID);
       });
 
-      it('stores the document type', () => {
+      it('stores the terms type', () => {
         expect(commit.message).to.include(DOCUMENT_TYPE);
       });
 
@@ -436,7 +436,7 @@ describe('GitRepository', () => {
       expect(record.serviceId).to.equal(SERVICE_PROVIDER_ID);
     });
 
-    it('returns the document type', () => {
+    it('returns the terms type', () => {
       expect(record.documentType).to.equal(DOCUMENT_TYPE);
     });
 

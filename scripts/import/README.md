@@ -54,6 +54,6 @@ NODE_ENV=import node scripts/import/index.js
 The script will:
 
 - Ignore commits which are not a document snapshot (like renaming or documentation commits).
-- Rename document types according to declared rules. See the [renamer module documentation](../renamer/README.md).
+- Rename terms types according to declared rules. See the [renamer module documentation](../renamer/README.md).
 - Rename services according to declared rules. See the [renamer module documentation](../renamer/README.md).
 - Handle duplicates, so you can run it twice without worrying about duplicate entries in the database.

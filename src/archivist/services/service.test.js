@@ -154,7 +154,7 @@ describe('Service', () => {
       subject.addDocumentDeclaration(privacyPolicyDeclaration);
     });
 
-    it('returns the service document types', async () => {
+    it('returns the service terms types', async () => {
       expect(subject.getDocumentTypes()).to.have.members([
         termsOfServiceDeclaration.type,
         privacyPolicyDeclaration.type,

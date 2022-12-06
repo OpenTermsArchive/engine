@@ -1,6 +1,6 @@
 # Renamer
 
-This module is used to apply renaming rules to service IDs and document types.
+This module is used to apply renaming rules to service IDs and terms types.
 
 ## Usage
 
@@ -24,9 +24,9 @@ To rename a service, add a rule in `./rules/services.json`, for example, to rena
 }
 ```
 
-### Document type
+### Terms type
 
-To rename a document type, add a rule in `./rules/documentTypes.json`, for example, to rename "Program Policies" to "Acceptable Use Policy", add the following line in the file:
+To rename a terms type, add a rule in `./rules/documentTypes.json`, for example, to rename "Program Policies" to "Acceptable Use Policy", add the following line in the file:
 
 ```json
 {
@@ -35,9 +35,9 @@ To rename a document type, add a rule in `./rules/documentTypes.json`, for examp
 }
 ```
 
-### Document type for a specific service
+### Terms type for a specific service
 
-To rename a document type only for a specific service, add a rule in `./rules/servicesDocumentTypes.json`, for example, to rename "Program Policies" to "Acceptable Use Policy" only for Skype, add the following line in the file:
+To rename a terms type only for a specific service, add a rule in `./rules/servicesDocumentTypes.json`, for example, to rename "Program Policies" to "Acceptable Use Policy" only for Skype, add the following line in the file:
 
 ```json
 {
