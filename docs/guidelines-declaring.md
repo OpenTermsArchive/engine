@@ -45,7 +45,7 @@ Example: Apple's App Store uses only generic terms (“app” and “store”). 
 
 ## Usual noise
 
-Generally speaking, noises are unwanted content in versions. At the moment we found three types of noise.
+Noise is unwanted content in versions.
 
 ### Irrelevant content
 
@@ -82,12 +82,10 @@ Reddit User Agreement
 Reddit User Agreement
 =====================
 ```
-**Filter in Javascript :**
-```javascript
-export function removeOptionsList(document) {
-  document.querySelectorAll('.filter-holder').forEach(element => element.remove());
-}
-```
+
+#### Solution
+
+Target elements in the `remove` property of a declaration.
 
 ### Invisible HTML elements
 
@@ -113,14 +111,8 @@ goglobalwithtwitterbanner
 Twitter Terms of Service
 ========================
 ```
-**Filter in Javascript :**
-```javascript
-export function removeNotDisplayedElements(document) {
-  document.querySelectorAll('[style="display: none;"]').forEach(element => element.remove());
-}
-```
 
-- **Invisible elements that disrupt Markdown rendering** usually do so by being taken into account by HTML to Markdown conversion, whereas they were not in the original page.
+**Invisible elements that disrupt Markdown rendering** usually do so by being taken into account by HTML to Markdown conversion, whereas they were not in the original page.
 
 Invisible links disrupts numbering.
 
@@ -157,15 +149,10 @@ AGREEMENT
 
 2.  Term, Terms and Termination
 ```
-**Filter in Javascript :**
-```javascript
-export function numberListCorrectly(document) {
-  document.querySelectorAll('ol')
-    .forEach(listToClean => Array.from(listToClean.children)
-      .filter(element => element.tagName != 'LI')
-      .map(element => element.remove()));
-}
-```
+
+#### Solution
+
+Target elements in the `remove` property of a declaration.
 
 ### Content generating frequent and legally irrelevant changes
 
@@ -186,12 +173,7 @@ You can only use our copyrights or [trademarks (or any similar marks)](https://l
 ```
 You can only use our copyrights or [trademarks (or any similar marks)](https://l.facebook.com/l.php?u=https%3A%2F%2Fen.facebookbrand.com%2Ftrademarks%2F)
 ```
-**Filter in Javascript :**
-```javascript
-export function cleanUrls(document) {
-  const links = document.querySelectorAll('[href*="https://l.facebook.com/l.php?"]');
-  links.forEach(link => {
-    link.href = link.href.replace(/&h=\S*/, '');
-  });
-}
-```
+
+#### Solution
+
+Write a filter in the declaration.

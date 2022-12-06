@@ -142,41 +142,89 @@ _This property is optional._
 
 Beyond [selecting a subset of a web page](#select), some documents will have non-significant parts in the middle of otherwise significant parts. For example, they can have “go to top” links or banner ads. These can be removed by listing [CSS selectors](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors), [range selectors](#range-selectors) or an array of them under the `remove` property.
 
-> Examples:
->
-> ```json
-> {
->   "fetch": "https://support.google.com/adsense/answer/48182",
->   "select": ".article-container",
->   "remove": ".print-button, .go-to-top"
-> }
-> ```
->
-> ```json
-> {
->   "fetch": "https://www.wechat.com/en/service_terms.html",
->   "select": "#agreement",
->   "remove": {
->     "startBefore": "#wechat-terms-of-service-usa-specific-terms-",
->     "endBefore": "#wechat-terms-of-service-european-union-specific-terms-"
->   }
-> }
-> ```
->
-> ```json
-> {
->   "fetch": "https://fr-fr.facebook.com/legal/terms/plain_text_terms",
->   "select": "div[role=main]",
->   "remove": [
->     {
->       "startBefore": "[role=\"separator\"]",
->       "endAfter": "body"
->     },
->     "[style=\"display:none\"]"
->   ]
-> }
-> ```
->
+##### Example
+
+Let's assume a web page contains the following content:
+
+```html
+<main>
+  <div class="filter-holder">
+    <select class="filter-options">
+        <option value="https://www.example.com/policies/user-agreement" selected>User Agreement</option>
+        <option value="https://www.example.com/policies/privacy-policy">Privacy Policy</option>
+        <option value="https://www.example.com/policies/content-policy">Content Policy</option>
+        <option value="https://www.example.com/policies/broadcasting-content-policy">Broadcasting Content Policy</option>
+    </select>
+  </div>
+  <h1>User Agreement</h1>
+  <div>…terms…</div>
+</main>
+```
+
+If only `main` is used in `select`, the following version will be extracted:
+
+```md
+User Agreement Privacy Policy Content Policy Broadcasting Content Policy Moderator Guidelines Transparency Report 2017 Transparency Report 2018 Guidelines for Law Enforcement Transparency Report 2019
+
+User Agreement
+==============
+
+…terms…
+```
+
+Whereas we want instead:
+
+```md
+User Agreement
+==============
+
+…terms…
+```
+
+This result can be obtained with the following declaration:
+
+```json
+{
+  "fetch": "https://example.com/user-agreement",
+  "select": "main",
+  "remove": ".filter-holder"
+}
+```
+
+##### Complex selectors examples
+
+```json
+{
+ "fetch": "https://support.google.com/adsense/answer/48182",
+ "select": ".article-container",
+ "remove": ".print-button, .go-to-top"
+}
+```
+
+```json
+{
+ "fetch": "https://www.wechat.com/en/service_terms.html",
+ "select": "#agreement",
+ "remove": {
+   "startBefore": "#wechat-terms-of-service-usa-specific-terms-",
+   "endBefore": "#wechat-terms-of-service-european-union-specific-terms-"
+ }
+}
+```
+
+```json
+{
+ "fetch": "https://fr-fr.facebook.com/legal/terms/plain_text_terms",
+ "select": "div[role=main]",
+ "remove": [
+   {
+     "startBefore": "[role=\"separator\"]",
+     "endAfter": "body"
+   },
+   "[style=\"display:none\"]"
+ ]
+}
+```
 
 #### `executeClientScripts`
 
