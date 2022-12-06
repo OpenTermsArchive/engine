@@ -40,6 +40,13 @@ A **collection** is characterised by a **scope** across **dimensions** that desc
 
 > Federated public collections can be [found on GitHub](https://github.com/OpenTermsArchive?q=versions).
 
+#### Example scope
+
+> The documents declared in this collection are:
+> - Related to dating services used in Europe.
+> - In the European Union and Switzerland jurisdictions.
+> - In English, unless no English version exists, in which case the primary official language of the jurisdiction of incorporation of the service operator will be used.
+
 ### Terms types
 
 To distinguish between the different **terms** of a **service**, each has a **type**, such as “Terms of Service”, “Privacy Policy”, “Developer Agreement”…

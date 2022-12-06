@@ -94,7 +94,7 @@ Let’s start by defining these keys!
 
 This property should simply contain the URL at which the document you want to track can be downloaded. HTML and PDF files are supported.
 
-When documents coexist in different languages and jurisdictions, please refer to the scope of the collection to which you are contributing. This scope is usually defined in the README.
+When documents coexist in different languages and jurisdictions, please refer to the [scope of the collection](../README.md#collections) to which you are contributing. This scope is usually defined in the README.
 
 #### `select`
 
