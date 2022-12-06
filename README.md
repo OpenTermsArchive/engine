@@ -441,6 +441,6 @@ Beyond individual contributions, we need funds and committed partners to pay for
 
 ## License
 
-The code for this software is distributed under the [European Union Public Licence (EUPL) v1.2](https://joinup.ec.europa.eu/collection/eupl/eupl-text-eupl-12). In short, this [means](https://choosealicense.com/licenses/eupl-1.2/) you are allowed to read, use, modify and redistribute this source code, as long as you make it clear where it comes from and make available any change you make to it under similar conditions.
+The code for this software is distributed under the [European Union Public Licence (EUPL) v1.2](https://joinup.ec.europa.eu/collection/eupl/eupl-text-eupl-12). In short, this [means](https://choosealicense.com/licenses/eupl-1.2/) you are allowed to read, use, modify and redistribute this source code, as long as you as you credit “Open Terms Archive Contributors” and make available any change you make to it under similar conditions.
 
 Contact the core team over email at `contact@[project name without spaces].org` if you have any specific need or question regarding licensing.
