@@ -1,4 +1,4 @@
-_The document you are reading now is targeted at developers wanting to use or contribute to the engine of [Open Terms Archive](https://opentermsarchive.org) For a high-level overview of Open Terms Archive’s wider goals and processes, please read its [public homepage](https://opentermsarchive.org)._
+_The document you are reading now is targeted at developers wanting to use or contribute to the engine of [Open Terms Archive](https://opentermsarchive.org). For a high-level overview of Open Terms Archive’s wider goals and processes, please read its [public homepage](https://opentermsarchive.org)._
 
 # Open Terms Archive Engine
 
