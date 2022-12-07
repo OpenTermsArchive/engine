@@ -372,6 +372,8 @@ Two storage repositories are currently supported: Git and MongoDB. Each one can 
 ```
 ##### MongoDB
 
+This engine is currently tested with MongoDB v6.
+
 ```json
 {
   …
