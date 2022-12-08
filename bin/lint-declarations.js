@@ -9,14 +9,9 @@ import path from 'path';
 import { fileURLToPath, pathToFileURL } from 'url';
 
 import { program } from 'commander';
-import config from 'config';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-// Initialise configs to allow clients of this module to use it without requiring node-config in their own application.
-// see https://github.com/lorenwest/node-config/wiki/Sub-Module-Configuration
-
-config.util.setModuleDefaults('services', { declarationsPath: path.resolve(process.cwd(), './declarations') });
 const { version } = JSON.parse(fs.readFileSync(new URL('../package.json', import.meta.url)).toString());
 
 program
