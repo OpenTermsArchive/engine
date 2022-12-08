@@ -6,19 +6,11 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 
 import { program } from 'commander';
-import config from 'config';
 import Mocha from 'mocha';
 
 const { version } = JSON.parse(fs.readFileSync(new URL('../package.json', import.meta.url)).toString());
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-
-const defaultConfigs = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../config/default.json')));
-
-// Initialise configs to allow clients of this module to use it without requiring node-config in their own application.
-// see https://github.com/lorenwest/node-config/wiki/Sub-Module-Configuration
-config.util.setModuleDefaults('services', { declarationsPath: path.resolve(process.cwd(), './declarations') });
-config.util.setModuleDefaults('fetcher', defaultConfigs.fetcher);
 
 const VALIDATE_PATH = path.resolve(__dirname, '../scripts/declarations/validate/index.mocha.js');
 
