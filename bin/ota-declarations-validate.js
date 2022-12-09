@@ -1,14 +1,11 @@
 #! /usr/bin/env node
 import './.env.js'; // Workaround to ensure `SUPPRESS_NO_CONFIG_WARNING` is set before config is imported
 
-import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
 import { program } from 'commander';
 import Mocha from 'mocha';
-
-const { version } = JSON.parse(fs.readFileSync(new URL('../package.json', import.meta.url)).toString());
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -21,9 +18,8 @@ process.on('unhandledRejection', reason => {
 });
 
 program
-  .name('ota-validate-declarations')
+  .name('ota declarations validate')
   .description('Run a series of tests to check the validity of document declarations')
-  .version(version)
   .option('-s, --services [serviceId...]', 'service IDs of services to handle')
   .option('-d, --documentTypes [documentType...]', 'document types to handle')
   .option('-m, --modified', 'to only lint modified services already commited to git')

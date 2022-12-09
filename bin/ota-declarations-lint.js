@@ -1,0 +1,19 @@
+#! /usr/bin/env node
+import './.env.js';
+
+import path from 'path';
+import { fileURLToPath, pathToFileURL } from 'url';
+
+import { program } from 'commander';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+program
+  .name('ota declarations lint')
+  .description('Check format and stylistic errors in declarations and auto fix them')
+  .option('-s, --services [serviceId...]', 'service IDs of services to handle')
+  .option('-m, --modified', 'to only lint modified services already commited to git');
+
+const lintDeclarations = (await import(pathToFileURL(path.resolve(__dirname, '../scripts/declarations/lint/index.js')))).default; // asynchronous loading to ensure .env.js is load before
+
+lintDeclarations(program.parse().opts());
