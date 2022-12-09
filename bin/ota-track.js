@@ -13,7 +13,7 @@ const track = (await import(pathToFileURL(path.resolve(__dirname, '../src/index.
 program
   .description('Retrieve declared documents, then record snapshots and extract versions, then publish the resulting records')
   .option('-s, --services [serviceId...]', 'service IDs of services to handle')
-  .option('-d, --documentTypes [documentType...]', 'terms types to handle')
+  .option('-t, --termsType [termsType...]', 'terms types to handle')
   .option('-r, --refilter-only', 'only refilter exisiting snapshots with last declarations and engine\'s updates')
   .option('--schedule', 'schedule automatic document tracking');
 

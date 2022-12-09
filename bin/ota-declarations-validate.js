@@ -21,7 +21,7 @@ program
   .name('ota declarations validate')
   .description('Run a series of tests to check the validity of document declarations')
   .option('-s, --services [serviceId...]', 'service IDs of services to handle')
-  .option('-d, --documentTypes [documentType...]', 'document types to handle')
+  .option('-t, --termsTypes [termsType...]', 'terms types to handle')
   .option('-m, --modified', 'to only lint modified services already commited to git')
   .option('-so, --schema-only', 'only refilter exisiting snapshots with last declarations and engine\'s updates');
 
