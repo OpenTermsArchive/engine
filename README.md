@@ -150,17 +150,17 @@ This quick example aimed at letting you try the engine quickly. Most likely, you
 
 ### CLI
 
-Once the engine module is installed as a dependency within another module, the following commands are available.
+Once the engine module is installed as a dependency within another module, the `ota` command with following subcommands are available.
 
 In these commands:
 
 - **`<service_id>`** is the case sensitive name of the service declaration file without the extension. For example, for `Twitter.json`, the service ID is `Twitter`.
 - **`<terms_type>`** is the property name used under the `documents` property in the declaration to declare a terms. For example, in the getting started declaration, the terms type declared is `Privacy Policy`.
 
-#### `ota-track`
+#### `ota track`
 
 ```sh
-npx ota-track
+npx ota track
 ```
 
 [Track](#tracking-documents) the current terms of services according to provided declarations.
@@ -172,31 +172,31 @@ The declarations, snapshots and versions paths are defined in the [configuration
 ##### Recap of available options
 
 ```sh
-npx ota-track --help
+npx ota track --help
 ```
 
 ##### Track terms of specific services
 
 ```sh
-npx ota-track --services "<service_id>" ["<service_id>"...]
+npx ota track --services "<service_id>" ["<service_id>"...]
 ```
 
 ##### Track specific terms of specific services
 
 ```sh
-npx ota-track --services "<service_id>" ["<service_id>"...] --documentTypes "<terms_type>" ["<terms_type>"...]
+npx ota track --services "<service_id>" ["<service_id>"...] --documentTypes "<terms_type>" ["<terms_type>"...]
 ```
 
 ##### Track documents four times a day
 
 ```sh
-npx ota-track --schedule
+npx ota track --schedule
 ```
 
-#### `ota-validate-declarations`
+#### `ota declarations validate`
 
 ```sh
-npx ota-validate-declarations [--services <service_id>...]
+npx ota declarations validate [--services <service_id>...]
 ```
 
 Check that all declarations allow recording a snapshot and a version properly.
@@ -206,7 +206,7 @@ If one or several `<service_id>` are provided, check only those services.
 ##### Validate schema only
 
 ```sh
-npx ota-validate-declarations --schema-only [--services <service_id>...]
+npx ota declarations validate --schema-only [--services <service_id>...]
 ```
 
 Check that all declarations are readable by the engine.
@@ -215,10 +215,10 @@ Allows for a much faster check of declarations, but does not check that the docu
 
 If one or several `<service_id>` are provided, check only those services.
 
-#### `ota-lint-declarations`
+#### `ota declarations lint`
 
 ```sh
-npx ota-lint-declarations [--services <service_id>...]
+npx ota declarations lint [--services <service_id>...]
 ```
 
 Normalise the format of declarations.
