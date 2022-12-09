@@ -28,7 +28,8 @@
     "bin",
     "config",
     "scripts",
-    "src"
+    "src",
+    ".eslintrc.yaml"
   ],
   "scripts": {
     "dataset:generate": "node scripts/dataset/main.js",
