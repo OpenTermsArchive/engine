@@ -24,6 +24,13 @@
     "ota-track": "./bin/track.js",
     "ota-validate-declarations": "./bin/validate-declarations.js"
   },
+  "files": [
+    "bin",
+    "config",
+    "scripts",
+    "src",
+    ".eslintrc.yaml"
+  ],
   "scripts": {
     "dataset:generate": "node scripts/dataset/main.js",
     "dataset:release": "node scripts/dataset/main.js --publish --remove-local-copy",
@@ -40,12 +47,6 @@
     "posttest": "npm run lint",
     "test:debug": "npm run test -- --inspect-brk --exit"
   },
-  "files": [
-    "bin",
-    "config",
-    "scripts",
-    "src"
-  ],
   "dependencies": {
     "@accordproject/markdown-cicero": "^0.15.2",
     "@accordproject/markdown-pdf": "^0.15.2",
