@@ -1,10 +1,7 @@
 import path from 'path';
-import { fileURLToPath } from 'url';
 
 import GitRepository from './git/index.js';
 import MongoRepository from './mongo/index.js';
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export default class RepositoryFactory {
   static create(params) {
@@ -12,7 +9,7 @@ export default class RepositoryFactory {
     case 'git':
       return new GitRepository({
         ...params.git,
-        path: path.resolve(__dirname, '../../../../', params.git.path),
+        path: path.resolve(process.cwd(), params.git.path),
       });
     case 'mongo':
       return new MongoRepository(params.mongo);
