@@ -8,7 +8,7 @@ import { program } from 'commander';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-const track = (await import(pathToFileURL(path.resolve(__dirname, '../src/index.js')))).default; // asynchronous loading to ensure .env.js is load before
+const track = (await import(pathToFileURL(path.resolve(__dirname, '../src/index.js')))).default; // load asynchronously to ensure .env.js is loaded before
 
 program
   .description('Retrieve declared documents, then record snapshots and extract versions, then publish the resulting records')
