@@ -56,7 +56,7 @@ Full changeset and discussions: [#959](https://github.com/ambanum/OpenTermsArchi
 
 ## 0.18.0 - 2022-12-12
 ### Added
-- Load both the configurations defined in this module and the configurations defined in the module which use it as dependency.
+- Load both the configurations defined in this module and the configurations defined in the module which use it as dependency
 
 ## 0.17.2 - 2022-12-12
 ### Fixed
@@ -64,10 +64,10 @@ Full changeset and discussions: [#959](https://github.com/ambanum/OpenTermsArchi
 
 ## 0.17.1 - 2022-12-06
 ### Fixed
-- Rewrite documentation to bring it up to date with current behaviour.
+- Rewrite documentation to bring it up to date with current behaviour
 
 ## 0.17.0 - 2022-12-06
 ### Added
-- Publish package on NPM under name `@opentermsarchive/engine`.
-- Export `filter`, `pageDeclaration` and `fetch` in NPM module.
-- Add changelog.
+- Publish package on NPM under name `@opentermsarchive/engine`
+- Export `filter`, `pageDeclaration` and `fetch` in NPM module
+- Add changelog
