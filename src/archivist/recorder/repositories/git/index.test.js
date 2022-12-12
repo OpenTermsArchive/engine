@@ -38,7 +38,8 @@ let git;
 describe('GitRepository', () => {
   let subject;
 
-  before(async () => {
+  before(async function () {
+    this.timeout(5000);
     git = new Git({
       path: RECORDER_PATH,
       author: {
