@@ -1,4 +1,7 @@
 {
+  "services": {
+    "declarationsPath": "../declarations/declarations"
+  },
   "recorder": {
     "versions": {
       "storage": {
