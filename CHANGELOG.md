@@ -3,9 +3,15 @@
 All changes that impact users of this module are documented in this file, in the [Common Changelog](https://common-changelog.org) format with some additional specifications defined in the CONTRIBUTING file. This codebase adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## Unreleased [patch]
+
+_Full changeset and discussions: [#981](https://github.com/ambanum/OpenTermsArchive/pull/981)._
+
 ### Added
+
 - Specification of changelog format
+
 ### Changed
+
 - Specification of changelog format is now in CONTRIBUTING
 
 ## 0.25.1 - 2023-02-20
@@ -51,23 +57,43 @@ Full changeset and discussions: [#959](https://github.com/ambanum/OpenTermsArchi
 - Ensure paths for given Git storage configuration are relative to current working directory instead of engine module folder
 
 ## 0.18.1 - 2022-12-12
+
+_Full changeset and discussions: [#979](https://github.com/ambanum/OpenTermsArchive/pull/979)._
+
 ### Fixed
+
 - Add missing configuration for production
 
 ## 0.18.0 - 2022-12-12
+
+_Full changeset and discussions: [#976](https://github.com/ambanum/OpenTermsArchive/pull/976)._
+
 ### Added
+
 - Load both the configurations defined in this module and the configurations defined in the module which use it as dependency
 
 ## 0.17.2 - 2022-12-12
+
+_Full changeset and discussions: [#977](https://github.com/ambanum/OpenTermsArchive/pull/977)._
+
 ### Fixed
+
 - Add missing file required for CLI in the packaging process
 
 ## 0.17.1 - 2022-12-06
+
+_Full changeset and discussions: [#971](https://github.com/ambanum/OpenTermsArchive/pull/971)._
+
 ### Fixed
+
 - Rewrite documentation to bring it up to date with current behaviour
 
 ## 0.17.0 - 2022-12-06
+
+_Full changeset and discussions: [#957](https://github.com/ambanum/OpenTermsArchive/pull/957)._
+
 ### Added
+
 - Publish package on NPM under name `@opentermsarchive/engine`
 - Export `filter`, `pageDeclaration` and `fetch` in NPM module
 - Add changelog
