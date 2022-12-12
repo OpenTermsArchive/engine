@@ -5,22 +5,21 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath, pathToFileURL } from 'url';
 
-import config from 'config';
+import { program } from 'commander';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-const defaultConfigs = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../config/default.json')));
+const { description, version } = JSON.parse(fs.readFileSync(new URL('../package.json', import.meta.url)).toString());
 
-// Initialise configs to allow clients of this module to use it without requiring node-config in their own application.
-// see https://github.com/lorenwest/node-config/wiki/Sub-Module-Configuration
-config.util.setModuleDefaults('services', { declarationsPath: path.resolve(process.cwd(), './declarations') });
-config.util.setModuleDefaults('fetcher', defaultConfigs.fetcher);
-config.util.setModuleDefaults('recorder', config.util.extendDeep({}, defaultConfigs.recorder, {
-  versions: { storage: { git: { path: path.resolve(process.cwd(), './data/versions') } } },
-  snapshots: { storage: { git: { path: path.resolve(process.cwd(), './data/snapshots') } } },
-}));
-config.util.setModuleDefaults('logger', defaultConfigs.logger);
-// we do not want any tracker when launching through this command line
-config.util.setModuleDefaults('tracker', {});
+program
+  .name('ota-track')
+  .description(description)
+  .version(version)
+  .option('-s, --services [serviceId...]', 'service IDs of services to handle')
+  .option('-d, --documentTypes [documentType...]', 'terms types to handle')
+  .option('-r, --refilter-only', 'only refilter exisiting snapshots with last declarations and engine\'s updates')
+  .option('--schedule', 'schedule automatic document tracking');
 
-import(pathToFileURL(path.resolve(__dirname, '../src/main.js')));
+const track = (await import(pathToFileURL(path.resolve(__dirname, '../src/index.js')))).default;
+
+track(program.parse(process.argv).opts());

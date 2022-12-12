@@ -41,7 +41,7 @@
     "lint": "eslint src test scripts bin",
     "lint:fix": "npm run lint -- --fix",
     "refilter": "npm start -- --refilter-only",
-    "start": "node --max-http-header-size=32768 src/main.js",
+    "start": "node --max-http-header-size=32768 bin/track.js",
     "start:scheduler": "npm start -- --schedule",
     "test": "cross-env NODE_ENV=test mocha --recursive \"./src/**/*.test.js\" \"./scripts/**/*.test.js\" --exit",
     "posttest": "npm run lint",

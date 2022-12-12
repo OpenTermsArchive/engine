@@ -28,7 +28,7 @@ const SLOW_DOCUMENT_THRESHOLD = 10 * 1000; // number of milliseconds after which
 const eslint = new ESLint({ overrideConfigFile: ESLINT_CONFIG_PATH, fix: false });
 const eslintWithFix = new ESLint({ overrideConfigFile: ESLINT_CONFIG_PATH, fix: true });
 
-const declarationsPath = path.resolve(ROOT_PATH, config.get('services.declarationsPath'));
+const declarationsPath = path.resolve(process.cwd(), config.get('services.declarationsPath'));
 const instancePath = path.resolve(declarationsPath, '../');
 
 export default async options => {
