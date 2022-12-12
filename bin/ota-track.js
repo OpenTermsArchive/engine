@@ -11,10 +11,10 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const track = (await import(pathToFileURL(path.resolve(__dirname, '../src/index.js')))).default; // load asynchronously to ensure .env.js is loaded before
 
 program
-  .description('Retrieve declared documents, then record snapshots and extract versions, then publish the resulting records')
-  .option('-s, --services [serviceId...]', 'service IDs of services to handle')
-  .option('-t, --termsType [termsType...]', 'terms types to handle')
-  .option('-r, --refilter-only', 'only refilter exisiting snapshots with last declarations and engine\'s updates')
+  .description('Retrieve declared documents, record snapshots, extract versions and publish the resulting records')
+  .option('-s, --services [serviceId...]', 'service IDs of services to track')
+  .option('-t, --termsType [termsType...]', 'terms types to track')
+  .option('-r, --refilter-only', 'refilter existing snapshots with latest declarations and engine, without recording new snapshots')
   .option('--schedule', 'schedule automatic document tracking');
 
 track(program.parse(process.argv).opts());

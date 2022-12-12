@@ -22,8 +22,8 @@ program
   .description('Run a series of tests to check the validity of document declarations')
   .option('-s, --services [serviceId...]', 'service IDs of services to handle')
   .option('-t, --termsTypes [termsType...]', 'terms types to handle')
-  .option('-m, --modified', 'to only lint modified services already commited to git')
-  .option('-so, --schema-only', 'only refilter exisiting snapshots with last declarations and engine\'s updates');
+  .option('-m, --modified', 'target only services modified in the current git branch')
+  .option('-o, --schema-only', 'much faster check of declarations, but does not check that the documents are actually accessible.');
 
 const mocha = new Mocha({
   delay: true, // as the validation script performs an asynchronous load before running the tests, the execution of the tests are delayed until run() is called
