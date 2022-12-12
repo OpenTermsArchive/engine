@@ -8,7 +8,7 @@ Unlike Common Changelog, the `unreleased` section of [Keep a Changelog](https://
 ## Unreleased [minor]
 
 ### Changed
-- **Breaking:** Change exposed CLI commands
+- **Breaking:** Unify all CLI commands as subcommands of one single `ota` command and rename some options; the new CLI can be discovered in the documentation and by running `ota help` ([#978](https://github.com/ambanum/OpenTermsArchive/pull/978))
 
 ## 0.18.2 - 2022-12-12
 ### Fixed
