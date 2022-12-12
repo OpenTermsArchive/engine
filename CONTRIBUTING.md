@@ -55,7 +55,12 @@ We add this additional rule:
 
 ### Changelog
 
-All changes to the codebase that impact users must be documented in the [`CHANGELOG.md`](./CHANGELOG.md) file. The format to use is documented in the file itself.
+All changes to the codebase that impact users must be documented in the [`CHANGELOG.md`](./CHANGELOG.md) file.
+
+The format to use is [Common Changelog](https://common-changelog.org), with the following additional specifications:
+
+1. The `unreleased` section of [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) is preserved with the addition of a tag to specify which type of release should be published and to foster discussions about it inside pull requests. This tag should be one of the names mandated by SemVer, within brackets: `[patch]`, `[minor]` or `[major]`. For example: `## Unreleased [minor]`.
+2. Each listed change must provide an actionable way to adapt the user’s codebase, either directly in the changelog or through instructions or links.
 
 ## Development
 
