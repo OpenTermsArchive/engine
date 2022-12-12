@@ -150,7 +150,7 @@ This quick example aimed at letting you try the engine quickly. Most likely, you
 
 ### CLI
 
-Once the engine module is installed as a dependency within another module, the `ota` command with following subcommands are available.
+Once the engine module is installed as a dependency within another module, the `ota` command with the following subcommands is available.
 
 In these commands:
 
