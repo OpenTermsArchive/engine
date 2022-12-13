@@ -84,9 +84,12 @@ export async function filterHTML({ content, pageDeclaration }) {
 
   // clean code from common changing patterns - initially for Windstream
   domFragment.querySelectorAll('a[href*="/email-protection"]').forEach(node => {
-    if (node.href.match(/((.*?)\/email-protection#)[0-9a-fA-F]+/gim)) {
-      node.href = `${node.href.split('#')[0]}#removed`;
-    }
+    const newProtectedLink = webPageDOM.createElement('a');
+    const [href] = node.href.split('#');
+
+    newProtectedLink.href = href;
+    newProtectedLink.innerHTML = '[email protected]';
+    node.parentNode.replaceChild(newProtectedLink, node);
   });
 
   const markdownContent = transform(domFragment);
