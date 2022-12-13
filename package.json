@@ -30,8 +30,8 @@
     ".eslintrc.yaml"
   ],
   "scripts": {
-    "dataset:generate": "node scripts/dataset/main.js",
-    "dataset:release": "node scripts/dataset/main.js --publish --remove-local-copy",
+    "dataset:generate": "node bin/ota.js dataset",
+    "dataset:release": "node bin/ota.js dataset --publish --remove-local-copy",
     "dataset:scheduler": "npm run dataset:release -- --schedule",
     "declarations:lint": "node bin/ota.js lint",
     "declarations:validate": "node bin/ota.js validate",
