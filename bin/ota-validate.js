@@ -1,14 +1,11 @@
 #! /usr/bin/env node
-import './.env.js'; // Workaround to ensure `SUPPRESS_NO_CONFIG_WARNING` is set before config is imported
+import './env.js';
 
-import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
 import { program } from 'commander';
 import Mocha from 'mocha';
-
-const { version } = JSON.parse(fs.readFileSync(new URL('../package.json', import.meta.url)).toString());
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -21,13 +18,12 @@ process.on('unhandledRejection', reason => {
 });
 
 program
-  .name('ota-validate-declarations')
+  .name('ota validate')
   .description('Run a series of tests to check the validity of document declarations')
-  .version(version)
-  .option('-s, --services [serviceId...]', 'service IDs of services to handle')
-  .option('-d, --documentTypes [documentType...]', 'document types to handle')
-  .option('-m, --modified', 'to only lint modified services already commited to git')
-  .option('-so, --schema-only', 'only refilter exisiting snapshots with last declarations and engine\'s updates');
+  .option('-s, --services [serviceId...]', 'service IDs of services to validate')
+  .option('-t, --termsTypes [termsType...]', 'terms types to validate')
+  .option('-m, --modified', 'target only services modified in the current git branch')
+  .option('-o, --schema-only', 'much faster check of declarations, but does not check that the documents are actually accessible');
 
 const mocha = new Mocha({
   delay: true, // as the validation script performs an asynchronous load before running the tests, the execution of the tests are delayed until run() is called

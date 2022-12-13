@@ -34,7 +34,7 @@ const instancePath = path.resolve(declarationsPath, '../');
 export default async options => {
   const schemaOnly = options.schemaOnly || false;
   let servicesToValidate = options.services || [];
-  const documentTypes = options.documentTypes || [];
+  const documentTypes = options.termsTypes || [];
   let servicesDocumentTypes = {};
 
   const serviceDeclarations = await services.loadWithHistory(servicesToValidate);
