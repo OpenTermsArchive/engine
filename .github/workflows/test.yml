@@ -31,7 +31,12 @@ jobs:
         with:
           node-version: 16
       - run: npm ci
-      - run: npm test
+      - name: Run tests (Linux)
+        if: ${{ runner.os == 'Linux' }}
+        run: npm test
+      - name: Run tests (Windows or macOS)
+        if: ${{ runner.os == 'Windows' || runner.os == 'macOS' }}
+        run: npm test -- --timeout 5000
 
   validate_declarations:
     strategy:
