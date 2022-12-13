@@ -227,6 +227,36 @@ Automatically correct formatting mistakes and ensure that all declarations are s
 
 If one or several `<service_id>` are provided, check only those services.
 
+#### `ota dataset`
+
+Export the versions dataset into a ZIP file and publish it to GitHub releases.
+
+The dataset title and the URL of the versions repository are defined in the [configuration](#configuring).
+
+To export the dataset into a local ZIP file:
+
+```sh
+npx ota dataset [$filename]
+```
+
+To export the dataset into a ZIP file and publish it on GitHub releases:
+
+```sh
+npx ota dataset --publish
+```
+
+To export, publish the dataset and remove the local copy that was created after it has been uploaded:
+
+```sh
+npx ota dataset --publish --removeLocalCopy
+```
+
+To schedule export, publishing and local copy removal:
+
+```sh
+npx ota dataset --schedule --publish --removeLocalCopy
+```
+
 ### API
 
 Once added as a dependency, the engine exposes a JavaScript API that can be called in your own code. The following modules are available.
