@@ -193,10 +193,10 @@ npx ota track --services "<service_id>" ["<service_id>"...] --termsTypes "<terms
 npx ota track --schedule
 ```
 
-#### `ota declarations validate`
+#### `ota validate`
 
 ```sh
-npx ota declarations validate [--services <service_id>...] [--termsTypes <terms_type>...]
+npx ota validate [--services <service_id>...] [--termsTypes <terms_type>...]
 ```
 
 Check that all declarations allow recording a snapshot and a version properly.
@@ -206,7 +206,7 @@ If one or several `<service_id>` are provided, check only those services.
 ##### Validate schema only
 
 ```sh
-npx ota declarations validate --schema-only [--services <service_id>...] [--termsTypes <terms_type>...]
+npx ota validate --schema-only [--services <service_id>...] [--termsTypes <terms_type>...]
 ```
 
 Check that all declarations are readable by the engine.
@@ -215,10 +215,10 @@ Allows for a much faster check of declarations, but does not check that the docu
 
 If one or several `<service_id>` are provided, check only those services.
 
-#### `ota declarations lint`
+#### `ota lint`
 
 ```sh
-npx ota declarations lint [--services <service_id>...]
+npx ota lint [--services <service_id>...]
 ```
 
 Normalise the format of declarations.
