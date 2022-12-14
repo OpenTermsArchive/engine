@@ -242,19 +242,21 @@ npx ota dataset [--file <filename>]
 To export the dataset into a ZIP file and publish it on GitHub releases:
 
 ```sh
-npx ota dataset --publish
+GITHUB_TOKEN=ghp_XXXXXXXXX npx ota dataset --publish
 ```
+
+The `GITHUB_TOKEN` can also be defined in a [`.env` file](#environment-variables).
 
 To export, publish the dataset and remove the local copy that was created after it has been uploaded:
 
 ```sh
-npx ota dataset --publish --remove-local-copy
+GITHUB_TOKEN=ghp_XXXXXXXXX npx ota dataset --publish --remove-local-copy
 ```
 
 To schedule export, publishing and local copy removal:
 
 ```sh
-npx ota dataset --schedule --publish --remove-local-copy
+GITHUB_TOKEN=ghp_XXXXXXXXX npx ota dataset --schedule --publish --remove-local-copy
 ```
 
 ### API
