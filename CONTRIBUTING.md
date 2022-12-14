@@ -33,7 +33,7 @@ To help reviewers, make sure to describe your pull request with a **clear text e
 
 ### Continuous delivery
 
-GitHub Actions is used to deploy the application on every merge to the main branch.
+GitHub Actions is used to release the package on every merge to the main branch.
 
 Branch protection is active, meaning that a merge to the main branch can only take place once all tests pass in CI, and that the peer review policy has been fulfilled.
 
@@ -90,8 +90,8 @@ For command-line examples and documentation, we follow the [docopt usage pattern
 - mutually exclusive elements are given between `(` and `)` and separated by `|`.
 
 ```diff
-- npm start [ $service_id ] [, $service_id, ...]
-+ npm start [service_id]...
+- npm start --services [ $service_id ] [, $service_id, ...]
++ npm start --services [service_id...]
 ```
 
 ##### Long options
@@ -100,8 +100,8 @@ In order to improve the understandability of commands, we document all CLI optio
 
 
 ```diff
-- ansible-playbook -i production.yml app.yml -l france -t stop
-+ ansible-playbook --inventory production.yml app.yml --limit france --tag stop
+- npm start -s [$service_id] -r
++ npm start --services [$service_id] --refilter-only
 ```
 
 ## Naming
