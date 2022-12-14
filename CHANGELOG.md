@@ -8,7 +8,7 @@ Unlike Common Changelog, the `unreleased` section of [Keep a Changelog](https://
 ## Unreleased [minor]
 
 ### Added
-- Add dataset generation in exposed CLI
+- Add dataset command to CLI; this command can be discovered in the documentation and by running `ota dataset help`
 
 ## 0.20.0 - 2022-12-13
 Full changeset and discussions: [#959](https://github.com/ambanum/OpenTermsArchive/pull/959)._
