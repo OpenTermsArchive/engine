@@ -236,7 +236,7 @@ The dataset title and the URL of the versions repository are defined in the [con
 To export the dataset into a local ZIP file:
 
 ```sh
-npx ota dataset [$filename]
+npx ota dataset [--file <filename>]
 ```
 
 To export the dataset into a ZIP file and publish it on GitHub releases:
@@ -248,13 +248,13 @@ npx ota dataset --publish
 To export, publish the dataset and remove the local copy that was created after it has been uploaded:
 
 ```sh
-npx ota dataset --publish --removeLocalCopy
+npx ota dataset --publish --remove-local-copy
 ```
 
 To schedule export, publishing and local copy removal:
 
 ```sh
-npx ota dataset --schedule --publish --removeLocalCopy
+npx ota dataset --schedule --publish --remove-local-copy
 ```
 
 ### API
@@ -306,10 +306,6 @@ import pageDeclaration from '@opentermsarchive/engine/page-declaration';
 ```
 
 The `PageDeclaration` format is defined [in source code](./src/archivist/services/pageDeclaration.js).
-
-### Dataset generation
-
-See the [`dataset` script documentation](./scripts/dataset/README.md).
 
 ## Configuring
 
