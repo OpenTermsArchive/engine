@@ -13,4 +13,5 @@ program
   .command('track', 'Track the current terms of services according to provided declarations')
   .command('validate', 'Run a series of tests to check the validity of document declarations')
   .command('lint', 'Check format and stylistic errors in declarations and auto fix them')
+  .command('dataset', 'Export the versions dataset into a ZIP file and optionally publish it to GitHub releases')
   .parse(process.argv);

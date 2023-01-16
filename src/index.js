@@ -6,7 +6,7 @@ import logger from './logger/index.js';
 import Notifier from './notifier/index.js';
 import Tracker from './tracker/index.js';
 
-export default async function track({ services = [], termsType: documentTypes, refilterOnly, schedule }) {
+export default async function track({ services = [], termsTypes: documentTypes, refilterOnly, schedule }) {
   const archivist = new Archivist({ recorderConfig: config.get('recorder') });
 
   archivist.attach(logger);

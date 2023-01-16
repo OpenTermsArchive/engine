@@ -72,6 +72,15 @@ Avoid “you” and “we” (who is “we” in a common anyway?). Use neutral 
 
 #### CLI
 
+##### Options case
+
+Use snake case for multiple word options:
+
+```diff
+- ota validate --schemaOnly
++ ota validate --schema-only
+```
+
 ##### docopt
 
 For command-line examples and documentation, we follow the [docopt usage patterns](http://docopt.org) syntax. Quick recap of the main points:

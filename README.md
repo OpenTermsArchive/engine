@@ -184,7 +184,7 @@ npx ota track --services "<service_id>" ["<service_id>"...]
 ##### Track specific terms of specific services
 
 ```sh
-npx ota track --services "<service_id>" ["<service_id>"...] --termsTypes "<terms_type>" ["<terms_type>"...]
+npx ota track --services "<service_id>" ["<service_id>"...] --terms-types "<terms_type>" ["<terms_type>"...]
 ```
 
 ##### Track documents four times a day
@@ -196,7 +196,7 @@ npx ota track --schedule
 #### `ota validate`
 
 ```sh
-npx ota validate [--services <service_id>...] [--termsTypes <terms_type>...]
+npx ota validate [--services <service_id>...] [--terms-types <terms_type>...]
 ```
 
 Check that all declarations allow recording a snapshot and a version properly.
@@ -206,7 +206,7 @@ If one or several `<service_id>` are provided, check only those services.
 ##### Validate schema only
 
 ```sh
-npx ota validate --schema-only [--services <service_id>...] [--termsTypes <terms_type>...]
+npx ota validate --schema-only [--services <service_id>...] [--terms-types <terms_type>...]
 ```
 
 Check that all declarations are readable by the engine.
@@ -226,6 +226,38 @@ Normalise the format of declarations.
 Automatically correct formatting mistakes and ensure that all declarations are standardised.
 
 If one or several `<service_id>` are provided, check only those services.
+
+#### `ota dataset`
+
+Export the versions dataset into a ZIP file and publish it to GitHub releases.
+
+The dataset title and the URL of the versions repository are defined in the [configuration](#configuring).
+
+To export the dataset into a local ZIP file:
+
+```sh
+npx ota dataset [--file <filename>]
+```
+
+To export the dataset into a ZIP file and publish it on GitHub releases:
+
+```sh
+GITHUB_TOKEN=ghp_XXXXXXXXX npx ota dataset --publish
+```
+
+The `GITHUB_TOKEN` can also be defined in a [`.env` file](#environment-variables).
+
+To export, publish the dataset and remove the local copy that was created after it has been uploaded:
+
+```sh
+GITHUB_TOKEN=ghp_XXXXXXXXX npx ota dataset --publish --remove-local-copy
+```
+
+To schedule export, publishing and local copy removal:
+
+```sh
+GITHUB_TOKEN=ghp_XXXXXXXXX npx ota dataset --schedule --publish --remove-local-copy
+```
 
 ### API
 
@@ -276,10 +308,6 @@ import pageDeclaration from '@opentermsarchive/engine/page-declaration';
 ```
 
 The `PageDeclaration` format is defined [in source code](./src/archivist/services/pageDeclaration.js).
-
-### Dataset generation
-
-See the [`dataset` script documentation](./scripts/dataset/README.md).
 
 ## Configuring
 
