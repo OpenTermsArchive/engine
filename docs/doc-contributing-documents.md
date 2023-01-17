@@ -315,7 +315,8 @@ export async function convertImagesToBase64(document, documentDeclaration) {
 
 #### Terms type
 
-Great, your document declaration is now almost complete! We simply need to write it under the appropriate terms type in the `documents` JSON object within the service declaration. In order to distinguish between the many documents that can be associated with a service and enable cross-services comparison of similar terms, we maintain a unique list of terms types. You can find the list of allowed values for the `<terms type>` key in the file [`src/archivist/services/documentTypes.json`](https://github.com/ambanum/OpenTermsArchive/tree/main/src/archivist/services/documentTypes.json) of the Open Terms Archive repository.
+Great, your document declaration is now almost complete! We simply need to write it under the appropriate terms type in the `documents` JSON object within the service declaration. In order to distinguish between the many documents that can be associated with a service and enable cross-services comparison of similar terms, we maintain a unique list of terms types.
+You can find more information and the list of allowed values for the `<terms type>` key in the [dedicated repository](https://github.com/OpenTermsArchive/terms-types).
 
 The types might not always match the exact name given by the service provider. For example, some providers might call their document “Terms and Conditions” or “Terms of Use” instead of “Terms of Service”. The terms type does not have to match the exact name, it only has to match the _commitment_ that is taken.
 
