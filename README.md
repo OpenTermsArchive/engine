@@ -426,8 +426,7 @@ If an outgoing HTTP/HTTPS proxy to access the Internet is required, it is possib
 
 ## Deploying
 
-Deployment is managed with [Ansible](https://www.ansible.com). See the [Open Terms Archive deployment Ansible collection](https://github.com/OpenTermsArchive/deployment).
-
+Deployment recipes are available in a [dedicated repository](https://github.com/OpenTermsArchive/deployment). Look at the [README](https://github.com/OpenTermsArchive/deployment#readme) to know how to deploy the engine.
 ## Contributing
 
 ### Getting a copy
