@@ -2,7 +2,6 @@ import fsApi from 'fs';
 import path from 'path';
 import { pathToFileURL } from 'url';
 
-import TERMS_TYPES from '@opentermsarchive/terms-types';
 import config from 'config';
 
 import DocumentDeclaration from './documentDeclaration.js';
@@ -11,8 +10,6 @@ import Service from './service.js';
 
 const fs = fsApi.promises;
 const declarationsPath = path.resolve(process.cwd(), config.get('services.declarationsPath'));
-
-export const DOCUMENT_TYPES = TERMS_TYPES;
 
 export async function load(servicesIdsToLoad = []) {
   let servicesIds = await getDeclaredServicesIds();
@@ -28,7 +25,7 @@ export async function load(servicesIdsToLoad = []) {
 
     const service = new Service({ id: serviceId, name });
 
-    await Promise.all(Object.keys(documentsDeclaration).map(documentType => loadServiceDocument(service, documentType, documentsDeclaration[documentType])));
+    await Promise.all(Object.keys(documentsDeclaration).map(termsType => loadServiceDocument(service, termsType, documentsDeclaration[termsType])));
 
     services[serviceId] = service;
   }));
@@ -58,8 +55,8 @@ async function loadServiceFilters(serviceId, filterNames) {
   return filterNames.map(filterName => serviceFilters[filterName]);
 }
 
-async function loadServiceDocument(service, documentType, documentTypeDeclaration) {
-  const { filter: filterNames, fetch: location, executeClientScripts, select: contentSelectors, remove: noiseSelectors, combine } = documentTypeDeclaration;
+async function loadServiceDocument(service, termsType, termsTypeDeclaration) {
+  const { filter: filterNames, fetch: location, executeClientScripts, select: contentSelectors, remove: noiseSelectors, combine } = termsTypeDeclaration;
 
   const pages = [];
 
@@ -83,7 +80,7 @@ async function loadServiceDocument(service, documentType, documentTypeDeclaratio
     }
   }
 
-  service.addDocumentDeclaration(new DocumentDeclaration({ service, type: documentType, pages }));
+  service.addDocumentDeclaration(new DocumentDeclaration({ service, termsType, pages }));
 }
 
 async function getDeclaredServicesIds() {
@@ -100,15 +97,15 @@ export async function loadWithHistory(servicesIds = []) {
   for (const serviceId of Object.keys(services)) {
     const { declarations, filters } = await loadServiceHistoryFiles(serviceId); // eslint-disable-line no-await-in-loop
 
-    for (const documentType of Object.keys(declarations)) {
-      const documentTypeDeclarationEntries = declarations[documentType];
-      const filterNames = [...new Set(documentTypeDeclarationEntries.flatMap(declaration => declaration.filter))].filter(Boolean);
-      const allHistoryDates = extractHistoryDates({ documentTypeDeclarationEntries, filters, filterNames });
+    for (const termsType of Object.keys(declarations)) {
+      const termsTypeDeclarationEntries = declarations[termsType];
+      const filterNames = [...new Set(termsTypeDeclarationEntries.flatMap(declaration => declaration.filter))].filter(Boolean);
+      const allHistoryDates = extractHistoryDates({ termsTypeDeclarationEntries, filters, filterNames });
 
-      const latestValidDocumentDeclaration = documentTypeDeclarationEntries.find(entry => !entry.validUntil);
+      const latestValidDocumentDeclaration = termsTypeDeclarationEntries.find(entry => !entry.validUntil);
 
       allHistoryDates.forEach(async date => {
-        const declarationForThisDate = documentTypeDeclarationEntries.find(entry => new Date(date) <= new Date(entry.validUntil)) || latestValidDocumentDeclaration;
+        const declarationForThisDate = termsTypeDeclarationEntries.find(entry => new Date(date) <= new Date(entry.validUntil)) || latestValidDocumentDeclaration;
         const { filter: declarationForThisDateFilterNames, combine } = declarationForThisDate;
 
         const pages = [];
@@ -150,7 +147,7 @@ export async function loadWithHistory(servicesIds = []) {
 
         services[serviceId].addDocumentDeclaration(new DocumentDeclaration({
           service: services[serviceId],
-          type: documentType,
+          termsType,
           pages,
           validUntil: date,
         }));
@@ -161,7 +158,7 @@ export async function loadWithHistory(servicesIds = []) {
   return services;
 }
 
-function extractHistoryDates({ filters, filterNames, documentTypeDeclarationEntries }) {
+function extractHistoryDates({ filters, filterNames, termsTypeDeclarationEntries }) {
   const allHistoryDates = [];
 
   Object.keys(filters).forEach(filterName => {
@@ -170,7 +167,7 @@ function extractHistoryDates({ filters, filterNames, documentTypeDeclarationEntr
     }
   });
 
-  documentTypeDeclarationEntries.forEach(({ validUntil }) => allHistoryDates.push(validUntil));
+  termsTypeDeclarationEntries.forEach(({ validUntil }) => allHistoryDates.push(validUntil));
 
   const sortedDates = allHistoryDates.sort((a, b) => new Date(a) - new Date(b));
   const uniqSortedDates = [...new Set(sortedDates)];
@@ -211,9 +208,9 @@ async function loadServiceHistoryFiles(serviceId) {
     }
   }
 
-  Object.keys(serviceDeclaration.documents).forEach(documentType => {
-    serviceHistory[documentType] = serviceHistory[documentType] || [];
-    serviceHistory[documentType].push(serviceDeclaration.documents[documentType]);
+  Object.keys(serviceDeclaration.documents).forEach(termsType => {
+    serviceHistory[termsType] = serviceHistory[termsType] || [];
+    serviceHistory[termsType].push(serviceDeclaration.documents[termsType]);
   });
 
   sortHistory(serviceHistory);

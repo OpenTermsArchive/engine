@@ -20,8 +20,8 @@ const { expect } = chai;
 const FIRST_SERVICE_PROVIDER_ID = 'ServiceA';
 const SECOND_SERVICE_PROVIDER_ID = 'ServiceB';
 
-const FIRST_DOCUMENT_TYPE = 'Terms of Service';
-const SECOND_DOCUMENT_TYPE = 'Privacy Policy';
+const FIRST_TERMS_TYPE = 'Terms of Service';
+const SECOND_TERMS_TYPE = 'Privacy Policy';
 
 const FIRST_FETCH_DATE = '2021-01-01T11:27:00.000Z';
 const SECOND_FETCH_DATE = '2021-01-11T11:32:47.000Z';
@@ -58,7 +58,7 @@ describe('Export', () => {
 
       await repository.save(new Record({
         serviceId: FIRST_SERVICE_PROVIDER_ID,
-        documentType: FIRST_DOCUMENT_TYPE,
+        termsType: FIRST_TERMS_TYPE,
         content: FIRST_CONTENT,
         mimeType: MIME_TYPE,
         fetchDate: FIRST_FETCH_DATE,
@@ -67,7 +67,7 @@ describe('Export', () => {
 
       await repository.save(new Record({
         serviceId: FIRST_SERVICE_PROVIDER_ID,
-        documentType: FIRST_DOCUMENT_TYPE,
+        termsType: FIRST_TERMS_TYPE,
         content: SECOND_CONTENT,
         mimeType: MIME_TYPE,
         fetchDate: SECOND_FETCH_DATE,
@@ -76,7 +76,7 @@ describe('Export', () => {
 
       await repository.save(new Record({
         serviceId: SECOND_SERVICE_PROVIDER_ID,
-        documentType: FIRST_DOCUMENT_TYPE,
+        termsType: FIRST_TERMS_TYPE,
         content: FIRST_CONTENT,
         mimeType: MIME_TYPE,
         fetchDate: THIRD_FETCH_DATE,
@@ -85,7 +85,7 @@ describe('Export', () => {
 
       await repository.save(new Record({
         serviceId: SECOND_SERVICE_PROVIDER_ID,
-        documentType: SECOND_DOCUMENT_TYPE,
+        termsType: SECOND_TERMS_TYPE,
         content: FIRST_CONTENT,
         mimeType: MIME_TYPE,
         fetchDate: FOURTH_FETCH_DATE,

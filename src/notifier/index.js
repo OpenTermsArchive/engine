@@ -33,12 +33,12 @@ export default class Notifier {
     this.delayedVersionNotificationsParams = [];
   }
 
-  async notifyVersionRecorded(serviceProviderId, documentTypeId, versionId) {
+  async notifyVersionRecorded(serviceProviderId, termsType, versionId) {
     const sendParams = {
       templateId: config.get('notifier.sendInBlue.updateTemplateId'),
       params: {
         SERVICE_PROVIDER_NAME: this.serviceProviders[serviceProviderId].name,
-        DOCUMENT_TYPE: documentTypeId,
+        DOCUMENT_TYPE: termsType,
         SHA: versionId,
       },
     };
@@ -47,7 +47,7 @@ export default class Notifier {
       config.get('notifier.sendInBlue.updatesListId'),
     ];
 
-    const notificationListName = `${this.serviceProviders[serviceProviderId].name} - ${documentTypeId} - Update`;
+    const notificationListName = `${this.serviceProviders[serviceProviderId].name} - ${termsType} - Update`;
     const notificationList = await this.searchContactList(notificationListName);
 
     if (notificationList?.id) {

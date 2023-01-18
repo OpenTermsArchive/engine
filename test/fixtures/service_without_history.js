@@ -18,7 +18,7 @@ const filters = [
 
 service.addDocumentDeclaration(new DocumentDeclaration({
   service,
-  type: 'Terms of Service',
+  termsType: 'Terms of Service',
   pages: [new PageDeclaration({
     location: 'https://www.service-without-history.example/tos',
     contentSelectors: 'body',

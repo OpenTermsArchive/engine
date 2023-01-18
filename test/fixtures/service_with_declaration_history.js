@@ -19,7 +19,7 @@ const filters = [
 [
   new DocumentDeclaration({
     service,
-    type: 'Terms of Service',
+    termsType: 'Terms of Service',
     pages: [
       new PageDeclaration({
         location: 'https://www.service-with-declaration-history.example/terms',
@@ -32,7 +32,7 @@ const filters = [
   }),
   new DocumentDeclaration({
     service,
-    type: 'Terms of Service',
+    termsType: 'Terms of Service',
     pages: [
       new PageDeclaration({
         location: 'https://www.service-with-declaration-history.example/tos',
@@ -45,7 +45,7 @@ const filters = [
   }),
   new DocumentDeclaration({
     service,
-    type: 'Terms of Service',
+    termsType: 'Terms of Service',
     pages: [
       new PageDeclaration({
         location: 'https://www.service-with-declaration-history.example/tos',

@@ -6,7 +6,7 @@ import logger from './logger/index.js';
 import Notifier from './notifier/index.js';
 import Tracker from './tracker/index.js';
 
-export default async function track({ services = [], termsTypes: documentTypes, refilterOnly, schedule }) {
+export default async function track({ services = [], termsTypes, refilterOnly, schedule }) {
   const archivist = new Archivist({ recorderConfig: config.get('recorder') });
 
   archivist.attach(logger);
@@ -29,7 +29,7 @@ export default async function track({ services = [], termsTypes: documentTypes, 
     });
   }
 
-  await archivist.refilterAndRecord(serviceIds, documentTypes);
+  await archivist.refilterAndRecord(serviceIds, termsTypes);
 
   if (refilterOnly) {
     return;
@@ -47,7 +47,7 @@ export default async function track({ services = [], termsTypes: documentTypes, 
   }
 
   if (!schedule) {
-    await archivist.trackChanges(serviceIds, documentTypes);
+    await archivist.trackChanges(serviceIds, termsTypes);
 
     return;
   }
@@ -55,5 +55,5 @@ export default async function track({ services = [], termsTypes: documentTypes, 
   logger.info('The scheduler is running…');
   logger.info('Documents will be tracked every six hours starting at half past midnight');
 
-  cron('30 */6 * * *', () => archivist.trackChanges(serviceIds, documentTypes));
+  cron('30 */6 * * *', () => archivist.trackChanges(serviceIds, termsTypes));
 }

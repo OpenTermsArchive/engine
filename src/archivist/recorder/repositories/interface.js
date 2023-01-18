@@ -39,11 +39,11 @@ export default class RepositoryInterface {
   * In case of snapshots, if the record is related to a multipage document, the page ID is required to find the corresponding snapshot
   *
   * @param {string} serviceId - Service ID of record to find
-  * @param {string} documentType - Terms type of record to find
+  * @param {string} termsType - Terms type of record to find
   * @param {string} [pageId] - Page ID of record to find. Used to differentiate pages of multipage document. Not necessary for single page document
   * @returns {Promise<Record>} Promise that will be resolved with the found record or an empty object if none match the given criteria
   */
-  async findLatest(serviceId, documentType, pageId) {
+  async findLatest(serviceId, termsType, pageId) {
     throw new Error(`#findLatest method is not implemented in ${this.constructor.name}`);
   }
 

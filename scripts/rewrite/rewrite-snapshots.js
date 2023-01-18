@@ -76,13 +76,13 @@ let recorder;
     const { content, mimeType } = await loadFile(SNAPSHOTS_SOURCE_PATH, relativeFilePath);
 
     let serviceId = path.dirname(relativeFilePath);
-    let documentType = path.basename(relativeFilePath, path.extname(relativeFilePath));
+    let termsType = path.basename(relativeFilePath, path.extname(relativeFilePath));
 
-    ({ serviceId, documentType } = renamer.applyRules(serviceId, documentType));
+    ({ serviceId, termsType } = renamer.applyRules(serviceId, termsType));
 
     const { id: snapshotId } = await recorder.recordSnapshot({
       serviceId,
-      documentType,
+      termsType,
       content,
       mimeType,
       fetchDate: commit.date,

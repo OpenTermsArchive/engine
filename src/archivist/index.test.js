@@ -265,7 +265,7 @@ describe('Archivist', function () {
         before(async () => app.recordSnapshot({
           content: 'document content 3',
           serviceId: SERVICE_A_ID,
-          documentType: SERVICE_A_TYPE,
+          termsType: SERVICE_A_TYPE,
           mimeType: MIME_TYPE,
           fetchDate: FETCH_DATE,
         }));
@@ -289,7 +289,7 @@ describe('Archivist', function () {
             await app.recordSnapshot({
               content: 'document content',
               serviceId: SERVICE_A_ID,
-              documentType: SERVICE_A_TYPE,
+              termsType: SERVICE_A_TYPE,
               mimeType: MIME_TYPE,
               fetchDate: FETCH_DATE,
             });
@@ -297,7 +297,7 @@ describe('Archivist', function () {
             await app.recordSnapshot({
               content: 'document content modified',
               serviceId: SERVICE_A_ID,
-              documentType: SERVICE_A_TYPE,
+              termsType: SERVICE_A_TYPE,
               mimeType: MIME_TYPE,
               fetchDate: FETCH_DATE,
             });
@@ -321,7 +321,7 @@ describe('Archivist', function () {
             await app.recordSnapshot({
               content: 'document content',
               serviceId: SERVICE_A_ID,
-              documentType: SERVICE_A_TYPE,
+              termsType: SERVICE_A_TYPE,
               mimeType: MIME_TYPE,
               fetchDate: FETCH_DATE,
             });
@@ -329,7 +329,7 @@ describe('Archivist', function () {
             await app.recordSnapshot({
               content: 'document content',
               serviceId: SERVICE_A_ID,
-              documentType: SERVICE_A_TYPE,
+              termsType: SERVICE_A_TYPE,
               mimeType: MIME_TYPE,
               fetchDate: FETCH_DATE,
             });
@@ -359,7 +359,7 @@ describe('Archivist', function () {
             mimeType: MIME_TYPE,
             fetchDate: FETCH_DATE,
             serviceId: SERVICE_A_ID,
-            documentType: SERVICE_A_TYPE,
+            termsType: SERVICE_A_TYPE,
           }));
 
         after(() => {
@@ -384,7 +384,7 @@ describe('Archivist', function () {
               fetchDate: FETCH_DATE,
               snapshotIds: ['sha'],
               serviceId: SERVICE_A_ID,
-              documentType: SERVICE_A_TYPE,
+              termsType: SERVICE_A_TYPE,
             });
             resetSpiesHistory();
             await app.recordVersion({
@@ -393,7 +393,7 @@ describe('Archivist', function () {
               fetchDate: FETCH_DATE,
               snapshotIds: ['sha'],
               serviceId: SERVICE_A_ID,
-              documentType: SERVICE_A_TYPE,
+              termsType: SERVICE_A_TYPE,
             });
           });
 
@@ -418,7 +418,7 @@ describe('Archivist', function () {
               mimeType: MIME_TYPE,
               fetchDate: FETCH_DATE,
               serviceId: SERVICE_A_ID,
-              documentType: SERVICE_A_TYPE,
+              termsType: SERVICE_A_TYPE,
             });
             resetSpiesHistory();
             await app.recordVersion({
@@ -427,7 +427,7 @@ describe('Archivist', function () {
               mimeType: MIME_TYPE,
               fetchDate: FETCH_DATE,
               serviceId: SERVICE_A_ID,
-              documentType: SERVICE_A_TYPE,
+              termsType: SERVICE_A_TYPE,
             });
           });
 

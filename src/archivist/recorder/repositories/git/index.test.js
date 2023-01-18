@@ -8,7 +8,7 @@ import mime from 'mime';
 
 import Record from '../../record.js';
 
-import { DOCUMENT_TYPE_AND_PAGE_ID_SEPARATOR, SNAPSHOT_ID_MARKER } from './dataMapper.js';
+import { TERMS_TYPE_AND_PAGE_ID_SEPARATOR, SNAPSHOT_ID_MARKER } from './dataMapper.js';
 import Git from './git.js';
 
 import GitRepository from './index.js';
@@ -19,11 +19,11 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const RECORDER_PATH = path.resolve(__dirname, '../../../', config.get('recorder.versions.storage.git.path'));
 
 const SERVICE_PROVIDER_ID = 'test_service';
-const DOCUMENT_TYPE = 'Terms of Service';
+const TERMS_TYPE = 'Terms of Service';
 const PAGE_ID = 'community-standards-hate-speech';
 const CONTENT = 'ToS fixture data with UTF-8 çhãràčtęrs';
-const EXPECTED_FILE_PATH = `${RECORDER_PATH}/${SERVICE_PROVIDER_ID}/${DOCUMENT_TYPE}.html`;
-const EXPECTED_FILE_PATH_WITH_PAGE_ID = `${RECORDER_PATH}/${SERVICE_PROVIDER_ID}/${DOCUMENT_TYPE}${DOCUMENT_TYPE_AND_PAGE_ID_SEPARATOR}${PAGE_ID}.html`;
+const EXPECTED_FILE_PATH = `${RECORDER_PATH}/${SERVICE_PROVIDER_ID}/${TERMS_TYPE}.html`;
+const EXPECTED_FILE_PATH_WITH_PAGE_ID = `${RECORDER_PATH}/${SERVICE_PROVIDER_ID}/${TERMS_TYPE}${TERMS_TYPE_AND_PAGE_ID_SEPARATOR}${PAGE_ID}.html`;
 const EXPECTED_PDF_FILE_PATH = EXPECTED_FILE_PATH.replace('html', 'pdf');
 const FETCH_DATE = new Date('2000-01-01T12:00:00.000Z');
 const FETCH_DATE_LATER = new Date('2000-01-02T12:00:00.000Z');
@@ -71,7 +71,7 @@ describe('GitRepository', () => {
 
         ({ id, isFirstRecord } = await subject.save(new Record({
           serviceId: SERVICE_PROVIDER_ID,
-          documentType: DOCUMENT_TYPE,
+          termsType: TERMS_TYPE,
           pageId: PAGE_ID,
           content: CONTENT,
           fetchDate: FETCH_DATE,
@@ -103,7 +103,7 @@ describe('GitRepository', () => {
       });
 
       it('stores the terms type', () => {
-        expect(commit.message).to.include(DOCUMENT_TYPE);
+        expect(commit.message).to.include(TERMS_TYPE);
       });
 
       it('stores information that it is the first record for this specific document', () => {
@@ -139,7 +139,7 @@ describe('GitRepository', () => {
       before(async () => {
         await subject.save(new Record({
           serviceId: SERVICE_PROVIDER_ID,
-          documentType: DOCUMENT_TYPE,
+          termsType: TERMS_TYPE,
           content: CONTENT,
           mimeType: MIME_TYPE,
           fetchDate: FETCH_DATE,
@@ -149,7 +149,7 @@ describe('GitRepository', () => {
 
         ({ id, isFirstRecord } = await subject.save(new Record({
           serviceId: SERVICE_PROVIDER_ID,
-          documentType: DOCUMENT_TYPE,
+          termsType: TERMS_TYPE,
           content: UPDATED_CONTENT,
           fetchDate: FETCH_DATE,
           snapshotIds: [SNAPSHOT_ID],
@@ -180,7 +180,7 @@ describe('GitRepository', () => {
       before(async () => {
         await subject.save(new Record({
           serviceId: SERVICE_PROVIDER_ID,
-          documentType: DOCUMENT_TYPE,
+          termsType: TERMS_TYPE,
           content: CONTENT,
           mimeType: MIME_TYPE,
           fetchDate: FETCH_DATE,
@@ -190,7 +190,7 @@ describe('GitRepository', () => {
 
         ({ id, isFirstRecord } = await subject.save(new Record({
           serviceId: SERVICE_PROVIDER_ID,
-          documentType: DOCUMENT_TYPE,
+          termsType: TERMS_TYPE,
           content: CONTENT,
           mimeType: MIME_TYPE,
           fetchDate: FETCH_DATE,
@@ -216,7 +216,7 @@ describe('GitRepository', () => {
       before(async () => {
         await subject.save(new Record({
           serviceId: SERVICE_PROVIDER_ID,
-          documentType: DOCUMENT_TYPE,
+          termsType: TERMS_TYPE,
           content: CONTENT,
           mimeType: MIME_TYPE,
           fetchDate: FETCH_DATE_EARLIER,
@@ -226,7 +226,7 @@ describe('GitRepository', () => {
 
         ({ id, isFirstRecord } = await subject.save(new Record({
           serviceId: SERVICE_PROVIDER_ID,
-          documentType: DOCUMENT_TYPE,
+          termsType: TERMS_TYPE,
           content: REFILTERED_CONTENT,
           fetchDate: FETCH_DATE,
           isRefilter: true,
@@ -260,7 +260,7 @@ describe('GitRepository', () => {
 
         ({ id, isFirstRecord } = await subject.save(new Record({
           serviceId: SERVICE_PROVIDER_ID,
-          documentType: DOCUMENT_TYPE,
+          termsType: TERMS_TYPE,
           content: PDF_CONTENT,
           fetchDate: FETCH_DATE,
           snapshotIds: [SNAPSHOT_ID],
@@ -295,7 +295,7 @@ describe('GitRepository', () => {
       before(async () => {
         ({ id, isFirstRecord } = await subject.save(new Record({
           serviceId: SERVICE_PROVIDER_ID,
-          documentType: DOCUMENT_TYPE,
+          termsType: TERMS_TYPE,
           pageId: PAGE_ID,
           content: CONTENT,
           fetchDate: FETCH_DATE,
@@ -316,7 +316,7 @@ describe('GitRepository', () => {
       });
 
       it('stores the terms type', () => {
-        expect(commit.message).to.include(DOCUMENT_TYPE);
+        expect(commit.message).to.include(TERMS_TYPE);
       });
 
       it('stores the page ID', () => {
@@ -331,7 +331,7 @@ describe('GitRepository', () => {
       before(async () => {
         ({ id, isFirstRecord } = await subject.save(new Record({
           serviceId: SERVICE_PROVIDER_ID,
-          documentType: DOCUMENT_TYPE,
+          termsType: TERMS_TYPE,
           pageId: PAGE_ID,
           content: CONTENT,
           fetchDate: FETCH_DATE,
@@ -353,7 +353,7 @@ describe('GitRepository', () => {
       });
 
       it('stores the terms type', () => {
-        expect(commit.message).to.include(DOCUMENT_TYPE);
+        expect(commit.message).to.include(TERMS_TYPE);
       });
 
       it('stores the page ID', () => {
@@ -369,7 +369,7 @@ describe('GitRepository', () => {
       before(async () => {
         ({ id, isFirstRecord } = await subject.save(new Record({
           serviceId: SERVICE_PROVIDER_ID,
-          documentType: DOCUMENT_TYPE,
+          termsType: TERMS_TYPE,
           pageId: PAGE_ID,
           content: CONTENT,
           fetchDate: FETCH_DATE,
@@ -396,7 +396,7 @@ describe('GitRepository', () => {
       });
 
       it('stores the terms type', () => {
-        expect(commit.message).to.include(DOCUMENT_TYPE);
+        expect(commit.message).to.include(TERMS_TYPE);
       });
 
       it('stores the page ID', () => {
@@ -412,7 +412,7 @@ describe('GitRepository', () => {
     before(async () => {
       ({ id } = await subject.save(new Record({
         serviceId: SERVICE_PROVIDER_ID,
-        documentType: DOCUMENT_TYPE,
+        termsType: TERMS_TYPE,
         pageId: PAGE_ID,
         content: CONTENT,
         fetchDate: FETCH_DATE,
@@ -438,7 +438,7 @@ describe('GitRepository', () => {
     });
 
     it('returns the terms type', () => {
-      expect(record.documentType).to.equal(DOCUMENT_TYPE);
+      expect(record.termsType).to.equal(TERMS_TYPE);
     });
 
     it('returns the content', async () => {
@@ -477,7 +477,7 @@ describe('GitRepository', () => {
 
       const { id: id1 } = await subject.save(new Record({
         serviceId: SERVICE_PROVIDER_ID,
-        documentType: DOCUMENT_TYPE,
+        termsType: TERMS_TYPE,
         content: CONTENT,
         fetchDate: FETCH_DATE,
         snapshotIds: [SNAPSHOT_ID],
@@ -488,7 +488,7 @@ describe('GitRepository', () => {
 
       const { id: id2 } = await subject.save(new Record({
         serviceId: SERVICE_PROVIDER_ID,
-        documentType: DOCUMENT_TYPE,
+        termsType: TERMS_TYPE,
         content: `${CONTENT} - updated`,
         fetchDate: FETCH_DATE_LATER,
         snapshotIds: [SNAPSHOT_ID],
@@ -499,7 +499,7 @@ describe('GitRepository', () => {
 
       const { id: id3 } = await subject.save(new Record({
         serviceId: SERVICE_PROVIDER_ID,
-        documentType: DOCUMENT_TYPE,
+        termsType: TERMS_TYPE,
         content: `${CONTENT} - updated 2`,
         isRefilter: true,
         fetchDate: FETCH_DATE_EARLIER,
@@ -537,7 +537,7 @@ describe('GitRepository', () => {
 
       await subject.save(new Record({
         serviceId: SERVICE_PROVIDER_ID,
-        documentType: DOCUMENT_TYPE,
+        termsType: TERMS_TYPE,
         content: CONTENT,
         fetchDate: FETCH_DATE,
         snapshotIds: [SNAPSHOT_ID],
@@ -545,7 +545,7 @@ describe('GitRepository', () => {
       }));
       await subject.save(new Record({
         serviceId: SERVICE_PROVIDER_ID,
-        documentType: DOCUMENT_TYPE,
+        termsType: TERMS_TYPE,
         content: `${CONTENT} - updated`,
         fetchDate: FETCH_DATE_LATER,
         snapshotIds: [SNAPSHOT_ID],
@@ -553,7 +553,7 @@ describe('GitRepository', () => {
       }));
       await subject.save(new Record({
         serviceId: SERVICE_PROVIDER_ID,
-        documentType: DOCUMENT_TYPE,
+        termsType: TERMS_TYPE,
         content: `${CONTENT} - updated 2`,
         isRefilter: true,
         fetchDate: FETCH_DATE_EARLIER,
@@ -582,7 +582,7 @@ describe('GitRepository', () => {
         before(async () => {
           await subject.save(new Record({
             serviceId: SERVICE_PROVIDER_ID,
-            documentType: DOCUMENT_TYPE,
+            termsType: TERMS_TYPE,
             content: CONTENT,
             mimeType: MIME_TYPE,
             fetchDate: FETCH_DATE_EARLIER,
@@ -590,13 +590,13 @@ describe('GitRepository', () => {
 
           ({ id: lastSnapshotId } = await subject.save(new Record({
             serviceId: SERVICE_PROVIDER_ID,
-            documentType: DOCUMENT_TYPE,
+            termsType: TERMS_TYPE,
             content: UPDATED_FILE_CONTENT,
             mimeType: MIME_TYPE,
             fetchDate: FETCH_DATE,
           })));
 
-          latestRecord = await subject.findLatest(SERVICE_PROVIDER_ID, DOCUMENT_TYPE);
+          latestRecord = await subject.findLatest(SERVICE_PROVIDER_ID, TERMS_TYPE);
         });
 
         after(async () => subject.removeAll());
@@ -618,13 +618,13 @@ describe('GitRepository', () => {
         before(async () => {
           ({ id: lastSnapshotId } = await subject.save(new Record({
             serviceId: SERVICE_PROVIDER_ID,
-            documentType: DOCUMENT_TYPE,
+            termsType: TERMS_TYPE,
             content: PDF_CONTENT,
             mimeType: PDF_MIME_TYPE,
             fetchDate: FETCH_DATE,
           })));
 
-          latestRecord = await subject.findLatest(SERVICE_PROVIDER_ID, DOCUMENT_TYPE);
+          latestRecord = await subject.findLatest(SERVICE_PROVIDER_ID, TERMS_TYPE);
         });
 
         after(async () => subject.removeAll());
@@ -647,7 +647,7 @@ describe('GitRepository', () => {
       let latestRecord;
 
       before(async () => {
-        latestRecord = await subject.findLatest(SERVICE_PROVIDER_ID, DOCUMENT_TYPE);
+        latestRecord = await subject.findLatest(SERVICE_PROVIDER_ID, TERMS_TYPE);
       });
 
       it('returns null', async () => {
@@ -664,7 +664,7 @@ describe('GitRepository', () => {
     before(async () => {
       const { id: id1 } = await subject.save(new Record({
         serviceId: SERVICE_PROVIDER_ID,
-        documentType: DOCUMENT_TYPE,
+        termsType: TERMS_TYPE,
         content: CONTENT,
         fetchDate: FETCH_DATE,
         snapshotIds: [SNAPSHOT_ID],
@@ -675,7 +675,7 @@ describe('GitRepository', () => {
 
       const { id: id2 } = await subject.save(new Record({
         serviceId: SERVICE_PROVIDER_ID,
-        documentType: DOCUMENT_TYPE,
+        termsType: TERMS_TYPE,
         content: `${CONTENT} - updated`,
         fetchDate: FETCH_DATE_LATER,
         snapshotIds: [SNAPSHOT_ID],
@@ -686,7 +686,7 @@ describe('GitRepository', () => {
 
       const { id: id3 } = await subject.save(new Record({
         serviceId: SERVICE_PROVIDER_ID,
-        documentType: DOCUMENT_TYPE,
+        termsType: TERMS_TYPE,
         content: `${CONTENT} - updated 2`,
         isRefilter: true,
         fetchDate: FETCH_DATE_EARLIER,

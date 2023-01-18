@@ -19,7 +19,7 @@ const filters = [
 [
   new DocumentDeclaration({
     service,
-    type: 'Terms of Service',
+    termsType: 'Terms of Service',
     pages: [
       new PageDeclaration({
         location: 'https://www.service-with-history.example/terms',
@@ -32,7 +32,7 @@ const filters = [
   }),
   new DocumentDeclaration({
     service,
-    type: 'Terms of Service',
+    termsType: 'Terms of Service',
     pages: [
       new PageDeclaration({
         location: 'https://www.service-with-history.example/tos',
@@ -45,7 +45,7 @@ const filters = [
   }),
   new DocumentDeclaration({
     service,
-    type: 'Terms of Service',
+    termsType: 'Terms of Service',
     pages: [
       new PageDeclaration({
         location: 'https://www.service-with-history.example/tos',
@@ -58,7 +58,7 @@ const filters = [
   }),
   new DocumentDeclaration({
     service,
-    type: 'Terms of Service',
+    termsType: 'Terms of Service',
     pages: [
       new PageDeclaration({
         location: 'https://www.service-with-history.example/tos',
@@ -75,7 +75,7 @@ const filters = [
   }),
   new DocumentDeclaration({
     service,
-    type: 'Terms of Service',
+    termsType: 'Terms of Service',
     pages: [
       new PageDeclaration({
         location: 'https://www.service-with-history.example/tos',
@@ -92,7 +92,7 @@ const filters = [
   }),
   new DocumentDeclaration({
     service,
-    type: 'Terms of Service',
+    termsType: 'Terms of Service',
     pages: [
       new PageDeclaration({
         location: 'https://www.service-with-history.example/terms_of_service',
@@ -112,7 +112,7 @@ const filters = [
   }),
   new DocumentDeclaration({
     service,
-    type: 'Terms of Service',
+    termsType: 'Terms of Service',
     pages: [
       new PageDeclaration({
         location: 'https://www.service-with-history.example/terms',
@@ -132,7 +132,7 @@ const filters = [
   }),
   new DocumentDeclaration({
     service,
-    type: 'Terms of Service',
+    termsType: 'Terms of Service',
     pages: [
       new PageDeclaration({
         location: 'https://www.service-with-history.example/terms',
@@ -152,7 +152,7 @@ const filters = [
   }),
   new DocumentDeclaration({
     service,
-    type: 'Terms of Service',
+    termsType: 'Terms of Service',
     pages: [
       new PageDeclaration({
         location: 'https://www.service-with-history.example/terms',
@@ -172,7 +172,7 @@ const filters = [
   }),
   new DocumentDeclaration({
     service,
-    type: 'Privacy Policy',
+    termsType: 'Privacy Policy',
     pages: [
       new PageDeclaration({
         location: 'https://www.service-with-history.example/privacy',

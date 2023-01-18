@@ -17,7 +17,7 @@ const { connectionURI } = config.get('recorder.snapshots.storage.mongo');
 const client = new MongoClient(connectionURI);
 
 const SERVICE_PROVIDER_ID = 'test_service';
-const DOCUMENT_TYPE = 'Terms of Service';
+const TERMS_TYPE = 'Terms of Service';
 const PAGE_ID = 'community-standards-hate-speech';
 const CONTENT = 'ToS fixture data with UTF-8 çhãràčtęrs';
 const MIME_TYPE = 'text/html';
@@ -53,12 +53,12 @@ describe('MongoRepository', () => {
       before(async () => {
         numberOfRecordsBefore = await collection.find({
           serviceId: SERVICE_PROVIDER_ID,
-          documentType: DOCUMENT_TYPE,
+          termsType: TERMS_TYPE,
         }).count();
 
         (record = await subject.save(new Record({
           serviceId: SERVICE_PROVIDER_ID,
-          documentType: DOCUMENT_TYPE,
+          termsType: TERMS_TYPE,
           pageId: PAGE_ID,
           content: CONTENT,
           mimeType: MIME_TYPE,
@@ -68,12 +68,12 @@ describe('MongoRepository', () => {
 
         numberOfRecordsAfter = await collection.find({
           serviceId: SERVICE_PROVIDER_ID,
-          documentType: DOCUMENT_TYPE,
+          termsType: TERMS_TYPE,
         }).count();
 
         (mongoDocument = await collection.findOne({
           serviceId: SERVICE_PROVIDER_ID,
-          documentType: DOCUMENT_TYPE,
+          termsType: TERMS_TYPE,
         }));
       });
 
@@ -96,7 +96,7 @@ describe('MongoRepository', () => {
       });
 
       it('stores the terms type', () => {
-        expect(mongoDocument.documentType).to.include(DOCUMENT_TYPE);
+        expect(mongoDocument.termsType).to.include(TERMS_TYPE);
       });
 
       it('stores information that it is the first record for this specific document', () => {
@@ -132,7 +132,7 @@ describe('MongoRepository', () => {
       before(async () => {
         (record = await subject.save(new Record({
           serviceId: SERVICE_PROVIDER_ID,
-          documentType: DOCUMENT_TYPE,
+          termsType: TERMS_TYPE,
           content: CONTENT,
           mimeType: MIME_TYPE,
           fetchDate: FETCH_DATE,
@@ -141,12 +141,12 @@ describe('MongoRepository', () => {
 
         numberOfRecordsBefore = await collection.find({
           serviceId: SERVICE_PROVIDER_ID,
-          documentType: DOCUMENT_TYPE,
+          termsType: TERMS_TYPE,
         }).count();
 
         (record = await subject.save(new Record({
           serviceId: SERVICE_PROVIDER_ID,
-          documentType: DOCUMENT_TYPE,
+          termsType: TERMS_TYPE,
           content: UPDATED_CONTENT,
           mimeType: MIME_TYPE,
           fetchDate: FETCH_DATE,
@@ -155,12 +155,12 @@ describe('MongoRepository', () => {
 
         numberOfRecordsAfter = await collection.find({
           serviceId: SERVICE_PROVIDER_ID,
-          documentType: DOCUMENT_TYPE,
+          termsType: TERMS_TYPE,
         }).count();
 
         ([mongoDocument] = await collection.find({
           serviceId: SERVICE_PROVIDER_ID,
-          documentType: DOCUMENT_TYPE,
+          termsType: TERMS_TYPE,
         }).limit(1).sort({ created_at: -1 }).toArray());
       });
 
@@ -183,7 +183,7 @@ describe('MongoRepository', () => {
       before(async () => {
         await subject.save(new Record({
           serviceId: SERVICE_PROVIDER_ID,
-          documentType: DOCUMENT_TYPE,
+          termsType: TERMS_TYPE,
           content: CONTENT,
           mimeType: MIME_TYPE,
           fetchDate: FETCH_DATE,
@@ -191,12 +191,12 @@ describe('MongoRepository', () => {
 
         numberOfRecordsBefore = await collection.find({
           serviceId: SERVICE_PROVIDER_ID,
-          documentType: DOCUMENT_TYPE,
+          termsType: TERMS_TYPE,
         }).count();
 
         (record = await subject.save(new Record({
           serviceId: SERVICE_PROVIDER_ID,
-          documentType: DOCUMENT_TYPE,
+          termsType: TERMS_TYPE,
           content: CONTENT,
           mimeType: MIME_TYPE,
           fetchDate: FETCH_DATE_LATER,
@@ -204,7 +204,7 @@ describe('MongoRepository', () => {
 
         numberOfRecordsAfter = await collection.find({
           serviceId: SERVICE_PROVIDER_ID,
-          documentType: DOCUMENT_TYPE,
+          termsType: TERMS_TYPE,
         }).count();
       });
 
@@ -225,7 +225,7 @@ describe('MongoRepository', () => {
       before(async () => {
         await subject.save(new Record({
           serviceId: SERVICE_PROVIDER_ID,
-          documentType: DOCUMENT_TYPE,
+          termsType: TERMS_TYPE,
           content: CONTENT,
           mimeType: MIME_TYPE,
           fetchDate: FETCH_DATE_EARLIER,
@@ -233,12 +233,12 @@ describe('MongoRepository', () => {
 
         numberOfRecordsBefore = await collection.find({
           serviceId: SERVICE_PROVIDER_ID,
-          documentType: DOCUMENT_TYPE,
+          termsType: TERMS_TYPE,
         }).count();
 
         (record = await subject.save(new Record({
           serviceId: SERVICE_PROVIDER_ID,
-          documentType: DOCUMENT_TYPE,
+          termsType: TERMS_TYPE,
           content: REFILTERED_CONTENT,
           mimeType: MIME_TYPE,
           fetchDate: FETCH_DATE,
@@ -248,12 +248,12 @@ describe('MongoRepository', () => {
 
         numberOfRecordsAfter = await collection.find({
           serviceId: SERVICE_PROVIDER_ID,
-          documentType: DOCUMENT_TYPE,
+          termsType: TERMS_TYPE,
         }).count();
 
         ([mongoDocument] = await collection.find({
           serviceId: SERVICE_PROVIDER_ID,
-          documentType: DOCUMENT_TYPE,
+          termsType: TERMS_TYPE,
         }).limit(1).sort({ created_at: -1 }).toArray());
       });
 
@@ -276,14 +276,14 @@ describe('MongoRepository', () => {
       before(async () => {
         numberOfRecordsBefore = await collection.find({
           serviceId: SERVICE_PROVIDER_ID,
-          documentType: DOCUMENT_TYPE,
+          termsType: TERMS_TYPE,
           content: PDF_CONTENT,
           mimeType: PDF_MIME_TYPE,
         }).count();
 
         (record = await subject.save(new Record({
           serviceId: SERVICE_PROVIDER_ID,
-          documentType: DOCUMENT_TYPE,
+          termsType: TERMS_TYPE,
           content: PDF_CONTENT,
           mimeType: PDF_MIME_TYPE,
           fetchDate: FETCH_DATE,
@@ -292,12 +292,12 @@ describe('MongoRepository', () => {
 
         numberOfRecordsAfter = await collection.find({
           serviceId: SERVICE_PROVIDER_ID,
-          documentType: DOCUMENT_TYPE,
+          termsType: TERMS_TYPE,
         }).count();
 
         (mongoDocument = await collection.findOne({
           serviceId: SERVICE_PROVIDER_ID,
-          documentType: DOCUMENT_TYPE,
+          termsType: TERMS_TYPE,
         }));
       });
 
@@ -326,7 +326,7 @@ describe('MongoRepository', () => {
       before(async () => {
         (record = await subject.save(new Record({
           serviceId: SERVICE_PROVIDER_ID,
-          documentType: DOCUMENT_TYPE,
+          termsType: TERMS_TYPE,
           pageId: PAGE_ID,
           content: CONTENT,
           mimeType: MIME_TYPE,
@@ -335,7 +335,7 @@ describe('MongoRepository', () => {
 
         (mongoDocument = await collection.findOne({
           serviceId: SERVICE_PROVIDER_ID,
-          documentType: DOCUMENT_TYPE,
+          termsType: TERMS_TYPE,
         }));
       });
 
@@ -350,7 +350,7 @@ describe('MongoRepository', () => {
       });
 
       it('stores the terms type', () => {
-        expect(mongoDocument.documentType).to.include(DOCUMENT_TYPE);
+        expect(mongoDocument.termsType).to.include(TERMS_TYPE);
       });
 
       it('stores the page ID', () => {
@@ -365,7 +365,7 @@ describe('MongoRepository', () => {
       before(async () => {
         (record = await subject.save(new Record({
           serviceId: SERVICE_PROVIDER_ID,
-          documentType: DOCUMENT_TYPE,
+          termsType: TERMS_TYPE,
           pageId: PAGE_ID,
           content: CONTENT,
           mimeType: MIME_TYPE,
@@ -375,7 +375,7 @@ describe('MongoRepository', () => {
 
         (mongoDocument = await collection.findOne({
           serviceId: SERVICE_PROVIDER_ID,
-          documentType: DOCUMENT_TYPE,
+          termsType: TERMS_TYPE,
         }));
       });
 
@@ -393,7 +393,7 @@ describe('MongoRepository', () => {
       });
 
       it('stores the terms type', () => {
-        expect(mongoDocument.documentType).to.include(DOCUMENT_TYPE);
+        expect(mongoDocument.termsType).to.include(TERMS_TYPE);
       });
 
       it('stores the page ID', () => {
@@ -409,7 +409,7 @@ describe('MongoRepository', () => {
     before(async () => {
       ({ id } = await subject.save(new Record({
         serviceId: SERVICE_PROVIDER_ID,
-        documentType: DOCUMENT_TYPE,
+        termsType: TERMS_TYPE,
         pageId: PAGE_ID,
         content: CONTENT,
         fetchDate: FETCH_DATE,
@@ -435,7 +435,7 @@ describe('MongoRepository', () => {
     });
 
     it('returns the terms type', () => {
-      expect(record.documentType).to.equal(DOCUMENT_TYPE);
+      expect(record.termsType).to.equal(TERMS_TYPE);
     });
 
     it('returns the content', async () => {
@@ -472,7 +472,7 @@ describe('MongoRepository', () => {
     before(async () => {
       const { id: id1 } = await subject.save(new Record({
         serviceId: SERVICE_PROVIDER_ID,
-        documentType: DOCUMENT_TYPE,
+        termsType: TERMS_TYPE,
         content: CONTENT,
         fetchDate: FETCH_DATE,
         snapshotIds: [SNAPSHOT_ID],
@@ -483,7 +483,7 @@ describe('MongoRepository', () => {
 
       const { id: id2 } = await subject.save(new Record({
         serviceId: SERVICE_PROVIDER_ID,
-        documentType: DOCUMENT_TYPE,
+        termsType: TERMS_TYPE,
         content: `${CONTENT} - updated`,
         fetchDate: FETCH_DATE_LATER,
         snapshotIds: [SNAPSHOT_ID],
@@ -494,7 +494,7 @@ describe('MongoRepository', () => {
 
       const { id: id3 } = await subject.save(new Record({
         serviceId: SERVICE_PROVIDER_ID,
-        documentType: DOCUMENT_TYPE,
+        termsType: TERMS_TYPE,
         content: `${CONTENT} - updated 2`,
         isRefilter: true,
         fetchDate: FETCH_DATE_EARLIER,
@@ -530,7 +530,7 @@ describe('MongoRepository', () => {
     before(async () => {
       await subject.save(new Record({
         serviceId: SERVICE_PROVIDER_ID,
-        documentType: DOCUMENT_TYPE,
+        termsType: TERMS_TYPE,
         content: CONTENT,
         fetchDate: FETCH_DATE,
         snapshotIds: [SNAPSHOT_ID],
@@ -538,7 +538,7 @@ describe('MongoRepository', () => {
       }));
       await subject.save(new Record({
         serviceId: SERVICE_PROVIDER_ID,
-        documentType: DOCUMENT_TYPE,
+        termsType: TERMS_TYPE,
         content: `${CONTENT} - updated`,
         fetchDate: FETCH_DATE_LATER,
         snapshotIds: [SNAPSHOT_ID],
@@ -546,7 +546,7 @@ describe('MongoRepository', () => {
       }));
       await subject.save(new Record({
         serviceId: SERVICE_PROVIDER_ID,
-        documentType: DOCUMENT_TYPE,
+        termsType: TERMS_TYPE,
         content: `${CONTENT} - updated 2`,
         isRefilter: true,
         fetchDate: FETCH_DATE_EARLIER,
@@ -575,7 +575,7 @@ describe('MongoRepository', () => {
         before(async () => {
           await subject.save(new Record({
             serviceId: SERVICE_PROVIDER_ID,
-            documentType: DOCUMENT_TYPE,
+            termsType: TERMS_TYPE,
             content: CONTENT,
             fetchDate: FETCH_DATE,
             mimeType: MIME_TYPE,
@@ -583,7 +583,7 @@ describe('MongoRepository', () => {
 
           ({ id: lastSnapshotId } = await subject.save(new Record({
             serviceId: SERVICE_PROVIDER_ID,
-            documentType: DOCUMENT_TYPE,
+            termsType: TERMS_TYPE,
             content: UPDATED_CONTENT,
             mimeType: MIME_TYPE,
             fetchDate: FETCH_DATE_LATER,
@@ -591,7 +591,7 @@ describe('MongoRepository', () => {
 
           latestRecord = await subject.findLatest(
             SERVICE_PROVIDER_ID,
-            DOCUMENT_TYPE,
+            TERMS_TYPE,
           );
         });
 
@@ -614,7 +614,7 @@ describe('MongoRepository', () => {
         before(async () => {
           await subject.save(new Record({
             serviceId: SERVICE_PROVIDER_ID,
-            documentType: DOCUMENT_TYPE,
+            termsType: TERMS_TYPE,
             content: PDF_CONTENT,
             mimeType: PDF_MIME_TYPE,
             fetchDate: FETCH_DATE,
@@ -622,13 +622,13 @@ describe('MongoRepository', () => {
 
           ({ id: lastSnapshotId } = await subject.save(new Record({
             serviceId: SERVICE_PROVIDER_ID,
-            documentType: DOCUMENT_TYPE,
+            termsType: TERMS_TYPE,
             content: UPDATED_PDF_CONTENT,
             mimeType: PDF_MIME_TYPE,
             fetchDate: FETCH_DATE_LATER,
           })));
 
-          latestRecord = await subject.findLatest(SERVICE_PROVIDER_ID, DOCUMENT_TYPE);
+          latestRecord = await subject.findLatest(SERVICE_PROVIDER_ID, TERMS_TYPE);
         });
 
         after(async () => subject.removeAll());
@@ -653,7 +653,7 @@ describe('MongoRepository', () => {
       let latestRecord;
 
       before(async () => {
-        latestRecord = await subject.findLatest(SERVICE_PROVIDER_ID, DOCUMENT_TYPE);
+        latestRecord = await subject.findLatest(SERVICE_PROVIDER_ID, TERMS_TYPE);
       });
 
       it('returns null', async () => {
@@ -670,7 +670,7 @@ describe('MongoRepository', () => {
     before(async () => {
       const { id: id1 } = await subject.save(new Record({
         serviceId: SERVICE_PROVIDER_ID,
-        documentType: DOCUMENT_TYPE,
+        termsType: TERMS_TYPE,
         content: CONTENT,
         fetchDate: FETCH_DATE,
         snapshotIds: [SNAPSHOT_ID],
@@ -681,7 +681,7 @@ describe('MongoRepository', () => {
 
       const { id: id2 } = await subject.save(new Record({
         serviceId: SERVICE_PROVIDER_ID,
-        documentType: DOCUMENT_TYPE,
+        termsType: TERMS_TYPE,
         content: `${CONTENT} - updated`,
         fetchDate: FETCH_DATE_LATER,
         snapshotIds: [SNAPSHOT_ID],
@@ -692,7 +692,7 @@ describe('MongoRepository', () => {
 
       const { id: id3 } = await subject.save(new Record({
         serviceId: SERVICE_PROVIDER_ID,
-        documentType: DOCUMENT_TYPE,
+        termsType: TERMS_TYPE,
         content: `${CONTENT} - updated 2`,
         isRefilter: true,
         fetchDate: FETCH_DATE_EARLIER,
