@@ -90,8 +90,8 @@ For command-line examples and documentation, we follow the [docopt usage pattern
 - mutually exclusive elements are given between `(` and `)` and separated by `|`.
 
 ```diff
-- npm start --services [ $service_id ] [, $service_id, ...]
-+ npm start --services [service_id...]
+- ota track --services [ $service_id ] [, $service_id, ...]
++ ota track [--services <service_id>...]
 ```
 
 ##### Long options
@@ -100,8 +100,8 @@ In order to improve the understandability of commands, we document all CLI optio
 
 
 ```diff
-- npm start -s [$service_id] -r
-+ npm start --services [$service_id] --refilter-only
+- ota track -s $service_id -r
++ ota track --services <service_id> --refilter-only
 ```
 
 ## Naming
