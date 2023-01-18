@@ -371,7 +371,7 @@ The default configuration can be found in `config/default.json`. The full refere
 }
 ```
 
-The default configuration is merged with (and overridden by) environment-specific configuration that can be specified at startup with the `NODE_ENV` environment variable. For example, running `NODE_ENV=vagrant npm start` will load the `vagrant.json` configuration file. See [node-config](https://github.com/node-config/node-config) for more information about configuration files.
+The default configuration is merged with (and overridden by) environment-specific configuration that can be specified at startup with the `NODE_ENV` environment variable. See [node-config](https://github.com/node-config/node-config) for more information about configuration files.
 
 In order to have a local configuration that override all exisiting config, it is recommended to create a `config/development.json` file with overridden values.
 
@@ -426,8 +426,7 @@ If an outgoing HTTP/HTTPS proxy to access the Internet is required, it is possib
 
 ## Deploying
 
-Deployment is managed with [Ansible](https://www.ansible.com). See the [Open Terms Archive deployment Ansible collection](https://github.com/OpenTermsArchive/ota.deployment-ansible-collection).
-
+Deployment recipes are available in a [dedicated repository](https://github.com/OpenTermsArchive/deployment). Look at the [README](https://github.com/OpenTermsArchive/deployment#readme) to know how to deploy the engine.
 ## Contributing
 
 ### Getting a copy

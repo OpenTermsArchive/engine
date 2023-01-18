@@ -1,8 +1,6 @@
 .DS_Store
 node_modules
 /.env
-.vagrant
-vault.key
 data
 yarn.lock
 tmp

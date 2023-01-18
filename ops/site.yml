@@ -1,6 +1,0 @@
----
-- name: Set up Open Terms Archive
-  hosts: all
-
-- import_playbook: infra.yml
-- import_playbook: app.yml
