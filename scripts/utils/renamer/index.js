@@ -10,12 +10,12 @@ let renamingRules;
 export async function loadRules() {
   renamingRules = {
     serviceNames: JSON.parse(await fs.readFile(path.resolve(__dirname, './rules/serviceNames.json'))),
-    documentTypes: JSON.parse(await fs.readFile(path.resolve(__dirname, './rules/documentTypes.json'))),
-    documentTypesByService: JSON.parse(await fs.readFile(path.resolve(__dirname, './rules/documentTypesByService.json'))),
+    termsTypes: JSON.parse(await fs.readFile(path.resolve(__dirname, './rules/termsTypes.json'))),
+    termsTypesByService: JSON.parse(await fs.readFile(path.resolve(__dirname, './rules/termsTypesByService.json'))),
   };
 }
 
-export function applyRules(serviceId, documentType) {
+export function applyRules(serviceId, termsType) {
   const renamedServiceId = renamingRules.serviceNames[serviceId];
 
   if (renamedServiceId) {
@@ -23,23 +23,23 @@ export function applyRules(serviceId, documentType) {
     serviceId = renamedServiceId;
   }
 
-  const renamedDocumentType = renamingRules.documentTypes[documentType];
+  const renamedDocumentType = renamingRules.termsTypes[termsType];
 
   if (renamedDocumentType) {
-    console.log(`⌙ Rename terms type "${documentType}" to "${renamedDocumentType}" of "${serviceId}" service`);
-    documentType = renamedDocumentType;
+    console.log(`⌙ Rename terms type "${termsType}" to "${renamedDocumentType}" of "${serviceId}" service`);
+    termsType = renamedDocumentType;
   }
 
-  const renamedServiceDocumentType = renamingRules.documentTypesByService[serviceId]
-    && renamingRules.documentTypesByService[serviceId][documentType];
+  const renamedServiceDocumentType = renamingRules.termsTypesByService[serviceId]
+    && renamingRules.termsTypesByService[serviceId][termsType];
 
   if (renamedServiceDocumentType) {
-    console.log(`⌙ Specific rename terms type "${documentType}" to "${renamedServiceDocumentType}" of "${serviceId}" service`);
-    documentType = renamedServiceDocumentType;
+    console.log(`⌙ Specific rename terms type "${termsType}" to "${renamedServiceDocumentType}" of "${serviceId}" service`);
+    termsType = renamedServiceDocumentType;
   }
 
   return {
     serviceId,
-    documentType,
+    termsType,
   };
 }

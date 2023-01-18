@@ -9,7 +9,7 @@ const service = new Service({
 
 service.addDocumentDeclaration(new DocumentDeclaration({
   service,
-  type: 'Terms of Service',
+  termsType: 'Terms of Service',
   validUntil: null,
   pages: [new PageDeclaration({
     location: 'https://www.servicea.example/tos',

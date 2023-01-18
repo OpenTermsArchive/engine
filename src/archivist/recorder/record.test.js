@@ -9,10 +9,10 @@ const { expect } = chai;
 describe('Record', () => {
   let repository;
   let subject;
-  const REQUIRED_PARAMS = [ 'serviceId', 'documentType', 'mimeType', 'fetchDate' ];
+  const REQUIRED_PARAMS = [ 'serviceId', 'termsType', 'mimeType', 'fetchDate' ];
   const recordParams = {
     serviceId: 'ServiceA',
-    documentType: 'Terms of Service',
+    termsType: 'Terms of Service',
     mimeType: 'text/html',
     fetchDate: new Date('2000-01-01T12:00:00.000Z'),
   };

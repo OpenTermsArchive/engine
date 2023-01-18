@@ -1,7 +1,7 @@
 export default class DocumentDeclaration {
-  constructor({ service, type, pages, validUntil }) {
+  constructor({ service, termsType, pages, validUntil }) {
     this.service = service;
-    this.type = type;
+    this.termsType = termsType;
     this.pages = pages;
 
     if (validUntil) {
@@ -17,7 +17,7 @@ export default class DocumentDeclaration {
     return {
       name: this.service.name,
       documents: {
-        [this.type]: this.isMultiPage
+        [this.termsType]: this.isMultiPage
           ? { combine: this.pages.map(page => page.toPersistence()) }
           : this.pages[0].toPersistence(),
       },

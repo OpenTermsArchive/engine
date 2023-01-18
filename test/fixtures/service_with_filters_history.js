@@ -19,7 +19,7 @@ const filters = [
 [
   new DocumentDeclaration({
     service,
-    type: 'Terms of Service',
+    termsType: 'Terms of Service',
     pages: [
       new PageDeclaration({
         location: 'https://www.service-with-filters-history.example/terms',
@@ -32,7 +32,7 @@ const filters = [
   }),
   new DocumentDeclaration({
     service,
-    type: 'Terms of Service',
+    termsType: 'Terms of Service',
     pages: [
       new PageDeclaration({
         location: 'https://www.service-with-filters-history.example/terms',
@@ -52,7 +52,7 @@ const filters = [
   }),
   new DocumentDeclaration({
     service,
-    type: 'Terms of Service',
+    termsType: 'Terms of Service',
     pages: [
       new PageDeclaration({
         location: 'https://www.service-with-filters-history.example/terms',
@@ -72,7 +72,7 @@ const filters = [
   }),
   new DocumentDeclaration({
     service,
-    type: 'Terms of Service',
+    termsType: 'Terms of Service',
     pages: [
       new PageDeclaration({
         location: 'https://www.service-with-filters-history.example/terms',
@@ -92,7 +92,7 @@ const filters = [
   }),
   new DocumentDeclaration({
     service,
-    type: 'Terms of Service',
+    termsType: 'Terms of Service',
     pages: [
       new PageDeclaration({
         location: 'https://www.service-with-filters-history.example/terms',
@@ -112,7 +112,7 @@ const filters = [
   }),
   new DocumentDeclaration({
     service,
-    type: 'Terms of Service',
+    termsType: 'Terms of Service',
     pages: [
       new PageDeclaration({
         location: 'https://www.service-with-filters-history.example/terms',
@@ -132,7 +132,7 @@ const filters = [
   }),
   new DocumentDeclaration({
     service,
-    type: 'Terms of Service',
+    termsType: 'Terms of Service',
     pages: [
       new PageDeclaration({
         location: 'https://www.service-with-filters-history.example/terms',

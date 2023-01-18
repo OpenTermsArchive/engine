@@ -86,9 +86,9 @@ let recorder;
     const { content, mimeType } = await loadFile(SNAPSHOTS_SOURCE_PATH, relativeFilePath);
 
     let serviceId = path.dirname(relativeFilePath);
-    let documentType = path.basename(relativeFilePath, path.extname(relativeFilePath));
+    let termsType = path.basename(relativeFilePath, path.extname(relativeFilePath));
 
-    ({ serviceId, documentType } = renamer.applyRules(serviceId, documentType));
+    ({ serviceId, termsType } = renamer.applyRules(serviceId, termsType));
 
     if (!servicesDeclarations[serviceId]) {
       console.log(`⌙ Skip unknown service "${serviceId}"`);
@@ -96,12 +96,12 @@ let recorder;
     }
 
     const documentDeclaration = servicesDeclarations[serviceId].getDocumentDeclaration(
-      documentType,
+      termsType,
       commit.date,
     );
 
     if (!documentDeclaration) {
-      console.log(`⌙ Skip unknown terms type "${documentType}" for service "${serviceId}"`);
+      console.log(`⌙ Skip unknown terms type "${termsType}" for service "${serviceId}"`);
       continue;
     }
 
@@ -118,7 +118,7 @@ let recorder;
 
       const { id: versionId } = await recorder.recordVersion({
         serviceId,
-        documentType,
+        termsType,
         content: document,
         mimeType: MARKDOWN_MIME_TYPE, // The result of the `filter` function is always in markdown format
         fetchDate: commit.date,

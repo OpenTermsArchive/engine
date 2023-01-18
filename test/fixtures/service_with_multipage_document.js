@@ -19,7 +19,7 @@ const filters = [
 [
   new DocumentDeclaration({
     service,
-    type: 'Community Guidelines',
+    termsType: 'Community Guidelines',
     validUntil: null,
     pages: [
       new PageDeclaration({
@@ -47,7 +47,7 @@ const filters = [
   }),
   new DocumentDeclaration({
     service,
-    type: 'Community Guidelines',
+    termsType: 'Community Guidelines',
     validUntil: '2020-04-15T21:30:21.000Z',
     pages: [
       new PageDeclaration({
@@ -72,7 +72,7 @@ const filters = [
   }),
   new DocumentDeclaration({
     service,
-    type: 'Community Guidelines',
+    termsType: 'Community Guidelines',
     validUntil: '2020-03-15T21:30:21.000Z',
     pages: [
       new PageDeclaration({

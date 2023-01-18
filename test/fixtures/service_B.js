@@ -9,7 +9,7 @@ const service = new Service({
 
 service.addDocumentDeclaration(new DocumentDeclaration({
   service,
-  type: 'Privacy Policy',
+  termsType: 'Privacy Policy',
   pages: [new PageDeclaration({
     location: 'https://www.serviceb.example/privacy',
     contentSelectors: 'body',

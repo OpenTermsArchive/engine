@@ -34,10 +34,10 @@ export default class GitRepository extends RepositoryInterface {
   }
 
   async save(record) {
-    const { serviceId, documentType, pageId, fetchDate } = record;
+    const { serviceId, termsType, pageId, fetchDate } = record;
 
     if (record.isFirstRecord === undefined || record.isFirstRecord === null) {
-      record.isFirstRecord = !await this.#isTracked(serviceId, documentType, pageId);
+      record.isFirstRecord = !await this.#isTracked(serviceId, termsType, pageId);
     }
 
     const { message, content, filePath: relativeFilePath } = await this.#toPersistence(record);
@@ -64,8 +64,8 @@ export default class GitRepository extends RepositoryInterface {
     return this.git.pushChanges();
   }
 
-  async findLatest(serviceId, documentType, pageId) {
-    const filePath = DataMapper.generateFilePath(serviceId, documentType, pageId);
+  async findLatest(serviceId, termsType, pageId) {
+    const filePath = DataMapper.generateFilePath(serviceId, termsType, pageId);
     const commit = await this.git.getCommit([filePath]);
 
     return this.#toDomain(commit);
@@ -102,7 +102,7 @@ export default class GitRepository extends RepositoryInterface {
   }
 
   async loadRecordContent(record) {
-    const relativeFilePath = DataMapper.generateFilePath(record.serviceId, record.documentType, record.pageId, record.mimeType);
+    const relativeFilePath = DataMapper.generateFilePath(record.serviceId, record.termsType, record.pageId, record.mimeType);
 
     if (record.mimeType != mime.getType('pdf')) {
       record.content = await this.git.show(`${record.id}:${relativeFilePath}`);
@@ -152,8 +152,8 @@ export default class GitRepository extends RepositoryInterface {
     }
   }
 
-  #isTracked(serviceId, documentType, pageId) {
-    return this.git.isTracked(`${this.path}/${DataMapper.generateFilePath(serviceId, documentType, pageId)}`);
+  #isTracked(serviceId, termsType, pageId) {
+    return this.git.isTracked(`${this.path}/${DataMapper.generateFilePath(serviceId, termsType, pageId)}`);
   }
 
   async #toDomain(commit, { deferContentLoading } = {}) {

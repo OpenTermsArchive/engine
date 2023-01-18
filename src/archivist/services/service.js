@@ -6,12 +6,12 @@ export default class Service {
     this.name = name;
   }
 
-  getDocumentDeclaration(documentType, date) {
-    if (!this.documents[documentType]) {
+  getDocumentDeclaration(termsType, date) {
+    if (!this.documents[termsType]) {
       return null;
     }
 
-    const { latest: currentlyValidDocumentDeclaration, history } = this.documents[documentType];
+    const { latest: currentlyValidDocumentDeclaration, history } = this.documents[termsType];
 
     if (!date) {
       return currentlyValidDocumentDeclaration;
@@ -23,7 +23,7 @@ export default class Service {
     );
   }
 
-  getDocumentTypes() {
+  getTermsTypes() {
     return Object.keys(this.documents);
   }
 
@@ -32,29 +32,29 @@ export default class Service {
       document.service = this;
     }
 
-    this.documents[document.type] = this.documents[document.type] || {};
+    this.documents[document.termsType] = this.documents[document.termsType] || {};
 
     if (!document.validUntil) {
-      this.documents[document.type].latest = document;
+      this.documents[document.termsType].latest = document;
 
       return;
     }
 
-    this.documents[document.type].history = this.documents[document.type].history || [];
-    this.documents[document.type].history.push(document);
-    this.documents[document.type].history.sort((a, b) => new Date(a.validUntil) - new Date(b.validUntil));
+    this.documents[document.termsType].history = this.documents[document.termsType].history || [];
+    this.documents[document.termsType].history.push(document);
+    this.documents[document.termsType].history.sort((a, b) => new Date(a.validUntil) - new Date(b.validUntil));
   }
 
-  getHistoryDates(documentType) {
-    return this.documents[documentType].history.map(entry => entry.validUntil);
+  getHistoryDates(termsType) {
+    return this.documents[termsType].history.map(entry => entry.validUntil);
   }
 
-  getNumberOfDocuments() {
-    return this.getDocumentTypes().length;
+  getNumberOfTerms() {
+    return this.getTermsTypes().length;
   }
 
   hasHistory() {
     // If a service is loaded without its history it could return false even if a history declaration file exists.
-    return Boolean(Object.keys(this.documents).find(documentType => this.documents[documentType].history));
+    return Boolean(Object.keys(this.documents).find(termsType => this.documents[termsType].history));
   }
 }

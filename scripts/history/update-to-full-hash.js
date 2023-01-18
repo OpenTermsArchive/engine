@@ -47,9 +47,9 @@ const ROOT_PATH = path.resolve(__dirname, '../../');
     const { id: recordId } = await versionsTargetRepository.save(record);
 
     if (!recordId) {
-      logger.warn({ message: 'Record skipped', serviceId: record.serviceId, type: record.documentType, id: record.id, current, total });
+      logger.warn({ message: 'Record skipped', serviceId: record.serviceId, type: record.termsType, id: record.id, current, total });
     } else {
-      logger.info({ message: `Update short sha ${record.snapshotId} to ${fullSnapshotId}`, serviceId: record.serviceId, type: record.documentType, id: record.id, current, total });
+      logger.info({ message: `Update short sha ${record.snapshotId} to ${fullSnapshotId}`, serviceId: record.serviceId, type: record.termsType, id: record.id, current, total });
     }
 
     current++;

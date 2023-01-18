@@ -1,8 +1,8 @@
-import { DOCUMENT_TYPES } from '../../../src/archivist/services/index.js';
+import TERMS_TYPES from '@opentermsarchive/terms-types';
 
 import definitions from './definitions.js';
 
-const AVAILABLE_TYPES_NAME = Object.keys(DOCUMENT_TYPES);
+const AVAILABLE_TYPES_NAME = Object.keys(TERMS_TYPES);
 
 const documentsProperties = () => {
   const result = {};

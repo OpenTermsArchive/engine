@@ -7,7 +7,7 @@ const { expect } = chai;
 
 describe('DocumentDeclaration', () => {
   const service = { name: 'Service' };
-  const type = 'Terms of Service';
+  const termsType = 'Terms of Service';
   const URL = 'https://www.service.example/terms';
   const page1 = new PageDeclaration({
     location: URL,
@@ -61,22 +61,22 @@ describe('DocumentDeclaration', () => {
 
   describe('#toPersistence', () => {
     it('converts one page document to JSON representation', async () => {
-      const result = new DocumentDeclaration({ service, type, pages: [page1] }).toPersistence();
+      const result = new DocumentDeclaration({ service, termsType, pages: [page1] }).toPersistence();
 
       const expectedResult = {
         name: service.name,
-        documents: { [type]: page1AsJSON },
+        documents: { [termsType]: page1AsJSON },
       };
 
       expect(result).to.deep.equal(expectedResult);
     });
 
     it('converts multipage document to JSON representation', async () => {
-      const result = new DocumentDeclaration({ service, type, pages: [ page1, page2 ] }).toPersistence();
+      const result = new DocumentDeclaration({ service, termsType, pages: [ page1, page2 ] }).toPersistence();
 
       const expectedResult = {
         name: service.name,
-        documents: { [type]: { combine: [ page1AsJSON, page2AsJSON ] } },
+        documents: { [termsType]: { combine: [ page1AsJSON, page2AsJSON ] } },
       };
 
       expect(result).to.deep.equal(expectedResult);

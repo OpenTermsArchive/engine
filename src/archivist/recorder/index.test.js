@@ -41,7 +41,7 @@ describe('Recorder', () => {
 
           const validParams = {
             serviceId: SERVICE_ID,
-            documentType: TYPE,
+            termsType: TYPE,
             content: CONTENT,
             fetchDate: FETCH_DATE,
             mimeType: MIME_TYPE,
@@ -49,7 +49,7 @@ describe('Recorder', () => {
 
           const paramsNameToExpectedTextInError = {
             serviceId: 'service ID',
-            documentType: 'terms type',
+            termsType: 'terms type',
             fetchDate: 'fetch date',
             content: 'content',
             mimeType: 'mime type',
@@ -78,7 +78,7 @@ describe('Recorder', () => {
           before(async () => {
             ({ id, isFirstRecord } = await recorder.recordSnapshot({
               serviceId: SERVICE_ID,
-              documentType: TYPE,
+              termsType: TYPE,
               content: CONTENT,
               mimeType: MIME_TYPE,
               fetchDate: FETCH_DATE,
@@ -108,7 +108,7 @@ describe('Recorder', () => {
           before(async () => {
             await recorder.recordSnapshot({
               serviceId: SERVICE_ID,
-              documentType: TYPE,
+              termsType: TYPE,
               content: CONTENT,
               mimeType: MIME_TYPE,
               fetchDate: FETCH_DATE,
@@ -116,7 +116,7 @@ describe('Recorder', () => {
 
             ({ id, isFirstRecord } = await recorder.recordSnapshot({
               serviceId: SERVICE_ID,
-              documentType: TYPE,
+              termsType: TYPE,
               content: UPDATED_CONTENT,
               mimeType: MIME_TYPE,
               fetchDate: FETCH_DATE_LATER,
@@ -144,7 +144,7 @@ describe('Recorder', () => {
           before(async () => {
             await recorder.recordSnapshot({
               serviceId: SERVICE_ID,
-              documentType: TYPE,
+              termsType: TYPE,
               content: CONTENT,
               mimeType: MIME_TYPE,
               fetchDate: FETCH_DATE,
@@ -152,7 +152,7 @@ describe('Recorder', () => {
 
             ({ id, isFirstRecord } = await recorder.recordSnapshot({
               serviceId: SERVICE_ID,
-              documentType: TYPE,
+              termsType: TYPE,
               content: CONTENT,
               mimeType: MIME_TYPE,
               fetchDate: FETCH_DATE_LATER,
@@ -182,7 +182,7 @@ describe('Recorder', () => {
 
           const validParams = {
             serviceId: SERVICE_ID,
-            documentType: TYPE,
+            termsType: TYPE,
             content: CONTENT,
             snapshotIds: [SNAPSHOT_ID],
             fetchDate: FETCH_DATE,
@@ -190,7 +190,7 @@ describe('Recorder', () => {
 
           const paramsNameToExpectedTextInError = {
             serviceId: 'service ID',
-            documentType: 'terms type',
+            termsType: 'terms type',
             snapshotIds: 'snapshot ID',
             fetchDate: 'fetch date',
             content: 'content',
@@ -219,7 +219,7 @@ describe('Recorder', () => {
           before(async () => {
             ({ id, isFirstRecord } = await recorder.recordVersion({
               serviceId: SERVICE_ID,
-              documentType: TYPE,
+              termsType: TYPE,
               content: CONTENT,
               snapshotIds: [SNAPSHOT_ID],
               fetchDate: FETCH_DATE,
@@ -249,7 +249,7 @@ describe('Recorder', () => {
           before(async () => {
             await recorder.recordVersion({
               serviceId: SERVICE_ID,
-              documentType: TYPE,
+              termsType: TYPE,
               content: CONTENT,
               snapshotIds: [SNAPSHOT_ID],
               fetchDate: FETCH_DATE,
@@ -257,7 +257,7 @@ describe('Recorder', () => {
 
             ({ id, isFirstRecord } = await recorder.recordVersion({
               serviceId: SERVICE_ID,
-              documentType: TYPE,
+              termsType: TYPE,
               content: UPDATED_CONTENT,
               snapshotIds: [SNAPSHOT_ID],
               fetchDate: FETCH_DATE_LATER,
@@ -289,7 +289,7 @@ describe('Recorder', () => {
           before(async () => {
             await recorder.recordVersion({
               serviceId: SERVICE_ID,
-              documentType: TYPE,
+              termsType: TYPE,
               content: CONTENT,
               snapshotIds: [SNAPSHOT_ID],
               fetchDate: FETCH_DATE,
@@ -297,7 +297,7 @@ describe('Recorder', () => {
 
             ({ id, isFirstRecord } = await recorder.recordVersion({
               serviceId: SERVICE_ID,
-              documentType: TYPE,
+              termsType: TYPE,
               content: CONTENT,
               snapshotIds: [SNAPSHOT_ID],
               fetchDate: FETCH_DATE_LATER,
@@ -327,7 +327,7 @@ describe('Recorder', () => {
 
           const validParams = {
             serviceId: SERVICE_ID,
-            documentType: TYPE,
+            termsType: TYPE,
             content: CONTENT,
             snapshotIds: [SNAPSHOT_ID],
             fetchDate: FETCH_DATE,
@@ -335,7 +335,7 @@ describe('Recorder', () => {
 
           const paramsNameToExpectedTextInError = {
             serviceId: 'service ID',
-            documentType: 'terms type',
+            termsType: 'terms type',
             snapshotIds: 'snapshot ID',
             fetchDate: 'fetch date',
             content: 'content',
@@ -364,7 +364,7 @@ describe('Recorder', () => {
           before(async () => {
             ({ id, isFirstRecord } = await recorder.recordRefilter({
               serviceId: SERVICE_ID,
-              documentType: TYPE,
+              termsType: TYPE,
               content: CONTENT,
               snapshotIds: [SNAPSHOT_ID],
               fetchDate: FETCH_DATE,
@@ -394,7 +394,7 @@ describe('Recorder', () => {
           before(async () => {
             await recorder.recordRefilter({
               serviceId: SERVICE_ID,
-              documentType: TYPE,
+              termsType: TYPE,
               content: CONTENT,
               snapshotIds: [SNAPSHOT_ID],
               fetchDate: FETCH_DATE,
@@ -402,7 +402,7 @@ describe('Recorder', () => {
 
             ({ id, isFirstRecord } = await recorder.recordRefilter({
               serviceId: SERVICE_ID,
-              documentType: TYPE,
+              termsType: TYPE,
               content: UPDATED_CONTENT,
               snapshotIds: [SNAPSHOT_ID],
               fetchDate: FETCH_DATE_LATER,
@@ -434,7 +434,7 @@ describe('Recorder', () => {
           before(async () => {
             await recorder.recordRefilter({
               serviceId: SERVICE_ID,
-              documentType: TYPE,
+              termsType: TYPE,
               content: CONTENT,
               snapshotIds: [SNAPSHOT_ID],
               fetchDate: FETCH_DATE,
@@ -442,7 +442,7 @@ describe('Recorder', () => {
 
             ({ id, isFirstRecord } = await recorder.recordRefilter({
               serviceId: SERVICE_ID,
-              documentType: TYPE,
+              termsType: TYPE,
               content: CONTENT,
               snapshotIds: [SNAPSHOT_ID],
               fetchDate: FETCH_DATE_LATER,

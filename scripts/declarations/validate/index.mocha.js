@@ -25,7 +25,7 @@ const instancePath = path.resolve(declarationsPath, '../');
 export default async options => {
   const schemaOnly = options.schemaOnly || false;
   let servicesToValidate = options.services || [];
-  const documentTypes = options.termsTypes || [];
+  const termsTypes = options.termsTypes || [];
   let servicesDocumentTypes = {};
 
   const serviceDeclarations = await services.loadWithHistory(servicesToValidate);
@@ -77,13 +77,13 @@ export default async options => {
 
         if (!schemaOnly && service) {
           service.getDocumentTypes()
-            .filter(documentType => {
+            .filter(termsType => {
               if (servicesDocumentTypes[serviceId] && servicesDocumentTypes[serviceId].length > 0) {
-                return servicesDocumentTypes[serviceId].includes(documentType);
+                return servicesDocumentTypes[serviceId].includes(termsType);
               }
 
-              if (documentTypes.length > 0) {
-                return documentTypes.includes(documentType);
+              if (termsTypes.length > 0) {
+                return termsTypes.includes(termsType);
               }
 
               return true;

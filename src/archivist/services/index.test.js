@@ -14,15 +14,15 @@ describe('Services', () => {
 
     async function validateServiceWithoutHistory(serviceId, expected) {
       /* eslint-disable no-loop-func */
-      for (const documentType of expected.getDocumentTypes()) {
-        context(`${documentType}`, () => {
+      for (const termsType of expected.getTermsTypes()) {
+        context(`${termsType}`, () => {
           let actualDocumentDeclaration;
           let actualFilters;
           let actualContentSelectors;
           let actualNoiseSelectors;
           let actualExecuteClientScripts;
 
-          const expectedDocumentDeclaration = expected.getDocumentDeclaration(documentType);
+          const expectedDocumentDeclaration = expected.getDocumentDeclaration(termsType);
 
           const { pages } = expectedDocumentDeclaration;
 
@@ -36,7 +36,7 @@ describe('Services', () => {
 
             context(`Page: ${page.id}`, () => {
               before(() => {
-                actualDocumentDeclaration = result[serviceId].getDocumentDeclaration(documentType);
+                actualDocumentDeclaration = result[serviceId].getDocumentDeclaration(termsType);
                 const { pages: actualPages } = actualDocumentDeclaration;
 
                 ({
@@ -52,7 +52,7 @@ describe('Services', () => {
               });
 
               it('has the proper terms type', () => {
-                expect(actualDocumentDeclaration.type).to.eql(expectedDocumentDeclaration.type);
+                expect(actualDocumentDeclaration.termsType).to.eql(expectedDocumentDeclaration.termsType);
               });
 
               it('has no validity date', () => {
@@ -151,19 +151,19 @@ describe('Services', () => {
 
     async function validateServiceWithHistory(serviceId, expected) {
       /* eslint-disable no-loop-func */
-      for (const documentType of expected.getDocumentTypes()) {
-        context(`${documentType}`, () => {
-          const { history: expectedHistory } = expected.documents[documentType];
+      for (const termsType of expected.getTermsTypes()) {
+        context(`${termsType}`, () => {
+          const { history: expectedHistory } = expected.documents[termsType];
           const expectedHistoryDates = expectedHistory && [ ...expectedHistory.map(entry => entry.validUntil), null ]; // add `null` entry to simulate the still current valid declaration
 
           let actualDocumentDeclaration;
           let actualFilters;
-          const expectedDocumentDeclaration = expected.getDocumentDeclaration(documentType);
+          const expectedDocumentDeclaration = expected.getDocumentDeclaration(termsType);
 
           const { pages } = expectedDocumentDeclaration;
 
           before(() => {
-            actualDocumentDeclaration = result[serviceId].getDocumentDeclaration(documentType);
+            actualDocumentDeclaration = result[serviceId].getDocumentDeclaration(termsType);
           });
 
           it('has the proper service name', () => {
@@ -171,7 +171,7 @@ describe('Services', () => {
           });
 
           it('has the proper terms type', () => {
-            expect(actualDocumentDeclaration.type).to.eql(expectedDocumentDeclaration.type);
+            expect(actualDocumentDeclaration.termsType).to.eql(expectedDocumentDeclaration.termsType);
           });
 
           pages.forEach((page, index) => {
@@ -192,7 +192,7 @@ describe('Services', () => {
                     let noiseSelectorsForThisDate;
                     let actualExecuteClientScriptsForThisDate;
 
-                    const { pages: pagesForThisDate } = expected.getDocumentDeclaration(documentType, date);
+                    const { pages: pagesForThisDate } = expected.getDocumentDeclaration(termsType, date);
                     const {
                       filters: expectedFiltersForThisDate,
                       contentSelectors: expectedContentSelectors,
@@ -201,7 +201,7 @@ describe('Services', () => {
                     } = pagesForThisDate[index];
 
                     before(() => {
-                      const { pages: actualPagesForThisDate } = result[serviceId].getDocumentDeclaration(documentType, date);
+                      const { pages: actualPagesForThisDate } = result[serviceId].getDocumentDeclaration(termsType, date);
 
                       ({
                         filters: actualFiltersForThisDate,

@@ -145,10 +145,10 @@ async function rewriteSnapshots(repository, records, idsMapping, logger) {
     idsMapping[record.id] = recordId; // Saves the mapping between the old ID and the new one.
 
     if (recordId) {
-      logger.info({ message: `Migrated snapshot with new ID: ${recordId}`, serviceId: record.serviceId, type: record.documentType, id: record.id, current: i++, total: records.length });
+      logger.info({ message: `Migrated snapshot with new ID: ${recordId}`, serviceId: record.serviceId, type: record.termsType, id: record.id, current: i++, total: records.length });
       counters.migrated++;
     } else {
-      logger.info({ message: 'Skipped snapshot', serviceId: record.serviceId, type: record.documentType, id: record.id, current: i++, total: records.length });
+      logger.info({ message: 'Skipped snapshot', serviceId: record.serviceId, type: record.termsType, id: record.id, current: i++, total: records.length });
       counters.skipped++;
     }
   }
@@ -169,10 +169,10 @@ async function rewriteVersions(repository, records, idsMapping, logger) {
     const { id: recordId } = await repository.save(record); // eslint-disable-line no-await-in-loop
 
     if (recordId) {
-      logger.info({ message: `Migrated version with new ID: ${recordId}`, serviceId: record.serviceId, type: record.documentType, id: record.id, current: i++, total: records.length });
+      logger.info({ message: `Migrated version with new ID: ${recordId}`, serviceId: record.serviceId, type: record.termsType, id: record.id, current: i++, total: records.length });
       counters.migrated++;
     } else {
-      logger.info({ message: 'Skipped version', serviceId: record.serviceId, type: record.documentType, id: record.id, current: i++, total: records.length });
+      logger.info({ message: 'Skipped version', serviceId: record.serviceId, type: record.termsType, id: record.id, current: i++, total: records.length });
       counters.skipped++;
     }
   }
