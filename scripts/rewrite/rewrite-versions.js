@@ -110,7 +110,7 @@ let recorder;
     }
 
     try {
-      const document = await extract({
+      const versionContent = await extract({
         content,
         mimeType,
         terms,
@@ -119,7 +119,7 @@ let recorder;
       const { id: versionId } = await recorder.recordVersion({
         serviceId,
         termsType,
-        content: document,
+        content: versionContent,
         mimeType: MARKDOWN_MIME_TYPE, // The result of the `extract` function is always in markdown format
         fetchDate: commit.date,
         snapshotId: commit.hash,

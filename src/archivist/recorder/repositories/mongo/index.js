@@ -53,7 +53,7 @@ export default class MongoRepository extends RepositoryInterface {
   }
 
   async findLatest(serviceId, termsType) {
-    const [mongoDocument] = await this.collection.find({ serviceId, termsType }).limit(1).sort({ fetchDate: -1 }).toArray(); // `findOne` doesn't support the `sort` method, so even for only one document use `find`
+    const [mongoDocument] = await this.collection.find({ serviceId, termsType }).limit(1).sort({ fetchDate: -1 }).toArray(); // `findOne` doesn't support the `sort` method, so even for only one mongo document use `find`
 
     return this.#toDomain(mongoDocument);
   }
@@ -95,12 +95,12 @@ export default class MongoRepository extends RepositoryInterface {
     record.content = content instanceof Binary ? content.buffer : content;
   }
 
-  async #toDomain(document, { deferContentLoading } = {}) {
-    if (!document) {
+  async #toDomain(mongoDocument, { deferContentLoading } = {}) {
+    if (!mongoDocument) {
       return null;
     }
 
-    const record = DataMapper.toDomain(document);
+    const record = DataMapper.toDomain(mongoDocument);
 
     if (deferContentLoading) {
       return record;

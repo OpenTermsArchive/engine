@@ -115,12 +115,12 @@ export async function extractFromPDF({ content: pdfBuffer }) {
   }
 }
 
-function selectRange(document, rangeSelector) {
+function selectRange(webPageDOM, rangeSelector) {
   const { startBefore, startAfter, endBefore, endAfter } = rangeSelector;
 
-  const selection = document.createRange();
-  const startNode = document.querySelector(startBefore || startAfter);
-  const endNode = document.querySelector(endBefore || endAfter);
+  const selection = webPageDOM.createRange();
+  const startNode = webPageDOM.querySelector(startBefore || startAfter);
+  const endNode = webPageDOM.querySelector(endBefore || endAfter);
 
   if (!startNode) {
     throw new InaccessibleContentError(`The "start" selector has no match in document in: ${JSON.stringify(rangeSelector)}`);
@@ -136,8 +136,8 @@ function selectRange(document, rangeSelector) {
   return selection;
 }
 
-export function convertRelativeURLsToAbsolute(document, baseURL) {
-  Array.from(document.querySelectorAll(LINKS_TO_CONVERT_SELECTOR)).forEach(link => {
+export function convertRelativeURLsToAbsolute(webPageDOM, baseURL) {
+  Array.from(webPageDOM.querySelectorAll(LINKS_TO_CONVERT_SELECTOR)).forEach(link => {
     link.href = url.resolve(baseURL, link.href);
   });
 }
