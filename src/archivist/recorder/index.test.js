@@ -89,7 +89,7 @@ describe('Recorder', () => {
 
           after(async () => recorder.snapshotsRepository.removeAll());
 
-          it('records the document with the proper content', async () => {
+          it('records the snapshot with the proper content', async () => {
             expect(await record.content).to.equal(CONTENT);
           });
 
@@ -127,7 +127,7 @@ describe('Recorder', () => {
 
           after(async () => recorder.snapshotsRepository.removeAll());
 
-          it('records the document with the proper content', async () => {
+          it('records the snapshot with the proper content', async () => {
             expect(await record.content).to.equal(UPDATED_CONTENT);
           });
 
@@ -163,7 +163,7 @@ describe('Recorder', () => {
 
           after(async () => recorder.snapshotsRepository.removeAll());
 
-          it('does not record the document', async () => {
+          it('does not record the snapshot', async () => {
             expect(id).to.not.be.ok;
           });
         });
@@ -230,7 +230,7 @@ describe('Recorder', () => {
 
           after(async () => recorder.versionsRepository.removeAll());
 
-          it('records the document with the proper content', async () => {
+          it('records the version with the proper content', async () => {
             expect(await record.content).to.equal(CONTENT);
           });
 
@@ -268,11 +268,11 @@ describe('Recorder', () => {
 
           after(async () => recorder.versionsRepository.removeAll());
 
-          it('records the document with the proper content', async () => {
+          it('records the version with the proper content', async () => {
             expect(await record.content).to.equal(UPDATED_CONTENT);
           });
 
-          it('records in the document that it is not an extracted only version', async () => {
+          it('records in the version that it is not an extracted only version', async () => {
             expect(record.isRefilter).to.equal(false);
           });
 
@@ -308,7 +308,7 @@ describe('Recorder', () => {
 
           after(async () => recorder.versionsRepository.removeAll());
 
-          it('does not record the document', async () => {
+          it('does not record the version', async () => {
             expect(id).to.not.be.ok;
           });
         });
@@ -337,7 +337,7 @@ describe('Recorder', () => {
 
             after(async () => recorder.versionsRepository.removeAll()); after(async () => recorder.versionsRepository.removeAll());
 
-            it('records the document with the proper content', async () => {
+            it('records the version with the proper content', async () => {
               expect(await record.content).to.equal(CONTENT);
             });
 
@@ -376,11 +376,11 @@ describe('Recorder', () => {
 
             after(async () => recorder.versionsRepository.removeAll());
 
-            it('records the document with the proper content', async () => {
+            it('records the version with the proper content', async () => {
               expect(await record.content).to.equal(UPDATED_CONTENT);
             });
 
-            it('records in the document that it is an extracted only version', async () => {
+            it('records in the version that it is an extracted only version', async () => {
               expect(record.isRefilter).to.equal(true);
             });
 
@@ -417,7 +417,7 @@ describe('Recorder', () => {
 
             after(async () => recorder.versionsRepository.removeAll());
 
-            it('does not record the document', async () => {
+            it('does not record the version', async () => {
               expect(id).to.not.be.ok;
             });
           });
