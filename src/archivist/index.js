@@ -64,7 +64,6 @@ export default class Archivist extends events.EventEmitter {
         process.exit(2);
       }, 60 * 1000);
 
-      this.refilterDocumentsQueue.kill();
       this.trackDocumentChangesQueue.kill();
       await stopHeadlessBrowser().then(() => console.log('Headless browser stopped'));
       await this.recorder.finalize().then(() => console.log('Recorder finalized'));
@@ -73,10 +72,9 @@ export default class Archivist extends events.EventEmitter {
   }
 
   initQueues() {
-    this.trackDocumentChangesQueue = async.queue(async documentDeclaration => this.trackDocumentChanges(documentDeclaration), MAX_PARALLEL_DOCUMENTS_TRACKS);
-    this.refilterDocumentsQueue = async.queue(async documentDeclaration => this.refilterAndRecordDocument(documentDeclaration), MAX_PARALLEL_REFILTERS);
+    this.trackDocumentChangesQueue = async.queue(this.trackDocumentChanges.bind(this), MAX_PARALLEL_DOCUMENTS_TRACKS);
 
-    const queueErrorHandler = async (error, documentDeclaration) => {
+    const queueErrorHandler = async (error, { documentDeclaration }) => {
       const { service, termsType } = documentDeclaration;
 
       if (error.toString().includes('HttpError: API rate limit exceeded for user ID')) {
@@ -93,7 +91,6 @@ export default class Archivist extends events.EventEmitter {
     };
 
     this.trackDocumentChangesQueue.error(queueErrorHandler);
-    this.refilterDocumentsQueue.error(queueErrorHandler);
   }
 
   attach(listener) {
@@ -106,43 +103,30 @@ export default class Archivist extends events.EventEmitter {
     });
   }
 
-  async trackChanges(servicesIds = this.serviceIds, termsTypes = []) {
-    this.emit('trackingStarted', servicesIds.length, this.getNumberOfDocuments(servicesIds));
+  async trackChanges({ servicesIds = this.serviceIds, termsTypes = [], refilterOnly }) {
+    this.emit(refilterOnly ? 'refilteringStarted' : 'trackingStarted', servicesIds.length, this.getNumberOfDocuments(servicesIds));
 
     await Promise.all([ launchHeadlessBrowser(), this.recorder.initialize() ]);
 
-    this.#forEachDocumentOf(servicesIds, termsTypes, documentDeclaration => this.trackDocumentChangesQueue.push(documentDeclaration));
+    this.trackDocumentChangesQueue.concurrency = refilterOnly ? MAX_PARALLEL_REFILTERS : MAX_PARALLEL_DOCUMENTS_TRACKS;
+
+    this.#forEachDocumentOf(servicesIds, termsTypes, documentDeclaration => this.trackDocumentChangesQueue.push({ documentDeclaration, refilterOnly }));
 
     await this.trackDocumentChangesQueue.drain();
     await Promise.all([ stopHeadlessBrowser(), this.recorder.finalize() ]);
 
-    this.emit('trackingCompleted', servicesIds.length, this.getNumberOfDocuments(servicesIds));
+    this.emit(refilterOnly ? 'refilteringCompleted' : 'trackingCompleted', servicesIds.length, this.getNumberOfDocuments(servicesIds));
   }
 
-  async refilterAndRecord(servicesIds = this.serviceIds, termsTypes = []) {
-    this.emit('refilteringStarted', servicesIds.length, this.getNumberOfDocuments(servicesIds));
+  async trackDocumentChanges({ documentDeclaration, refilterOnly }) {
+    if (!refilterOnly) {
+      await Promise.all((await this.fetchDocumentPages(documentDeclaration)).map(params => this.recordSnapshot(params)));
+    }
 
-    await this.recorder.initialize();
-
-    this.#forEachDocumentOf(servicesIds, termsTypes, documentDeclaration => this.refilterDocumentsQueue.push(documentDeclaration));
-
-    await this.refilterDocumentsQueue.drain();
-    await this.recorder.finalize();
-
-    this.emit('refilteringCompleted', servicesIds.length, this.getNumberOfDocuments(servicesIds));
+    return this.generateDocumentVersion(documentDeclaration, { refilterOnly });
   }
 
-  async trackDocumentChanges(documentDeclaration) {
-    await Promise.all((await this.fetchDocumentPages(documentDeclaration)).map(params => this.recordSnapshot(params)));
-
-    return this.generateDocumentVersion(documentDeclaration);
-  }
-
-  async refilterAndRecordDocument(documentDeclaration) {
-    return this.generateDocumentVersion(documentDeclaration, { isRefiltering: true });
-  }
-
-  async generateDocumentVersion(documentDeclaration, { isRefiltering = false } = {}) {
+  async generateDocumentVersion(documentDeclaration, { refilterOnly = false } = {}) {
     const { service: { id: serviceId }, termsType, pages } = documentDeclaration;
 
     const snapshots = await this.getDocumentSnapshots(documentDeclaration);
@@ -159,7 +143,7 @@ export default class Archivist extends events.EventEmitter {
       serviceId,
       termsType,
       fetchDate,
-      isRefiltering,
+      isRefiltering: refilterOnly,
     });
   }
 
