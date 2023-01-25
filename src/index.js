@@ -29,7 +29,9 @@ export default async function track({ services = [], termsTypes, refilterOnly, s
     });
   }
 
-  await archivist.refilterAndRecord(serviceIds, termsTypes);
+  // The result of the filtering step that generates the version from the snapshots may depend on changes to the engine or its dependencies.
+  // So, let's start by only performing the filtering process so that we can annotate any versions generated related to such changes and avoid sending notifications.
+  await archivist.trackChanges({ serviceIds, termsTypes, refilterOnly: true });
 
   if (refilterOnly) {
     return;
@@ -47,7 +49,7 @@ export default async function track({ services = [], termsTypes, refilterOnly, s
   }
 
   if (!schedule) {
-    await archivist.trackChanges(serviceIds, termsTypes);
+    await archivist.trackChanges({ serviceIds, termsTypes });
 
     return;
   }
@@ -55,5 +57,5 @@ export default async function track({ services = [], termsTypes, refilterOnly, s
   logger.info('The scheduler is running…');
   logger.info('Documents will be tracked every six hours starting at half past midnight');
 
-  cron('30 */6 * * *', () => archivist.trackChanges(serviceIds, termsTypes));
+  cron('30 */6 * * *', () => archivist.trackChanges({ serviceIds, termsTypes }));
 }

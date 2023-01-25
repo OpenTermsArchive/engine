@@ -49,7 +49,7 @@ describe('Archivist', function () {
   let serviceBSnapshotExpectedContent;
   let serviceBVersionExpectedContent;
 
-  const serviceIds = [ 'service_A', 'service_B' ];
+  const servicesIds = [ 'service_A', 'service_B' ];
 
   before(async () => {
     gitVersion = new Git({
@@ -76,7 +76,7 @@ describe('Archivist', function () {
     });
 
     context('when everything works fine', () => {
-      before(async () => app.trackChanges(serviceIds));
+      before(async () => app.trackChanges({ servicesIds }));
 
       after(resetGitRepositories);
 
@@ -110,7 +110,7 @@ describe('Archivist', function () {
         // as there is no more HTTP request mocks for service A, it should throw an `ENOTFOUND` error which is considered as an expected error in our workflow
         nock.cleanAll();
         nock('https://www.serviceb.example').get('/privacy').reply(200, serviceBSnapshotExpectedContent, { 'Content-Type': 'application/pdf' });
-        await app.trackChanges(serviceIds);
+        await app.trackChanges({ servicesIds });
       });
 
       after(resetGitRepositories);
@@ -152,7 +152,7 @@ describe('Archivist', function () {
           app = new Archivist({ recorderConfig: config.get('recorder') });
 
           await app.initialize();
-          await app.trackChanges(serviceIds);
+          await app.trackChanges({ servicesIds });
 
           ({ id: originalSnapshotId } = await app.recorder.snapshotsRepository.findLatest(SERVICE_A_ID, SERVICE_A_TYPE));
           ({ id: firstVersionId } = await app.recorder.versionsRepository.findLatest(SERVICE_A_ID, SERVICE_A_TYPE));
@@ -161,7 +161,7 @@ describe('Archivist', function () {
 
           app.serviceDeclarations[SERVICE_A_ID].getDocumentDeclaration(SERVICE_A_TYPE).pages[0].contentSelectors = 'h1';
 
-          await app.refilterAndRecord([ 'service_A', 'service_B' ]);
+          await app.trackChanges({ servicesIds: [ 'service_A', 'service_B' ], refilterOnly: true });
 
           const [refilterVersionCommit] = await gitVersion.log({ file: SERVICE_A_EXPECTED_VERSION_FILE_PATH });
 
@@ -208,14 +208,14 @@ describe('Archivist', function () {
           app = new Archivist({ recorderConfig: config.get('recorder') });
 
           await app.initialize();
-          await app.trackChanges(serviceIds);
+          await app.trackChanges({ servicesIds });
 
           app.serviceDeclarations[SERVICE_A_ID].getDocumentDeclaration(SERVICE_A_TYPE).pages[0].contentSelectors = 'inexistant-selector';
           inaccessibleContentSpy = sinon.spy();
           versionNotChangedSpy = sinon.spy();
           app.on('inaccessibleContent', inaccessibleContentSpy);
           app.on('versionNotChanged', versionNotChangedSpy);
-          await app.refilterAndRecord(serviceIds);
+          await app.trackChanges({ servicesIds, refilterOnly: true });
         });
 
         after(resetGitRepositories);
@@ -451,7 +451,7 @@ describe('Archivist', function () {
         nock('https://www.servicea.example').get('/tos').reply(200, serviceASnapshotExpectedContent, { 'Content-Type': 'text/html' });
         nock('https://www.serviceb.example').get('/privacy').reply(200, serviceBSnapshotExpectedContent, { 'Content-Type': 'application/pdf' });
 
-        return app.trackChanges(serviceIds);
+        return app.trackChanges({ servicesIds });
       });
 
       after(() => {
@@ -494,14 +494,14 @@ describe('Archivist', function () {
           nock('https://www.servicea.example').get('/tos').reply(200, serviceASnapshotExpectedContent, { 'Content-Type': 'text/html' });
           nock('https://www.serviceb.example').get('/privacy').reply(200, serviceBSnapshotExpectedContent, { 'Content-Type': 'application/pdf' });
 
-          await app.trackChanges(serviceIds);
+          await app.trackChanges({ servicesIds });
 
           nock('https://www.servicea.example').get('/tos').reply(200, serviceASnapshotExpectedContent, { 'Content-Type': 'text/html' });
           nock('https://www.serviceb.example').get('/privacy').reply(200, serviceBSnapshotExpectedContent, { 'Content-Type': 'application/pdf' });
 
           resetSpiesHistory();
 
-          return app.trackChanges(serviceIds);
+          return app.trackChanges({ servicesIds });
         });
 
         after(() => {
@@ -543,13 +543,13 @@ describe('Archivist', function () {
           nock('https://www.servicea.example').get('/tos').reply(200, serviceASnapshotExpectedContent, { 'Content-Type': 'text/html' });
           nock('https://www.serviceb.example').get('/privacy').reply(200, serviceBSnapshotExpectedContent, { 'Content-Type': 'application/pdf' });
 
-          await app.trackChanges(serviceIds);
+          await app.trackChanges({ servicesIds });
 
           nock('https://www.servicea.example').get('/tos').reply(200, serviceBSnapshotExpectedContent, { 'Content-Type': 'text/html' });
           nock('https://www.serviceb.example').get('/privacy').reply(200, serviceBSnapshotExpectedContent, { 'Content-Type': 'application/pdf' });
 
           resetSpiesHistory();
-          await app.trackChanges(serviceIds);
+          await app.trackChanges({ servicesIds });
         });
 
         after(() => {
