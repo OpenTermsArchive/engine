@@ -299,15 +299,15 @@ await stopHeadlessBrowser();
 
 The `fetch` module options are defined as a [`node-config` submodule](https://github.com/node-config/node-config/wiki/Sub-Module-Configuration). The default `fetcher` configuration can be overridden by adding a `fetcher` object to the [local configuration file](#configuration-file).
 
-#### `filter`
+#### `extract`
 
-The `filter` module transforms HTML or PDF content into a Markdown string according to a [declaration](#declarations).
+The `extract` module transforms HTML or PDF content into a Markdown string according to a [declaration](#declarations).
 
 ```js
-import filter from '@opentermsarchive/engine/filter';
+import extract from '@opentermsarchive/engine/extract';
 ```
 
-The `filter` function documentation is available [as JSDoc](./src/archivist/filter/index.js).
+The `extract` function documentation is available [as JSDoc](./src/archivist/extract/index.js).
 
 #### `PageDeclaration`
 

@@ -16,7 +16,7 @@
   "exports": {
     ".": "./src/exports.js",
     "./fetch": "./src/archivist/fetcher/exports.js",
-    "./filter": "./src/archivist/filter/exports.js",
+    "./extract": "./src/archivist/extract/exports.js",
     "./page-declaration": "./src/archivist/services/pageDeclaration.js"
   },
   "bin": {
@@ -36,9 +36,9 @@
     "declarations:lint": "node bin/ota.js lint",
     "declarations:validate": "node bin/ota.js validate",
     "declarations:validate:schema": "npm run declarations:validate -- --schema-only",
+    "extract": "npm start -- --extract-only",
     "lint": "eslint src test scripts bin",
     "lint:fix": "npm run lint -- --fix",
-    "refilter": "npm start -- --refilter-only",
     "start": "node --max-http-header-size=32768 bin/ota.js track",
     "start:scheduler": "npm start -- --schedule",
     "test": "cross-env NODE_ENV=test mocha --recursive \"./src/**/*.test.js\" \"./scripts/**/*.test.js\" --exit",

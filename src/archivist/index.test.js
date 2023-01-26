@@ -135,97 +135,97 @@ describe('Archivist', function () {
         expect(resultingTerms).to.equal(serviceBVersionExpectedContent);
       });
     });
-  });
 
-  describe('#refilterAndRecord', () => {
-    context('when a service’s filter declaration changes', () => {
-      context('when everything works fine', () => {
-        let originalSnapshotId;
-        let firstVersionId;
-        let refilterVersionId;
-        let refilterVersionMessageBody;
-        let serviceBCommits;
+    context('with extraction step only', () => {
+      context('when a service’s filter declaration changes', () => {
+        context('when everything works fine', () => {
+          let originalSnapshotId;
+          let firstVersionId;
+          let reExtractedVersionId;
+          let reExtractedVersionMessageBody;
+          let serviceBCommits;
 
-        before(async () => {
-          nock('https://www.servicea.example').get('/tos').reply(200, serviceASnapshotExpectedContent, { 'Content-Type': 'text/html' });
-          nock('https://www.serviceb.example').get('/privacy').reply(200, serviceBSnapshotExpectedContent, { 'Content-Type': 'application/pdf' });
-          app = new Archivist({ recorderConfig: config.get('recorder') });
+          before(async () => {
+            nock('https://www.servicea.example').get('/tos').reply(200, serviceASnapshotExpectedContent, { 'Content-Type': 'text/html' });
+            nock('https://www.serviceb.example').get('/privacy').reply(200, serviceBSnapshotExpectedContent, { 'Content-Type': 'application/pdf' });
+            app = new Archivist({ recorderConfig: config.get('recorder') });
 
-          await app.initialize();
-          await app.trackChanges({ servicesIds });
+            await app.initialize();
+            await app.trackChanges({ servicesIds });
 
-          ({ id: originalSnapshotId } = await app.recorder.snapshotsRepository.findLatest(SERVICE_A_ID, SERVICE_A_TYPE));
-          ({ id: firstVersionId } = await app.recorder.versionsRepository.findLatest(SERVICE_A_ID, SERVICE_A_TYPE));
+            ({ id: originalSnapshotId } = await app.recorder.snapshotsRepository.findLatest(SERVICE_A_ID, SERVICE_A_TYPE));
+            ({ id: firstVersionId } = await app.recorder.versionsRepository.findLatest(SERVICE_A_ID, SERVICE_A_TYPE));
 
-          serviceBCommits = await gitVersion.log({ file: SERVICE_B_EXPECTED_VERSION_FILE_PATH });
+            serviceBCommits = await gitVersion.log({ file: SERVICE_B_EXPECTED_VERSION_FILE_PATH });
 
-          app.serviceDeclarations[SERVICE_A_ID].getDocumentDeclaration(SERVICE_A_TYPE).pages[0].contentSelectors = 'h1';
+            app.serviceDeclarations[SERVICE_A_ID].getDocumentDeclaration(SERVICE_A_TYPE).pages[0].contentSelectors = 'h1';
 
-          await app.trackChanges({ servicesIds: [ 'service_A', 'service_B' ], refilterOnly: true });
+            await app.trackChanges({ servicesIds: [ 'service_A', 'service_B' ], extractOnly: true });
 
-          const [refilterVersionCommit] = await gitVersion.log({ file: SERVICE_A_EXPECTED_VERSION_FILE_PATH });
+            const [reExtractedVersionCommit] = await gitVersion.log({ file: SERVICE_A_EXPECTED_VERSION_FILE_PATH });
 
-          refilterVersionId = refilterVersionCommit.hash;
-          refilterVersionMessageBody = refilterVersionCommit.body;
+            reExtractedVersionId = reExtractedVersionCommit.hash;
+            reExtractedVersionMessageBody = reExtractedVersionCommit.body;
+          });
+
+          after(resetGitRepositories);
+
+          it('update version of the changed service', async () => {
+            const serviceAContent = await fs.readFile(path.resolve(__dirname, SERVICE_A_EXPECTED_VERSION_FILE_PATH), { encoding: 'utf8' });
+
+            expect(serviceAContent).to.equal('Terms of service with UTF-8 \'çhãràčtęrs"\n========================================');
+          });
+
+          it('generates a new version id', async () => {
+            expect(reExtractedVersionId).to.not.equal(firstVersionId);
+          });
+
+          it('mentions the snapshot id in the changelog', async () => {
+            expect(reExtractedVersionMessageBody).to.include(originalSnapshotId);
+          });
+
+          it('does not change other services', async () => {
+            const serviceBVersion = await fs.readFile(path.resolve(__dirname, SERVICE_B_EXPECTED_VERSION_FILE_PATH), { encoding: 'utf8' });
+
+            expect(serviceBVersion).to.equal(serviceBVersionExpectedContent);
+          });
+
+          it('does not generate a new id for other services', async () => {
+            const serviceBCommitsAfterExtraction = await gitVersion.log({ file: SERVICE_B_EXPECTED_VERSION_FILE_PATH });
+
+            expect(serviceBCommitsAfterExtraction.map(commit => commit.hash)).to.deep.equal(serviceBCommits.map(commit => commit.hash));
+          });
         });
 
-        after(resetGitRepositories);
+        context('when there is an expected error', () => {
+          let inaccessibleContentSpy;
+          let versionNotChangedSpy;
 
-        it('refilters the changed service', async () => {
-          const serviceAContent = await fs.readFile(path.resolve(__dirname, SERVICE_A_EXPECTED_VERSION_FILE_PATH), { encoding: 'utf8' });
+          before(async () => {
+            nock('https://www.servicea.example').get('/tos').reply(200, serviceASnapshotExpectedContent, { 'Content-Type': 'text/html' });
+            nock('https://www.serviceb.example').get('/privacy').reply(200, serviceBSnapshotExpectedContent, { 'Content-Type': 'application/pdf' });
+            app = new Archivist({ recorderConfig: config.get('recorder') });
 
-          expect(serviceAContent).to.equal('Terms of service with UTF-8 \'çhãràčtęrs"\n========================================');
-        });
+            await app.initialize();
+            await app.trackChanges({ servicesIds });
 
-        it('generates a new version id', async () => {
-          expect(refilterVersionId).to.not.equal(firstVersionId);
-        });
+            app.serviceDeclarations[SERVICE_A_ID].getDocumentDeclaration(SERVICE_A_TYPE).pages[0].contentSelectors = 'inexistant-selector';
+            inaccessibleContentSpy = sinon.spy();
+            versionNotChangedSpy = sinon.spy();
+            app.on('inaccessibleContent', inaccessibleContentSpy);
+            app.on('versionNotChanged', versionNotChangedSpy);
+            await app.trackChanges({ servicesIds, extractOnly: true });
+          });
 
-        it('mentions the snapshot id in the changelog', async () => {
-          expect(refilterVersionMessageBody).to.include(originalSnapshotId);
-        });
+          after(resetGitRepositories);
 
-        it('does not change other services', async () => {
-          const serviceBVersion = await fs.readFile(path.resolve(__dirname, SERVICE_B_EXPECTED_VERSION_FILE_PATH), { encoding: 'utf8' });
+          it('emits an inaccessibleContent event when an error happens', async () => {
+            expect(inaccessibleContentSpy).to.have.been.called;
+          });
 
-          expect(serviceBVersion).to.equal(serviceBVersionExpectedContent);
-        });
-
-        it('does not generate a new id for other services', async () => {
-          const serviceBCommitsAfterRefiltering = await gitVersion.log({ file: SERVICE_B_EXPECTED_VERSION_FILE_PATH });
-
-          expect(serviceBCommitsAfterRefiltering.map(commit => commit.hash)).to.deep.equal(serviceBCommits.map(commit => commit.hash));
-        });
-      });
-
-      context('when there is an expected error', () => {
-        let inaccessibleContentSpy;
-        let versionNotChangedSpy;
-
-        before(async () => {
-          nock('https://www.servicea.example').get('/tos').reply(200, serviceASnapshotExpectedContent, { 'Content-Type': 'text/html' });
-          nock('https://www.serviceb.example').get('/privacy').reply(200, serviceBSnapshotExpectedContent, { 'Content-Type': 'application/pdf' });
-          app = new Archivist({ recorderConfig: config.get('recorder') });
-
-          await app.initialize();
-          await app.trackChanges({ servicesIds });
-
-          app.serviceDeclarations[SERVICE_A_ID].getDocumentDeclaration(SERVICE_A_TYPE).pages[0].contentSelectors = 'inexistant-selector';
-          inaccessibleContentSpy = sinon.spy();
-          versionNotChangedSpy = sinon.spy();
-          app.on('inaccessibleContent', inaccessibleContentSpy);
-          app.on('versionNotChanged', versionNotChangedSpy);
-          await app.trackChanges({ servicesIds, refilterOnly: true });
-        });
-
-        after(resetGitRepositories);
-
-        it('emits an inaccessibleContent event when an error happens during refiltering', async () => {
-          expect(inaccessibleContentSpy).to.have.been.called;
-        });
-
-        it('still refilters other services', async () => {
-          expect(versionNotChangedSpy).to.have.been.calledWith(SERVICE_B_ID, SERVICE_B_TYPE);
+          it('still apply extraction step to other services', async () => {
+            expect(versionNotChangedSpy).to.have.been.calledWith(SERVICE_B_ID, SERVICE_B_TYPE);
+          });
         });
       });
     });

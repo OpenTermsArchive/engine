@@ -21,26 +21,26 @@ const { CiceroMarkTransformer } = ciceroMark;
 const ciceroMarkTransformer = new CiceroMarkTransformer();
 
 /**
- * Filter document content and convert it to Markdown
+ * Extract document content and convert it to Markdown
  *
- * @param {Object} params - Filter parameters
- * @param {string|Buffer} params.content - Content to filter: a buffer containing PDF data in case mimetype associated is PDF or a DOM dump of an HTML page given as a string
+ * @param {Object} params - Extract parameters
+ * @param {string|Buffer} params.content - Content from which to extract: a buffer containing PDF data in case mimetype associated is PDF or a DOM dump of an HTML page given as a string
  * @param {string} params.mimeType - MIME type of the given content
  * @param {string} params.pageDeclaration - see {@link ./src/archivist/services/pageDeclaration.js}
- * @returns {Promise<string>} Promise which is fulfilled once the content is filtered and converted in Markdown. The promise will resolve into a string containing the filtered content in Markdown format
+ * @returns {Promise<string>} Promise which is fulfilled once the content is extracted and converted in Markdown. The promise will resolve into a string containing the extracted content in Markdown format
 */
-export default async function filter({ content, mimeType, pageDeclaration }) {
+export default async function extract({ content, mimeType, pageDeclaration }) {
   if (mimeType == 'application/pdf') {
-    return filterPDF({ content });
+    return extractFromPDF({ content });
   }
 
-  return filterHTML({
+  return extractFromHTML({
     content,
     pageDeclaration,
   });
 }
 
-export async function filterHTML({ content, pageDeclaration }) {
+export async function extractFromHTML({ content, pageDeclaration }) {
   const {
     location,
     contentSelectors = [],
@@ -101,7 +101,7 @@ export async function filterHTML({ content, pageDeclaration }) {
   return markdownContent;
 }
 
-export async function filterPDF({ content: pdfBuffer }) {
+export async function extractFromPDF({ content: pdfBuffer }) {
   try {
     const ciceroMarkdown = await PdfTransformer.toCiceroMark(pdfBuffer);
 

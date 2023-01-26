@@ -15,7 +15,7 @@ program
   .description('Retrieve declared documents, record snapshots, extract versions and publish the resulting records')
   .option('-s, --services [serviceId...]', 'service IDs of services to track')
   .option('-t, --terms-types [termsType...]', 'terms types to track')
-  .option('-r, --refilter-only', 'refilter existing snapshots with latest declarations and engine, without recording new snapshots')
+  .option('-e, --extract-only', 'extract versions from existing snapshots with latest declarations and engine, without recording new snapshots')
   .option('--schedule', 'schedule automatic document tracking');
 
 track(program.parse(process.argv).opts());
