@@ -6,7 +6,7 @@ import logger from './logger/index.js';
 import Notifier from './notifier/index.js';
 import Tracker from './tracker/index.js';
 
-export default async function track({ services = [], termsTypes, refilterOnly, schedule }) {
+export default async function track({ services = [], termsTypes, extractOnly, schedule }) {
   const archivist = new Archivist({ recorderConfig: config.get('recorder') });
 
   archivist.attach(logger);
@@ -29,11 +29,11 @@ export default async function track({ services = [], termsTypes, refilterOnly, s
     });
   }
 
-  // The result of the filtering step that generates the version from the snapshots may depend on changes to the engine or its dependencies.
-  // So, let's start by only performing the filtering process so that we can annotate any versions generated related to such changes and avoid sending notifications.
-  await archivist.trackChanges({ serviceIds, termsTypes, refilterOnly: true });
+  // The result of the extraction step that generates the version from the snapshots may depend on changes to the engine or its dependencies.
+  // So, let's start by only performing the extraction process so that we can annotate any versions generated related to such changes and avoid sending notifications.
+  await archivist.trackChanges({ serviceIds, termsTypes, extractOnly: true });
 
-  if (refilterOnly) {
+  if (extractOnly) {
     return;
   }
 

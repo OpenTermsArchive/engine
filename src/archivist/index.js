@@ -4,8 +4,8 @@ import async from 'async';
 import config from 'config';
 
 import { InaccessibleContentError } from './errors.js';
+import extract from './extract/index.js';
 import fetch, { launchHeadlessBrowser, stopHeadlessBrowser, FetchDocumentError } from './fetcher/index.js';
-import filter from './filter/index.js';
 import Recorder from './recorder/index.js';
 import * as services from './services/index.js';
 
@@ -14,7 +14,7 @@ import * as services from './services/index.js';
 // - too many requests on the same endpoint yield 403
 // - sometimes when creating a commit no SHA are returned for unknown reasons
 const MAX_PARALLEL_DOCUMENTS_TRACKS = 1;
-const MAX_PARALLEL_REFILTERS = 10;
+const MAX_PARALLEL_DOCUMENTS_TRACKS_WITH_EXTRACT_ONLY = 10;
 
 export const AVAILABLE_EVENTS = [
   'snapshotRecorded',
@@ -23,8 +23,6 @@ export const AVAILABLE_EVENTS = [
   'versionRecorded',
   'firstVersionRecorded',
   'versionNotChanged',
-  'refilteringStarted',
-  'refilteringCompleted',
   'trackingStarted',
   'trackingCompleted',
   'inaccessibleContent',
@@ -44,7 +42,7 @@ export default class Archivist extends events.EventEmitter {
     super();
     this.recorder = new Recorder(recorderConfig);
     this.fetch = params => fetch({ ...params, config: config.get('fetcher') });
-    this.filter = filter;
+    this.extract = extract;
   }
 
   async initialize() {
@@ -103,30 +101,26 @@ export default class Archivist extends events.EventEmitter {
     });
   }
 
-  async trackChanges({ servicesIds = this.serviceIds, termsTypes = [], refilterOnly }) {
-    this.emit(refilterOnly ? 'refilteringStarted' : 'trackingStarted', servicesIds.length, this.getNumberOfDocuments(servicesIds));
+  async trackChanges({ servicesIds = this.serviceIds, termsTypes = [], extractOnly }) {
+    this.emit('trackingStarted', servicesIds.length, this.getNumberOfDocuments(servicesIds), extractOnly);
 
     await Promise.all([ launchHeadlessBrowser(), this.recorder.initialize() ]);
 
-    this.trackDocumentChangesQueue.concurrency = refilterOnly ? MAX_PARALLEL_REFILTERS : MAX_PARALLEL_DOCUMENTS_TRACKS;
+    this.trackDocumentChangesQueue.concurrency = extractOnly ? MAX_PARALLEL_DOCUMENTS_TRACKS_WITH_EXTRACT_ONLY : MAX_PARALLEL_DOCUMENTS_TRACKS;
 
-    this.#forEachDocumentOf(servicesIds, termsTypes, documentDeclaration => this.trackDocumentChangesQueue.push({ documentDeclaration, refilterOnly }));
+    this.#forEachDocumentOf(servicesIds, termsTypes, documentDeclaration => this.trackDocumentChangesQueue.push({ documentDeclaration, extractOnly }));
 
     await this.trackDocumentChangesQueue.drain();
     await Promise.all([ stopHeadlessBrowser(), this.recorder.finalize() ]);
 
-    this.emit(refilterOnly ? 'refilteringCompleted' : 'trackingCompleted', servicesIds.length, this.getNumberOfDocuments(servicesIds));
+    this.emit('trackingCompleted', servicesIds.length, this.getNumberOfDocuments(servicesIds), extractOnly);
   }
 
-  async trackDocumentChanges({ documentDeclaration, refilterOnly }) {
-    if (!refilterOnly) {
+  async trackDocumentChanges({ documentDeclaration, extractOnly }) {
+    if (!extractOnly) {
       await Promise.all((await this.fetchDocumentPages(documentDeclaration)).map(params => this.recordSnapshot(params)));
     }
 
-    return this.generateDocumentVersion(documentDeclaration, { refilterOnly });
-  }
-
-  async generateDocumentVersion(documentDeclaration, { refilterOnly = false } = {}) {
     const { service: { id: serviceId }, termsType, pages } = documentDeclaration;
 
     const snapshots = await this.getDocumentSnapshots(documentDeclaration);
@@ -138,12 +132,12 @@ export default class Archivist extends events.EventEmitter {
     const [{ fetchDate }] = snapshots; // In case of multipage document, use the first snapshot fetch date
 
     return this.recordVersion({
-      content: await this.generateDocumentFilteredContent(snapshots, pages),
+      content: await this.extractVersionContent(snapshots, pages),
       snapshotIds: snapshots.map(({ id }) => id),
       serviceId,
       termsType,
       fetchDate,
-      isRefiltering: refilterOnly,
+      extractOnly,
     });
   }
 
@@ -190,12 +184,12 @@ export default class Archivist extends events.EventEmitter {
     return (await Promise.all(pages.map(async page => this.recorder.getLatestSnapshot(serviceId, termsType, isMultiPage && page.id)))).filter(Boolean);
   }
 
-  async generateDocumentFilteredContent(snapshots, pages) {
+  async extractVersionContent(snapshots, pages) {
     return (
       await Promise.all(snapshots.map(async ({ pageId, content, mimeType }) => {
         const pageDeclaration = pageId ? pages.find(({ id }) => pageId == id) : pages[0];
 
-        return this.filter({ content, mimeType, pageDeclaration });
+        return this.extract({ content, mimeType, pageDeclaration });
       }))
     ).join('\n\n');
   }
@@ -221,15 +215,14 @@ export default class Archivist extends events.EventEmitter {
     return snapshotId;
   }
 
-  async recordVersion({ content, fetchDate, snapshotIds, serviceId, termsType, isRefiltering }) {
-    const recordFunction = !isRefiltering ? 'recordVersion' : 'recordRefilter';
-
-    const { id: versionId, isFirstRecord } = await this.recorder[recordFunction]({
+  async recordVersion({ content, fetchDate, snapshotIds, serviceId, termsType, extractOnly }) {
+    const { id: versionId, isFirstRecord } = await this.recorder.recordVersion({
       serviceId,
       termsType,
       content,
       fetchDate,
       snapshotIds,
+      extractOnly,
     });
 
     if (!versionId) {

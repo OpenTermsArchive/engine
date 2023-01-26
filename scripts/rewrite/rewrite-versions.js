@@ -4,7 +4,7 @@ import { fileURLToPath } from 'url';
 import config from 'config';
 
 import { InaccessibleContentError } from '../../src/archivist/errors.js';
-import filter from '../../src/archivist/filter/index.js';
+import extract from '../../src/archivist/extract/index.js';
 import Recorder from '../../src/archivist/recorder/index.js';
 import Git from '../../src/archivist/recorder/repositories/git/git.js';
 import GitRepository from '../../src/archivist/recorder/repositories/git/index.js';
@@ -110,7 +110,7 @@ let recorder;
     }
 
     try {
-      const document = await filter({
+      const document = await extract({
         content,
         mimeType,
         documentDeclaration,
@@ -120,7 +120,7 @@ let recorder;
         serviceId,
         termsType,
         content: document,
-        mimeType: MARKDOWN_MIME_TYPE, // The result of the `filter` function is always in markdown format
+        mimeType: MARKDOWN_MIME_TYPE, // The result of the `extract` function is always in markdown format
         fetchDate: commit.date,
         snapshotId: commit.hash,
       });

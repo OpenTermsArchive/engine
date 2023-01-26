@@ -272,7 +272,7 @@ describe('Recorder', () => {
             expect(await record.content).to.equal(UPDATED_CONTENT);
           });
 
-          it('records in the document that it is not a refilter', async () => {
+          it('records in the document that it is not an extracted only version', async () => {
             expect(record.isRefilter).to.equal(false);
           });
 
@@ -312,149 +312,114 @@ describe('Recorder', () => {
             expect(id).to.not.be.ok;
           });
         });
-      });
 
-      describe('#recordRefilter', () => {
-        const CONTENT = '# ToS fixture data with UTF-8 çhãràčtęrs';
-        const SNAPSHOT_ID = '61af86dc5ff5caa74ae926ad';
+        context('when it is an extracted only version', () => {
+          const CONTENT = '# ToS fixture data with UTF-8 çhãràčtęrs';
+          const SNAPSHOT_ID = '61af86dc5ff5caa74ae926ad';
 
-        let id;
-        let isFirstRecord;
-        let record;
+          let id;
+          let isFirstRecord;
+          let record;
 
-        context('when a required param is missing', () => {
-          after(async () => recorder.versionsRepository.removeAll());
+          context('when it is the first record', () => {
+            before(async () => {
+              ({ id, isFirstRecord } = await recorder.recordVersion({
+                serviceId: SERVICE_ID,
+                termsType: TYPE,
+                content: CONTENT,
+                snapshotIds: [SNAPSHOT_ID],
+                fetchDate: FETCH_DATE,
+                extractOnly: true,
+              }));
 
-          const validParams = {
-            serviceId: SERVICE_ID,
-            termsType: TYPE,
-            content: CONTENT,
-            snapshotIds: [SNAPSHOT_ID],
-            fetchDate: FETCH_DATE,
-          };
+              record = await recorder.versionsRepository.findLatest(SERVICE_ID, TYPE);
+            });
 
-          const paramsNameToExpectedTextInError = {
-            serviceId: 'service ID',
-            termsType: 'terms type',
-            snapshotIds: 'snapshot ID',
-            fetchDate: 'fetch date',
-            content: 'content',
-          };
+            after(async () => recorder.versionsRepository.removeAll()); after(async () => recorder.versionsRepository.removeAll());
 
-          Object.entries(validParams).forEach(([testedRequiredParam]) => {
-            context(`when "${testedRequiredParam}" is missing`, () => {
-              it('throws an error', async () => {
-                try {
-                  const validParamsExceptTheOneTested = Object.fromEntries(Object.entries(validParams).filter(([paramName]) => paramName != testedRequiredParam));
+            it('records the document with the proper content', async () => {
+              expect(await record.content).to.equal(CONTENT);
+            });
 
-                  await recorder.recordRefilter(validParamsExceptTheOneTested);
-                } catch (e) {
-                  expect(e).to.be.an('error');
-                  expect(e.message).to.contain(paramsNameToExpectedTextInError[testedRequiredParam]);
+            it('returns the record id', async () => {
+              expect(record.id).to.include(id);
+            });
 
-                  return;
-                }
-                expect.fail('No error was thrown');
+            it('returns a boolean to know if it is the first record', async () => {
+              expect(isFirstRecord).to.be.true;
+            });
+          });
+
+          context('when it is not the first record', () => {
+            const UPDATED_CONTENT = '<html><h1>ToS fixture data with UTF-8 çhãràčtęrs</h1><h2>Updated!</h2></html>';
+
+            before(async () => {
+              await recorder.recordVersion({
+                serviceId: SERVICE_ID,
+                termsType: TYPE,
+                content: CONTENT,
+                snapshotIds: [SNAPSHOT_ID],
+                fetchDate: FETCH_DATE,
               });
-            });
-          });
-        });
 
-        context('when it is the first record', () => {
-          before(async () => {
-            ({ id, isFirstRecord } = await recorder.recordRefilter({
-              serviceId: SERVICE_ID,
-              termsType: TYPE,
-              content: CONTENT,
-              snapshotIds: [SNAPSHOT_ID],
-              fetchDate: FETCH_DATE,
-            }));
+              ({ id, isFirstRecord } = await recorder.recordVersion({
+                serviceId: SERVICE_ID,
+                termsType: TYPE,
+                content: UPDATED_CONTENT,
+                snapshotIds: [SNAPSHOT_ID],
+                fetchDate: FETCH_DATE_LATER,
+                extractOnly: true,
+              }));
 
-            record = await recorder.versionsRepository.findLatest(SERVICE_ID, TYPE);
-          });
-
-          after(async () => recorder.versionsRepository.removeAll()); after(async () => recorder.versionsRepository.removeAll());
-
-          it('records the document with the proper content', async () => {
-            expect(await record.content).to.equal(CONTENT);
-          });
-
-          it('returns the record id', async () => {
-            expect(record.id).to.include(id);
-          });
-
-          it('returns a boolean to know if it is the first record', async () => {
-            expect(isFirstRecord).to.be.true;
-          });
-        });
-
-        context('when it is not the first record', () => {
-          const UPDATED_CONTENT = '<html><h1>ToS fixture data with UTF-8 çhãràčtęrs</h1><h2>Updated!</h2></html>';
-
-          before(async () => {
-            await recorder.recordRefilter({
-              serviceId: SERVICE_ID,
-              termsType: TYPE,
-              content: CONTENT,
-              snapshotIds: [SNAPSHOT_ID],
-              fetchDate: FETCH_DATE,
+              record = await recorder.versionsRepository.findLatest(SERVICE_ID, TYPE);
             });
 
-            ({ id, isFirstRecord } = await recorder.recordRefilter({
-              serviceId: SERVICE_ID,
-              termsType: TYPE,
-              content: UPDATED_CONTENT,
-              snapshotIds: [SNAPSHOT_ID],
-              fetchDate: FETCH_DATE_LATER,
-            }));
+            after(async () => recorder.versionsRepository.removeAll());
 
-            record = await recorder.versionsRepository.findLatest(SERVICE_ID, TYPE);
-          });
-
-          after(async () => recorder.versionsRepository.removeAll());
-
-          it('records the document with the proper content', async () => {
-            expect(await record.content).to.equal(UPDATED_CONTENT);
-          });
-
-          it('records in the document that it is a refilter', async () => {
-            expect(record.isRefilter).to.equal(true);
-          });
-
-          it('returns the record id', async () => {
-            expect(record.id).to.include(id);
-          });
-
-          it('returns a boolean to know if it is the first record', async () => {
-            expect(isFirstRecord).to.be.false;
-          });
-        });
-
-        context('when the content has not changed', () => {
-          before(async () => {
-            await recorder.recordRefilter({
-              serviceId: SERVICE_ID,
-              termsType: TYPE,
-              content: CONTENT,
-              snapshotIds: [SNAPSHOT_ID],
-              fetchDate: FETCH_DATE,
+            it('records the document with the proper content', async () => {
+              expect(await record.content).to.equal(UPDATED_CONTENT);
             });
 
-            ({ id, isFirstRecord } = await recorder.recordRefilter({
-              serviceId: SERVICE_ID,
-              termsType: TYPE,
-              content: CONTENT,
-              snapshotIds: [SNAPSHOT_ID],
-              fetchDate: FETCH_DATE_LATER,
-            }));
+            it('records in the document that it is an extracted only version', async () => {
+              expect(record.isRefilter).to.equal(true);
+            });
 
-            record = await recorder.versionsRepository.findLatest(SERVICE_ID, TYPE);
+            it('returns the record id', async () => {
+              expect(record.id).to.include(id);
+            });
+
+            it('returns a boolean to know if it is the first record', async () => {
+              expect(isFirstRecord).to.be.false;
+            });
           });
 
-          after(async () => recorder.versionsRepository.removeAll());
+          context('when the content has not changed', () => {
+            before(async () => {
+              await recorder.recordVersion({
+                serviceId: SERVICE_ID,
+                termsType: TYPE,
+                content: CONTENT,
+                snapshotIds: [SNAPSHOT_ID],
+                fetchDate: FETCH_DATE,
+              });
 
-          it('does not record the document', async () => {
-            expect(id).to.not.be.ok;
+              ({ id, isFirstRecord } = await recorder.recordVersion({
+                serviceId: SERVICE_ID,
+                termsType: TYPE,
+                content: CONTENT,
+                snapshotIds: [SNAPSHOT_ID],
+                fetchDate: FETCH_DATE_LATER,
+                extractOnly: true,
+              }));
+
+              record = await recorder.versionsRepository.findLatest(SERVICE_ID, TYPE);
+            });
+
+            after(async () => recorder.versionsRepository.removeAll());
+
+            it('does not record the document', async () => {
+              expect(id).to.not.be.ok;
+            });
           });
         });
       });

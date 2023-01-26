@@ -6,8 +6,8 @@ import { expect } from 'chai';
 import config from 'config';
 import jsonSourceMap from 'json-source-map';
 
+import extract from '../../../src/archivist/extract/index.js';
 import fetch, { launchHeadlessBrowser, stopHeadlessBrowser } from '../../../src/archivist/fetcher/index.js';
-import filter from '../../../src/archivist/filter/index.js';
 import * as services from '../../../src/archivist/services/index.js';
 import DeclarationUtils from '../utils/index.js';
 
@@ -124,7 +124,7 @@ export default async options => {
                         this.skip();
                       }
 
-                      filteredContent = await filter({ content, pageDeclaration: page, mimeType });
+                      filteredContent = await extract({ content, pageDeclaration: page, mimeType });
 
                       expect(filteredContent).to.not.be.empty;
                     });
@@ -162,7 +162,7 @@ export default async options => {
                         cssSelectors: page.cssSelectors,
                         config: config.get('fetcher'),
                       });
-                      const secondFilteredContent = await filter({ content: document.content, pageDeclaration: page, mimeType: document.mimeType });
+                      const secondFilteredContent = await extract({ content: document.content, pageDeclaration: page, mimeType: document.mimeType });
 
                       expect(secondFilteredContent).to.equal(filteredContent);
                     });
