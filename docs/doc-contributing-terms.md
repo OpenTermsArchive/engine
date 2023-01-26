@@ -1,10 +1,10 @@
-# Contributing documents
+# Contributing terms
 
-## Tracking new documents
+## Tracking new terms
 
-Tracking documents is done by _declaring_ them and the service they are associated with. Such a declaration is achieved by editing JSON files in the [`declarations`](./declarations) folder.
+Tracking terms is done by _declaring_ them and the service they are associated with. Such a declaration is achieved by editing JSON files in the [`declarations`](./declarations) folder.
 
-Before adding a new document, open the [`declarations`](./declarations) folder and check if the service you want to track documents for is already declared. If a JSON file with the name of the service is already present, you can jump straight to [declaring documents](#declaring-documents). Otherwise, keep reading!
+Before adding a new terms, open the [`declarations`](./declarations) folder and check if the service you want to track terms for is already declared. If a JSON file with the name of the service is already present, you can jump straight to [declaring terms](#declaring-terms). Otherwise, keep reading!
 
 ### Declaring a new service
 
@@ -65,11 +65,11 @@ Once you have the [service name](#service-name) and the [service ID](#service-id
 }
 ```
 
-Within the `documents` JSON object, we will now declare documents.
+Within the `documents` JSON object, we will now declare terms.
 
-## Declaring documents
+## Declaring terms
 
-Documents are declared in a service declaration file, under the `documents` property. The way in which each document should be obtained is declared as a JSON object.
+Terms are declared in a service declaration file, under the `documents` property. The way in which each terms should be obtained is declared as a JSON object.
 
 ```json
   …
@@ -92,9 +92,9 @@ Let’s start by defining these keys!
 
 #### `fetch`
 
-This property should simply contain the URL at which the document you want to track can be downloaded. HTML and PDF files are supported.
+This property should simply contain the URL at which the terms you want to track can be downloaded. HTML and PDF files are supported.
 
-When documents coexist in different languages and jurisdictions, please refer to the [scope of the collection](../README.md#collections) to which you are contributing. This scope is usually defined in the README.
+When terms coexist in different languages and jurisdictions, please refer to the [scope of the collection](../README.md#collections) to which you are contributing. This scope is usually defined in the README.
 
 #### `select`
 
@@ -241,7 +241,7 @@ _This property is optional._
 
 Finally, some documents will need more complex filtering beyond simple element selection and removal, for example to remove noise (changes in textual content that are not meaningful to the terms of services). Such filters are declared as JavaScript functions that modify the downloaded web page through the [DOM API](https://developer.mozilla.org/en-US/docs/Web/API/Document_Object_Model).
 
-Filters take the document DOM and the document declaration as parameters and are:
+Filters take the document DOM and the terms declaration as parameters and are:
 
 - **in-place**: they modify the document structure and content directly;
 - **idempotent**: they should return the same document structure and content even if run repeatedly on their own result.
@@ -315,16 +315,16 @@ export async function convertImagesToBase64(document, documentDeclaration) {
 
 #### Terms type
 
-Great, your document declaration is now almost complete! We simply need to write it under the appropriate terms type in the `documents` JSON object within the service declaration. In order to distinguish between the many documents that can be associated with a service and enable cross-services comparison of similar terms, we maintain a unique list of terms types.
+Great, your terms declaration is now almost complete! We simply need to write it under the appropriate terms type in the `documents` JSON object within the service declaration. In order to distinguish between the many terms that can be associated with a service and enable cross-services comparison of similar terms, we maintain a unique list of terms types.
 You can find more information and the list of allowed values for the `<terms type>` key in the [dedicated repository](https://github.com/OpenTermsArchive/terms-types).
 
-The types might not always match the exact name given by the service provider. For example, some providers might call their document “Terms and Conditions” or “Terms of Use” instead of “Terms of Service”. The terms type does not have to match the exact name, it only has to match the _commitment_ that is taken.
+The types might not always match the exact name given by the service provider. For example, some providers might call their terms “Terms and Conditions” or “Terms of Use” instead of “Terms of Service”. The terms type does not have to match the exact name, it only has to match the _commitment_ that is taken.
 
 If the terms you want to add match no existing type, you can [suggest a new one](https://github.com/ambanum/OpenTermsArchive/discussions/categories/document-types).
 
 ##### Defining new terms types
 
-Before defining a new terms type, please note that wanting to multiply documents types is usually a symptom that the service needs to be broken down into several services. For example, rather than considering that Facebook has several specific variations of “Terms of Service”, it is more accurate to declare “Terms of Service” documents for the services “Facebook” (social network service for the general public), “Facebook Ads” (ads service for advertisers) and “Facebook Payments” (payment service for developers). On the other hand, the “Google Ads” service is a commercial suite acting as an umbrella for several pieces of software that all share the same contractual documents, and there is thus no need to separate each of them. See practical guidelines for [provider prefixing](declarations-guidelines.md#provider-prefixing).
+Before defining a new terms type, please note that wanting to multiply terms types is usually a symptom that the service needs to be broken down into several services. For example, rather than considering that Facebook has several specific variations of “Terms of Service”, it is more accurate to declare “Terms of Service” terms for the services “Facebook” (social network service for the general public), “Facebook Ads” (ads service for advertisers) and “Facebook Payments” (payment service for developers). On the other hand, the “Google Ads” service is a commercial suite acting as an umbrella for several pieces of software that all share the same contractual documents, and there is thus no need to separate each of them. See practical guidelines for [provider prefixing](declarations-guidelines.md#provider-prefixing).
 
 In order to guide usage and disambiguate synonyms, we characterise each terms type along three dimensions of the commitment that is being taken in it:
 
@@ -376,7 +376,7 @@ npm run lint [$service_id [$another_service_id …]]
 
 ## Maintaining declarations
 
-All parts of a **document** **declaration** (web location, selection, noise removal, single or multiple pages distribution…) can change over time. The process of updating these elements to enable continued **tracking** is called **maintenance**. Without it, **documents** can become:
+All parts of a **document** **declaration** (web location, selection, noise removal, single or multiple documents distribution…) can change over time. The process of updating these elements to enable continued **tracking** is called **maintenance**. Without it, **terms** can become:
 
 - **unreachable**: no **snapshot** can be **recorded** at all, because the **location** changed or the **service** denies access;
 - **unextractable**: no **version** can be **extracted** from the **snapshot**, because the selection of content or some **filter** fails;
@@ -386,19 +386,19 @@ Open Terms Archive needs to keep track of this changes in order to regenerate ve
 
 ### Service history
 
-To keep track of services declarations and filters changes, Open Terms Archive offers a versioning system. It is optional and should be added only when needed. It works by creating history files for documents declarations and filters, where each entry should be a previous valid declaration or filter function and should have an expiry date.
+To keep track of services declarations and filters changes, Open Terms Archive offers a versioning system. It is optional and should be added only when needed. It works by creating history files for terms declarations and filters, where each entry should be a previous valid declaration or filter function and should have an expiry date.
 
-Both for documents and filters history, the expiration date is declared in a property `validUntil`. It should be the authored date and time of the last snapshot commit for which the declaration is still valid.
+Both for terms and filters history, the expiration date is declared in a property `validUntil`. It should be the authored date and time of the last snapshot commit for which the declaration is still valid.
 
-Documents declarations history files and filters history files can both evolve on their own. Having one does not imply to create the other.
+Terms declarations history files and filters history files can both evolve on their own. Having one does not imply to create the other.
 
 The current (latest) valid declaration has no date and should not appear in the history object: it stays in its own file, just like if there was no history at all.
 
-#### Document declaration history
+#### Terms declaration history
 
 Declarations history are stored in a history JSON file with the following name `declarations/$service_id.history.json`.
 
-The document history contains an object with terms types as properties. Each terms type property is an array of history entries. Each entry has the same format as a normal document declaration, except there is the **mandatory** extra property `validUntil`.
+The terms history contains an object with terms types as properties. Each terms type property is an array of history entries. Each entry has the same format as a normal terms declaration, except there is the **mandatory** extra property `validUntil`.
 
 ```json
 {
