@@ -9,7 +9,8 @@ import Mocha from 'mocha';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-const VALIDATE_PATH = path.resolve(__dirname, '../scripts/declarations/validate/index.mocha.js');
+const VALIDATE_TEST_FILEPATH = '../scripts/declarations/validate/index.mocha.js';
+const VALIDATE_PATH = path.resolve(__dirname, VALIDATE_TEST_FILEPATH);
 
 // Mocha catches unhandled rejection from the user code and re-emits them to the process (see https://github.com/mochajs/mocha/blob/master/lib/runner.js#L198)
 process.on('unhandledRejection', reason => {
@@ -40,7 +41,7 @@ const mocha = new Mocha({
 
   let hasFailedTests = false;
 
-  const generateValidationTestSuite = (await import('../scripts/declarations/validate/index.mocha.js')).default;
+  const generateValidationTestSuite = (await import(VALIDATE_TEST_FILEPATH)).default;
 
   generateValidationTestSuite(program.parse().opts());
 
