@@ -226,12 +226,12 @@ Run [`ota validate`](#ota-validate) only on files that have been modified in Git
 #### `ota lint`
 
 ```sh
-npx ota lint [--services <service_id>...]
+npx ota lint [--services <service_id>...] [--fix] [--modified]
 ```
 
-Normalise the format of declarations.
+Test the the format of declarations' normalisation.
 
-Automatically correct formatting mistakes and ensure that all declarations are standardised.
+Use `--fix` to automatically correct formatting mistakes and ensure that all declarations are standardised.
 
 If one or several `<service_id>` are provided, check only those services.
 
