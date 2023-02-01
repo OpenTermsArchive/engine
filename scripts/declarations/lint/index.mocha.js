@@ -34,6 +34,8 @@ export default async options => {
     ({ services: servicesToValidate } = await declarationUtils.getModifiedServiceDocumentTypes());
   }
 
+  const lintFile = lintAndFixFile(options.fix);
+
   describe('Service declarations lint validation', async function () {
     this.timeout(30000);
 
@@ -52,24 +54,24 @@ export default async options => {
           }
         });
 
-        it('valid declaration file format', async () => {
+        it('valid declaration file lint', async () => {
           await lintFile(filePath);
         });
 
         if (service && service.hasHistory()) {
-          it('valid history declaration file format', async () => {
+          it('valid history declaration file lint', async () => {
             await lintFile(historyFilePath);
           });
         }
 
         if (fsApi.existsSync(filtersFilePath)) {
-          it('valid filters file format', async () => {
+          it('valid filters file lint', async () => {
             await lintFile(filtersFilePath);
           });
         }
 
         if (fsApi.existsSync(filtersHistoryFilePath)) {
-          it('valid filters history file format', async () => {
+          it('valid filters history file lint', async () => {
             await lintFile(filtersHistoryFilePath);
           });
         }
@@ -80,17 +82,24 @@ export default async options => {
   run();
 };
 
-async function lintFile(filePath) {
+const lintAndFixFile = fix => async filePath => {
+  // Create a new instance of linter with option `fix` set to true to get a fixed output.
+  // It is not possible to use only a linter with this option enabled because when
+  // this option is set, if it can fix errors, it considers that there are no errors and returns `0` for the `errorCount`.
+  // So use two linters to have access both to `errorCount` and fix `output` variables.
   const [lintResult] = await eslint.lintFiles(filePath);
 
   if (!lintResult.errorCount) {
     return;
   }
 
-  // Create a new instance of linter with option `fix` set to true to get a fixed output.
-  // It is not possible to use only a linter with this option enabled because when this option is set, if it can fix errors, it considers that there are no errors and returns `0` for the `errorCount`.
-  // So use two linters to have access both to `errorCount` and fix `output` variables.
   const [lintResultFixed] = await eslintWithFix.lintFiles(filePath);
 
+  if (fix) {
+    await ESLint.outputFixes([lintResultFixed]);
+
+    return lintAndFixFile(false)(filePath);
+  }
+
   expect(lintResult.source).to.equal(lintResultFixed.output, `${path.basename(filePath)} is not properly formatted. Use the lint script to format it correctly.\n`);
-}
+};

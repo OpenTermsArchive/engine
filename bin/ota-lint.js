@@ -22,7 +22,8 @@ program
   .name('ota lint')
   .description('Check format and stylistic errors in declarations and auto fix them')
   .option('-s, --services [serviceId...]', 'service IDs of services to lint')
-  .option('-m, --modified', 'to only lint modified services already commited to git');
+  .option('-m, --modified', 'to only lint modified services already commited to git')
+  .option('-f, --fix', 'to fix the declarations');
 
 const mocha = new Mocha({
   delay: true, // as the validation script performs an asynchronous load before running the tests, the execution of the tests are delayed until run() is called
