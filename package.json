@@ -15,6 +15,7 @@
   "type": "module",
   "exports": {
     ".": "./src/exports.js",
+    "./track": "./src/index.js",
     "./fetch": "./src/archivist/fetcher/exports.js",
     "./filter": "./src/archivist/filter/exports.js",
     "./services": "./src/archivist/services/exports.js",
