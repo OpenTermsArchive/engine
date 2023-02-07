@@ -46,9 +46,9 @@ export default async function track({ services = [], termsTypes: documentTypes, 
     archivist.attach(tracker);
   }
 
-  await archivist.trackChanges(serviceIds, documentTypes);
-
   if (!schedule) {
+    await archivist.trackChanges(serviceIds, documentTypes);
+
     return;
   }
 
