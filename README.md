@@ -261,6 +261,8 @@ To export, publish the dataset and remove the local copy that was created after 
 GITHUB_TOKEN=ghp_XXXXXXXXX npx ota dataset --publish --remove-local-copy
 ```
 
+##### Publish dataset on monday every week
+
 To schedule export, publishing and local copy removal:
 
 ```sh
