@@ -215,6 +215,14 @@ Allows for a much faster check of declarations, but does not check that the docu
 
 If one or several `<service_id>` are provided, check only those services.
 
+##### Validate modified terms only
+
+```sh
+npx ota validate --modified
+```
+
+Run [`ota validate`](#ota-validate) only on files that have been modified in Git.
+
 #### `ota lint`
 
 ```sh
