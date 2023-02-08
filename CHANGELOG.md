@@ -4,7 +4,10 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html) and the format is based on [Common Changelog](https://common-changelog.org).\
 Unlike Common Changelog, the `unreleased` section of [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) is preserved with the addition of a tag to specify which type of release should be published and to foster discussions about it inside pull requests. This tag should be one of the names mandated by SemVer, within brackets: `[patch]`, `[minor]` or `[major]`. For example: `## Unreleased [minor]`.
 
-## Unreleased
+## Unreleased [patch]
+
+### Changed
+- Improved documentation for CLI commands
 
 ## 0.25.0 - 2023-02-08
 ### Changed
