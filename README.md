@@ -215,6 +215,14 @@ Allows for a much faster check of declarations, but does not check that the docu
 
 If one or several `<service_id>` are provided, check only those services.
 
+##### Validate modified terms only
+
+```sh
+npx ota validate --modified
+```
+
+Run [`ota validate`](#ota-validate) only on files that have been modified in Git.
+
 #### `ota lint`
 
 ```sh
@@ -252,6 +260,8 @@ To export, publish the dataset and remove the local copy that was created after 
 ```sh
 GITHUB_TOKEN=ghp_XXXXXXXXX npx ota dataset --publish --remove-local-copy
 ```
+
+##### Publish dataset on monday every week
 
 To schedule export, publishing and local copy removal:
 
