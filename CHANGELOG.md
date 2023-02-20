@@ -7,7 +7,7 @@ Unlike Common Changelog, the `unreleased` section of [Keep a Changelog](https://
 ## Unreleased [patch]
 
 ### Changed
-- Improved documentation for CLI commands
+- Improve documentation for CLI commands
 
 ## 0.25.0 - 2023-02-08
 ### Changed
