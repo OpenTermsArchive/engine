@@ -2,7 +2,9 @@
 
 All changes that impact users of this module are documented in this file, in the [Common Changelog](https://common-changelog.org) format with some additional specifications defined in the CONTRIBUTING file. This codebase adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased [patch]
+## Unreleased
+
+## 0.25.2 - 2023-02-20
 
 _Full changeset and discussions: [#981](https://github.com/ambanum/OpenTermsArchive/pull/981)._
 
@@ -15,45 +17,65 @@ _Full changeset and discussions: [#981](https://github.com/ambanum/OpenTermsArch
 - Specification of changelog format is now in CONTRIBUTING
 
 ## 0.25.1 - 2023-02-20
+
 ### Changed
+
 - Improve documentation for CLI commands
 
 ## 0.25.0 - 2023-02-08
+
 ### Changed
+
 - **Breaking:** Replace behaviour of `ota track --schedule`. It now tracks the changes only on scheduled hours. It was before running also on launch.
 
 ## 0.24.0 - 2023-01-25
+
 ### Added
+
 - Trigger a release event on CI to deploy documentation website
 
 ## 0.23.0 - 2023-01-18
+
 ### Removed
+
 - **Breaking:** Remove obsolete ansible deployment recipes as it was extracted in a [dedicated repository](https://github.com/OpenTermsArchive/deployment). Look at the [README](https://github.com/OpenTermsArchive/deployment#readme) to know how to deploy the engine.
 
 ## 0.22.0 - 2023-01-17
+
 ### Changed
+
 - Replace embedded terms types list with the one defined in the dedicated repository `@opentermsarchive/terms-types`.
 
 ## 0.21.0 - 2023-01-16
+
 ### Added
+
 - Add dataset command to CLI; this command can be discovered in the documentation and by running `ota dataset help`
 
 ## 0.20.0 - 2022-12-13
+
 Full changeset and discussions: [#959](https://github.com/ambanum/OpenTermsArchive/pull/959)._
 
 ### Changed
+
 - Improved reliability and expanded coverage of email protection global filter
 
 ## 0.19.1 - 2022-12-13
+
 ### Fixed
+
 - Add missing configuration for production
 
 ## 0.19.0 - 2022-12-13
+
 ### Changed
+
 - **Breaking:** Unify all CLI commands as subcommands of one single `ota` command and rename some options; the new CLI can be discovered in the documentation and by running `ota help` ([#978](https://github.com/ambanum/OpenTermsArchive/pull/978))
 
 ## 0.18.2 - 2022-12-12
+
 ### Fixed
+
 - Ensure paths for given Git storage configuration are relative to current working directory instead of engine module folder
 
 ## 0.18.1 - 2022-12-12
