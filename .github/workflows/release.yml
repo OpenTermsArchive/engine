@@ -37,6 +37,7 @@ jobs:
         with:
           version: ${{ env.NEW_VERSION }}
           operation: release
+          format: markdownlint
 
       - name: Commit CHANGELOG.md and package.json changes and create tag
         run: |
@@ -70,15 +71,15 @@ jobs:
           body: ${{ steps.get-changelog.outputs.changelog }}
           token: ${{ secrets.RELEASE_BOT_GITHUB_TOKEN }}
 
-      - name: Publish to NPM public repository
-        uses: JS-DevTools/npm-publish@v1
-        with:
-          token: ${{ secrets.NPMJS_ACCESS_TOKEN }}
+      # - name: Publish to NPM public repository
+      #   uses: JS-DevTools/npm-publish@v1
+      #   with:
+      #     token: ${{ secrets.NPMJS_ACCESS_TOKEN }}
 
-      - name: Trigger documentation deploy
-        uses: peter-evans/repository-dispatch@v2
-        with:
-          token: ${{ secrets.TRIGGER_DOCS_DEPLOY_TOKEN }}
-          event-type: engine-release
-          repository: OpenTermsArchive/docs
-          client-payload: '{"version": "${{ env.NEW_VERSION }}"}'
+      # - name: Trigger documentation deploy
+      #   uses: peter-evans/repository-dispatch@v2
+      #   with:
+      #     token: ${{ secrets.TRIGGER_DOCS_DEPLOY_TOKEN }}
+      #     event-type: engine-release
+      #     repository: OpenTermsArchive/docs
+      #     client-payload: '{"version": "${{ env.NEW_VERSION }}"}'
