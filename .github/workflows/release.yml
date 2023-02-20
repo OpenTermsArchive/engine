@@ -14,7 +14,7 @@ jobs:
     uses: "ambanum/OpenTermsArchive/.github/workflows/test.yml@main"
   release:
     if: github.event.pull_request.merged == true
-    needs: [ changelog, test ]
+    needs: [ changelog ]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
