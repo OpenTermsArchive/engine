@@ -17,11 +17,11 @@ export default class Recorder {
     return Promise.all([ this.versionsRepository.finalize(), this.snapshotsRepository.finalize() ]);
   }
 
-  async getLatestSnapshot(serviceId, termsType, pageId) {
-    return this.snapshotsRepository.findLatest(serviceId, termsType, pageId);
+  async getLatestSnapshot(serviceId, termsType, documentId) {
+    return this.snapshotsRepository.findLatest(serviceId, termsType, documentId);
   }
 
-  async recordSnapshot({ serviceId, termsType, pageId, fetchDate, mimeType, content }) {
+  async recordSnapshot({ serviceId, termsType, documentId, fetchDate, mimeType, content }) {
     if (!serviceId) {
       throw new Error('A service ID is required');
     }
@@ -42,7 +42,7 @@ export default class Recorder {
       throw new Error('A document mime type is required to ensure data consistency');
     }
 
-    return this.snapshotsRepository.save(new Record({ serviceId, termsType, pageId, fetchDate, mimeType, content }));
+    return this.snapshotsRepository.save(new Record({ serviceId, termsType, documentId, fetchDate, mimeType, content }));
   }
 
   async recordVersion({ serviceId, termsType, snapshotIds, fetchDate, content, extractOnly }) {

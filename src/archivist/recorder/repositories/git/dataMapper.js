@@ -12,22 +12,22 @@ export const COMMIT_MESSAGE_PREFIX = {
   update: 'Update',
 };
 
-export const TERMS_TYPE_AND_PAGE_ID_SEPARATOR = ' #';
+export const TERMS_TYPE_AND_DOCUMENT_ID_SEPARATOR = ' #';
 export const SNAPSHOT_ID_MARKER = '%SNAPSHOT_ID';
 const SINGLE_SNAPSHOT_PREFIX = 'This version was recorded after filtering snapshot';
-const MULTIPLE_SNAPSHOT_PREFIX = 'This version was recorded after filtering and assembling the following snapshots from %NUMBER pages:';
+const MULTIPLE_SNAPSHOT_PREFIX = 'This version was recorded after filtering and assembling the following snapshots from %NUMBER documents:';
 
 export const COMMIT_MESSAGE_PREFIXES_REGEXP = new RegExp(`^(${COMMIT_MESSAGE_PREFIX.startTracking}|${COMMIT_MESSAGE_PREFIX.refilter}|${COMMIT_MESSAGE_PREFIX.update})`);
 
 export function toPersistence(record, snapshotIdentiferTemplate) {
-  const { serviceId, termsType, pageId, isRefilter, snapshotIds = [], mimeType, isFirstRecord } = record;
+  const { serviceId, termsType, documentId, isRefilter, snapshotIds = [], mimeType, isFirstRecord } = record;
 
   let prefix = isRefilter ? COMMIT_MESSAGE_PREFIX.refilter : COMMIT_MESSAGE_PREFIX.update;
 
   prefix = isFirstRecord ? COMMIT_MESSAGE_PREFIX.startTracking : prefix;
 
   const subject = `${prefix} ${serviceId} ${termsType}`;
-  const pageIdMessage = `${pageId ? `Page ID ${pageId}\n\n` : ''}`;
+  const pageIdMessage = `${documentId ? `Document ID ${documentId}\n\n` : ''}`;
   let snapshotIdsMessage;
 
   if (snapshotIds.length == 1) {
@@ -36,7 +36,7 @@ export function toPersistence(record, snapshotIdentiferTemplate) {
     snapshotIdsMessage = `${MULTIPLE_SNAPSHOT_PREFIX.replace('%NUMBER', snapshotIds.length)}\n${snapshotIds.map(snapshotId => `- ${snapshotIdentiferTemplate.replace(SNAPSHOT_ID_MARKER, snapshotId)}`).join('\n')}`;
   }
 
-  const filePath = generateFilePath(serviceId, termsType, pageId, mimeType);
+  const filePath = generateFilePath(serviceId, termsType, documentId, mimeType);
 
   return {
     message: `${subject}\n\n${pageIdMessage || ''}\n\n${snapshotIdsMessage || ''}`,
@@ -57,13 +57,13 @@ export function toDomain(commit) {
   const [relativeFilePath] = modifiedFilesInCommit;
   const snapshotIdsMatch = body.match(/\b[0-9a-f]{5,40}\b/g);
 
-  const [ termsType, pageId ] = path.basename(relativeFilePath, path.extname(relativeFilePath)).split(TERMS_TYPE_AND_PAGE_ID_SEPARATOR);
+  const [ termsType, documentId ] = path.basename(relativeFilePath, path.extname(relativeFilePath)).split(TERMS_TYPE_AND_DOCUMENT_ID_SEPARATOR);
 
   return new Record({
     id: hash,
     serviceId: path.dirname(relativeFilePath),
     termsType,
-    pageId,
+    documentId,
     mimeType: mime.getType(relativeFilePath),
     fetchDate: new Date(date),
     isFirstRecord: message.startsWith(COMMIT_MESSAGE_PREFIX.startTracking),
@@ -72,12 +72,12 @@ export function toDomain(commit) {
   });
 }
 
-function generateFileName(termsType, pageId, extension) {
-  return `${termsType}${pageId ? `${TERMS_TYPE_AND_PAGE_ID_SEPARATOR}${pageId}` : ''}.${extension}`;
+function generateFileName(termsType, documentId, extension) {
+  return `${termsType}${documentId ? `${TERMS_TYPE_AND_DOCUMENT_ID_SEPARATOR}${documentId}` : ''}.${extension}`;
 }
 
-export function generateFilePath(serviceId, termsType, pageId, mimeType) {
+export function generateFilePath(serviceId, termsType, documentId, mimeType) {
   const extension = mime.getExtension(mimeType) || '*'; // If mime type is undefined, an asterisk is set as an extension. Used to match all files for the given service ID, terms type and page ID when mime type is unknown.
 
-  return `${serviceId}/${generateFileName(termsType, pageId, extension)}`; // Do not use `path.join` as even for Windows, the path should be with `/` and not `\`. See https://github.com/ambanum/OpenTermsArchive/runs/8110230474?check_suite_focus=true#step:7:125
+  return `${serviceId}/${generateFileName(termsType, documentId, extension)}`; // Do not use `path.join` as even for Windows, the path should be with `/` and not `\`. See https://github.com/ambanum/OpenTermsArchive/runs/8110230474?check_suite_focus=true#step:7:125
 }

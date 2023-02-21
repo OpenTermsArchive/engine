@@ -4,7 +4,7 @@ import definitions from './definitions.js';
 
 const AVAILABLE_TYPES_NAME = Object.keys(TERMS_TYPES);
 
-const documentsProperties = () => {
+const termsProperties = () => {
   const result = {};
 
   AVAILABLE_TYPES_NAME.forEach(type => {
@@ -27,7 +27,7 @@ const schema = {
   type: 'object',
   additionalProperties: false,
   title: 'Service declaration history',
-  properties: documentsProperties(),
+  properties: termsProperties(),
   propertyNames: { enum: AVAILABLE_TYPES_NAME },
   definitions: {
     ...definitions,

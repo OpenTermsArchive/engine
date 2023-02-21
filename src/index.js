@@ -55,7 +55,7 @@ export default async function track({ services = [], termsTypes, extractOnly, sc
   }
 
   logger.info('The scheduler is running…');
-  logger.info('Documents will be tracked every six hours starting at half past midnight');
+  logger.info('Terms will be tracked every six hours starting at half past midnight');
 
   cron('30 */6 * * *', () => archivist.trackChanges({ serviceIds, termsTypes }));
 }

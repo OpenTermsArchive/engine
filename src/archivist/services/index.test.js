@@ -22,29 +22,29 @@ describe('Services', () => {
           let actualNoiseSelectors;
           let actualExecuteClientScripts;
 
-          const expectedDocumentDeclaration = expected.getDocumentDeclaration(termsType);
+          const expectedDocumentDeclaration = expected.getTerms(termsType);
 
-          const { pages } = expectedDocumentDeclaration;
+          const { documents } = expectedDocumentDeclaration;
 
-          pages.forEach((page, index) => {
+          documents.forEach((document, index) => {
             const {
               filters: expectedFilters,
               contentSelectors: expectedContentSelectors,
               noiseSelectors: expectedNoiseSelectors,
               executeClientScripts: expectedExecuteClientScripts,
-            } = page;
+            } = document;
 
-            context(`Page: ${page.id}`, () => {
+            context(`Document: ${document.id}`, () => {
               before(() => {
-                actualDocumentDeclaration = result[serviceId].getDocumentDeclaration(termsType);
-                const { pages: actualPages } = actualDocumentDeclaration;
+                actualDocumentDeclaration = result[serviceId].getTerms(termsType);
+                const { documents: actualDocuments } = actualDocumentDeclaration;
 
                 ({
                   filters: actualFilters,
                   contentSelectors: actualContentSelectors,
                   noiseSelectors: actualNoiseSelectors,
                   executeClientScripts: actualExecuteClientScripts,
-                } = actualPages[index]);
+                } = actualDocuments[index]);
               });
 
               it('has the proper service name', () => {
@@ -129,9 +129,9 @@ describe('Services', () => {
       });
     });
 
-    context('when a service has a multipage document', async () => {
-      describe('Service with a multipage document', async () => {
-        await validateServiceWithoutHistory('service_with_multipage_document', expectedServices.service_with_multipage_document);
+    context('when a service has a multi documents terms', async () => {
+      describe('Service with a multi documents terms', async () => {
+        await validateServiceWithoutHistory('service_with_multi_documents_terms', expectedServices.service_with_multi_documents_terms);
       });
     });
 
@@ -158,12 +158,12 @@ describe('Services', () => {
 
           let actualDocumentDeclaration;
           let actualFilters;
-          const expectedDocumentDeclaration = expected.getDocumentDeclaration(termsType);
+          const expectedDocumentDeclaration = expected.getTerms(termsType);
 
-          const { pages } = expectedDocumentDeclaration;
+          const { documents } = expectedDocumentDeclaration;
 
           before(() => {
-            actualDocumentDeclaration = result[serviceId].getDocumentDeclaration(termsType);
+            actualDocumentDeclaration = result[serviceId].getTerms(termsType);
           });
 
           it('has the proper service name', () => {
@@ -174,14 +174,14 @@ describe('Services', () => {
             expect(actualDocumentDeclaration.termsType).to.eql(expectedDocumentDeclaration.termsType);
           });
 
-          pages.forEach((page, index) => {
-            const { filters: expectedFilters } = page;
+          documents.forEach((document, index) => {
+            const { filters: expectedFilters } = document;
 
-            context(`${page.id} page`, () => {
+            context(`${document.id} document`, () => {
               before(() => {
-                const { pages: actualPages } = actualDocumentDeclaration;
+                const { documents: actualDocuments } = actualDocumentDeclaration;
 
-                ({ filters: actualFilters } = actualPages[index]);
+                ({ filters: actualFilters } = actualDocuments[index]);
               });
 
               if (expectedHistoryDates) {
@@ -192,23 +192,23 @@ describe('Services', () => {
                     let noiseSelectorsForThisDate;
                     let actualExecuteClientScriptsForThisDate;
 
-                    const { pages: pagesForThisDate } = expected.getDocumentDeclaration(termsType, date);
+                    const { documents: documentsForThisDate } = expected.getTerms(termsType, date);
                     const {
                       filters: expectedFiltersForThisDate,
                       contentSelectors: expectedContentSelectors,
                       noiseSelectors: expectedNoiseSelectors,
                       expectedExecuteClientScripts: expectedExecuteClientScriptsForThisDate,
-                    } = pagesForThisDate[index];
+                    } = documentsForThisDate[index];
 
                     before(() => {
-                      const { pages: actualPagesForThisDate } = result[serviceId].getDocumentDeclaration(termsType, date);
+                      const { documents: actualDocumentsForThisDate } = result[serviceId].getTerms(termsType, date);
 
                       ({
                         filters: actualFiltersForThisDate,
                         contentSelectors: contentSelectorsForThisDate,
                         noiseSelectors: noiseSelectorsForThisDate,
                         expectedExecuteClientScripts: actualExecuteClientScriptsForThisDate,
-                      } = actualPagesForThisDate[index]);
+                      } = actualDocumentsForThisDate[index]);
                     });
 
                     it('has the proper content selectors', async () => {
@@ -308,9 +308,9 @@ describe('Services', () => {
       });
     });
 
-    context('when a service has a multipage document', async () => {
-      describe('Service with a multipage document', async () => {
-        await validateServiceWithHistory('service_with_multipage_document', expectedServices.service_with_multipage_document);
+    context('when a service has a multi documents terms', async () => {
+      describe('Service with a multi documents terms', async () => {
+        await validateServiceWithHistory('service_with_multi_documents_terms', expectedServices.service_with_multi_documents_terms);
       });
     });
 

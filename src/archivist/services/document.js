@@ -1,4 +1,4 @@
-export default class PageDeclaration {
+export default class Document {
   constructor({ location, executeClientScripts, contentSelectors, noiseSelectors, filters }) {
     this.location = location;
     this.executeClientScripts = executeClientScripts;
@@ -12,8 +12,8 @@ export default class PageDeclaration {
     const { contentSelectors, noiseSelectors } = this;
 
     const result = [
-      ...PageDeclaration.extractCssSelectorsFromProperty(contentSelectors),
-      ...PageDeclaration.extractCssSelectorsFromProperty(noiseSelectors),
+      ...Document.extractCssSelectorsFromProperty(contentSelectors),
+      ...Document.extractCssSelectorsFromProperty(noiseSelectors),
     ];
 
     return result.filter(selector => selector);
@@ -23,10 +23,10 @@ export default class PageDeclaration {
     if (Array.isArray(property)) {
       return []
         .concat(property)
-        .flatMap(selector => PageDeclaration.extractCssSelectorsFromSelector(selector));
+        .flatMap(selector => Document.extractCssSelectorsFromSelector(selector));
     }
 
-    return PageDeclaration.extractCssSelectorsFromSelector(property);
+    return Document.extractCssSelectorsFromSelector(property);
   }
 
   static extractCssSelectorsFromSelector(selector) {

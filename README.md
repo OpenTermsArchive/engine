@@ -309,15 +309,15 @@ import extract from '@opentermsarchive/engine/extract';
 
 The `extract` function documentation is available [as JSDoc](./src/archivist/extract/index.js).
 
-#### `PageDeclaration`
+#### `Document`
 
-The `PageDeclaration` class encapsulates information about a page tracked by Open Terms Archive.
+The `Document` class encapsulates information about a terms' document tracked by Open Terms Archive.
 
 ```js
-import pageDeclaration from '@opentermsarchive/engine/page-declaration';
+import Document from '@opentermsarchive/engine/document';
 ```
 
-The `PageDeclaration` format is defined [in source code](./src/archivist/services/pageDeclaration.js).
+The `Document` format is defined [in source code](./src/archivist/services/document.js).
 
 ## Configuring
 

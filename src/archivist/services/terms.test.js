@@ -1,15 +1,15 @@
 import chai from 'chai';
 
-import DocumentDeclaration from './documentDeclaration.js';
-import PageDeclaration from './pageDeclaration.js';
+import Document from './document.js';
+import Terms from './terms.js';
 
 const { expect } = chai;
 
-describe('DocumentDeclaration', () => {
+describe('Terms', () => {
   const service = { name: 'Service' };
   const termsType = 'Terms of Service';
   const URL = 'https://www.service.example/terms';
-  const page1 = new PageDeclaration({
+  const document1 = new Document({
     location: URL,
     contentSelectors: [
       {
@@ -26,7 +26,7 @@ describe('DocumentDeclaration', () => {
       'body',
     ],
   });
-  const page1AsJSON = {
+  const document1AsJSON = {
     fetch: URL,
     select: [
       {
@@ -46,12 +46,12 @@ describe('DocumentDeclaration', () => {
     executeClientScripts: undefined,
   };
 
-  const page2 = new PageDeclaration({
+  const document2 = new Document({
     location: URL,
     contentSelectors: 'body',
   });
 
-  const page2AsJSON = {
+  const document2AsJSON = {
     fetch: URL,
     select: 'body',
     remove: undefined,
@@ -60,23 +60,23 @@ describe('DocumentDeclaration', () => {
   };
 
   describe('#toPersistence', () => {
-    it('converts one page document to JSON representation', async () => {
-      const result = new DocumentDeclaration({ service, termsType, pages: [page1] }).toPersistence();
+    it('converts document with only one terms to JSON representation', async () => {
+      const result = new Terms({ service, termsType, documents: [document1] }).toPersistence();
 
       const expectedResult = {
         name: service.name,
-        documents: { [termsType]: page1AsJSON },
+        documents: { [termsType]: document1AsJSON },
       };
 
       expect(result).to.deep.equal(expectedResult);
     });
 
-    it('converts multipage document to JSON representation', async () => {
-      const result = new DocumentDeclaration({ service, termsType, pages: [ page1, page2 ] }).toPersistence();
+    it('converts document with multiple documents to JSON representation', async () => {
+      const result = new Terms({ service, termsType, documents: [ document1, document2 ] }).toPersistence();
 
       const expectedResult = {
         name: service.name,
-        documents: { [termsType]: { combine: [ page1AsJSON, page2AsJSON ] } },
+        documents: { [termsType]: { combine: [ document1AsJSON, document2AsJSON ] } },
       };
 
       expect(result).to.deep.equal(expectedResult);

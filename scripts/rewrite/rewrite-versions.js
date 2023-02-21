@@ -95,25 +95,25 @@ let recorder;
       continue;
     }
 
-    const documentDeclaration = servicesDeclarations[serviceId].getDocumentDeclaration(
+    const terms = servicesDeclarations[serviceId].getTerms(
       termsType,
       commit.date,
     );
 
-    if (!documentDeclaration) {
+    if (!terms) {
       console.log(`⌙ Skip unknown terms type "${termsType}" for service "${serviceId}"`);
       continue;
     }
 
-    if (documentDeclaration.validUntil) {
-      console.log(`⌙ Use declaration valid until ${documentDeclaration.validUntil}`);
+    if (terms.validUntil) {
+      console.log(`⌙ Use declaration valid until ${terms.validUntil}`);
     }
 
     try {
       const document = await extract({
         content,
         mimeType,
-        documentDeclaration,
+        terms,
       });
 
       const { id: versionId } = await recorder.recordVersion({

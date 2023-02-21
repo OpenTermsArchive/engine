@@ -1,17 +1,17 @@
 import chai from 'chai';
 
-import PageDeclaration from './pageDeclaration.js';
+import Document from './document.js';
 
 const { expect } = chai;
 
-describe('PageDeclaration', () => {
+describe('Document', () => {
   const URL = 'https://www.service.example/terms';
 
   describe('#getCssSelectors', () => {
     context('with "select" property', () => {
       context('with string selector', () => {
         it('extracts selectors', async () => {
-          const result = new PageDeclaration({ location: URL, contentSelectors: 'body' }).cssSelectors;
+          const result = new Document({ location: URL, contentSelectors: 'body' }).cssSelectors;
 
           expect(result).to.deep.equal(['body']);
         });
@@ -19,7 +19,7 @@ describe('PageDeclaration', () => {
 
       context('with range selector', () => {
         it('extracts selectors', async () => {
-          const result = new PageDeclaration({
+          const result = new Document({
             location: URL,
             contentSelectors: {
               startBefore: '#startBefore',
@@ -33,7 +33,7 @@ describe('PageDeclaration', () => {
 
       context('with an array of mixed selectors', () => {
         it('extracts selectors', async () => {
-          const result = new PageDeclaration({
+          const result = new Document({
             location: URL,
             contentSelectors: [
               {
@@ -52,7 +52,7 @@ describe('PageDeclaration', () => {
     context('with "remove" property', () => {
       context('with string selector', () => {
         it('extracts selectors', async () => {
-          const result = new PageDeclaration({ location: URL, noiseSelectors: 'body' }).cssSelectors;
+          const result = new Document({ location: URL, noiseSelectors: 'body' }).cssSelectors;
 
           expect(result).to.deep.equal(['body']);
         });
@@ -60,7 +60,7 @@ describe('PageDeclaration', () => {
 
       context('with range selector', () => {
         it('extracts selectors', async () => {
-          const result = new PageDeclaration({
+          const result = new Document({
             location: URL,
             noiseSelectors: {
               startBefore: '#startBefore',
@@ -74,7 +74,7 @@ describe('PageDeclaration', () => {
 
       context('with an array of mixed selectors', () => {
         it('extracts selectors', async () => {
-          const result = new PageDeclaration({
+          const result = new Document({
             location: URL,
             noiseSelectors: [
               {
@@ -93,7 +93,7 @@ describe('PageDeclaration', () => {
     context('with both "select" and "remove" property', () => {
       context('with string selector', () => {
         it('extracts selectors', async () => {
-          const result = new PageDeclaration({
+          const result = new Document({
             location: URL,
             contentSelectors: 'body',
             noiseSelectors: 'h1',
@@ -105,7 +105,7 @@ describe('PageDeclaration', () => {
 
       context('with range selector', () => {
         it('extracts selectors', async () => {
-          const result = new PageDeclaration({
+          const result = new Document({
             location: URL,
             contentSelectors: {
               startBefore: '#startBefore',
@@ -128,7 +128,7 @@ describe('PageDeclaration', () => {
 
       context('with an array of mixed selectors', () => {
         it('extracts selectors', async () => {
-          const result = new PageDeclaration({
+          const result = new Document({
             location: URL,
             contentSelectors: [
               {
@@ -161,7 +161,7 @@ describe('PageDeclaration', () => {
 
   describe('#toPersistence', () => {
     it('converts basic page declaration into JSON representation', async () => {
-      const result = new PageDeclaration({
+      const result = new Document({
         location: URL,
         contentSelectors: 'body',
       }).toPersistence();
@@ -178,7 +178,7 @@ describe('PageDeclaration', () => {
     });
 
     it('converts page declaration with all fields to JSON representation', async () => {
-      const result = new PageDeclaration({
+      const result = new Document({
         location: URL,
         contentSelectors: [
           {

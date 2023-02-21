@@ -1,52 +1,52 @@
 export default class Service {
-  documents = new Map();
+  terms = new Map();
 
   constructor({ id, name }) {
     this.id = id;
     this.name = name;
   }
 
-  getDocumentDeclaration(termsType, date) {
-    if (!this.documents[termsType]) {
+  getTerms(termsType, date) {
+    if (!this.terms[termsType]) {
       return null;
     }
 
-    const { latest: currentlyValidDocumentDeclaration, history } = this.documents[termsType];
+    const { latest: currentlyValidTerms, history } = this.terms[termsType];
 
     if (!date) {
-      return currentlyValidDocumentDeclaration;
+      return currentlyValidTerms;
     }
 
     return (
       history?.find(entry => new Date(date) <= new Date(entry.validUntil))
-      || currentlyValidDocumentDeclaration
+      || currentlyValidTerms
     );
   }
 
   getTermsTypes() {
-    return Object.keys(this.documents);
+    return Object.keys(this.terms);
   }
 
-  addDocumentDeclaration(document) {
-    if (!document.service) {
-      document.service = this;
+  addTerms(terms) {
+    if (!terms.service) {
+      terms.service = this;
     }
 
-    this.documents[document.termsType] = this.documents[document.termsType] || {};
+    this.terms[terms.termsType] = this.terms[terms.termsType] || {};
 
-    if (!document.validUntil) {
-      this.documents[document.termsType].latest = document;
+    if (!terms.validUntil) {
+      this.terms[terms.termsType].latest = terms;
 
       return;
     }
 
-    this.documents[document.termsType].history = this.documents[document.termsType].history || [];
-    this.documents[document.termsType].history.push(document);
-    this.documents[document.termsType].history.sort((a, b) => new Date(a.validUntil) - new Date(b.validUntil));
+    this.terms[terms.termsType].history = this.terms[terms.termsType].history || [];
+    this.terms[terms.termsType].history.push(terms);
+    this.terms[terms.termsType].history.sort((a, b) => new Date(a.validUntil) - new Date(b.validUntil));
   }
 
   getHistoryDates(termsType) {
-    return this.documents[termsType].history.map(entry => entry.validUntil);
+    return this.terms[termsType].history.map(entry => entry.validUntil);
   }
 
   getNumberOfTerms() {
@@ -55,6 +55,6 @@ export default class Service {
 
   hasHistory() {
     // If a service is loaded without its history it could return false even if a history declaration file exists.
-    return Boolean(Object.keys(this.documents).find(termsType => this.documents[termsType].history));
+    return Boolean(Object.keys(this.terms).find(termsType => this.terms[termsType].history));
   }
 }
