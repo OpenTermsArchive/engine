@@ -4,9 +4,9 @@ import { pathToFileURL } from 'url';
 
 import config from 'config';
 
-import DocumentDeclaration from './documentDeclaration.js';
-import PageDeclaration from './pageDeclaration.js';
+import Document from './document.js';
 import Service from './service.js';
+import Terms from './terms.js';
 
 const fs = fsApi.promises;
 const declarationsPath = path.resolve(process.cwd(), config.get('services.declarationsPath'));
@@ -58,19 +58,19 @@ async function loadServiceFilters(serviceId, filterNames) {
 async function loadServiceDocument(service, termsType, termsTypeDeclaration) {
   const { filter: filterNames, fetch: location, executeClientScripts, select: contentSelectors, remove: noiseSelectors, combine } = termsTypeDeclaration;
 
-  const pages = [];
+  const documents = [];
 
   const filters = await loadServiceFilters(service.id, filterNames);
 
   if (!combine) {
-    pages.push(new PageDeclaration({ location, executeClientScripts, contentSelectors, noiseSelectors, filters }));
+    documents.push(new Document({ location, executeClientScripts, contentSelectors, noiseSelectors, filters }));
   } else {
-    for (const pageDeclaration of combine) {
-      const { filter: pageFilterNames, fetch: pageLocation, executeClientScripts: pageExecuteClientScripts, select: pageContentSelectors, remove: pageNoiseSelectors } = pageDeclaration;
+    for (const document of combine) {
+      const { filter: pageFilterNames, fetch: pageLocation, executeClientScripts: pageExecuteClientScripts, select: pageContentSelectors, remove: pageNoiseSelectors } = document;
 
       const pageFilters = await loadServiceFilters(service.id, pageFilterNames); // eslint-disable-line no-await-in-loop
 
-      pages.push(new PageDeclaration({
+      documents.push(new Document({
         location: pageLocation || location,
         executeClientScripts: (pageExecuteClientScripts === undefined || pageExecuteClientScripts === null ? executeClientScripts : pageExecuteClientScripts),
         contentSelectors: pageContentSelectors || contentSelectors,
@@ -80,7 +80,7 @@ async function loadServiceDocument(service, termsType, termsTypeDeclaration) {
     }
   }
 
-  service.addDocumentDeclaration(new DocumentDeclaration({ service, termsType, pages }));
+  service.addTerms(new Terms({ service, termsType, documents }));
 }
 
 async function getDeclaredServicesIds() {
@@ -102,13 +102,13 @@ export async function loadWithHistory(servicesIds = []) {
       const filterNames = [...new Set(termsTypeDeclarationEntries.flatMap(declaration => declaration.filter))].filter(Boolean);
       const allHistoryDates = extractHistoryDates({ termsTypeDeclarationEntries, filters, filterNames });
 
-      const latestValidDocumentDeclaration = termsTypeDeclarationEntries.find(entry => !entry.validUntil);
+      const latestValidTerms = termsTypeDeclarationEntries.find(entry => !entry.validUntil);
 
       allHistoryDates.forEach(async date => {
-        const declarationForThisDate = termsTypeDeclarationEntries.find(entry => new Date(date) <= new Date(entry.validUntil)) || latestValidDocumentDeclaration;
+        const declarationForThisDate = termsTypeDeclarationEntries.find(entry => new Date(date) <= new Date(entry.validUntil)) || latestValidTerms;
         const { filter: declarationForThisDateFilterNames, combine } = declarationForThisDate;
 
-        const pages = [];
+        const documents = [];
         let actualFilters;
 
         if (declarationForThisDateFilterNames) {
@@ -122,7 +122,7 @@ export async function loadWithHistory(servicesIds = []) {
         }
 
         if (!combine) {
-          pages.push(new PageDeclaration({
+          documents.push(new Document({
             location: declarationForThisDate.fetch,
             executeClientScripts: declarationForThisDate.executeClientScripts,
             contentSelectors: declarationForThisDate.select,
@@ -130,12 +130,12 @@ export async function loadWithHistory(servicesIds = []) {
             filters: actualFilters,
           }));
         } else {
-          for (const pageDeclaration of combine) {
-            const { filter: pageFilterNames, fetch: pageLocation, executeClientScripts: pageExecuteClientScripts, select: pageContentSelectors, remove: pageNoiseSelectors } = pageDeclaration;
+          for (const document of combine) {
+            const { filter: pageFilterNames, fetch: pageLocation, executeClientScripts: pageExecuteClientScripts, select: pageContentSelectors, remove: pageNoiseSelectors } = document;
 
             const pageFilters = await loadServiceFilters(serviceId, pageFilterNames); // eslint-disable-line no-await-in-loop
 
-            pages.push(new PageDeclaration({
+            documents.push(new Document({
               location: pageLocation || declarationForThisDate.fetch,
               executeClientScripts: (pageExecuteClientScripts === undefined || pageExecuteClientScripts === null ? declarationForThisDate.executeClientScripts : pageExecuteClientScripts),
               contentSelectors: pageContentSelectors || declarationForThisDate.select,
@@ -145,10 +145,10 @@ export async function loadWithHistory(servicesIds = []) {
           }
         }
 
-        services[serviceId].addDocumentDeclaration(new DocumentDeclaration({
+        services[serviceId].addTerms(new Terms({
           service: services[serviceId],
           termsType,
-          pages,
+          documents,
           validUntil: date,
         }));
       });

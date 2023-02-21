@@ -1,19 +1,19 @@
 {
-  "name": "Service with multipage",
+  "name": "Service with multi documents terms",
   "documents": {
     "Community Guidelines": {
       "combine": [
         {
-          "fetch": "https://www.service-with-multipage-document.example/community-standards",
+          "fetch": "https://www.service-with-multi-documents-terms.example/community-standards",
           "select": "#main"
         },
         {
-          "fetch": "https://www.service-with-multipage-document.example/community-standards/hate-speech/",
+          "fetch": "https://www.service-with-multi-documents-terms.example/community-standards/hate-speech/",
           "remove": "#footer",
           "executeClientScripts": false
         },
         {
-          "fetch": "https://www.service-with-multipage-document.example/community-standards/violence-incitement/",
+          "fetch": "https://www.service-with-multi-documents-terms.example/community-standards/violence-incitement/",
           "filter": [
             "removeShareButton",
             "removePrintButton"

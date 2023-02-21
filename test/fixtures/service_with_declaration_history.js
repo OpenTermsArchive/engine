@@ -1,6 +1,6 @@
-import DocumentDeclaration from '../../src/archivist/services/documentDeclaration.js';
-import PageDeclaration from '../../src/archivist/services/pageDeclaration.js';
+import Document from '../../src/archivist/services/document.js';
 import Service from '../../src/archivist/services/service.js';
+import Terms from '../../src/archivist/services/terms.js';
 
 const service = new Service({
   id: 'service_with_declaration_history',
@@ -17,11 +17,11 @@ const filters = [
 ];
 
 [
-  new DocumentDeclaration({
+  new Terms({
     service,
     termsType: 'Terms of Service',
-    pages: [
-      new PageDeclaration({
+    documents: [
+      new Document({
         location: 'https://www.service-with-declaration-history.example/terms',
         contentSelectors: 'main',
         noiseSelectors: undefined,
@@ -30,11 +30,11 @@ const filters = [
     ],
     validUntil: null,
   }),
-  new DocumentDeclaration({
+  new Terms({
     service,
     termsType: 'Terms of Service',
-    pages: [
-      new PageDeclaration({
+    documents: [
+      new Document({
         location: 'https://www.service-with-declaration-history.example/tos',
         contentSelectors: 'body',
         noiseSelectors: undefined,
@@ -43,11 +43,11 @@ const filters = [
     ],
     validUntil: '2020-08-22T21:30:21.000Z',
   }),
-  new DocumentDeclaration({
+  new Terms({
     service,
     termsType: 'Terms of Service',
-    pages: [
-      new PageDeclaration({
+    documents: [
+      new Document({
         location: 'https://www.service-with-declaration-history.example/tos',
         contentSelectors: 'main',
         noiseSelectors: undefined,
@@ -60,6 +60,6 @@ const filters = [
     ],
     validUntil: '2020-09-30T21:30:21.000Z',
   }),
-].forEach(declaration => service.addDocumentDeclaration(declaration));
+].forEach(declaration => service.addTerms(declaration));
 
 export default service;

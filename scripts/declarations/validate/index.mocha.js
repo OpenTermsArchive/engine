@@ -26,7 +26,7 @@ export default async options => {
   const schemaOnly = options.schemaOnly || false;
   let servicesToValidate = options.services || [];
   const termsTypes = options.termsTypes || [];
-  let servicesDocumentTypes = {};
+  let servicesTermsTypes = {};
 
   const serviceDeclarations = await services.loadWithHistory(servicesToValidate);
 
@@ -37,7 +37,7 @@ export default async options => {
   if (options.modified) {
     const declarationUtils = new DeclarationUtils(instancePath);
 
-    ({ services: servicesToValidate, servicesDocumentTypes } = await declarationUtils.getModifiedServiceDocumentTypes());
+    ({ services: servicesToValidate, servicesTermsTypes } = await declarationUtils.getModifiedServiceTermsTypes());
   }
 
   describe('Service declarations validation', async function () {
@@ -78,8 +78,8 @@ export default async options => {
         if (!schemaOnly && service) {
           service.getDocumentTypes()
             .filter(termsType => {
-              if (servicesDocumentTypes[serviceId] && servicesDocumentTypes[serviceId].length > 0) {
-                return servicesDocumentTypes[serviceId].includes(termsType);
+              if (servicesTermsTypes[serviceId] && servicesTermsTypes[serviceId].length > 0) {
+                return servicesTermsTypes[serviceId].includes(termsType);
               }
 
               if (termsTypes.length > 0) {
@@ -90,41 +90,39 @@ export default async options => {
             })
             .forEach(type => {
               describe(type, () => {
-                const documentDeclaration = service.getDocumentDeclaration(type);
+                const terms = service.getTerms(type);
 
-                documentDeclaration.pages.forEach(page => {
+                terms.documents.forEach(document => {
                   let content;
                   let filteredContent;
                   let mimeType;
 
-                  context(page.location, () => {
+                  context(document.location, () => {
                     before(async function () {
-                      if (!documentDeclaration) {
+                      if (!terms) {
                         console.log('      (Tests skipped as declaration has been archived)');
                         this.skip();
                       }
                     });
 
                     it('fetchable URL', async () => {
-                      const { location, executeClientScripts } = page;
-                      const document = await fetch({
+                      const { location, executeClientScripts } = document;
+
+                      ({ content, mimeType } = await fetch({
                         url: location,
                         executeClientScripts,
-                        cssSelectors: page.cssSelectors,
+                        cssSelectors: document.cssSelectors,
                         config: config.get('fetcher'),
-                      });
-
-                      content = document.content;
-                      mimeType = document.mimeType;
+                      }));
                     });
 
-                    it('selector matches an element in the web page', async function checkSelector() {
+                    it('selector matches an element in the document', async function checkSelector() {
                       if (!content) {
                         console.log('          [Tests skipped as URL is not fetchable]');
                         this.skip();
                       }
 
-                      filteredContent = await extract({ content, pageDeclaration: page, mimeType });
+                      filteredContent = await extract({ content, document, mimeType });
 
                       expect(filteredContent).to.not.be.empty;
                     });
@@ -156,13 +154,13 @@ export default async options => {
                         this.skip();
                       }
 
-                      const document = await fetch({
-                        url: page.location,
-                        executeClientScripts: page.executeClientScripts,
-                        cssSelectors: page.cssSelectors,
+                      const { content, mimeType } = await fetch({
+                        url: document.location,
+                        executeClientScripts: document.executeClientScripts,
+                        cssSelectors: document.cssSelectors,
                         config: config.get('fetcher'),
                       });
-                      const secondFilteredContent = await extract({ content: document.content, pageDeclaration: page, mimeType: document.mimeType });
+                      const secondFilteredContent = await extract({ content, document, mimeType });
 
                       expect(secondFilteredContent).to.equal(filteredContent);
                     });

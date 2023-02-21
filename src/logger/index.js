@@ -11,15 +11,15 @@ const { combine, timestamp, printf, colorize } = winston.format;
 const alignedWithColorsAndTime = combine(
   colorize(),
   timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
-  printf(({ level, message, timestamp, serviceId, type, pageId }) => {
+  printf(({ level, message, timestamp, serviceId, type, documentId }) => {
     let prefix = '';
 
     if (serviceId && type) {
       prefix = `${serviceId} — ${type}`;
     }
 
-    if (pageId) {
-      prefix = `${prefix}:${pageId}`;
+    if (documentId) {
+      prefix = `${prefix}:${documentId}`;
     }
 
     if (prefix.length > 75) {
@@ -71,18 +71,18 @@ const logger = winston.createLogger({
   rejectionHandlers: transports,
 });
 
-logger.onFirstSnapshotRecorded = (serviceId, type, pageId, snapshotId) => {
-  logger.info({ message: `Recorded first snapshot with id ${snapshotId}`, serviceId, type, pageId });
+logger.onFirstSnapshotRecorded = (serviceId, type, documentId, snapshotId) => {
+  logger.info({ message: `Recorded first snapshot with id ${snapshotId}`, serviceId, type, documentId });
   recordedSnapshotsCount++;
 };
 
-logger.onSnapshotRecorded = (serviceId, type, pageId, snapshotId) => {
-  logger.info({ message: `Recorded snapshot with id ${snapshotId}`, serviceId, type, pageId });
+logger.onSnapshotRecorded = (serviceId, type, documentId, snapshotId) => {
+  logger.info({ message: `Recorded snapshot with id ${snapshotId}`, serviceId, type, documentId });
   recordedSnapshotsCount++;
 };
 
-logger.onSnapshotNotChanged = (serviceId, type, pageId) => {
-  logger.info({ message: 'No changes, did not record snapshot', serviceId, type, pageId });
+logger.onSnapshotNotChanged = (serviceId, type, documentId) => {
+  logger.info({ message: 'No changes, did not record snapshot', serviceId, type, documentId });
 };
 
 logger.onFirstVersionRecorded = (serviceId, type, versionId) => {
@@ -123,8 +123,8 @@ logger.onInaccessibleContent = ({ message }, serviceId, type) => {
   logger.warn({ message, serviceId, type });
 };
 
-logger.onError = (error, serviceId, type, pageId) => {
-  logger.error({ message: error.stack, serviceId, type, pageId });
+logger.onError = (error, serviceId, type, documentId) => {
+  logger.error({ message: error.stack, serviceId, type, documentId });
 };
 
 export default logger;

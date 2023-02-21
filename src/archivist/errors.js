@@ -3,7 +3,7 @@ export class InaccessibleContentError extends Error {
     if (Array.isArray(message)) {
       message = `\n - ${message.join('\n - ')}`;
     }
-    super(`The document cannot be accessed or its content can not be selected:${message}`);
+    super(`The terms cannot be accessed or its content can not be selected:${message}`);
     this.name = 'InaccessibleContentError';
   }
 }

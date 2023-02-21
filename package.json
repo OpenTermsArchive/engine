@@ -17,7 +17,7 @@
     ".": "./src/exports.js",
     "./fetch": "./src/archivist/fetcher/exports.js",
     "./extract": "./src/archivist/extract/exports.js",
-    "./page-declaration": "./src/archivist/services/pageDeclaration.js"
+    "./document": "./src/archivist/services/document.js"
   },
   "bin": {
     "ota": "./bin/ota.js"

@@ -18,7 +18,7 @@ const client = new MongoClient(connectionURI);
 
 const SERVICE_PROVIDER_ID = 'test_service';
 const TERMS_TYPE = 'Terms of Service';
-const PAGE_ID = 'community-standards-hate-speech';
+const DOCUMENT_ID = 'community-standards-hate-speech';
 const CONTENT = 'ToS fixture data with UTF-8 çhãràčtęrs';
 const MIME_TYPE = 'text/html';
 const FETCH_DATE = new Date('2000-01-01T12:00:00.000Z');
@@ -59,7 +59,7 @@ describe('MongoRepository', () => {
         (record = await subject.save(new Record({
           serviceId: SERVICE_PROVIDER_ID,
           termsType: TERMS_TYPE,
-          pageId: PAGE_ID,
+          documentId: DOCUMENT_ID,
           content: CONTENT,
           mimeType: MIME_TYPE,
           fetchDate: FETCH_DATE,
@@ -99,7 +99,7 @@ describe('MongoRepository', () => {
         expect(mongoDocument.termsType).to.include(TERMS_TYPE);
       });
 
-      it('stores information that it is the first record for this specific document', () => {
+      it('stores information that it is the first record for this specific terms', () => {
         expect(mongoDocument.isFirstRecord).to.be.true;
       });
 
@@ -120,8 +120,8 @@ describe('MongoRepository', () => {
           expect(mongoDocument.snapshotIds.map(snapshotId => snapshotId.toString())).to.deep.equal([SNAPSHOT_ID]);
         });
 
-        it('stores the page ID', () => {
-          expect(mongoDocument.pageId).to.equal(PAGE_ID);
+        it('stores the document ID', () => {
+          expect(mongoDocument.documentId).to.equal(DOCUMENT_ID);
         });
       });
     });
@@ -327,7 +327,7 @@ describe('MongoRepository', () => {
         (record = await subject.save(new Record({
           serviceId: SERVICE_PROVIDER_ID,
           termsType: TERMS_TYPE,
-          pageId: PAGE_ID,
+          documentId: DOCUMENT_ID,
           content: CONTENT,
           mimeType: MIME_TYPE,
           fetchDate: FETCH_DATE,
@@ -353,8 +353,8 @@ describe('MongoRepository', () => {
         expect(mongoDocument.termsType).to.include(TERMS_TYPE);
       });
 
-      it('stores the page ID', () => {
-        expect(mongoDocument.pageId).to.include(PAGE_ID);
+      it('stores the document ID', () => {
+        expect(mongoDocument.documentId).to.include(DOCUMENT_ID);
       });
     });
 
@@ -366,7 +366,7 @@ describe('MongoRepository', () => {
         (record = await subject.save(new Record({
           serviceId: SERVICE_PROVIDER_ID,
           termsType: TERMS_TYPE,
-          pageId: PAGE_ID,
+          documentId: DOCUMENT_ID,
           content: CONTENT,
           mimeType: MIME_TYPE,
           fetchDate: FETCH_DATE,
@@ -396,8 +396,8 @@ describe('MongoRepository', () => {
         expect(mongoDocument.termsType).to.include(TERMS_TYPE);
       });
 
-      it('stores the page ID', () => {
-        expect(mongoDocument.pageId).to.include(PAGE_ID);
+      it('stores the document ID', () => {
+        expect(mongoDocument.documentId).to.include(DOCUMENT_ID);
       });
     });
   });
@@ -410,7 +410,7 @@ describe('MongoRepository', () => {
       ({ id } = await subject.save(new Record({
         serviceId: SERVICE_PROVIDER_ID,
         termsType: TERMS_TYPE,
-        pageId: PAGE_ID,
+        documentId: DOCUMENT_ID,
         content: CONTENT,
         fetchDate: FETCH_DATE,
         snapshotIds: [SNAPSHOT_ID],
@@ -454,8 +454,8 @@ describe('MongoRepository', () => {
       expect(record.snapshotIds).to.deep.equal([SNAPSHOT_ID]);
     });
 
-    it('returns the page ID', () => {
-      expect(record.pageId).to.equal(PAGE_ID);
+    it('returns the document ID', () => {
+      expect(record.documentId).to.equal(DOCUMENT_ID);
     });
 
     context('when requested record does not exist', () => {

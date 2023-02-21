@@ -60,7 +60,7 @@
       "label": {
         "name": "bot-report",
         "color": "FEF2C0",
-        "description": "Automatically created by Open Terms Archive when a document cannot be fetched"
+        "description": "Automatically created by Open Terms Archive when a terms cannot be fetched"
       }
     }
   },

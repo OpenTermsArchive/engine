@@ -23,19 +23,19 @@ export function applyRules(serviceId, termsType) {
     serviceId = renamedServiceId;
   }
 
-  const renamedDocumentType = renamingRules.termsTypes[termsType];
+  const renamedTermsType = renamingRules.termsTypes[termsType];
 
-  if (renamedDocumentType) {
-    console.log(`⌙ Rename terms type "${termsType}" to "${renamedDocumentType}" of "${serviceId}" service`);
-    termsType = renamedDocumentType;
+  if (renamedTermsType) {
+    console.log(`⌙ Rename terms type "${termsType}" to "${renamedTermsType}" of "${serviceId}" service`);
+    termsType = renamedTermsType;
   }
 
-  const renamedServiceDocumentType = renamingRules.termsTypesByService[serviceId]
+  const renamedServiceTermsType = renamingRules.termsTypesByService[serviceId]
     && renamingRules.termsTypesByService[serviceId][termsType];
 
-  if (renamedServiceDocumentType) {
-    console.log(`⌙ Specific rename terms type "${termsType}" to "${renamedServiceDocumentType}" of "${serviceId}" service`);
-    termsType = renamedServiceDocumentType;
+  if (renamedServiceTermsType) {
+    console.log(`⌙ Specific rename terms type "${termsType}" to "${renamedServiceTermsType}" of "${serviceId}" service`);
+    termsType = renamedServiceTermsType;
   }
 
   return {

@@ -158,7 +158,7 @@ describe('Archivist', function () {
 
             serviceBCommits = await gitVersion.log({ file: SERVICE_B_EXPECTED_VERSION_FILE_PATH });
 
-            app.serviceDeclarations[SERVICE_A_ID].getDocumentDeclaration(SERVICE_A_TYPE).pages[0].contentSelectors = 'h1';
+            app.serviceDeclarations[SERVICE_A_ID].getTerms(SERVICE_A_TYPE).documents[0].contentSelectors = 'h1';
 
             await app.trackChanges({ servicesIds: [ 'service_A', 'service_B' ], extractOnly: true });
 
@@ -209,7 +209,7 @@ describe('Archivist', function () {
             await app.initialize();
             await app.trackChanges({ servicesIds });
 
-            app.serviceDeclarations[SERVICE_A_ID].getDocumentDeclaration(SERVICE_A_TYPE).pages[0].contentSelectors = 'inexistant-selector';
+            app.serviceDeclarations[SERVICE_A_ID].getTerms(SERVICE_A_TYPE).documents[0].contentSelectors = 'inexistant-selector';
             inaccessibleContentSpy = sinon.spy();
             versionNotChangedSpy = sinon.spy();
             app.on('inaccessibleContent', inaccessibleContentSpy);

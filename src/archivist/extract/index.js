@@ -26,27 +26,27 @@ const ciceroMarkTransformer = new CiceroMarkTransformer();
  * @param {Object} params - Extract parameters
  * @param {string|Buffer} params.content - Content from which to extract: a buffer containing PDF data in case mimetype associated is PDF or a DOM dump of an HTML page given as a string
  * @param {string} params.mimeType - MIME type of the given content
- * @param {string} params.pageDeclaration - see {@link ./src/archivist/services/pageDeclaration.js}
+ * @param {string} params.document - see {@link ./src/archivist/services/document.js}
  * @returns {Promise<string>} Promise which is fulfilled once the content is extracted and converted in Markdown. The promise will resolve into a string containing the extracted content in Markdown format
 */
-export default async function extract({ content, mimeType, pageDeclaration }) {
+export default async function extract({ content, mimeType, document }) {
   if (mimeType == 'application/pdf') {
     return extractFromPDF({ content });
   }
 
   return extractFromHTML({
     content,
-    pageDeclaration,
+    document,
   });
 }
 
-export async function extractFromHTML({ content, pageDeclaration }) {
+export async function extractFromHTML({ content, document }) {
   const {
     location,
     contentSelectors = [],
     noiseSelectors = [],
     filters: serviceSpecificFilters = [],
-  } = pageDeclaration;
+  } = document;
 
   const jsdomInstance = new JSDOM(content, {
     url: location,

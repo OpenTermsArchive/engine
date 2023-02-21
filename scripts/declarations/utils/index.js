@@ -33,18 +33,18 @@ export default class DeclarationUtils {
     return modifiedServiceIds;
   }
 
-  async getModifiedServiceDocumentTypes() {
+  async getModifiedServiceTermsTypes() {
     const { modifiedFilePaths, modifiedServiceIds } = await this.getModifiedData();
-    const servicesDocumentTypes = {};
+    const servicesTermsTypes = {};
 
     await Promise.all(modifiedFilePaths.map(async modifiedFilePath => {
       const serviceId = DeclarationUtils.filePathToServiceId(modifiedFilePath);
 
       if (!modifiedFilePath.endsWith('.json')) {
         // Here we should compare AST of both files to detect on which function
-        // change has been made, and then find which document type depends on this
+        // change has been made, and then find which terms type depends on this
         // function.
-        // As this is a complicated process, we will just send back all document types
+        // As this is a complicated process, we will just send back all terms types
         const declaration = await this.getJSONFile(`declarations/${serviceId}.json`, this.defaultBranch);
 
         return Object.keys(declaration.documents);
@@ -60,7 +60,7 @@ export default class DeclarationUtils {
         return;
       }
 
-      const modifiedDocumentTypes = diff.reduce((acc, { path }) => {
+      const modifiedTermsTypes = diff.reduce((acc, { path }) => {
         if (modifiedFilePath.includes('.history')) {
           acc.add(path[0]);
         } else if (path[0] == 'documents') {
@@ -70,12 +70,12 @@ export default class DeclarationUtils {
         return acc;
       }, new Set());
 
-      servicesDocumentTypes[serviceId] = Array.from(new Set([ ...servicesDocumentTypes[serviceId] || [], ...modifiedDocumentTypes ]));
+      servicesTermsTypes[serviceId] = Array.from(new Set([ ...servicesTermsTypes[serviceId] || [], ...modifiedTermsTypes ]));
     }));
 
     return {
       services: modifiedServiceIds,
-      servicesDocumentTypes,
+      servicesTermsTypes,
     };
   }
 }

@@ -9,12 +9,12 @@ import fetch, { launchHeadlessBrowser, stopHeadlessBrowser, FetchDocumentError }
 import Recorder from './recorder/index.js';
 import * as services from './services/index.js';
 
-// The parallel handling feature is currently set to a parallelism of 1 on document tracking
+// The parallel handling feature is currently set to a parallelism of 1 on terms tracking
 // because when it's higher there are two issues:
 // - too many requests on the same endpoint yield 403
 // - sometimes when creating a commit no SHA are returned for unknown reasons
-const MAX_PARALLEL_DOCUMENTS_TRACKS = 1;
-const MAX_PARALLEL_DOCUMENTS_TRACKS_WITH_EXTRACT_ONLY = 10;
+const MAX_PARALLEL_TERMS_TRACKS = 1;
+const MAX_PARALLEL_TERMS_TRACKS_WITH_EXTRACT_ONLY = 10;
 
 export const AVAILABLE_EVENTS = [
   'snapshotRecorded',
@@ -51,7 +51,7 @@ export default class Archivist extends events.EventEmitter {
     }
 
     await this.recorder.initialize();
-    this.initQueues();
+    this.initQueue();
     this.services = await services.load();
 
     this.on('error', async () => {
@@ -62,33 +62,30 @@ export default class Archivist extends events.EventEmitter {
         process.exit(2);
       }, 60 * 1000);
 
-      this.trackDocumentChangesQueue.kill();
+      this.trackingQueue.kill();
       await stopHeadlessBrowser().then(() => console.log('Headless browser stopped'));
       await this.recorder.finalize().then(() => console.log('Recorder finalized'));
       process.exit(1);
     });
   }
 
-  initQueues() {
-    this.trackDocumentChangesQueue = async.queue(this.trackDocumentChanges.bind(this), MAX_PARALLEL_DOCUMENTS_TRACKS);
-
-    const queueErrorHandler = async (error, { documentDeclaration }) => {
-      const { service, termsType } = documentDeclaration;
+  initQueue() {
+    this.trackingQueue = async.queue(this.trackTermsChanges.bind(this), MAX_PARALLEL_TERMS_TRACKS);
+    this.trackingQueue.error(async (error, { terms }) => {
+      const { service, termsType } = terms;
 
       if (error.toString().includes('HttpError: API rate limit exceeded for user ID')) {
         return; // This is an error due to SendInBlue quota, bypass
       }
 
       if (error instanceof InaccessibleContentError) {
-        this.emit('inaccessibleContent', error, service.id, termsType, documentDeclaration);
+        this.emit('inaccessibleContent', error, service.id, termsType, terms);
 
         return;
       }
 
       this.emit('error', error, service.id, termsType);
-    };
-
-    this.trackDocumentChangesQueue.error(queueErrorHandler);
+    });
   }
 
   attach(listener) {
@@ -102,37 +99,37 @@ export default class Archivist extends events.EventEmitter {
   }
 
   async trackChanges({ servicesIds = this.serviceIds, termsTypes = [], extractOnly }) {
-    this.emit('trackingStarted', servicesIds.length, this.getNumberOfDocuments(servicesIds), extractOnly);
+    this.emit('trackingStarted', servicesIds.length, this.getNumberOfTerms(servicesIds), extractOnly);
 
     await Promise.all([ launchHeadlessBrowser(), this.recorder.initialize() ]);
 
-    this.trackDocumentChangesQueue.concurrency = extractOnly ? MAX_PARALLEL_DOCUMENTS_TRACKS_WITH_EXTRACT_ONLY : MAX_PARALLEL_DOCUMENTS_TRACKS;
+    this.trackingQueue.concurrency = extractOnly ? MAX_PARALLEL_TERMS_TRACKS_WITH_EXTRACT_ONLY : MAX_PARALLEL_TERMS_TRACKS;
 
-    this.#forEachDocumentOf(servicesIds, termsTypes, documentDeclaration => this.trackDocumentChangesQueue.push({ documentDeclaration, extractOnly }));
+    this.#forEachTermsOf(servicesIds, termsTypes, terms => this.trackingQueue.push({ terms, extractOnly }));
 
-    await this.trackDocumentChangesQueue.drain();
+    await this.trackingQueue.drain();
     await Promise.all([ stopHeadlessBrowser(), this.recorder.finalize() ]);
 
-    this.emit('trackingCompleted', servicesIds.length, this.getNumberOfDocuments(servicesIds), extractOnly);
+    this.emit('trackingCompleted', servicesIds.length, this.getNumberOfTerms(servicesIds), extractOnly);
   }
 
-  async trackDocumentChanges({ documentDeclaration, extractOnly }) {
+  async trackTermsChanges({ terms, extractOnly }) {
     if (!extractOnly) {
-      await Promise.all((await this.fetchDocumentPages(documentDeclaration)).map(params => this.recordSnapshot(params)));
+      await Promise.all((await this.fetchTermsDocuments(terms)).map(params => this.recordSnapshot(params)));
     }
 
-    const { service: { id: serviceId }, termsType, pages } = documentDeclaration;
+    const { service: { id: serviceId }, termsType, documents } = terms;
 
-    const snapshots = await this.getDocumentSnapshots(documentDeclaration);
+    const snapshots = await this.getTermsSnapshots(terms);
 
     if (!snapshots.length) {
       return;
     }
 
-    const [{ fetchDate }] = snapshots; // In case of multipage document, use the first snapshot fetch date
+    const [{ fetchDate }] = snapshots; // In case of multi documents terms, use the first snapshot fetch date
 
     return this.recordVersion({
-      content: await this.extractVersionContent(snapshots, pages),
+      content: await this.extractVersionContent(snapshots, documents),
       snapshotIds: snapshots.map(({ id }) => id),
       serviceId,
       termsType,
@@ -141,10 +138,10 @@ export default class Archivist extends events.EventEmitter {
     });
   }
 
-  async fetchDocumentPages({ service: { id: serviceId }, termsType, pages, isMultiPage }) {
+  async fetchTermsDocuments({ service: { id: serviceId }, termsType, documents, isMultiDocument }) {
     const inaccessibleContentErrors = [];
 
-    const result = await Promise.all(pages.map(async ({ location: url, executeClientScripts, cssSelectors, id: pageId }) => {
+    const result = await Promise.all(documents.map(async ({ location: url, executeClientScripts, cssSelectors, id: documentId }) => {
       try {
         const { mimeType, content } = await this.fetch({ url, executeClientScripts, cssSelectors });
 
@@ -153,7 +150,7 @@ export default class Archivist extends events.EventEmitter {
           mimeType,
           serviceId,
           termsType,
-          pageId: isMultiPage && pageId,
+          documentId: isMultiDocument && documentId,
           fetchDate: new Date(),
         };
       } catch (error) {
@@ -180,37 +177,37 @@ export default class Archivist extends events.EventEmitter {
     return result;
   }
 
-  async getDocumentSnapshots({ service: { id: serviceId }, termsType, pages, isMultiPage }) {
-    return (await Promise.all(pages.map(async page => this.recorder.getLatestSnapshot(serviceId, termsType, isMultiPage && page.id)))).filter(Boolean);
+  async getTermsSnapshots({ service: { id: serviceId }, termsType, documents, isMultiDocument }) {
+    return (await Promise.all(documents.map(async document => this.recorder.getLatestSnapshot(serviceId, termsType, isMultiDocument && document.id)))).filter(Boolean);
   }
 
-  async extractVersionContent(snapshots, pages) {
+  async extractVersionContent(snapshots, documents) {
     return (
-      await Promise.all(snapshots.map(async ({ pageId, content, mimeType }) => {
-        const pageDeclaration = pageId ? pages.find(({ id }) => pageId == id) : pages[0];
+      await Promise.all(snapshots.map(async ({ documentId, content, mimeType }) => {
+        const document = documentId ? documents.find(({ id }) => documentId == id) : documents[0];
 
-        return this.extract({ content, mimeType, pageDeclaration });
+        return this.extract({ content, mimeType, document });
       }))
     ).join('\n\n');
   }
 
-  async recordSnapshot({ content, mimeType, fetchDate, serviceId, termsType, pageId }) {
+  async recordSnapshot({ content, mimeType, fetchDate, serviceId, termsType, documentId }) {
     const { id: snapshotId, isFirstRecord } = await this.recorder.recordSnapshot({
       serviceId,
       termsType,
-      pageId,
+      documentId,
       content,
       mimeType,
       fetchDate,
     });
 
     if (!snapshotId) {
-      this.emit('snapshotNotChanged', serviceId, termsType, pageId);
+      this.emit('snapshotNotChanged', serviceId, termsType, documentId);
 
       return;
     }
 
-    this.emit(isFirstRecord ? 'firstSnapshotRecorded' : 'snapshotRecorded', serviceId, termsType, pageId, snapshotId);
+    this.emit(isFirstRecord ? 'firstSnapshotRecorded' : 'snapshotRecorded', serviceId, termsType, documentId, snapshotId);
 
     return snapshotId;
   }
@@ -234,19 +231,19 @@ export default class Archivist extends events.EventEmitter {
     this.emit(isFirstRecord ? 'firstVersionRecorded' : 'versionRecorded', serviceId, termsType, versionId);
   }
 
-  getNumberOfDocuments(serviceIds = this.serviceIds) {
-    return serviceIds.reduce((acc, serviceId) => acc + this.services[serviceId].getNumberOfDocuments(), 0);
+  getNumberOfTerms(serviceIds = this.serviceIds) {
+    return serviceIds.reduce((acc, serviceId) => acc + this.services[serviceId].getNumberOfTerms(), 0);
   }
 
-  async #forEachDocumentOf(servicesIds = [], termsTypes = [], callback) { // eslint-disable-line default-param-last
+  async #forEachTermsOf(servicesIds = [], termsTypes = [], callback) { // eslint-disable-line default-param-last
     servicesIds.sort((a, b) => a.localeCompare(b)); // Sort service IDs by lowercase name to have more intuitive logs
     servicesIds.forEach(serviceId => {
-      this.services[serviceId].getDocumentTypes().forEach(termsType => {
+      this.services[serviceId].getTermsTypes().forEach(termsType => {
         if (termsTypes.length && !termsTypes.includes(termsType)) {
           return;
         }
 
-        callback(this.services[serviceId].getDocumentDeclaration(termsType));
+        callback(this.services[serviceId].getTerms(termsType));
       });
     });
   }

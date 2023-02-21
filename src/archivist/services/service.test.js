@@ -1,7 +1,7 @@
 import chai from 'chai';
 
-import DocumentDeclaration from './documentDeclaration.js';
 import Service from './service.js';
+import Terms from './terms.js';
 
 const { expect } = chai;
 
@@ -9,126 +9,104 @@ describe('Service', () => {
   let subject;
   const TERMS_TYPE = 'Terms of Service';
 
-  describe('#addDocumentDeclaration', () => {
-    let documentDeclaration;
+  describe('#addTerms', () => {
+    let terms;
 
     before(async () => {
-      documentDeclaration = new DocumentDeclaration({
+      terms = new Terms({
         termsType: TERMS_TYPE,
         service: subject,
-        pages: [{
-          location: 'https://www.service.example/tos',
-          contentSelectors: 'body',
-        }],
       });
     });
 
-    context('when document declaration has no validity date', () => {
+    context('when terms declaration has no validity date', () => {
       before(async () => {
         subject = new Service({ id: 'serviceID', name: 'serviceName' });
-        subject.addDocumentDeclaration(documentDeclaration);
+        subject.addTerms(terms);
       });
 
-      it('adds the document as the last valid document declaration', async () => {
-        expect(subject.getDocumentDeclaration(TERMS_TYPE)).to.deep.eql(documentDeclaration);
+      it('adds the terms as the last valid terms declaration', async () => {
+        expect(subject.getTerms(TERMS_TYPE)).to.deep.eql(terms);
       });
     });
 
-    context('when document declaration has a validity date', () => {
-      let expiredDocumentDeclaration;
+    context('when terms declaration has a validity date', () => {
+      let expiredTerms;
       const VALIDITY_DATE = new Date('2020-07-22T11:30:21.000Z');
 
       before(async () => {
         subject = new Service({ id: 'serviceID', name: 'serviceName' });
-        expiredDocumentDeclaration = new DocumentDeclaration({
+        expiredTerms = new Terms({
           termsType: TERMS_TYPE,
           service: subject,
           validUntil: VALIDITY_DATE,
-          pages: [{
-            location: 'https://www.service.example/terms',
-            contentSelectors: 'main',
-          }],
         });
-        subject.addDocumentDeclaration(expiredDocumentDeclaration);
-        subject.addDocumentDeclaration(documentDeclaration);
+        subject.addTerms(expiredTerms);
+        subject.addTerms(terms);
       });
 
-      it('adds the document with the proper validity date', async () => {
-        expect(subject.getDocumentDeclaration(TERMS_TYPE, VALIDITY_DATE)).to.deep.eql(expiredDocumentDeclaration);
+      it('adds the terms with the proper validity date', async () => {
+        expect(subject.getTerms(TERMS_TYPE, VALIDITY_DATE)).to.deep.eql(expiredTerms);
       });
     });
   });
 
-  describe('#getDocumentDeclaration', () => {
+  describe('#getTerms', () => {
     let subject;
 
-    const lastDeclaration = new DocumentDeclaration({
-      termsType: TERMS_TYPE,
-      pages: [{
-        location: 'https://www.service.example/tos',
-        contentSelectors: 'body',
-      }],
-    });
+    const lastDeclaration = new Terms({ termsType: TERMS_TYPE });
 
     context('when there is no history', () => {
       before(async () => {
         subject = new Service({ id: 'serviceID', name: 'serviceName' });
-        subject.addDocumentDeclaration(lastDeclaration);
+        subject.addTerms(lastDeclaration);
       });
 
       context('without given date', () => {
-        it('returns the last document declaration', async () => {
-          expect(subject.getDocumentDeclaration(TERMS_TYPE)).to.eql(lastDeclaration);
+        it('returns the last terms declaration', async () => {
+          expect(subject.getTerms(TERMS_TYPE)).to.eql(lastDeclaration);
         });
       });
 
       context('with a date', () => {
-        it('returns the last document declaration', async () => {
-          expect(subject.getDocumentDeclaration(TERMS_TYPE, '2020-08-21T11:30:21.000Z')).to.eql(lastDeclaration);
+        it('returns the last terms declaration', async () => {
+          expect(subject.getTerms(TERMS_TYPE, '2020-08-21T11:30:21.000Z')).to.eql(lastDeclaration);
         });
       });
     });
 
-    context('when the document has a history', () => {
-      const firstDeclaration = new DocumentDeclaration({
+    context('when the terms has a history', () => {
+      const firstDeclaration = new Terms({
         termsType: TERMS_TYPE,
         validUntil: '2020-07-22T11:30:21.000Z',
-        pages: [{
-          location: 'https://www.service.example/terms',
-          contentSelectors: 'main',
-        }],
       });
 
-      const secondDeclaration = new DocumentDeclaration({
+      const secondDeclaration = new Terms({
         termsType: TERMS_TYPE,
         validUntil: '2020-08-22T11:30:21.000Z',
-        pages: [{
-          location: 'https://www.service.example/terms-of-service',
-          contentSelectors: 'main',
-        }],
       });
 
       before(async () => {
         subject = new Service({ id: 'serviceID', name: 'serviceName' });
-        subject.addDocumentDeclaration(lastDeclaration);
-        subject.addDocumentDeclaration(firstDeclaration);
-        subject.addDocumentDeclaration(secondDeclaration);
+        subject.addTerms(lastDeclaration);
+        subject.addTerms(firstDeclaration);
+        subject.addTerms(secondDeclaration);
       });
 
       context('without given date', () => {
-        it('returns the last document declaration', async () => {
-          expect(subject.getDocumentDeclaration(TERMS_TYPE)).to.eql(lastDeclaration);
+        it('returns the last terms declaration', async () => {
+          expect(subject.getTerms(TERMS_TYPE)).to.eql(lastDeclaration);
         });
       });
 
       context('with a date', () => {
-        it('returns the document declaration according to the given date', async () => {
-          expect(subject.getDocumentDeclaration(TERMS_TYPE, '2020-08-21T11:30:21.000Z')).to.eql(secondDeclaration);
+        it('returns the terms declaration according to the given date', async () => {
+          expect(subject.getTerms(TERMS_TYPE, '2020-08-21T11:30:21.000Z')).to.eql(secondDeclaration);
         });
 
-        context('strictly equal to a document declaration validity date', () => {
-          it('returns the document declaration with the validity date equal to the given date', async () => {
-            expect(subject.getDocumentDeclaration(TERMS_TYPE, secondDeclaration.validUntil)).to.eql(secondDeclaration);
+        context('strictly equal to a terms declaration validity date', () => {
+          it('returns the terms declaration with the validity date equal to the given date', async () => {
+            expect(subject.getTerms(TERMS_TYPE, secondDeclaration.validUntil)).to.eql(secondDeclaration);
           });
         });
       });
@@ -143,25 +121,15 @@ describe('Service', () => {
     before(async () => {
       subject = new Service({ id: 'serviceID', name: 'serviceName' });
 
-      termsOfServiceDeclaration = new DocumentDeclaration({
-        termsType: TERMS_TYPE,
-        pages: [{
-          location: 'https://www.service.example/tos',
-          contentSelectors: 'body',
-        }],
-      });
+      termsOfServiceDeclaration = new Terms({ termsType: TERMS_TYPE });
 
-      privacyPolicyDeclaration = new DocumentDeclaration({
+      privacyPolicyDeclaration = new Terms({
         termsType: 'Privacy Policy',
         validUntil: '2020-07-22T11:30:21.000Z',
-        pages: [{
-          location: 'https://www.service.example/terms',
-          contentSelectors: 'main',
-        }],
       });
 
-      subject.addDocumentDeclaration(termsOfServiceDeclaration);
-      subject.addDocumentDeclaration(privacyPolicyDeclaration);
+      subject.addTerms(termsOfServiceDeclaration);
+      subject.addTerms(privacyPolicyDeclaration);
     });
 
     it('returns the service terms types', async () => {
