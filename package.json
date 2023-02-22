@@ -17,7 +17,7 @@
     ".": "./src/exports.js",
     "./fetch": "./src/archivist/fetcher/exports.js",
     "./extract": "./src/archivist/extract/exports.js",
-    "./document": "./src/archivist/services/document.js"
+    "./sourceDocument": "./src/archivist/services/sourceDocument.js"
   },
   "bin": {
     "ota": "./bin/ota.js"

@@ -4,8 +4,8 @@ import { pathToFileURL } from 'url';
 
 import config from 'config';
 
-import Document from './document.js';
 import Service from './service.js';
+import SourceDocument from './sourceDocument.js';
 import Terms from './terms.js';
 
 const fs = fsApi.promises;
@@ -21,11 +21,11 @@ export async function load(servicesIdsToLoad = []) {
   const services = {};
 
   await Promise.all(servicesIds.map(async serviceId => {
-    const { name, documents: documentsDeclaration } = await loadServiceDeclaration(serviceId);
+    const { name, documents: terms } = await loadServiceDeclaration(serviceId);
 
     const service = new Service({ id: serviceId, name });
 
-    await Promise.all(Object.keys(documentsDeclaration).map(termsType => loadServiceDocument(service, termsType, documentsDeclaration[termsType])));
+    await Promise.all(Object.keys(terms).map(termsType => loadServiceDocument(service, termsType, terms[termsType])));
 
     services[serviceId] = service;
   }));
@@ -58,29 +58,29 @@ async function loadServiceFilters(serviceId, filterNames) {
 async function loadServiceDocument(service, termsType, termsTypeDeclaration) {
   const { filter: filterNames, fetch: location, executeClientScripts, select: contentSelectors, remove: noiseSelectors, combine } = termsTypeDeclaration;
 
-  const documents = [];
+  const sourceDocuments = [];
 
   const filters = await loadServiceFilters(service.id, filterNames);
 
   if (!combine) {
-    documents.push(new Document({ location, executeClientScripts, contentSelectors, noiseSelectors, filters }));
+    sourceDocuments.push(new SourceDocument({ location, executeClientScripts, contentSelectors, noiseSelectors, filters }));
   } else {
-    for (const document of combine) {
-      const { filter: pageFilterNames, fetch: pageLocation, executeClientScripts: pageExecuteClientScripts, select: pageContentSelectors, remove: pageNoiseSelectors } = document;
+    for (const sourceDocument of combine) {
+      const { filter: sourceDocumentFilterNames, fetch: sourceDocumentLocation, executeClientScripts: sourceDocumentExecuteClientScripts, select: sourceDocumentContentSelectors, remove: sourceDocumentNoiseSelectors } = sourceDocument;
 
-      const pageFilters = await loadServiceFilters(service.id, pageFilterNames); // eslint-disable-line no-await-in-loop
+      const sourceDocumentFilters = await loadServiceFilters(service.id, sourceDocumentFilterNames); // eslint-disable-line no-await-in-loop
 
-      documents.push(new Document({
-        location: pageLocation || location,
-        executeClientScripts: (pageExecuteClientScripts === undefined || pageExecuteClientScripts === null ? executeClientScripts : pageExecuteClientScripts),
-        contentSelectors: pageContentSelectors || contentSelectors,
-        noiseSelectors: pageNoiseSelectors || noiseSelectors,
-        filters: pageFilters || filters,
+      sourceDocuments.push(new SourceDocument({
+        location: sourceDocumentLocation || location,
+        executeClientScripts: (sourceDocumentExecuteClientScripts === undefined || sourceDocumentExecuteClientScripts === null ? executeClientScripts : sourceDocumentExecuteClientScripts),
+        contentSelectors: sourceDocumentContentSelectors || contentSelectors,
+        noiseSelectors: sourceDocumentNoiseSelectors || noiseSelectors,
+        filters: sourceDocumentFilters || filters,
       }));
     }
   }
 
-  service.addTerms(new Terms({ service, termsType, documents }));
+  service.addTerms(new Terms({ service, termsType, sourceDocuments }));
 }
 
 async function getDeclaredServicesIds() {
@@ -108,7 +108,7 @@ export async function loadWithHistory(servicesIds = []) {
         const declarationForThisDate = termsTypeDeclarationEntries.find(entry => new Date(date) <= new Date(entry.validUntil)) || latestValidTerms;
         const { filter: declarationForThisDateFilterNames, combine } = declarationForThisDate;
 
-        const documents = [];
+        const sourceDocuments = [];
         let actualFilters;
 
         if (declarationForThisDateFilterNames) {
@@ -122,7 +122,7 @@ export async function loadWithHistory(servicesIds = []) {
         }
 
         if (!combine) {
-          documents.push(new Document({
+          sourceDocuments.push(new SourceDocument({
             location: declarationForThisDate.fetch,
             executeClientScripts: declarationForThisDate.executeClientScripts,
             contentSelectors: declarationForThisDate.select,
@@ -130,17 +130,17 @@ export async function loadWithHistory(servicesIds = []) {
             filters: actualFilters,
           }));
         } else {
-          for (const document of combine) {
-            const { filter: pageFilterNames, fetch: pageLocation, executeClientScripts: pageExecuteClientScripts, select: pageContentSelectors, remove: pageNoiseSelectors } = document;
+          for (const sourceDocument of combine) {
+            const { filter: sourceDocumentFilterNames, fetch: sourceDocumentLocation, executeClientScripts: sourceDocumentExecuteClientScripts, select: sourceDocumentContentSelectors, remove: sourceDocumentNoiseSelectors } = sourceDocument;
 
-            const pageFilters = await loadServiceFilters(serviceId, pageFilterNames); // eslint-disable-line no-await-in-loop
+            const sourceDocumentFilters = await loadServiceFilters(serviceId, sourceDocumentFilterNames); // eslint-disable-line no-await-in-loop
 
-            documents.push(new Document({
-              location: pageLocation || declarationForThisDate.fetch,
-              executeClientScripts: (pageExecuteClientScripts === undefined || pageExecuteClientScripts === null ? declarationForThisDate.executeClientScripts : pageExecuteClientScripts),
-              contentSelectors: pageContentSelectors || declarationForThisDate.select,
-              noiseSelectors: pageNoiseSelectors || declarationForThisDate.remove,
-              filters: pageFilters || actualFilters,
+            sourceDocuments.push(new SourceDocument({
+              location: sourceDocumentLocation || declarationForThisDate.fetch,
+              executeClientScripts: (sourceDocumentExecuteClientScripts === undefined || sourceDocumentExecuteClientScripts === null ? declarationForThisDate.executeClientScripts : sourceDocumentExecuteClientScripts),
+              contentSelectors: sourceDocumentContentSelectors || declarationForThisDate.select,
+              noiseSelectors: sourceDocumentNoiseSelectors || declarationForThisDate.remove,
+              filters: sourceDocumentFilters || actualFilters,
             }));
           }
         }
@@ -148,7 +148,7 @@ export async function loadWithHistory(servicesIds = []) {
         services[serviceId].addTerms(new Terms({
           service: services[serviceId],
           termsType,
-          documents,
+          sourceDocuments,
           validUntil: date,
         }));
       });

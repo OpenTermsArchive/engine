@@ -24,20 +24,20 @@ describe('Services', () => {
 
           const expectedDocumentDeclaration = expected.getTerms(termsType);
 
-          const { documents } = expectedDocumentDeclaration;
+          const { sourceDocuments } = expectedDocumentDeclaration;
 
-          documents.forEach((document, index) => {
+          sourceDocuments.forEach((sourceDocument, index) => {
             const {
               filters: expectedFilters,
               contentSelectors: expectedContentSelectors,
               noiseSelectors: expectedNoiseSelectors,
               executeClientScripts: expectedExecuteClientScripts,
-            } = document;
+            } = sourceDocument;
 
-            context(`Document: ${document.id}`, () => {
+            context(`SourceDocument: ${sourceDocument.id}`, () => {
               before(() => {
                 actualDocumentDeclaration = result[serviceId].getTerms(termsType);
-                const { documents: actualDocuments } = actualDocumentDeclaration;
+                const { sourceDocuments: actualDocuments } = actualDocumentDeclaration;
 
                 ({
                   filters: actualFilters,
@@ -129,8 +129,8 @@ describe('Services', () => {
       });
     });
 
-    context('when a service has a multi documents terms', async () => {
-      describe('Service with a multi documents terms', async () => {
+    context('when a service has a multi sourceDocuments terms', async () => {
+      describe('Service with a multi sourceDocuments terms', async () => {
         await validateServiceWithoutHistory('service_with_multi_documents_terms', expectedServices.service_with_multi_documents_terms);
       });
     });
@@ -153,14 +153,14 @@ describe('Services', () => {
       /* eslint-disable no-loop-func */
       for (const termsType of expected.getTermsTypes()) {
         context(`${termsType}`, () => {
-          const { history: expectedHistory } = expected.documents[termsType];
+          const { history: expectedHistory } = expected.terms[termsType];
           const expectedHistoryDates = expectedHistory && [ ...expectedHistory.map(entry => entry.validUntil), null ]; // add `null` entry to simulate the still current valid declaration
 
           let actualDocumentDeclaration;
           let actualFilters;
           const expectedDocumentDeclaration = expected.getTerms(termsType);
 
-          const { documents } = expectedDocumentDeclaration;
+          const { sourceDocuments } = expectedDocumentDeclaration;
 
           before(() => {
             actualDocumentDeclaration = result[serviceId].getTerms(termsType);
@@ -174,12 +174,12 @@ describe('Services', () => {
             expect(actualDocumentDeclaration.termsType).to.eql(expectedDocumentDeclaration.termsType);
           });
 
-          documents.forEach((document, index) => {
-            const { filters: expectedFilters } = document;
+          sourceDocuments.forEach((sourceDocument, index) => {
+            const { filters: expectedFilters } = sourceDocument;
 
-            context(`${document.id} document`, () => {
+            context(`${sourceDocument.id} sourceDocument`, () => {
               before(() => {
-                const { documents: actualDocuments } = actualDocumentDeclaration;
+                const { sourceDocuments: actualDocuments } = actualDocumentDeclaration;
 
                 ({ filters: actualFilters } = actualDocuments[index]);
               });
@@ -192,7 +192,7 @@ describe('Services', () => {
                     let noiseSelectorsForThisDate;
                     let actualExecuteClientScriptsForThisDate;
 
-                    const { documents: documentsForThisDate } = expected.getTerms(termsType, date);
+                    const { sourceDocuments: documentsForThisDate } = expected.getTerms(termsType, date);
                     const {
                       filters: expectedFiltersForThisDate,
                       contentSelectors: expectedContentSelectors,
@@ -201,7 +201,7 @@ describe('Services', () => {
                     } = documentsForThisDate[index];
 
                     before(() => {
-                      const { documents: actualDocumentsForThisDate } = result[serviceId].getTerms(termsType, date);
+                      const { sourceDocuments: actualDocumentsForThisDate } = result[serviceId].getTerms(termsType, date);
 
                       ({
                         filters: actualFiltersForThisDate,
@@ -308,8 +308,8 @@ describe('Services', () => {
       });
     });
 
-    context('when a service has a multi documents terms', async () => {
-      describe('Service with a multi documents terms', async () => {
+    context('when a service has a multi sourceDocuments terms', async () => {
+      describe('Service with a multi sourceDocuments terms', async () => {
         await validateServiceWithHistory('service_with_multi_documents_terms', expectedServices.service_with_multi_documents_terms);
       });
     });

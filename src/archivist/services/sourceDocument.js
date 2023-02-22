@@ -1,4 +1,4 @@
-export default class Document {
+export default class SourceDocument {
   constructor({ location, executeClientScripts, contentSelectors, noiseSelectors, filters }) {
     this.location = location;
     this.executeClientScripts = executeClientScripts;
@@ -12,8 +12,8 @@ export default class Document {
     const { contentSelectors, noiseSelectors } = this;
 
     const result = [
-      ...Document.extractCssSelectorsFromProperty(contentSelectors),
-      ...Document.extractCssSelectorsFromProperty(noiseSelectors),
+      ...SourceDocument.extractCssSelectorsFromProperty(contentSelectors),
+      ...SourceDocument.extractCssSelectorsFromProperty(noiseSelectors),
     ];
 
     return result.filter(selector => selector);
@@ -23,10 +23,10 @@ export default class Document {
     if (Array.isArray(property)) {
       return []
         .concat(property)
-        .flatMap(selector => Document.extractCssSelectorsFromSelector(selector));
+        .flatMap(selector => SourceDocument.extractCssSelectorsFromSelector(selector));
     }
 
-    return Document.extractCssSelectorsFromSelector(property);
+    return SourceDocument.extractCssSelectorsFromSelector(property);
   }
 
   static extractCssSelectorsFromSelector(selector) {

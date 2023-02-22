@@ -115,10 +115,10 @@ export default class Archivist extends events.EventEmitter {
 
   async trackTermsChanges({ terms, extractOnly }) {
     if (!extractOnly) {
-      await Promise.all((await this.fetchTermsDocuments(terms)).map(params => this.recordSnapshot(params)));
+      await Promise.all((await this.fetchTermsSourceDocuments(terms)).map(params => this.recordSnapshot(params)));
     }
 
-    const { service: { id: serviceId }, termsType, documents } = terms;
+    const { service: { id: serviceId }, termsType, sourceDocuments } = terms;
 
     const snapshots = await this.getTermsSnapshots(terms);
 
@@ -126,10 +126,10 @@ export default class Archivist extends events.EventEmitter {
       return;
     }
 
-    const [{ fetchDate }] = snapshots; // In case of multi documents terms, use the first snapshot fetch date
+    const [{ fetchDate }] = snapshots; // In case of multi source documents terms, use the first snapshot fetch date
 
     return this.recordVersion({
-      content: await this.extractVersionContent(snapshots, documents),
+      content: await this.extractVersionContent(snapshots, sourceDocuments),
       snapshotIds: snapshots.map(({ id }) => id),
       serviceId,
       termsType,
@@ -138,10 +138,10 @@ export default class Archivist extends events.EventEmitter {
     });
   }
 
-  async fetchTermsDocuments({ service: { id: serviceId }, termsType, documents, isMultiDocument }) {
+  async fetchTermsSourceDocuments({ service: { id: serviceId }, termsType, sourceDocuments, hasMultiSourceDocuments }) {
     const inaccessibleContentErrors = [];
 
-    const result = await Promise.all(documents.map(async ({ location: url, executeClientScripts, cssSelectors, id: documentId }) => {
+    const result = await Promise.all(sourceDocuments.map(async ({ location: url, executeClientScripts, cssSelectors, id: documentId }) => {
       try {
         const { mimeType, content } = await this.fetch({ url, executeClientScripts, cssSelectors });
 
@@ -150,7 +150,7 @@ export default class Archivist extends events.EventEmitter {
           mimeType,
           serviceId,
           termsType,
-          documentId: isMultiDocument && documentId,
+          documentId: hasMultiSourceDocuments && documentId,
           fetchDate: new Date(),
         };
       } catch (error) {
@@ -177,16 +177,16 @@ export default class Archivist extends events.EventEmitter {
     return result;
   }
 
-  async getTermsSnapshots({ service: { id: serviceId }, termsType, documents, isMultiDocument }) {
-    return (await Promise.all(documents.map(async document => this.recorder.getLatestSnapshot(serviceId, termsType, isMultiDocument && document.id)))).filter(Boolean);
+  async getTermsSnapshots({ service: { id: serviceId }, termsType, sourceDocuments, hasMultiSourceDocuments }) {
+    return (await Promise.all(sourceDocuments.map(async sourceDocument => this.recorder.getLatestSnapshot(serviceId, termsType, hasMultiSourceDocuments && sourceDocument.id)))).filter(Boolean);
   }
 
-  async extractVersionContent(snapshots, documents) {
+  async extractVersionContent(snapshots, sourceDocuments) {
     return (
       await Promise.all(snapshots.map(async ({ documentId, content, mimeType }) => {
-        const document = documentId ? documents.find(({ id }) => documentId == id) : documents[0];
+        const sourceDocument = documentId ? sourceDocuments.find(({ id }) => documentId == id) : sourceDocuments[0];
 
-        return this.extract({ content, mimeType, document });
+        return this.extract({ content, mimeType, sourceDocument });
       }))
     ).join('\n\n');
   }

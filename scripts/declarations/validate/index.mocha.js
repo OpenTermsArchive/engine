@@ -92,12 +92,12 @@ export default async options => {
               describe(type, () => {
                 const terms = service.getTerms(type);
 
-                terms.documents.forEach(document => {
+                terms.sourceDocuments.forEach(sourceDocument => {
                   let content;
                   let filteredContent;
                   let mimeType;
 
-                  context(document.location, () => {
+                  context(sourceDocument.location, () => {
                     before(async function () {
                       if (!terms) {
                         console.log('      (Tests skipped as declaration has been archived)');
@@ -106,23 +106,23 @@ export default async options => {
                     });
 
                     it('fetchable URL', async () => {
-                      const { location, executeClientScripts } = document;
+                      const { location, executeClientScripts } = sourceDocument;
 
                       ({ content, mimeType } = await fetch({
                         url: location,
                         executeClientScripts,
-                        cssSelectors: document.cssSelectors,
+                        cssSelectors: sourceDocument.cssSelectors,
                         config: config.get('fetcher'),
                       }));
                     });
 
-                    it('selector matches an element in the document', async function checkSelector() {
+                    it('selector matches an element in the source document', async function checkSelector() {
                       if (!content) {
                         console.log('          [Tests skipped as URL is not fetchable]');
                         this.skip();
                       }
 
-                      filteredContent = await extract({ content, document, mimeType });
+                      filteredContent = await extract({ content, sourceDocument, mimeType });
 
                       expect(filteredContent).to.not.be.empty;
                     });
@@ -155,12 +155,12 @@ export default async options => {
                       }
 
                       const { content, mimeType } = await fetch({
-                        url: document.location,
-                        executeClientScripts: document.executeClientScripts,
-                        cssSelectors: document.cssSelectors,
+                        url: sourceDocument.location,
+                        executeClientScripts: sourceDocument.executeClientScripts,
+                        cssSelectors: sourceDocument.cssSelectors,
                         config: config.get('fetcher'),
                       });
-                      const secondFilteredContent = await extract({ content, document, mimeType });
+                      const secondFilteredContent = await extract({ content, sourceDocument, mimeType });
 
                       expect(secondFilteredContent).to.equal(filteredContent);
                     });

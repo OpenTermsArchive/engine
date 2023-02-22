@@ -1,25 +1,25 @@
 export default class Terms {
-  constructor({ service, termsType, documents, validUntil }) {
+  constructor({ service, termsType, sourceDocuments, validUntil }) {
     this.service = service;
     this.termsType = termsType;
-    this.documents = documents;
+    this.sourceDocuments = sourceDocuments;
 
     if (validUntil) {
       this.validUntil = validUntil;
     }
   }
 
-  get isMultiDocument() {
-    return this.documents.length > 1;
+  get hasMultiSourceDocuments() {
+    return this.sourceDocuments.length > 1;
   }
 
   toPersistence() {
     return {
       name: this.service.name,
       documents: {
-        [this.termsType]: this.isMultiDocument
-          ? { combine: this.documents.map(page => page.toPersistence()) }
-          : this.documents[0].toPersistence(),
+        [this.termsType]: this.hasMultiSourceDocuments
+          ? { combine: this.sourceDocuments.map(sourceDocument => sourceDocument.toPersistence()) }
+          : this.sourceDocuments[0].toPersistence(),
       },
     };
   }

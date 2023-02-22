@@ -1,5 +1,5 @@
-import Document from '../../src/archivist/services/document.js';
 import Service from '../../src/archivist/services/service.js';
+import SourceDocument from '../../src/archivist/services/sourceDocument.js';
 import Terms from '../../src/archivist/services/terms.js';
 
 const service = new Service({
@@ -21,22 +21,22 @@ const filters = [
     service,
     termsType: 'Community Guidelines',
     validUntil: null,
-    documents: [
-      new Document({
+    sourceDocuments: [
+      new SourceDocument({
         location: 'https://www.service-with-multi-documents-terms.example/community-standards',
         contentSelectors: '#main',
         noiseSelectors: 'body',
         filters: undefined,
         executeClientScripts: true,
       }),
-      new Document({
+      new SourceDocument({
         location: 'https://www.service-with-multi-documents-terms.example/community-standards/hate-speech/',
         contentSelectors: 'body',
         noiseSelectors: '#footer',
         filters: undefined,
         executeClientScripts: false,
       }),
-      new Document({
+      new SourceDocument({
         location: 'https://www.service-with-multi-documents-terms.example/community-standards/violence-incitement/',
         contentSelectors: 'body',
         noiseSelectors: 'body',
@@ -49,20 +49,20 @@ const filters = [
     service,
     termsType: 'Community Guidelines',
     validUntil: '2020-04-15T21:30:21.000Z',
-    documents: [
-      new Document({
+    sourceDocuments: [
+      new SourceDocument({
         location: 'https://www.service-with-multi-documents-terms.example/community-standards',
         contentSelectors: 'body',
         noiseSelectors: undefined,
         filters: undefined,
       }),
-      new Document({
+      new SourceDocument({
         location: 'https://www.service-with-multi-documents-terms.example/community-standards/hate-speech/',
         contentSelectors: 'body',
         noiseSelectors: undefined,
         filters: undefined,
       }),
-      new Document({
+      new SourceDocument({
         location: 'https://www.service-with-multi-documents-terms.example/community-standards/violence-incitement/',
         contentSelectors: 'body',
         noiseSelectors: undefined,
@@ -74,20 +74,20 @@ const filters = [
     service,
     termsType: 'Community Guidelines',
     validUntil: '2020-03-15T21:30:21.000Z',
-    documents: [
-      new Document({
+    sourceDocuments: [
+      new SourceDocument({
         location: 'https://www.service-with-multi-documents-terms.example/community-standards',
         contentSelectors: 'body',
         noiseSelectors: undefined,
         filters: undefined,
       }),
-      new Document({
+      new SourceDocument({
         location: 'https://www.service-with-multi-documents-terms.example/community-standards/hate-speech/',
         contentSelectors: 'body',
         noiseSelectors: undefined,
         filters: undefined,
       }),
-      new Document({
+      new SourceDocument({
         location: 'https://www.service-with-multi-documents-terms.example/community-standards/violence-incitement/',
         contentSelectors: 'body',
         noiseSelectors: undefined,

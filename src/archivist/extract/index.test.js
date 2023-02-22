@@ -6,7 +6,7 @@ import chai from 'chai';
 import jsdom from 'jsdom';
 
 import { InaccessibleContentError } from '../errors.js';
-import Document from '../services/document.js';
+import SourceDocument from '../services/sourceDocument.js';
 
 import { convertRelativeURLsToAbsolute, extractFromHTML, extractFromPDF } from './index.js';
 
@@ -132,7 +132,7 @@ describe('Extract', () => {
         it('extract content from the given HTML with common changing items', async () => {
           const result = await extractFromHTML({
             content: rawHTMLWithCommonChangingItems,
-            document: new Document({
+            sourceDocument: new SourceDocument({
               location: virtualLocation,
               contentSelectors: 'body',
             }),
@@ -144,7 +144,7 @@ describe('Extract', () => {
         it('extract content from the given HTML', async () => {
           const result = await extractFromHTML({
             content: rawHTML,
-            document: new Document({
+            sourceDocument: new SourceDocument({
               location: virtualLocation,
               contentSelectors: 'body',
             }),
@@ -157,7 +157,7 @@ describe('Extract', () => {
           it('throws an InaccessibleContentError error', async () => {
             await expect(extractFromHTML({
               content: rawHTML,
-              document: new Document({
+              sourceDocument: new SourceDocument({
                 location: virtualLocation,
                 contentSelectors: '#thisAnchorDoesNotExist',
               }),
@@ -169,7 +169,7 @@ describe('Extract', () => {
           it('throws an InaccessibleContentError error', async () => {
             await expect(extractFromHTML({
               content: rawHTML,
-              document: new Document({
+              sourceDocument: new SourceDocument({
                 location: virtualLocation,
                 contentSelectors: '#empty',
               }),
@@ -181,7 +181,7 @@ describe('Extract', () => {
           it('throws an InaccessibleContentError error', async () => {
             await expect(extractFromHTML({
               content: rawHTML,
-              document: new Document({
+              sourceDocument: new SourceDocument({
                 location: virtualLocation,
                 contentSelectors: '#whitespaceOnly',
               }),
@@ -193,7 +193,7 @@ describe('Extract', () => {
           it('extract content from the given HTML', async () => {
             const result = await extractFromHTML({
               content: rawHTML,
-              document: new Document({
+              sourceDocument: new SourceDocument({
                 location: virtualLocation,
                 contentSelectors: 'h1, #link2',
               }),
@@ -208,7 +208,7 @@ describe('Extract', () => {
         it('extract content from the given HTML', async () => {
           const result = await extractFromHTML({
             content: rawHTML,
-            document: new Document({
+            sourceDocument: new SourceDocument({
               location: virtualLocation,
               contentSelectors: [ 'h1', '#link2' ],
             }),
@@ -221,7 +221,7 @@ describe('Extract', () => {
           it('extract content from the given HTML', async () => {
             const result = await extractFromHTML({
               content: rawHTML,
-              document: new Document({
+              sourceDocument: new SourceDocument({
                 location: virtualLocation,
                 contentSelectors: [ 'h1', 'h1 ~ p' ],
               }),
@@ -237,7 +237,7 @@ describe('Extract', () => {
           it('extract content from the given HTML', async () => {
             const result = await extractFromHTML({
               content: rawHTML,
-              document: new Document({
+              sourceDocument: new SourceDocument({
                 location: virtualLocation,
                 contentSelectors: {
                   startBefore: '#link1',
@@ -253,7 +253,7 @@ describe('Extract', () => {
           it('extract content from the given HTML', async () => {
             const result = await extractFromHTML({
               content: rawHTML,
-              document: new Document({
+              sourceDocument: new SourceDocument({
                 location: virtualLocation,
                 contentSelectors: {
                   startBefore: '#link2',
@@ -269,7 +269,7 @@ describe('Extract', () => {
           it('extract content from the given HTML', async () => {
             const result = await extractFromHTML({
               content: rawHTML,
-              document: new Document({
+              sourceDocument: new SourceDocument({
                 location: virtualLocation,
                 contentSelectors: {
                   startAfter: '#link1',
@@ -285,7 +285,7 @@ describe('Extract', () => {
           it('extract content from the given HTML', async () => {
             const result = await extractFromHTML({
               content: rawHTML,
-              document: new Document({
+              sourceDocument: new SourceDocument({
                 location: virtualLocation,
                 contentSelectors: {
                   startAfter: '#link2',
@@ -301,7 +301,7 @@ describe('Extract', () => {
           it('throws an InaccessibleContentError error', async () => {
             await expect(extractFromHTML({
               content: rawHTML,
-              document: new Document({
+              sourceDocument: new SourceDocument({
                 location: virtualLocation,
                 contentSelectors: {
                   startAfter: '#paragraph1',
@@ -315,7 +315,7 @@ describe('Extract', () => {
           it('throws an InaccessibleContentError error', async () => {
             await expect(extractFromHTML({
               content: rawHTML,
-              document: new Document({
+              sourceDocument: new SourceDocument({
                 location: virtualLocation,
                 contentSelectors: {
                   startAfter: '#link2',
@@ -331,7 +331,7 @@ describe('Extract', () => {
         it('extract content from the given HTML', async () => {
           const result = await extractFromHTML({
             content: rawHTML,
-            document: new Document({
+            sourceDocument: new SourceDocument({
               location: virtualLocation,
               contentSelectors: [
                 {
@@ -354,7 +354,7 @@ describe('Extract', () => {
         it('extract content from the given HTML', async () => {
           const result = await extractFromHTML({
             content: rawHTML,
-            document: new Document({
+            sourceDocument: new SourceDocument({
               location: virtualLocation,
               contentSelectors: [
                 'h1',
@@ -376,7 +376,7 @@ describe('Extract', () => {
         it('removes the specified elements', async () => {
           const result = await extractFromHTML({
             content: rawHTML,
-            document: new Document({
+            sourceDocument: new SourceDocument({
               location: virtualLocation,
               contentSelectors: 'body',
               noiseSelectors: 'h1',
@@ -391,7 +391,7 @@ describe('Extract', () => {
         it('removes the specified elements', async () => {
           const result = await extractFromHTML({
             content: rawHTML,
-            document: new Document({
+            sourceDocument: new SourceDocument({
               location: virtualLocation,
               contentSelectors: 'body',
               noiseSelectors: [ 'h1', '#link3' ],
@@ -406,7 +406,7 @@ describe('Extract', () => {
         it('removes the specified elements', async () => {
           const result = await extractFromHTML({
             content: rawHTML,
-            document: new Document({
+            sourceDocument: new SourceDocument({
               location: virtualLocation,
               contentSelectors: 'body',
               noiseSelectors: {
@@ -422,7 +422,7 @@ describe('Extract', () => {
           it('throws an InaccessibleContentError error', async () => {
             await expect(extractFromHTML({
               content: rawHTML,
-              document: new Document({
+              sourceDocument: new SourceDocument({
                 location: virtualLocation,
                 contentSelectors: 'body',
                 noiseSelectors: {
@@ -437,7 +437,7 @@ describe('Extract', () => {
           it('throws an InaccessibleContentError error', async () => {
             await expect(extractFromHTML({
               content: rawHTML,
-              document: new Document({
+              sourceDocument: new SourceDocument({
                 location: virtualLocation,
                 contentSelectors: 'body',
                 noiseSelectors: {
@@ -453,7 +453,7 @@ describe('Extract', () => {
         it('removes all the selections', async () => {
           const result = await extractFromHTML({
             content: rawHTML,
-            document: new Document({
+            sourceDocument: new SourceDocument({
               location: virtualLocation,
               contentSelectors: 'body',
               noiseSelectors: [
@@ -477,7 +477,7 @@ describe('Extract', () => {
         it('removes all the selections', async () => {
           const result = await extractFromHTML({
             content: rawHTML,
-            document: new Document({
+            sourceDocument: new SourceDocument({
               location: virtualLocation,
               contentSelectors: 'body',
               noiseSelectors: [
@@ -497,7 +497,7 @@ describe('Extract', () => {
           it('removes all the selections', async () => {
             const result = await extractFromHTML({
               content: rawHTML,
-              document: new Document({
+              sourceDocument: new SourceDocument({
                 location: virtualLocation,
                 contentSelectors: 'body',
                 noiseSelectors: [
@@ -521,7 +521,7 @@ describe('Extract', () => {
         it('extract content from the given HTML also with given additional filter', async () => {
           const result = await extractFromHTML({
             content: rawHTML,
-            document: new Document({
+            sourceDocument: new SourceDocument({
               location: virtualLocation,
               contentSelectors: 'body',
               filters: [additionalFilter.removeLinks],
@@ -536,7 +536,7 @@ describe('Extract', () => {
         it('extract content from the given HTML also with given additional filter', async () => {
           const result = await extractFromHTML({
             content: rawHTML,
-            document: new Document({
+            sourceDocument: new SourceDocument({
               location: virtualLocation,
               contentSelectors: 'body',
               filters: [additionalFilter.removeLinksAsync],

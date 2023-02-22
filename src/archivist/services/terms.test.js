@@ -1,6 +1,6 @@
 import chai from 'chai';
 
-import Document from './document.js';
+import SourceDocument from './sourceDocument.js';
 import Terms from './terms.js';
 
 const { expect } = chai;
@@ -9,7 +9,7 @@ describe('Terms', () => {
   const service = { name: 'Service' };
   const termsType = 'Terms of Service';
   const URL = 'https://www.service.example/terms';
-  const document1 = new Document({
+  const document1 = new SourceDocument({
     location: URL,
     contentSelectors: [
       {
@@ -46,7 +46,7 @@ describe('Terms', () => {
     executeClientScripts: undefined,
   };
 
-  const document2 = new Document({
+  const document2 = new SourceDocument({
     location: URL,
     contentSelectors: 'body',
   });
@@ -60,8 +60,8 @@ describe('Terms', () => {
   };
 
   describe('#toPersistence', () => {
-    it('converts document with only one terms to JSON representation', async () => {
-      const result = new Terms({ service, termsType, documents: [document1] }).toPersistence();
+    it('converts terms with only one source document to JSON representation', async () => {
+      const result = new Terms({ service, termsType, sourceDocuments: [document1] }).toPersistence();
 
       const expectedResult = {
         name: service.name,
@@ -71,8 +71,8 @@ describe('Terms', () => {
       expect(result).to.deep.equal(expectedResult);
     });
 
-    it('converts document with multiple documents to JSON representation', async () => {
-      const result = new Terms({ service, termsType, documents: [ document1, document2 ] }).toPersistence();
+    it('converts terms with multiple source documents to JSON representation', async () => {
+      const result = new Terms({ service, termsType, sourceDocuments: [ document1, document2 ] }).toPersistence();
 
       const expectedResult = {
         name: service.name,
