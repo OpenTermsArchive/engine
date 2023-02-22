@@ -387,8 +387,8 @@ describe('GitRepository', () => {
         expect(commit.body).to.include(config.get('recorder.versions.storage.git.snapshotIdentiferTemplate').replace(SNAPSHOT_ID_MARKER, SNAPSHOT_ID_2));
       });
 
-      it('stores number of documents', () => {
-        expect(commit.body).to.include(`${snapshotIds.length} documents`);
+      it('stores number of source documents', () => {
+        expect(commit.body).to.include(`${snapshotIds.length} source documents`);
       });
 
       it('stores the service ID', () => {

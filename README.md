@@ -309,15 +309,15 @@ import extract from '@opentermsarchive/engine/extract';
 
 The `extract` function documentation is available [as JSDoc](./src/archivist/extract/index.js).
 
-#### `Document`
+#### `SourceDocument`
 
-The `Document` class encapsulates information about a terms' document tracked by Open Terms Archive.
+The `SourceDocument` class encapsulates information about a terms' source document tracked by Open Terms Archive.
 
 ```js
-import Document from '@opentermsarchive/engine/document';
+import SourceDocument from '@opentermsarchive/engine/sourceDocument';
 ```
 
-The `Document` format is defined [in source code](./src/archivist/services/document.js).
+The `SourceDocument` format is defined [in source code](./src/archivist/services/sourceDocument.js).
 
 ## Configuring
 

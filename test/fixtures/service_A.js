@@ -1,5 +1,5 @@
-import Document from '../../src/archivist/services/document.js';
 import Service from '../../src/archivist/services/service.js';
+import SourceDocument from '../../src/archivist/services/sourceDocument.js';
 import Terms from '../../src/archivist/services/terms.js';
 
 const service = new Service({
@@ -11,7 +11,7 @@ service.addTerms(new Terms({
   service,
   termsType: 'Terms of Service',
   validUntil: null,
-  documents: [new Document({
+  sourceDocuments: [new SourceDocument({
     location: 'https://www.servicea.example/tos',
     contentSelectors: 'body',
     noiseSelectors: undefined,

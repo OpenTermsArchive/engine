@@ -10,8 +10,8 @@ const termsProperties = () => {
   AVAILABLE_TYPES_NAME.forEach(type => {
     result[type] = {
       oneOf: [
-        { $ref: '#/definitions/singlePageDocument' },
-        { $ref: '#/definitions/multiPageDocument' },
+        { $ref: '#/definitions/singleSourceDocumentsTerms' },
+        { $ref: '#/definitions/multiSourceDocumentsTerms' },
         { $ref: '#/definitions/pdfDocument' },
       ],
     };
@@ -52,7 +52,7 @@ const schema = {
       required: ['fetch'],
       properties: { fetch: { $ref: '#/definitions/pdfLocation' } },
     },
-    page: {
+    sourceDocument: {
       type: 'object',
       additionalProperties: false,
       required: ['fetch'],
@@ -64,20 +64,20 @@ const schema = {
         executeClientScripts: { $ref: '#/definitions/executeClientScripts' },
       },
     },
-    singlePageDocument: {
+    singleSourceDocumentsTerms: {
       allOf: [
-        { $ref: '#/definitions/page' },
+        { $ref: '#/definitions/sourceDocument' },
         { required: [ 'fetch', 'select' ] },
       ],
     },
-    multiPageDocument: {
+    multiSourceDocumentsTerms: {
       type: 'object',
       additionalProperties: false,
       required: ['combine'],
       properties: {
         combine: {
           type: 'array',
-          items: { $ref: '#/definitions/page' },
+          items: { $ref: '#/definitions/sourceDocument' },
         },
         select: { $ref: '#/definitions/contentSelectors' },
         filter: { $ref: '#/definitions/filters' },

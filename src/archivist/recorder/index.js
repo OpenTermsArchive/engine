@@ -35,11 +35,11 @@ export default class Recorder {
     }
 
     if (!content) {
-      throw new Error('A document content is required');
+      throw new Error('A source document content is required');
     }
 
     if (!mimeType) {
-      throw new Error('A document mime type is required to ensure data consistency');
+      throw new Error('A source document mime type is required to ensure data consistency');
     }
 
     return this.snapshotsRepository.save(new Record({ serviceId, termsType, documentId, fetchDate, mimeType, content }));
@@ -63,7 +63,7 @@ export default class Recorder {
     }
 
     if (!content) {
-      throw new Error('A document content is required');
+      throw new Error('A source document content is required');
     }
 
     const mimeType = mime.getType('markdown'); // A version is always in markdown format

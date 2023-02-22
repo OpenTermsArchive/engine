@@ -36,11 +36,11 @@ export default class RepositoryInterface {
 
   /**
   * Find the most recent record that matches the given service ID and terms type and optionally the document ID
-  * In case of snapshots, if the record is related to a multi documents, the document ID is required to find the corresponding snapshot
+  * In case of snapshots, if the record is related to a multi source documents terms, the document ID is required to find the corresponding snapshot
   *
   * @param {string} serviceId - Service ID of record to find
   * @param {string} termsType - Terms type of record to find
-  * @param {string} [documentId] - Document ID of record to find. Used to differentiate document of multi documents terms. Not necessary for single document terms
+  * @param {string} [documentId] - Document ID of record to find. Used to differentiate document of multi source documents terms. Not necessary for single source document terms
   * @returns {Promise<Record>} Promise that will be resolved with the found record or an empty object if none match the given criteria
   */
   async findLatest(serviceId, termsType, documentId) {

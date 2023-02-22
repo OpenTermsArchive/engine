@@ -15,7 +15,7 @@ export const COMMIT_MESSAGE_PREFIX = {
 export const TERMS_TYPE_AND_DOCUMENT_ID_SEPARATOR = ' #';
 export const SNAPSHOT_ID_MARKER = '%SNAPSHOT_ID';
 const SINGLE_SNAPSHOT_PREFIX = 'This version was recorded after filtering snapshot';
-const MULTIPLE_SNAPSHOT_PREFIX = 'This version was recorded after filtering and assembling the following snapshots from %NUMBER documents:';
+const MULTIPLE_SNAPSHOT_PREFIX = 'This version was recorded after filtering and assembling the following snapshots from %NUMBER source documents:';
 
 export const COMMIT_MESSAGE_PREFIXES_REGEXP = new RegExp(`^(${COMMIT_MESSAGE_PREFIX.startTracking}|${COMMIT_MESSAGE_PREFIX.refilter}|${COMMIT_MESSAGE_PREFIX.update})`);
 
@@ -27,7 +27,7 @@ export function toPersistence(record, snapshotIdentiferTemplate) {
   prefix = isFirstRecord ? COMMIT_MESSAGE_PREFIX.startTracking : prefix;
 
   const subject = `${prefix} ${serviceId} ${termsType}`;
-  const pageIdMessage = `${documentId ? `Document ID ${documentId}\n\n` : ''}`;
+  const documentIdMessage = `${documentId ? `Document ID ${documentId}\n\n` : ''}`;
   let snapshotIdsMessage;
 
   if (snapshotIds.length == 1) {
@@ -39,7 +39,7 @@ export function toPersistence(record, snapshotIdentiferTemplate) {
   const filePath = generateFilePath(serviceId, termsType, documentId, mimeType);
 
   return {
-    message: `${subject}\n\n${pageIdMessage || ''}\n\n${snapshotIdsMessage || ''}`,
+    message: `${subject}\n\n${documentIdMessage || ''}\n\n${snapshotIdsMessage || ''}`,
     content: record.content,
     filePath,
   };
@@ -51,7 +51,7 @@ export function toDomain(commit) {
   const modifiedFilesInCommit = diff.files.map(({ file }) => file);
 
   if (modifiedFilesInCommit.length > 1) {
-    throw new Error(`Only one document should have been recorded in ${hash}, but all these documents were recorded: ${modifiedFilesInCommit.join(', ')}`);
+    throw new Error(`Only one file should have been recorded in ${hash}, but all these files were recorded: ${modifiedFilesInCommit.join(', ')}`);
   }
 
   const [relativeFilePath] = modifiedFilesInCommit;
@@ -77,7 +77,7 @@ function generateFileName(termsType, documentId, extension) {
 }
 
 export function generateFilePath(serviceId, termsType, documentId, mimeType) {
-  const extension = mime.getExtension(mimeType) || '*'; // If mime type is undefined, an asterisk is set as an extension. Used to match all files for the given service ID, terms type and page ID when mime type is unknown.
+  const extension = mime.getExtension(mimeType) || '*'; // If mime type is undefined, an asterisk is set as an extension. Used to match all files for the given service ID, terms type and document ID when mime type is unknown.
 
   return `${serviceId}/${generateFileName(termsType, documentId, extension)}`; // Do not use `path.join` as even for Windows, the path should be with `/` and not `\`. See https://github.com/ambanum/OpenTermsArchive/runs/8110230474?check_suite_focus=true#step:7:125
 }

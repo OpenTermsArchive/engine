@@ -1,17 +1,17 @@
 import chai from 'chai';
 
-import Document from './document.js';
+import SourceDocument from './sourceDocument.js';
 
 const { expect } = chai;
 
-describe('Document', () => {
+describe('SourceDocument', () => {
   const URL = 'https://www.service.example/terms';
 
   describe('#getCssSelectors', () => {
     context('with "select" property', () => {
       context('with string selector', () => {
         it('extracts selectors', async () => {
-          const result = new Document({ location: URL, contentSelectors: 'body' }).cssSelectors;
+          const result = new SourceDocument({ location: URL, contentSelectors: 'body' }).cssSelectors;
 
           expect(result).to.deep.equal(['body']);
         });
@@ -19,7 +19,7 @@ describe('Document', () => {
 
       context('with range selector', () => {
         it('extracts selectors', async () => {
-          const result = new Document({
+          const result = new SourceDocument({
             location: URL,
             contentSelectors: {
               startBefore: '#startBefore',
@@ -33,7 +33,7 @@ describe('Document', () => {
 
       context('with an array of mixed selectors', () => {
         it('extracts selectors', async () => {
-          const result = new Document({
+          const result = new SourceDocument({
             location: URL,
             contentSelectors: [
               {
@@ -52,7 +52,7 @@ describe('Document', () => {
     context('with "remove" property', () => {
       context('with string selector', () => {
         it('extracts selectors', async () => {
-          const result = new Document({ location: URL, noiseSelectors: 'body' }).cssSelectors;
+          const result = new SourceDocument({ location: URL, noiseSelectors: 'body' }).cssSelectors;
 
           expect(result).to.deep.equal(['body']);
         });
@@ -60,7 +60,7 @@ describe('Document', () => {
 
       context('with range selector', () => {
         it('extracts selectors', async () => {
-          const result = new Document({
+          const result = new SourceDocument({
             location: URL,
             noiseSelectors: {
               startBefore: '#startBefore',
@@ -74,7 +74,7 @@ describe('Document', () => {
 
       context('with an array of mixed selectors', () => {
         it('extracts selectors', async () => {
-          const result = new Document({
+          const result = new SourceDocument({
             location: URL,
             noiseSelectors: [
               {
@@ -93,7 +93,7 @@ describe('Document', () => {
     context('with both "select" and "remove" property', () => {
       context('with string selector', () => {
         it('extracts selectors', async () => {
-          const result = new Document({
+          const result = new SourceDocument({
             location: URL,
             contentSelectors: 'body',
             noiseSelectors: 'h1',
@@ -105,7 +105,7 @@ describe('Document', () => {
 
       context('with range selector', () => {
         it('extracts selectors', async () => {
-          const result = new Document({
+          const result = new SourceDocument({
             location: URL,
             contentSelectors: {
               startBefore: '#startBefore',
@@ -128,7 +128,7 @@ describe('Document', () => {
 
       context('with an array of mixed selectors', () => {
         it('extracts selectors', async () => {
-          const result = new Document({
+          const result = new SourceDocument({
             location: URL,
             contentSelectors: [
               {
@@ -160,8 +160,8 @@ describe('Document', () => {
   });
 
   describe('#toPersistence', () => {
-    it('converts basic page declaration into JSON representation', async () => {
-      const result = new Document({
+    it('converts basic source document declaration into JSON representation', async () => {
+      const result = new SourceDocument({
         location: URL,
         contentSelectors: 'body',
       }).toPersistence();
@@ -177,8 +177,8 @@ describe('Document', () => {
       expect(result).to.deep.equal(expectedResult);
     });
 
-    it('converts page declaration with all fields to JSON representation', async () => {
-      const result = new Document({
+    it('converts source document declaration with all fields to JSON representation', async () => {
+      const result = new SourceDocument({
         location: URL,
         contentSelectors: [
           {
