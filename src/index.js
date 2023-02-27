@@ -15,10 +15,10 @@ export default async function track({ services = [], termsTypes, extractOnly, sc
 
   logger.info('Start Open Terms Archive\n');
 
-  let serviceIds;
+  let servicesIds;
 
   if (services.length) {
-    serviceIds = services.filter(serviceId => {
+    servicesIds = services.filter(serviceId => {
       const isServiceDeclared = archivist.serviceDeclarations[serviceId];
 
       if (!isServiceDeclared) {
@@ -31,7 +31,7 @@ export default async function track({ services = [], termsTypes, extractOnly, sc
 
   // The result of the extraction step that generates the version from the snapshots may depend on changes to the engine or its dependencies.
   // So, let's start by only performing the extraction process so that we can annotate any versions generated related to such changes and avoid sending notifications.
-  await archivist.trackAllTermsChanges({ serviceIds, termsTypes, extractOnly: true });
+  await archivist.trackAllTermsChanges({ servicesIds, termsTypes, extractOnly: true });
 
   if (extractOnly) {
     return;
@@ -49,7 +49,7 @@ export default async function track({ services = [], termsTypes, extractOnly, sc
   }
 
   if (!schedule) {
-    await archivist.trackAllTermsChanges({ serviceIds, termsTypes });
+    await archivist.trackAllTermsChanges({ servicesIds, termsTypes });
 
     return;
   }
@@ -57,5 +57,5 @@ export default async function track({ services = [], termsTypes, extractOnly, sc
   logger.info('The scheduler is running…');
   logger.info('Terms will be tracked every six hours starting at half past midnight');
 
-  cron('30 */6 * * *', () => archivist.trackAllTermsChanges({ serviceIds, termsTypes }));
+  cron('30 */6 * * *', () => archivist.trackAllTermsChanges({ servicesIds, termsTypes }));
 }
