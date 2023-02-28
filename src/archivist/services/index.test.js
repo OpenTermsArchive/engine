@@ -19,7 +19,7 @@ describe('Services', () => {
           let actualDocumentDeclaration;
           let actualFilters;
           let actualContentSelectors;
-          let actualNoiseSelectors;
+          let actualInsignificantContentSelectors;
           let actualExecuteClientScripts;
 
           const expectedDocumentDeclaration = expected.getTerms(termsType);
@@ -30,7 +30,7 @@ describe('Services', () => {
             const {
               filters: expectedFilters,
               contentSelectors: expectedContentSelectors,
-              noiseSelectors: expectedNoiseSelectors,
+              insignificantContentSelectors: expectedInsignificantContentSelectors,
               executeClientScripts: expectedExecuteClientScripts,
             } = sourceDocument;
 
@@ -42,7 +42,7 @@ describe('Services', () => {
                 ({
                   filters: actualFilters,
                   contentSelectors: actualContentSelectors,
-                  noiseSelectors: actualNoiseSelectors,
+                  insignificantContentSelectors: actualInsignificantContentSelectors,
                   executeClientScripts: actualExecuteClientScripts,
                 } = actualDocuments[index]);
               });
@@ -63,8 +63,8 @@ describe('Services', () => {
                 expect(actualContentSelectors).to.equal(expectedContentSelectors);
               });
 
-              it('has the proper noise selectors', async () => {
-                expect(actualNoiseSelectors).to.equal(expectedNoiseSelectors);
+              it('has the proper insignificant content selectors', async () => {
+                expect(actualInsignificantContentSelectors).to.equal(expectedInsignificantContentSelectors);
               });
 
               it('has the proper executeClientScripts option', async () => {
@@ -189,14 +189,14 @@ describe('Services', () => {
                   context(`${date || 'Current'}`, () => {
                     let actualFiltersForThisDate;
                     let contentSelectorsForThisDate;
-                    let noiseSelectorsForThisDate;
+                    let insignificantContentSelectorsForThisDate;
                     let actualExecuteClientScriptsForThisDate;
 
                     const { sourceDocuments: documentsForThisDate } = expected.getTerms(termsType, date);
                     const {
                       filters: expectedFiltersForThisDate,
                       contentSelectors: expectedContentSelectors,
-                      noiseSelectors: expectedNoiseSelectors,
+                      insignificantContentSelectors: expectedInsignificantContentSelectors,
                       expectedExecuteClientScripts: expectedExecuteClientScriptsForThisDate,
                     } = documentsForThisDate[index];
 
@@ -206,7 +206,7 @@ describe('Services', () => {
                       ({
                         filters: actualFiltersForThisDate,
                         contentSelectors: contentSelectorsForThisDate,
-                        noiseSelectors: noiseSelectorsForThisDate,
+                        insignificantContentSelectors: insignificantContentSelectorsForThisDate,
                         expectedExecuteClientScripts: actualExecuteClientScriptsForThisDate,
                       } = actualDocumentsForThisDate[index]);
                     });
@@ -215,8 +215,8 @@ describe('Services', () => {
                       expect(contentSelectorsForThisDate).to.equal(expectedContentSelectors);
                     });
 
-                    it('has the proper noise selectors', async () => {
-                      expect(noiseSelectorsForThisDate).to.equal(expectedNoiseSelectors);
+                    it('has the proper insignificant content selectors', async () => {
+                      expect(insignificantContentSelectorsForThisDate).to.equal(expectedInsignificantContentSelectors);
                     });
 
                     it('has the proper executeClientScripts option', async () => {

@@ -14,7 +14,7 @@ service.addTerms(new Terms({
   sourceDocuments: [new SourceDocument({
     location: 'https://www.servicea.example/tos',
     contentSelectors: 'body',
-    noiseSelectors: undefined,
+    insignificantContentSelectors: undefined,
     filters: undefined,
   })],
 }));

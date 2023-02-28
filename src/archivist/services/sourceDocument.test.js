@@ -52,7 +52,7 @@ describe('SourceDocument', () => {
     context('with "remove" property', () => {
       context('with string selector', () => {
         it('extracts selectors', async () => {
-          const result = new SourceDocument({ location: URL, noiseSelectors: 'body' }).cssSelectors;
+          const result = new SourceDocument({ location: URL, insignificantContentSelectors: 'body' }).cssSelectors;
 
           expect(result).to.deep.equal(['body']);
         });
@@ -62,7 +62,7 @@ describe('SourceDocument', () => {
         it('extracts selectors', async () => {
           const result = new SourceDocument({
             location: URL,
-            noiseSelectors: {
+            insignificantContentSelectors: {
               startBefore: '#startBefore',
               endBefore: '#endBefore',
             },
@@ -76,7 +76,7 @@ describe('SourceDocument', () => {
         it('extracts selectors', async () => {
           const result = new SourceDocument({
             location: URL,
-            noiseSelectors: [
+            insignificantContentSelectors: [
               {
                 startBefore: '#startBefore',
                 endBefore: '#endBefore',
@@ -96,7 +96,7 @@ describe('SourceDocument', () => {
           const result = new SourceDocument({
             location: URL,
             contentSelectors: 'body',
-            noiseSelectors: 'h1',
+            insignificantContentSelectors: 'h1',
           }).cssSelectors;
 
           expect(result).to.deep.equal([ 'body', 'h1' ]);
@@ -111,7 +111,7 @@ describe('SourceDocument', () => {
               startBefore: '#startBefore',
               endBefore: '#endBefore',
             },
-            noiseSelectors: {
+            insignificantContentSelectors: {
               startBefore: '#startBefore',
               endBefore: '#endBefore',
             },
@@ -137,7 +137,7 @@ describe('SourceDocument', () => {
               },
               'body',
             ],
-            noiseSelectors: [
+            insignificantContentSelectors: [
               {
                 startBefore: '#startBefore',
                 endBefore: '#endBefore',
@@ -187,7 +187,7 @@ describe('SourceDocument', () => {
           },
           'body',
         ],
-        noiseSelectors: [
+        insignificantContentSelectors: [
           {
             startBefore: '#startBefore',
             endBefore: '#endBefore',

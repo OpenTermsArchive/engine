@@ -1,19 +1,19 @@
 export default class SourceDocument {
-  constructor({ location, executeClientScripts, contentSelectors, noiseSelectors, filters }) {
+  constructor({ location, executeClientScripts, contentSelectors, insignificantContentSelectors, filters }) {
     this.location = location;
     this.executeClientScripts = executeClientScripts;
     this.contentSelectors = contentSelectors;
-    this.noiseSelectors = noiseSelectors;
+    this.insignificantContentSelectors = insignificantContentSelectors;
     this.filters = filters;
     this.id = new URL(location).pathname.split('/').filter(Boolean).join('-');
   }
 
   get cssSelectors() {
-    const { contentSelectors, noiseSelectors } = this;
+    const { contentSelectors, insignificantContentSelectors } = this;
 
     const result = [
       ...SourceDocument.extractCssSelectorsFromProperty(contentSelectors),
-      ...SourceDocument.extractCssSelectorsFromProperty(noiseSelectors),
+      ...SourceDocument.extractCssSelectorsFromProperty(insignificantContentSelectors),
     ];
 
     return result.filter(selector => selector);
@@ -43,7 +43,7 @@ export default class SourceDocument {
     return {
       fetch: this.location,
       select: this.contentSelectors,
-      remove: this.noiseSelectors,
+      remove: this.insignificantContentSelectors,
       filter: this.filters ? this.filters.map(filter => filter.name) : undefined,
       executeClientScripts: this.executeClientScripts,
     };

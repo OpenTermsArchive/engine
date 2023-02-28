@@ -24,7 +24,7 @@ const filters = [
       new SourceDocument({
         location: 'https://www.service-with-history.example/terms',
         contentSelectors: 'main',
-        noiseSelectors: undefined,
+        insignificantContentSelectors: undefined,
         filters,
       }),
     ],
@@ -37,7 +37,7 @@ const filters = [
       new SourceDocument({
         location: 'https://www.service-with-history.example/tos',
         contentSelectors: 'body',
-        noiseSelectors: undefined,
+        insignificantContentSelectors: undefined,
         filters: undefined,
       }),
     ],
@@ -50,7 +50,7 @@ const filters = [
       new SourceDocument({
         location: 'https://www.service-with-history.example/tos',
         contentSelectors: 'body',
-        noiseSelectors: undefined,
+        insignificantContentSelectors: undefined,
         filters: undefined,
       }),
     ],
@@ -63,7 +63,7 @@ const filters = [
       new SourceDocument({
         location: 'https://www.service-with-history.example/tos',
         contentSelectors: 'main',
-        noiseSelectors: undefined,
+        insignificantContentSelectors: undefined,
         filters: [
           async function removeShareButton() {
             return 'first-removeShareButton';
@@ -80,7 +80,7 @@ const filters = [
       new SourceDocument({
         location: 'https://www.service-with-history.example/tos',
         contentSelectors: 'main',
-        noiseSelectors: undefined,
+        insignificantContentSelectors: undefined,
         filters: [
           async function removeShareButton() {
             return 'second-removeShareButton';
@@ -97,7 +97,7 @@ const filters = [
       new SourceDocument({
         location: 'https://www.service-with-history.example/terms_of_service',
         contentSelectors: 'body',
-        noiseSelectors: undefined,
+        insignificantContentSelectors: undefined,
         filters: [
           async function removeShareButton() {
             return 'second-removeShareButton';
@@ -117,7 +117,7 @@ const filters = [
       new SourceDocument({
         location: 'https://www.service-with-history.example/terms',
         contentSelectors: 'main',
-        noiseSelectors: undefined,
+        insignificantContentSelectors: undefined,
         filters: [
           async function removeShareButton() {
             return 'second-removeShareButton';
@@ -137,7 +137,7 @@ const filters = [
       new SourceDocument({
         location: 'https://www.service-with-history.example/terms',
         contentSelectors: 'main',
-        noiseSelectors: undefined,
+        insignificantContentSelectors: undefined,
         filters: [
           async function removeShareButton() {
             return 'third-removeShareButton';
@@ -157,7 +157,7 @@ const filters = [
       new SourceDocument({
         location: 'https://www.service-with-history.example/terms',
         contentSelectors: 'main',
-        noiseSelectors: undefined,
+        insignificantContentSelectors: undefined,
         filters: [
           async function removeShareButton() {
             return 'third-removeShareButton';
@@ -177,7 +177,7 @@ const filters = [
       new SourceDocument({
         location: 'https://www.service-with-history.example/privacy',
         contentSelectors: 'body',
-        noiseSelectors: undefined,
+        insignificantContentSelectors: undefined,
         filters: undefined,
       }),
     ],

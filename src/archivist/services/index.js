@@ -56,17 +56,17 @@ async function loadServiceFilters(serviceId, filterNames) {
 }
 
 async function loadServiceDocument(service, termsType, termsTypeDeclaration) {
-  const { filter: filterNames, fetch: location, executeClientScripts, select: contentSelectors, remove: noiseSelectors, combine } = termsTypeDeclaration;
+  const { filter: filterNames, fetch: location, executeClientScripts, select: contentSelectors, remove: insignificantContentSelectors, combine } = termsTypeDeclaration;
 
   const sourceDocuments = [];
 
   const filters = await loadServiceFilters(service.id, filterNames);
 
   if (!combine) {
-    sourceDocuments.push(new SourceDocument({ location, executeClientScripts, contentSelectors, noiseSelectors, filters }));
+    sourceDocuments.push(new SourceDocument({ location, executeClientScripts, contentSelectors, insignificantContentSelectors, filters }));
   } else {
     for (const sourceDocument of combine) {
-      const { filter: sourceDocumentFilterNames, fetch: sourceDocumentLocation, executeClientScripts: sourceDocumentExecuteClientScripts, select: sourceDocumentContentSelectors, remove: sourceDocumentNoiseSelectors } = sourceDocument;
+      const { filter: sourceDocumentFilterNames, fetch: sourceDocumentLocation, executeClientScripts: sourceDocumentExecuteClientScripts, select: sourceDocumentContentSelectors, remove: sourceDocumentInsignificantContentSelectors } = sourceDocument;
 
       const sourceDocumentFilters = await loadServiceFilters(service.id, sourceDocumentFilterNames); // eslint-disable-line no-await-in-loop
 
@@ -74,7 +74,7 @@ async function loadServiceDocument(service, termsType, termsTypeDeclaration) {
         location: sourceDocumentLocation || location,
         executeClientScripts: (sourceDocumentExecuteClientScripts === undefined || sourceDocumentExecuteClientScripts === null ? executeClientScripts : sourceDocumentExecuteClientScripts),
         contentSelectors: sourceDocumentContentSelectors || contentSelectors,
-        noiseSelectors: sourceDocumentNoiseSelectors || noiseSelectors,
+        insignificantContentSelectors: sourceDocumentInsignificantContentSelectors || insignificantContentSelectors,
         filters: sourceDocumentFilters || filters,
       }));
     }
@@ -126,12 +126,12 @@ export async function loadWithHistory(servicesIds = []) {
             location: declarationForThisDate.fetch,
             executeClientScripts: declarationForThisDate.executeClientScripts,
             contentSelectors: declarationForThisDate.select,
-            noiseSelectors: declarationForThisDate.remove,
+            insignificantContentSelectors: declarationForThisDate.remove,
             filters: actualFilters,
           }));
         } else {
           for (const sourceDocument of combine) {
-            const { filter: sourceDocumentFilterNames, fetch: sourceDocumentLocation, executeClientScripts: sourceDocumentExecuteClientScripts, select: sourceDocumentContentSelectors, remove: sourceDocumentNoiseSelectors } = sourceDocument;
+            const { filter: sourceDocumentFilterNames, fetch: sourceDocumentLocation, executeClientScripts: sourceDocumentExecuteClientScripts, select: sourceDocumentContentSelectors, remove: sourceDocumentInsignificantContentSelectors } = sourceDocument;
 
             const sourceDocumentFilters = await loadServiceFilters(serviceId, sourceDocumentFilterNames); // eslint-disable-line no-await-in-loop
 
@@ -139,7 +139,7 @@ export async function loadWithHistory(servicesIds = []) {
               location: sourceDocumentLocation || declarationForThisDate.fetch,
               executeClientScripts: (sourceDocumentExecuteClientScripts === undefined || sourceDocumentExecuteClientScripts === null ? declarationForThisDate.executeClientScripts : sourceDocumentExecuteClientScripts),
               contentSelectors: sourceDocumentContentSelectors || declarationForThisDate.select,
-              noiseSelectors: sourceDocumentNoiseSelectors || declarationForThisDate.remove,
+              insignificantContentSelectors: sourceDocumentInsignificantContentSelectors || declarationForThisDate.remove,
               filters: sourceDocumentFilters || actualFilters,
             }));
           }

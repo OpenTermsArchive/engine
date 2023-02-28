@@ -13,7 +13,7 @@ service.addTerms(new Terms({
   sourceDocuments: [new SourceDocument({
     location: 'https://www.serviceb.example/privacy',
     contentSelectors: 'body',
-    noiseSelectors: undefined,
+    insignificantContentSelectors: undefined,
     filters: undefined,
   })],
   validUntil: null,

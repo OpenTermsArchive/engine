@@ -22,7 +22,7 @@ service.addTerms(new Terms({
   sourceDocuments: [new SourceDocument({
     location: 'https://www.service-without-history.example/tos',
     contentSelectors: 'body',
-    noiseSelectors: undefined,
+    insignificantContentSelectors: undefined,
     filters,
   })],
   validUntil: null,

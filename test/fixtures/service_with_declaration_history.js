@@ -24,7 +24,7 @@ const filters = [
       new SourceDocument({
         location: 'https://www.service-with-declaration-history.example/terms',
         contentSelectors: 'main',
-        noiseSelectors: undefined,
+        insignificantContentSelectors: undefined,
         filters,
       }),
     ],
@@ -37,7 +37,7 @@ const filters = [
       new SourceDocument({
         location: 'https://www.service-with-declaration-history.example/tos',
         contentSelectors: 'body',
-        noiseSelectors: undefined,
+        insignificantContentSelectors: undefined,
         filters: undefined,
       }),
     ],
@@ -50,7 +50,7 @@ const filters = [
       new SourceDocument({
         location: 'https://www.service-with-declaration-history.example/tos',
         contentSelectors: 'main',
-        noiseSelectors: undefined,
+        insignificantContentSelectors: undefined,
         filters: [
           async function removeShareButton() {
             return 'last-removeShareButton';
