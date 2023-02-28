@@ -18,7 +18,7 @@ describe('Terms', () => {
       },
       'body',
     ],
-    noiseSelectors: [
+    insignificantContentSelectors: [
       {
         startBefore: '#startBefore',
         endBefore: '#endBefore',

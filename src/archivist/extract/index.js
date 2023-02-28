@@ -44,7 +44,7 @@ export async function extractFromHTML({ content, sourceDocument }) {
   const {
     location,
     contentSelectors = [],
-    noiseSelectors = [],
+    insignificantContentSelectors = [],
     filters: serviceSpecificFilters = [],
   } = sourceDocument;
 
@@ -61,7 +61,7 @@ export async function extractFromHTML({ content, sourceDocument }) {
       await filterFunction(webPageDOM, {
         fetch: location,
         select: contentSelectors,
-        remove: noiseSelectors,
+        remove: insignificantContentSelectors,
         filter: serviceSpecificFilters.map(filter => filter.name),
       });
       /* eslint-enable no-await-in-loop */
@@ -70,7 +70,7 @@ export async function extractFromHTML({ content, sourceDocument }) {
     }
   }
 
-  remove(webPageDOM, noiseSelectors); // remove function works in place
+  remove(webPageDOM, insignificantContentSelectors); // remove function works in place
 
   const domFragment = select(webPageDOM, contentSelectors);
 
@@ -143,11 +143,11 @@ export function convertRelativeURLsToAbsolute(webPageDOM, baseURL) {
 }
 
 // Works in place
-function remove(webPageDOM, noiseSelectors) {
+function remove(webPageDOM, insignificantContentSelectors) {
   const rangeSelections = [];
   const nodes = [];
 
-  [].concat(noiseSelectors).forEach(selector => {
+  [].concat(insignificantContentSelectors).forEach(selector => {
     if (typeof selector === 'object') {
       rangeSelections.push(selectRange(webPageDOM, selector));
     } else {

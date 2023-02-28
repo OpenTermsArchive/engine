@@ -379,7 +379,7 @@ describe('Extract', () => {
             sourceDocument: new SourceDocument({
               location: virtualLocation,
               contentSelectors: 'body',
-              noiseSelectors: 'h1',
+              insignificantContentSelectors: 'h1',
             }),
           });
 
@@ -394,7 +394,7 @@ describe('Extract', () => {
             sourceDocument: new SourceDocument({
               location: virtualLocation,
               contentSelectors: 'body',
-              noiseSelectors: [ 'h1', '#link3' ],
+              insignificantContentSelectors: [ 'h1', '#link3' ],
             }),
           });
 
@@ -409,7 +409,7 @@ describe('Extract', () => {
             sourceDocument: new SourceDocument({
               location: virtualLocation,
               contentSelectors: 'body',
-              noiseSelectors: {
+              insignificantContentSelectors: {
                 startBefore: '#link1',
                 endAfter: '#link3',
               },
@@ -425,7 +425,7 @@ describe('Extract', () => {
               sourceDocument: new SourceDocument({
                 location: virtualLocation,
                 contentSelectors: 'body',
-                noiseSelectors: {
+                insignificantContentSelectors: {
                   startAfter: '#paragraph1',
                   endAfter: '#link2',
                 },
@@ -440,7 +440,7 @@ describe('Extract', () => {
               sourceDocument: new SourceDocument({
                 location: virtualLocation,
                 contentSelectors: 'body',
-                noiseSelectors: {
+                insignificantContentSelectors: {
                   startAfter: '#link2',
                   endAfter: '#paragraph1',
                 },
@@ -456,7 +456,7 @@ describe('Extract', () => {
             sourceDocument: new SourceDocument({
               location: virtualLocation,
               contentSelectors: 'body',
-              noiseSelectors: [
+              insignificantContentSelectors: [
                 {
                   startBefore: 'h1',
                   endBefore: '#link1',
@@ -480,7 +480,7 @@ describe('Extract', () => {
             sourceDocument: new SourceDocument({
               location: virtualLocation,
               contentSelectors: 'body',
-              noiseSelectors: [
+              insignificantContentSelectors: [
                 'h1',
                 {
                   startBefore: '#link3',
@@ -500,7 +500,7 @@ describe('Extract', () => {
               sourceDocument: new SourceDocument({
                 location: virtualLocation,
                 contentSelectors: 'body',
-                noiseSelectors: [
+                insignificantContentSelectors: [
                   'h1',
                   {
                     startAfter: 'h1',
