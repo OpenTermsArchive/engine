@@ -130,7 +130,7 @@ export default class Archivist extends events.EventEmitter {
       serviceId: terms.service.id,
       termsType: terms.type,
       fetchDate,
-      extractOnly,
+      isExtractOnly: extractOnly,
     });
   }
 
@@ -208,14 +208,14 @@ export default class Archivist extends events.EventEmitter {
     return snapshotId;
   }
 
-  async recordVersion({ content, fetchDate, snapshotIds, serviceId, termsType, extractOnly }) {
+  async recordVersion({ content, fetchDate, snapshotIds, serviceId, termsType, isExtractOnly }) {
     const { id: versionId, isFirstRecord } = await this.recorder.recordVersion({
       serviceId,
       termsType,
       content,
       fetchDate,
       snapshotIds,
-      extractOnly,
+      isExtractOnly,
     });
 
     if (!versionId) {
