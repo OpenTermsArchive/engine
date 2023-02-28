@@ -44,8 +44,8 @@ export default class GitRepository extends RepositoryInterface {
 
     const filePath = path.join(this.path, relativeFilePath);
 
-    await GitRepository.#writeFile({ filePath, content });
-    const sha = await this.#commit({ filePath, message, date: fetchDate });
+    await GitRepository.writeFile({ filePath, content });
+    const sha = await this.commit({ filePath, message, date: fetchDate });
 
     if (!sha) {
       return Object(null);
@@ -82,11 +82,7 @@ export default class GitRepository extends RepositoryInterface {
   }
 
   async count() {
-    return (await this.git.log([
-      `--grep=${DataMapper.COMMIT_MESSAGE_PREFIX.startTracking}`,
-      `--grep=${DataMapper.COMMIT_MESSAGE_PREFIX.refilter}`,
-      `--grep=${DataMapper.COMMIT_MESSAGE_PREFIX.update}`,
-    ])).length;
+    return (await this.git.log(Object.values(DataMapper.COMMIT_MESSAGE_PREFIX).map(prefix => `--grep=${prefix}`))).length;
   }
 
   async* iterate() {
@@ -130,7 +126,7 @@ export default class GitRepository extends RepositoryInterface {
       .sort((commitA, commitB) => new Date(commitA.date) - new Date(commitB.date)); // Make sure that the commits are sorted in ascending chronological order
   }
 
-  static async #writeFile({ filePath, content }) {
+  static async writeFile({ filePath, content }) {
     const directory = path.dirname(filePath);
 
     if (!fsApi.existsSync(directory)) {
@@ -142,7 +138,7 @@ export default class GitRepository extends RepositoryInterface {
     return filePath;
   }
 
-  async #commit({ filePath, message, date }) {
+  async commit({ filePath, message, date }) {
     try {
       await this.git.add(filePath);
 

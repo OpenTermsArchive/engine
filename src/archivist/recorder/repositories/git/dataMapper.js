@@ -7,27 +7,30 @@ import Record from '../../record.js';
 mime.define({ 'text/markdown': ['md'] }, true); // ensure extension for markdown files is `.md` and not `.markdown`
 
 export const COMMIT_MESSAGE_PREFIX = {
-  startTracking: 'Start tracking',
-  refilter: 'Refilter',
-  update: 'Update',
+  startTracking: 'Initial record of',
+  extractOnly: 'Apply technical or declaration upgrade on',
+  update: 'Record new changes of',
+  deprecated_startTracking: 'Start tracking',
+  deprecated_refilter: 'Refilter',
+  deprecated_update: 'Update',
 };
 
 export const TERMS_TYPE_AND_DOCUMENT_ID_SEPARATOR = ' #';
 export const SNAPSHOT_ID_MARKER = '%SNAPSHOT_ID';
-const SINGLE_SNAPSHOT_PREFIX = 'This version was recorded after filtering snapshot';
-const MULTIPLE_SNAPSHOT_PREFIX = 'This version was recorded after filtering and assembling the following snapshots from %NUMBER source documents:';
+const SINGLE_SNAPSHOT_PREFIX = 'This version was recorded after an extraction from the snapshot';
+const MULTIPLE_SNAPSHOT_PREFIX = 'This version was recorded after an extraction and an assembling from the following snapshots from %NUMBER source documents:';
 
-export const COMMIT_MESSAGE_PREFIXES_REGEXP = new RegExp(`^(${COMMIT_MESSAGE_PREFIX.startTracking}|${COMMIT_MESSAGE_PREFIX.refilter}|${COMMIT_MESSAGE_PREFIX.update})`);
+export const COMMIT_MESSAGE_PREFIXES_REGEXP = new RegExp(`^(${Object.values(COMMIT_MESSAGE_PREFIX).join('|')})`);
 
 export function toPersistence(record, snapshotIdentiferTemplate) {
-  const { serviceId, termsType, documentId, isRefilter, snapshotIds = [], mimeType, isFirstRecord } = record;
+  const { serviceId, termsType, documentId, isExtractOnly, snapshotIds = [], mimeType, isFirstRecord } = record;
 
-  let prefix = isRefilter ? COMMIT_MESSAGE_PREFIX.refilter : COMMIT_MESSAGE_PREFIX.update;
+  let prefix = isExtractOnly ? COMMIT_MESSAGE_PREFIX.extractOnly : COMMIT_MESSAGE_PREFIX.update;
 
   prefix = isFirstRecord ? COMMIT_MESSAGE_PREFIX.startTracking : prefix;
 
   const subject = `${prefix} ${serviceId} ${termsType}`;
-  const documentIdMessage = `${documentId ? `Page ID ${documentId}\n\n` : ''}`;
+  const documentIdMessage = `${documentId ? `Document ID ${documentId}\n\n` : ''}`;
   let snapshotIdsMessage;
 
   if (snapshotIds.length == 1) {
@@ -66,8 +69,8 @@ export function toDomain(commit) {
     documentId,
     mimeType: mime.getType(relativeFilePath),
     fetchDate: new Date(date),
-    isFirstRecord: message.startsWith(COMMIT_MESSAGE_PREFIX.startTracking),
-    isRefilter: message.startsWith(COMMIT_MESSAGE_PREFIX.refilter),
+    isFirstRecord: message.startsWith(COMMIT_MESSAGE_PREFIX.startTracking) || message.startsWith(COMMIT_MESSAGE_PREFIX.deprecated_startTracking),
+    isExtractOnly: message.startsWith(COMMIT_MESSAGE_PREFIX.extractOnly) || message.startsWith(COMMIT_MESSAGE_PREFIX.deprecated_refilter),
     snapshotIds: snapshotIdsMatch || [],
   });
 }
