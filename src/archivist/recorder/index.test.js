@@ -273,7 +273,7 @@ describe('Recorder', () => {
           });
 
           it('records in the version that it is not an extracted only version', async () => {
-            expect(record.isRefilter).to.equal(false);
+            expect(record.isExtractOnly).to.equal(false);
           });
 
           it('returns the record id', async () => {
@@ -329,7 +329,7 @@ describe('Recorder', () => {
                 content: CONTENT,
                 snapshotIds: [SNAPSHOT_ID],
                 fetchDate: FETCH_DATE,
-                extractOnly: true,
+                isExtractOnly: true,
               }));
 
               record = await recorder.versionsRepository.findLatest(SERVICE_ID, TYPE);
@@ -368,7 +368,7 @@ describe('Recorder', () => {
                 content: UPDATED_CONTENT,
                 snapshotIds: [SNAPSHOT_ID],
                 fetchDate: FETCH_DATE_LATER,
-                extractOnly: true,
+                isExtractOnly: true,
               }));
 
               record = await recorder.versionsRepository.findLatest(SERVICE_ID, TYPE);
@@ -381,7 +381,7 @@ describe('Recorder', () => {
             });
 
             it('records in the version that it is an extracted only version', async () => {
-              expect(record.isRefilter).to.equal(true);
+              expect(record.isExtractOnly).to.equal(true);
             });
 
             it('returns the record id', async () => {
@@ -409,7 +409,7 @@ describe('Recorder', () => {
                 content: CONTENT,
                 snapshotIds: [SNAPSHOT_ID],
                 fetchDate: FETCH_DATE_LATER,
-                extractOnly: true,
+                isExtractOnly: true,
               }));
 
               record = await recorder.versionsRepository.findLatest(SERVICE_ID, TYPE);
