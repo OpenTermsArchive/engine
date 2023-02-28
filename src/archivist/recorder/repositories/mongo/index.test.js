@@ -219,8 +219,8 @@ describe('MongoRepository', () => {
       });
     });
 
-    context('when it is a refilter', () => {
-      const REFILTERED_CONTENT = `${CONTENT} refiltered`;
+    context('when it is an extracted only version', () => {
+      const EXTRACTED_ONLY_CONTENT = `${CONTENT} extracted only`;
 
       before(async () => {
         await subject.save(new Record({
@@ -229,7 +229,7 @@ describe('MongoRepository', () => {
           content: CONTENT,
           mimeType: MIME_TYPE,
           fetchDate: FETCH_DATE_EARLIER,
-        })); // A refilter cannot be the first record
+        })); // An extracted only version cannot be the first record
 
         numberOfRecordsBefore = await collection.find({
           serviceId: SERVICE_PROVIDER_ID,
@@ -239,11 +239,11 @@ describe('MongoRepository', () => {
         (record = await subject.save(new Record({
           serviceId: SERVICE_PROVIDER_ID,
           termsType: TERMS_TYPE,
-          content: REFILTERED_CONTENT,
+          content: EXTRACTED_ONLY_CONTENT,
           mimeType: MIME_TYPE,
           fetchDate: FETCH_DATE,
           snapshotIds: [SNAPSHOT_ID],
-          isRefilter: true,
+          isExtractOnly: true,
         })));
 
         numberOfRecordsAfter = await collection.find({
@@ -267,8 +267,8 @@ describe('MongoRepository', () => {
         expect(mongoDocument._id.toString()).to.equal(record.id);
       });
 
-      it('stores information that it is a refilter of this specific document', () => {
-        expect(mongoDocument.isRefilter).to.be.true;
+      it('stores information that it is an extracted only version', () => {
+        expect(mongoDocument.isExtractOnly).to.be.true;
       });
     });
 
@@ -496,7 +496,7 @@ describe('MongoRepository', () => {
         serviceId: SERVICE_PROVIDER_ID,
         termsType: TERMS_TYPE,
         content: `${CONTENT} - updated 2`,
-        isRefilter: true,
+        isExtractOnly: true,
         fetchDate: FETCH_DATE_EARLIER,
         snapshotIds: [SNAPSHOT_ID],
         mimeType: MIME_TYPE,
@@ -548,7 +548,7 @@ describe('MongoRepository', () => {
         serviceId: SERVICE_PROVIDER_ID,
         termsType: TERMS_TYPE,
         content: `${CONTENT} - updated 2`,
-        isRefilter: true,
+        isExtractOnly: true,
         fetchDate: FETCH_DATE_EARLIER,
         snapshotIds: [SNAPSHOT_ID],
         mimeType: MIME_TYPE,
@@ -694,7 +694,7 @@ describe('MongoRepository', () => {
         serviceId: SERVICE_PROVIDER_ID,
         termsType: TERMS_TYPE,
         content: `${CONTENT} - updated 2`,
-        isRefilter: true,
+        isExtractOnly: true,
         fetchDate: FETCH_DATE_EARLIER,
         snapshotIds: [SNAPSHOT_ID],
         mimeType: MIME_TYPE,
