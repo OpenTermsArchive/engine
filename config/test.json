@@ -8,7 +8,7 @@
         "git": {
           "path": "./test/data/versions",
           "publish": false,
-          "snapshotIdentiferTemplate": "https://github.com/ambanum/OpenTermsArchive-snapshots/commit/%SNAPSHOT_ID",
+          "snapshotIdentiferTemplate": "https://github.com/OpenTermsArchive/sandbox-snapshots/commit/%SNAPSHOT_ID",
           "author": {
             "name": "Open Terms Archive Testing Bot",
             "email": "bot@opentermsarchive.org"
@@ -44,6 +44,6 @@
   },
   "dataset": {
     "title": "sandbox",
-    "versionsRepositoryURL": "https://github.com/OpenTermsArchive/sandbox"
+    "versionsRepositoryURL": "https://github.com/OpenTermsArchive/sandbox-versions"
   }
 }

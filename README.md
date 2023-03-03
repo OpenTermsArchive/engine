@@ -446,7 +446,7 @@ In order to edit the code of the engine itself, an editable and executable copy 
 First of all, follow the [requirements](#requirements) above. Then, clone the repository:
 
 ```sh
-git clone https://github.com/ambanum/OpenTermsArchive.git
+git clone https://github.com/OpenTermsArchive/engine.git
 cd OpenTermsArchive
 ```
 

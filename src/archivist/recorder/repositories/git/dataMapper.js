@@ -79,5 +79,5 @@ function generateFileName(documentType, pageId, extension) {
 export function generateFilePath(serviceId, documentType, pageId, mimeType) {
   const extension = mime.getExtension(mimeType) || '*'; // If mime type is undefined, an asterisk is set as an extension. Used to match all files for the given service ID, terms type and page ID when mime type is unknown.
 
-  return `${serviceId}/${generateFileName(documentType, pageId, extension)}`; // Do not use `path.join` as even for Windows, the path should be with `/` and not `\`. See https://github.com/ambanum/OpenTermsArchive/runs/8110230474?check_suite_focus=true#step:7:125
+  return `${serviceId}/${generateFileName(documentType, pageId, extension)}`; // Do not use `path.join` as even for Windows, the path should be with `/` and not `\`. See https://github.com/OpenTermsArchive/engine/runs/8110230474?check_suite_focus=true#step:7:125
 }

@@ -2,7 +2,7 @@
 
 All services declarations, snapshots and versions repo has been renamed and moved to the [OpenTermArchive organization](https://github.com/OpenTermsArchive) on github.
 
-Documentation on the new naming system can be found [here](https://github.com/ambanum/OpenTermsArchive/blob/main/CONTRIBUTING.md#instances-and-repositories-names)
+Documentation on the new naming system can be found [here](https://github.com/OpenTermsArchive/engine/blob/main/CONTRIBUTING.md#instances-and-repositories-names)
 
 If you already have some of those projects locally, you can run
 
@@ -37,6 +37,6 @@ To reflect this change, if you already have this project locally, execute:
     cd ..
     mv CGUs OpenTermsArchive
     cd OpenTermsArchive
-    git remote set-url origin https://github.com/ambanum/OpenTermsArchive.git
+    git remote set-url origin https://github.com/OpenTermsArchive/engine.git
 ```
 

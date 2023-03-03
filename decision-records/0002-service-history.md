@@ -209,4 +209,4 @@ _Option 2_ and _Option 3_ hide the complexity of history management in separate 
 
 ## Decision Outcome
 
-[After consulting the community](https://github.com/ambanum/OpenTermsArchive/issues/156), the options 2A is retained as it hide complexity (compared to Option 1) of the history while increasing its discoverability (compared to Option 3) for contributors who might become more “adventurous”.
+[After consulting the community](https://github.com/OpenTermsArchive/engine/issues/156), the options 2A is retained as it hide complexity (compared to Option 1) of the history while increasing its discoverability (compared to Option 3) for contributors who might become more “adventurous”.
