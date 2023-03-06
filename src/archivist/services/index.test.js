@@ -34,7 +34,7 @@ describe('Services', () => {
               executeClientScripts: expectedExecuteClientScripts,
             } = sourceDocument;
 
-            context(`SourceDocument: ${sourceDocument.id}`, () => {
+            context(`source document: ${sourceDocument.id}`, () => {
               before(() => {
                 actualDocumentDeclaration = result[serviceId].getTerms(termsType);
                 const { sourceDocuments: actualDocuments } = actualDocumentDeclaration;
@@ -105,34 +105,24 @@ describe('Services', () => {
       await validateServiceWithoutHistory('service_B', expectedServices.service_B);
     });
 
-    context('when a service has no history', async () => {
-      describe('Service without history', async () => {
-        await validateServiceWithoutHistory('service_without_history', expectedServices.service_without_history);
-      });
+    describe('Service without history', async () => {
+      await validateServiceWithoutHistory('service_without_history', expectedServices.service_without_history);
     });
 
-    context('when a service has only history for declarations', async () => {
-      describe('Service with declaration history', async () => {
-        await validateServiceWithoutHistory('service_with_declaration_history', expectedServices.service_with_declaration_history);
-      });
+    describe('Service with declaration history only', async () => {
+      await validateServiceWithoutHistory('service_with_declaration_history', expectedServices.service_with_declaration_history);
     });
 
-    context('when a service has only history for filters', async () => {
-      describe('Service with filters history', async () => {
-        await validateServiceWithoutHistory('service_with_filters_history', expectedServices.service_with_filters_history);
-      });
+    describe('Service with filters history only', async () => {
+      await validateServiceWithoutHistory('service_with_filters_history', expectedServices.service_with_filters_history);
     });
 
-    context('when a service has histories both for filters and for declarations', async () => {
-      describe('Service with history', async () => {
-        await validateServiceWithoutHistory('service_with_history', expectedServices.service_with_history);
-      });
+    describe('Service with both filters and declarations histories', async () => {
+      await validateServiceWithoutHistory('service_with_history', expectedServices.service_with_history);
     });
 
-    context('when a service has a multi sourceDocuments terms', async () => {
-      describe('Service with a multi sourceDocuments terms', async () => {
-        await validateServiceWithoutHistory('service_with_multi_documents_terms', expectedServices.service_with_multi_documents_terms);
-      });
+    describe('Service with terms with multiple source documents', async () => {
+      await validateServiceWithoutHistory('service_with_multiple_source_documents_terms', expectedServices.service_with_multiple_source_documents_terms);
     });
 
     context('when specifying services to load', async () => {
@@ -284,34 +274,24 @@ describe('Services', () => {
       await validateServiceWithHistory('service_B', expectedServices.service_B);
     });
 
-    context('when a service has no history', async () => {
-      describe('Service without history', async () => {
-        await validateServiceWithHistory('service_without_history', expectedServices.service_without_history);
-      });
+    describe('Service without history', async () => {
+      await validateServiceWithHistory('service_without_history', expectedServices.service_without_history);
     });
 
-    context('when a service has only declarations history', async () => {
-      describe('Service with declaration history', async () => {
-        await validateServiceWithHistory('service_with_declaration_history', expectedServices.service_with_declaration_history);
-      });
+    describe('Service with declaration history only', async () => {
+      await validateServiceWithHistory('service_with_declaration_history', expectedServices.service_with_declaration_history);
     });
 
-    context('when a service has only filters history', async () => {
-      describe('Service with filters history', async () => {
-        await validateServiceWithHistory('service_with_filters_history', expectedServices.service_with_filters_history);
-      });
+    describe('Service with filters history only', async () => {
+      await validateServiceWithHistory('service_with_filters_history', expectedServices.service_with_filters_history);
     });
 
-    context('when a service has both filters and declarations histories', async () => {
-      describe('Service with history', async () => {
-        await validateServiceWithHistory('service_with_history', expectedServices.service_with_history);
-      });
+    describe('Service with both filters and declarations histories', async () => {
+      await validateServiceWithHistory('service_with_history', expectedServices.service_with_history);
     });
 
-    context('when a service has a multi sourceDocuments terms', async () => {
-      describe('Service with a multi sourceDocuments terms', async () => {
-        await validateServiceWithHistory('service_with_multi_documents_terms', expectedServices.service_with_multi_documents_terms);
-      });
+    describe('Service with terms with multiple source documents', async () => {
+      await validateServiceWithHistory('service_with_multiple_source_documents_terms', expectedServices.service_with_multiple_source_documents_terms);
     });
 
     context('when specifying services to load', async () => {
