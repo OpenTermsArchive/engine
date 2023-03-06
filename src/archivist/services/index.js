@@ -66,7 +66,13 @@ async function loadServiceDocument(service, termsType, termsTypeDeclaration) {
     sourceDocuments.push(new SourceDocument({ location, executeClientScripts, contentSelectors, insignificantContentSelectors, filters }));
   } else {
     for (const sourceDocument of combine) {
-      const { filter: sourceDocumentFilterNames, fetch: sourceDocumentLocation, executeClientScripts: sourceDocumentExecuteClientScripts, select: sourceDocumentContentSelectors, remove: sourceDocumentInsignificantContentSelectors } = sourceDocument;
+      const {
+        filter: sourceDocumentFilterNames,
+        fetch: sourceDocumentLocation,
+        executeClientScripts: sourceDocumentExecuteClientScripts,
+        select: sourceDocumentContentSelectors,
+        remove: sourceDocumentInsignificantContentSelectors,
+      } = sourceDocument;
 
       const sourceDocumentFilters = await loadServiceFilters(service.id, sourceDocumentFilterNames); // eslint-disable-line no-await-in-loop
 
@@ -131,7 +137,13 @@ export async function loadWithHistory(servicesIds = []) {
           }));
         } else {
           for (const sourceDocument of combine) {
-            const { filter: sourceDocumentFilterNames, fetch: sourceDocumentLocation, executeClientScripts: sourceDocumentExecuteClientScripts, select: sourceDocumentContentSelectors, remove: sourceDocumentInsignificantContentSelectors } = sourceDocument;
+            const {
+              filter: sourceDocumentFilterNames,
+              fetch: sourceDocumentLocation,
+              executeClientScripts: sourceDocumentExecuteClientScripts,
+              select: sourceDocumentContentSelectors,
+              remove: sourceDocumentInsignificantContentSelectors,
+            } = sourceDocument;
 
             const sourceDocumentFilters = await loadServiceFilters(serviceId, sourceDocumentFilterNames); // eslint-disable-line no-await-in-loop
 
