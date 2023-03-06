@@ -25,7 +25,7 @@ const instancePath = path.resolve(declarationsPath, '../');
 export default async options => {
   const schemaOnly = options.schemaOnly || false;
   let servicesToValidate = options.services || [];
-  const termsTypes = options.termsTypes || [];
+  const termsTypes = options.types || [];
   let servicesTermsTypes = {};
 
   const serviceDeclarations = await services.loadWithHistory(servicesToValidate);

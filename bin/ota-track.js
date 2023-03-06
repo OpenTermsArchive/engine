@@ -14,7 +14,7 @@ program
   .name('ota track')
   .description('Retrieve declared documents, record snapshots, extract versions and publish the resulting records')
   .option('-s, --services [serviceId...]', 'service IDs of services to track')
-  .option('-t, --terms-types [termsType...]', 'terms types to track')
+  .option('-t, --types [termsType...]', 'terms types to track')
   .option('-e, --extract-only', 'extract versions from existing snapshots with latest declarations and engine, without recording new snapshots')
   .option('--schedule', 'track automatically at a regular interval');
 

@@ -6,7 +6,7 @@ import logger from './logger/index.js';
 import Notifier from './notifier/index.js';
 import Tracker from './tracker/index.js';
 
-export default async function track({ services = [], termsTypes, extractOnly, schedule }) {
+export default async function track({ services = [], types, extractOnly, schedule }) {
   const archivist = new Archivist({ recorderConfig: config.get('recorder') });
 
   archivist.attach(logger);
@@ -15,10 +15,8 @@ export default async function track({ services = [], termsTypes, extractOnly, sc
 
   logger.info('Start Open Terms Archive\n');
 
-  let servicesIds;
-
   if (services.length) {
-    servicesIds = services.filter(serviceId => {
+    services = services.filter(serviceId => {
       const isServiceDeclared = archivist.serviceDeclarations[serviceId];
 
       if (!isServiceDeclared) {
@@ -31,7 +29,7 @@ export default async function track({ services = [], termsTypes, extractOnly, sc
 
   // The result of the extraction step that generates the version from the snapshots may depend on changes to the engine or its dependencies.
   // The process thus starts by only performing the extraction process so that any version following such changes can be labelled (to avoid sending notifications, for example)
-  await archivist.trackAllTermsChanges({ servicesIds, termsTypes, extractOnly: true });
+  await archivist.trackAllTermsChanges({ services, types, extractOnly: true });
 
   if (extractOnly) {
     return;
@@ -49,7 +47,7 @@ export default async function track({ services = [], termsTypes, extractOnly, sc
   }
 
   if (!schedule) {
-    await archivist.trackAllTermsChanges({ servicesIds, termsTypes });
+    await archivist.trackAllTermsChanges({ services, types });
 
     return;
   }
@@ -57,5 +55,5 @@ export default async function track({ services = [], termsTypes, extractOnly, sc
   logger.info('The scheduler is running…');
   logger.info('Terms will be tracked every six hours starting at half past midnight');
 
-  cron('30 */6 * * *', () => archivist.trackAllTermsChanges({ servicesIds, termsTypes }));
+  cron('30 */6 * * *', () => archivist.trackAllTermsChanges({ services, types }));
 }
