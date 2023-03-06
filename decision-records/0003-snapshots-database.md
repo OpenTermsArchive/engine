@@ -35,7 +35,7 @@ The solution considered in order to provide a quality dataset therefore consists
 To rewrite history, we go through the snapshot commits one by one after reordering them (in memory) and we create a version commit each time, avoiding commits corresponding to noise and performing any renaming.
 
 This implies being able to version the service filters (used to generate the version from the snapshot).
-See https://github.com/ambanum/OpenTermsArchive/issues/156.
+See https://github.com/OpenTermsArchive/engine/issues/156.
 
 ### Problem
 
@@ -52,7 +52,7 @@ At the date of this document, the number of commits entries approaches the milli
 
 Also, `git` implies to store data in a hash tree in the form of chronologically ordered commits. So to insert snapshots in the history, it implies to rewrite the whole snapshots history which also takes the same time as reading them.
 
-As described previously, we need to be able to regenerate versions from snapshots (for example to [rename services](https://github.com/ambanum/OpenTermsArchive/issues/314)) and to be able to insert snapshots in the history (for example to [import databases](https://github.com/ambanum/OpenTermsArchive/pull/214)).
+As described previously, we need to be able to regenerate versions from snapshots (for example to [rename services](https://github.com/OpenTermsArchive/engine/issues/314)) and to be able to insert snapshots in the history (for example to [import databases](https://github.com/OpenTermsArchive/engine/pull/214)).
 **This cannot take 6 months.**
 
 Moreover, as the number of snapshots will keep on growing, we need a system which allows scaling, potentially across multiple servers.

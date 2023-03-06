@@ -2,13 +2,13 @@
   "name": "@opentermsarchive/engine",
   "version": "0.26.0",
   "description": "Tracks and makes visible changes to the terms of online services",
-  "homepage": "https://github.com/ambanum/OpenTermsArchive#readme",
+  "homepage": "https://github.com/OpenTermsArchive/engine#readme",
   "bugs": {
-    "url": "https://github.com/ambanum/OpenTermsArchive/issues"
+    "url": "https://github.com/OpenTermsArchive/engine/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ambanum/OpenTermsArchive.git"
+    "url": "git+https://github.com/OpenTermsArchive/engine.git"
   },
   "license": "EUPL-1.2",
   "author": "ambanum",

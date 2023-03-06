@@ -5,7 +5,7 @@
         "git": {
           "path": "./data/versions-rewritten",
           "publish": false,
-          "prefixMessageToSnapshotId": "This version was recorded after filtering snapshot https://github.com/ambanum/OpenTermsArchive-snapshots/commit/",
+          "prefixMessageToSnapshotId": "This version was recorded after filtering snapshot https://github.com/OpenTermsArchive/contrib-snapshots/commit/",
           "author": {
             "name": "Open Terms Archive Bot",
             "email": "bot@opentermsarchive.org"
