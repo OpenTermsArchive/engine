@@ -76,7 +76,7 @@ export default async options => {
         }
 
         if (!schemaOnly && service) {
-          service.getDocumentTypes()
+          service.getTermsTypes()
             .filter(termsType => {
               if (servicesTermsTypes[serviceId] && servicesTermsTypes[serviceId].length > 0) {
                 return servicesTermsTypes[serviceId].includes(termsType);
@@ -154,12 +154,12 @@ export default async options => {
                         this.skip();
                       }
 
-                      const { content, mimeType } = await fetch({
+                      ({ content, mimeType } = await fetch({
                         url: sourceDocument.location,
                         executeClientScripts: sourceDocument.executeClientScripts,
                         cssSelectors: sourceDocument.cssSelectors,
                         config: config.get('fetcher'),
-                      });
+                      }));
                       const secondFilteredContent = await extract({ content, sourceDocument, mimeType });
 
                       expect(secondFilteredContent).to.equal(filteredContent);
