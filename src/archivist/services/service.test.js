@@ -75,7 +75,7 @@ describe('Service', () => {
       });
     });
 
-    context('when the terms has a history', () => {
+    context('when the terms have a history', () => {
       const firstDeclaration = new Terms({
         termsType: TERMS_TYPE,
         validUntil: '2020-07-22T11:30:21.000Z',

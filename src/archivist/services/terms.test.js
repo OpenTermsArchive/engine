@@ -60,7 +60,7 @@ describe('Terms', () => {
   };
 
   describe('#toPersistence', () => {
-    it('converts terms with only one source document to JSON representation', async () => {
+    it('converts terms with single source document to JSON representation', async () => {
       const result = new Terms({ service, termsType, sourceDocuments: [document1] }).toPersistence();
 
       const expectedResult = {

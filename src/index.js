@@ -30,7 +30,7 @@ export default async function track({ services = [], termsTypes, extractOnly, sc
   }
 
   // The result of the extraction step that generates the version from the snapshots may depend on changes to the engine or its dependencies.
-  // So, let's start by only performing the extraction process so that we can annotate any versions generated related to such changes and avoid sending notifications.
+  // The process thus starts by only performing the extraction process so that any version following such changes can be labelled (to avoid sending notifications, for example)
   await archivist.trackAllTermsChanges({ servicesIds, termsTypes, extractOnly: true });
 
   if (extractOnly) {

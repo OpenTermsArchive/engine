@@ -160,7 +160,7 @@ describe('SourceDocument', () => {
   });
 
   describe('#toPersistence', () => {
-    it('converts basic source document declaration into JSON representation', async () => {
+    it('converts basic source document declarations into JSON representation', async () => {
       const result = new SourceDocument({
         location: URL,
         contentSelectors: 'body',
@@ -177,7 +177,7 @@ describe('SourceDocument', () => {
       expect(result).to.deep.equal(expectedResult);
     });
 
-    it('converts source document declaration with all fields to JSON representation', async () => {
+    it('converts full source document declarations to JSON representation', async () => {
       const result = new SourceDocument({
         location: URL,
         contentSelectors: [

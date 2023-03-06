@@ -126,7 +126,7 @@ export default class Archivist extends events.EventEmitter {
       return;
     }
 
-    const [{ fetchDate }] = snapshots; // In case of multi source documents terms, use the first snapshot fetch date
+    const [{ fetchDate }] = snapshots; // In case of terms with multiple source documents, use the fetch date of the first snapshot
 
     return this.recordVersion({
       content: await this.extractVersionContent(snapshots, sourceDocuments),
