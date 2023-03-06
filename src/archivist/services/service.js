@@ -32,17 +32,17 @@ export default class Service {
       terms.service = this;
     }
 
-    this.terms[terms.termsType] = this.terms[terms.termsType] || {};
+    this.terms[terms.type] = this.terms[terms.type] || {};
 
     if (!terms.validUntil) {
-      this.terms[terms.termsType].latest = terms;
+      this.terms[terms.type].latest = terms;
 
       return;
     }
 
-    this.terms[terms.termsType].history = this.terms[terms.termsType].history || [];
-    this.terms[terms.termsType].history.push(terms);
-    this.terms[terms.termsType].history.sort((a, b) => new Date(a.validUntil) - new Date(b.validUntil));
+    this.terms[terms.type].history = this.terms[terms.type].history || [];
+    this.terms[terms.type].history.push(terms);
+    this.terms[terms.type].history.sort((a, b) => new Date(a.validUntil) - new Date(b.validUntil));
   }
 
   getHistoryDates(termsType) {

@@ -19,7 +19,7 @@ const filters = [
 [
   new Terms({
     service,
-    termsType: 'Community Guidelines',
+    type: 'Community Guidelines',
     validUntil: null,
     sourceDocuments: [
       new SourceDocument({
@@ -47,7 +47,7 @@ const filters = [
   }),
   new Terms({
     service,
-    termsType: 'Community Guidelines',
+    type: 'Community Guidelines',
     validUntil: '2020-04-15T21:30:21.000Z',
     sourceDocuments: [
       new SourceDocument({
@@ -72,7 +72,7 @@ const filters = [
   }),
   new Terms({
     service,
-    termsType: 'Community Guidelines',
+    type: 'Community Guidelines',
     validUntil: '2020-03-15T21:30:21.000Z',
     sourceDocuments: [
       new SourceDocument({

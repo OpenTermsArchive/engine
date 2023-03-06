@@ -18,7 +18,7 @@ const filters = [
 
 service.addTerms(new Terms({
   service,
-  termsType: 'Terms of Service',
+  type: 'Terms of Service',
   sourceDocuments: [new SourceDocument({
     location: 'https://www.service-without-history.example/tos',
     contentSelectors: 'body',

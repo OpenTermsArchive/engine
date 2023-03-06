@@ -9,7 +9,7 @@ const service = new Service({
 
 service.addTerms(new Terms({
   service,
-  termsType: 'Privacy Policy',
+  type: 'Privacy Policy',
   sourceDocuments: [new SourceDocument({
     location: 'https://www.serviceb.example/privacy',
     contentSelectors: 'body',

@@ -61,7 +61,7 @@ describe('Terms', () => {
 
   describe('#toPersistence', () => {
     it('converts terms with single source document to JSON representation', async () => {
-      const result = new Terms({ service, termsType, sourceDocuments: [document1] }).toPersistence();
+      const result = new Terms({ service, type: termsType, sourceDocuments: [document1] }).toPersistence();
 
       const expectedResult = {
         name: service.name,
@@ -72,7 +72,7 @@ describe('Terms', () => {
     });
 
     it('converts terms with multiple source documents to JSON representation', async () => {
-      const result = new Terms({ service, termsType, sourceDocuments: [ document1, document2 ] }).toPersistence();
+      const result = new Terms({ service, type: termsType, sourceDocuments: [ document1, document2 ] }).toPersistence();
 
       const expectedResult = {
         name: service.name,
