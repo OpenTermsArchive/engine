@@ -4,7 +4,7 @@
 
 Tracking terms is done by _declaring_ them and the service they are associated with. Such a declaration is achieved by editing JSON files in the [`declarations`](./declarations) folder.
 
-Before adding a new terms, open the [`declarations`](./declarations) folder and check if the service you want to track terms for is already declared. If a JSON file with the name of the service is already present, you can jump straight to [declaring terms](#declaring-terms). Otherwise, keep reading!
+Before adding new terms, open the [`declarations`](./declarations) folder and check if the service you want to track terms for is already declared. If a JSON file with the name of the service is already present, you can jump straight to [declaring terms](#declaring-terms). Otherwise, keep reading!
 
 ### Declaring a new service
 
@@ -69,7 +69,7 @@ Within the `documents` JSON object, we will now declare terms.
 
 ## Declaring terms
 
-Terms are declared in a service declaration file, under the `documents` property. The way in which each terms should be obtained is declared as a JSON object.
+Terms are declared in a service declaration file, under the `documents` property. The way in which each type of terms should be obtained is declared as a JSON object.
 
 ```json
   …
@@ -318,13 +318,13 @@ export async function convertImagesToBase64(document, documentDeclaration) {
 Great, your terms declaration is now almost complete! We simply need to write it under the appropriate terms type in the `documents` JSON object within the service declaration. In order to distinguish between the many terms that can be associated with a service and enable cross-services comparison of similar terms, we maintain a unique list of terms types.
 You can find more information and the list of allowed values for the `<terms type>` key in the [dedicated repository](https://github.com/OpenTermsArchive/terms-types).
 
-The types might not always match the exact name given by the service provider. For example, some providers might call their terms “Terms and Conditions” or “Terms of Use” instead of “Terms of Service”. The terms type does not have to match the exact name, it only has to match the _commitment_ that is taken.
+The types might not always match the exact name given by the service provider. For example, some providers might call “Terms and Conditions” or “Terms of Use” what some others call “Terms of Service”. The terms type does not have to match the exact name, it only has to match the _commitment_ that is taken.
 
 If the terms you want to add match no existing type, you can [suggest a new one](https://github.com/ambanum/OpenTermsArchive/discussions/categories/document-types).
 
 ##### Defining new terms types
 
-Before defining a new terms type, please note that wanting to multiply terms types is usually a symptom that the service needs to be broken down into several services. For example, rather than considering that Facebook has several specific variations of “Terms of Service”, it is more accurate to declare “Terms of Service” terms for the services “Facebook” (social network service for the general public), “Facebook Ads” (ads service for advertisers) and “Facebook Payments” (payment service for developers). On the other hand, the “Google Ads” service is a commercial suite acting as an umbrella for several pieces of software that all share the same contractual documents, and there is thus no need to separate each of them. See practical guidelines for [provider prefixing](declarations-guidelines.md#provider-prefixing).
+Before defining a new terms type, please note that wanting to multiply terms types is usually a symptom that the service needs to be broken down into several services. For example, rather than considering that Facebook has several specific variations of “Terms of Service”, it is more accurate to declare “Terms of Service” for the services “Facebook” (social network service for the general public), “Facebook Ads” (ads service for advertisers) and “Facebook Payments” (payment service for developers). On the other hand, the “Google Ads” service is a commercial suite acting as an umbrella for several pieces of software that all share the same terms, and there is thus no need to separate each of them. See practical guidelines for [provider prefixing](declarations-guidelines.md#provider-prefixing).
 
 In order to guide usage and disambiguate synonyms, we characterise each terms type along three dimensions of the commitment that is being taken in it:
 
@@ -376,7 +376,7 @@ npm run lint [$service_id [$another_service_id …]]
 
 ## Maintaining declarations
 
-All parts of a **document** **declaration** (web location, selection, noise removal, single or multiple documents distribution…) can change over time. The process of updating these elements to enable continued **tracking** is called **maintenance**. Without it, **terms** can become:
+All parts of a **terms** **declaration** (web location, selection, noise removal, distribution across multiple documents…) can change over time. The process of updating these elements to enable continued **tracking** is called **maintenance**. Without it, **terms** can become:
 
 - **unreachable**: no **snapshot** can be **recorded** at all, because the **location** changed or the **service** denies access;
 - **unextractable**: no **version** can be **extracted** from the **snapshot**, because the selection of content or some **filter** fails;

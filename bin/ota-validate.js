@@ -24,7 +24,7 @@ program
   .option('-s, --services [serviceId...]', 'service IDs of services to validate')
   .option('-t, --terms-types [termsType...]', 'terms types to validate')
   .option('-m, --modified', 'target only services modified in the current git branch')
-  .option('-o, --schema-only', 'much faster check of declarations, but does not check that the terms are actually accessible');
+  .option('-o, --schema-only', 'much faster check of declarations, but does not check that the documents are actually accessible');
 
 const mocha = new Mocha({
   delay: true, // as the validation script performs an asynchronous load before running the tests, the execution of the tests are delayed until run() is called
