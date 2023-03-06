@@ -195,7 +195,7 @@ export default class Tracker {
     });
 
     const body = `
-This terms is no longer properly tracked.
+These terms are no longer tracked.
 
 ${message}
 
