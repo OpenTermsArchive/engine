@@ -12,8 +12,8 @@ const termsProperties = () => {
       type: 'array',
       items: {
         oneOf: [
-          { $ref: '#/definitions/singleSourceDocumentsTermsHistory' },
-          { $ref: '#/definitions/multiSourceDocumentsTermsHistory' },
+          { $ref: '#/definitions/singleSourceDocumentTermsHistory' },
+          { $ref: '#/definitions/multipleSourceDocumentsTermsHistory' },
           { $ref: '#/definitions/pdfDocumentHistory' },
         ],
       },
@@ -40,7 +40,7 @@ const schema = {
         validUntil: { $ref: '#/definitions/validUntil' },
       },
     },
-    singleSourceDocumentsTermsHistory: {
+    singleSourceDocumentTermsHistory: {
       type: 'object',
       additionalProperties: false,
       required: [ 'fetch', 'select', 'validUntil' ],
@@ -53,7 +53,7 @@ const schema = {
         validUntil: { $ref: '#/definitions/validUntil' },
       },
     },
-    multiSourceDocumentsTermsHistory: {
+    multipleSourceDocumentsTermsHistory: {
       type: 'object',
       additionalProperties: false,
       required: ['combine'],

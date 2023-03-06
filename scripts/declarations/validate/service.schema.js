@@ -10,8 +10,8 @@ const termsProperties = () => {
   AVAILABLE_TYPES_NAME.forEach(type => {
     result[type] = {
       oneOf: [
-        { $ref: '#/definitions/singleSourceDocumentsTerms' },
-        { $ref: '#/definitions/multiSourceDocumentsTerms' },
+        { $ref: '#/definitions/singleSourceDocumentTerms' },
+        { $ref: '#/definitions/multipleSourceDocumentsTerms' },
         { $ref: '#/definitions/pdfDocument' },
       ],
     };
@@ -64,13 +64,13 @@ const schema = {
         executeClientScripts: { $ref: '#/definitions/executeClientScripts' },
       },
     },
-    singleSourceDocumentsTerms: {
+    singleSourceDocumentTerms: {
       allOf: [
         { $ref: '#/definitions/sourceDocument' },
         { required: [ 'fetch', 'select' ] },
       ],
     },
-    multiSourceDocumentsTerms: {
+    multipleSourceDocumentsTerms: {
       type: 'object',
       additionalProperties: false,
       required: ['combine'],
