@@ -24,17 +24,17 @@ export default class DeclarationUtils {
 
     const modifiedFilePaths = modifiedFilePathsAsString ? modifiedFilePathsAsString.split('\n') : [];
 
-    return { modifiedFilePaths, modifiedServiceIds: Array.from(new Set(modifiedFilePaths.map(DeclarationUtils.filePathToServiceId))) };
+    return { modifiedFilePaths, modifiedServicesIds: Array.from(new Set(modifiedFilePaths.map(DeclarationUtils.filePathToServiceId))) };
   }
 
   async getModifiedServices() {
-    const { modifiedServiceIds } = await this.getModifiedData();
+    const { modifiedServicesIds } = await this.getModifiedData();
 
-    return modifiedServiceIds;
+    return modifiedServicesIds;
   }
 
   async getModifiedServiceTermsTypes() {
-    const { modifiedFilePaths, modifiedServiceIds } = await this.getModifiedData();
+    const { modifiedFilePaths, modifiedServicesIds } = await this.getModifiedData();
     const servicesTermsTypes = {};
 
     await Promise.all(modifiedFilePaths.map(async modifiedFilePath => {
@@ -74,7 +74,7 @@ export default class DeclarationUtils {
     }));
 
     return {
-      services: modifiedServiceIds,
+      services: modifiedServicesIds,
       servicesTermsTypes,
     };
   }
