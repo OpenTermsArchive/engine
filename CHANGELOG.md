@@ -2,7 +2,15 @@
 
 All changes that impact users of this module are documented in this file, in the [Common Changelog](https://common-changelog.org) format with some additional specifications defined in the CONTRIBUTING file. This codebase adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased
+## Unreleased [minor]
+
+### Changed
+
+- Improve vocabulary
+- **Breaking:** In exposed CLI `--refilter-only` option is now called `--extract-only`. Short option switches from `-r` to `-e`.
+- **Breaking:** In exposed CLI `--terms-types` option is now called `--types`. Short option is stil `-t`.
+- **Breaking:** In exposed API `filter` function is now called `extract`.
+- **Breaking:** In exposed API `PageDeclaration` class is now called `SourceDocument`.
 
 ## 0.26.0 - 2023-02-20
 
