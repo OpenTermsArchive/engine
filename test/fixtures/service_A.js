@@ -9,7 +9,7 @@ const service = new Service({
 
 service.addTerms(new Terms({
   service,
-  termsType: 'Terms of Service',
+  type: 'Terms of Service',
   validUntil: null,
   sourceDocuments: [new SourceDocument({
     location: 'https://www.servicea.example/tos',

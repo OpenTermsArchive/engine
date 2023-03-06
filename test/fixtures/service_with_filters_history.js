@@ -19,7 +19,7 @@ const filters = [
 [
   new Terms({
     service,
-    termsType: 'Terms of Service',
+    type: 'Terms of Service',
     sourceDocuments: [
       new SourceDocument({
         location: 'https://www.service-with-filters-history.example/terms',
@@ -32,7 +32,7 @@ const filters = [
   }),
   new Terms({
     service,
-    termsType: 'Terms of Service',
+    type: 'Terms of Service',
     sourceDocuments: [
       new SourceDocument({
         location: 'https://www.service-with-filters-history.example/terms',
@@ -52,7 +52,7 @@ const filters = [
   }),
   new Terms({
     service,
-    termsType: 'Terms of Service',
+    type: 'Terms of Service',
     sourceDocuments: [
       new SourceDocument({
         location: 'https://www.service-with-filters-history.example/terms',
@@ -72,7 +72,7 @@ const filters = [
   }),
   new Terms({
     service,
-    termsType: 'Terms of Service',
+    type: 'Terms of Service',
     sourceDocuments: [
       new SourceDocument({
         location: 'https://www.service-with-filters-history.example/terms',
@@ -92,7 +92,7 @@ const filters = [
   }),
   new Terms({
     service,
-    termsType: 'Terms of Service',
+    type: 'Terms of Service',
     sourceDocuments: [
       new SourceDocument({
         location: 'https://www.service-with-filters-history.example/terms',
@@ -112,7 +112,7 @@ const filters = [
   }),
   new Terms({
     service,
-    termsType: 'Terms of Service',
+    type: 'Terms of Service',
     sourceDocuments: [
       new SourceDocument({
         location: 'https://www.service-with-filters-history.example/terms',
@@ -132,7 +132,7 @@ const filters = [
   }),
   new Terms({
     service,
-    termsType: 'Terms of Service',
+    type: 'Terms of Service',
     sourceDocuments: [
       new SourceDocument({
         location: 'https://www.service-with-filters-history.example/terms',

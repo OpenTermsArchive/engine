@@ -1,7 +1,7 @@
 export default class Terms {
-  constructor({ service, termsType, sourceDocuments, validUntil }) {
+  constructor({ service, type, sourceDocuments, validUntil }) {
     this.service = service;
-    this.termsType = termsType;
+    this.type = type;
     this.sourceDocuments = sourceDocuments;
 
     if (validUntil) {
@@ -17,7 +17,7 @@ export default class Terms {
     return {
       name: this.service.name,
       documents: {
-        [this.termsType]: this.hasMultipleSourceDocuments
+        [this.type]: this.hasMultipleSourceDocuments
           ? { combine: this.sourceDocuments.map(sourceDocument => sourceDocument.toPersistence()) }
           : this.sourceDocuments[0].toPersistence(),
       },

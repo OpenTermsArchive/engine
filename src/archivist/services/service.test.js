@@ -14,7 +14,7 @@ describe('Service', () => {
 
     before(async () => {
       terms = new Terms({
-        termsType: TERMS_TYPE,
+        type: TERMS_TYPE,
         service: subject,
       });
     });
@@ -37,7 +37,7 @@ describe('Service', () => {
       before(async () => {
         subject = new Service({ id: 'serviceID', name: 'serviceName' });
         expiredTerms = new Terms({
-          termsType: TERMS_TYPE,
+          type: TERMS_TYPE,
           service: subject,
           validUntil: VALIDITY_DATE,
         });
@@ -54,7 +54,7 @@ describe('Service', () => {
   describe('#getTerms', () => {
     let subject;
 
-    const lastDeclaration = new Terms({ termsType: TERMS_TYPE });
+    const lastDeclaration = new Terms({ type: TERMS_TYPE });
 
     context('when there is no history', () => {
       before(async () => {
@@ -77,12 +77,12 @@ describe('Service', () => {
 
     context('when the terms have a history', () => {
       const firstDeclaration = new Terms({
-        termsType: TERMS_TYPE,
+        type: TERMS_TYPE,
         validUntil: '2020-07-22T11:30:21.000Z',
       });
 
       const secondDeclaration = new Terms({
-        termsType: TERMS_TYPE,
+        type: TERMS_TYPE,
         validUntil: '2020-08-22T11:30:21.000Z',
       });
 
@@ -121,10 +121,10 @@ describe('Service', () => {
     before(async () => {
       subject = new Service({ id: 'serviceID', name: 'serviceName' });
 
-      termsOfServiceDeclaration = new Terms({ termsType: TERMS_TYPE });
+      termsOfServiceDeclaration = new Terms({ type: TERMS_TYPE });
 
       privacyPolicyDeclaration = new Terms({
-        termsType: 'Privacy Policy',
+        type: 'Privacy Policy',
         validUntil: '2020-07-22T11:30:21.000Z',
       });
 
@@ -134,8 +134,8 @@ describe('Service', () => {
 
     it('returns the service terms types', async () => {
       expect(subject.getTermsTypes()).to.have.members([
-        termsOfServiceDeclaration.termsType,
-        privacyPolicyDeclaration.termsType,
+        termsOfServiceDeclaration.type,
+        privacyPolicyDeclaration.type,
       ]);
     });
   });

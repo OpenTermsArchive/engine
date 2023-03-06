@@ -72,19 +72,17 @@ export default class Archivist extends events.EventEmitter {
   initQueue() {
     this.trackingQueue = async.queue(this.trackTermsChanges.bind(this), MAX_PARALLEL_TRACKING);
     this.trackingQueue.error(async (error, { terms }) => {
-      const { service, termsType } = terms;
-
       if (error.toString().includes('HttpError: API rate limit exceeded for user ID')) {
         return; // This is an error due to SendInBlue quota, bypass
       }
 
       if (error instanceof InaccessibleContentError) {
-        this.emit('inaccessibleContent', error, service.id, termsType, terms);
+        this.emit('inaccessibleContent', error, terms.service.id, terms.type, terms);
 
         return;
       }
 
-      this.emit('error', error, service.id, termsType);
+      this.emit('error', error, terms.service.id, terms.type);
     });
   }
 
@@ -118,8 +116,6 @@ export default class Archivist extends events.EventEmitter {
       await Promise.all((await this.fetchTermsSourceDocuments(terms)).map(params => this.recordSnapshot(params)));
     }
 
-    const { service: { id: serviceId }, termsType, sourceDocuments } = terms;
-
     const snapshots = await this.getTermsSnapshots(terms);
 
     if (!snapshots.length) {
@@ -129,16 +125,16 @@ export default class Archivist extends events.EventEmitter {
     const [{ fetchDate }] = snapshots; // In case of terms with multiple source documents, use the fetch date of the first snapshot
 
     return this.recordVersion({
-      content: await this.extractVersionContent(snapshots, sourceDocuments),
+      content: await this.extractVersionContent(snapshots, terms.sourceDocuments),
       snapshotIds: snapshots.map(({ id }) => id),
-      serviceId,
-      termsType,
+      serviceId: terms.service.id,
+      termsType: terms.type,
       fetchDate,
       extractOnly,
     });
   }
 
-  async fetchTermsSourceDocuments({ service: { id: serviceId }, termsType, sourceDocuments, hasMultipleSourceDocuments }) {
+  async fetchTermsSourceDocuments({ service: { id: serviceId }, type, sourceDocuments, hasMultipleSourceDocuments }) {
     const inaccessibleContentErrors = [];
 
     const result = await Promise.all(sourceDocuments.map(async ({ location: url, executeClientScripts, cssSelectors, id: documentId }) => {
@@ -149,7 +145,7 @@ export default class Archivist extends events.EventEmitter {
           content,
           mimeType,
           serviceId,
-          termsType,
+          termsType: type,
           documentId: hasMultipleSourceDocuments && documentId,
           fetchDate: new Date(),
         };
@@ -177,7 +173,7 @@ export default class Archivist extends events.EventEmitter {
     return result;
   }
 
-  async getTermsSnapshots({ service: { id: serviceId }, termsType, sourceDocuments, hasMultipleSourceDocuments }) {
+  async getTermsSnapshots({ service: { id: serviceId }, type: termsType, sourceDocuments, hasMultipleSourceDocuments }) {
     return (await Promise.all(sourceDocuments.map(async sourceDocument => this.recorder.getLatestSnapshot(serviceId, termsType, hasMultipleSourceDocuments && sourceDocument.id)))).filter(Boolean);
   }
 

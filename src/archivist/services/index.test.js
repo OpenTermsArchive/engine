@@ -16,15 +16,15 @@ describe('Services', () => {
       /* eslint-disable no-loop-func */
       for (const termsType of expected.getTermsTypes()) {
         context(`${termsType}`, () => {
-          let actualDocumentDeclaration;
+          let actualTerms;
           let actualFilters;
           let actualContentSelectors;
           let actualInsignificantContentSelectors;
           let actualExecuteClientScripts;
 
-          const expectedDocumentDeclaration = expected.getTerms(termsType);
+          const expectedTerms = expected.getTerms(termsType);
 
-          const { sourceDocuments } = expectedDocumentDeclaration;
+          const { sourceDocuments } = expectedTerms;
 
           sourceDocuments.forEach((sourceDocument, index) => {
             const {
@@ -36,8 +36,8 @@ describe('Services', () => {
 
             context(`source document: ${sourceDocument.id}`, () => {
               before(() => {
-                actualDocumentDeclaration = result[serviceId].getTerms(termsType);
-                const { sourceDocuments: actualDocuments } = actualDocumentDeclaration;
+                actualTerms = result[serviceId].getTerms(termsType);
+                const { sourceDocuments: actualDocuments } = actualTerms;
 
                 ({
                   filters: actualFilters,
@@ -48,15 +48,15 @@ describe('Services', () => {
               });
 
               it('has the proper service name', () => {
-                expect(actualDocumentDeclaration.service.name).to.eql(expectedDocumentDeclaration.service.name);
+                expect(actualTerms.service.name).to.eql(expectedTerms.service.name);
               });
 
               it('has the proper terms type', () => {
-                expect(actualDocumentDeclaration.termsType).to.eql(expectedDocumentDeclaration.termsType);
+                expect(actualTerms.type).to.eql(expectedTerms.type);
               });
 
               it('has no validity date', () => {
-                expect(actualDocumentDeclaration.validUntil).to.be.undefined;
+                expect(actualTerms.validUntil).to.be.undefined;
               });
 
               it('has the proper content selectors', async () => {
@@ -146,22 +146,22 @@ describe('Services', () => {
           const { history: expectedHistory } = expected.terms[termsType];
           const expectedHistoryDates = expectedHistory && [ ...expectedHistory.map(entry => entry.validUntil), null ]; // add `null` entry to simulate the still current valid declaration
 
-          let actualDocumentDeclaration;
+          let actualTerms;
           let actualFilters;
-          const expectedDocumentDeclaration = expected.getTerms(termsType);
+          const expectedTerms = expected.getTerms(termsType);
 
-          const { sourceDocuments } = expectedDocumentDeclaration;
+          const { sourceDocuments } = expectedTerms;
 
           before(() => {
-            actualDocumentDeclaration = result[serviceId].getTerms(termsType);
+            actualTerms = result[serviceId].getTerms(termsType);
           });
 
           it('has the proper service name', () => {
-            expect(actualDocumentDeclaration.service.name).to.eql(expectedDocumentDeclaration.service.name);
+            expect(actualTerms.service.name).to.eql(expectedTerms.service.name);
           });
 
           it('has the proper terms type', () => {
-            expect(actualDocumentDeclaration.termsType).to.eql(expectedDocumentDeclaration.termsType);
+            expect(actualTerms.type).to.eql(expectedTerms.type);
           });
 
           sourceDocuments.forEach((sourceDocument, index) => {
@@ -169,7 +169,7 @@ describe('Services', () => {
 
             context(`${sourceDocument.id} sourceDocument`, () => {
               before(() => {
-                const { sourceDocuments: actualDocuments } = actualDocumentDeclaration;
+                const { sourceDocuments: actualDocuments } = actualTerms;
 
                 ({ filters: actualFilters } = actualDocuments[index]);
               });
@@ -232,7 +232,7 @@ describe('Services', () => {
                 }
               } else {
                 it('has no history', async () => {
-                  expect(actualDocumentDeclaration.validUntil).to.be.undefined;
+                  expect(actualTerms.validUntil).to.be.undefined;
                 });
 
                 if (expectedFilters) {

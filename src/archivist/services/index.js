@@ -86,7 +86,7 @@ async function loadServiceDocument(service, termsType, termsTypeDeclaration) {
     }
   }
 
-  service.addTerms(new Terms({ service, termsType, sourceDocuments }));
+  service.addTerms(new Terms({ service, type: termsType, sourceDocuments }));
 }
 
 async function getDeclaredServicesIds() {
@@ -159,7 +159,7 @@ export async function loadWithHistory(servicesIds = []) {
 
         services[serviceId].addTerms(new Terms({
           service: services[serviceId],
-          termsType,
+          type: termsType,
           sourceDocuments,
           validUntil: date,
         }));

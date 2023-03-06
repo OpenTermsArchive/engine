@@ -19,7 +19,7 @@ const filters = [
 [
   new Terms({
     service,
-    termsType: 'Terms of Service',
+    type: 'Terms of Service',
     sourceDocuments: [
       new SourceDocument({
         location: 'https://www.service-with-declaration-history.example/terms',
@@ -32,7 +32,7 @@ const filters = [
   }),
   new Terms({
     service,
-    termsType: 'Terms of Service',
+    type: 'Terms of Service',
     sourceDocuments: [
       new SourceDocument({
         location: 'https://www.service-with-declaration-history.example/tos',
@@ -45,7 +45,7 @@ const filters = [
   }),
   new Terms({
     service,
-    termsType: 'Terms of Service',
+    type: 'Terms of Service',
     sourceDocuments: [
       new SourceDocument({
         location: 'https://www.service-with-declaration-history.example/tos',
