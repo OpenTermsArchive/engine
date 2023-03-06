@@ -9,7 +9,7 @@ export default class Terms {
     }
   }
 
-  get hasMultiSourceDocuments() {
+  get hasMultipleSourceDocuments() {
     return this.sourceDocuments.length > 1;
   }
 
@@ -17,7 +17,7 @@ export default class Terms {
     return {
       name: this.service.name,
       documents: {
-        [this.termsType]: this.hasMultiSourceDocuments
+        [this.termsType]: this.hasMultipleSourceDocuments
           ? { combine: this.sourceDocuments.map(sourceDocument => sourceDocument.toPersistence()) }
           : this.sourceDocuments[0].toPersistence(),
       },

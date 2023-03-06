@@ -13,8 +13,8 @@ import * as services from './services/index.js';
 // because when it's higher there are two issues:
 // - too many requests on the same endpoint yield 403
 // - sometimes when creating a commit no SHA are returned for unknown reasons
-const MAX_PARALLEL_TERMS_TRACKS = 1;
-const MAX_PARALLEL_TERMS_TRACKS_WITH_EXTRACT_ONLY = 10;
+const MAX_PARALLEL_TRACKING = 1;
+const MAX_PARALLEL_EXTRACTING = 10;
 
 export const AVAILABLE_EVENTS = [
   'snapshotRecorded',
@@ -70,7 +70,7 @@ export default class Archivist extends events.EventEmitter {
   }
 
   initQueue() {
-    this.trackingQueue = async.queue(this.trackTermsChanges.bind(this), MAX_PARALLEL_TERMS_TRACKS);
+    this.trackingQueue = async.queue(this.trackTermsChanges.bind(this), MAX_PARALLEL_TRACKING);
     this.trackingQueue.error(async (error, { terms }) => {
       const { service, termsType } = terms;
 
@@ -103,7 +103,7 @@ export default class Archivist extends events.EventEmitter {
 
     await Promise.all([ launchHeadlessBrowser(), this.recorder.initialize() ]);
 
-    this.trackingQueue.concurrency = extractOnly ? MAX_PARALLEL_TERMS_TRACKS_WITH_EXTRACT_ONLY : MAX_PARALLEL_TERMS_TRACKS;
+    this.trackingQueue.concurrency = extractOnly ? MAX_PARALLEL_EXTRACTING : MAX_PARALLEL_TRACKING;
 
     this.#forEachTermsOf(servicesIds, termsTypes, terms => this.trackingQueue.push({ terms, extractOnly }));
 
@@ -138,7 +138,7 @@ export default class Archivist extends events.EventEmitter {
     });
   }
 
-  async fetchTermsSourceDocuments({ service: { id: serviceId }, termsType, sourceDocuments, hasMultiSourceDocuments }) {
+  async fetchTermsSourceDocuments({ service: { id: serviceId }, termsType, sourceDocuments, hasMultipleSourceDocuments }) {
     const inaccessibleContentErrors = [];
 
     const result = await Promise.all(sourceDocuments.map(async ({ location: url, executeClientScripts, cssSelectors, id: documentId }) => {
@@ -150,7 +150,7 @@ export default class Archivist extends events.EventEmitter {
           mimeType,
           serviceId,
           termsType,
-          documentId: hasMultiSourceDocuments && documentId,
+          documentId: hasMultipleSourceDocuments && documentId,
           fetchDate: new Date(),
         };
       } catch (error) {
@@ -177,8 +177,8 @@ export default class Archivist extends events.EventEmitter {
     return result;
   }
 
-  async getTermsSnapshots({ service: { id: serviceId }, termsType, sourceDocuments, hasMultiSourceDocuments }) {
-    return (await Promise.all(sourceDocuments.map(async sourceDocument => this.recorder.getLatestSnapshot(serviceId, termsType, hasMultiSourceDocuments && sourceDocument.id)))).filter(Boolean);
+  async getTermsSnapshots({ service: { id: serviceId }, termsType, sourceDocuments, hasMultipleSourceDocuments }) {
+    return (await Promise.all(sourceDocuments.map(async sourceDocument => this.recorder.getLatestSnapshot(serviceId, termsType, hasMultipleSourceDocuments && sourceDocument.id)))).filter(Boolean);
   }
 
   async extractVersionContent(snapshots, sourceDocuments) {
