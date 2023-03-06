@@ -184,7 +184,7 @@ npx ota track --services "<service_id>" ["<service_id>"...]
 ##### Track specific terms of specific services
 
 ```sh
-npx ota track --services "<service_id>" ["<service_id>"...] --terms-types "<terms_type>" ["<terms_type>"...]
+npx ota track --services "<service_id>" ["<service_id>"...] --types "<terms_type>" ["<terms_type>"...]
 ```
 
 ##### Track terms four times a day
@@ -196,7 +196,7 @@ npx ota track --schedule
 #### `ota validate`
 
 ```sh
-npx ota validate [--services <service_id>...] [--terms-types <terms_type>...]
+npx ota validate [--services <service_id>...] [--types <terms_type>...]
 ```
 
 Check that all declarations allow recording a snapshot and a version properly.
@@ -206,7 +206,7 @@ If one or several `<service_id>` are provided, check only those services.
 ##### Validate schema only
 
 ```sh
-npx ota validate --schema-only [--services <service_id>...] [--terms-types <terms_type>...]
+npx ota validate --schema-only [--services <service_id>...] [--types <terms_type>...]
 ```
 
 Check that all declarations are readable by the engine.

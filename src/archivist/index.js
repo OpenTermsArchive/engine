@@ -34,7 +34,7 @@ export default class Archivist extends events.EventEmitter {
     return this.services;
   }
 
-  get serviceIds() {
+  get servicesIds() {
     return Object.keys(this.services);
   }
 
@@ -98,7 +98,7 @@ export default class Archivist extends events.EventEmitter {
     });
   }
 
-  async trackAllTermsChanges({ servicesIds = this.serviceIds, termsTypes = [], extractOnly = false }) {
+  async trackAllTermsChanges({ services: servicesIds = this.servicesIds, terms: termsTypes = [], extractOnly = false }) {
     this.emit('trackingStarted', servicesIds.length, this.getNumberOfTerms(servicesIds), extractOnly);
 
     await Promise.all([ launchHeadlessBrowser(), this.recorder.initialize() ]);
@@ -231,8 +231,8 @@ export default class Archivist extends events.EventEmitter {
     this.emit(isFirstRecord ? 'firstVersionRecorded' : 'versionRecorded', serviceId, termsType, versionId);
   }
 
-  getNumberOfTerms(serviceIds = this.serviceIds) {
-    return serviceIds.reduce((acc, serviceId) => acc + this.services[serviceId].getNumberOfTerms(), 0);
+  getNumberOfTerms(servicesIds = this.servicesIds) {
+    return servicesIds.reduce((acc, serviceId) => acc + this.services[serviceId].getNumberOfTerms(), 0);
   }
 
   async #forEachTermsOf(servicesIds = [], termsTypes = [], callback) { // eslint-disable-line default-param-last
