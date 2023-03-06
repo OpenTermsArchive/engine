@@ -27,7 +27,7 @@ export function toPersistence(record, snapshotIdentiferTemplate) {
   prefix = isFirstRecord ? COMMIT_MESSAGE_PREFIX.startTracking : prefix;
 
   const subject = `${prefix} ${serviceId} ${termsType}`;
-  const documentIdMessage = `${documentId ? `Document ID ${documentId}\n\n` : ''}`;
+  const documentIdMessage = `${documentId ? `Page ID ${documentId}\n\n` : ''}`;
   let snapshotIdsMessage;
 
   if (snapshotIds.length == 1) {
