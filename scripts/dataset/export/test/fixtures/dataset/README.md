@@ -2,7 +2,7 @@
 
 This dataset consolidates the contractual documents of 2 service providers, in all their versions that were accessible online between January 1, 2021 and January 6, 2022.
 
-This dataset is tailored for datascientists and other analysts. You can also explore all these versions interactively on [https://github.com/OpenTermsArchive/sandbox](https://github.com/OpenTermsArchive/sandbox).
+This dataset is tailored for datascientists and other analysts. You can also explore all these versions interactively on [https://github.com/OpenTermsArchive/sandbox-versions](https://github.com/OpenTermsArchive/sandbox-versions).
 
 It has been generated with [Open Terms Archive](https://opentermsarchive.org).
 
