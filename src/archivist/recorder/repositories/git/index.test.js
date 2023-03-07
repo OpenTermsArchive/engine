@@ -308,7 +308,7 @@ describe('GitRepository', () => {
       after(async () => subject.removeAll());
 
       it('does not store snapshots IDs', () => {
-        expect(commit.body).to.be.equal(`Document ID ${DOCUMENT_ID}\n`);
+        expect(commit.body).to.be.equal(`Page ID ${DOCUMENT_ID}\n`);
       });
 
       it('stores the service ID', () => {
