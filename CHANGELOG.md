@@ -12,6 +12,8 @@ _Full changeset and discussions: [#996](https://github.com/OpenTermsArchive/engi
 - **Breaking:** Rename CLI option `--refilter-only`, `-r` to `--extract-only`, `-e` in API; simply rename accordingly in your own codebase
 - **Breaking:** Rename function and its parameters `filter({ content, mimeType, pageDeclaration })` to `extract({ content, mimeType, sourceDocument })` in API; simply rename accordingly in your own codebase
 - **Breaking:** Rename class `PageDeclaration` to `SourceDocument` and its atribute `noiseSelectors` to `insignificantContentSelectors` in API; simply rename accordingly in your own codebase
+- **Breaking:** Rephrase commit messages in Git data layer but keep backwards compatibility for existing data; `Start tracking` to `Initial record of`, `Refilter` to `Apply technical or declaration upgrade on` and `Update` to `Record new changes of`; if you have scripts that parse commit messages directly, update them accordingly
+- **Breaking:** Rename document attribute `isRefilter` to `isExtractOnly` in MongoDB data layer but keep backwards compatibility for existing data; if you have scripts that query the Mongo database directly, update them accordingly
 - Make vocabulary consistent throughout the codebase ([#971](https://github.com/OpenTermsArchive/engine/pull/971))
 
 ### Removed
