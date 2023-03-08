@@ -82,7 +82,7 @@ export default class GitRepository extends RepositoryInterface {
   }
 
   async count() {
-    return (await this.git.log(Object.values(DataMapper.COMMIT_MESSAGE_PREFIX).map(prefix => `--grep=${prefix}`))).length;
+    return (await this.git.log(Object.values(DataMapper.COMMIT_MESSAGE_PREFIXES).map(prefix => `--grep=${prefix}`))).length;
   }
 
   async* iterate() {
