@@ -741,7 +741,7 @@ describe('GitRepository', () => {
       currentFirstRecord: {
         path: 'service/terms-current.md',
         content: 'content',
-        message: 'Initial record of Service Terms',
+        message: 'First record of Service Terms',
         date: new Date('2023-02-28T04:00:00.000Z'),
       },
       currentExtractOnly: {
