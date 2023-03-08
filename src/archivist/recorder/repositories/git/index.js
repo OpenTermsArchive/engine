@@ -45,7 +45,7 @@ export default class GitRepository extends RepositoryInterface {
     const filePath = path.join(this.path, relativeFilePath);
 
     await GitRepository.writeFile({ filePath, content });
-    const sha = await this.commit({ filePath, message, date: fetchDate });
+    const sha = await this.#commit({ filePath, message, date: fetchDate });
 
     if (!sha) {
       return Object(null);
@@ -138,7 +138,7 @@ export default class GitRepository extends RepositoryInterface {
     return filePath;
   }
 
-  async commit({ filePath, message, date }) {
+  async #commit({ filePath, message, date }) {
     try {
       await this.git.add(filePath);
 
