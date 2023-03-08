@@ -129,7 +129,7 @@ describe('Extract', () => {
   describe('#extractFromHTML', () => {
     describe('Select', () => {
       context('with string selector', () => {
-        it('extract content from the given HTML with common changing items', async () => {
+        it('extracts content from the given HTML with common changing items', async () => {
           const result = await extractFromHTML({
             content: rawHTMLWithCommonChangingItems,
             sourceDocument: new SourceDocument({
@@ -141,7 +141,7 @@ describe('Extract', () => {
           expect(result).to.equal(expectedExtractedWithCommonChangingItems);
         });
 
-        it('extract content from the given HTML', async () => {
+        it('extracts content from the given HTML', async () => {
           const result = await extractFromHTML({
             content: rawHTML,
             sourceDocument: new SourceDocument({
@@ -190,7 +190,7 @@ describe('Extract', () => {
         });
 
         context('with multiple selectors in one string', () => {
-          it('extract content from the given HTML', async () => {
+          it('extracts content from the given HTML', async () => {
             const result = await extractFromHTML({
               content: rawHTML,
               sourceDocument: new SourceDocument({
@@ -205,7 +205,7 @@ describe('Extract', () => {
       });
 
       context('with an array of selectors', () => {
-        it('extract content from the given HTML', async () => {
+        it('extracts content from the given HTML', async () => {
           const result = await extractFromHTML({
             content: rawHTML,
             sourceDocument: new SourceDocument({
@@ -218,7 +218,7 @@ describe('Extract', () => {
         });
 
         context('when one selector is dependent on another', () => {
-          it('extract content from the given HTML', async () => {
+          it('extracts content from the given HTML', async () => {
             const result = await extractFromHTML({
               content: rawHTML,
               sourceDocument: new SourceDocument({
@@ -234,7 +234,7 @@ describe('Extract', () => {
 
       context('with range selector', () => {
         context('with startBefore and endBefore', () => {
-          it('extract content from the given HTML', async () => {
+          it('extracts content from the given HTML', async () => {
             const result = await extractFromHTML({
               content: rawHTML,
               sourceDocument: new SourceDocument({
@@ -250,7 +250,7 @@ describe('Extract', () => {
           });
         });
         context('with startBefore and endAfter', () => {
-          it('extract content from the given HTML', async () => {
+          it('extracts content from the given HTML', async () => {
             const result = await extractFromHTML({
               content: rawHTML,
               sourceDocument: new SourceDocument({
@@ -266,7 +266,7 @@ describe('Extract', () => {
           });
         });
         context('with startAfter and endBefore', () => {
-          it('extract content from the given HTML', async () => {
+          it('extracts content from the given HTML', async () => {
             const result = await extractFromHTML({
               content: rawHTML,
               sourceDocument: new SourceDocument({
@@ -282,7 +282,7 @@ describe('Extract', () => {
           });
         });
         context('with startAfter and endAfter', () => {
-          it('extract content from the given HTML', async () => {
+          it('extracts content from the given HTML', async () => {
             const result = await extractFromHTML({
               content: rawHTML,
               sourceDocument: new SourceDocument({
@@ -328,7 +328,7 @@ describe('Extract', () => {
       });
 
       context('with an array of range selectors', () => {
-        it('extract content from the given HTML', async () => {
+        it('extracts content from the given HTML', async () => {
           const result = await extractFromHTML({
             content: rawHTML,
             sourceDocument: new SourceDocument({
@@ -351,7 +351,7 @@ describe('Extract', () => {
       });
 
       context('with an array of mixed string selectors and range selectors', () => {
-        it('extract content from the given HTML', async () => {
+        it('extracts content from the given HTML', async () => {
           const result = await extractFromHTML({
             content: rawHTML,
             sourceDocument: new SourceDocument({
@@ -518,7 +518,7 @@ describe('Extract', () => {
 
     describe('Filter', () => {
       context('with a synchronous filter', () => {
-        it('extract content from the given HTML also with given additional filter', async () => {
+        it('extracts content from the given HTML also with given additional filter', async () => {
           const result = await extractFromHTML({
             content: rawHTML,
             sourceDocument: new SourceDocument({
@@ -533,7 +533,7 @@ describe('Extract', () => {
       });
 
       context('with an asynchronous filter', () => {
-        it('extract content from the given HTML also with given additional filter', async () => {
+        it('extracts content from the given HTML also with given additional filter', async () => {
           const result = await extractFromHTML({
             content: rawHTML,
             sourceDocument: new SourceDocument({
@@ -561,7 +561,7 @@ describe('Extract', () => {
       );
     });
 
-    it('extract content from the given PDF', async () => {
+    it('extracts content from the given PDF', async () => {
       expect(await extractFromPDF({ content: pdfContent })).to.equal(expectedExtractedContent);
     });
   });
