@@ -8,7 +8,7 @@ import mime from 'mime';
 
 import Record from '../../record.js';
 
-import { TERMS_TYPE_AND_DOCUMENT_ID_SEPARATOR, SNAPSHOT_ID_MARKER, COMMIT_MESSAGE_PREFIX } from './dataMapper.js';
+import { TERMS_TYPE_AND_DOCUMENT_ID_SEPARATOR, SNAPSHOT_ID_MARKER, COMMIT_MESSAGE_PREFIXES } from './dataMapper.js';
 import Git from './git.js';
 
 import GitRepository from './index.js';
@@ -107,7 +107,7 @@ describe('GitRepository', () => {
       });
 
       it('stores information that it is the first record for these specific terms', () => {
-        expect(commit.message).to.include(COMMIT_MESSAGE_PREFIX.startTracking);
+        expect(commit.message).to.include(COMMIT_MESSAGE_PREFIXES.startTracking);
       });
 
       it('stores the proper content', () => {
@@ -250,7 +250,7 @@ describe('GitRepository', () => {
       });
 
       it('stores information that it is an extracted only version', () => {
-        expect(commit.message).to.include(COMMIT_MESSAGE_PREFIX.extractOnly);
+        expect(commit.message).to.include(COMMIT_MESSAGE_PREFIXES.extractOnly);
       });
     });
 
