@@ -105,7 +105,7 @@ describe('Archivist', function () {
       });
     });
 
-    context('when there is an expected error', () => {
+    context('when there is an operational error', () => {
       before(async () => {
         // as there is no more HTTP request mocks for service A, it should throw an `ENOTFOUND` error which is considered as an expected error in our workflow
         nock.cleanAll();
@@ -136,7 +136,7 @@ describe('Archivist', function () {
       });
     });
 
-    context('with extraction step only', () => {
+    context('extracting only', () => {
       context('when a service’s filter declaration changes', () => {
         context('when everything works fine', () => {
           let originalSnapshotId;
@@ -170,7 +170,7 @@ describe('Archivist', function () {
 
           after(resetGitRepositories);
 
-          it('update version of the changed service', async () => {
+          it('updates the version of the changed service', async () => {
             const serviceAContent = await fs.readFile(path.resolve(__dirname, SERVICE_A_EXPECTED_VERSION_FILE_PATH), { encoding: 'utf8' });
 
             expect(serviceAContent).to.equal('Terms of service with UTF-8 \'çhãràčtęrs"\n========================================');
@@ -197,7 +197,7 @@ describe('Archivist', function () {
           });
         });
 
-        context('when there is an expected error', () => {
+        context('when there is an operational error', () => {
           let inaccessibleContentSpy;
           let versionNotChangedSpy;
 
@@ -219,11 +219,11 @@ describe('Archivist', function () {
 
           after(resetGitRepositories);
 
-          it('emits an inaccessibleContent event when an error happens', async () => {
+          it('emits an inaccessibleContent event', async () => {
             expect(inaccessibleContentSpy).to.have.been.called;
           });
 
-          it('still apply extraction step to other services', async () => {
+          it('still extracts the terms of other services', async () => {
             expect(versionNotChangedSpy).to.have.been.calledWith(SERVICE_B_ID, SERVICE_B_TYPE);
           });
         });

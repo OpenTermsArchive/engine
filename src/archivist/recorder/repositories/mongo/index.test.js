@@ -87,7 +87,7 @@ describe('MongoRepository', () => {
         expect(mongoDocument._id.toString()).to.equal(record.id);
       });
 
-      it('returns a boolean to know if it is the first record', () => {
+      it('states that it is the first record', () => {
         expect(record.isFirstRecord).to.be.true;
       });
 
@@ -99,7 +99,7 @@ describe('MongoRepository', () => {
         expect(mongoDocument.termsType).to.include(TERMS_TYPE);
       });
 
-      it('stores information that it is the first record for this specific terms', () => {
+      it('stores information that it is the first record for these specific terms', () => {
         expect(mongoDocument.isFirstRecord).to.be.true;
       });
 
@@ -174,7 +174,7 @@ describe('MongoRepository', () => {
         expect(mongoDocument._id.toString()).to.equal(record.id);
       });
 
-      it('returns a boolean to know if it is the first record', () => {
+      it('states that it is not the first record', () => {
         expect(record.isFirstRecord).to.be.false;
       });
     });
@@ -426,7 +426,7 @@ describe('MongoRepository', () => {
       expect(record.id).to.include(id);
     });
 
-    it('returns a boolean to know if it is the first record', () => {
+    it('states that it is the first record', () => {
       expect(record.isFirstRecord).to.be.true;
     });
 

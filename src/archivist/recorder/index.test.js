@@ -97,7 +97,7 @@ describe('Recorder', () => {
             expect(record.id).to.include(id);
           });
 
-          it('returns a boolean to know if it is the first record', async () => {
+          it('states that it is the first record', async () => {
             expect(isFirstRecord).to.be.true;
           });
         });
@@ -135,7 +135,7 @@ describe('Recorder', () => {
             expect(record.id).to.include(id);
           });
 
-          it('returns a boolean to know if it is the first record', async () => {
+          it('states that it is not the first record', async () => {
             expect(isFirstRecord).to.be.false;
           });
         });
@@ -238,7 +238,7 @@ describe('Recorder', () => {
             expect(record.id).to.include(id);
           });
 
-          it('returns a boolean to know if it is the first record', async () => {
+          it('states that it is the first record', async () => {
             expect(isFirstRecord).to.be.true;
           });
         });
@@ -280,7 +280,7 @@ describe('Recorder', () => {
             expect(record.id).to.include(id);
           });
 
-          it('returns a boolean to know if it is the first record', async () => {
+          it('states that it is not the first record', async () => {
             expect(isFirstRecord).to.be.false;
           });
         });
@@ -308,12 +308,12 @@ describe('Recorder', () => {
 
           after(async () => recorder.versionsRepository.removeAll());
 
-          it('does not record the version', async () => {
+          it('does not record any version', async () => {
             expect(id).to.not.be.ok;
           });
         });
 
-        context('when it is an extracted only version', () => {
+        context('when it is an extraction only', () => {
           const CONTENT = '# ToS fixture data with UTF-8 çhãràčtęrs';
           const SNAPSHOT_ID = '61af86dc5ff5caa74ae926ad';
 
@@ -345,7 +345,7 @@ describe('Recorder', () => {
               expect(record.id).to.include(id);
             });
 
-            it('returns a boolean to know if it is the first record', async () => {
+            it('states that it is the first record', async () => {
               expect(isFirstRecord).to.be.true;
             });
           });
@@ -388,7 +388,7 @@ describe('Recorder', () => {
               expect(record.id).to.include(id);
             });
 
-            it('returns a boolean to know if it is the first record', async () => {
+            it('states that it is not the first record', async () => {
               expect(isFirstRecord).to.be.false;
             });
           });
@@ -417,7 +417,7 @@ describe('Recorder', () => {
 
             after(async () => recorder.versionsRepository.removeAll());
 
-            it('does not record the version', async () => {
+            it('does not record any version', async () => {
               expect(id).to.not.be.ok;
             });
           });

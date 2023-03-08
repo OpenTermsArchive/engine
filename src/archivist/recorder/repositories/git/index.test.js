@@ -94,7 +94,7 @@ describe('GitRepository', () => {
         expect(commit.hash).to.include(id);
       });
 
-      it('returns a boolean to know if it is the first record', () => {
+      it('states that it is the first record', () => {
         expect(isFirstRecord).to.be.true;
       });
 
@@ -106,7 +106,7 @@ describe('GitRepository', () => {
         expect(commit.message).to.include(TERMS_TYPE);
       });
 
-      it('stores information that it is the first record for this specific terms', () => {
+      it('stores information that it is the first record for these specific terms', () => {
         expect(commit.message).to.include('Start tracking');
       });
 
@@ -171,7 +171,7 @@ describe('GitRepository', () => {
         expect(commit.hash).to.include(id);
       });
 
-      it('returns a boolean to know if it is the first record', () => {
+      it('states that it is not the first record', () => {
         expect(isFirstRecord).to.be.false;
       });
     });
@@ -387,7 +387,7 @@ describe('GitRepository', () => {
         expect(commit.body).to.include(config.get('recorder.versions.storage.git.snapshotIdentiferTemplate').replace(SNAPSHOT_ID_MARKER, SNAPSHOT_ID_2));
       });
 
-      it('stores number of source documents', () => {
+      it('stores the number of source documents', () => {
         expect(commit.body).to.include(`${snapshotIds.length} source documents`);
       });
 
@@ -429,7 +429,7 @@ describe('GitRepository', () => {
       expect(record.id).to.include(id);
     });
 
-    it('returns a boolean to know if it is the first record', () => {
+    it('states that it is the first record', () => {
       expect(record.isFirstRecord).to.be.true;
     });
 
