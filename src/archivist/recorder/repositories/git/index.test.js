@@ -783,7 +783,8 @@ describe('GitRepository', () => {
 
         await GitRepository.writeFile({ filePath, content });
 
-        const sha = await subject.commit({ filePath, message, date });
+        await git.add(filePath);
+        const sha = await git.commit({ filePath, message, date });
 
         commit.id = sha;
         expectedIds.push(sha);
