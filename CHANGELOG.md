@@ -6,11 +6,15 @@ All changes that impact users of this module are documented in this file, in the
 
 ### Changed
 
-- Improve vocabulary
-- **Breaking:** In exposed CLI `--refilter-only` option is now called `--extract-only`. Short option switches from `-r` to `-e`.
-- **Breaking:** In exposed CLI `--terms-types` option is now called `--types`. Short option is stil `-t`.
-- **Breaking:** In exposed API `filter` function is now called `extract`.
-- **Breaking:** In exposed API `PageDeclaration` class is now called `SourceDocument`.
+- **Breaking:** Rename CLI option `--terms-types` to `--types` in API; simply rename accordingly in your own codebase
+- **Breaking:** Rename CLI option `--refilter-only`, `-r` to `--extract-only`, `-e` in API; simply rename accordingly in your own codebase
+- **Breaking:** Rename function and its parameters `filter({ content, mimeType, pageDeclaration })` to `extract({ content, mimeType, sourceDocument })` in API; simply rename accordingly in your own codebase
+- **Breaking:** Rename class `PageDeclaration` to `SourceDocument` and its atribute `noiseSelectors` to `insignificantContentSelectors` in API; simply rename accordingly in your own codebase
+- Improve vocabulary ([#971](https://github.com/ambanum/OpenTermsArchive/pull/971))
+
+### Removed
+
+- **Breaking:** Remove `npm run extract` command; use `npm run start -- --extract-only` instead
 
 ## 0.26.0 - 2023-02-20
 
