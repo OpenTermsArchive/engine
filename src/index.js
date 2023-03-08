@@ -29,7 +29,7 @@ export default async function track({ services = [], types, extractOnly, schedul
 
   // The result of the extraction step that generates the version from the snapshots may depend on changes to the engine or its dependencies.
   // The process thus starts by only performing the extraction process so that any version following such changes can be labelled (to avoid sending notifications, for example)
-  await archivist.trackAllTermsChanges({ services, types, extractOnly: true });
+  await archivist.track({ services, types, extractOnly: true });
 
   if (extractOnly) {
     return;
@@ -47,7 +47,7 @@ export default async function track({ services = [], types, extractOnly, schedul
   }
 
   if (!schedule) {
-    await archivist.trackAllTermsChanges({ services, types });
+    await archivist.track({ services, types });
 
     return;
   }
@@ -55,5 +55,5 @@ export default async function track({ services = [], types, extractOnly, schedul
   logger.info('The scheduler is running…');
   logger.info('Terms will be tracked every six hours starting at half past midnight');
 
-  cron('30 */6 * * *', () => archivist.trackAllTermsChanges({ services, types }));
+  cron('30 */6 * * *', () => archivist.track({ services, types }));
 }
