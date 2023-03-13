@@ -30,7 +30,7 @@ export const EVENTS = [
 
 export default class Archivist extends events.EventEmitter {
   get servicesIds() {
-    return Object.keys(this.services);
+    return Object.keys(this.services).sort((a, b) => a.localeCompare(b)); // Sort service IDs by lowercase name to have more intuitive logs;
   }
 
   constructor({ recorderConfig, fetcherConfig }) {
@@ -98,7 +98,15 @@ export default class Archivist extends events.EventEmitter {
 
     this.trackingQueue.concurrency = extractOnly ? MAX_PARALLEL_EXTRACTING : MAX_PARALLEL_TRACKING;
 
-    this.#forEachTermsOf(servicesIds, termsTypes, terms => this.trackingQueue.push({ terms, extractOnly }));
+    servicesIds.forEach(serviceId => {
+      this.services[serviceId].getTermsTypes().forEach(termsType => {
+        if (termsTypes.length && !termsTypes.includes(termsType)) {
+          return;
+        }
+
+        this.trackingQueue.push({ terms: this.services[serviceId].getTerms(termsType), extractOnly });
+      });
+    });
 
     await this.trackingQueue.drain();
     await Promise.all([ stopHeadlessBrowser(), this.recorder.finalize() ]);
@@ -224,18 +232,5 @@ export default class Archivist extends events.EventEmitter {
 
   getNumberOfTerms(servicesIds = this.servicesIds) {
     return servicesIds.reduce((acc, serviceId) => acc + this.services[serviceId].getNumberOfTerms(), 0);
-  }
-
-  async #forEachTermsOf(servicesIds = [], termsTypes = [], callback) { // eslint-disable-line default-param-last
-    servicesIds.sort((a, b) => a.localeCompare(b)); // Sort service IDs by lowercase name to have more intuitive logs
-    servicesIds.forEach(serviceId => {
-      this.services[serviceId].getTermsTypes().forEach(termsType => {
-        if (termsTypes.length && !termsTypes.includes(termsType)) {
-          return;
-        }
-
-        callback(this.services[serviceId].getTerms(termsType));
-      });
-    });
   }
 }
