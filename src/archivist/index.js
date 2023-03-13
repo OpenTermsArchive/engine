@@ -1,7 +1,6 @@
 import events from 'events';
 
 import async from 'async';
-import config from 'config';
 
 import { InaccessibleContentError } from './errors.js';
 import extract from './extract/index.js';
@@ -38,10 +37,10 @@ export default class Archivist extends events.EventEmitter {
     return Object.keys(this.services);
   }
 
-  constructor({ recorderConfig }) {
+  constructor({ recorderConfig, fetcherConfig }) {
     super();
     this.recorder = new Recorder(recorderConfig);
-    this.fetch = params => fetch({ ...params, config: config.get('fetcher') });
+    this.fetch = params => fetch({ ...params, config: fetcherConfig });
     this.extract = extract;
   }
 
