@@ -15,7 +15,7 @@ import * as services from './services/index.js';
 const MAX_PARALLEL_TRACKING = 1;
 const MAX_PARALLEL_EXTRACTING = 10;
 
-export const AVAILABLE_EVENTS = [
+export const EVENTS = [
   'snapshotRecorded',
   'firstSnapshotRecorded',
   'snapshotNotChanged',
@@ -82,7 +82,7 @@ export default class Archivist extends events.EventEmitter {
   }
 
   attach(listener) {
-    AVAILABLE_EVENTS.forEach(event => {
+    EVENTS.forEach(event => {
       const handlerName = `on${event[0].toUpperCase()}${event.substring(1)}`;
 
       if (listener[handlerName]) {
