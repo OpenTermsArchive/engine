@@ -7,7 +7,10 @@ import Notifier from './notifier/index.js';
 import Tracker from './tracker/index.js';
 
 export default async function track({ services = [], types, extractOnly, schedule }) {
-  const archivist = new Archivist({ recorderConfig: config.get('recorder') });
+  const archivist = new Archivist({
+    recorderConfig: config.get('recorder'),
+    fetcherConfig: config.get('fetcher'),
+  });
 
   archivist.attach(logger);
 
