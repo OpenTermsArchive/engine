@@ -7,6 +7,7 @@ import extract from './extract/index.js';
 import fetch, { launchHeadlessBrowser, stopHeadlessBrowser, FetchDocumentError } from './fetcher/index.js';
 import Recorder from './recorder/index.js';
 import * as services from './services/index.js';
+import Service from './services/service.js';
 
 // The parallel handling feature is currently set to a parallelism of 1 on terms tracking
 // because when it's higher there are two issues:
@@ -92,8 +93,7 @@ export default class Archivist extends events.EventEmitter {
   }
 
   async track({ services: servicesIds = this.servicesIds, terms: termsTypes = [], extractOnly = false }) {
-    this.emit('trackingStarted', servicesIds.length, this.getNumberOfTerms(servicesIds), extractOnly);
-
+    this.emit('trackingStarted', servicesIds.length, Service.getNumberOfTerms(this.services, servicesIds), extractOnly);
     await Promise.all([ launchHeadlessBrowser(), this.recorder.initialize() ]);
 
     this.trackingQueue.concurrency = extractOnly ? MAX_PARALLEL_EXTRACTING : MAX_PARALLEL_TRACKING;
@@ -109,9 +109,9 @@ export default class Archivist extends events.EventEmitter {
     });
 
     await this.trackingQueue.drain();
-    await Promise.all([ stopHeadlessBrowser(), this.recorder.finalize() ]);
 
-    this.emit('trackingCompleted', servicesIds.length, this.getNumberOfTerms(servicesIds), extractOnly);
+    await Promise.all([ stopHeadlessBrowser(), this.recorder.finalize() ]);
+    this.emit('trackingCompleted', servicesIds.length, Service.getNumberOfTerms(this.services, servicesIds), extractOnly);
   }
 
   async trackTermsChanges({ terms, extractOnly = false }) {
@@ -228,9 +228,5 @@ export default class Archivist extends events.EventEmitter {
     }
 
     this.emit(isFirstRecord ? 'firstVersionRecorded' : 'versionRecorded', serviceId, termsType, versionId);
-  }
-
-  getNumberOfTerms(servicesIds = this.servicesIds) {
-    return servicesIds.reduce((acc, serviceId) => acc + this.services[serviceId].getNumberOfTerms(), 0);
   }
 }

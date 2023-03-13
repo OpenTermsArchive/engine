@@ -57,4 +57,8 @@ export default class Service {
     // If a service is loaded without its history it could return false even if a history declaration file exists.
     return Boolean(Object.keys(this.terms).find(termsType => this.terms[termsType].history));
   }
+
+  static getNumberOfTerms(services, servicesIds) {
+    return servicesIds.reduce((acc, serviceId) => acc + services[serviceId].getNumberOfTerms(), 0);
+  }
 }
