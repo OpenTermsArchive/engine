@@ -6,7 +6,7 @@ import logger from './logger/index.js';
 import Notifier from './notifier/index.js';
 import Tracker from './tracker/index.js';
 
-export default async function track({ services = [], types, extractOnly, schedule }) {
+export default async function track({ services, types, extractOnly, schedule }) {
   const archivist = new Archivist({
     recorderConfig: config.get('recorder'),
     fetcherConfig: config.get('fetcher'),
@@ -18,7 +18,7 @@ export default async function track({ services = [], types, extractOnly, schedul
 
   logger.info('Start Open Terms Archive\n');
 
-  if (services.length) {
+  if (services?.length) {
     services = services.filter(serviceId => {
       const isServiceDeclared = archivist.serviceDeclarations[serviceId];
 
