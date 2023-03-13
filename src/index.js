@@ -20,7 +20,7 @@ export default async function track({ services, types, extractOnly, schedule }) 
 
   if (services?.length) {
     services = services.filter(serviceId => {
-      const isServiceDeclared = archivist.serviceDeclarations[serviceId];
+      const isServiceDeclared = archivist.services[serviceId];
 
       if (!isServiceDeclared) {
         logger.warn(`Parameter "${serviceId}" was interpreted as a service ID to update, but no matching declaration was found; it will be ignored`);
@@ -39,7 +39,7 @@ export default async function track({ services, types, extractOnly, schedule }) 
   }
 
   if (process.env.NODE_ENV === 'production') {
-    archivist.attach(new Notifier(archivist.serviceDeclarations));
+    archivist.attach(new Notifier(archivist.services));
   }
 
   if (process.env.GITHUB_TOKEN) {
