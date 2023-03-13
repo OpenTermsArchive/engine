@@ -1,10 +1,12 @@
 export default class SourceDocument {
-  constructor({ location, executeClientScripts, contentSelectors, insignificantContentSelectors, filters }) {
+  constructor({ location, executeClientScripts, contentSelectors, insignificantContentSelectors, filters, content, mimeType }) {
     this.location = location;
     this.executeClientScripts = executeClientScripts;
     this.contentSelectors = contentSelectors;
     this.insignificantContentSelectors = insignificantContentSelectors;
     this.filters = filters;
+    this.content = content;
+    this.mimeType = mimeType;
     this.id = new URL(location).pathname.split('/').filter(Boolean).join('-');
   }
 

@@ -130,74 +130,62 @@ describe('Extract', () => {
     describe('Select', () => {
       context('with string selector', () => {
         it('extracts content from the given HTML with common changing items', async () => {
-          const result = await extractFromHTML({
+          const result = await extractFromHTML(new SourceDocument({
+            location: virtualLocation,
+            contentSelectors: 'body',
             content: rawHTMLWithCommonChangingItems,
-            sourceDocument: new SourceDocument({
-              location: virtualLocation,
-              contentSelectors: 'body',
-            }),
-          });
+          }));
 
           expect(result).to.equal(expectedExtractedWithCommonChangingItems);
         });
 
         it('extracts content from the given HTML', async () => {
-          const result = await extractFromHTML({
+          const result = await extractFromHTML(new SourceDocument({
+            location: virtualLocation,
+            contentSelectors: 'body',
             content: rawHTML,
-            sourceDocument: new SourceDocument({
-              location: virtualLocation,
-              contentSelectors: 'body',
-            }),
-          });
+          }));
 
           expect(result).to.equal(expectedExtracted);
         });
 
         context('with no match for the given selector', () => {
           it('throws an InaccessibleContentError error', async () => {
-            await expect(extractFromHTML({
+            await expect(extractFromHTML(new SourceDocument({
+              location: virtualLocation,
+              contentSelectors: '#thisAnchorDoesNotExist',
               content: rawHTML,
-              sourceDocument: new SourceDocument({
-                location: virtualLocation,
-                contentSelectors: '#thisAnchorDoesNotExist',
-              }),
-            })).to.be.rejectedWith(InaccessibleContentError, /#thisAnchorDoesNotExist/);
+            }))).to.be.rejectedWith(InaccessibleContentError, /#thisAnchorDoesNotExist/);
           });
         });
 
         context('with no content for the matching given selector', () => {
           it('throws an InaccessibleContentError error', async () => {
-            await expect(extractFromHTML({
+            await expect(extractFromHTML(new SourceDocument({
+              location: virtualLocation,
+              contentSelectors: '#empty',
               content: rawHTML,
-              sourceDocument: new SourceDocument({
-                location: virtualLocation,
-                contentSelectors: '#empty',
-              }),
-            })).to.be.rejectedWith(InaccessibleContentError, /empty content/);
+            }))).to.be.rejectedWith(InaccessibleContentError, /empty content/);
           });
         });
 
         context('with a whitespace only content for the corresponding given selector', () => {
           it('throws an InaccessibleContentError error', async () => {
-            await expect(extractFromHTML({
+            await expect(extractFromHTML(new SourceDocument({
+              location: virtualLocation,
+              contentSelectors: '#whitespaceOnly',
               content: rawHTML,
-              sourceDocument: new SourceDocument({
-                location: virtualLocation,
-                contentSelectors: '#whitespaceOnly',
-              }),
-            })).to.be.rejectedWith(InaccessibleContentError, /empty content/);
+            }))).to.be.rejectedWith(InaccessibleContentError, /empty content/);
           });
         });
 
         context('with multiple selectors in one string', () => {
           it('extracts content from the given HTML', async () => {
-            const result = await extractFromHTML({
+            const result = await extractFromHTML(new SourceDocument({
+              location: virtualLocation,
+              contentSelectors: 'h1, #link2',
               content: rawHTML,
-              sourceDocument: new SourceDocument({
-                location: virtualLocation,
-                contentSelectors: 'h1, #link2',
-              }),
-            });
+            }));
 
             expect(result).to.equal('Title\n=====\n\n[link 2](#anchor)');
           });
@@ -206,26 +194,22 @@ describe('Extract', () => {
 
       context('with an array of selectors', () => {
         it('extracts content from the given HTML', async () => {
-          const result = await extractFromHTML({
+          const result = await extractFromHTML(new SourceDocument({
             content: rawHTML,
-            sourceDocument: new SourceDocument({
-              location: virtualLocation,
-              contentSelectors: [ 'h1', '#link2' ],
-            }),
-          });
+            location: virtualLocation,
+            contentSelectors: [ 'h1', '#link2' ],
+          }));
 
           expect(result).to.equal('Title\n=====\n\n[link 2](#anchor)');
         });
 
         context('when one selector is dependent on another', () => {
           it('extracts content from the given HTML', async () => {
-            const result = await extractFromHTML({
+            const result = await extractFromHTML(new SourceDocument({
               content: rawHTML,
-              sourceDocument: new SourceDocument({
-                location: virtualLocation,
-                contentSelectors: [ 'h1', 'h1 ~ p' ],
-              }),
-            });
+              location: virtualLocation,
+              contentSelectors: [ 'h1', 'h1 ~ p' ],
+            }));
 
             expect(result).to.equal('Title\n=====\n\n[link 1](https://exemple.com/relative/link)\n\n[link 2](#anchor)\n\n[link 3](http://absolute.url/link)');
           });
@@ -235,116 +219,102 @@ describe('Extract', () => {
       context('with range selector', () => {
         context('with startBefore and endBefore', () => {
           it('extracts content from the given HTML', async () => {
-            const result = await extractFromHTML({
+            const result = await extractFromHTML(new SourceDocument({
               content: rawHTML,
-              sourceDocument: new SourceDocument({
-                location: virtualLocation,
-                contentSelectors: {
-                  startBefore: '#link1',
-                  endBefore: '#link2',
-                },
-              }),
-            });
+              location: virtualLocation,
+              contentSelectors: {
+                startBefore: '#link1',
+                endBefore: '#link2',
+              },
+            }));
 
             expect(result).to.equal('[link 1](https://exemple.com/relative/link)');
           });
         });
         context('with startBefore and endAfter', () => {
           it('extracts content from the given HTML', async () => {
-            const result = await extractFromHTML({
+            const result = await extractFromHTML(new SourceDocument({
               content: rawHTML,
-              sourceDocument: new SourceDocument({
-                location: virtualLocation,
-                contentSelectors: {
-                  startBefore: '#link2',
-                  endAfter: '#link2',
-                },
-              }),
-            });
+              location: virtualLocation,
+              contentSelectors: {
+                startBefore: '#link2',
+                endAfter: '#link2',
+              },
+            }));
 
             expect(result).to.equal('[link 2](#anchor)');
           });
         });
         context('with startAfter and endBefore', () => {
           it('extracts content from the given HTML', async () => {
-            const result = await extractFromHTML({
+            const result = await extractFromHTML(new SourceDocument({
               content: rawHTML,
-              sourceDocument: new SourceDocument({
-                location: virtualLocation,
-                contentSelectors: {
-                  startAfter: '#link1',
-                  endBefore: '#link3',
-                },
-              }),
-            });
+              location: virtualLocation,
+              contentSelectors: {
+                startAfter: '#link1',
+                endBefore: '#link3',
+              },
+            }));
 
             expect(result).to.equal('[link 2](#anchor)');
           });
         });
         context('with startAfter and endAfter', () => {
           it('extracts content from the given HTML', async () => {
-            const result = await extractFromHTML({
+            const result = await extractFromHTML(new SourceDocument({
               content: rawHTML,
-              sourceDocument: new SourceDocument({
-                location: virtualLocation,
-                contentSelectors: {
-                  startAfter: '#link2',
-                  endAfter: '#link3',
-                },
-              }),
-            });
+              location: virtualLocation,
+              contentSelectors: {
+                startAfter: '#link2',
+                endAfter: '#link3',
+              },
+            }));
 
             expect(result).to.equal('[link 3](http://absolute.url/link)');
           });
         });
         context('with a "start" selector that has no match', () => {
           it('throws an InaccessibleContentError error', async () => {
-            await expect(extractFromHTML({
+            await expect(extractFromHTML(new SourceDocument({
               content: rawHTML,
-              sourceDocument: new SourceDocument({
-                location: virtualLocation,
-                contentSelectors: {
-                  startAfter: '#paragraph1',
-                  endAfter: '#link2',
-                },
-              }),
-            })).to.be.rejectedWith(InaccessibleContentError, /"start" selector has no match/);
+              location: virtualLocation,
+              contentSelectors: {
+                startAfter: '#paragraph1',
+                endAfter: '#link2',
+              },
+            }))).to.be.rejectedWith(InaccessibleContentError, /"start" selector has no match/);
           });
         });
         context('with an "end" selector that has no match', () => {
           it('throws an InaccessibleContentError error', async () => {
-            await expect(extractFromHTML({
+            await expect(extractFromHTML(new SourceDocument({
               content: rawHTML,
-              sourceDocument: new SourceDocument({
-                location: virtualLocation,
-                contentSelectors: {
-                  startAfter: '#link2',
-                  endAfter: '#paragraph1',
-                },
-              }),
-            })).to.be.rejectedWith(InaccessibleContentError, /"end" selector has no match/);
+              location: virtualLocation,
+              contentSelectors: {
+                startAfter: '#link2',
+                endAfter: '#paragraph1',
+              },
+            }))).to.be.rejectedWith(InaccessibleContentError, /"end" selector has no match/);
           });
         });
       });
 
       context('with an array of range selectors', () => {
         it('extracts content from the given HTML', async () => {
-          const result = await extractFromHTML({
+          const result = await extractFromHTML(new SourceDocument({
             content: rawHTML,
-            sourceDocument: new SourceDocument({
-              location: virtualLocation,
-              contentSelectors: [
-                {
-                  startAfter: '#link1',
-                  endAfter: '#link2',
-                },
-                {
-                  startAfter: '#link2',
-                  endAfter: '#link3',
-                },
-              ],
-            }),
-          });
+            location: virtualLocation,
+            contentSelectors: [
+              {
+                startAfter: '#link1',
+                endAfter: '#link2',
+              },
+              {
+                startAfter: '#link2',
+                endAfter: '#link3',
+              },
+            ],
+          }));
 
           expect(result).to.equal('[link 2](#anchor)\n\n[link 3](http://absolute.url/link)');
         });
@@ -352,19 +322,17 @@ describe('Extract', () => {
 
       context('with an array of mixed string selectors and range selectors', () => {
         it('extracts content from the given HTML', async () => {
-          const result = await extractFromHTML({
+          const result = await extractFromHTML(new SourceDocument({
             content: rawHTML,
-            sourceDocument: new SourceDocument({
-              location: virtualLocation,
-              contentSelectors: [
-                'h1',
-                {
-                  startAfter: '#link2',
-                  endAfter: '#link3',
-                },
-              ],
-            }),
-          });
+            location: virtualLocation,
+            contentSelectors: [
+              'h1',
+              {
+                startAfter: '#link2',
+                endAfter: '#link3',
+              },
+            ],
+          }));
 
           expect(result).to.equal('Title\n=====\n\n[link 3](http://absolute.url/link)');
         });
@@ -374,14 +342,12 @@ describe('Extract', () => {
     describe('Remove', () => {
       context('with a simple selector', () => {
         it('removes the specified elements', async () => {
-          const result = await extractFromHTML({
+          const result = await extractFromHTML(new SourceDocument({
             content: rawHTML,
-            sourceDocument: new SourceDocument({
-              location: virtualLocation,
-              contentSelectors: 'body',
-              insignificantContentSelectors: 'h1',
-            }),
-          });
+            location: virtualLocation,
+            contentSelectors: 'body',
+            insignificantContentSelectors: 'h1',
+          }));
 
           expect(result).to.equal('[link 1](https://exemple.com/relative/link)\n\n[link 2](#anchor)\n\n[link 3](http://absolute.url/link)');
         });
@@ -389,14 +355,12 @@ describe('Extract', () => {
 
       context('with an array of string selectors', () => {
         it('removes the specified elements', async () => {
-          const result = await extractFromHTML({
+          const result = await extractFromHTML(new SourceDocument({
             content: rawHTML,
-            sourceDocument: new SourceDocument({
-              location: virtualLocation,
-              contentSelectors: 'body',
-              insignificantContentSelectors: [ 'h1', '#link3' ],
-            }),
-          });
+            location: virtualLocation,
+            contentSelectors: 'body',
+            insignificantContentSelectors: [ 'h1', '#link3' ],
+          }));
 
           expect(result).to.equal('[link 1](https://exemple.com/relative/link)\n\n[link 2](#anchor)');
         });
@@ -404,70 +368,62 @@ describe('Extract', () => {
 
       context('with a simple range selector', () => {
         it('removes the specified elements', async () => {
-          const result = await extractFromHTML({
+          const result = await extractFromHTML(new SourceDocument({
             content: rawHTML,
-            sourceDocument: new SourceDocument({
-              location: virtualLocation,
-              contentSelectors: 'body',
-              insignificantContentSelectors: {
-                startBefore: '#link1',
-                endAfter: '#link3',
-              },
-            }),
-          });
+            location: virtualLocation,
+            contentSelectors: 'body',
+            insignificantContentSelectors: {
+              startBefore: '#link1',
+              endAfter: '#link3',
+            },
+          }));
 
           expect(result).to.equal('Title\n=====');
         });
         context('with a "start" selector that has no match', () => {
           it('throws an InaccessibleContentError error', async () => {
-            await expect(extractFromHTML({
+            await expect(extractFromHTML(new SourceDocument({
               content: rawHTML,
-              sourceDocument: new SourceDocument({
-                location: virtualLocation,
-                contentSelectors: 'body',
-                insignificantContentSelectors: {
-                  startAfter: '#paragraph1',
-                  endAfter: '#link2',
-                },
-              }),
-            })).to.be.rejectedWith(InaccessibleContentError, /"start" selector has no match/);
+              location: virtualLocation,
+              contentSelectors: 'body',
+              insignificantContentSelectors: {
+                startAfter: '#paragraph1',
+                endAfter: '#link2',
+              },
+            }))).to.be.rejectedWith(InaccessibleContentError, /"start" selector has no match/);
           });
         });
         context('with an "end" selector that has no match', () => {
           it('throws an InaccessibleContentError error', async () => {
-            await expect(extractFromHTML({
+            await expect(extractFromHTML(new SourceDocument({
               content: rawHTML,
-              sourceDocument: new SourceDocument({
-                location: virtualLocation,
-                contentSelectors: 'body',
-                insignificantContentSelectors: {
-                  startAfter: '#link2',
-                  endAfter: '#paragraph1',
-                },
-              }),
-            })).to.be.rejectedWith(InaccessibleContentError, /"end" selector has no match/);
+              location: virtualLocation,
+              contentSelectors: 'body',
+              insignificantContentSelectors: {
+                startAfter: '#link2',
+                endAfter: '#paragraph1',
+              },
+            }))).to.be.rejectedWith(InaccessibleContentError, /"end" selector has no match/);
           });
         });
       });
       context('with an array of range selectors', () => {
         it('removes all the selections', async () => {
-          const result = await extractFromHTML({
+          const result = await extractFromHTML(new SourceDocument({
             content: rawHTML,
-            sourceDocument: new SourceDocument({
-              location: virtualLocation,
-              contentSelectors: 'body',
-              insignificantContentSelectors: [
-                {
-                  startBefore: 'h1',
-                  endBefore: '#link1',
-                },
-                {
-                  startBefore: '#link3',
-                  endAfter: '#link3',
-                },
-              ],
-            }),
-          });
+            location: virtualLocation,
+            contentSelectors: 'body',
+            insignificantContentSelectors: [
+              {
+                startBefore: 'h1',
+                endBefore: '#link1',
+              },
+              {
+                startBefore: '#link3',
+                endAfter: '#link3',
+              },
+            ],
+          }));
 
           expect(result).to.equal('[link 1](https://exemple.com/relative/link)\n\n[link 2](#anchor)');
         });
@@ -475,40 +431,36 @@ describe('Extract', () => {
 
       context('with an array of mixed selectors and range selectors', () => {
         it('removes all the selections', async () => {
-          const result = await extractFromHTML({
+          const result = await extractFromHTML(new SourceDocument({
             content: rawHTML,
-            sourceDocument: new SourceDocument({
-              location: virtualLocation,
-              contentSelectors: 'body',
-              insignificantContentSelectors: [
-                'h1',
-                {
-                  startBefore: '#link3',
-                  endAfter: '#link3',
-                },
-              ],
-            }),
-          });
+            location: virtualLocation,
+            contentSelectors: 'body',
+            insignificantContentSelectors: [
+              'h1',
+              {
+                startBefore: '#link3',
+                endAfter: '#link3',
+              },
+            ],
+          }));
 
           expect(result).to.equal('[link 1](https://exemple.com/relative/link)\n\n[link 2](#anchor)');
         });
 
         context('where one selector is dependent on another', () => {
           it('removes all the selections', async () => {
-            const result = await extractFromHTML({
+            const result = await extractFromHTML(new SourceDocument({
               content: rawHTML,
-              sourceDocument: new SourceDocument({
-                location: virtualLocation,
-                contentSelectors: 'body',
-                insignificantContentSelectors: [
-                  'h1',
-                  {
-                    startAfter: 'h1',
-                    endBefore: '#link2',
-                  },
-                ],
-              }),
-            });
+              location: virtualLocation,
+              contentSelectors: 'body',
+              insignificantContentSelectors: [
+                'h1',
+                {
+                  startAfter: 'h1',
+                  endBefore: '#link2',
+                },
+              ],
+            }));
 
             expect(result).to.equal('[link 2](#anchor)\n\n[link 3](http://absolute.url/link)');
           });
@@ -519,14 +471,12 @@ describe('Extract', () => {
     describe('Filter', () => {
       context('with a synchronous filter', () => {
         it('extracts content from the given HTML also with given additional filter', async () => {
-          const result = await extractFromHTML({
+          const result = await extractFromHTML(new SourceDocument({
             content: rawHTML,
-            sourceDocument: new SourceDocument({
-              location: virtualLocation,
-              contentSelectors: 'body',
-              filters: [additionalFilter.removeLinks],
-            }),
-          });
+            location: virtualLocation,
+            contentSelectors: 'body',
+            filters: [additionalFilter.removeLinks],
+          }));
 
           expect(result).to.equal(expectedExtractedWithAdditional);
         });
@@ -534,14 +484,12 @@ describe('Extract', () => {
 
       context('with an asynchronous filter', () => {
         it('extracts content from the given HTML also with given additional filter', async () => {
-          const result = await extractFromHTML({
+          const result = await extractFromHTML(new SourceDocument({
             content: rawHTML,
-            sourceDocument: new SourceDocument({
-              location: virtualLocation,
-              contentSelectors: 'body',
-              filters: [additionalFilter.removeLinksAsync],
-            }),
-          });
+            location: virtualLocation,
+            contentSelectors: 'body',
+            filters: [additionalFilter.removeLinksAsync],
+          }));
 
           expect(result).to.equal(expectedExtractedWithAdditional);
         });
