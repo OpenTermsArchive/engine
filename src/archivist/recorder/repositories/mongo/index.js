@@ -10,12 +10,13 @@ import RepositoryInterface from '../interface.js';
 import * as DataMapper from './dataMapper.js';
 
 export default class MongoRepository extends RepositoryInterface {
-  constructor({ database: databaseName, collection: collectionName, connectionURI }) {
+  constructor(recordType, { database: databaseName, collection: collectionName, connectionURI }) {
     super();
 
     this.client = new MongoClient(connectionURI);
     this.databaseName = databaseName;
     this.collectionName = collectionName;
+    this.recordType = recordType;
   }
 
   async initialize() {
@@ -100,7 +101,7 @@ export default class MongoRepository extends RepositoryInterface {
       return null;
     }
 
-    const record = DataMapper.toDomain(mongoDocument);
+    const record = DataMapper.toDomain(this.recordType, mongoDocument);
 
     if (deferContentLoading) {
       return record;
@@ -116,6 +117,6 @@ export default class MongoRepository extends RepositoryInterface {
       await this.repository.loadRecordContent(record);
     }
 
-    return DataMapper.toPersistence(record);
+    return DataMapper.toPersistence(this.recordType, record);
   }
 }

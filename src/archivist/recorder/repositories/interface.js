@@ -3,7 +3,7 @@
  * @see {@link https://martinfowler.com/eaaCatalog/repository.html|Repository}
  * @interface
  */
-export default class RepositoryInterface {
+class RepositoryInterface {
   /**
   * [Optional] Initialize repository
   * Override this method if the repository needs some asynchronous initialization code (open database connection and create collections, initialize Git…)
@@ -106,3 +106,5 @@ export default class RepositoryInterface {
     throw new Error(`#loadRecordContent method is not implemented in ${this.constructor.name}`);
   }
 }
+
+export default RepositoryInterface;
