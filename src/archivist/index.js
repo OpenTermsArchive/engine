@@ -29,10 +29,6 @@ export const AVAILABLE_EVENTS = [
 ];
 
 export default class Archivist extends events.EventEmitter {
-  get serviceDeclarations() {
-    return this.services;
-  }
-
   get servicesIds() {
     return Object.keys(this.services);
   }
