@@ -6,6 +6,8 @@ import { InaccessibleContentError } from './errors.js';
 import extract from './extract/index.js';
 import fetch, { launchHeadlessBrowser, stopHeadlessBrowser, FetchDocumentError } from './fetcher/index.js';
 import Recorder from './recorder/index.js';
+import Snapshot from './recorder/snapshot.js';
+import Version from './recorder/version.js';
 import * as services from './services/index.js';
 import Service from './services/service.js';
 
@@ -116,42 +118,53 @@ export default class Archivist extends events.EventEmitter {
 
   async trackTermsChanges({ terms, extractOnly = false }) {
     if (!extractOnly) {
-      await Promise.all((await this.fetchTermsSourceDocuments(terms)).map(params => this.recordSnapshot(params)));
+      terms.fetchDate = new Date();
+
+      await this.fetchSourceDocuments(terms);
+
+      await Promise.all(terms.sourceDocuments.map(async sourceDocument => {
+        const record = new Snapshot({
+          serviceId: terms.service.id,
+          termsType: terms.type,
+          documentId: terms.hasMultipleSourceDocuments && sourceDocument.id,
+          fetchDate: terms.fetchDate,
+          content: sourceDocument.content,
+          mimeType: sourceDocument.mimeType,
+        });
+
+        await this.recordSnapshot(record);
+
+        sourceDocument.snapshotId = record.id;
+      }));
+    } else {
+      await this.loadSourceDocumentsFromSnapshots(terms);
     }
 
-    const snapshots = await this.getTermsSnapshots(terms);
-
-    if (!snapshots.length) {
+    if (terms.sourceDocuments.filter(({ content }) => !content).length) {
       return;
     }
 
-    const [{ fetchDate }] = snapshots; // In case of terms with multiple source documents, use the fetch date of the first snapshot
-
-    return this.recordVersion({
-      snapshotIds: snapshots.map(({ id }) => id),
+    return this.recordVersion(new Version({
       content: await this.extractVersionContent(terms.sourceDocuments),
+      snapshotIds: terms.sourceDocuments.map(sourceDocuments => sourceDocuments.snapshotId),
       serviceId: terms.service.id,
       termsType: terms.type,
-      fetchDate,
+      fetchDate: terms.fetchDate,
       isExtractOnly: extractOnly,
-    });
+    }));
   }
 
-  async fetchTermsSourceDocuments({ service: { id: serviceId }, type, sourceDocuments, hasMultipleSourceDocuments }) {
+  async fetchSourceDocuments(terms) {
     const inaccessibleContentErrors = [];
 
-    const result = await Promise.all(sourceDocuments.map(async ({ location: url, executeClientScripts, cssSelectors, id: documentId }) => {
+    await Promise.all(terms.sourceDocuments.map(async sourceDocument => {
+      const { location: url, executeClientScripts, cssSelectors } = sourceDocument;
+
       try {
         const { mimeType, content } = await this.fetch({ url, executeClientScripts, cssSelectors });
 
-        return {
-          content,
-          mimeType,
-          serviceId,
-          termsType: type,
-          documentId: hasMultipleSourceDocuments && documentId,
-          fetchDate: new Date(),
-        };
+        sourceDocument.content = content;
+        sourceDocument.mimeType = mimeType;
       } catch (error) {
         if (!(error instanceof FetchDocumentError)) {
           throw error;
@@ -172,61 +185,45 @@ export default class Archivist extends events.EventEmitter {
     if (inaccessibleContentErrors.length) {
       throw new InaccessibleContentError(inaccessibleContentErrors);
     }
-
-    return result;
   }
 
-  async getTermsSnapshots({ service: { id: serviceId }, type: termsType, sourceDocuments, hasMultipleSourceDocuments }) {
-    return (await Promise.all(sourceDocuments.map(async sourceDocument => this.recorder.getLatestSnapshot(serviceId, termsType, hasMultipleSourceDocuments && sourceDocument.id)))).filter(Boolean);
+  async loadSourceDocumentsFromSnapshots(terms) {
+    return Promise.all(terms.sourceDocuments.map(async sourceDocument => {
+      const snapshot = await this.recorder.getLatestSnapshot(terms, sourceDocument.id);
+
+      if (snapshot) {
+        sourceDocument.content = snapshot.content;
+        sourceDocument.mimeType = snapshot.mimeType;
+        terms.fetchDate = snapshot.fetchDate;
+      }
+    }));
   }
 
-  async extractVersionContent(snapshots, sourceDocuments) {
-    return (
-      await Promise.all(snapshots.map(async ({ documentId, content, mimeType }) => {
-        const sourceDocument = documentId ? sourceDocuments.find(({ id }) => documentId == id) : sourceDocuments[0];
-
-        return this.extract({ content, mimeType, sourceDocument });
-      }))
-    ).join('\n\n');
+  async extractVersionContent(sourceDocuments) {
+    return (await Promise.all(sourceDocuments.map(async sourceDocument => this.extract(sourceDocument)))).join('\n\n');
   }
 
-  async recordSnapshot({ content, mimeType, fetchDate, serviceId, termsType, documentId }) {
-    const { id: snapshotId, isFirstRecord } = await this.recorder.recordSnapshot({
-      serviceId,
-      termsType,
-      documentId,
-      content,
-      mimeType,
-      fetchDate,
-    });
+  async recordSnapshot(record) {
+    await this.recorder.record(record);
 
-    if (!snapshotId) {
-      this.emit('snapshotNotChanged', serviceId, termsType, documentId);
+    if (!record.id) {
+      this.emit('snapshotNotChanged', record.serviceId, record.termsType, record.documentId);
 
       return;
     }
 
-    this.emit(isFirstRecord ? 'firstSnapshotRecorded' : 'snapshotRecorded', serviceId, termsType, documentId, snapshotId);
-
-    return snapshotId;
+    this.emit(record.isFirstRecord ? 'firstSnapshotRecorded' : 'snapshotRecorded', record.serviceId, record.termsType, record.documentId, record.id);
   }
 
-  async recordVersion({ content, fetchDate, snapshotIds, serviceId, termsType, isExtractOnly }) {
-    const { id: versionId, isFirstRecord } = await this.recorder.recordVersion({
-      serviceId,
-      termsType,
-      content,
-      fetchDate,
-      snapshotIds,
-      isExtractOnly,
-    });
+  async recordVersion(record) {
+    await this.recorder.record(record);
 
-    if (!versionId) {
-      this.emit('versionNotChanged', serviceId, termsType);
+    if (!record.id) {
+      this.emit('versionNotChanged', record.serviceId, record.termsType);
 
       return;
     }
 
-    this.emit(isFirstRecord ? 'firstVersionRecorded' : 'versionRecorded', serviceId, termsType, versionId);
+    this.emit(record.isFirstRecord ? 'firstVersionRecorded' : 'versionRecorded', record.serviceId, record.termsType, record.id);
   }
 }

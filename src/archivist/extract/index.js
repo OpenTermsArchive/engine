@@ -5,6 +5,7 @@ import mardownPdf from '@accordproject/markdown-pdf';
 import TurndownService from '@opentermsarchive/turndown';
 import turndownPluginGithubFlavouredMarkdown from 'joplin-turndown-plugin-gfm';
 import jsdom from 'jsdom';
+import mime from 'mime';
 
 import { InaccessibleContentError } from '../errors.js';
 
@@ -27,7 +28,7 @@ const ciceroMarkTransformer = new CiceroMarkTransformer();
  * @returns {Promise<string>} Promise which is fulfilled once the content is extracted and converted in Markdown. The promise will resolve into a string containing the extracted content in Markdown format
 */
 export default async function extract(sourceDocument) {
-  if (sourceDocument.mimeType == 'application/pdf') {
+  if (sourceDocument.mimeType == mime.getType('pdf')) {
     return extractFromPDF(sourceDocument);
   }
 

@@ -9,8 +9,10 @@ import sinon from 'sinon';
 import sinonChai from 'sinon-chai';
 
 import Git from './recorder/repositories/git/git.js';
+import Snapshot from './recorder/snapshot.js';
+import Version from './recorder/version.js';
 
-import Archivist, { AVAILABLE_EVENTS } from './index.js';
+import Archivist, { EVENTS } from './index.js';
 
 const fs = fsApi.promises;
 
@@ -71,7 +73,10 @@ describe('Archivist', function () {
     before(async () => {
       nock('https://www.servicea.example').get('/tos').reply(200, serviceASnapshotExpectedContent, { 'Content-Type': 'text/html' });
       nock('https://www.serviceb.example').get('/privacy').reply(200, serviceBSnapshotExpectedContent, { 'Content-Type': 'application/pdf' });
-      app = new Archivist({ recorderConfig: config.get('recorder') });
+      app = new Archivist({
+        recorderConfig: config.get('recorder'),
+        fetcherConfig: config.get('fetcher'),
+      });
       await app.initialize();
     });
 
@@ -148,7 +153,10 @@ describe('Archivist', function () {
           before(async () => {
             nock('https://www.servicea.example').get('/tos').reply(200, serviceASnapshotExpectedContent, { 'Content-Type': 'text/html' });
             nock('https://www.serviceb.example').get('/privacy').reply(200, serviceBSnapshotExpectedContent, { 'Content-Type': 'application/pdf' });
-            app = new Archivist({ recorderConfig: config.get('recorder') });
+            app = new Archivist({
+              recorderConfig: config.get('recorder'),
+              fetcherConfig: config.get('fetcher'),
+            });
 
             await app.initialize();
             await app.track({ services });
@@ -158,7 +166,7 @@ describe('Archivist', function () {
 
             serviceBCommits = await gitVersion.log({ file: SERVICE_B_EXPECTED_VERSION_FILE_PATH });
 
-            app.serviceDeclarations[SERVICE_A_ID].getTerms(SERVICE_A_TYPE).sourceDocuments[0].contentSelectors = 'h1';
+            app.services[SERVICE_A_ID].getTerms(SERVICE_A_TYPE).sourceDocuments[0].contentSelectors = 'h1';
 
             await app.track({ services: [ 'service_A', 'service_B' ], extractOnly: true });
 
@@ -204,12 +212,15 @@ describe('Archivist', function () {
           before(async () => {
             nock('https://www.servicea.example').get('/tos').reply(200, serviceASnapshotExpectedContent, { 'Content-Type': 'text/html' });
             nock('https://www.serviceb.example').get('/privacy').reply(200, serviceBSnapshotExpectedContent, { 'Content-Type': 'application/pdf' });
-            app = new Archivist({ recorderConfig: config.get('recorder') });
+            app = new Archivist({
+              recorderConfig: config.get('recorder'),
+              fetcherConfig: config.get('fetcher'),
+            });
 
             await app.initialize();
             await app.track({ services });
 
-            app.serviceDeclarations[SERVICE_A_ID].getTerms(SERVICE_A_TYPE).sourceDocuments[0].contentSelectors = 'inexistant-selector';
+            app.services[SERVICE_A_ID].getTerms(SERVICE_A_TYPE).sourceDocuments[0].contentSelectors = 'inexistant-selector';
             inaccessibleContentSpy = sinon.spy();
             versionNotChangedSpy = sinon.spy();
             app.on('inaccessibleContent', inaccessibleContentSpy);
@@ -239,7 +250,7 @@ describe('Archivist', function () {
     }
 
     function emitsOnly(eventNames) {
-      AVAILABLE_EVENTS.filter(el => eventNames.indexOf(el) < 0).forEach(event => {
+      EVENTS.filter(el => eventNames.indexOf(el) < 0).forEach(event => {
         const handlerName = `on${event[0].toUpperCase()}${event.substr(1)}`;
 
         it(`emits no "${event}" event`, () => {
@@ -249,10 +260,13 @@ describe('Archivist', function () {
     }
 
     before(async () => {
-      app = new Archivist({ recorderConfig: config.get('recorder') });
+      app = new Archivist({
+        recorderConfig: config.get('recorder'),
+        fetcherConfig: config.get('fetcher'),
+      });
       await app.initialize();
 
-      AVAILABLE_EVENTS.forEach(event => {
+      EVENTS.forEach(event => {
         const handlerName = `on${event[0].toUpperCase()}${event.substr(1)}`;
 
         spies[handlerName] = sinon.spy();
@@ -262,13 +276,13 @@ describe('Archivist', function () {
 
     describe('#recordSnapshot', () => {
       context('when it is the first record', () => {
-        before(async () => app.recordSnapshot({
+        before(async () => app.recordSnapshot(new Snapshot({
           content: 'document content 3',
           serviceId: SERVICE_A_ID,
           termsType: SERVICE_A_TYPE,
           mimeType: MIME_TYPE,
           fetchDate: FETCH_DATE,
-        }));
+        })));
 
         after(() => {
           resetSpiesHistory();
@@ -286,21 +300,21 @@ describe('Archivist', function () {
       context('when it is not the first record', () => {
         context('when there are changes', () => {
           before(async () => {
-            await app.recordSnapshot({
+            await app.recordSnapshot(new Snapshot({
               content: 'document content',
               serviceId: SERVICE_A_ID,
               termsType: SERVICE_A_TYPE,
               mimeType: MIME_TYPE,
               fetchDate: FETCH_DATE,
-            });
+            }));
             resetSpiesHistory();
-            await app.recordSnapshot({
+            await app.recordSnapshot(new Snapshot({
               content: 'document content modified',
               serviceId: SERVICE_A_ID,
               termsType: SERVICE_A_TYPE,
               mimeType: MIME_TYPE,
               fetchDate: FETCH_DATE,
-            });
+            }));
           });
 
           after(() => {
@@ -318,21 +332,21 @@ describe('Archivist', function () {
 
         context('when there are no changes', () => {
           before(async () => {
-            await app.recordSnapshot({
+            await app.recordSnapshot(new Snapshot({
               content: 'document content',
               serviceId: SERVICE_A_ID,
               termsType: SERVICE_A_TYPE,
               mimeType: MIME_TYPE,
               fetchDate: FETCH_DATE,
-            });
+            }));
             resetSpiesHistory();
-            await app.recordSnapshot({
+            await app.recordSnapshot(new Snapshot({
               content: 'document content',
               serviceId: SERVICE_A_ID,
               termsType: SERVICE_A_TYPE,
               mimeType: MIME_TYPE,
               fetchDate: FETCH_DATE,
-            });
+            }));
           });
 
           after(() => {
@@ -353,14 +367,14 @@ describe('Archivist', function () {
     describe('#recordVersion', () => {
       context('when it is the first record', () => {
         before(async () =>
-          app.recordVersion({
+          app.recordVersion(new Version({
             content: serviceASnapshotExpectedContent,
             snapshotIds: ['sha'],
             mimeType: MIME_TYPE,
             fetchDate: FETCH_DATE,
             serviceId: SERVICE_A_ID,
             termsType: SERVICE_A_TYPE,
-          }));
+          })));
 
         after(() => {
           resetSpiesHistory();
@@ -378,23 +392,23 @@ describe('Archivist', function () {
       context('when it is not the first record', () => {
         context('when there are changes', () => {
           before(async () => {
-            await app.recordVersion({
+            await app.recordVersion(new Version({
               content: serviceASnapshotExpectedContent,
               mimeType: MIME_TYPE,
               fetchDate: FETCH_DATE,
               snapshotIds: ['sha'],
               serviceId: SERVICE_A_ID,
               termsType: SERVICE_A_TYPE,
-            });
+            }));
             resetSpiesHistory();
-            await app.recordVersion({
+            await app.recordVersion(new Version({
               content: serviceBSnapshotExpectedContent,
               mimeType: MIME_TYPE,
               fetchDate: FETCH_DATE,
               snapshotIds: ['sha'],
               serviceId: SERVICE_A_ID,
               termsType: SERVICE_A_TYPE,
-            });
+            }));
           });
 
           after(() => {
@@ -412,23 +426,23 @@ describe('Archivist', function () {
 
         context('when there are no changes', () => {
           before(async () => {
-            await app.recordVersion({
+            await app.recordVersion(new Version({
               content: serviceASnapshotExpectedContent,
               snapshotIds: ['sha'],
               mimeType: MIME_TYPE,
               fetchDate: FETCH_DATE,
               serviceId: SERVICE_A_ID,
               termsType: SERVICE_A_TYPE,
-            });
+            }));
             resetSpiesHistory();
-            await app.recordVersion({
+            await app.recordVersion(new Version({
               content: serviceASnapshotExpectedContent,
               snapshotIds: ['sha'],
               mimeType: MIME_TYPE,
               fetchDate: FETCH_DATE,
               serviceId: SERVICE_A_ID,
               termsType: SERVICE_A_TYPE,
-            });
+            }));
           });
 
           after(() => {

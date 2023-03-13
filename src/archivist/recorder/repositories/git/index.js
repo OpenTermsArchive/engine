@@ -8,6 +8,8 @@ import path from 'path';
 
 import mime from 'mime';
 
+import Snapshot from '../../snapshot.js';
+import Version from '../../version.js';
 import RepositoryInterface from '../interface.js';
 
 import * as DataMapper from './dataMapper.js';
@@ -18,12 +20,18 @@ const fs = fsApi.promises;
 mime.define({ 'text/markdown': ['md'] }, true); // ensure extension for markdown files is `.md` and not `.markdown`
 
 export default class GitRepository extends RepositoryInterface {
-  constructor({ path, author, publish, snapshotIdentiferTemplate }) {
+  constructor(recordType, { path, author, publish, snapshotIdentiferTemplate }) {
     super();
+
+    if (!(recordType == Version || recordType == Snapshot)) {
+      throw new Error(`Unknown record type ${recordType}`);
+    }
+
     this.path = path;
     this.needsPublication = publish;
     this.git = new Git({ path: this.path, author });
     this.snapshotIdentiferTemplate = snapshotIdentiferTemplate;
+    this.recordType = recordType;
   }
 
   async initialize() {
@@ -157,7 +165,7 @@ export default class GitRepository extends RepositoryInterface {
       return null;
     }
 
-    const record = DataMapper.toDomain(commit);
+    const record = DataMapper.toDomain(this.recordType, commit);
 
     if (deferContentLoading) {
       return record;
@@ -173,6 +181,6 @@ export default class GitRepository extends RepositoryInterface {
       await this.loadRecordContent(record);
     }
 
-    return DataMapper.toPersistence(record, this.snapshotIdentiferTemplate);
+    return DataMapper.toPersistence(this.recordType, record, this.snapshotIdentiferTemplate);
   }
 }
