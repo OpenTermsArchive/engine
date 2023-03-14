@@ -10,7 +10,7 @@ All changes that impact users of this module are documented in this file, in the
 - **Breaking:** Rename CLI option `--refilter-only`, `-r` to `--extract-only`, `-e` in API; simply rename accordingly in your own codebase
 - **Breaking:** Rename function and its parameters `filter({ content, mimeType, pageDeclaration })` to `extract({ content, mimeType, sourceDocument })` in API; simply rename accordingly in your own codebase
 - **Breaking:** Rename class `PageDeclaration` to `SourceDocument` and its atribute `noiseSelectors` to `insignificantContentSelectors` in API; simply rename accordingly in your own codebase
-- Improve vocabulary ([#971](https://github.com/ambanum/OpenTermsArchive/pull/971))
+- Make vocabulary consistent throughout the codebase ([#971](https://github.com/ambanum/OpenTermsArchive/pull/971))
 
 ### Removed
 
