@@ -4,7 +4,7 @@ All changes that impact users of this module are documented in this file, in the
 
 ## Unreleased [minor]
 
-_Full changeset and discussions: [#996](https://github.com/ambanum/OpenTermsArchive/pull/996)._
+_Full changeset and discussions: [#996](https://github.com/OpenTermsArchive/engine/pull/996)._
 
 ### Changed
 
@@ -12,7 +12,7 @@ _Full changeset and discussions: [#996](https://github.com/ambanum/OpenTermsArch
 - **Breaking:** Rename CLI option `--refilter-only`, `-r` to `--extract-only`, `-e` in API; simply rename accordingly in your own codebase
 - **Breaking:** Rename function and its parameters `filter({ content, mimeType, pageDeclaration })` to `extract({ content, mimeType, sourceDocument })` in API; simply rename accordingly in your own codebase
 - **Breaking:** Rename class `PageDeclaration` to `SourceDocument` and its atribute `noiseSelectors` to `insignificantContentSelectors` in API; simply rename accordingly in your own codebase
-- Make vocabulary consistent throughout the codebase ([#971](https://github.com/ambanum/OpenTermsArchive/pull/971))
+- Make vocabulary consistent throughout the codebase ([#971](https://github.com/OpenTermsArchive/engine/pull/971))
 
 ### Removed
 
@@ -82,7 +82,7 @@ _Full changeset and discussions: [#981](https://github.com/OpenTermsArchive/engi
 
 ## 0.20.0 - 2022-12-13
 
-Full changeset and discussions: [#959](https://github.com/OpenTermsArchive/engine/pull/959)._
+_Full changeset and discussions: [#959](https://github.com/OpenTermsArchive/engine/pull/959)._
 
 ### Changed
 
