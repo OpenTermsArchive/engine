@@ -4,7 +4,7 @@ All changes that impact users of this module are documented in this file, in the
 
 ## Unreleased [minor]
 
-_Full changeset and discussions: [#996](https://github.com/OpenTermsArchive/engine/pull/996)._
+_Full changeset and discussions: [#996](https://github.com/OpenTermsArchive/engine/pull/996), [#999](https://github.com/OpenTermsArchive/engine/pull/999)._
 
 ### Changed
 
