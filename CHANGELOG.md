@@ -4,7 +4,7 @@ All changes that impact users of this module are documented in this file, in the
 
 ## Unreleased [minor]
 
-_Full changeset and discussions: [#996](https://github.com/ambanum/OpenTermsArchive/pull/996)._
+_Full changeset and discussions: [#996](https://github.com/OpenTermsArchive/engine/pull/996)._
 
 ### Changed
 
@@ -12,7 +12,7 @@ _Full changeset and discussions: [#996](https://github.com/ambanum/OpenTermsArch
 - **Breaking:** Rename CLI option `--refilter-only`, `-r` to `--extract-only`, `-e` in API; simply rename accordingly in your own codebase
 - **Breaking:** Rename function and its parameters `filter({ content, mimeType, pageDeclaration })` to `extract({ content, mimeType, sourceDocument })` in API; simply rename accordingly in your own codebase
 - **Breaking:** Rename class `PageDeclaration` to `SourceDocument` and its atribute `noiseSelectors` to `insignificantContentSelectors` in API; simply rename accordingly in your own codebase
-- Make vocabulary consistent throughout the codebase ([#971](https://github.com/ambanum/OpenTermsArchive/pull/971))
+- Make vocabulary consistent throughout the codebase ([#971](https://github.com/OpenTermsArchive/engine/pull/971))
 
 ### Removed
 
@@ -27,7 +27,7 @@ _Full changeset and discussions: [#996](https://github.com/ambanum/OpenTermsArch
 
 ## 0.25.2 - 2023-02-20
 
-_Full changeset and discussions: [#981](https://github.com/ambanum/OpenTermsArchive/pull/981)._
+_Full changeset and discussions: [#981](https://github.com/OpenTermsArchive/engine/pull/981)._
 
 ### Added
 
@@ -75,7 +75,7 @@ _Full changeset and discussions: [#981](https://github.com/ambanum/OpenTermsArch
 
 ## 0.20.0 - 2022-12-13
 
-Full changeset and discussions: [#959](https://github.com/ambanum/OpenTermsArchive/pull/959)._
+_Full changeset and discussions: [#959](https://github.com/OpenTermsArchive/engine/pull/959)._
 
 ### Changed
 
@@ -91,7 +91,7 @@ Full changeset and discussions: [#959](https://github.com/ambanum/OpenTermsArchi
 
 ### Changed
 
-- **Breaking:** Unify all CLI commands as subcommands of one single `ota` command and rename some options; the new CLI can be discovered in the documentation and by running `ota help` ([#978](https://github.com/ambanum/OpenTermsArchive/pull/978))
+- **Breaking:** Unify all CLI commands as subcommands of one single `ota` command and rename some options; the new CLI can be discovered in the documentation and by running `ota help` ([#978](https://github.com/OpenTermsArchive/engine/pull/978))
 
 ## 0.18.2 - 2022-12-12
 
@@ -101,7 +101,7 @@ Full changeset and discussions: [#959](https://github.com/ambanum/OpenTermsArchi
 
 ## 0.18.1 - 2022-12-12
 
-_Full changeset and discussions: [#979](https://github.com/ambanum/OpenTermsArchive/pull/979)._
+_Full changeset and discussions: [#979](https://github.com/OpenTermsArchive/engine/pull/979)._
 
 ### Fixed
 
@@ -109,7 +109,7 @@ _Full changeset and discussions: [#979](https://github.com/ambanum/OpenTermsArch
 
 ## 0.18.0 - 2022-12-12
 
-_Full changeset and discussions: [#976](https://github.com/ambanum/OpenTermsArchive/pull/976)._
+_Full changeset and discussions: [#976](https://github.com/OpenTermsArchive/engine/pull/976)._
 
 ### Added
 
@@ -117,7 +117,7 @@ _Full changeset and discussions: [#976](https://github.com/ambanum/OpenTermsArch
 
 ## 0.17.2 - 2022-12-12
 
-_Full changeset and discussions: [#977](https://github.com/ambanum/OpenTermsArchive/pull/977)._
+_Full changeset and discussions: [#977](https://github.com/OpenTermsArchive/engine/pull/977)._
 
 ### Fixed
 
@@ -125,7 +125,7 @@ _Full changeset and discussions: [#977](https://github.com/ambanum/OpenTermsArch
 
 ## 0.17.1 - 2022-12-06
 
-_Full changeset and discussions: [#971](https://github.com/ambanum/OpenTermsArchive/pull/971)._
+_Full changeset and discussions: [#971](https://github.com/OpenTermsArchive/engine/pull/971)._
 
 ### Fixed
 
@@ -133,7 +133,7 @@ _Full changeset and discussions: [#971](https://github.com/ambanum/OpenTermsArch
 
 ## 0.17.0 - 2022-12-06
 
-_Full changeset and discussions: [#957](https://github.com/ambanum/OpenTermsArchive/pull/957)._
+_Full changeset and discussions: [#957](https://github.com/OpenTermsArchive/engine/pull/957)._
 
 ### Added
 
