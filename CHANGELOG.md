@@ -4,6 +4,8 @@ All changes that impact users of this module are documented in this file, in the
 
 ## Unreleased [minor]
 
+_Full changeset and discussions: [#996](https://github.com/ambanum/OpenTermsArchive/pull/996)._
+
 ### Changed
 
 - **Breaking:** Rename CLI option `--terms-types` to `--types` in API; simply rename accordingly in your own codebase
