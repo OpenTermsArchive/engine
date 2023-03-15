@@ -6,34 +6,37 @@ import Record from '../../record.js';
 
 mime.define({ 'text/markdown': ['md'] }, true); // ensure extension for markdown files is `.md` and not `.markdown`
 
-export const COMMIT_MESSAGE_PREFIX = {
-  startTracking: 'Start tracking',
-  refilter: 'Refilter',
-  update: 'Update',
+export const COMMIT_MESSAGE_PREFIXES = {
+  startTracking: 'First record of',
+  extractOnly: 'Apply technical or declaration upgrade on',
+  update: 'Record new changes of',
+  deprecated_startTracking: 'Start tracking',
+  deprecated_refilter: 'Refilter',
+  deprecated_update: 'Update',
 };
 
 export const TERMS_TYPE_AND_DOCUMENT_ID_SEPARATOR = ' #';
 export const SNAPSHOT_ID_MARKER = '%SNAPSHOT_ID';
-const SINGLE_SNAPSHOT_PREFIX = 'This version was recorded after filtering snapshot';
-const MULTIPLE_SNAPSHOT_PREFIX = 'This version was recorded after filtering and assembling the following snapshots from %NUMBER source documents:';
+const SINGLE_SOURCE_DOCUMENT_PREFIX = 'This version was recorded after extracting from snapshot';
+const MULTIPLE_SOURCE_DOCUMENTS_PREFIX = 'This version was recorded after extracting from and assembling the following snapshots from %NUMBER source documents:';
 
-export const COMMIT_MESSAGE_PREFIXES_REGEXP = new RegExp(`^(${COMMIT_MESSAGE_PREFIX.startTracking}|${COMMIT_MESSAGE_PREFIX.refilter}|${COMMIT_MESSAGE_PREFIX.update})`);
+export const COMMIT_MESSAGE_PREFIXES_REGEXP = new RegExp(`^(${Object.values(COMMIT_MESSAGE_PREFIXES).join('|')})`);
 
 export function toPersistence(record, snapshotIdentiferTemplate) {
-  const { serviceId, termsType, documentId, isRefilter, snapshotIds = [], mimeType, isFirstRecord } = record;
+  const { serviceId, termsType, documentId, isExtractOnly, snapshotIds = [], mimeType, isFirstRecord } = record;
 
-  let prefix = isRefilter ? COMMIT_MESSAGE_PREFIX.refilter : COMMIT_MESSAGE_PREFIX.update;
+  let prefix = isExtractOnly ? COMMIT_MESSAGE_PREFIXES.extractOnly : COMMIT_MESSAGE_PREFIXES.update;
 
-  prefix = isFirstRecord ? COMMIT_MESSAGE_PREFIX.startTracking : prefix;
+  prefix = isFirstRecord ? COMMIT_MESSAGE_PREFIXES.startTracking : prefix;
 
   const subject = `${prefix} ${serviceId} ${termsType}`;
-  const documentIdMessage = `${documentId ? `Page ID ${documentId}\n\n` : ''}`;
+  const documentIdMessage = `${documentId ? `Document ID ${documentId}\n\n` : ''}`;
   let snapshotIdsMessage;
 
   if (snapshotIds.length == 1) {
-    snapshotIdsMessage = `${SINGLE_SNAPSHOT_PREFIX} ${snapshotIdentiferTemplate.replace(SNAPSHOT_ID_MARKER, snapshotIds[0])}`;
+    snapshotIdsMessage = `${SINGLE_SOURCE_DOCUMENT_PREFIX} ${snapshotIdentiferTemplate.replace(SNAPSHOT_ID_MARKER, snapshotIds[0])}`;
   } else if (snapshotIds.length > 1) {
-    snapshotIdsMessage = `${MULTIPLE_SNAPSHOT_PREFIX.replace('%NUMBER', snapshotIds.length)}\n${snapshotIds.map(snapshotId => `- ${snapshotIdentiferTemplate.replace(SNAPSHOT_ID_MARKER, snapshotId)}`).join('\n')}`;
+    snapshotIdsMessage = `${MULTIPLE_SOURCE_DOCUMENTS_PREFIX.replace('%NUMBER', snapshotIds.length)}\n${snapshotIds.map(snapshotId => `- ${snapshotIdentiferTemplate.replace(SNAPSHOT_ID_MARKER, snapshotId)}`).join('\n')}`;
   }
 
   const filePath = generateFilePath(serviceId, termsType, documentId, mimeType);
@@ -66,8 +69,8 @@ export function toDomain(commit) {
     documentId,
     mimeType: mime.getType(relativeFilePath),
     fetchDate: new Date(date),
-    isFirstRecord: message.startsWith(COMMIT_MESSAGE_PREFIX.startTracking),
-    isRefilter: message.startsWith(COMMIT_MESSAGE_PREFIX.refilter),
+    isFirstRecord: message.startsWith(COMMIT_MESSAGE_PREFIXES.startTracking) || message.startsWith(COMMIT_MESSAGE_PREFIXES.deprecated_startTracking),
+    isExtractOnly: message.startsWith(COMMIT_MESSAGE_PREFIXES.extractOnly) || message.startsWith(COMMIT_MESSAGE_PREFIXES.deprecated_refilter),
     snapshotIds: snapshotIdsMatch || [],
   });
 }

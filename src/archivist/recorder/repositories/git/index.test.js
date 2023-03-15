@@ -8,7 +8,7 @@ import mime from 'mime';
 
 import Record from '../../record.js';
 
-import { TERMS_TYPE_AND_DOCUMENT_ID_SEPARATOR, SNAPSHOT_ID_MARKER } from './dataMapper.js';
+import { TERMS_TYPE_AND_DOCUMENT_ID_SEPARATOR, SNAPSHOT_ID_MARKER, COMMIT_MESSAGE_PREFIXES } from './dataMapper.js';
 import Git from './git.js';
 
 import GitRepository from './index.js';
@@ -16,7 +16,7 @@ import GitRepository from './index.js';
 const { expect } = chai;
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const RECORDER_PATH = path.resolve(__dirname, '../../../', config.get('recorder.versions.storage.git.path'));
+const RECORDER_PATH = path.resolve(__dirname, '../../../../..', config.get('recorder.versions.storage.git.path'));
 
 const SERVICE_PROVIDER_ID = 'test_service';
 const TERMS_TYPE = 'Terms of Service';
@@ -107,7 +107,7 @@ describe('GitRepository', () => {
       });
 
       it('stores information that it is the first record for these specific terms', () => {
-        expect(commit.message).to.include('Start tracking');
+        expect(commit.message).to.include(COMMIT_MESSAGE_PREFIXES.startTracking);
       });
 
       it('stores the proper content', () => {
@@ -210,8 +210,8 @@ describe('GitRepository', () => {
       });
     });
 
-    context('when it is a refilter', () => {
-      const REFILTERED_CONTENT = `${CONTENT} refiltered`;
+    context('when it is an extracted only version', () => {
+      const EXTRACTED_ONLY_CONTENT = `${CONTENT} extracted only`;
 
       before(async () => {
         await subject.save(new Record({
@@ -220,16 +220,16 @@ describe('GitRepository', () => {
           content: CONTENT,
           mimeType: MIME_TYPE,
           fetchDate: FETCH_DATE_EARLIER,
-        })); // A refilter cannot be the first record
+        })); // An extracted only version cannot be the first record
 
         numberOfRecordsBefore = (await git.log()).length;
 
         ({ id, isFirstRecord } = await subject.save(new Record({
           serviceId: SERVICE_PROVIDER_ID,
           termsType: TERMS_TYPE,
-          content: REFILTERED_CONTENT,
+          content: EXTRACTED_ONLY_CONTENT,
           fetchDate: FETCH_DATE,
-          isRefilter: true,
+          isExtractOnly: true,
           snapshotIds: [SNAPSHOT_ID],
           mimeType: MIME_TYPE,
         })));
@@ -249,8 +249,8 @@ describe('GitRepository', () => {
         expect(commit.hash).to.include(id);
       });
 
-      it('stores information that it is a refilter of this specific terms', () => {
-        expect(commit.message).to.include('Refilter');
+      it('stores information that it is an extracted only version', () => {
+        expect(commit.message).to.include(COMMIT_MESSAGE_PREFIXES.extractOnly);
       });
     });
 
@@ -308,7 +308,7 @@ describe('GitRepository', () => {
       after(async () => subject.removeAll());
 
       it('does not store snapshots IDs', () => {
-        expect(commit.body).to.be.equal(`Page ID ${DOCUMENT_ID}\n`);
+        expect(commit.body).to.be.equal(`Document ID ${DOCUMENT_ID}\n`);
       });
 
       it('stores the service ID', () => {
@@ -501,7 +501,7 @@ describe('GitRepository', () => {
         serviceId: SERVICE_PROVIDER_ID,
         termsType: TERMS_TYPE,
         content: `${CONTENT} - updated 2`,
-        isRefilter: true,
+        isExtractOnly: true,
         fetchDate: FETCH_DATE_EARLIER,
         snapshotIds: [SNAPSHOT_ID],
         mimeType: MIME_TYPE,
@@ -555,7 +555,7 @@ describe('GitRepository', () => {
         serviceId: SERVICE_PROVIDER_ID,
         termsType: TERMS_TYPE,
         content: `${CONTENT} - updated 2`,
-        isRefilter: true,
+        isExtractOnly: true,
         fetchDate: FETCH_DATE_EARLIER,
         snapshotIds: [SNAPSHOT_ID],
         mimeType: MIME_TYPE,
@@ -688,7 +688,7 @@ describe('GitRepository', () => {
         serviceId: SERVICE_PROVIDER_ID,
         termsType: TERMS_TYPE,
         content: `${CONTENT} - updated 2`,
-        isRefilter: true,
+        isExtractOnly: true,
         fetchDate: FETCH_DATE_EARLIER,
         snapshotIds: [SNAPSHOT_ID],
         mimeType: MIME_TYPE,
@@ -710,6 +710,191 @@ describe('GitRepository', () => {
 
     it('iterates in ascending order', async () => {
       expect(fetchDates).to.deep.equal([ FETCH_DATE_EARLIER, FETCH_DATE, FETCH_DATE_LATER ]);
+    });
+  });
+
+  context('backwards compatibility with deprecated commit messages', () => {
+    const expectedIds = [];
+    const expectedDates = [];
+
+    let subject;
+
+    const commits = {
+      deprecatedFirstRecord: {
+        path: 'service/terms-deprecated.md',
+        content: 'content',
+        message: 'Start tracking Service Terms',
+        date: new Date('2023-02-28T01:00:00.000Z'),
+      },
+      deprecatedRefilter: {
+        path: 'service/terms-deprecated.md',
+        content: 'content refiltered',
+        message: 'Refilter Service Terms',
+        date: new Date('2023-02-28T02:00:00.000Z'),
+      },
+      deprecatedUpdate: {
+        path: 'service/terms-deprecated.md',
+        content: 'content updated',
+        message: 'Update Service Terms',
+        date: new Date('2023-02-28T03:00:00.000Z'),
+      },
+      currentFirstRecord: {
+        path: 'service/terms-current.md',
+        content: 'content',
+        message: 'First record of Service Terms',
+        date: new Date('2023-02-28T04:00:00.000Z'),
+      },
+      currentExtractOnly: {
+        path: 'service/terms-current.md',
+        content: 'content extract only',
+        message: 'Apply technical or declaration upgrade on Service Terms',
+        date: new Date('2023-02-28T05:00:00.000Z'),
+      },
+      currentUpdate: {
+        path: 'service/terms-current.md',
+        content: 'content updated',
+        message: 'Record new changes of Service Terms',
+        date: new Date('2023-02-28T06:00:00.000Z'),
+      },
+    };
+
+    before(async function () {
+      this.timeout(5000);
+      git = new Git({
+        path: RECORDER_PATH,
+        author: {
+          name: config.get('recorder.versions.storage.git.author.name'),
+          email: config.get('recorder.versions.storage.git.author.email'),
+        },
+      });
+
+      await git.initialize();
+      subject = new GitRepository({
+        ...config.get('recorder.versions.storage.git'),
+        path: RECORDER_PATH,
+      });
+
+      await subject.initialize();
+
+      /* eslint-disable no-await-in-loop */
+      for (const commit of Object.values(commits)) {
+        const { path: relativeFilePath, date, content, message } = commit;
+        const filePath = path.join(RECORDER_PATH, relativeFilePath);
+
+        await GitRepository.writeFile({ filePath, content });
+
+        await git.add(filePath);
+        const sha = await git.commit({ filePath, message, date });
+
+        commit.id = sha;
+        expectedIds.push(sha);
+        expectedDates.push(date);
+      }
+      /* eslint-enable no-await-in-loop */
+    });
+
+    after(async () => subject.removeAll());
+
+    describe('Records attributes', () => {
+      describe('#isExtractOnly', () => {
+        context('records with deprecated message', () => {
+          it('returns the proper value', async () => {
+            expect((await subject.findById(commits.deprecatedRefilter.id)).isExtractOnly).to.be.true;
+          });
+
+          it('returns the proper value', async () => {
+            expect((await subject.findById(commits.deprecatedFirstRecord.id)).isExtractOnly).to.be.false;
+          });
+        });
+
+        context('record with current message', () => {
+          it('returns the proper value', async () => {
+            expect((await subject.findById(commits.currentExtractOnly.id)).isExtractOnly).to.be.true;
+          });
+
+          it('returns the proper value', async () => {
+            expect((await subject.findById(commits.currentFirstRecord.id)).isExtractOnly).to.be.false;
+          });
+        });
+      });
+
+      describe('#isFirstRecord', () => {
+        context('records with deprecated message', () => {
+          it('returns the proper value', async () => {
+            expect((await subject.findById(commits.deprecatedFirstRecord.id)).isFirstRecord).to.be.true;
+          });
+
+          it('returns the proper value', async () => {
+            expect((await subject.findById(commits.deprecatedRefilter.id)).isFirstRecord).to.be.false;
+          });
+        });
+
+        context('record with current message', () => {
+          it('returns the proper value', async () => {
+            expect((await subject.findById(commits.currentFirstRecord.id)).isFirstRecord).to.be.true;
+          });
+
+          it('returns the proper value', async () => {
+            expect((await subject.findById(commits.currentExtractOnly.id)).isFirstRecord).to.be.false;
+          });
+        });
+      });
+    });
+
+    describe('#findAll', () => {
+      let records;
+
+      before(async function () {
+        this.timeout(5000);
+
+        (records = await subject.findAll());
+      });
+
+      it('returns all records', () => {
+        expect(records.map(record => record.id)).to.have.members(expectedIds);
+      });
+
+      it('returns Record objects', () => {
+        for (const record of records) {
+          expect(record).to.be.an.instanceof(Record);
+        }
+      });
+
+      it('returns records in ascending order', async () => {
+        expect(records.map(record => record.fetchDate)).to.deep.equal(expectedDates);
+      });
+    });
+
+    describe('#count', () => {
+      let count;
+
+      before(async () => {
+        (count = await subject.count());
+      });
+
+      it('returns the proper count', async () => {
+        expect(count).to.equal(expectedIds.length);
+      });
+    });
+
+    describe('#iterate', () => {
+      const ids = [];
+      const fetchDates = [];
+
+      before(async () => {
+        for await (const record of subject.iterate()) {
+          ids.push(record.id);
+          fetchDates.push(record.fetchDate);
+        }
+      });
+
+      it('iterates through all records', async () => {
+        expect(ids).to.have.members(expectedIds);
+      });
+
+      it('iterates in ascending order', async () => {
+        expect(fetchDates).to.deep.equal(expectedDates);
+      });
     });
   });
 });

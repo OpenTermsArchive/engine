@@ -45,7 +45,7 @@ export default class Recorder {
     return this.snapshotsRepository.save(new Record({ serviceId, termsType, documentId, fetchDate, mimeType, content }));
   }
 
-  async recordVersion({ serviceId, termsType, snapshotIds, fetchDate, content, extractOnly }) {
+  async recordVersion({ serviceId, termsType, snapshotIds, fetchDate, content, isExtractOnly }) {
     if (!serviceId) {
       throw new Error('A service ID is required');
     }
@@ -68,6 +68,6 @@ export default class Recorder {
 
     const mimeType = mime.getType('markdown'); // A version is always in markdown format
 
-    return this.versionsRepository.save(new Record({ serviceId, termsType, snapshotIds, fetchDate, mimeType, content, isRefilter: extractOnly }));
+    return this.versionsRepository.save(new Record({ serviceId, termsType, snapshotIds, fetchDate, mimeType, content, isExtractOnly }));
   }
 }
