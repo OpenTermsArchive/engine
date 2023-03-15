@@ -17,16 +17,16 @@ export default class Notifier {
     this.delayedVersionNotificationsParams = [];
   }
 
-  async onVersionRecorded(serviceId, type, versionId) {
-    this.delayedVersionNotificationsParams.push({ serviceId, type, versionId });
+  async onVersionRecorded(record) {
+    this.delayedVersionNotificationsParams.push(record);
   }
 
   async onTrackingCompleted() {
-    this.delayedVersionNotificationsParams.forEach(async ({ serviceId, type, versionId }) => {
+    this.delayedVersionNotificationsParams.forEach(async ({ serviceId, termsType, id }) => {
       try {
-        await this.notifyVersionRecorded(serviceId, type, versionId);
+        await this.notifyVersionRecorded(serviceId, termsType, id);
       } catch (error) {
-        console.error(`The notification for version ${versionId} of ${serviceId} — ${type} can not be sent:`, error);
+        console.error(`The notification for version ${id} of ${serviceId} — ${termsType} can not be sent:`, error);
       }
     });
 

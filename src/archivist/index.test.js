@@ -208,6 +208,7 @@ describe('Archivist', function () {
         context('when there is an operational error', () => {
           let inaccessibleContentSpy;
           let versionNotChangedSpy;
+          let versionB;
 
           before(async () => {
             nock('https://www.servicea.example').get('/tos').reply(200, serviceASnapshotExpectedContent, { 'Content-Type': 'text/html' });
@@ -219,12 +220,16 @@ describe('Archivist', function () {
 
             await app.initialize();
             await app.track({ services });
-
             app.services[SERVICE_A_ID].getTerms(SERVICE_A_TYPE).sourceDocuments[0].contentSelectors = 'inexistant-selector';
             inaccessibleContentSpy = sinon.spy();
             versionNotChangedSpy = sinon.spy();
             app.on('inaccessibleContent', inaccessibleContentSpy);
-            app.on('versionNotChanged', versionNotChangedSpy);
+            app.on('versionNotChanged', record => {
+              if (record.serviceId == 'service_B') {
+                versionB = record;
+              }
+              versionNotChangedSpy(record);
+            });
             await app.track({ services, extractOnly: true });
           });
 
@@ -235,7 +240,7 @@ describe('Archivist', function () {
           });
 
           it('still extracts the terms of other services', async () => {
-            expect(versionNotChangedSpy).to.have.been.calledWith(SERVICE_B_ID, SERVICE_B_TYPE);
+            expect(versionNotChangedSpy).to.have.been.calledWith(versionB);
           });
         });
       });
@@ -274,142 +279,113 @@ describe('Archivist', function () {
       });
     });
 
-    describe('#recordSnapshot', () => {
-      context('when it is the first record', () => {
-        before(async () => app.recordSnapshot(new Snapshot({
-          content: 'document content 3',
+    context('Snapshot', () => {
+      let snapshot;
+
+      before(() => {
+        snapshot = new Snapshot({
+          content: 'document content',
           serviceId: SERVICE_A_ID,
           termsType: SERVICE_A_TYPE,
           mimeType: MIME_TYPE,
           fetchDate: FETCH_DATE,
-        })));
-
-        after(() => {
-          resetSpiesHistory();
-
-          return resetGitRepositories();
         });
-
-        it('emits "firstSnapshotRecorded" event', async () => {
-          expect(spies.onFirstSnapshotRecorded).to.have.been.calledWith(SERVICE_A_ID, SERVICE_A_TYPE);
-        });
-
-        emitsOnly(['firstSnapshotRecorded']);
       });
 
-      context('when it is not the first record', () => {
-        context('when there are changes', () => {
-          before(async () => {
-            await app.recordSnapshot(new Snapshot({
-              content: 'document content',
-              serviceId: SERVICE_A_ID,
-              termsType: SERVICE_A_TYPE,
-              mimeType: MIME_TYPE,
-              fetchDate: FETCH_DATE,
-            }));
+      describe('#record', () => {
+        context('when it is the first record', () => {
+          before(async () => app.record(snapshot));
+
+          after(() => {
             resetSpiesHistory();
-            await app.recordSnapshot(new Snapshot({
+
+            return resetGitRepositories();
+          });
+
+          it('emits "firstSnapshotRecorded" event', async () => {
+            expect(spies.onFirstSnapshotRecorded).to.have.been.calledWith(snapshot);
+          });
+
+          emitsOnly(['firstSnapshotRecorded']);
+        });
+
+        context('when it is not the first record', () => {
+          context('when there are changes', () => {
+            const changedSnapshot = new Snapshot({
               content: 'document content modified',
               serviceId: SERVICE_A_ID,
               termsType: SERVICE_A_TYPE,
               mimeType: MIME_TYPE,
               fetchDate: FETCH_DATE,
-            }));
+            });
+
+            before(async () => {
+              await app.record(snapshot);
+              resetSpiesHistory();
+              await app.record(changedSnapshot);
+            });
+
+            after(() => {
+              resetSpiesHistory();
+
+              return resetGitRepositories();
+            });
+
+            it('emits "snapshotRecorded" event', async () => {
+              expect(spies.onSnapshotRecorded).to.have.been.calledWith(changedSnapshot);
+            });
+
+            emitsOnly(['snapshotRecorded']);
           });
 
-          after(() => {
-            resetSpiesHistory();
+          context('when there are no changes', () => {
+            let clonedSnapshot;
 
-            return resetGitRepositories();
+            before(async () => {
+              await app.record(snapshot);
+              resetSpiesHistory();
+              clonedSnapshot = new Snapshot({
+                content: snapshot.content,
+                serviceId: snapshot.serviceId,
+                termsType: snapshot.termsType,
+                mimeType: snapshot.mimeType,
+                fetchDate: snapshot.fetchDate,
+              });
+              await app.record(clonedSnapshot);
+            });
+
+            after(() => {
+              resetSpiesHistory();
+
+              return resetGitRepositories();
+            });
+
+            it('emits "snapshotNotChanged" event', async () => {
+              expect(spies.onSnapshotNotChanged).to.have.been.calledWith(clonedSnapshot);
+            });
+
+            emitsOnly(['snapshotNotChanged']);
           });
-
-          it('emits "snapshotRecorded" event', async () => {
-            expect(spies.onSnapshotRecorded).to.have.been.calledWith(SERVICE_A_ID, SERVICE_A_TYPE);
-          });
-
-          emitsOnly(['snapshotRecorded']);
-        });
-
-        context('when there are no changes', () => {
-          before(async () => {
-            await app.recordSnapshot(new Snapshot({
-              content: 'document content',
-              serviceId: SERVICE_A_ID,
-              termsType: SERVICE_A_TYPE,
-              mimeType: MIME_TYPE,
-              fetchDate: FETCH_DATE,
-            }));
-            resetSpiesHistory();
-            await app.recordSnapshot(new Snapshot({
-              content: 'document content',
-              serviceId: SERVICE_A_ID,
-              termsType: SERVICE_A_TYPE,
-              mimeType: MIME_TYPE,
-              fetchDate: FETCH_DATE,
-            }));
-          });
-
-          after(() => {
-            resetSpiesHistory();
-
-            return resetGitRepositories();
-          });
-
-          it('emits "snapshotNotChanged" event', async () => {
-            expect(spies.onSnapshotNotChanged).to.have.been.calledWith(SERVICE_A_ID, SERVICE_A_TYPE);
-          });
-
-          emitsOnly(['snapshotNotChanged']);
         });
       });
     });
 
-    describe('#recordVersion', () => {
-      context('when it is the first record', () => {
-        before(async () =>
-          app.recordVersion(new Version({
-            content: serviceASnapshotExpectedContent,
-            snapshotIds: ['sha'],
-            mimeType: MIME_TYPE,
-            fetchDate: FETCH_DATE,
-            serviceId: SERVICE_A_ID,
-            termsType: SERVICE_A_TYPE,
-          })));
+    context('Version', () => {
+      let version;
 
-        after(() => {
-          resetSpiesHistory();
-
-          return resetGitRepositories();
+      before(() => {
+        version = new Version({
+          content: serviceAVersionExpectedContent,
+          snapshotIds: ['sha'],
+          fetchDate: FETCH_DATE,
+          serviceId: SERVICE_A_ID,
+          termsType: SERVICE_A_TYPE,
         });
-
-        it('emits "firstVersionRecorded" event', async () => {
-          expect(spies.onFirstVersionRecorded).to.have.been.calledWith(SERVICE_A_ID, SERVICE_A_TYPE);
-        });
-
-        emitsOnly(['firstVersionRecorded']);
       });
 
-      context('when it is not the first record', () => {
-        context('when there are changes', () => {
-          before(async () => {
-            await app.recordVersion(new Version({
-              content: serviceASnapshotExpectedContent,
-              mimeType: MIME_TYPE,
-              fetchDate: FETCH_DATE,
-              snapshotIds: ['sha'],
-              serviceId: SERVICE_A_ID,
-              termsType: SERVICE_A_TYPE,
-            }));
-            resetSpiesHistory();
-            await app.recordVersion(new Version({
-              content: serviceBSnapshotExpectedContent,
-              mimeType: MIME_TYPE,
-              fetchDate: FETCH_DATE,
-              snapshotIds: ['sha'],
-              serviceId: SERVICE_A_ID,
-              termsType: SERVICE_A_TYPE,
-            }));
-          });
+      describe('#record', () => {
+        context('when it is the first record', () => {
+          before(async () => app.record(version));
 
           after(() => {
             resetSpiesHistory();
@@ -417,45 +393,71 @@ describe('Archivist', function () {
             return resetGitRepositories();
           });
 
-          it('emits "versionRecorded" event', async () => {
-            expect(spies.onVersionRecorded).to.have.been.calledWith(SERVICE_A_ID, SERVICE_A_TYPE);
+          it('emits "firstVersionRecorded" event', async () => {
+            expect(spies.onFirstVersionRecorded).to.have.been.calledWith(version);
           });
 
-          emitsOnly(['versionRecorded']);
+          emitsOnly(['firstVersionRecorded']);
         });
 
-        context('when there are no changes', () => {
-          before(async () => {
-            await app.recordVersion(new Version({
-              content: serviceASnapshotExpectedContent,
-              snapshotIds: ['sha'],
-              mimeType: MIME_TYPE,
-              fetchDate: FETCH_DATE,
-              serviceId: SERVICE_A_ID,
-              termsType: SERVICE_A_TYPE,
-            }));
-            resetSpiesHistory();
-            await app.recordVersion(new Version({
-              content: serviceASnapshotExpectedContent,
-              snapshotIds: ['sha'],
-              mimeType: MIME_TYPE,
-              fetchDate: FETCH_DATE,
-              serviceId: SERVICE_A_ID,
-              termsType: SERVICE_A_TYPE,
-            }));
+        context('when it is not the first record', () => {
+          context('when there are changes', () => {
+            let changedVersion;
+
+            before(async () => {
+              await app.record(version);
+              resetSpiesHistory();
+              changedVersion = new Version({
+                content: serviceBSnapshotExpectedContent,
+                fetchDate: FETCH_DATE,
+                snapshotIds: ['sha'],
+                serviceId: SERVICE_A_ID,
+                termsType: SERVICE_A_TYPE,
+              });
+              await app.record(changedVersion);
+            });
+
+            after(() => {
+              resetSpiesHistory();
+
+              return resetGitRepositories();
+            });
+
+            it('emits "versionRecorded" event', async () => {
+              expect(spies.onVersionRecorded).to.have.been.calledWith(changedVersion);
+            });
+
+            emitsOnly(['versionRecorded']);
           });
 
-          after(() => {
-            resetSpiesHistory();
+          context('when there are no changes', () => {
+            let clonedVersion;
 
-            return resetGitRepositories();
+            before(async () => {
+              await app.record(version);
+              resetSpiesHistory();
+              clonedVersion = new Version({
+                content: version.content,
+                serviceId: version.serviceId,
+                termsType: version.termsType,
+                snapshotIds: version.snapshotIds,
+                fetchDate: version.fetchDate,
+              });
+              await app.record(clonedVersion);
+            });
+
+            after(() => {
+              resetSpiesHistory();
+
+              return resetGitRepositories();
+            });
+
+            it('emits "versionNotChanged" event', async () => {
+              expect(spies.onVersionNotChanged).to.have.been.calledWith(clonedVersion);
+            });
+
+            emitsOnly(['versionNotChanged']);
           });
-
-          it('emits "versionNotChanged" event', async () => {
-            expect(spies.onVersionNotChanged).to.have.been.calledWith(SERVICE_A_ID, SERVICE_A_TYPE);
-          });
-
-          emitsOnly(['versionNotChanged']);
         });
       });
     });
@@ -553,6 +555,11 @@ describe('Archivist', function () {
       });
 
       context('when a service changed', () => {
+        let snapshotA;
+        let snapshotB;
+        let versionA;
+        let versionB;
+
         before(async () => {
           nock('https://www.servicea.example').get('/tos').reply(200, serviceASnapshotExpectedContent, { 'Content-Type': 'text/html' });
           nock('https://www.serviceb.example').get('/privacy').reply(200, serviceBSnapshotExpectedContent, { 'Content-Type': 'application/pdf' });
@@ -563,6 +570,18 @@ describe('Archivist', function () {
           nock('https://www.serviceb.example').get('/privacy').reply(200, serviceBSnapshotExpectedContent, { 'Content-Type': 'application/pdf' });
 
           resetSpiesHistory();
+          app.on('snapshotNotChanged', record => {
+            snapshotB = record;
+          });
+          app.on('snapshotRecorded', record => {
+            snapshotA = record;
+          });
+          app.on('versionNotChanged', record => {
+            versionB = record;
+          });
+          app.on('versionRecorded', record => {
+            versionA = record;
+          });
           await app.track({ services });
         });
 
@@ -577,19 +596,19 @@ describe('Archivist', function () {
         });
 
         it('emits "snapshotNotChanged" event for the service that was not changed', async () => {
-          expect(spies.onSnapshotNotChanged).to.have.been.calledOnceWith(SERVICE_B_ID, SERVICE_B_TYPE);
+          expect(spies.onSnapshotNotChanged).to.have.been.calledOnceWith(snapshotB);
         });
 
         it('emits "snapshotRecorded" event for the service that was changed', async () => {
-          expect(spies.onSnapshotRecorded).to.have.been.calledOnceWith(SERVICE_A_ID, SERVICE_A_TYPE);
+          expect(spies.onSnapshotRecorded).to.have.been.calledOnceWith(snapshotA);
         });
 
         it('emits "versionNotChanged" events for the service that was not changed', async () => {
-          expect(spies.onVersionNotChanged).to.have.been.calledOnceWith(SERVICE_B_ID, SERVICE_B_TYPE);
+          expect(spies.onVersionNotChanged).to.have.been.calledOnceWith(versionB);
         });
 
         it('emits "versionRecorded" event for the service that was changed', async () => {
-          expect(spies.onVersionRecorded).to.have.been.calledOnceWith(SERVICE_A_ID, SERVICE_A_TYPE);
+          expect(spies.onVersionRecorded).to.have.been.calledOnceWith(versionA);
         });
 
         it('emits "snapshotRecorded" events after "versionRecorded" events', async () => {

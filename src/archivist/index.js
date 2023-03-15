@@ -75,12 +75,12 @@ export default class Archivist extends events.EventEmitter {
       }
 
       if (error instanceof InaccessibleContentError) {
-        this.emit('inaccessibleContent', error, terms.service.id, terms.type, terms);
+        this.emit('inaccessibleContent', error, terms);
 
         return;
       }
 
-      this.emit('error', error, terms.service.id, terms.type);
+      this.emit('error', error, terms);
     });
   }
 
@@ -132,7 +132,7 @@ export default class Archivist extends events.EventEmitter {
           mimeType: sourceDocument.mimeType,
         });
 
-        await this.recordSnapshot(record);
+        await this.record(record);
 
         sourceDocument.snapshotId = record.id;
       }));
@@ -144,7 +144,7 @@ export default class Archivist extends events.EventEmitter {
       return;
     }
 
-    return this.recordVersion(new Version({
+    return this.record(new Version({
       content: await this.extractVersionContent(terms.sourceDocuments),
       snapshotIds: terms.sourceDocuments.map(sourceDocuments => sourceDocuments.snapshotId),
       serviceId: terms.service.id,
@@ -203,27 +203,17 @@ export default class Archivist extends events.EventEmitter {
     return (await Promise.all(sourceDocuments.map(async sourceDocument => this.extract(sourceDocument)))).join('\n\n');
   }
 
-  async recordSnapshot(record) {
+  async record(record) {
     await this.recorder.record(record);
 
+    const recordType = record.constructor.name;
+
     if (!record.id) {
-      this.emit('snapshotNotChanged', record.serviceId, record.termsType, record.documentId);
+      this.emit(`${recordType.toLowerCase()}NotChanged`, record);
 
       return;
     }
 
-    this.emit(record.isFirstRecord ? 'firstSnapshotRecorded' : 'snapshotRecorded', record.serviceId, record.termsType, record.documentId, record.id);
-  }
-
-  async recordVersion(record) {
-    await this.recorder.record(record);
-
-    if (!record.id) {
-      this.emit('versionNotChanged', record.serviceId, record.termsType);
-
-      return;
-    }
-
-    this.emit(record.isFirstRecord ? 'firstVersionRecorded' : 'versionRecorded', record.serviceId, record.termsType, record.id);
+    this.emit(record.isFirstRecord ? `first${recordType}Recorded` : `${recordType.toLowerCase()}Recorded`, record);
   }
 }

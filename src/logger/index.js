@@ -11,11 +11,11 @@ const { combine, timestamp, printf, colorize } = winston.format;
 const alignedWithColorsAndTime = combine(
   colorize(),
   timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
-  printf(({ level, message, timestamp, serviceId, type, documentId }) => {
+  printf(({ level, message, timestamp, serviceId, termsType, documentId }) => {
     let prefix = '';
 
-    if (serviceId && type) {
-      prefix = `${serviceId} — ${type}`;
+    if (serviceId && termsType) {
+      prefix = `${serviceId} — ${termsType}`;
     }
 
     if (documentId) {
@@ -71,32 +71,32 @@ const logger = winston.createLogger({
   rejectionHandlers: transports,
 });
 
-logger.onFirstSnapshotRecorded = (serviceId, type, documentId, snapshotId) => {
-  logger.info({ message: `Recorded first snapshot with id ${snapshotId}`, serviceId, type, documentId });
+logger.onFirstSnapshotRecorded = ({ serviceId, termsType, documentId, id }) => {
+  logger.info({ message: `Recorded first snapshot with id ${id}`, serviceId, termsType, documentId });
   recordedSnapshotsCount++;
 };
 
-logger.onSnapshotRecorded = (serviceId, type, documentId, snapshotId) => {
-  logger.info({ message: `Recorded snapshot with id ${snapshotId}`, serviceId, type, documentId });
+logger.onSnapshotRecorded = ({ serviceId, termsType, documentId, id }) => {
+  logger.info({ message: `Recorded snapshot with id ${id}`, serviceId, termsType, documentId });
   recordedSnapshotsCount++;
 };
 
-logger.onSnapshotNotChanged = (serviceId, type, documentId) => {
-  logger.info({ message: 'No changes, did not record snapshot', serviceId, type, documentId });
+logger.onSnapshotNotChanged = ({ serviceId, termsType, documentId }) => {
+  logger.info({ message: 'No changes, did not record snapshot', serviceId, termsType, documentId });
 };
 
-logger.onFirstVersionRecorded = (serviceId, type, versionId) => {
-  logger.info({ message: `Recorded first version with id ${versionId}`, serviceId, type });
+logger.onFirstVersionRecorded = ({ serviceId, termsType, id }) => {
+  logger.info({ message: `Recorded first version with id ${id}`, serviceId, termsType });
   recordedVersionsCount++;
 };
 
-logger.onVersionRecorded = (serviceId, type, versionId) => {
-  logger.info({ message: `Recorded version with id ${versionId}`, serviceId, type });
+logger.onVersionRecorded = ({ serviceId, termsType, id }) => {
+  logger.info({ message: `Recorded version with id ${id}`, serviceId, termsType });
   recordedVersionsCount++;
 };
 
-logger.onVersionNotChanged = (serviceId, type) => {
-  logger.info({ message: 'No changes after filtering, did not record version', serviceId, type });
+logger.onVersionNotChanged = ({ serviceId, termsType }) => {
+  logger.info({ message: 'No changes after filtering, did not record version', serviceId, termsType });
 };
 
 logger.onTrackingStarted = (numberOfServices, numberOfTerms, extractOnly) => {
@@ -119,12 +119,12 @@ logger.onTrackingCompleted = (numberOfServices, numberOfTerms, extractOnly) => {
   }
 };
 
-logger.onInaccessibleContent = ({ message }, serviceId, type) => {
-  logger.warn({ message, serviceId, type });
+logger.onInaccessibleContent = ({ message }, terms) => {
+  logger.warn({ message, serviceId: terms.serviceId, termsType: terms.type });
 };
 
-logger.onError = (error, serviceId, type, documentId) => {
-  logger.error({ message: error.stack, serviceId, type, documentId });
+logger.onError = (error, terms) => {
+  logger.error({ message: error.stack, serviceId: terms.serviceId, termsType: terms.type });
 };
 
 export default logger;
