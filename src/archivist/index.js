@@ -193,7 +193,7 @@ export default class Archivist extends events.EventEmitter {
       isExtractOnly: extractOnly,
     });
 
-    await this.recorder.recordSnapshot(record);
+    await this.recorder.record(record);
 
     if (!record.id) {
       this.emit('versionNotChanged', record);
@@ -217,7 +217,7 @@ export default class Archivist extends events.EventEmitter {
         mimeType: sourceDocument.mimeType,
       });
 
-      await this.recorder.recordVersion(record);
+      await this.recorder.record(record);
 
       if (!record.id) {
         this.emit('snapshotNotChanged', record);
