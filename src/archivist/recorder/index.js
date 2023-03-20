@@ -1,4 +1,6 @@
 import RepositoryFactory from './repositories/factory.js';
+import Snapshot from './snapshot.js';
+import Version from './version.js';
 
 export default class Recorder {
   constructor(config) {
@@ -18,15 +20,14 @@ export default class Recorder {
     return this.snapshotsRepository.findLatest(terms.service.id, terms.type, terms.hasMultipleSourceDocuments && sourceDocumentId);
   }
 
-  async recordVersion(record) {
+  async record(record) {
     record.validate();
 
-    return this.versionsRepository.save(record);
-  }
-
-  async recordSnapshot(record) {
-    record.validate();
-
-    return this.snapshotsRepository.save(record);
+    switch (record.constructor) { // eslint-disable-line default-case
+    case Version:
+      return this.versionsRepository.save(record);
+    case Snapshot:
+      return this.snapshotsRepository.save(record);
+    }
   }
 }
