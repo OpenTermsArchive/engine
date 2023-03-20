@@ -47,7 +47,7 @@ describe('Export', () => {
 
     before(async function () {
       this.timeout(10000);
-      repository = new GitRepository(Version, {
+      repository = new GitRepository({
         ...config.get('recorder.versions.storage.git'),
         path: path.resolve(__dirname, '../../../', config.get('recorder.versions.storage.git.path')),
       });

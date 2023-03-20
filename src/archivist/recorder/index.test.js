@@ -56,7 +56,7 @@ describe('Recorder', () => {
                       {},
                     );
 
-                    await recorder.record(new Snapshot({ ...validParamsExceptTheOneTested }));
+                    await recorder.recordSnapshot(new Snapshot({ ...validParamsExceptTheOneTested }));
                   } catch (e) {
                     expect(e).to.be.an('error');
                     expect(e.message).to.contain(testedRequiredParam);
@@ -71,7 +71,7 @@ describe('Recorder', () => {
 
           context('when it is the first record', () => {
             before(async () => {
-              ({ id, isFirstRecord } = await recorder.record(new Snapshot({
+              ({ id, isFirstRecord } = await recorder.recordSnapshot(new Snapshot({
                 serviceId: SERVICE_ID,
                 termsType: TYPE,
                 content: CONTENT,
@@ -101,7 +101,7 @@ describe('Recorder', () => {
             const UPDATED_CONTENT = '<html><h1>ToS fixture data with UTF-8 çhãràčtęrs</h1><h2>Updated!</h2></html>';
 
             before(async () => {
-              await recorder.record(new Snapshot({
+              await recorder.recordSnapshot(new Snapshot({
                 serviceId: SERVICE_ID,
                 termsType: TYPE,
                 content: CONTENT,
@@ -109,7 +109,7 @@ describe('Recorder', () => {
                 fetchDate: FETCH_DATE,
               }));
 
-              ({ id, isFirstRecord } = await recorder.record(new Snapshot({
+              ({ id, isFirstRecord } = await recorder.recordSnapshot(new Snapshot({
                 serviceId: SERVICE_ID,
                 termsType: TYPE,
                 content: UPDATED_CONTENT,
@@ -137,7 +137,7 @@ describe('Recorder', () => {
 
           context('when the content has not changed', () => {
             before(async () => {
-              await recorder.record(new Snapshot({
+              await recorder.recordSnapshot(new Snapshot({
                 serviceId: SERVICE_ID,
                 termsType: TYPE,
                 content: CONTENT,
@@ -145,7 +145,7 @@ describe('Recorder', () => {
                 fetchDate: FETCH_DATE,
               }));
 
-              ({ id, isFirstRecord } = await recorder.record(new Snapshot({
+              ({ id, isFirstRecord } = await recorder.recordSnapshot(new Snapshot({
                 serviceId: SERVICE_ID,
                 termsType: TYPE,
                 content: CONTENT,
@@ -190,7 +190,7 @@ describe('Recorder', () => {
                       {},
                     );
 
-                    await recorder.record(new Version({ ...validParamsExceptTheOneTested }));
+                    await recorder.recordVersion(new Version({ ...validParamsExceptTheOneTested }));
                   } catch (e) {
                     expect(e).to.be.an('error');
                     expect(e.message).to.contain(testedRequiredParam);
@@ -205,7 +205,7 @@ describe('Recorder', () => {
 
           context('when it is the first record', () => {
             before(async () => {
-              ({ id, isFirstRecord } = await recorder.record(new Version({
+              ({ id, isFirstRecord } = await recorder.recordVersion(new Version({
                 serviceId: SERVICE_ID,
                 termsType: TYPE,
                 content: CONTENT,
@@ -235,7 +235,7 @@ describe('Recorder', () => {
             const UPDATED_CONTENT = '<html><h1>ToS fixture data with UTF-8 çhãràčtęrs</h1><h2>Updated!</h2></html>';
 
             before(async () => {
-              await recorder.record(new Version({
+              await recorder.recordVersion(new Version({
                 serviceId: SERVICE_ID,
                 termsType: TYPE,
                 content: CONTENT,
@@ -243,7 +243,7 @@ describe('Recorder', () => {
                 fetchDate: FETCH_DATE,
               }));
 
-              ({ id, isFirstRecord } = await recorder.record(new Version({
+              ({ id, isFirstRecord } = await recorder.recordVersion(new Version({
                 serviceId: SERVICE_ID,
                 termsType: TYPE,
                 content: UPDATED_CONTENT,
@@ -275,7 +275,7 @@ describe('Recorder', () => {
 
           context('when the content has not changed', () => {
             before(async () => {
-              await recorder.record(new Version({
+              await recorder.recordVersion(new Version({
                 serviceId: SERVICE_ID,
                 termsType: TYPE,
                 content: CONTENT,
@@ -283,7 +283,7 @@ describe('Recorder', () => {
                 fetchDate: FETCH_DATE,
               }));
 
-              ({ id, isFirstRecord } = await recorder.record(new Version({
+              ({ id, isFirstRecord } = await recorder.recordVersion(new Version({
                 serviceId: SERVICE_ID,
                 termsType: TYPE,
                 content: CONTENT,
@@ -311,7 +311,7 @@ describe('Recorder', () => {
 
             context('when it is the first record', () => {
               before(async () => {
-                ({ id, isFirstRecord } = await recorder.record(new Version({
+                ({ id, isFirstRecord } = await recorder.recordVersion(new Version({
                   serviceId: SERVICE_ID,
                   termsType: TYPE,
                   content: CONTENT,
@@ -342,7 +342,7 @@ describe('Recorder', () => {
               const UPDATED_CONTENT = '<html><h1>ToS fixture data with UTF-8 çhãràčtęrs</h1><h2>Updated!</h2></html>';
 
               before(async () => {
-                await recorder.record(new Version({
+                await recorder.recordVersion(new Version({
                   serviceId: SERVICE_ID,
                   termsType: TYPE,
                   content: CONTENT,
@@ -350,7 +350,7 @@ describe('Recorder', () => {
                   fetchDate: FETCH_DATE,
                 }));
 
-                ({ id, isFirstRecord } = await recorder.record(new Version({
+                ({ id, isFirstRecord } = await recorder.recordVersion(new Version({
                   serviceId: SERVICE_ID,
                   termsType: TYPE,
                   content: UPDATED_CONTENT,
@@ -383,7 +383,7 @@ describe('Recorder', () => {
 
             context('when the content has not changed', () => {
               before(async () => {
-                await recorder.record(new Version({
+                await recorder.recordVersion(new Version({
                   serviceId: SERVICE_ID,
                   termsType: TYPE,
                   content: CONTENT,
@@ -391,7 +391,7 @@ describe('Recorder', () => {
                   fetchDate: FETCH_DATE,
                 }));
 
-                ({ id, isFirstRecord } = await recorder.record(new Version({
+                ({ id, isFirstRecord } = await recorder.recordVersion(new Version({
                   serviceId: SERVICE_ID,
                   termsType: TYPE,
                   content: CONTENT,

@@ -3,55 +3,37 @@ import { ObjectId } from 'mongodb';
 import Snapshot from '../../snapshot.js';
 import Version from '../../version.js';
 
-export function toPersistence(recordType, record) {
-  const commonFields = {
-    serviceId: record.serviceId,
-    termsType: record.termsType,
-    fetchDate: record.fetchDate,
-    isFirstRecord: record.isFirstRecord,
-    content: record.content,
-    created_at: new Date(),
-  };
+export function toPersistence(record) {
+  const recordFields = Object.fromEntries(Object.entries(record));
 
-  switch (recordType) { // eslint-disable-line default-case
-  case Version:
-    return {
-      ...commonFields,
-      isExtractOnly: record.isExtractOnly,
-      snapshotIds: record.snapshotIds?.map(snapshotId => new ObjectId(snapshotId)),
-    };
-  case Snapshot:
-    return {
-      ...commonFields,
-      documentId: record.documentId,
-      mimeType: record.mimeType,
-    };
+  if (recordFields.snapshotIds) {
+    recordFields.snapshotIds = record.snapshotIds.map(snapshotId => new ObjectId(snapshotId));
   }
+
+  recordFields.content = record.content;
+  recordFields.created_at = new Date();
+
+  return recordFields;
 }
 
-export function toDomain(recordType, mongoDocument) {
+export function toDomain(mongoDocument) {
   const { _id, serviceId, termsType, documentId, fetchDate, mimeType, isExtractOnly, isRefilter, isFirstRecord, snapshotIds } = mongoDocument;
 
-  const commonAttributes = {
+  const attributes = {
     id: _id.toString(),
     serviceId,
     termsType,
+    documentId,
+    mimeType,
     fetchDate: new Date(fetchDate),
     isFirstRecord: Boolean(isFirstRecord),
+    isExtractOnly: Boolean(isExtractOnly) || Boolean(isRefilter),
+    snapshotIds: snapshotIds?.map(snapshotId => snapshotId.toString()) || [],
   };
 
-  switch (recordType) { // eslint-disable-line default-case
-  case Version:
-    return new Version({
-      ...commonAttributes,
-      isExtractOnly: Boolean(isExtractOnly) || Boolean(isRefilter),
-      snapshotIds: snapshotIds?.map(snapshotId => snapshotId.toString()) || [],
-    });
-  case Snapshot:
-    return new Snapshot({
-      ...commonAttributes,
-      documentId,
-      mimeType,
-    });
+  if (snapshotIds) {
+    return new Version(attributes);
   }
+
+  return new Snapshot(attributes);
 }

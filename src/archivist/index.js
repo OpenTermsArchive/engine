@@ -132,7 +132,7 @@ export default class Archivist extends events.EventEmitter {
           mimeType: sourceDocument.mimeType,
         });
 
-        await this.record(record);
+        await this.recordSnapshot(record);
 
         sourceDocument.snapshotId = record.id;
       }));
@@ -144,7 +144,7 @@ export default class Archivist extends events.EventEmitter {
       return;
     }
 
-    return this.record(new Version({
+    return this.recordVersion(new Version({
       content: await this.extractVersionContent(terms.sourceDocuments),
       snapshotIds: terms.sourceDocuments.map(sourceDocuments => sourceDocuments.snapshotId),
       serviceId: terms.service.id,
@@ -203,17 +203,27 @@ export default class Archivist extends events.EventEmitter {
     return (await Promise.all(sourceDocuments.map(async sourceDocument => this.extract(sourceDocument)))).join('\n\n');
   }
 
-  async record(record) {
-    await this.recorder.record(record);
-
-    const recordType = record.constructor.name;
+  async recordVersion(record) {
+    await this.recorder.recordVersion(record);
 
     if (!record.id) {
-      this.emit(`${recordType.toLowerCase()}NotChanged`, record);
+      this.emit('versionNotChanged', record);
 
       return;
     }
 
-    this.emit(record.isFirstRecord ? `first${recordType}Recorded` : `${recordType.toLowerCase()}Recorded`, record);
+    this.emit(record.isFirstRecord ? 'firstVersionRecorded' : 'versionRecorded', record);
+  }
+
+  async recordSnapshot(record) {
+    await this.recorder.recordSnapshot(record);
+
+    if (!record.id) {
+      this.emit('snapshotNotChanged', record);
+
+      return;
+    }
+
+    this.emit(record.isFirstRecord ? 'firstSnapshotRecorded' : 'snapshotRecorded', record);
   }
 }

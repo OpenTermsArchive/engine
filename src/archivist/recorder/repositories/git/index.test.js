@@ -48,6 +48,7 @@ describe('GitRepository', () => {
   context('Version', () => {
     before(async function () {
       this.timeout(5000);
+
       git = new Git({
         path: RECORDER_PATH,
         author: {
@@ -58,7 +59,7 @@ describe('GitRepository', () => {
 
       await git.initialize();
 
-      subject = new GitRepository(Version, {
+      subject = new GitRepository({
         ...config.get('recorder.versions.storage.git'),
         path: RECORDER_PATH,
       });
@@ -484,6 +485,7 @@ describe('GitRepository', () => {
               termsType: TERMS_TYPE,
               content: CONTENT,
               fetchDate: FETCH_DATE_EARLIER,
+              snapshotIds: [SNAPSHOT_ID],
             }));
 
             ({ id: lastSnapshotId } = await subject.save(new Version({
@@ -491,6 +493,7 @@ describe('GitRepository', () => {
               termsType: TERMS_TYPE,
               content: UPDATED_FILE_CONTENT,
               fetchDate: FETCH_DATE,
+              snapshotIds: [SNAPSHOT_ID],
             })));
 
             latestRecord = await subject.findLatest(SERVICE_PROVIDER_ID, TERMS_TYPE);
@@ -596,7 +599,7 @@ describe('GitRepository', () => {
 
       await git.initialize();
 
-      subject = new GitRepository(Snapshot, {
+      subject = new GitRepository({
         ...config.get('recorder.snapshots.storage.git'),
         path: RECORDER_PATH,
       });
@@ -1129,37 +1132,37 @@ describe('GitRepository', () => {
       deprecatedFirstRecord: {
         path: 'service/terms-deprecated.md',
         content: 'content',
-        message: 'Start tracking Service Terms',
+        message: 'Start tracking Service Terms\n\nThis version was recorded after extracting from snapshot https://github.com/ambanum/OpenTermsArchive-snapshots/commit/513fadb2ae415c87747047e33287805d59e2dd55',
         date: new Date('2023-02-28T01:00:00.000Z'),
       },
       deprecatedRefilter: {
         path: 'service/terms-deprecated.md',
         content: 'content refiltered',
-        message: 'Refilter Service Terms',
+        message: 'Refilter Service Terms\n\nThis version was recorded after extracting from snapshot https://github.com/ambanum/OpenTermsArchive-snapshots/commit/513fadb2ae415c87747047e33287805d59e2dd55',
         date: new Date('2023-02-28T02:00:00.000Z'),
       },
       deprecatedUpdate: {
         path: 'service/terms-deprecated.md',
         content: 'content updated',
-        message: 'Update Service Terms',
+        message: 'Update Service Terms\n\nThis version was recorded after extracting from snapshot https://github.com/ambanum/OpenTermsArchive-snapshots/commit/513fadb2ae415c87747047e33287805d59e2dd55',
         date: new Date('2023-02-28T03:00:00.000Z'),
       },
       currentFirstRecord: {
         path: 'service/terms-current.md',
         content: 'content',
-        message: 'First record of Service Terms',
+        message: 'First record of Service Terms\n\nThis version was recorded after extracting from snapshot https://github.com/ambanum/OpenTermsArchive-snapshots/commit/513fadb2ae415c87747047e33287805d59e2dd55',
         date: new Date('2023-02-28T04:00:00.000Z'),
       },
       currentExtractOnly: {
         path: 'service/terms-current.md',
         content: 'content extract only',
-        message: 'Apply technical or declaration upgrade on Service Terms',
+        message: 'Apply technical or declaration upgrade on Service Terms\n\nThis version was recorded after extracting from snapshot https://github.com/ambanum/OpenTermsArchive-snapshots/commit/513fadb2ae415c87747047e33287805d59e2dd55',
         date: new Date('2023-02-28T05:00:00.000Z'),
       },
       currentUpdate: {
         path: 'service/terms-current.md',
         content: 'content updated',
-        message: 'Record new changes of Service Terms',
+        message: 'Record new changes of Service Terms\n\nThis version was recorded after extracting from snapshot https://github.com/ambanum/OpenTermsArchive-snapshots/commit/513fadb2ae415c87747047e33287805d59e2dd55',
         date: new Date('2023-02-28T06:00:00.000Z'),
       },
     };
@@ -1175,7 +1178,7 @@ describe('GitRepository', () => {
       });
 
       await git.initialize();
-      subject = new GitRepository(Version, {
+      subject = new GitRepository({
         ...config.get('recorder.versions.storage.git'),
         path: RECORDER_PATH,
       });
