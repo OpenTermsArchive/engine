@@ -41,7 +41,7 @@ describe('MongoRepository', () => {
 
   context('Version', () => {
     before(async () => {
-      subject = new MongoRepository(Version, config.get('recorder.versions.storage.mongo'));
+      subject = new MongoRepository(config.get('recorder.versions.storage.mongo'));
       await subject.initialize();
       await client.connect();
       const db = client.db(config.get('recorder.versions.storage.mongo.database'));
@@ -498,6 +498,7 @@ describe('MongoRepository', () => {
               termsType: TERMS_TYPE,
               content: CONTENT,
               fetchDate: FETCH_DATE,
+              snapshotIds: [SNAPSHOT_ID],
             }));
 
             ({ id: lastSnapshotId } = await subject.save(new Version({
@@ -505,6 +506,7 @@ describe('MongoRepository', () => {
               termsType: TERMS_TYPE,
               content: UPDATED_CONTENT,
               fetchDate: FETCH_DATE_LATER,
+              snapshotIds: [SNAPSHOT_ID],
             })));
 
             latestRecord = await subject.findLatest(
@@ -599,7 +601,7 @@ describe('MongoRepository', () => {
 
   context('Snapshot', () => {
     before(async () => {
-      subject = new MongoRepository(Snapshot, config.get('recorder.snapshots.storage.mongo'));
+      subject = new MongoRepository(config.get('recorder.snapshots.storage.mongo'));
       await subject.initialize();
       await client.connect();
       const db = client.db(config.get('recorder.snapshots.storage.mongo.database'));
