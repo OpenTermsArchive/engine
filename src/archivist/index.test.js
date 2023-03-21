@@ -108,7 +108,7 @@ describe('Archivist', function () {
       });
     });
 
-    context('when there is an operational error', () => {
+    context('when there is an operational error with service A', () => {
       before(async () => {
         // as there is no more HTTP request mocks for service A, it should throw an `ENOTFOUND` error which is considered as an expected error in our workflow
         nock.cleanAll();
@@ -203,7 +203,7 @@ describe('Archivist', function () {
           });
         });
 
-        context('when there is an operational error', () => {
+        context('when there is an operational error with service A', () => {
           let inaccessibleContentSpy;
           let versionNotChangedSpy;
           let versionB;
