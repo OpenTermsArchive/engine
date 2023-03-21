@@ -118,8 +118,6 @@ export default class Archivist extends events.EventEmitter {
 
   async trackTermsChanges({ terms, extractOnly = false }) {
     if (!extractOnly) {
-      terms.fetchDate = new Date();
-
       await this.fetchSourceDocuments(terms);
       await this.recordTermsSnapshots(terms);
     } else {
@@ -134,6 +132,8 @@ export default class Archivist extends events.EventEmitter {
   }
 
   async fetchSourceDocuments(terms) {
+    terms.fetchDate = new Date();
+
     const inaccessibleContentErrors = [];
 
     await Promise.all(terms.sourceDocuments.map(async sourceDocument => {
