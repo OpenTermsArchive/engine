@@ -117,11 +117,11 @@ export default class Archivist extends events.EventEmitter {
   }
 
   async trackTermsChanges({ terms, extractOnly = false }) {
-    if (!extractOnly) {
+    if (extractOnly) {
+      await this.loadSourceDocumentsFromSnapshots(terms);
+    } else {
       await this.fetchSourceDocuments(terms);
       await this.recordTermsSnapshots(terms);
-    } else {
-      await this.loadSourceDocumentsFromSnapshots(terms);
     }
 
     if (terms.sourceDocuments.filter(({ content }) => !content).length) {
