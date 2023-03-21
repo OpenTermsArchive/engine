@@ -93,9 +93,7 @@ export default async options => {
                 const terms = service.getTerms(type);
 
                 terms.sourceDocuments.forEach(sourceDocument => {
-                  let content;
                   let filteredContent;
-                  let mimeType;
 
                   context(sourceDocument.location, () => {
                     before(async function () {
@@ -108,7 +106,7 @@ export default async options => {
                     it('fetchable URL', async () => {
                       const { location, executeClientScripts } = sourceDocument;
 
-                      ({ content, mimeType } = await fetch({
+                      ({ content: sourceDocument.content, mimeType: sourceDocument.mimeType } = await fetch({
                         url: location,
                         executeClientScripts,
                         cssSelectors: sourceDocument.cssSelectors,
@@ -117,18 +115,18 @@ export default async options => {
                     });
 
                     it('selector matches an element in the source document', async function checkSelector() {
-                      if (!content) {
+                      if (!sourceDocument.content) {
                         console.log('          [Tests skipped as URL is not fetchable]');
                         this.skip();
                       }
 
-                      filteredContent = await extract({ content, sourceDocument, mimeType });
+                      filteredContent = await extract(sourceDocument);
 
                       expect(filteredContent).to.not.be.empty;
                     });
 
                     it(`filtered content has at least ${MIN_DOC_LENGTH} characters`, async function checkContentLength() {
-                      if (!content) {
+                      if (!sourceDocument.content) {
                         console.log('          [Tests skipped as URL is not fetchable]');
                         this.skip();
                       }
@@ -144,7 +142,7 @@ export default async options => {
                     it('content is consistent when fetched and filtered twice in a row', async function checkContentConsistency() {
                       this.slow(SLOW_DOCUMENT_THRESHOLD * 2);
 
-                      if (!content) {
+                      if (!sourceDocument.content) {
                         console.log('          [Tests skipped as URL is not fetchable]');
                         this.skip();
                       }
@@ -154,13 +152,13 @@ export default async options => {
                         this.skip();
                       }
 
-                      ({ content, mimeType } = await fetch({
+                      ({ content: sourceDocument.content, mimeType: sourceDocument.mimeType } = await fetch({
                         url: sourceDocument.location,
                         executeClientScripts: sourceDocument.executeClientScripts,
                         cssSelectors: sourceDocument.cssSelectors,
                         config: config.get('fetcher'),
                       }));
-                      const secondFilteredContent = await extract({ content, sourceDocument, mimeType });
+                      const secondFilteredContent = await extract(sourceDocument);
 
                       expect(secondFilteredContent).to.equal(filteredContent);
                     });
