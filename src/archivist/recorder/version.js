@@ -7,6 +7,6 @@ export default class Version extends Record {
 
   constructor(params) {
     super(params);
-    this.mimeType = mime.getType('markdown'); // A version is always in markdown format
+    this.mimeType = mime.getType('markdown');
   }
 }
