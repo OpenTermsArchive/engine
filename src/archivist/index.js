@@ -121,21 +121,7 @@ export default class Archivist extends events.EventEmitter {
       terms.fetchDate = new Date();
 
       await this.fetchSourceDocuments(terms);
-
-      await Promise.all(terms.sourceDocuments.map(async sourceDocument => {
-        const record = new Snapshot({
-          serviceId: terms.service.id,
-          termsType: terms.type,
-          documentId: terms.hasMultipleSourceDocuments && sourceDocument.id,
-          fetchDate: terms.fetchDate,
-          content: sourceDocument.content,
-          mimeType: sourceDocument.mimeType,
-        });
-
-        await this.recordSnapshot(record);
-
-        sourceDocument.snapshotId = record.id;
-      }));
+      await this.recordTermsSnapshots(terms);
     } else {
       await this.loadSourceDocumentsFromSnapshots(terms);
     }
@@ -144,14 +130,7 @@ export default class Archivist extends events.EventEmitter {
       return;
     }
 
-    return this.recordVersion(new Version({
-      content: await this.extractVersionContent(terms.sourceDocuments),
-      snapshotIds: terms.sourceDocuments.map(sourceDocuments => sourceDocuments.snapshotId),
-      serviceId: terms.service.id,
-      termsType: terms.type,
-      fetchDate: terms.fetchDate,
-      isExtractOnly: extractOnly,
-    }));
+    return this.recordTermsVersion(terms, extractOnly);
   }
 
   async fetchSourceDocuments(terms) {
@@ -203,27 +182,53 @@ export default class Archivist extends events.EventEmitter {
     return (await Promise.all(sourceDocuments.map(async sourceDocument => this.extract(sourceDocument)))).join('\n\n');
   }
 
-  async recordVersion(record) {
-    await this.recorder.recordVersion(record);
+  async recordTermsVersion(terms, extractOnly) {
+    const record = new Version({
+      content: await this.extractVersionContent(terms.sourceDocuments),
+      snapshotIds: terms.sourceDocuments.map(sourceDocuments => sourceDocuments.snapshotId),
+      serviceId: terms.service.id,
+      termsType: terms.type,
+      fetchDate: terms.fetchDate,
+      isExtractOnly: extractOnly,
+    });
+
+    await this.recorder.recordSnapshot(record);
 
     if (!record.id) {
       this.emit('versionNotChanged', record);
 
-      return;
+      return record;
     }
 
     this.emit(record.isFirstRecord ? 'firstVersionRecorded' : 'versionRecorded', record);
+
+    return record;
   }
 
-  async recordSnapshot(record) {
-    await this.recorder.recordSnapshot(record);
+  async recordTermsSnapshots(terms) {
+    return Promise.all(terms.sourceDocuments.map(async sourceDocument => {
+      const record = new Snapshot({
+        serviceId: terms.service.id,
+        termsType: terms.type,
+        documentId: terms.hasMultipleSourceDocuments && sourceDocument.id,
+        fetchDate: terms.fetchDate,
+        content: sourceDocument.content,
+        mimeType: sourceDocument.mimeType,
+      });
 
-    if (!record.id) {
-      this.emit('snapshotNotChanged', record);
+      await this.recorder.recordVersion(record);
 
-      return;
-    }
+      if (!record.id) {
+        this.emit('snapshotNotChanged', record);
 
-    this.emit(record.isFirstRecord ? 'firstSnapshotRecorded' : 'snapshotRecorded', record);
+        return record;
+      }
+
+      sourceDocument.snapshotId = record.id;
+
+      this.emit(record.isFirstRecord ? 'firstSnapshotRecorded' : 'snapshotRecorded', record);
+
+      return record;
+    }));
   }
 }
