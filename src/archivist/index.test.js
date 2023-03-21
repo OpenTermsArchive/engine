@@ -9,8 +9,6 @@ import sinon from 'sinon';
 import sinonChai from 'sinon-chai';
 
 import Git from './recorder/repositories/git/git.js';
-import Snapshot from './recorder/snapshot.js';
-import Version from './recorder/version.js';
 
 import Archivist, { EVENTS } from './index.js';
 
@@ -279,22 +277,50 @@ describe('Archivist', function () {
       });
     });
 
-    context('Snapshot', () => {
+    describe('#recordTermsSnapshots', () => {
+      let terms;
       let snapshot;
 
-      before(() => {
-        snapshot = new Snapshot({
-          content: 'document content',
-          serviceId: SERVICE_A_ID,
-          termsType: SERVICE_A_TYPE,
-          mimeType: MIME_TYPE,
-          fetchDate: FETCH_DATE,
+      before(async () => {
+        terms = app.services.service_A.getTerms('Terms of Service');
+        terms.fetchDate = FETCH_DATE;
+        terms.sourceDocuments.forEach(async sourceDocument => {
+          sourceDocument.content = serviceASnapshotExpectedContent;
+          sourceDocument.mimeType = MIME_TYPE;
         });
+        resetSpiesHistory();
       });
 
-      describe('#record', () => {
-        context('when it is the first record', () => {
-          before(async () => app.record(snapshot));
+      context('when it is the first record', () => {
+        before(async () => {
+          [snapshot] = await app.recordTermsSnapshots(terms);
+        });
+
+        after(() => {
+          resetSpiesHistory();
+
+          return resetGitRepositories();
+        });
+
+        it('emits "firstSnapshotRecorded" event', async () => {
+          expect(spies.onFirstSnapshotRecorded).to.have.been.calledWith(snapshot);
+        });
+
+        emitsOnly(['firstSnapshotRecorded']);
+      });
+
+      context('when it is not the first record', () => {
+        context('when there are changes', () => {
+          let changedSnapshot;
+
+          before(async () => {
+            await app.recordTermsSnapshots(terms);
+            resetSpiesHistory();
+            terms.sourceDocuments.forEach(async sourceDocument => {
+              sourceDocument.content = serviceBSnapshotExpectedContent;
+            });
+            [changedSnapshot] = await app.recordTermsSnapshots(terms);
+          });
 
           after(() => {
             resetSpiesHistory();
@@ -302,90 +328,81 @@ describe('Archivist', function () {
             return resetGitRepositories();
           });
 
-          it('emits "firstSnapshotRecorded" event', async () => {
-            expect(spies.onFirstSnapshotRecorded).to.have.been.calledWith(snapshot);
+          it('emits "snapshotRecorded" event', async () => {
+            expect(spies.onSnapshotRecorded).to.have.been.calledWith(changedSnapshot);
           });
 
-          emitsOnly(['firstSnapshotRecorded']);
+          emitsOnly(['snapshotRecorded']);
         });
 
-        context('when it is not the first record', () => {
-          context('when there are changes', () => {
-            const changedSnapshot = new Snapshot({
-              content: 'document content modified',
-              serviceId: SERVICE_A_ID,
-              termsType: SERVICE_A_TYPE,
-              mimeType: MIME_TYPE,
-              fetchDate: FETCH_DATE,
-            });
+        context('when there are no changes', () => {
+          let snapshot;
 
-            before(async () => {
-              await app.record(snapshot);
-              resetSpiesHistory();
-              await app.record(changedSnapshot);
-            });
-
-            after(() => {
-              resetSpiesHistory();
-
-              return resetGitRepositories();
-            });
-
-            it('emits "snapshotRecorded" event', async () => {
-              expect(spies.onSnapshotRecorded).to.have.been.calledWith(changedSnapshot);
-            });
-
-            emitsOnly(['snapshotRecorded']);
+          before(async () => {
+            await app.recordTermsSnapshots(terms);
+            resetSpiesHistory();
+            [snapshot] = await app.recordTermsSnapshots(terms);
           });
 
-          context('when there are no changes', () => {
-            let clonedSnapshot;
+          after(() => {
+            resetSpiesHistory();
 
-            before(async () => {
-              await app.record(snapshot);
-              resetSpiesHistory();
-              clonedSnapshot = new Snapshot({
-                content: snapshot.content,
-                serviceId: snapshot.serviceId,
-                termsType: snapshot.termsType,
-                mimeType: snapshot.mimeType,
-                fetchDate: snapshot.fetchDate,
-              });
-              await app.record(clonedSnapshot);
-            });
-
-            after(() => {
-              resetSpiesHistory();
-
-              return resetGitRepositories();
-            });
-
-            it('emits "snapshotNotChanged" event', async () => {
-              expect(spies.onSnapshotNotChanged).to.have.been.calledWith(clonedSnapshot);
-            });
-
-            emitsOnly(['snapshotNotChanged']);
+            return resetGitRepositories();
           });
+
+          it('emits "snapshotNotChanged" event', async () => {
+            expect(spies.onSnapshotNotChanged).to.have.been.calledWith(snapshot);
+          });
+
+          emitsOnly(['snapshotNotChanged']);
         });
       });
     });
 
-    context('Version', () => {
+    describe('#recordTermsVersion', () => {
+      let terms;
       let version;
 
-      before(() => {
-        version = new Version({
-          content: serviceAVersionExpectedContent,
-          snapshotIds: ['sha'],
-          fetchDate: FETCH_DATE,
-          serviceId: SERVICE_A_ID,
-          termsType: SERVICE_A_TYPE,
+      before(async () => {
+        terms = app.services.service_A.getTerms('Terms of Service');
+        terms.fetchDate = FETCH_DATE;
+        terms.sourceDocuments.forEach(async sourceDocument => {
+          sourceDocument.content = serviceASnapshotExpectedContent;
+          sourceDocument.mimeType = MIME_TYPE;
         });
+        resetSpiesHistory();
       });
 
-      describe('#record', () => {
-        context('when it is the first record', () => {
-          before(async () => app.record(version));
+      context('when it is the first record', () => {
+        before(async () => {
+          version = await app.recordTermsVersion(terms);
+        });
+
+        after(() => {
+          resetSpiesHistory();
+
+          return resetGitRepositories();
+        });
+
+        it('emits "firstVersionRecorded" event', async () => {
+          expect(spies.onFirstVersionRecorded).to.have.been.calledWith(version);
+        });
+
+        emitsOnly(['firstVersionRecorded']);
+      });
+
+      context('when it is not the first record', () => {
+        context('when there are changes', () => {
+          let changedVersion;
+
+          before(async () => {
+            await app.recordTermsVersion(terms);
+            resetSpiesHistory();
+            terms.sourceDocuments.forEach(async sourceDocument => {
+              sourceDocument.content = serviceBSnapshotExpectedContent;
+            });
+            changedVersion = await app.recordTermsVersion(terms);
+          });
 
           after(() => {
             resetSpiesHistory();
@@ -393,71 +410,33 @@ describe('Archivist', function () {
             return resetGitRepositories();
           });
 
-          it('emits "firstVersionRecorded" event', async () => {
-            expect(spies.onFirstVersionRecorded).to.have.been.calledWith(version);
+          it('emits "versionRecorded" event', async () => {
+            expect(spies.onVersionRecorded).to.have.been.calledWith(changedVersion);
           });
 
-          emitsOnly(['firstVersionRecorded']);
+          emitsOnly(['versionRecorded']);
         });
 
-        context('when it is not the first record', () => {
-          context('when there are changes', () => {
-            let changedVersion;
+        context('when there are no changes', () => {
+          let version;
 
-            before(async () => {
-              await app.record(version);
-              resetSpiesHistory();
-              changedVersion = new Version({
-                content: serviceBSnapshotExpectedContent,
-                fetchDate: FETCH_DATE,
-                snapshotIds: ['sha'],
-                serviceId: SERVICE_A_ID,
-                termsType: SERVICE_A_TYPE,
-              });
-              await app.record(changedVersion);
-            });
-
-            after(() => {
-              resetSpiesHistory();
-
-              return resetGitRepositories();
-            });
-
-            it('emits "versionRecorded" event', async () => {
-              expect(spies.onVersionRecorded).to.have.been.calledWith(changedVersion);
-            });
-
-            emitsOnly(['versionRecorded']);
+          before(async () => {
+            await app.recordTermsVersion(terms);
+            resetSpiesHistory();
+            version = await app.recordTermsVersion(terms);
           });
 
-          context('when there are no changes', () => {
-            let clonedVersion;
+          after(() => {
+            resetSpiesHistory();
 
-            before(async () => {
-              await app.record(version);
-              resetSpiesHistory();
-              clonedVersion = new Version({
-                content: version.content,
-                serviceId: version.serviceId,
-                termsType: version.termsType,
-                snapshotIds: version.snapshotIds,
-                fetchDate: version.fetchDate,
-              });
-              await app.record(clonedVersion);
-            });
-
-            after(() => {
-              resetSpiesHistory();
-
-              return resetGitRepositories();
-            });
-
-            it('emits "versionNotChanged" event', async () => {
-              expect(spies.onVersionNotChanged).to.have.been.calledWith(clonedVersion);
-            });
-
-            emitsOnly(['versionNotChanged']);
+            return resetGitRepositories();
           });
+
+          it('emits "versionNotChanged" event', async () => {
+            expect(spies.onVersionNotChanged).to.have.been.calledWith(version);
+          });
+
+          emitsOnly(['versionNotChanged']);
         });
       });
     });
