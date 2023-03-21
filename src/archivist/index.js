@@ -119,13 +119,14 @@ export default class Archivist extends events.EventEmitter {
   async trackTermsChanges({ terms, extractOnly = false }) {
     if (extractOnly) {
       await this.loadTermsSourceDocumentsFromSnapshots(terms);
+
+      if (terms.sourceDocuments.filter(sourceDocument => !sourceDocument.content).length) {
+        // If some source documents do not have associated snapshots, it is not possible to generate a fully valid version.
+        return;
+      }
     } else {
       await this.fetchTermsSourceDocuments(terms);
       await this.recordTermsSnapshots(terms);
-    }
-
-    if (terms.sourceDocuments.filter(({ content }) => !content).length) {
-      return;
     }
 
     return this.recordTermsVersion(terms, extractOnly);
