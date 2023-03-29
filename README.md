@@ -141,7 +141,7 @@ In an editor, create the following declaration file in `declarations/Open Terms 
 In the terminal:
 
 ```sh
-npx ota-track
+npx ota track
 ```
 
 The tracked terms can be found in the `data` folder.
