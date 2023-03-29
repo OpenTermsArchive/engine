@@ -22,7 +22,7 @@ const RECORDER_PATH = path.resolve(__dirname, '../../../../..', config.get('reco
 
 const SERVICE_PROVIDER_ID = 'test_service';
 const TERMS_TYPE = 'Terms of Service';
-const DOCUMENT_ID = 'community-standards-hate-speech';
+const DOCUMENT_ID = '126382350847838';
 const CONTENT = 'ToS fixture data with UTF-8 çhãràčtęrs';
 
 const BASE_PATH = `${RECORDER_PATH}/${SERVICE_PROVIDER_ID}/${TERMS_TYPE}`;
@@ -893,6 +893,7 @@ describe('GitRepository', () => {
           termsType: TERMS_TYPE,
           content: CONTENT,
           fetchDate: FETCH_DATE,
+          documentId: DOCUMENT_ID,
           mimeType: HTML_MIME_TYPE,
         }));
 
