@@ -65,6 +65,8 @@ export default class Archivist extends events.EventEmitter {
       await this.recorder.finalize().then(() => console.log('Recorder finalized'));
       process.exit(1);
     });
+
+    return this;
   }
 
   initQueue() {
