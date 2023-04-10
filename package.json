@@ -100,7 +100,8 @@
     "node-stream-zip": "^1.15.0",
     "prettier": "^2.2.1",
     "sinon": "^12.0.1",
-    "sinon-chai": "^3.7.0"
+    "sinon-chai": "^3.7.0",
+    "supertest": "^6.3.3"
   },
   "peerDependencies": {
     "@opentermsarchive/terms-types": "~0.1.1"

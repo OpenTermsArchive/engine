@@ -6,21 +6,22 @@ export default class Service {
     this.name = name;
   }
 
-  getTerms(termsType, date) {
-    if (!this.terms[termsType]) {
-      return null;
+  getTerms(termsType) {
+    if (!termsType) {
+      return this.getTermsTypes().map(termsType => this.getTerms(termsType));
+    }
+
+    return this.terms[termsType]?.latest;
+  }
+
+  getTermsAtDate(termsType, date) {
+    if (!date) {
+      return this.getTerms(termsType);
     }
 
     const { latest: currentlyValidTerms, history } = this.terms[termsType];
 
-    if (!date) {
-      return currentlyValidTerms;
-    }
-
-    return (
-      history?.find(entry => new Date(date) <= new Date(entry.validUntil))
-      || currentlyValidTerms
-    );
+    return history?.find(entry => new Date(date) <= new Date(entry.validUntil)) || currentlyValidTerms;
   }
 
   getTermsTypes() {

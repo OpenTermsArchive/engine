@@ -19,18 +19,18 @@ describe('Service', () => {
       });
     });
 
-    context('when terms declaration has no validity date', () => {
+    context('when terms has no validity date', () => {
       before(async () => {
         subject = new Service({ id: 'serviceID', name: 'serviceName' });
         subject.addTerms(terms);
       });
 
-      it('adds the terms as the last valid terms declaration', async () => {
+      it('adds the terms as the last valid terms', async () => {
         expect(subject.getTerms(TERMS_TYPE)).to.deep.eql(terms);
       });
     });
 
-    context('when terms declaration has a validity date', () => {
+    context('when terms has a validity date', () => {
       let expiredTerms;
       const VALIDITY_DATE = new Date('2020-07-22T11:30:21.000Z');
 
@@ -46,7 +46,7 @@ describe('Service', () => {
       });
 
       it('adds the terms with the proper validity date', async () => {
-        expect(subject.getTerms(TERMS_TYPE, VALIDITY_DATE)).to.deep.eql(expiredTerms);
+        expect(subject.getTermsAtDate(TERMS_TYPE, VALIDITY_DATE)).to.deep.eql(expiredTerms);
       });
     });
   });
@@ -54,59 +54,85 @@ describe('Service', () => {
   describe('#getTerms', () => {
     let subject;
 
-    const lastDeclaration = new Terms({ type: TERMS_TYPE });
+    const termsOfService = new Terms({ type: TERMS_TYPE });
+    const privacyPolicy = new Terms({ type: 'Privacy Policy' });
+
+    before(async () => {
+      subject = new Service({ id: 'serviceID', name: 'serviceName' });
+      subject.addTerms(termsOfService);
+      subject.addTerms(privacyPolicy);
+    });
+
+    it('returns all terms', async () => {
+      expect(subject.getTerms()).to.deep.eql([
+        termsOfService,
+        privacyPolicy,
+      ]);
+    });
+
+    context('when a terms type is given', () => {
+      it('returns the terms of that type', async () => {
+        expect(subject.getTerms(TERMS_TYPE)).to.eql(termsOfService);
+      });
+    });
+  });
+
+  describe('#getTermsAtDate', () => {
+    let subject;
+
+    const last = new Terms({ type: TERMS_TYPE });
 
     context('when there is no history', () => {
       before(async () => {
         subject = new Service({ id: 'serviceID', name: 'serviceName' });
-        subject.addTerms(lastDeclaration);
+        subject.addTerms(last);
       });
 
       context('without given date', () => {
-        it('returns the last terms declaration', async () => {
-          expect(subject.getTerms(TERMS_TYPE)).to.eql(lastDeclaration);
+        it('returns the last terms', async () => {
+          expect(subject.getTermsAtDate(TERMS_TYPE)).to.eql(last);
         });
       });
 
       context('with a date', () => {
-        it('returns the last terms declaration', async () => {
-          expect(subject.getTerms(TERMS_TYPE, '2020-08-21T11:30:21.000Z')).to.eql(lastDeclaration);
+        it('returns the last terms', async () => {
+          expect(subject.getTermsAtDate(TERMS_TYPE, '2020-08-21T11:30:21.000Z')).to.eql(last);
         });
       });
     });
 
     context('when the terms have a history', () => {
-      const firstDeclaration = new Terms({
+      const first = new Terms({
         type: TERMS_TYPE,
         validUntil: '2020-07-22T11:30:21.000Z',
       });
 
-      const secondDeclaration = new Terms({
+      const second = new Terms({
         type: TERMS_TYPE,
         validUntil: '2020-08-22T11:30:21.000Z',
       });
 
       before(async () => {
         subject = new Service({ id: 'serviceID', name: 'serviceName' });
-        subject.addTerms(lastDeclaration);
-        subject.addTerms(firstDeclaration);
-        subject.addTerms(secondDeclaration);
+        subject.addTerms(last);
+        subject.addTerms(first);
+        subject.addTerms(second);
       });
 
       context('without given date', () => {
-        it('returns the last terms declaration', async () => {
-          expect(subject.getTerms(TERMS_TYPE)).to.eql(lastDeclaration);
+        it('returns the last terms', async () => {
+          expect(subject.getTermsAtDate(TERMS_TYPE)).to.eql(last);
         });
       });
 
       context('with a date', () => {
-        it('returns the terms declaration according to the given date', async () => {
-          expect(subject.getTerms(TERMS_TYPE, '2020-08-21T11:30:21.000Z')).to.eql(secondDeclaration);
+        it('returns the terms according to the given date', async () => {
+          expect(subject.getTermsAtDate(TERMS_TYPE, '2020-08-21T11:30:21.000Z')).to.eql(second);
         });
 
-        context('strictly equal to a terms declaration validity date', () => {
-          it('returns the terms declaration with the validity date equal to the given date', async () => {
-            expect(subject.getTerms(TERMS_TYPE, secondDeclaration.validUntil)).to.eql(secondDeclaration);
+        context('strictly equal to a terms validity date', () => {
+          it('returns the terms with the validity date equal to the given date', async () => {
+            expect(subject.getTermsAtDate(TERMS_TYPE, second.validUntil)).to.eql(second);
           });
         });
       });
@@ -115,27 +141,27 @@ describe('Service', () => {
 
   describe('#getTermsTypes', () => {
     let subject;
-    let termsOfServiceDeclaration;
-    let privacyPolicyDeclaration;
+    let termsOfService;
+    let privacyPolicy;
 
     before(async () => {
       subject = new Service({ id: 'serviceID', name: 'serviceName' });
 
-      termsOfServiceDeclaration = new Terms({ type: TERMS_TYPE });
+      termsOfService = new Terms({ type: TERMS_TYPE });
 
-      privacyPolicyDeclaration = new Terms({
+      privacyPolicy = new Terms({
         type: 'Privacy Policy',
         validUntil: '2020-07-22T11:30:21.000Z',
       });
 
-      subject.addTerms(termsOfServiceDeclaration);
-      subject.addTerms(privacyPolicyDeclaration);
+      subject.addTerms(termsOfService);
+      subject.addTerms(privacyPolicy);
     });
 
     it('returns the service terms types', async () => {
       expect(subject.getTermsTypes()).to.have.members([
-        termsOfServiceDeclaration.type,
-        privacyPolicyDeclaration.type,
+        termsOfService.type,
+        privacyPolicy.type,
       ]);
     });
   });
