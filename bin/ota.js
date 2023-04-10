@@ -14,4 +14,5 @@ program
   .command('validate', 'Run a series of tests to check the validity of terms declarations')
   .command('lint', 'Check format and stylistic errors in declarations and auto fix them')
   .command('dataset', 'Export the versions dataset into a ZIP file and optionally publish it to GitHub releases')
+  .command('serve', 'Start the collection metadata API server')
   .parse(process.argv);
