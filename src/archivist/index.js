@@ -118,21 +118,21 @@ export default class Archivist extends events.EventEmitter {
 
   async trackTermsChanges({ terms, extractOnly = false }) {
     if (!extractOnly) {
-      await this.fetchTermsSourceDocuments(terms);
-      await this.recordTermsSnapshots(terms);
+      await this.fetchSourceDocuments(terms);
+      await this.recordSnapshots(terms);
     }
 
-    await this.loadTermsSourceDocumentsFromSnapshots(terms);
+    await this.loadSourceDocumentsFromSnapshots(terms);
 
     if (terms.sourceDocuments.filter(sourceDocument => !sourceDocument.content).length) {
       // If some source documents do not have associated snapshots, it is not possible to generate a fully valid version
       return;
     }
 
-    return this.recordTermsVersion(terms, extractOnly);
+    return this.recordVersion(terms, extractOnly);
   }
 
-  async fetchTermsSourceDocuments(terms) {
+  async fetchSourceDocuments(terms) {
     terms.fetchDate = new Date();
 
     const inaccessibleContentErrors = [];
@@ -167,7 +167,7 @@ export default class Archivist extends events.EventEmitter {
     }
   }
 
-  async loadTermsSourceDocumentsFromSnapshots(terms) {
+  async loadSourceDocumentsFromSnapshots(terms) {
     return Promise.all(terms.sourceDocuments.map(async sourceDocument => {
       const snapshot = await this.recorder.getLatestSnapshot(terms, sourceDocument.id);
 
@@ -185,7 +185,7 @@ export default class Archivist extends events.EventEmitter {
     return (await Promise.all(sourceDocuments.map(async sourceDocument => this.extract(sourceDocument)))).join(Version.SOURCE_DOCUMENTS_SEPARATOR);
   }
 
-  async recordTermsVersion(terms, extractOnly) {
+  async recordVersion(terms, extractOnly) {
     const record = new Version({
       content: await this.extractVersionContent(terms.sourceDocuments),
       snapshotIds: terms.sourceDocuments.map(sourceDocuments => sourceDocuments.snapshotId),
@@ -208,7 +208,7 @@ export default class Archivist extends events.EventEmitter {
     return record;
   }
 
-  async recordTermsSnapshots(terms) {
+  async recordSnapshots(terms) {
     return Promise.all(terms.sourceDocuments.map(async sourceDocument => {
       const record = new Snapshot({
         serviceId: terms.service.id,

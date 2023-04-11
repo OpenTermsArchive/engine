@@ -277,7 +277,7 @@ describe('Archivist', function () {
       });
     });
 
-    describe('#recordTermsSnapshots', () => {
+    describe('#recordSnapshots', () => {
       let terms;
       let snapshot;
 
@@ -293,7 +293,7 @@ describe('Archivist', function () {
 
       context('when it is the first record', () => {
         before(async () => {
-          [snapshot] = await app.recordTermsSnapshots(terms);
+          [snapshot] = await app.recordSnapshots(terms);
         });
 
         after(() => {
@@ -314,12 +314,12 @@ describe('Archivist', function () {
           let changedSnapshot;
 
           before(async () => {
-            await app.recordTermsSnapshots(terms);
+            await app.recordSnapshots(terms);
             resetSpiesHistory();
             terms.sourceDocuments.forEach(async sourceDocument => {
               sourceDocument.content = serviceBSnapshotExpectedContent;
             });
-            [changedSnapshot] = await app.recordTermsSnapshots(terms);
+            [changedSnapshot] = await app.recordSnapshots(terms);
           });
 
           after(() => {
@@ -339,9 +339,9 @@ describe('Archivist', function () {
           let snapshot;
 
           before(async () => {
-            await app.recordTermsSnapshots(terms);
+            await app.recordSnapshots(terms);
             resetSpiesHistory();
-            [snapshot] = await app.recordTermsSnapshots(terms);
+            [snapshot] = await app.recordSnapshots(terms);
           });
 
           after(() => {
@@ -359,7 +359,7 @@ describe('Archivist', function () {
       });
     });
 
-    describe('#recordTermsVersion', () => {
+    describe('#recordVersion', () => {
       let terms;
       let version;
 
@@ -375,7 +375,7 @@ describe('Archivist', function () {
 
       context('when it is the first record', () => {
         before(async () => {
-          version = await app.recordTermsVersion(terms);
+          version = await app.recordVersion(terms);
         });
 
         after(() => {
@@ -396,12 +396,12 @@ describe('Archivist', function () {
           let changedVersion;
 
           before(async () => {
-            await app.recordTermsVersion(terms);
+            await app.recordVersion(terms);
             resetSpiesHistory();
             terms.sourceDocuments.forEach(async sourceDocument => {
               sourceDocument.content = serviceBSnapshotExpectedContent;
             });
-            changedVersion = await app.recordTermsVersion(terms);
+            changedVersion = await app.recordVersion(terms);
           });
 
           after(() => {
@@ -421,9 +421,9 @@ describe('Archivist', function () {
           let version;
 
           before(async () => {
-            await app.recordTermsVersion(terms);
+            await app.recordVersion(terms);
             resetSpiesHistory();
-            version = await app.recordTermsVersion(terms);
+            version = await app.recordVersion(terms);
           });
 
           after(() => {
