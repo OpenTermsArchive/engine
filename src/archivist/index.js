@@ -171,11 +171,13 @@ export default class Archivist extends events.EventEmitter {
     return Promise.all(terms.sourceDocuments.map(async sourceDocument => {
       const snapshot = await this.recorder.getLatestSnapshot(terms, sourceDocument.id);
 
-      if (snapshot) {
-        sourceDocument.content = snapshot.content;
-        sourceDocument.mimeType = snapshot.mimeType;
-        terms.fetchDate = snapshot.fetchDate;
+      if (!snapshot) { // This can happen if one of the source documents for a terms has not yet been fetched
+        return;
       }
+
+      sourceDocument.content = snapshot.content;
+      sourceDocument.mimeType = snapshot.mimeType;
+      terms.fetchDate = snapshot.fetchDate;
     }));
   }
 
