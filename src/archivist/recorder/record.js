@@ -22,7 +22,7 @@ export default class Record {
 
   get content() {
     if (this.#content === undefined) {
-      throw new Error(`${this.constructor.name} content not defined, set the content or use Repository#loadRecordContent`);
+      throw new Error('Content not defined, set the content or use Repository#loadRecordContent');
     }
 
     return this.#content;
