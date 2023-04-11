@@ -62,21 +62,20 @@ export function toDomain(commit) {
   const snapshotIdsMatch = body.match(/\b[0-9a-f]{5,40}\b/g);
 
   const [ termsType, documentId ] = path.basename(relativeFilePath, path.extname(relativeFilePath)).split(TERMS_TYPE_AND_DOCUMENT_ID_SEPARATOR);
-  const mimeType = mime.getType(relativeFilePath);
 
   const attributes = {
     id: hash,
     serviceId: path.dirname(relativeFilePath),
     termsType,
     documentId,
-    mimeType,
+    mimeType: mime.getType(relativeFilePath),
     fetchDate: new Date(date),
     isFirstRecord: message.startsWith(COMMIT_MESSAGE_PREFIXES.startTracking) || message.startsWith(COMMIT_MESSAGE_PREFIXES.deprecated_startTracking),
     isExtractOnly: message.startsWith(COMMIT_MESSAGE_PREFIXES.extractOnly) || message.startsWith(COMMIT_MESSAGE_PREFIXES.deprecated_refilter),
     snapshotIds: snapshotIdsMatch || [],
   };
 
-  if (mimeType == mime.getType('markdown')) {
+  if (attributes.mimeType == mime.getType('markdown')) {
     return new Version(attributes);
   }
 
