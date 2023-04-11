@@ -282,7 +282,7 @@ describe('Archivist', function () {
       let snapshot;
 
       before(async () => {
-        terms = app.services.service_A.getTerms('Terms of Service');
+        terms = app.services.service_A.getTerms(SERVICE_A_TYPE);
         terms.fetchDate = FETCH_DATE;
         terms.sourceDocuments.forEach(async sourceDocument => {
           sourceDocument.content = serviceASnapshotExpectedContent;
@@ -364,7 +364,7 @@ describe('Archivist', function () {
       let version;
 
       before(async () => {
-        terms = app.services.service_A.getTerms('Terms of Service');
+        terms = app.services.service_A.getTerms(SERVICE_A_TYPE);
         terms.fetchDate = FETCH_DATE;
         terms.sourceDocuments.forEach(async sourceDocument => {
           sourceDocument.content = serviceASnapshotExpectedContent;
