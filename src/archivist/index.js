@@ -180,7 +180,7 @@ export default class Archivist extends events.EventEmitter {
   }
 
   async extractVersionContent(sourceDocuments) {
-    return (await Promise.all(sourceDocuments.map(async sourceDocument => this.extract(sourceDocument)))).join('\n\n');
+    return (await Promise.all(sourceDocuments.map(async sourceDocument => this.extract(sourceDocument)))).join(Version.SOURCE_DOCUMENTS_SEPARATOR);
   }
 
   async recordTermsVersion(terms, extractOnly) {
