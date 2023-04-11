@@ -21,31 +21,15 @@ describe('Version', () => {
       describe(`"${requiredParam}"`, () => {
         context('when missing', () => {
           it('throws an error', async () => {
-            try {
-              subject = new Version({ ...validParamsExceptTheOneTested });
-              subject.validate();
-            } catch (e) {
-              expect(e).to.be.an('error');
-              expect(e.message).to.have.string(requiredParam);
-
-              return;
-            }
-            expect.fail('No error was thrown');
+            subject = new Version({ ...validParamsExceptTheOneTested });
+            expect(subject.validate.bind(subject)).to.throw(RegExp(requiredParam));
           });
         });
 
         context('when null', () => {
           it('throws an error', async () => {
-            try {
-              subject = new Version({ ...validParamsExceptTheOneTested, [requiredParam]: null });
-              subject.validate();
-            } catch (e) {
-              expect(e).to.be.an('error');
-              expect(e.message).to.have.string(requiredParam);
-
-              return;
-            }
-            expect.fail('No error was thrown');
+            subject = new Version({ ...validParamsExceptTheOneTested, [requiredParam]: null });
+            expect(subject.validate.bind(subject)).to.throw(RegExp(requiredParam));
           });
         });
       });

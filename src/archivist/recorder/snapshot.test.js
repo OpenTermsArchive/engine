@@ -21,31 +21,15 @@ describe('Snapshot', () => {
       describe(`"${requiredParam}"`, () => {
         context('when missing', () => {
           it('throws an error', async () => {
-            try {
-              subject = new Snapshot({ ...validParamsExceptTheOneTested });
-              subject.validate();
-            } catch (e) {
-              expect(e).to.be.an('error');
-              expect(e.message).to.have.string(requiredParam);
-
-              return;
-            }
-            expect.fail('No error was thrown');
+            subject = new Snapshot({ ...validParamsExceptTheOneTested });
+            expect(subject.validate.bind(subject)).to.throw(RegExp(requiredParam));
           });
         });
 
         context('when null', () => {
           it('throws an error', async () => {
-            try {
-              subject = new Snapshot({ ...validParamsExceptTheOneTested, [requiredParam]: null });
-              subject.validate();
-            } catch (e) {
-              expect(e).to.be.an('error');
-              expect(e.message).to.have.string(requiredParam);
-
-              return;
-            }
-            expect.fail('No error was thrown');
+            subject = new Snapshot({ ...validParamsExceptTheOneTested, [requiredParam]: null });
+            expect(subject.validate.bind(subject)).to.throw(RegExp(requiredParam));
           });
         });
       });
