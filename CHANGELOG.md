@@ -6,6 +6,10 @@ All changes that impact users of this module are documented in this file, in the
 
 ### Changed
 - Change URL to engine repo from ambanum/OpenTermsArchive to OpenTermsArchive/engine
+- Replace information by links to documentation website 
+
+### Removed
+- Erase `docs` folder to avoid redundant documentation
 
 ## 0.26.0 - 2023-02-20
 
