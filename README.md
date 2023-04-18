@@ -4,17 +4,7 @@ _The document you are reading now is targeted at developers wanting to use or co
 
 This codebase is a Node.js module enabling downloading, archiving and publishing versions of documents obtained online. It can be used independently from the Open Terms Archive ecosystem.
 
-- - -
-
-## Table of contents
-
-- [Motivation](https://docs.opentermsarchive.org/#motivation)
-- [Main concepts](https://docs.opentermsarchive.org/#main-concepts)
-- [Add terms to a collection](https://docs.opentermsarchive.org/#add-terms-to-a-collection)
-- [Use the engine](https://docs.opentermsarchive.org/#use-the-engine)
-- [Configuring](https://docs.opentermsarchive.org/#configuring)
-- [Deploying](https://docs.opentermsarchive.org/#deploying)
-- [Contributing](https://docs.opentermsarchive.org/#contributing)
+For documentation, visit [docs.opentermsarchive.org](https://docs.opentermsarchive.org/)
 
 - - -
 
