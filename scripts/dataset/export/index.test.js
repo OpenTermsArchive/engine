@@ -8,8 +8,8 @@ import dircompare from 'dir-compare';
 import mime from 'mime';
 import StreamZip from 'node-stream-zip';
 
-import Record from '../../../src/archivist/recorder/record.js';
 import GitRepository from '../../../src/archivist/recorder/repositories/git/index.js';
+import Version from '../../../src/archivist/recorder/version.js';
 
 import generateArchive from './index.js';
 
@@ -20,8 +20,8 @@ const { expect } = chai;
 const FIRST_SERVICE_PROVIDER_ID = 'ServiceA';
 const SECOND_SERVICE_PROVIDER_ID = 'ServiceB';
 
-const FIRST_DOCUMENT_TYPE = 'Terms of Service';
-const SECOND_DOCUMENT_TYPE = 'Privacy Policy';
+const FIRST_TERMS_TYPE = 'Terms of Service';
+const SECOND_TERMS_TYPE = 'Privacy Policy';
 
 const FIRST_FETCH_DATE = '2021-01-01T11:27:00.000Z';
 const SECOND_FETCH_DATE = '2021-01-11T11:32:47.000Z';
@@ -30,8 +30,6 @@ const FOURTH_FETCH_DATE = '2022-01-01T12:12:24.000Z';
 
 const FIRST_CONTENT = 'First Content';
 const SECOND_CONTENT = 'Second Content';
-
-const MIME_TYPE = 'text/markdown';
 
 const SNAPSHOT_ID = '721ce4a63ad399ecbdb548a66d6d327e7bc97876';
 
@@ -56,38 +54,34 @@ describe('Export', () => {
 
       await repository.initialize();
 
-      await repository.save(new Record({
+      await repository.save(new Version({
         serviceId: FIRST_SERVICE_PROVIDER_ID,
-        documentType: FIRST_DOCUMENT_TYPE,
+        termsType: FIRST_TERMS_TYPE,
         content: FIRST_CONTENT,
-        mimeType: MIME_TYPE,
         fetchDate: FIRST_FETCH_DATE,
         snapshotId: SNAPSHOT_ID,
       }));
 
-      await repository.save(new Record({
+      await repository.save(new Version({
         serviceId: FIRST_SERVICE_PROVIDER_ID,
-        documentType: FIRST_DOCUMENT_TYPE,
+        termsType: FIRST_TERMS_TYPE,
         content: SECOND_CONTENT,
-        mimeType: MIME_TYPE,
         fetchDate: SECOND_FETCH_DATE,
         snapshotId: SNAPSHOT_ID,
       }));
 
-      await repository.save(new Record({
+      await repository.save(new Version({
         serviceId: SECOND_SERVICE_PROVIDER_ID,
-        documentType: FIRST_DOCUMENT_TYPE,
+        termsType: FIRST_TERMS_TYPE,
         content: FIRST_CONTENT,
-        mimeType: MIME_TYPE,
         fetchDate: THIRD_FETCH_DATE,
         snapshotId: SNAPSHOT_ID,
       }));
 
-      await repository.save(new Record({
+      await repository.save(new Version({
         serviceId: SECOND_SERVICE_PROVIDER_ID,
-        documentType: SECOND_DOCUMENT_TYPE,
+        termsType: SECOND_TERMS_TYPE,
         content: FIRST_CONTENT,
-        mimeType: MIME_TYPE,
         fetchDate: FOURTH_FETCH_DATE,
         snapshotId: SNAPSHOT_ID,
       }));

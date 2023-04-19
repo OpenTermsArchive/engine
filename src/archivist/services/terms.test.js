@@ -1,15 +1,15 @@
 import chai from 'chai';
 
-import DocumentDeclaration from './documentDeclaration.js';
-import PageDeclaration from './pageDeclaration.js';
+import SourceDocument from './sourceDocument.js';
+import Terms from './terms.js';
 
 const { expect } = chai;
 
-describe('DocumentDeclaration', () => {
+describe('Terms', () => {
   const service = { name: 'Service' };
-  const type = 'Terms of Service';
+  const termsType = 'Terms of Service';
   const URL = 'https://www.service.example/terms';
-  const page1 = new PageDeclaration({
+  const document1 = new SourceDocument({
     location: URL,
     contentSelectors: [
       {
@@ -18,7 +18,7 @@ describe('DocumentDeclaration', () => {
       },
       'body',
     ],
-    noiseSelectors: [
+    insignificantContentSelectors: [
       {
         startBefore: '#startBefore',
         endBefore: '#endBefore',
@@ -26,7 +26,7 @@ describe('DocumentDeclaration', () => {
       'body',
     ],
   });
-  const page1AsJSON = {
+  const document1AsJSON = {
     fetch: URL,
     select: [
       {
@@ -46,12 +46,12 @@ describe('DocumentDeclaration', () => {
     executeClientScripts: undefined,
   };
 
-  const page2 = new PageDeclaration({
+  const document2 = new SourceDocument({
     location: URL,
     contentSelectors: 'body',
   });
 
-  const page2AsJSON = {
+  const document2AsJSON = {
     fetch: URL,
     select: 'body',
     remove: undefined,
@@ -60,23 +60,23 @@ describe('DocumentDeclaration', () => {
   };
 
   describe('#toPersistence', () => {
-    it('converts one page document to JSON representation', async () => {
-      const result = new DocumentDeclaration({ service, type, pages: [page1] }).toPersistence();
+    it('converts terms with single source document to JSON representation', async () => {
+      const result = new Terms({ service, type: termsType, sourceDocuments: [document1] }).toPersistence();
 
       const expectedResult = {
         name: service.name,
-        documents: { [type]: page1AsJSON },
+        documents: { [termsType]: document1AsJSON },
       };
 
       expect(result).to.deep.equal(expectedResult);
     });
 
-    it('converts multipage document to JSON representation', async () => {
-      const result = new DocumentDeclaration({ service, type, pages: [ page1, page2 ] }).toPersistence();
+    it('converts terms with multiple source documents to JSON representation', async () => {
+      const result = new Terms({ service, type: termsType, sourceDocuments: [ document1, document2 ] }).toPersistence();
 
       const expectedResult = {
         name: service.name,
-        documents: { [type]: { combine: [ page1AsJSON, page2AsJSON ] } },
+        documents: { [termsType]: { combine: [ document1AsJSON, document2AsJSON ] } },
       };
 
       expect(result).to.deep.equal(expectedResult);

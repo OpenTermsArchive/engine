@@ -2,7 +2,23 @@
 
 All changes that impact users of this module are documented in this file, in the [Common Changelog](https://common-changelog.org) format with some additional specifications defined in the CONTRIBUTING file. This codebase adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased
+## Unreleased [minor]
+
+_Full changeset and discussions: [#996](https://github.com/OpenTermsArchive/engine/pull/996), [#999](https://github.com/OpenTermsArchive/engine/pull/999), [#1000](https://github.com/OpenTermsArchive/engine/pull/1000)._
+
+### Changed
+
+- **Breaking:** Rename CLI option `--terms-types` to `--types` in API; simply rename accordingly in your own codebase
+- **Breaking:** Rename CLI option `--refilter-only`, `-r` to `--extract-only`, `-e` in API; simply rename accordingly in your own codebase
+- **Breaking:** Rename class `PageDeclaration` to `SourceDocument` and its atribute `noiseSelectors` to `insignificantContentSelectors` in API; simply rename accordingly in your own codebase
+- **Breaking:** Rename function and its parameters `filter({ content, mimeType, pageDeclaration })` to `extract(sourceDocument)` in API; `content` and `mimeType` are embedded `sourceDocument` attributes; rename accordingly in your own codebase and set `content` and `mimeType` in the `sourceDocument` passed as a parameter to the function
+- **Breaking:** Rephrase commit messages in Git storage: `Start tracking` is changed to `First record of`, `Refilter` to `Apply technical or declaration upgrade on` and `Update` to `Record new changes of`; existing data will still be loaded, but new commits will use these new messages, if you have scripts that parse commit messages directly, update them accordingly
+- **Breaking:** Rename document attribute `isRefilter` to `isExtractOnly` in MongoDB storage; existing data will still be loaded, but new entries will use this new attribute, if you have scripts that query the Mongo database directly, update them accordingly
+- Make vocabulary consistent throughout the codebase ([#971](https://github.com/OpenTermsArchive/engine/pull/971))
+
+### Removed
+
+- **Breaking:** Remove `npm run extract` command; use `npm run start -- --extract-only` instead
 
 ## 0.26.1 - 2023-04-19
 
@@ -68,7 +84,7 @@ _Full changeset and discussions: [#981](https://github.com/OpenTermsArchive/engi
 
 ## 0.20.0 - 2022-12-13
 
-Full changeset and discussions: [#959](https://github.com/OpenTermsArchive/engine/pull/959)._
+_Full changeset and discussions: [#959](https://github.com/OpenTermsArchive/engine/pull/959)._
 
 ### Changed
 

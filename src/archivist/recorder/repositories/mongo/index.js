@@ -32,14 +32,14 @@ export default class MongoRepository extends RepositoryInterface {
   }
 
   async save(record) {
-    const { serviceId, documentType } = record;
+    const { serviceId, termsType } = record;
 
     if (record.isFirstRecord === undefined || record.isFirstRecord === null) {
-      record.isFirstRecord = !await this.collection.findOne({ serviceId, documentType });
+      record.isFirstRecord = !await this.collection.findOne({ serviceId, termsType });
     }
 
     const documentFields = await this.#toPersistence(record);
-    const previousRecord = await this.findLatest(serviceId, documentType);
+    const previousRecord = await this.findLatest(serviceId, termsType);
 
     if (previousRecord?.content == documentFields.content) {
       return Object(null);
@@ -52,8 +52,8 @@ export default class MongoRepository extends RepositoryInterface {
     return record;
   }
 
-  async findLatest(serviceId, documentType) {
-    const [mongoDocument] = await this.collection.find({ serviceId, documentType }).limit(1).sort({ fetchDate: -1 }).toArray(); // `findOne` doesn't support the `sort` method, so even for only one document use `find`
+  async findLatest(serviceId, termsType) {
+    const [mongoDocument] = await this.collection.find({ serviceId, termsType }).limit(1).sort({ fetchDate: -1 }).toArray(); // `findOne` doesn't support the `sort` method, so even for only one mongo document use `find`
 
     return this.#toDomain(mongoDocument);
   }
@@ -95,12 +95,12 @@ export default class MongoRepository extends RepositoryInterface {
     record.content = content instanceof Binary ? content.buffer : content;
   }
 
-  async #toDomain(document, { deferContentLoading } = {}) {
-    if (!document) {
+  async #toDomain(mongoDocument, { deferContentLoading } = {}) {
+    if (!mongoDocument) {
       return null;
     }
 
-    const record = DataMapper.toDomain(document);
+    const record = DataMapper.toDomain(mongoDocument);
 
     if (deferContentLoading) {
       return record;

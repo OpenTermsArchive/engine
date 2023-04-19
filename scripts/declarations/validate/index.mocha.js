@@ -6,8 +6,8 @@ import { expect } from 'chai';
 import config from 'config';
 import jsonSourceMap from 'json-source-map';
 
+import extract from '../../../src/archivist/extract/index.js';
 import fetch, { launchHeadlessBrowser, stopHeadlessBrowser } from '../../../src/archivist/fetcher/index.js';
-import filter from '../../../src/archivist/filter/index.js';
 import * as services from '../../../src/archivist/services/index.js';
 import DeclarationUtils from '../utils/index.js';
 
@@ -25,8 +25,8 @@ const instancePath = path.resolve(declarationsPath, '../');
 export default async options => {
   const schemaOnly = options.schemaOnly || false;
   let servicesToValidate = options.services || [];
-  const documentTypes = options.termsTypes || [];
-  let servicesDocumentTypes = {};
+  const termsTypes = options.types || [];
+  let servicesTermsTypes = {};
 
   const serviceDeclarations = await services.loadWithHistory(servicesToValidate);
 
@@ -37,7 +37,7 @@ export default async options => {
   if (options.modified) {
     const declarationUtils = new DeclarationUtils(instancePath);
 
-    ({ services: servicesToValidate, servicesDocumentTypes } = await declarationUtils.getModifiedServiceDocumentTypes());
+    ({ services: servicesToValidate, servicesTermsTypes } = await declarationUtils.getModifiedServiceTermsTypes());
   }
 
   describe('Service declarations validation', async function () {
@@ -76,61 +76,57 @@ export default async options => {
         }
 
         if (!schemaOnly && service) {
-          service.getDocumentTypes()
-            .filter(documentType => {
-              if (servicesDocumentTypes[serviceId] && servicesDocumentTypes[serviceId].length > 0) {
-                return servicesDocumentTypes[serviceId].includes(documentType);
+          service.getTermsTypes()
+            .filter(termsType => {
+              if (servicesTermsTypes[serviceId] && servicesTermsTypes[serviceId].length > 0) {
+                return servicesTermsTypes[serviceId].includes(termsType);
               }
 
-              if (documentTypes.length > 0) {
-                return documentTypes.includes(documentType);
+              if (termsTypes.length > 0) {
+                return termsTypes.includes(termsType);
               }
 
               return true;
             })
             .forEach(type => {
               describe(type, () => {
-                const documentDeclaration = service.getDocumentDeclaration(type);
+                const terms = service.getTerms(type);
 
-                documentDeclaration.pages.forEach(page => {
-                  let content;
+                terms.sourceDocuments.forEach(sourceDocument => {
                   let filteredContent;
-                  let mimeType;
 
-                  context(page.location, () => {
+                  context(sourceDocument.location, () => {
                     before(async function () {
-                      if (!documentDeclaration) {
+                      if (!terms) {
                         console.log('      (Tests skipped as declaration has been archived)');
                         this.skip();
                       }
                     });
 
                     it('fetchable URL', async () => {
-                      const { location, executeClientScripts } = page;
-                      const document = await fetch({
+                      const { location, executeClientScripts } = sourceDocument;
+
+                      ({ content: sourceDocument.content, mimeType: sourceDocument.mimeType } = await fetch({
                         url: location,
                         executeClientScripts,
-                        cssSelectors: page.cssSelectors,
+                        cssSelectors: sourceDocument.cssSelectors,
                         config: config.get('fetcher'),
-                      });
-
-                      content = document.content;
-                      mimeType = document.mimeType;
+                      }));
                     });
 
-                    it('selector matches an element in the web page', async function checkSelector() {
-                      if (!content) {
+                    it('selector matches an element in the source document', async function checkSelector() {
+                      if (!sourceDocument.content) {
                         console.log('          [Tests skipped as URL is not fetchable]');
                         this.skip();
                       }
 
-                      filteredContent = await filter({ content, pageDeclaration: page, mimeType });
+                      filteredContent = await extract(sourceDocument);
 
                       expect(filteredContent).to.not.be.empty;
                     });
 
                     it(`filtered content has at least ${MIN_DOC_LENGTH} characters`, async function checkContentLength() {
-                      if (!content) {
+                      if (!sourceDocument.content) {
                         console.log('          [Tests skipped as URL is not fetchable]');
                         this.skip();
                       }
@@ -146,7 +142,7 @@ export default async options => {
                     it('content is consistent when fetched and filtered twice in a row', async function checkContentConsistency() {
                       this.slow(SLOW_DOCUMENT_THRESHOLD * 2);
 
-                      if (!content) {
+                      if (!sourceDocument.content) {
                         console.log('          [Tests skipped as URL is not fetchable]');
                         this.skip();
                       }
@@ -156,13 +152,13 @@ export default async options => {
                         this.skip();
                       }
 
-                      const document = await fetch({
-                        url: page.location,
-                        executeClientScripts: page.executeClientScripts,
-                        cssSelectors: page.cssSelectors,
+                      ({ content: sourceDocument.content, mimeType: sourceDocument.mimeType } = await fetch({
+                        url: sourceDocument.location,
+                        executeClientScripts: sourceDocument.executeClientScripts,
+                        cssSelectors: sourceDocument.cssSelectors,
                         config: config.get('fetcher'),
-                      });
-                      const secondFilteredContent = await filter({ content: document.content, pageDeclaration: page, mimeType: document.mimeType });
+                      }));
+                      const secondFilteredContent = await extract(sourceDocument);
 
                       expect(secondFilteredContent).to.equal(filteredContent);
                     });

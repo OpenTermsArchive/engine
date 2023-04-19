@@ -5,6 +5,7 @@ import mardownPdf from '@accordproject/markdown-pdf';
 import TurndownService from '@opentermsarchive/turndown';
 import turndownPluginGithubFlavouredMarkdown from 'joplin-turndown-plugin-gfm';
 import jsdom from 'jsdom';
+import mime from 'mime';
 
 import { InaccessibleContentError } from '../errors.js';
 
@@ -21,32 +22,27 @@ const { CiceroMarkTransformer } = ciceroMark;
 const ciceroMarkTransformer = new CiceroMarkTransformer();
 
 /**
- * Filter document content and convert it to Markdown
+ * Extract content from source document and convert it to Markdown
  *
- * @param {Object} params - Filter parameters
- * @param {string|Buffer} params.content - Content to filter: a buffer containing PDF data in case mimetype associated is PDF or a DOM dump of an HTML page given as a string
- * @param {string} params.mimeType - MIME type of the given content
- * @param {string} params.pageDeclaration - see {@link ./src/archivist/services/pageDeclaration.js}
- * @returns {Promise<string>} Promise which is fulfilled once the content is filtered and converted in Markdown. The promise will resolve into a string containing the filtered content in Markdown format
+ * @param {string} sourceDocument - Source document from which to extract content, see {@link ./src/archivist/services/sourceDocument.js}
+ * @returns {Promise<string>} Promise which is fulfilled once the content is extracted and converted in Markdown. The promise will resolve into a string containing the extracted content in Markdown format
 */
-export default async function filter({ content, mimeType, pageDeclaration }) {
-  if (mimeType == 'application/pdf') {
-    return filterPDF({ content });
+export default async function extract(sourceDocument) {
+  if (sourceDocument.mimeType == mime.getType('pdf')) {
+    return extractFromPDF(sourceDocument);
   }
 
-  return filterHTML({
-    content,
-    pageDeclaration,
-  });
+  return extractFromHTML(sourceDocument);
 }
 
-export async function filterHTML({ content, pageDeclaration }) {
+export async function extractFromHTML(sourceDocument) {
   const {
     location,
     contentSelectors = [],
-    noiseSelectors = [],
+    insignificantContentSelectors = [],
     filters: serviceSpecificFilters = [],
-  } = pageDeclaration;
+    content,
+  } = sourceDocument;
 
   const jsdomInstance = new JSDOM(content, {
     url: location,
@@ -61,7 +57,7 @@ export async function filterHTML({ content, pageDeclaration }) {
       await filterFunction(webPageDOM, {
         fetch: location,
         select: contentSelectors,
-        remove: noiseSelectors,
+        remove: insignificantContentSelectors,
         filter: serviceSpecificFilters.map(filter => filter.name),
       });
       /* eslint-enable no-await-in-loop */
@@ -70,7 +66,7 @@ export async function filterHTML({ content, pageDeclaration }) {
     }
   }
 
-  remove(webPageDOM, noiseSelectors); // remove function works in place
+  remove(webPageDOM, insignificantContentSelectors); // remove function works in place
 
   const domFragment = select(webPageDOM, contentSelectors);
 
@@ -101,7 +97,7 @@ export async function filterHTML({ content, pageDeclaration }) {
   return markdownContent;
 }
 
-export async function filterPDF({ content: pdfBuffer }) {
+export async function extractFromPDF({ content: pdfBuffer }) {
   try {
     const ciceroMarkdown = await PdfTransformer.toCiceroMark(pdfBuffer);
 
@@ -115,12 +111,12 @@ export async function filterPDF({ content: pdfBuffer }) {
   }
 }
 
-function selectRange(document, rangeSelector) {
+function selectRange(webPageDOM, rangeSelector) {
   const { startBefore, startAfter, endBefore, endAfter } = rangeSelector;
 
-  const selection = document.createRange();
-  const startNode = document.querySelector(startBefore || startAfter);
-  const endNode = document.querySelector(endBefore || endAfter);
+  const selection = webPageDOM.createRange();
+  const startNode = webPageDOM.querySelector(startBefore || startAfter);
+  const endNode = webPageDOM.querySelector(endBefore || endAfter);
 
   if (!startNode) {
     throw new InaccessibleContentError(`The "start" selector has no match in document in: ${JSON.stringify(rangeSelector)}`);
@@ -136,18 +132,18 @@ function selectRange(document, rangeSelector) {
   return selection;
 }
 
-export function convertRelativeURLsToAbsolute(document, baseURL) {
-  Array.from(document.querySelectorAll(LINKS_TO_CONVERT_SELECTOR)).forEach(link => {
+export function convertRelativeURLsToAbsolute(webPageDOM, baseURL) {
+  Array.from(webPageDOM.querySelectorAll(LINKS_TO_CONVERT_SELECTOR)).forEach(link => {
     link.href = url.resolve(baseURL, link.href);
   });
 }
 
 // Works in place
-function remove(webPageDOM, noiseSelectors) {
+function remove(webPageDOM, insignificantContentSelectors) {
   const rangeSelections = [];
   const nodes = [];
 
-  [].concat(noiseSelectors).forEach(selector => {
+  [].concat(insignificantContentSelectors).forEach(selector => {
     if (typeof selector === 'object') {
       rangeSelections.push(selectRange(webPageDOM, selector));
     } else {

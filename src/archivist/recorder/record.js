@@ -1,10 +1,17 @@
+/**
+ * Abstract Class Record.
+ *
+ * @class Record
+ */
 export default class Record {
   #content;
 
-  static REQUIRED_PARAMS = Object.freeze([ 'serviceId', 'documentType', 'mimeType', 'fetchDate' ]);
+  static REQUIRED_PARAMS = Object.freeze([ 'serviceId', 'termsType', 'fetchDate', 'content' ]);
 
   constructor(params) {
-    Record.validate(params);
+    if (this.constructor == Record) {
+      throw new Error("Abstract Record class can't be instantiated.");
+    }
 
     Object.assign(this, Object.fromEntries(Object.entries(params)));
 
@@ -15,7 +22,7 @@ export default class Record {
 
   get content() {
     if (this.#content === undefined) {
-      throw new Error('Record content not defined, set the content or use Repository#loadRecordContent');
+      throw new Error('Content not defined, set the content or use Repository#loadRecordContent');
     }
 
     return this.#content;
@@ -25,10 +32,14 @@ export default class Record {
     this.#content = content;
   }
 
-  static validate(givenParams) {
-    for (const param of Record.REQUIRED_PARAMS) {
-      if (!Object.prototype.hasOwnProperty.call(givenParams, param) || givenParams[param] == null) {
-        throw new Error(`"${param}" is required`);
+  validate() {
+    for (const requiredParam of this.constructor.REQUIRED_PARAMS) {
+      if (requiredParam == 'content') {
+        if (this[requiredParam] == '' || this[requiredParam] == null) {
+          throw new Error(`${this.constructor.name} is not valid; "${requiredParam}" is empty or null`);
+        }
+      } else if (!Object.prototype.hasOwnProperty.call(this, requiredParam) || this[requiredParam] == null) {
+        throw new Error(`${this.constructor.name} is not valid; "${requiredParam}" is missing`);
       }
     }
   }

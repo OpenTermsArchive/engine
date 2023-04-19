@@ -31,7 +31,7 @@ export default async function generate({ archivePath, releaseDate }) {
 
   for await (const version of versionsRepository.iterate()) {
     const { content, fetchDate } = version;
-    const { serviceId, documentType } = renamer.applyRules(version.serviceId, version.documentType);
+    const { serviceId, termsType } = renamer.applyRules(version.serviceId, version.termsType);
 
     if (firstVersionDate > fetchDate) {
       firstVersionDate = fetchDate;
@@ -43,7 +43,7 @@ export default async function generate({ archivePath, releaseDate }) {
 
     services.add(serviceId);
 
-    const versionPath = generateVersionPath({ serviceId, documentType, fetchDate });
+    const versionPath = generateVersionPath({ serviceId, termsType, fetchDate });
 
     logger.info({ message: versionPath, counter: index, hash: version.id });
 
@@ -97,10 +97,10 @@ async function initializeArchive(targetPath) {
   return { basename, stream, done };
 }
 
-function generateVersionPath({ serviceId, documentType, fetchDate }) {
+function generateVersionPath({ serviceId, termsType, fetchDate }) {
   const fsCompliantDate = fetchDate.toISOString()
     .replace(/\.\d{3}/, '') // remove milliseconds
     .replace(/:|\./g, '-'); // replace `:` and `.` by `-` to be compliant with the file system
 
-  return `${serviceId}/${documentType}/${fsCompliantDate}.md`;
+  return `${serviceId}/${termsType}/${fsCompliantDate}.md`;
 }

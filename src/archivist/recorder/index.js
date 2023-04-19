@@ -1,7 +1,6 @@
-import mime from 'mime';
-
-import Record from './record.js';
 import RepositoryFactory from './repositories/factory.js';
+import Snapshot from './snapshot.js';
+import Version from './version.js';
 
 export default class Recorder {
   constructor(config) {
@@ -17,61 +16,18 @@ export default class Recorder {
     return Promise.all([ this.versionsRepository.finalize(), this.snapshotsRepository.finalize() ]);
   }
 
-  async getLatestSnapshot(serviceId, documentType, pageId) {
-    return this.snapshotsRepository.findLatest(serviceId, documentType, pageId);
+  async getLatestSnapshot(terms, sourceDocumentId) {
+    return this.snapshotsRepository.findLatest(terms.service.id, terms.type, terms.hasMultipleSourceDocuments && sourceDocumentId);
   }
 
-  async recordSnapshot({ serviceId, documentType, pageId, fetchDate, mimeType, content }) {
-    if (!serviceId) {
-      throw new Error('A service ID is required');
+  async record(record) {
+    record.validate();
+
+    switch (record.constructor) { // eslint-disable-line default-case
+    case Version:
+      return this.versionsRepository.save(record);
+    case Snapshot:
+      return this.snapshotsRepository.save(record);
     }
-
-    if (!documentType) {
-      throw new Error('A terms type is required');
-    }
-
-    if (!fetchDate) {
-      throw new Error('The fetch date of the snapshot is required to ensure data consistency');
-    }
-
-    if (!content) {
-      throw new Error('A document content is required');
-    }
-
-    if (!mimeType) {
-      throw new Error('A document mime type is required to ensure data consistency');
-    }
-
-    return this.snapshotsRepository.save(new Record({ serviceId, documentType, pageId, fetchDate, mimeType, content }));
-  }
-
-  async recordVersion({ serviceId, documentType, snapshotIds, fetchDate, content, isRefilter }) {
-    if (!serviceId) {
-      throw new Error('A service ID is required');
-    }
-
-    if (!documentType) {
-      throw new Error('A terms type is required');
-    }
-
-    if (!snapshotIds?.length) {
-      throw new Error(`At least one snapshot ID is required to ensure data consistency for ${serviceId}'s ${documentType}`);
-    }
-
-    if (!fetchDate) {
-      throw new Error('The fetch date of the snapshot is required to ensure data consistency');
-    }
-
-    if (!content) {
-      throw new Error('A document content is required');
-    }
-
-    const mimeType = mime.getType('markdown'); // A version is always in markdown format
-
-    return this.versionsRepository.save(new Record({ serviceId, documentType, snapshotIds, fetchDate, mimeType, content, isRefilter }));
-  }
-
-  async recordRefilter(params) {
-    return this.recordVersion({ isRefilter: true, ...params });
   }
 }

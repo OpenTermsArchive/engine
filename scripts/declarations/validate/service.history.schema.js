@@ -1,10 +1,10 @@
-import { DOCUMENT_TYPES } from '../../../src/archivist/services/index.js';
+import TERMS_TYPES from '@opentermsarchive/terms-types';
 
 import definitions from './definitions.js';
 
-const AVAILABLE_TYPES_NAME = Object.keys(DOCUMENT_TYPES);
+const AVAILABLE_TYPES_NAME = Object.keys(TERMS_TYPES);
 
-const documentsProperties = () => {
+const termsProperties = () => {
   const result = {};
 
   AVAILABLE_TYPES_NAME.forEach(type => {
@@ -12,8 +12,8 @@ const documentsProperties = () => {
       type: 'array',
       items: {
         oneOf: [
-          { $ref: '#/definitions/singlePageDocumentHistory' },
-          { $ref: '#/definitions/multiPageDocumentHistory' },
+          { $ref: '#/definitions/singleSourceDocumentTermsHistory' },
+          { $ref: '#/definitions/multipleSourceDocumentsTermsHistory' },
           { $ref: '#/definitions/pdfDocumentHistory' },
         ],
       },
@@ -27,7 +27,7 @@ const schema = {
   type: 'object',
   additionalProperties: false,
   title: 'Service declaration history',
-  properties: documentsProperties(),
+  properties: termsProperties(),
   propertyNames: { enum: AVAILABLE_TYPES_NAME },
   definitions: {
     ...definitions,
@@ -40,7 +40,7 @@ const schema = {
         validUntil: { $ref: '#/definitions/validUntil' },
       },
     },
-    singlePageDocumentHistory: {
+    singleSourceDocumentTermsHistory: {
       type: 'object',
       additionalProperties: false,
       required: [ 'fetch', 'select', 'validUntil' ],
@@ -48,12 +48,12 @@ const schema = {
         fetch: { $ref: '#/definitions/location' },
         select: { $ref: '#/definitions/contentSelectors' },
         filter: { $ref: '#/definitions/filters' },
-        remove: { $ref: '#/definitions/noiseSelectors' },
+        remove: { $ref: '#/definitions/insignificantContentSelectors' },
         executeClientScripts: { $ref: '#/definitions/executeClientScripts' },
         validUntil: { $ref: '#/definitions/validUntil' },
       },
     },
-    multiPageDocumentHistory: {
+    multipleSourceDocumentsTermsHistory: {
       type: 'object',
       additionalProperties: false,
       required: ['combine'],
@@ -68,14 +68,14 @@ const schema = {
               fetch: { $ref: '#/definitions/location' },
               select: { $ref: '#/definitions/contentSelectors' },
               filter: { $ref: '#/definitions/filters' },
-              remove: { $ref: '#/definitions/noiseSelectors' },
+              remove: { $ref: '#/definitions/insignificantContentSelectors' },
               executeClientScripts: { $ref: '#/definitions/executeClientScripts' },
             },
           },
         },
         select: { $ref: '#/definitions/contentSelectors' },
         filter: { $ref: '#/definitions/filters' },
-        remove: { $ref: '#/definitions/noiseSelectors' },
+        remove: { $ref: '#/definitions/insignificantContentSelectors' },
         executeClientScripts: { $ref: '#/definitions/executeClientScripts' },
         validUntil: { $ref: '#/definitions/validUntil' },
       },

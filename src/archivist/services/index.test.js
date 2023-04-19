@@ -14,57 +14,57 @@ describe('Services', () => {
 
     async function validateServiceWithoutHistory(serviceId, expected) {
       /* eslint-disable no-loop-func */
-      for (const documentType of expected.getDocumentTypes()) {
-        context(`${documentType}`, () => {
-          let actualDocumentDeclaration;
+      for (const termsType of expected.getTermsTypes()) {
+        context(`${termsType}`, () => {
+          let actualTerms;
           let actualFilters;
           let actualContentSelectors;
-          let actualNoiseSelectors;
+          let actualInsignificantContentSelectors;
           let actualExecuteClientScripts;
 
-          const expectedDocumentDeclaration = expected.getDocumentDeclaration(documentType);
+          const expectedTerms = expected.getTerms(termsType);
 
-          const { pages } = expectedDocumentDeclaration;
+          const { sourceDocuments } = expectedTerms;
 
-          pages.forEach((page, index) => {
+          sourceDocuments.forEach((sourceDocument, index) => {
             const {
               filters: expectedFilters,
               contentSelectors: expectedContentSelectors,
-              noiseSelectors: expectedNoiseSelectors,
+              insignificantContentSelectors: expectedInsignificantContentSelectors,
               executeClientScripts: expectedExecuteClientScripts,
-            } = page;
+            } = sourceDocument;
 
-            context(`Page: ${page.id}`, () => {
+            context(`source document: ${sourceDocument.id}`, () => {
               before(() => {
-                actualDocumentDeclaration = result[serviceId].getDocumentDeclaration(documentType);
-                const { pages: actualPages } = actualDocumentDeclaration;
+                actualTerms = result[serviceId].getTerms(termsType);
+                const { sourceDocuments: actualDocuments } = actualTerms;
 
                 ({
                   filters: actualFilters,
                   contentSelectors: actualContentSelectors,
-                  noiseSelectors: actualNoiseSelectors,
+                  insignificantContentSelectors: actualInsignificantContentSelectors,
                   executeClientScripts: actualExecuteClientScripts,
-                } = actualPages[index]);
+                } = actualDocuments[index]);
               });
 
               it('has the proper service name', () => {
-                expect(actualDocumentDeclaration.service.name).to.eql(expectedDocumentDeclaration.service.name);
+                expect(actualTerms.service.name).to.eql(expectedTerms.service.name);
               });
 
               it('has the proper terms type', () => {
-                expect(actualDocumentDeclaration.type).to.eql(expectedDocumentDeclaration.type);
+                expect(actualTerms.type).to.eql(expectedTerms.type);
               });
 
               it('has no validity date', () => {
-                expect(actualDocumentDeclaration.validUntil).to.be.undefined;
+                expect(actualTerms.validUntil).to.be.undefined;
               });
 
               it('has the proper content selectors', async () => {
                 expect(actualContentSelectors).to.equal(expectedContentSelectors);
               });
 
-              it('has the proper noise selectors', async () => {
-                expect(actualNoiseSelectors).to.equal(expectedNoiseSelectors);
+              it('has the proper insignificant content selectors', async () => {
+                expect(actualInsignificantContentSelectors).to.equal(expectedInsignificantContentSelectors);
               });
 
               it('has the proper executeClientScripts option', async () => {
@@ -105,34 +105,24 @@ describe('Services', () => {
       await validateServiceWithoutHistory('service_B', expectedServices.service_B);
     });
 
-    context('when a service has no history', async () => {
-      describe('Service without history', async () => {
-        await validateServiceWithoutHistory('service_without_history', expectedServices.service_without_history);
-      });
+    describe('Service without history', async () => {
+      await validateServiceWithoutHistory('service_without_history', expectedServices.service_without_history);
     });
 
-    context('when a service has only history for declarations', async () => {
-      describe('Service with declaration history', async () => {
-        await validateServiceWithoutHistory('service_with_declaration_history', expectedServices.service_with_declaration_history);
-      });
+    describe('Service with declaration history only', async () => {
+      await validateServiceWithoutHistory('service_with_declaration_history', expectedServices.service_with_declaration_history);
     });
 
-    context('when a service has only history for filters', async () => {
-      describe('Service with filters history', async () => {
-        await validateServiceWithoutHistory('service_with_filters_history', expectedServices.service_with_filters_history);
-      });
+    describe('Service with filters history only', async () => {
+      await validateServiceWithoutHistory('service_with_filters_history', expectedServices.service_with_filters_history);
     });
 
-    context('when a service has histories both for filters and for declarations', async () => {
-      describe('Service with history', async () => {
-        await validateServiceWithoutHistory('service_with_history', expectedServices.service_with_history);
-      });
+    describe('Service with both filters and declarations histories', async () => {
+      await validateServiceWithoutHistory('service_with_history', expectedServices.service_with_history);
     });
 
-    context('when a service has a multipage document', async () => {
-      describe('Service with a multipage document', async () => {
-        await validateServiceWithoutHistory('service_with_multipage_document', expectedServices.service_with_multipage_document);
-      });
+    describe('Service with terms with multiple source documents', async () => {
+      await validateServiceWithoutHistory('service_with_multiple_source_documents_terms', expectedServices.service_with_multiple_source_documents_terms);
     });
 
     context('when specifying services to load', async () => {
@@ -151,37 +141,37 @@ describe('Services', () => {
 
     async function validateServiceWithHistory(serviceId, expected) {
       /* eslint-disable no-loop-func */
-      for (const documentType of expected.getDocumentTypes()) {
-        context(`${documentType}`, () => {
-          const { history: expectedHistory } = expected.documents[documentType];
+      for (const termsType of expected.getTermsTypes()) {
+        context(`${termsType}`, () => {
+          const { history: expectedHistory } = expected.terms[termsType];
           const expectedHistoryDates = expectedHistory && [ ...expectedHistory.map(entry => entry.validUntil), null ]; // add `null` entry to simulate the still current valid declaration
 
-          let actualDocumentDeclaration;
+          let actualTerms;
           let actualFilters;
-          const expectedDocumentDeclaration = expected.getDocumentDeclaration(documentType);
+          const expectedTerms = expected.getTerms(termsType);
 
-          const { pages } = expectedDocumentDeclaration;
+          const { sourceDocuments } = expectedTerms;
 
           before(() => {
-            actualDocumentDeclaration = result[serviceId].getDocumentDeclaration(documentType);
+            actualTerms = result[serviceId].getTerms(termsType);
           });
 
           it('has the proper service name', () => {
-            expect(actualDocumentDeclaration.service.name).to.eql(expectedDocumentDeclaration.service.name);
+            expect(actualTerms.service.name).to.eql(expectedTerms.service.name);
           });
 
           it('has the proper terms type', () => {
-            expect(actualDocumentDeclaration.type).to.eql(expectedDocumentDeclaration.type);
+            expect(actualTerms.type).to.eql(expectedTerms.type);
           });
 
-          pages.forEach((page, index) => {
-            const { filters: expectedFilters } = page;
+          sourceDocuments.forEach((sourceDocument, index) => {
+            const { filters: expectedFilters } = sourceDocument;
 
-            context(`${page.id} page`, () => {
+            context(`${sourceDocument.id} sourceDocument`, () => {
               before(() => {
-                const { pages: actualPages } = actualDocumentDeclaration;
+                const { sourceDocuments: actualDocuments } = actualTerms;
 
-                ({ filters: actualFilters } = actualPages[index]);
+                ({ filters: actualFilters } = actualDocuments[index]);
               });
 
               if (expectedHistoryDates) {
@@ -189,34 +179,34 @@ describe('Services', () => {
                   context(`${date || 'Current'}`, () => {
                     let actualFiltersForThisDate;
                     let contentSelectorsForThisDate;
-                    let noiseSelectorsForThisDate;
+                    let insignificantContentSelectorsForThisDate;
                     let actualExecuteClientScriptsForThisDate;
 
-                    const { pages: pagesForThisDate } = expected.getDocumentDeclaration(documentType, date);
+                    const { sourceDocuments: documentsForThisDate } = expected.getTerms(termsType, date);
                     const {
                       filters: expectedFiltersForThisDate,
                       contentSelectors: expectedContentSelectors,
-                      noiseSelectors: expectedNoiseSelectors,
+                      insignificantContentSelectors: expectedInsignificantContentSelectors,
                       expectedExecuteClientScripts: expectedExecuteClientScriptsForThisDate,
-                    } = pagesForThisDate[index];
+                    } = documentsForThisDate[index];
 
                     before(() => {
-                      const { pages: actualPagesForThisDate } = result[serviceId].getDocumentDeclaration(documentType, date);
+                      const { sourceDocuments: actualDocumentsForThisDate } = result[serviceId].getTerms(termsType, date);
 
                       ({
                         filters: actualFiltersForThisDate,
                         contentSelectors: contentSelectorsForThisDate,
-                        noiseSelectors: noiseSelectorsForThisDate,
+                        insignificantContentSelectors: insignificantContentSelectorsForThisDate,
                         expectedExecuteClientScripts: actualExecuteClientScriptsForThisDate,
-                      } = actualPagesForThisDate[index]);
+                      } = actualDocumentsForThisDate[index]);
                     });
 
                     it('has the proper content selectors', async () => {
                       expect(contentSelectorsForThisDate).to.equal(expectedContentSelectors);
                     });
 
-                    it('has the proper noise selectors', async () => {
-                      expect(noiseSelectorsForThisDate).to.equal(expectedNoiseSelectors);
+                    it('has the proper insignificant content selectors', async () => {
+                      expect(insignificantContentSelectorsForThisDate).to.equal(expectedInsignificantContentSelectors);
                     });
 
                     it('has the proper executeClientScripts option', async () => {
@@ -242,7 +232,7 @@ describe('Services', () => {
                 }
               } else {
                 it('has no history', async () => {
-                  expect(actualDocumentDeclaration.validUntil).to.be.undefined;
+                  expect(actualTerms.validUntil).to.be.undefined;
                 });
 
                 if (expectedFilters) {
@@ -284,34 +274,24 @@ describe('Services', () => {
       await validateServiceWithHistory('service_B', expectedServices.service_B);
     });
 
-    context('when a service has no history', async () => {
-      describe('Service without history', async () => {
-        await validateServiceWithHistory('service_without_history', expectedServices.service_without_history);
-      });
+    describe('Service without history', async () => {
+      await validateServiceWithHistory('service_without_history', expectedServices.service_without_history);
     });
 
-    context('when a service has only declarations history', async () => {
-      describe('Service with declaration history', async () => {
-        await validateServiceWithHistory('service_with_declaration_history', expectedServices.service_with_declaration_history);
-      });
+    describe('Service with declaration history only', async () => {
+      await validateServiceWithHistory('service_with_declaration_history', expectedServices.service_with_declaration_history);
     });
 
-    context('when a service has only filters history', async () => {
-      describe('Service with filters history', async () => {
-        await validateServiceWithHistory('service_with_filters_history', expectedServices.service_with_filters_history);
-      });
+    describe('Service with filters history only', async () => {
+      await validateServiceWithHistory('service_with_filters_history', expectedServices.service_with_filters_history);
     });
 
-    context('when a service has both filters and declarations histories', async () => {
-      describe('Service with history', async () => {
-        await validateServiceWithHistory('service_with_history', expectedServices.service_with_history);
-      });
+    describe('Service with both filters and declarations histories', async () => {
+      await validateServiceWithHistory('service_with_history', expectedServices.service_with_history);
     });
 
-    context('when a service has a multipage document', async () => {
-      describe('Service with a multipage document', async () => {
-        await validateServiceWithHistory('service_with_multipage_document', expectedServices.service_with_multipage_document);
-      });
+    describe('Service with terms with multiple source documents', async () => {
+      await validateServiceWithHistory('service_with_multiple_source_documents_terms', expectedServices.service_with_multiple_source_documents_terms);
     });
 
     context('when specifying services to load', async () => {

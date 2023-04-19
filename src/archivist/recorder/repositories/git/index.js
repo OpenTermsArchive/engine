@@ -34,17 +34,17 @@ export default class GitRepository extends RepositoryInterface {
   }
 
   async save(record) {
-    const { serviceId, documentType, pageId, fetchDate } = record;
+    const { serviceId, termsType, documentId, fetchDate } = record;
 
     if (record.isFirstRecord === undefined || record.isFirstRecord === null) {
-      record.isFirstRecord = !await this.#isTracked(serviceId, documentType, pageId);
+      record.isFirstRecord = !await this.#isTracked(serviceId, termsType, documentId);
     }
 
     const { message, content, filePath: relativeFilePath } = await this.#toPersistence(record);
 
     const filePath = path.join(this.path, relativeFilePath);
 
-    await GitRepository.#writeFile({ filePath, content });
+    await GitRepository.writeFile({ filePath, content });
     const sha = await this.#commit({ filePath, message, date: fetchDate });
 
     if (!sha) {
@@ -64,8 +64,8 @@ export default class GitRepository extends RepositoryInterface {
     return this.git.pushChanges();
   }
 
-  async findLatest(serviceId, documentType, pageId) {
-    const filePath = DataMapper.generateFilePath(serviceId, documentType, pageId);
+  async findLatest(serviceId, termsType, documentId) {
+    const filePath = DataMapper.generateFilePath(serviceId, termsType, documentId);
     const commit = await this.git.getCommit([filePath]);
 
     return this.#toDomain(commit);
@@ -82,11 +82,7 @@ export default class GitRepository extends RepositoryInterface {
   }
 
   async count() {
-    return (await this.git.log([
-      `--grep=${DataMapper.COMMIT_MESSAGE_PREFIX.startTracking}`,
-      `--grep=${DataMapper.COMMIT_MESSAGE_PREFIX.refilter}`,
-      `--grep=${DataMapper.COMMIT_MESSAGE_PREFIX.update}`,
-    ])).length;
+    return (await this.git.log(Object.values(DataMapper.COMMIT_MESSAGE_PREFIXES).map(prefix => `--grep=${prefix}`))).length;
   }
 
   async* iterate() {
@@ -102,7 +98,7 @@ export default class GitRepository extends RepositoryInterface {
   }
 
   async loadRecordContent(record) {
-    const relativeFilePath = DataMapper.generateFilePath(record.serviceId, record.documentType, record.pageId, record.mimeType);
+    const relativeFilePath = DataMapper.generateFilePath(record.serviceId, record.termsType, record.documentId, record.mimeType);
 
     if (record.mimeType != mime.getType('pdf')) {
       record.content = await this.git.show(`${record.id}:${relativeFilePath}`);
@@ -126,11 +122,11 @@ export default class GitRepository extends RepositoryInterface {
 
   async #getCommits() {
     return (await this.git.listCommits())
-      .filter(({ message }) => message.match(DataMapper.COMMIT_MESSAGE_PREFIXES_REGEXP)) // Skip commits which are not a document record (README, LICENSE…)
+      .filter(({ message }) => message.match(DataMapper.COMMIT_MESSAGE_PREFIXES_REGEXP)) // Skip commits which are not a record (README, LICENSE…)
       .sort((commitA, commitB) => new Date(commitA.date) - new Date(commitB.date)); // Make sure that the commits are sorted in ascending chronological order
   }
 
-  static async #writeFile({ filePath, content }) {
+  static async writeFile({ filePath, content }) {
     const directory = path.dirname(filePath);
 
     if (!fsApi.existsSync(directory)) {
@@ -152,8 +148,8 @@ export default class GitRepository extends RepositoryInterface {
     }
   }
 
-  #isTracked(serviceId, documentType, pageId) {
-    return this.git.isTracked(`${this.path}/${DataMapper.generateFilePath(serviceId, documentType, pageId)}`);
+  #isTracked(serviceId, termsType, documentId) {
+    return this.git.isTracked(`${this.path}/${DataMapper.generateFilePath(serviceId, termsType, documentId)}`);
   }
 
   async #toDomain(commit, { deferContentLoading } = {}) {

@@ -1,20 +1,20 @@
-import DocumentDeclaration from '../../src/archivist/services/documentDeclaration.js';
-import PageDeclaration from '../../src/archivist/services/pageDeclaration.js';
 import Service from '../../src/archivist/services/service.js';
+import SourceDocument from '../../src/archivist/services/sourceDocument.js';
+import Terms from '../../src/archivist/services/terms.js';
 
 const service = new Service({
   id: 'service_A',
   name: 'Service A',
 });
 
-service.addDocumentDeclaration(new DocumentDeclaration({
+service.addTerms(new Terms({
   service,
   type: 'Terms of Service',
   validUntil: null,
-  pages: [new PageDeclaration({
+  sourceDocuments: [new SourceDocument({
     location: 'https://www.servicea.example/tos',
     contentSelectors: 'body',
-    noiseSelectors: undefined,
+    insignificantContentSelectors: undefined,
     filters: undefined,
   })],
 }));

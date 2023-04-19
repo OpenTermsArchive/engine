@@ -25,7 +25,7 @@ const definitions = {
     ],
   },
   contentSelectors: { $ref: '#/definitions/selectors' },
-  noiseSelectors: { $ref: '#/definitions/selectors' },
+  insignificantContentSelectors: { $ref: '#/definitions/selectors' },
   filters: {
     type: 'array',
     items: {

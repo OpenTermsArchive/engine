@@ -108,7 +108,7 @@ In order to improve the understandability of commands, we document all CLI optio
 
 ```diff
 - ota track -s $service_id -r
-+ ota track --services <service_id> --refilter-only
++ ota track --services <service_id> --extract-only
 ```
 
 ## Naming

@@ -1,17 +1,17 @@
-import { DOCUMENT_TYPES } from '../../../src/archivist/services/index.js';
+import TERMS_TYPES from '@opentermsarchive/terms-types';
 
 import definitions from './definitions.js';
 
-const AVAILABLE_TYPES_NAME = Object.keys(DOCUMENT_TYPES);
+const AVAILABLE_TYPES_NAME = Object.keys(TERMS_TYPES);
 
-const documentsProperties = () => {
+const termsProperties = () => {
   const result = {};
 
   AVAILABLE_TYPES_NAME.forEach(type => {
     result[type] = {
       oneOf: [
-        { $ref: '#/definitions/singlePageDocument' },
-        { $ref: '#/definitions/multiPageDocument' },
+        { $ref: '#/definitions/singleSourceDocumentTerms' },
+        { $ref: '#/definitions/multipleSourceDocumentsTerms' },
         { $ref: '#/definitions/pdfDocument' },
       ],
     };
@@ -33,7 +33,7 @@ const schema = {
     },
     documents: {
       type: 'object',
-      properties: documentsProperties(),
+      properties: termsProperties(),
       propertyNames: { enum: AVAILABLE_TYPES_NAME },
     },
     importedFrom: {
@@ -52,7 +52,7 @@ const schema = {
       required: ['fetch'],
       properties: { fetch: { $ref: '#/definitions/pdfLocation' } },
     },
-    page: {
+    sourceDocument: {
       type: 'object',
       additionalProperties: false,
       required: ['fetch'],
@@ -60,28 +60,28 @@ const schema = {
         fetch: { $ref: '#/definitions/location' },
         select: { $ref: '#/definitions/contentSelectors' },
         filter: { $ref: '#/definitions/filters' },
-        remove: { $ref: '#/definitions/noiseSelectors' },
+        remove: { $ref: '#/definitions/insignificantContentSelectors' },
         executeClientScripts: { $ref: '#/definitions/executeClientScripts' },
       },
     },
-    singlePageDocument: {
+    singleSourceDocumentTerms: {
       allOf: [
-        { $ref: '#/definitions/page' },
+        { $ref: '#/definitions/sourceDocument' },
         { required: [ 'fetch', 'select' ] },
       ],
     },
-    multiPageDocument: {
+    multipleSourceDocumentsTerms: {
       type: 'object',
       additionalProperties: false,
       required: ['combine'],
       properties: {
         combine: {
           type: 'array',
-          items: { $ref: '#/definitions/page' },
+          items: { $ref: '#/definitions/sourceDocument' },
         },
         select: { $ref: '#/definitions/contentSelectors' },
         filter: { $ref: '#/definitions/filters' },
-        remove: { $ref: '#/definitions/noiseSelectors' },
+        remove: { $ref: '#/definitions/insignificantContentSelectors' },
         executeClientScripts: { $ref: '#/definitions/executeClientScripts' },
       },
     },

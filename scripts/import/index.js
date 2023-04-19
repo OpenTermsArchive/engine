@@ -18,7 +18,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT_PATH = path.resolve(__dirname, '../../');
 const MAX_PARALLEL = 10;
 const MAX_RETRY = 5;
-const PDF_MIME_TYPE = 'application/pdf';
+const PDF_MIME_TYPE = mime.getType('pdf');
 const COUNTERS = {
   imported: 0,
   skippedNoChanges: 0,
@@ -87,10 +87,10 @@ function queueErrorHandler(error, { commit }) {
 
   const serviceId = path.dirname(relativeFilePath);
   const extension = path.extname(relativeFilePath);
-  const documentType = path.basename(relativeFilePath, extension);
+  const termsType = path.basename(relativeFilePath, extension);
 
   commitsNotImported.push(commit.hash);
-  logger.error({ message: `${error.stack}\nCommit details: ${JSON.stringify(commit, null, 2)}`, serviceId, type: documentType, sha: commit.hash });
+  logger.error({ message: `${error.stack}\nCommit details: ${JSON.stringify(commit, null, 2)}`, serviceId, type: termsType, sha: commit.hash });
   COUNTERS.errors++;
 }
 
@@ -117,9 +117,9 @@ function queueDrainHandler(totalToTreat) {
   };
 }
 
-async function getCommitContent({ sha, serviceId, documentType, extension }) {
+async function getCommitContent({ sha, serviceId, termsType, extension }) {
   const start = performance.now();
-  const url = `https://raw.githubusercontent.com/${config.get('import.githubRepository')}/${sha}/${encodeURI(serviceId)}/${encodeURI(documentType)}.${extension}`;
+  const url = `https://raw.githubusercontent.com/${config.get('import.githubRepository')}/${sha}/${encodeURI(serviceId)}/${encodeURI(termsType)}.${extension}`;
   const response = await nodeFetch(url);
   const end = performance.now();
 
@@ -141,7 +141,7 @@ async function getCommitContent({ sha, serviceId, documentType, extension }) {
     throw new TooManyRequestsError(`Cannot get commit content on Github ${url}. 429: Too Many Requests`);
   }
 
-  logger.info({ message: `Fetched in ${Number(end - start).toFixed(2)} ms`, serviceId, type: documentType, sha });
+  logger.info({ message: `Fetched in ${Number(end - start).toFixed(2)} ms`, serviceId, type: termsType, sha });
 
   return content;
 }
@@ -151,12 +151,12 @@ async function handleCommit(commit, index, total) {
 
   let serviceId = path.dirname(relativeFilePath);
   const extension = path.extname(relativeFilePath);
-  let documentType = path.basename(relativeFilePath, extension);
+  let termsType = path.basename(relativeFilePath, extension);
 
   logger.info({
     message: 'Start to handle commit',
     serviceId,
-    type: documentType,
+    type: termsType,
     sha: commit.hash,
     current: index + 1,
     total,
@@ -168,7 +168,7 @@ async function handleCommit(commit, index, total) {
     logger.info({
       message: 'Skipped commit as an entry already exists for this commit',
       serviceId,
-      type: documentType,
+      type: termsType,
       sha: commit.hash,
     });
     COUNTERS.skippedNoChanges++;
@@ -176,9 +176,9 @@ async function handleCommit(commit, index, total) {
     return;
   }
 
-  let content = await getCommitContent({ sha: commit.hash, serviceId, documentType, extension: extension.replace('.', '') });
+  let content = await getCommitContent({ sha: commit.hash, serviceId, termsType, extension: extension.replace('.', '') });
 
-  ({ serviceId, documentType } = renamer.applyRules(serviceId, documentType));
+  ({ serviceId, termsType } = renamer.applyRules(serviceId, termsType));
 
   const mimeType = mime.getType(extension);
 
@@ -198,7 +198,7 @@ async function handleCommit(commit, index, total) {
 
     await snapshotsCollection.insertOne({
       serviceId,
-      documentType,
+      termsType,
       content,
       mimeType,
       fetchDate: commit.date,
@@ -207,10 +207,10 @@ async function handleCommit(commit, index, total) {
     });
     const end = performance.now();
 
-    logger.info({ message: `Recorded in ${Number(end - start).toFixed(2)} ms`, serviceId, type: documentType });
+    logger.info({ message: `Recorded in ${Number(end - start).toFixed(2)} ms`, serviceId, type: termsType });
     COUNTERS.imported++;
   } catch (error) {
-    logger.error({ message: `Not saved: ${commit.date} ${error.stack}`, serviceId, type: documentType });
+    logger.error({ message: `Not saved: ${commit.date} ${error.stack}`, serviceId, type: termsType });
     commitsNotImported.push(commit.hash);
     COUNTERS.errors++;
   }

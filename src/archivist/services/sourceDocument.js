@@ -1,19 +1,21 @@
-export default class PageDeclaration {
-  constructor({ location, executeClientScripts, contentSelectors, noiseSelectors, filters }) {
+export default class SourceDocument {
+  constructor({ location, executeClientScripts, contentSelectors, insignificantContentSelectors, filters, content, mimeType }) {
     this.location = location;
     this.executeClientScripts = executeClientScripts;
     this.contentSelectors = contentSelectors;
-    this.noiseSelectors = noiseSelectors;
+    this.insignificantContentSelectors = insignificantContentSelectors;
     this.filters = filters;
+    this.content = content;
+    this.mimeType = mimeType;
     this.id = new URL(location).pathname.split('/').filter(Boolean).join('-');
   }
 
   get cssSelectors() {
-    const { contentSelectors, noiseSelectors } = this;
+    const { contentSelectors, insignificantContentSelectors } = this;
 
     const result = [
-      ...PageDeclaration.extractCssSelectorsFromProperty(contentSelectors),
-      ...PageDeclaration.extractCssSelectorsFromProperty(noiseSelectors),
+      ...SourceDocument.extractCssSelectorsFromProperty(contentSelectors),
+      ...SourceDocument.extractCssSelectorsFromProperty(insignificantContentSelectors),
     ];
 
     return result.filter(selector => selector);
@@ -23,10 +25,10 @@ export default class PageDeclaration {
     if (Array.isArray(property)) {
       return []
         .concat(property)
-        .flatMap(selector => PageDeclaration.extractCssSelectorsFromSelector(selector));
+        .flatMap(selector => SourceDocument.extractCssSelectorsFromSelector(selector));
     }
 
-    return PageDeclaration.extractCssSelectorsFromSelector(property);
+    return SourceDocument.extractCssSelectorsFromSelector(property);
   }
 
   static extractCssSelectorsFromSelector(selector) {
@@ -43,7 +45,7 @@ export default class PageDeclaration {
     return {
       fetch: this.location,
       select: this.contentSelectors,
-      remove: this.noiseSelectors,
+      remove: this.insignificantContentSelectors,
       filter: this.filters ? this.filters.map(filter => filter.name) : undefined,
       executeClientScripts: this.executeClientScripts,
     };

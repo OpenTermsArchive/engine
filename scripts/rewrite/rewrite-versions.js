@@ -4,7 +4,7 @@ import { fileURLToPath } from 'url';
 import config from 'config';
 
 import { InaccessibleContentError } from '../../src/archivist/errors.js';
-import filter from '../../src/archivist/filter/index.js';
+import extract from '../../src/archivist/extract/index.js';
 import Recorder from '../../src/archivist/recorder/index.js';
 import Git from '../../src/archivist/recorder/repositories/git/git.js';
 import GitRepository from '../../src/archivist/recorder/repositories/git/index.js';
@@ -86,41 +86,41 @@ let recorder;
     const { content, mimeType } = await loadFile(SNAPSHOTS_SOURCE_PATH, relativeFilePath);
 
     let serviceId = path.dirname(relativeFilePath);
-    let documentType = path.basename(relativeFilePath, path.extname(relativeFilePath));
+    let termsType = path.basename(relativeFilePath, path.extname(relativeFilePath));
 
-    ({ serviceId, documentType } = renamer.applyRules(serviceId, documentType));
+    ({ serviceId, termsType } = renamer.applyRules(serviceId, termsType));
 
     if (!servicesDeclarations[serviceId]) {
       console.log(`⌙ Skip unknown service "${serviceId}"`);
       continue;
     }
 
-    const documentDeclaration = servicesDeclarations[serviceId].getDocumentDeclaration(
-      documentType,
+    const terms = servicesDeclarations[serviceId].getTerms(
+      termsType,
       commit.date,
     );
 
-    if (!documentDeclaration) {
-      console.log(`⌙ Skip unknown terms type "${documentType}" for service "${serviceId}"`);
+    if (!terms) {
+      console.log(`⌙ Skip unknown terms type "${termsType}" for service "${serviceId}"`);
       continue;
     }
 
-    if (documentDeclaration.validUntil) {
-      console.log(`⌙ Use declaration valid until ${documentDeclaration.validUntil}`);
+    if (terms.validUntil) {
+      console.log(`⌙ Use declaration valid until ${terms.validUntil}`);
     }
 
     try {
-      const document = await filter({
+      const versionContent = await extract({
         content,
         mimeType,
-        documentDeclaration,
+        terms,
       });
 
       const { id: versionId } = await recorder.recordVersion({
         serviceId,
-        documentType,
-        content: document,
-        mimeType: MARKDOWN_MIME_TYPE, // The result of the `filter` function is always in markdown format
+        termsType,
+        content: versionContent,
+        mimeType: MARKDOWN_MIME_TYPE, // The result of the `extract` function is always in markdown format
         fetchDate: commit.date,
         snapshotId: commit.hash,
       });

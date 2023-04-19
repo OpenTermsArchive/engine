@@ -1,60 +1,64 @@
 export default class Service {
-  documents = new Map();
+  terms = new Map();
 
   constructor({ id, name }) {
     this.id = id;
     this.name = name;
   }
 
-  getDocumentDeclaration(documentType, date) {
-    if (!this.documents[documentType]) {
+  getTerms(termsType, date) {
+    if (!this.terms[termsType]) {
       return null;
     }
 
-    const { latest: currentlyValidDocumentDeclaration, history } = this.documents[documentType];
+    const { latest: currentlyValidTerms, history } = this.terms[termsType];
 
     if (!date) {
-      return currentlyValidDocumentDeclaration;
+      return currentlyValidTerms;
     }
 
     return (
       history?.find(entry => new Date(date) <= new Date(entry.validUntil))
-      || currentlyValidDocumentDeclaration
+      || currentlyValidTerms
     );
   }
 
-  getDocumentTypes() {
-    return Object.keys(this.documents);
+  getTermsTypes() {
+    return Object.keys(this.terms);
   }
 
-  addDocumentDeclaration(document) {
-    if (!document.service) {
-      document.service = this;
+  addTerms(terms) {
+    if (!terms.service) {
+      terms.service = this;
     }
 
-    this.documents[document.type] = this.documents[document.type] || {};
+    this.terms[terms.type] = this.terms[terms.type] || {};
 
-    if (!document.validUntil) {
-      this.documents[document.type].latest = document;
+    if (!terms.validUntil) {
+      this.terms[terms.type].latest = terms;
 
       return;
     }
 
-    this.documents[document.type].history = this.documents[document.type].history || [];
-    this.documents[document.type].history.push(document);
-    this.documents[document.type].history.sort((a, b) => new Date(a.validUntil) - new Date(b.validUntil));
+    this.terms[terms.type].history = this.terms[terms.type].history || [];
+    this.terms[terms.type].history.push(terms);
+    this.terms[terms.type].history.sort((a, b) => new Date(a.validUntil) - new Date(b.validUntil));
   }
 
-  getHistoryDates(documentType) {
-    return this.documents[documentType].history.map(entry => entry.validUntil);
+  getHistoryDates(termsType) {
+    return this.terms[termsType].history.map(entry => entry.validUntil);
   }
 
-  getNumberOfDocuments() {
-    return this.getDocumentTypes().length;
+  getNumberOfTerms() {
+    return this.getTermsTypes().length;
   }
 
   hasHistory() {
     // If a service is loaded without its history it could return false even if a history declaration file exists.
-    return Boolean(Object.keys(this.documents).find(documentType => this.documents[documentType].history));
+    return Boolean(Object.keys(this.terms).find(termsType => this.terms[termsType].history));
+  }
+
+  static getNumberOfTerms(services, servicesIds) {
+    return servicesIds.reduce((acc, serviceId) => acc + services[serviceId].getNumberOfTerms(), 0);
   }
 }

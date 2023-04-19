@@ -6,8 +6,11 @@ import logger from './logger/index.js';
 import Notifier from './notifier/index.js';
 import Tracker from './tracker/index.js';
 
-export default async function track({ services = [], termsTypes: documentTypes, refilterOnly, schedule }) {
-  const archivist = new Archivist({ recorderConfig: config.get('recorder') });
+export default async function track({ services, types, extractOnly, schedule }) {
+  const archivist = new Archivist({
+    recorderConfig: config.get('recorder'),
+    fetcherConfig: config.get('fetcher'),
+  });
 
   archivist.attach(logger);
 
@@ -15,11 +18,9 @@ export default async function track({ services = [], termsTypes: documentTypes, 
 
   logger.info('Start Open Terms Archive\n');
 
-  let serviceIds;
-
-  if (services.length) {
-    serviceIds = services.filter(serviceId => {
-      const isServiceDeclared = archivist.serviceDeclarations[serviceId];
+  if (services?.length) {
+    services = services.filter(serviceId => {
+      const isServiceDeclared = archivist.services[serviceId];
 
       if (!isServiceDeclared) {
         logger.warn(`Parameter "${serviceId}" was interpreted as a service ID to update, but no matching declaration was found; it will be ignored`);
@@ -29,14 +30,16 @@ export default async function track({ services = [], termsTypes: documentTypes, 
     });
   }
 
-  await archivist.refilterAndRecord(serviceIds, documentTypes);
+  // The result of the extraction step that generates the version from the snapshots may depend on changes to the engine or its dependencies.
+  // The process thus starts by only performing the extraction process so that any version following such changes can be labelled (to avoid sending notifications, for example)
+  await archivist.track({ services, types, extractOnly: true });
 
-  if (refilterOnly) {
+  if (extractOnly) {
     return;
   }
 
   if (process.env.NODE_ENV === 'production') {
-    archivist.attach(new Notifier(archivist.serviceDeclarations));
+    archivist.attach(new Notifier(archivist.services));
   }
 
   if (process.env.GITHUB_TOKEN) {
@@ -47,13 +50,13 @@ export default async function track({ services = [], termsTypes: documentTypes, 
   }
 
   if (!schedule) {
-    await archivist.trackChanges(serviceIds, documentTypes);
+    await archivist.track({ services, types });
 
     return;
   }
 
   logger.info('The scheduler is running…');
-  logger.info('Documents will be tracked every six hours starting at half past midnight');
+  logger.info('Terms will be tracked every six hours starting at half past midnight');
 
-  cron('30 */6 * * *', () => archivist.trackChanges(serviceIds, documentTypes));
+  cron('30 */6 * * *', () => archivist.track({ services, types }));
 }

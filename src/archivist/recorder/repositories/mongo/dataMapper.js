@@ -1,32 +1,39 @@
 import { ObjectId } from 'mongodb';
 
-import Record from '../../record.js';
+import Snapshot from '../../snapshot.js';
+import Version from '../../version.js';
 
 export function toPersistence(record) {
-  const documentFields = Object.fromEntries(Object.entries(record));
+  const recordFields = Object.fromEntries(Object.entries(record));
 
-  if (documentFields.snapshotIds) {
-    documentFields.snapshotIds = record.snapshotIds.map(snapshotId => new ObjectId(snapshotId));
+  if (recordFields.snapshotIds) {
+    recordFields.snapshotIds = record.snapshotIds.map(snapshotId => new ObjectId(snapshotId));
   }
 
-  documentFields.content = record.content;
-  documentFields.created_at = new Date();
+  recordFields.content = record.content;
+  recordFields.created_at = new Date();
 
-  return documentFields;
+  return recordFields;
 }
 
-export function toDomain(document) {
-  const { _id, serviceId, documentType, pageId, fetchDate, mimeType, isRefilter, isFirstRecord, snapshotIds } = document;
+export function toDomain(mongoDocument) {
+  const { _id, serviceId, termsType, documentId, fetchDate, mimeType, isExtractOnly, isRefilter, isFirstRecord, snapshotIds } = mongoDocument;
 
-  return new Record({
+  const attributes = {
     id: _id.toString(),
     serviceId,
-    documentType,
-    pageId,
+    termsType,
+    documentId,
     mimeType,
     fetchDate: new Date(fetchDate),
     isFirstRecord: Boolean(isFirstRecord),
-    isRefilter: Boolean(isRefilter),
+    isExtractOnly: Boolean(isExtractOnly) || Boolean(isRefilter),
     snapshotIds: snapshotIds?.map(snapshotId => snapshotId.toString()) || [],
-  });
+  };
+
+  if (snapshotIds) {
+    return new Version(attributes);
+  }
+
+  return new Snapshot(attributes);
 }

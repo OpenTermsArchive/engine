@@ -69,8 +69,8 @@ export default class Tracker {
     return this.onVersionRecorded(serviceId, type);
   }
 
-  async onInaccessibleContent(error, serviceId, type, documentDeclaration) {
-    const { title, body } = Tracker.formatIssueTitleAndBody({ message: error.toString(), repository: this.repository, documentDeclaration });
+  async onInaccessibleContent(error, serviceId, type, terms) {
+    const { title, body } = Tracker.formatIssueTitleAndBody({ message: error.toString(), repository: this.repository, terms });
 
     await this.createIssueIfNotExists({
       title,
@@ -179,9 +179,9 @@ export default class Tracker {
     }
   }
 
-  static formatIssueTitleAndBody({ message, repository, documentDeclaration }) {
-    const { service: { name }, type } = documentDeclaration;
-    const json = documentDeclaration.toPersistence();
+  static formatIssueTitleAndBody({ message, repository, terms }) {
+    const { service: { name }, type } = terms;
+    const json = terms.toPersistence();
     const title = `Fix ${name} - ${type}`;
 
     const encodedName = encodeURIComponent(name);
@@ -195,7 +195,7 @@ export default class Tracker {
     });
 
     const body = `
-This document is no longer properly tracked.
+These terms are no longer tracked.
 
 ${message}
 

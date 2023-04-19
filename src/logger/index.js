@@ -11,15 +11,15 @@ const { combine, timestamp, printf, colorize } = winston.format;
 const alignedWithColorsAndTime = combine(
   colorize(),
   timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
-  printf(({ level, message, timestamp, serviceId, type, pageId }) => {
+  printf(({ level, message, timestamp, serviceId, termsType, documentId }) => {
     let prefix = '';
 
-    if (serviceId && type) {
-      prefix = `${serviceId} — ${type}`;
+    if (serviceId && termsType) {
+      prefix = `${serviceId} — ${termsType}`;
     }
 
-    if (pageId) {
-      prefix = `${prefix}:${pageId}`;
+    if (documentId) {
+      prefix = `${prefix}:${documentId}`;
     }
 
     if (prefix.length > 75) {
@@ -71,61 +71,60 @@ const logger = winston.createLogger({
   rejectionHandlers: transports,
 });
 
-logger.onFirstSnapshotRecorded = (serviceId, type, pageId, snapshotId) => {
-  logger.info({ message: `Recorded first snapshot with id ${snapshotId}`, serviceId, type, pageId });
+logger.onFirstSnapshotRecorded = ({ serviceId, termsType, documentId, id }) => {
+  logger.info({ message: `Recorded first snapshot with id ${id}`, serviceId, termsType, documentId });
   recordedSnapshotsCount++;
 };
 
-logger.onSnapshotRecorded = (serviceId, type, pageId, snapshotId) => {
-  logger.info({ message: `Recorded snapshot with id ${snapshotId}`, serviceId, type, pageId });
+logger.onSnapshotRecorded = ({ serviceId, termsType, documentId, id }) => {
+  logger.info({ message: `Recorded snapshot with id ${id}`, serviceId, termsType, documentId });
   recordedSnapshotsCount++;
 };
 
-logger.onSnapshotNotChanged = (serviceId, type, pageId) => {
-  logger.info({ message: 'No changes, did not record snapshot', serviceId, type, pageId });
+logger.onSnapshotNotChanged = ({ serviceId, termsType, documentId }) => {
+  logger.info({ message: 'No changes, did not record snapshot', serviceId, termsType, documentId });
 };
 
-logger.onFirstVersionRecorded = (serviceId, type, versionId) => {
-  logger.info({ message: `Recorded first version with id ${versionId}`, serviceId, type });
+logger.onFirstVersionRecorded = ({ serviceId, termsType, id }) => {
+  logger.info({ message: `Recorded first version with id ${id}`, serviceId, termsType });
   recordedVersionsCount++;
 };
 
-logger.onVersionRecorded = (serviceId, type, versionId) => {
-  logger.info({ message: `Recorded version with id ${versionId}`, serviceId, type });
+logger.onVersionRecorded = ({ serviceId, termsType, id }) => {
+  logger.info({ message: `Recorded version with id ${id}`, serviceId, termsType });
   recordedVersionsCount++;
 };
 
-logger.onVersionNotChanged = (serviceId, type) => {
-  logger.info({ message: 'No changes after filtering, did not record version', serviceId, type });
+logger.onVersionNotChanged = ({ serviceId, termsType }) => {
+  logger.info({ message: 'No changes after filtering, did not record version', serviceId, termsType });
 };
 
-logger.onRefilteringStarted = (numberOfServices, numberOfDocuments) => {
-  logger.info(`Examining ${numberOfDocuments} documents from ${numberOfServices} services for refiltering…`);
-  recordedVersionsCount = 0;
-};
-
-logger.onRefilteringCompleted = (numberOfServices, numberOfDocuments) => {
-  logger.info(`Examined ${numberOfDocuments} documents from ${numberOfServices} services for refiltering`);
-  logger.info(`Recorded ${recordedVersionsCount} new versions\n`);
-};
-
-logger.onTrackingStarted = (numberOfServices, numberOfDocuments) => {
-  logger.info(`Tracking changes of ${numberOfDocuments} documents from ${numberOfServices} services…`);
+logger.onTrackingStarted = (numberOfServices, numberOfTerms, extractOnly) => {
+  if (extractOnly) {
+    logger.info(`Examining ${numberOfTerms} terms from ${numberOfServices} services for extraction…`);
+  } else {
+    logger.info(`Tracking changes of ${numberOfTerms} terms from ${numberOfServices} services…`);
+  }
   recordedSnapshotsCount = 0;
   recordedVersionsCount = 0;
 };
 
-logger.onTrackingCompleted = (numberOfServices, numberOfDocuments) => {
-  logger.info(`Tracked changes of ${numberOfDocuments} documents from ${numberOfServices} services`);
-  logger.info(`Recorded ${recordedSnapshotsCount} new snapshots and ${recordedVersionsCount} new versions\n`);
+logger.onTrackingCompleted = (numberOfServices, numberOfTerms, extractOnly) => {
+  if (extractOnly) {
+    logger.info(`Examined ${numberOfTerms} terms from ${numberOfServices} services for extraction`);
+    logger.info(`Recorded ${recordedVersionsCount} new versions\n`);
+  } else {
+    logger.info(`Tracked changes of ${numberOfTerms} terms from ${numberOfServices} services`);
+    logger.info(`Recorded ${recordedSnapshotsCount} new snapshots and ${recordedVersionsCount} new versions\n`);
+  }
 };
 
-logger.onInaccessibleContent = ({ message }, serviceId, type) => {
-  logger.warn({ message, serviceId, type });
+logger.onInaccessibleContent = ({ message }, terms) => {
+  logger.warn({ message, serviceId: terms.serviceId, termsType: terms.type });
 };
 
-logger.onError = (error, serviceId, type, pageId) => {
-  logger.error({ message: error.stack, serviceId, type, pageId });
+logger.onError = (error, terms) => {
+  logger.error({ message: error.stack, serviceId: terms.serviceId, termsType: terms.type });
 };
 
 export default logger;

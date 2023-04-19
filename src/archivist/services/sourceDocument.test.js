@@ -1,17 +1,17 @@
 import chai from 'chai';
 
-import PageDeclaration from './pageDeclaration.js';
+import SourceDocument from './sourceDocument.js';
 
 const { expect } = chai;
 
-describe('PageDeclaration', () => {
+describe('SourceDocument', () => {
   const URL = 'https://www.service.example/terms';
 
   describe('#getCssSelectors', () => {
     context('with "select" property', () => {
       context('with string selector', () => {
         it('extracts selectors', async () => {
-          const result = new PageDeclaration({ location: URL, contentSelectors: 'body' }).cssSelectors;
+          const result = new SourceDocument({ location: URL, contentSelectors: 'body' }).cssSelectors;
 
           expect(result).to.deep.equal(['body']);
         });
@@ -19,7 +19,7 @@ describe('PageDeclaration', () => {
 
       context('with range selector', () => {
         it('extracts selectors', async () => {
-          const result = new PageDeclaration({
+          const result = new SourceDocument({
             location: URL,
             contentSelectors: {
               startBefore: '#startBefore',
@@ -33,7 +33,7 @@ describe('PageDeclaration', () => {
 
       context('with an array of mixed selectors', () => {
         it('extracts selectors', async () => {
-          const result = new PageDeclaration({
+          const result = new SourceDocument({
             location: URL,
             contentSelectors: [
               {
@@ -52,7 +52,7 @@ describe('PageDeclaration', () => {
     context('with "remove" property', () => {
       context('with string selector', () => {
         it('extracts selectors', async () => {
-          const result = new PageDeclaration({ location: URL, noiseSelectors: 'body' }).cssSelectors;
+          const result = new SourceDocument({ location: URL, insignificantContentSelectors: 'body' }).cssSelectors;
 
           expect(result).to.deep.equal(['body']);
         });
@@ -60,9 +60,9 @@ describe('PageDeclaration', () => {
 
       context('with range selector', () => {
         it('extracts selectors', async () => {
-          const result = new PageDeclaration({
+          const result = new SourceDocument({
             location: URL,
-            noiseSelectors: {
+            insignificantContentSelectors: {
               startBefore: '#startBefore',
               endBefore: '#endBefore',
             },
@@ -74,9 +74,9 @@ describe('PageDeclaration', () => {
 
       context('with an array of mixed selectors', () => {
         it('extracts selectors', async () => {
-          const result = new PageDeclaration({
+          const result = new SourceDocument({
             location: URL,
-            noiseSelectors: [
+            insignificantContentSelectors: [
               {
                 startBefore: '#startBefore',
                 endBefore: '#endBefore',
@@ -93,10 +93,10 @@ describe('PageDeclaration', () => {
     context('with both "select" and "remove" property', () => {
       context('with string selector', () => {
         it('extracts selectors', async () => {
-          const result = new PageDeclaration({
+          const result = new SourceDocument({
             location: URL,
             contentSelectors: 'body',
-            noiseSelectors: 'h1',
+            insignificantContentSelectors: 'h1',
           }).cssSelectors;
 
           expect(result).to.deep.equal([ 'body', 'h1' ]);
@@ -105,13 +105,13 @@ describe('PageDeclaration', () => {
 
       context('with range selector', () => {
         it('extracts selectors', async () => {
-          const result = new PageDeclaration({
+          const result = new SourceDocument({
             location: URL,
             contentSelectors: {
               startBefore: '#startBefore',
               endBefore: '#endBefore',
             },
-            noiseSelectors: {
+            insignificantContentSelectors: {
               startBefore: '#startBefore',
               endBefore: '#endBefore',
             },
@@ -128,7 +128,7 @@ describe('PageDeclaration', () => {
 
       context('with an array of mixed selectors', () => {
         it('extracts selectors', async () => {
-          const result = new PageDeclaration({
+          const result = new SourceDocument({
             location: URL,
             contentSelectors: [
               {
@@ -137,7 +137,7 @@ describe('PageDeclaration', () => {
               },
               'body',
             ],
-            noiseSelectors: [
+            insignificantContentSelectors: [
               {
                 startBefore: '#startBefore',
                 endBefore: '#endBefore',
@@ -160,8 +160,8 @@ describe('PageDeclaration', () => {
   });
 
   describe('#toPersistence', () => {
-    it('converts basic page declaration into JSON representation', async () => {
-      const result = new PageDeclaration({
+    it('converts basic source document declarations into JSON representation', async () => {
+      const result = new SourceDocument({
         location: URL,
         contentSelectors: 'body',
       }).toPersistence();
@@ -177,8 +177,8 @@ describe('PageDeclaration', () => {
       expect(result).to.deep.equal(expectedResult);
     });
 
-    it('converts page declaration with all fields to JSON representation', async () => {
-      const result = new PageDeclaration({
+    it('converts full source document declarations to JSON representation', async () => {
+      const result = new SourceDocument({
         location: URL,
         contentSelectors: [
           {
@@ -187,7 +187,7 @@ describe('PageDeclaration', () => {
           },
           'body',
         ],
-        noiseSelectors: [
+        insignificantContentSelectors: [
           {
             startBefore: '#startBefore',
             endBefore: '#endBefore',

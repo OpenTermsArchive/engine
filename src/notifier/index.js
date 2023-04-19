@@ -17,28 +17,28 @@ export default class Notifier {
     this.delayedVersionNotificationsParams = [];
   }
 
-  async onVersionRecorded(serviceId, type, versionId) {
-    this.delayedVersionNotificationsParams.push({ serviceId, type, versionId });
+  async onVersionRecorded(record) {
+    this.delayedVersionNotificationsParams.push(record);
   }
 
   async onTrackingCompleted() {
-    this.delayedVersionNotificationsParams.forEach(async ({ serviceId, type, versionId }) => {
+    this.delayedVersionNotificationsParams.forEach(async ({ serviceId, termsType, id }) => {
       try {
-        await this.notifyVersionRecorded(serviceId, type, versionId);
+        await this.notifyVersionRecorded(serviceId, termsType, id);
       } catch (error) {
-        console.error(`The notification for version ${versionId} of ${serviceId} — ${type} can not be sent:`, error);
+        console.error(`The notification for version ${id} of ${serviceId} — ${termsType} can not be sent:`, error);
       }
     });
 
     this.delayedVersionNotificationsParams = [];
   }
 
-  async notifyVersionRecorded(serviceProviderId, documentTypeId, versionId) {
+  async notifyVersionRecorded(serviceProviderId, termsType, versionId) {
     const sendParams = {
       templateId: config.get('notifier.sendInBlue.updateTemplateId'),
       params: {
         SERVICE_PROVIDER_NAME: this.serviceProviders[serviceProviderId].name,
-        DOCUMENT_TYPE: documentTypeId,
+        DOCUMENT_TYPE: termsType,
         SHA: versionId,
       },
     };
@@ -47,7 +47,7 @@ export default class Notifier {
       config.get('notifier.sendInBlue.updatesListId'),
     ];
 
-    const notificationListName = `${this.serviceProviders[serviceProviderId].name} - ${documentTypeId} - Update`;
+    const notificationListName = `${this.serviceProviders[serviceProviderId].name} - ${termsType} - Update`;
     const notificationList = await this.searchContactList(notificationListName);
 
     if (notificationList?.id) {
