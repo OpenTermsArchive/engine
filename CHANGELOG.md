@@ -2,9 +2,12 @@
 
 All changes that impact users of this module are documented in this file, in the [Common Changelog](https://common-changelog.org) format with some additional specifications defined in the CONTRIBUTING file. This codebase adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased [patch]
+## Unreleased
+
+## 0.26.1 - 2023-04-19
 
 ### Changed
+
 - Change URL to engine repo from ambanum/OpenTermsArchive to OpenTermsArchive/engine
 - Replace documentation with links to the documentation website to avoid redundancy
 
