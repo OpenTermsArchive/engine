@@ -125,9 +125,9 @@ The instance name is written in lowercase and is made of one word for each dimen
 
 This name is used consistently in all communication, written references, and in the inventory of instances that are managed automatically. It is also used as the base for naming the database repositories, by suffixing it with each type:
 
-- The repository containing the declarations of services to be tracked is named `$instance_name-declarations`. You can [create it from a template](https://github.com/OpenTermsArchive/template-declarations/generate).
-- The repository containing the snapshots of the tracked documents (unless the instance is storing them in an alternative database) is named `$instance_name-snapshots`. You can [create it from a template](https://github.com/OpenTermsArchive/template-snapshots/generate).
-- The repository containing the versions of the tracked documents (unless the instance is storing them in an alternative database) is named `$instance_name-versions`. You can [create it from a template](https://github.com/OpenTermsArchive/template-versions/generate).
+- The repository containing the declarations of services to be tracked is named `<instance_name>-declarations`. You can [create it from a template](https://github.com/OpenTermsArchive/template-declarations/generate).
+- The repository containing the snapshots of the tracked documents (unless the instance is storing them in an alternative database) is named `<instance_name>-snapshots`. You can [create it from a template](https://github.com/OpenTermsArchive/template-snapshots/generate).
+- The repository containing the versions of the tracked documents (unless the instance is storing them in an alternative database) is named `<instance_name>-versions`. You can [create it from a template](https://github.com/OpenTermsArchive/template-versions/generate).
 
 ### Namespaces
 
