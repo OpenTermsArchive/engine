@@ -1,6 +1,9 @@
 import express from 'express';
 
-const router = express.Router();
+import * as Services from '../../archivist/services/index.js';
+
+const services = await Services.load();
+
 /**
  * @swagger
  * tags:
@@ -52,90 +55,89 @@ const router = express.Router();
  *           type: string
  *           description: The JavaScript function to apply filters to the content.
  */
+const router = express.Router();
 
-export default function servicesRouter(services) {
-  /**
-   * @swagger
-   * /services:
-   *   get:
-   *     summary: Enumerate all services.
-   *     tags: [Services]
-   *     produces:
-   *       - application/json
-   *     responses:
-   *       200:
-   *         description: A JSON array of all services.
-   *         content:
-   *           application/json:
-   *             schema:
-   *               type: array
-   *               items:
-   *                 $ref: '#/components/schemas/Service'
-   */
-  router.get('/', (req, res) => {
-    res.status(200).json(Object.values(services).map(service => ({
-      id: service.id,
-      name: service.name,
-    })));
-  });
+/**
+ * @swagger
+ * /services:
+ *   get:
+ *     summary: Enumerate all services.
+ *     tags: [Services]
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: A JSON array of all services.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Service'
+ */
+router.get('/', (req, res) => {
+  res.status(200).json(Object.values(services).map(service => ({
+    id: service.id,
+    name: service.name,
+  })));
+});
 
-  /**
-   * @swagger
-   * /service/{serviceId}:
-   *   get:
-   *     summary: Retrieve the declaration of a specific service through its ID.
-   *     tags: [Services]
-   *     produces:
-   *       - application/json
-   *     parameters:
-   *       - in: path
-   *         name: serviceId
-   *         description: The ID of the service.
-   *         schema:
-   *           type: string
-   *         required: true
-   *         example: service-1
-   *     responses:
-   *       200:
-   *         description: The full JSON declaration of the service with the given ID.
-   *         content:
-   *           application/json:
-   *             schema:
-   *               $ref: '#/components/schemas/Service'
-   *       404:
-   *         description: No matching service is found.
-   */
-  router.get('/:serviceId', (req, res) => {
-    const service = services[req.params.serviceId];
+/**
+ * @swagger
+ * /service/{serviceId}:
+ *   get:
+ *     summary: Retrieve the declaration of a specific service through its ID.
+ *     tags: [Services]
+ *     produces:
+ *       - application/json
+ *     parameters:
+ *       - in: path
+ *         name: serviceId
+ *         description: The ID of the service.
+ *         schema:
+ *           type: string
+ *         required: true
+ *         example: service-1
+ *     responses:
+ *       200:
+ *         description: The full JSON declaration of the service with the given ID.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Service'
+ *       404:
+ *         description: No matching service is found.
+ */
+router.get('/:serviceId', (req, res) => {
+  const service = services[req.params.serviceId];
 
-    if (!service) {
-      res.status(404).send('Service not found');
+  if (!service) {
+    res.status(404).send('Service not found');
 
-      return;
-    }
+    return;
+  }
 
-    const filters = {};
+  const filters = {};
 
-    res.status(200).json({
-      id: service.id,
-      name: service.name,
-      terms: service.getTerms().map(terms => ({
-        type: terms.type,
-        sourceDocuments: terms.sourceDocuments.map(({ location, contentSelectors, insignificantContentSelectors, filters: sourceDocumentFilters, executeClientScripts }) => ({
-          location,
-          contentSelectors,
-          insignificantContentSelectors,
-          executeClientScripts,
-          filters: sourceDocumentFilters?.map(filter => {
-            filters[filter.name] = filter.toString();
+  res.status(200).json({
+    id: service.id,
+    name: service.name,
+    terms: service.getTerms().map(terms => ({
+      type: terms.type,
+      sourceDocuments: terms.sourceDocuments.map(({ location, contentSelectors, insignificantContentSelectors, filters: sourceDocumentFilters, executeClientScripts }) => ({
+        location,
+        contentSelectors,
+        insignificantContentSelectors,
+        executeClientScripts,
+        filters: sourceDocumentFilters?.map(filter => {
+          filters[filter.name] = filter.toString();
 
-            return filter.name;
-          }),
-        })),
+          return filter.name;
+        }),
       })),
-      filters,
-    });
+    })),
+    filters,
   });
+});
 
-  return router;
-}
+export default router;
