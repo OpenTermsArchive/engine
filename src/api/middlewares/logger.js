@@ -1,10 +1,11 @@
+import morgan from 'morgan';
 import winston from 'winston';
 
 const { combine, timestamp, printf, colorize } = winston.format;
 
 const transports = [new winston.transports.Console()];
 
-const logger = winston.createLogger({
+export const logger = winston.createLogger({
   format: combine(
     colorize(),
     timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
@@ -14,4 +15,6 @@ const logger = winston.createLogger({
   rejectionHandlers: transports,
 });
 
-export default logger;
+const middleware = morgan('tiny', { stream: { write: message => logger.info(message.trim()) } });
+
+export default middleware;

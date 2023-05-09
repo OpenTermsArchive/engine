@@ -4,7 +4,7 @@ import helmet from 'helmet';
 
 import Archivist from '../archivist/index.js';
 
-import logger from './logger.js';
+import loggerMiddleware, { logger } from './middlewares/logger.js';
 import servicesRouter from './routes/services.js';
 import specsRouter from './routes/specs.js';
 
@@ -18,6 +18,11 @@ apiRouter.use('/services', servicesRouter(archivist.services));
 const app = express();
 
 app.use(helmet());
+
+if (process.env.NODE_ENV !== 'test') {
+  app.use(loggerMiddleware);
+}
+
 app.use(`${config.get('api.basePath')}/v1`, apiRouter);
 
 app.listen(config.get('api.port'));
