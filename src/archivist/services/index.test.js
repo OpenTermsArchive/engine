@@ -22,7 +22,7 @@ describe('Services', () => {
           let actualInsignificantContentSelectors;
           let actualExecuteClientScripts;
 
-          const expectedTerms = expected.getTerms(termsType);
+          const expectedTerms = expected.getTerms({ type: termsType });
 
           const { sourceDocuments } = expectedTerms;
 
@@ -36,7 +36,7 @@ describe('Services', () => {
 
             context(`source document: ${sourceDocument.id}`, () => {
               before(() => {
-                actualTerms = result[serviceId].getTerms(termsType);
+                actualTerms = result[serviceId].getTerms({ type: termsType });
                 const { sourceDocuments: actualDocuments } = actualTerms;
 
                 ({
@@ -148,12 +148,12 @@ describe('Services', () => {
 
           let actualTerms;
           let actualFilters;
-          const expectedTerms = expected.getTerms(termsType);
+          const expectedTerms = expected.getTerms({ type: termsType });
 
           const { sourceDocuments } = expectedTerms;
 
           before(() => {
-            actualTerms = result[serviceId].getTerms(termsType);
+            actualTerms = result[serviceId].getTerms({ type: termsType });
           });
 
           it('has the proper service name', () => {
@@ -182,7 +182,7 @@ describe('Services', () => {
                     let insignificantContentSelectorsForThisDate;
                     let actualExecuteClientScriptsForThisDate;
 
-                    const { sourceDocuments: documentsForThisDate } = expected.getTerms(termsType, date);
+                    const { sourceDocuments: documentsForThisDate } = expected.getTerms({ type: termsType, date });
                     const {
                       filters: expectedFiltersForThisDate,
                       contentSelectors: expectedContentSelectors,
@@ -191,7 +191,7 @@ describe('Services', () => {
                     } = documentsForThisDate[index];
 
                     before(() => {
-                      const { sourceDocuments: actualDocumentsForThisDate } = result[serviceId].getTerms(termsType, date);
+                      const { sourceDocuments: actualDocumentsForThisDate } = result[serviceId].getTerms({ type: termsType, date });
 
                       ({
                         filters: actualFiltersForThisDate,

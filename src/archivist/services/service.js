@@ -6,19 +6,23 @@ export default class Service {
     this.name = name;
   }
 
-  getTerms(termsType) {
-    if (!termsType) {
-      return this.getTermsTypes().map(termsType => this.getTerms(termsType));
+  getTerms({ type: termsType, date } = {}) {
+    if (termsType) {
+      if (date) {
+        return this.#getTermsAtDate(termsType, date);
+      }
+
+      return this.#getTermsAtDate(termsType, new Date());
     }
 
-    return this.terms[termsType]?.latest;
+    if (date) {
+      return this.getTermsTypes().map(termsType => this.#getTermsAtDate(termsType, date));
+    }
+
+    return this.getTermsTypes().map(termsType => this.#getTermsAtDate(termsType, new Date()));
   }
 
-  getTermsAtDate(termsType, date) {
-    if (!date) {
-      return this.getTerms(termsType);
-    }
-
+  #getTermsAtDate(termsType, date) {
     const { latest: currentlyValidTerms, history } = this.terms[termsType];
 
     return history?.find(entry => new Date(date) <= new Date(entry.validUntil)) || currentlyValidTerms;

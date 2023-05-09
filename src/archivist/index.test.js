@@ -164,7 +164,7 @@ describe('Archivist', function () {
 
             serviceBCommits = await gitVersion.log({ file: SERVICE_B_EXPECTED_VERSION_FILE_PATH });
 
-            app.services[SERVICE_A_ID].getTerms(SERVICE_A_TYPE).sourceDocuments[0].contentSelectors = 'h1';
+            app.services[SERVICE_A_ID].getTerms({ type: SERVICE_A_TYPE }).sourceDocuments[0].contentSelectors = 'h1';
 
             await app.track({ services: [ 'service_A', 'service_B' ], extractOnly: true });
 
@@ -218,7 +218,7 @@ describe('Archivist', function () {
 
             await app.initialize();
             await app.track({ services });
-            app.services[SERVICE_A_ID].getTerms(SERVICE_A_TYPE).sourceDocuments[0].contentSelectors = 'inexistant-selector';
+            app.services[SERVICE_A_ID].getTerms({ type: SERVICE_A_TYPE }).sourceDocuments[0].contentSelectors = 'inexistant-selector';
             inaccessibleContentSpy = sinon.spy();
             versionNotChangedSpy = sinon.spy();
             app.on('inaccessibleContent', inaccessibleContentSpy);
@@ -282,7 +282,7 @@ describe('Archivist', function () {
       let snapshot;
 
       before(async () => {
-        terms = app.services.service_A.getTerms(SERVICE_A_TYPE);
+        terms = app.services.service_A.getTerms({ type: SERVICE_A_TYPE });
         terms.fetchDate = FETCH_DATE;
         terms.sourceDocuments.forEach(async sourceDocument => {
           sourceDocument.content = serviceASnapshotExpectedContent;
@@ -364,7 +364,7 @@ describe('Archivist', function () {
       let version;
 
       before(async () => {
-        terms = app.services.service_A.getTerms(SERVICE_A_TYPE);
+        terms = app.services.service_A.getTerms({ type: SERVICE_A_TYPE });
         terms.fetchDate = FETCH_DATE;
         terms.sourceDocuments.forEach(async sourceDocument => {
           sourceDocument.content = serviceASnapshotExpectedContent;

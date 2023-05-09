@@ -108,7 +108,7 @@ export default class Archivist extends events.EventEmitter {
           return;
         }
 
-        this.trackingQueue.push({ terms: this.services[serviceId].getTerms(termsType), extractOnly });
+        this.trackingQueue.push({ terms: this.services[serviceId].getTerms({ type: termsType }), extractOnly });
       });
     });
 
