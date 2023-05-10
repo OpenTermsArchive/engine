@@ -2,7 +2,8 @@ import config from 'config';
 import express from 'express';
 import helmet from 'helmet';
 
-import loggerMiddleware, { logger } from './middlewares/logger.js';
+import logger from './logger.js';
+import loggerMiddleware from './middlewares/logger.js';
 import apiRouter from './routes/index.js';
 
 const app = express();
