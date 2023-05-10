@@ -52,8 +52,8 @@ const services = await Services.load();
  *                         description: The names of filters to apply to the content.
  *           description: The terms of service and privacy policy for the service.
  *         filters:
- *           type: string
- *           description: The JavaScript function to apply filters to the content.
+ *           type: array
+ *           description: The JavaScript functions to apply filters to the content.
  */
 const router = express.Router();
 
