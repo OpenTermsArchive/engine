@@ -107,7 +107,8 @@ router.get('/', (req, res) => {
  *         description: No service matching the provided ID is found.
  */
 router.get('/:serviceId', (req, res) => {
-  const service = services[req.params.serviceId];
+  const matchedServiceID = Object.keys(services).find(key => key.toLowerCase() === req.params.serviceId?.toLowerCase());
+  const service = services[matchedServiceID];
 
   if (!service) {
     res.status(404).send('Service not found');
