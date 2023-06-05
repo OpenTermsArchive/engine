@@ -4,9 +4,11 @@ All changes that impact users of this module are documented in this file, in the
 
 ## Unreleased [minor]
 
+_Full changeset and discussions: [#1011](https://github.com/OpenTermsArchive/engine/pull/1011)._
+
 ### Added
 
-- Add collection metadata API
+- Add collection metadata API ([#1003](https://github.com/OpenTermsArchive/engine/issues/1003))
 - Add `ota serve` command to CLI to start the server and expose the API
 
 ## 0.28.0 - 2023-04-25
