@@ -43,7 +43,7 @@ describe('Services API', () => {
     let response;
 
     before(async () => {
-      response = await request(app).get(`${basePath}/v1/services/service_A`);
+      response = await request(app).get(`${basePath}/v1/services/${encodeURI('Service B!')}`);
     });
 
     it('responds with 200 status code', () => {
