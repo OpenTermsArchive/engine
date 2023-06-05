@@ -13,7 +13,7 @@ const services = {
   service_with_declaration_history: serviceWithDeclarationHistory,
   service_with_multiple_source_documents_terms: serviceWithMultipleSourceDocumentsTerms,
   service_A: serviceA,
-  service_B: serviceB,
+  'Service B!': serviceB,
 };
 
 export default services;

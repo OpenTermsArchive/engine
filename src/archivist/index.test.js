@@ -42,14 +42,14 @@ describe('Archivist', function () {
   let serviceASnapshotExpectedContent;
   let serviceAVersionExpectedContent;
 
-  const SERVICE_B_ID = 'service_B';
+  const SERVICE_B_ID = 'Service B!';
   const SERVICE_B_TYPE = 'Privacy Policy';
   const SERVICE_B_EXPECTED_SNAPSHOT_FILE_PATH = `${SNAPSHOTS_PATH}/${SERVICE_B_ID}/${SERVICE_B_TYPE}.pdf`;
   const SERVICE_B_EXPECTED_VERSION_FILE_PATH = `${VERSIONS_PATH}/${SERVICE_B_ID}/${SERVICE_B_TYPE}.md`;
   let serviceBSnapshotExpectedContent;
   let serviceBVersionExpectedContent;
 
-  const services = [ 'service_A', 'service_B' ];
+  const services = [ 'service_A', 'Service B!' ];
 
   before(async () => {
     gitVersion = new Git({
@@ -166,7 +166,7 @@ describe('Archivist', function () {
 
             app.services[SERVICE_A_ID].getTerms({ type: SERVICE_A_TYPE }).sourceDocuments[0].contentSelectors = 'h1';
 
-            await app.track({ services: [ 'service_A', 'service_B' ], extractOnly: true });
+            await app.track({ services: [ 'service_A', 'Service B!' ], extractOnly: true });
 
             const [reExtractedVersionCommit] = await gitVersion.log({ file: SERVICE_A_EXPECTED_VERSION_FILE_PATH });
 
@@ -223,7 +223,7 @@ describe('Archivist', function () {
             versionNotChangedSpy = sinon.spy();
             app.on('inaccessibleContent', inaccessibleContentSpy);
             app.on('versionNotChanged', record => {
-              if (record.serviceId == 'service_B') {
+              if (record.serviceId == 'Service B!') {
                 versionB = record;
               }
               versionNotChangedSpy(record);

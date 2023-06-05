@@ -1,5 +1,5 @@
 {
-  "name": "Service B",
+  "name": "Service B!",
   "documents": {
     "Privacy Policy": {
       "fetch": "https://www.serviceb.example/privacy",
