@@ -52,9 +52,6 @@ const services = await Services.load();
  *                       items:
  *                         type: string
  *                         description: The names of filters to apply to the content.
- *         filters:
- *           type: array
- *           description: The JavaScript functions to apply filters to the content.
  */
 const router = express.Router();
 
@@ -118,8 +115,6 @@ router.get('/:serviceId', (req, res) => {
     return;
   }
 
-  const filters = {};
-
   res.status(200).json({
     id: service.id,
     name: service.name,
@@ -130,14 +125,9 @@ router.get('/:serviceId', (req, res) => {
         contentSelectors,
         insignificantContentSelectors,
         executeClientScripts,
-        filters: sourceDocumentFilters?.map(filter => {
-          filters[filter.name] = filter.toString();
-
-          return filter.name;
-        }),
+        filters: sourceDocumentFilters?.map(filter => filter.name),
       })),
     })),
-    filters,
   });
 });
 

@@ -62,10 +62,6 @@ describe('Services API', () => {
       expect(response.body).to.have.property('name');
     });
 
-    it('returns a service object with filters', () => {
-      expect(response.body).to.have.property('filters');
-    });
-
     it('returns a service object with an array of terms', () => {
       expect(response.body).to.have.property('terms').that.is.an('array');
     });
