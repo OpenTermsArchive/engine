@@ -92,7 +92,7 @@ describe('Services API', () => {
 
     context('When no matching service is found', () => {
       before(async () => {
-        response = await request(app).get(`${basePath}/v1/inexistantService`);
+        response = await request(app).get(`${basePath}/v1/nonExistentService`);
       });
 
       it('responds with 404 status code', () => {
