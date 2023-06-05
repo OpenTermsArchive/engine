@@ -95,10 +95,10 @@ let recorder;
       continue;
     }
 
-    const terms = servicesDeclarations[serviceId].getTerms(
-      termsType,
-      commit.date,
-    );
+    const terms = servicesDeclarations[serviceId].getTerms({
+      type: termsType,
+      date: commit.date,
+    });
 
     if (!terms) {
       console.log(`⌙ Skip unknown terms type "${termsType}" for service "${serviceId}"`);

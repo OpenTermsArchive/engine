@@ -90,7 +90,7 @@ export default async options => {
             })
             .forEach(type => {
               describe(type, () => {
-                const terms = service.getTerms(type);
+                const terms = service.getTerms({ type });
 
                 terms.sourceDocuments.forEach(sourceDocument => {
                   let filteredContent;

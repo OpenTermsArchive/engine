@@ -22,7 +22,7 @@ describe('Services', () => {
           let actualInsignificantContentSelectors;
           let actualExecuteClientScripts;
 
-          const expectedTerms = expected.getTerms(termsType);
+          const expectedTerms = expected.getTerms({ type: termsType });
 
           const { sourceDocuments } = expectedTerms;
 
@@ -36,7 +36,7 @@ describe('Services', () => {
 
             context(`source document: ${sourceDocument.id}`, () => {
               before(() => {
-                actualTerms = result[serviceId].getTerms(termsType);
+                actualTerms = result[serviceId].getTerms({ type: termsType });
                 const { sourceDocuments: actualDocuments } = actualTerms;
 
                 ({
@@ -102,7 +102,7 @@ describe('Services', () => {
     });
 
     describe('Service B', async () => {
-      await validateServiceWithoutHistory('service_B', expectedServices.service_B);
+      await validateServiceWithoutHistory('Service B!', expectedServices['Service B!']);
     });
 
     describe('Service without history', async () => {
@@ -127,11 +127,11 @@ describe('Services', () => {
 
     context('when specifying services to load', async () => {
       before(async () => {
-        result = await services.load([ 'service_A', 'service_B' ]);
+        result = await services.load([ 'service_A', 'Service B!' ]);
       });
 
       it('loads only the given services', async () => {
-        expect(result).to.have.all.keys('service_A', 'service_B');
+        expect(result).to.have.all.keys('service_A', 'Service B!');
       });
     });
   });
@@ -148,12 +148,12 @@ describe('Services', () => {
 
           let actualTerms;
           let actualFilters;
-          const expectedTerms = expected.getTerms(termsType);
+          const expectedTerms = expected.getTerms({ type: termsType });
 
           const { sourceDocuments } = expectedTerms;
 
           before(() => {
-            actualTerms = result[serviceId].getTerms(termsType);
+            actualTerms = result[serviceId].getTerms({ type: termsType });
           });
 
           it('has the proper service name', () => {
@@ -182,7 +182,7 @@ describe('Services', () => {
                     let insignificantContentSelectorsForThisDate;
                     let actualExecuteClientScriptsForThisDate;
 
-                    const { sourceDocuments: documentsForThisDate } = expected.getTerms(termsType, date);
+                    const { sourceDocuments: documentsForThisDate } = expected.getTerms({ type: termsType, date });
                     const {
                       filters: expectedFiltersForThisDate,
                       contentSelectors: expectedContentSelectors,
@@ -191,7 +191,7 @@ describe('Services', () => {
                     } = documentsForThisDate[index];
 
                     before(() => {
-                      const { sourceDocuments: actualDocumentsForThisDate } = result[serviceId].getTerms(termsType, date);
+                      const { sourceDocuments: actualDocumentsForThisDate } = result[serviceId].getTerms({ type: termsType, date });
 
                       ({
                         filters: actualFiltersForThisDate,
@@ -271,7 +271,7 @@ describe('Services', () => {
     });
 
     describe('Service B', async () => {
-      await validateServiceWithHistory('service_B', expectedServices.service_B);
+      await validateServiceWithHistory('Service B!', expectedServices['Service B!']);
     });
 
     describe('Service without history', async () => {
@@ -296,11 +296,11 @@ describe('Services', () => {
 
     context('when specifying services to load', async () => {
       before(async () => {
-        result = await services.loadWithHistory([ 'service_A', 'service_B' ]);
+        result = await services.loadWithHistory([ 'service_A', 'Service B!' ]);
       });
 
       it('loads only the given services', async () => {
-        expect(result).to.have.all.keys('service_A', 'service_B');
+        expect(result).to.have.all.keys('service_A', 'Service B!');
       });
     });
   });

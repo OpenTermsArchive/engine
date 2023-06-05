@@ -39,6 +39,7 @@
     "lint": "eslint src test scripts bin",
     "lint:fix": "npm run lint -- --fix",
     "start": "node --max-http-header-size=32768 bin/ota.js track",
+    "start:api": "node bin/ota.js serve",
     "start:scheduler": "npm start -- --schedule",
     "test": "cross-env NODE_ENV=test mocha --recursive \"./src/**/*.test.js\" \"./scripts/**/*.test.js\" --exit",
     "posttest": "npm run lint",
@@ -68,7 +69,9 @@
     "eslint-plugin-chai-friendly": "^0.7.2",
     "eslint-plugin-import": "^2.25.3",
     "eslint-plugin-json-format": "^2.0.1",
+    "express": "^4.18.2",
     "fs-extra": "^10.0.0",
+    "helmet": "^6.0.1",
     "http-proxy-agent": "^5.0.0",
     "https": "^1.0.0",
     "https-proxy-agent": "^5.0.0",
@@ -80,6 +83,7 @@
     "mime": "^2.5.2",
     "mocha": "^9.1.3",
     "mongodb": "^4.9.0",
+    "morgan": "^1.10.0",
     "node-fetch": "^3.1.0",
     "octokit": "^1.7.0",
     "pdfjs-dist": "^2.9.359",
@@ -88,6 +92,7 @@
     "puppeteer-extra-plugin-stealth": "^2.9.0",
     "sib-api-v3-sdk": "^8.2.1",
     "simple-git": "^3.8.0",
+    "swagger-jsdoc": "^6.2.8",
     "winston": "^3.3.3",
     "winston-mail": "^2.0.0"
   },
@@ -97,7 +102,8 @@
     "node-stream-zip": "^1.15.0",
     "prettier": "^2.2.1",
     "sinon": "^12.0.1",
-    "sinon-chai": "^3.7.0"
+    "sinon-chai": "^3.7.0",
+    "supertest": "^6.3.3"
   },
   "peerDependencies": {
     "@opentermsarchive/terms-types": "~0.1.1"

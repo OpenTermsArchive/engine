@@ -2,7 +2,14 @@
 
 All changes that impact users of this module are documented in this file, in the [Common Changelog](https://common-changelog.org) format with some additional specifications defined in the CONTRIBUTING file. This codebase adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased
+## Unreleased [minor]
+
+_Full changeset and discussions: [#1011](https://github.com/OpenTermsArchive/engine/pull/1011)._
+
+### Added
+
+- Add collection metadata API ([#1003](https://github.com/OpenTermsArchive/engine/issues/1003))
+- Add `ota serve` command to CLI to start the server and expose the API
 
 ## 0.28.0 - 2023-04-25
 

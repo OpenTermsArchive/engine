@@ -65,6 +65,8 @@ export default class Archivist extends events.EventEmitter {
       await this.recorder.finalize().then(() => console.log('Recorder finalized'));
       process.exit(1);
     });
+
+    return this;
   }
 
   initQueue() {
@@ -106,7 +108,7 @@ export default class Archivist extends events.EventEmitter {
           return;
         }
 
-        this.trackingQueue.push({ terms: this.services[serviceId].getTerms(termsType), extractOnly });
+        this.trackingQueue.push({ terms: this.services[serviceId].getTerms({ type: termsType }), extractOnly });
       });
     });
 
