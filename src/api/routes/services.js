@@ -13,6 +13,7 @@ const services = await Services.load();
  *   schemas:
  *     Service:
  *       type: object
+ *       description: Definition of a service and the agreements its provider sets forth. While the information is the same, the format differs from the JSON declaration files that are designed for readability by contributors.
  *       properties:
  *         id:
  *           type: string
@@ -22,6 +23,7 @@ const services = await Services.load();
  *           description: The name of the service.
  *         terms:
  *           type: array
+ *           description: Information that enables tracking the content of agreements defined by the service provider.
  *           items:
  *             type: object
  *             properties:
@@ -50,7 +52,6 @@ const services = await Services.load();
  *                       items:
  *                         type: string
  *                         description: The names of filters to apply to the content.
- *           description: The terms of service and privacy policy for the service.
  *         filters:
  *           type: array
  *           description: The JavaScript functions to apply filters to the content.
@@ -106,7 +107,7 @@ router.get('/', (req, res) => {
  *             schema:
  *               $ref: '#/components/schemas/Service'
  *       404:
- *         description: No matching service is found.
+ *         description: No service matching the provided ID is found.
  */
 router.get('/:serviceId', (req, res) => {
   const service = services[req.params.serviceId];
