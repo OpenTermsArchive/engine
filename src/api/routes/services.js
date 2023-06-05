@@ -37,7 +37,8 @@ const services = await Services.load();
  *                   properties:
  *                     location:
  *                       type: string
- *                       description: The URL location of the source document.
+ *                       format: uri
+ *                       description: The URL of the source document.
  *                     executeClientScripts:
  *                       type: boolean
  *                       description: Whether client-side scripts should be executed.
@@ -49,9 +50,9 @@ const services = await Services.load();
  *                       description: The CSS selectors for selecting insignificant content.
  *                     filters:
  *                       type: array
+ *                       description: The names of filters to apply to the content.
  *                       items:
  *                         type: string
- *                         description: The names of filters to apply to the content.
  */
 const router = express.Router();
 
@@ -95,7 +96,13 @@ router.get('/', (req, res) => {
  *         schema:
  *           type: string
  *         required: true
- *         example: service-1
+ *         examples:
+ *             service-1:
+ *               value: service-1
+ *               summary: Simple service ID
+ *             service-2:
+ *               value: Service 2!
+ *               summary: Service ID with spaces and special characters
  *     responses:
  *       200:
  *         description: The full JSON declaration of the service with the given ID.
