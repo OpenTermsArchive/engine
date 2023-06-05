@@ -128,12 +128,12 @@ router.get('/:serviceId', (req, res) => {
     name: service.name,
     terms: service.getTerms().map(terms => ({
       type: terms.type,
-      sourceDocuments: terms.sourceDocuments.map(({ location, contentSelectors, insignificantContentSelectors, filters: sourceDocumentFilters, executeClientScripts }) => ({
+      sourceDocuments: terms.sourceDocuments.map(({ location, contentSelectors, insignificantContentSelectors, filters, executeClientScripts }) => ({
         location,
         contentSelectors,
         insignificantContentSelectors,
         executeClientScripts,
-        filters: sourceDocumentFilters?.map(filter => filter.name),
+        filters: filters?.map(filter => filter.name),
       })),
     })),
   });
