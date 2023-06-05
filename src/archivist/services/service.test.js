@@ -19,7 +19,7 @@ describe('Service', () => {
       });
     });
 
-    context('when terms has no validity date', () => {
+    context('when terms have no validity date', () => {
       before(async () => {
         subject = new Service({ id: 'serviceID', name: 'serviceName' });
         subject.addTerms(terms);
@@ -30,7 +30,7 @@ describe('Service', () => {
       });
     });
 
-    context('when terms has a validity date', () => {
+    context('when terms have a validity date', () => {
       let expiredTerms;
       const VALIDITY_DATE = new Date('2020-07-22T11:30:21.000Z');
 
@@ -82,8 +82,8 @@ describe('Service', () => {
     context('when a terms type is given', () => {
       context('when a date is given', () => {
         context('when the terms has no history', () => {
-          it('returns the last terms according to the given type', async () => {
             expect(subject.getTerms({ type: 'Developer Terms', date: '2020-08-21T11:30:21.000Z' })).to.eql(latestDeveloperTerms);
+          it('returns the latest terms according to the given type', async () => {
           });
         });
 
@@ -101,7 +101,7 @@ describe('Service', () => {
       });
 
       context('without a given date', () => {
-        it('returns the last terms according to the given type', async () => {
+        it('returns the latest terms of given type', async () => {
           expect(subject.getTerms({ type: TERMS_TYPE })).to.eql(latestTermsOfService);
         });
       });
@@ -109,8 +109,8 @@ describe('Service', () => {
 
     context('when only a date is given', () => {
       context('when there is no history', () => {
-        it('returns all last terms', async () => {
           expect(subject.getTerms({ date: '2020-08-21T11:30:21.000Z' })).to.deep.eql([ latestTermsOfService, latestPrivacyPolicy, latestDeveloperTerms ]);
+        it('returns all latest terms', async () => {
         });
       });
 

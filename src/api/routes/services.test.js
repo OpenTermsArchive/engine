@@ -82,7 +82,7 @@ describe('Services API', () => {
       });
     });
 
-    it('each source documents should have a location', () => {
+    it('each source document should have a location', () => {
       response.body.terms.forEach(terms => {
         terms.sourceDocuments.forEach(sourceDocument => {
           expect(sourceDocument).to.have.property('location');
