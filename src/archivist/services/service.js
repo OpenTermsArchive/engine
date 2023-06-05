@@ -6,13 +6,13 @@ export default class Service {
     this.name = name;
   }
 
-  getTerms({ type: termsType, date } = {}) {
-    if (termsType) {
+  getTerms({ type, date } = {}) {
+    if (type) {
       if (date) {
-        return this.#getTermsAtDate(termsType, date);
+        return this.#getTermsAtDate(type, date);
       }
 
-      return this.#getTermsAtDate(termsType, new Date());
+      return this.#getTermsAtDate(type, new Date());
     }
 
     if (date) {
