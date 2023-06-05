@@ -15,7 +15,6 @@ router.get('/', (req, res) => {
       info: {
         title: 'Open Terms Archive API',
         version: '1.0.0',
-        description: 'Collection API of Open Terms Archive',
         license: {
           name: 'EUPL-1.2',
           url: 'https://eupl.eu/1.2/',

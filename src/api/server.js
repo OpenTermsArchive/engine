@@ -19,6 +19,6 @@ app.use(`${config.get('api.basePath')}/v1`, apiRouter);
 app.use(errorsMiddleware);
 
 app.listen(config.get('api.port'));
-logger.info('Start Open Terms Archive collection metadata API\n');
+logger.info('Start Open Terms Archive API\n');
 
 export default app;
