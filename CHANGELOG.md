@@ -8,7 +8,7 @@ _Full changeset and discussions: [#1013](https://github.com/OpenTermsArchive/eng
 
 ### Fixed
 
-- Fix issue creation on GitHub's tracker ([#1012](https://github.com/OpenTermsArchive/engine/issues/1012))
+- Fix issue creation on GitHub tracker ([#1012](https://github.com/OpenTermsArchive/engine/issues/1012))
 
 ## 0.29.0 - 2023-06-05
 
