@@ -69,7 +69,7 @@ export default class Tracker {
     return this.onVersionRecorded(serviceId, type);
   }
 
-  async onInaccessibleContent(error, serviceId, type, terms) {
+  async onInaccessibleContent(error, terms) {
     const { title, body } = Tracker.formatIssueTitleAndBody({ message: error.toString(), repository: this.repository, terms });
 
     await this.createIssueIfNotExists({
