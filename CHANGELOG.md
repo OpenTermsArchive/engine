@@ -2,7 +2,13 @@
 
 All changes that impact users of this module are documented in this file, in the [Common Changelog](https://common-changelog.org) format with some additional specifications defined in the CONTRIBUTING file. This codebase adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased
+## Unreleased [patch]
+
+_Full changeset and discussions: [#1013](https://github.com/OpenTermsArchive/engine/pull/1013)._
+
+### Fixed
+
+- Fix issue creation on GitHub's tracker ([#1012](https://github.com/OpenTermsArchive/engine/issues/1012))
 
 ## 0.29.0 - 2023-06-05
 
