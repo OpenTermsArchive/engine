@@ -93,6 +93,7 @@
     "sib-api-v3-sdk": "^8.2.1",
     "simple-git": "^3.8.0",
     "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "4.6.2",
     "winston": "^3.3.3",
     "winston-mail": "^2.0.0"
   },

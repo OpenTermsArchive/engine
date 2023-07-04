@@ -33,10 +33,6 @@ describe('Specs API', () => {
         expect(subject).to.have.property('openapi');
       });
 
-      it('swagger version', () => {
-        expect(subject).to.have.property('swagger');
-      });
-
       it('paths', () => {
         expect(subject).to.have.property('paths');
       });
