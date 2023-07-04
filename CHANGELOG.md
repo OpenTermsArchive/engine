@@ -2,7 +2,11 @@
 
 All changes that impact users of this module are documented in this file, in the [Common Changelog](https://common-changelog.org) format with some additional specifications defined in the CONTRIBUTING file. This codebase adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased
+## Unreleased [minor]
+
+### Added
+
+- Expose collection metadata API documentation with a user-friendly interface
 
 ## 0.29.1 - 2023-06-26
 
