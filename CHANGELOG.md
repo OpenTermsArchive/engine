@@ -4,6 +4,8 @@ All changes that impact users of this module are documented in this file, in the
 
 ## Unreleased [minor]
 
+_Full changeset and discussions: [#1015](https://github.com/OpenTermsArchive/engine/pull/1015)._
+
 ### Added
 
 - Expose collection metadata API documentation with a user-friendly interface
