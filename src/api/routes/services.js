@@ -83,7 +83,7 @@ router.get('/', (req, res) => {
 
 /**
  * @swagger
- * /service/{serviceId}:
+ * /services/{serviceId}:
  *   get:
  *     summary: Retrieve the declaration of a specific service through its ID.
  *     tags: [Services]
