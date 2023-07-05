@@ -46,8 +46,8 @@ describe('Specs API', () => {
           expect(subject).to.have.property('/services');
         });
 
-        it('/service/{serviceId}', () => {
-          expect(subject).to.have.property('/service/{serviceId}');
+        it('/services/{serviceId}', () => {
+          expect(subject).to.have.property('/services/{serviceId}');
         });
       });
     });
