@@ -12,7 +12,9 @@ if (process.env.NODE_ENV !== 'test') {
   app.use(loggerMiddleware);
 }
 
-app.use(`${config.get('api.basePath')}/v1`, apiRouter);
+const basePath = `${config.get('api.basePath')}/v1`;
+
+app.use(basePath, apiRouter(basePath));
 app.use(errorsMiddleware);
 
 app.listen(config.get('api.port'));
