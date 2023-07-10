@@ -12,8 +12,8 @@ _Full changeset and discussions: [#1015](https://github.com/OpenTermsArchive/eng
 
 ### Changed
 
-- Change path from `/services/:serviceId` to `/service/:serviceId` for direct access to a `service` resource; update paths accordingly in your own codebase
-- Change path from `/specs` to `/docs` for OpenAPI specification; update paths accordingly in your own codebase and set the HTTP header `Accept: application/json`
+- **Breaking:** Change path from `/services/:serviceId` to `/service/:serviceId` for direct access to a `service` resource; update paths accordingly in your own codebase
+- **Breaking:** Change path from `/specs` to `/docs` for OpenAPI specification; update paths accordingly in your own codebase and set the HTTP header `Accept: application/json`
 
 ## 0.29.1 - 2023-06-26
 
