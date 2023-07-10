@@ -13,7 +13,7 @@ _Full changeset and discussions: [#1015](https://github.com/OpenTermsArchive/eng
 
 ### Added
 
-- Embed [Swagger UI](https://swagger.io) for graphical user interface documentation of the API
+- Embed [Swagger UI](https://swagger.io) for graphical user interface documentation of the API; access it on `/docs`
 
 ## 0.29.1 - 2023-06-26
 
