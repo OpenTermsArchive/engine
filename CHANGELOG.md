@@ -6,14 +6,14 @@ All changes that impact users of this module are documented in this file, in the
 
 _Full changeset and discussions: [#1015](https://github.com/OpenTermsArchive/engine/pull/1015)._
 
-### Added
-
-- Embed [Swagger UI](https://swagger.io) for graphical user interface documentation of the API
-
 ### Changed
 
 - **Breaking:** Change path from `/services/:serviceId` to `/service/:serviceId` for direct access to a `service` resource; update paths accordingly in your own codebase
 - **Breaking:** Change path from `/specs` to `/docs` for OpenAPI specification; update paths accordingly in your own codebase and set the HTTP header `Accept: application/json`
+
+### Added
+
+- Embed [Swagger UI](https://swagger.io) for graphical user interface documentation of the API
 
 ## 0.29.1 - 2023-06-26
 
