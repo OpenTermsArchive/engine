@@ -27,7 +27,7 @@ export default function specsRouter(basePath) {
 
   router.use('/docs', swaggerUi.serve);
   router.get('/docs', (req, res) => {
-    if (req.get('Accept')?.match('json')) {
+    if (req.get('Accept')?.match('json')) { // send OpenAPI spec to machines, Swagger UI to humans
       return res.json(specs);
     }
 
