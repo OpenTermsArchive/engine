@@ -10,6 +10,10 @@ _Full changeset and discussions: [#1015](https://github.com/OpenTermsArchive/eng
 
 - Embed [Swagger UI](https://swagger.io) for graphical user interface documentation of the API
 
+### Changed
+
+- Change path from `/services/:serviceId` to `/service/:serviceId` for direct access to a `service` resource; update paths accordingly in your own codebase
+
 ## 0.29.1 - 2023-06-26
 
 _Full changeset and discussions: [#1013](https://github.com/OpenTermsArchive/engine/pull/1013)._
