@@ -22,6 +22,10 @@ export default function apiRouter(basePath) {
 
   router.use(helmet()); // then, enable all `helmet` HTTP response headers for all others routes
 
+  router.get('/', (req, res) => {
+    res.json({ message: 'Welcome to an instance of the Open Terms Archive API. Documentation is available at /docs' });
+  });
+
   router.use(servicesRouter);
 
   return router;
