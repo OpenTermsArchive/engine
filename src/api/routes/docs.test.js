@@ -30,7 +30,7 @@ describe('Docs API', () => {
           subject = response.body;
         });
 
-        it('openapi version', () => {
+        it('OpenAPI version', () => {
           expect(subject).to.have.property('openapi');
         });
 
