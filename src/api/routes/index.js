@@ -1,42 +1,28 @@
-import path from 'path';
-import { fileURLToPath } from 'url';
-
 import express from 'express';
 import helmet from 'helmet';
-import swaggerJsdoc from 'swagger-jsdoc';
-import swaggerUi from 'swagger-ui-express';
 
+import docsRouter from './docs.js';
 import servicesRouter from './services.js';
-import specsRouter from './specs.js';
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export default function apiRouter(basePath) {
-  const specs = swaggerJsdoc({
-    definition: {
-      openapi: '3.1.0',
-      info: {
-        title: 'Open Terms Archive API',
-        version: '1.0.0',
-        license: {
-          name: 'EUPL-1.2',
-          url: 'https://eupl.eu/1.2/',
-        },
-      },
-      servers: [{ url: basePath }],
+  const router = express.Router();
+
+  const defaultDirectives = helmet.contentSecurityPolicy.getDefaultDirectives();
+
+  delete defaultDirectives['upgrade-insecure-requests'];
+
+  router.use(helmet({
+    contentSecurityPolicy: {
+      useDefaults: false,
+      directives: defaultDirectives,
     },
-    apis: [`${__dirname}/*.js`],
-  });
+  })); // Do not enable `upgrade-insecure-requests` directive set by Helmet for docs routes to ensure insecure requests won't be upgraded to secure requests for swaggerUI assets; see https://github.com/center-for-threat-informed-defense/attack-workbench-rest-api/issues/96#issuecomment-924193910 and https://github.com/scottie1984/swagger-ui-express/issues/212#issuecomment-825803088
 
-  const apiRouter = express.Router();
+  router.use(docsRouter(basePath));
 
-  apiRouter.use('/', swaggerUi.serve);
-  apiRouter.get('/', swaggerUi.setup(specs));
+  router.use(helmet()); // then, enable all `helmet` HTTP response headers for all others routes
 
-  apiRouter.use(helmet()); // Register `helmet` after swaggerUi routes to ensure insecure requests won't be upgraded to secure requests for swaggerUI assets; see https://github.com/scottie1984/swagger-ui-express/issues/212#issuecomment-825803088
+  router.use(servicesRouter);
 
-  apiRouter.use('/specs', specsRouter(specs));
-  apiRouter.use(servicesRouter);
-
-  return apiRouter;
+  return router;
 }
