@@ -39,13 +39,13 @@ describe('Services API', () => {
     });
   });
 
-  describe('GET /services/:serviceId', () => {
+  describe('GET /service/:serviceId', () => {
     let response;
     const SERVICE_ID = 'Service B!';
     const CASE_INSENSITIVE_SERVICE_ID = 'service b!';
 
     before(async () => {
-      response = await request(app).get(`${basePath}/v1/services/${encodeURI(SERVICE_ID)}`);
+      response = await request(app).get(`${basePath}/v1/service/${encodeURI(SERVICE_ID)}`);
     });
 
     it('responds with 200 status code', () => {
@@ -94,7 +94,7 @@ describe('Services API', () => {
 
     context('With a case-insensitive service ID parameter', () => {
       before(async () => {
-        response = await request(app).get(`${basePath}/v1/services/${encodeURI(CASE_INSENSITIVE_SERVICE_ID)}`);
+        response = await request(app).get(`${basePath}/v1/service/${encodeURI(CASE_INSENSITIVE_SERVICE_ID)}`);
       });
 
       it('responds with 200 status code', () => {
@@ -140,7 +140,7 @@ describe('Services API', () => {
 
     context('When no matching service is found', () => {
       before(async () => {
-        response = await request(app).get(`${basePath}/v1/nonExistentService`);
+        response = await request(app).get(`${basePath}/v1/service/nonExistentService`);
       });
 
       it('responds with 404 status code', () => {

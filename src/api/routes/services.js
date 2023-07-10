@@ -74,7 +74,7 @@ const router = express.Router();
  *               items:
  *                 $ref: '#/components/schemas/Service'
  */
-router.get('/', (req, res) => {
+router.get('/services', (req, res) => {
   res.status(200).json(Object.values(services).map(service => ({
     id: service.id,
     name: service.name,
@@ -83,7 +83,7 @@ router.get('/', (req, res) => {
 
 /**
  * @swagger
- * /services/{serviceId}:
+ * /service/{serviceId}:
  *   get:
  *     summary: Retrieve the declaration of a specific service through its ID.
  *     tags: [Services]
@@ -113,7 +113,7 @@ router.get('/', (req, res) => {
  *       404:
  *         description: No service matching the provided ID is found.
  */
-router.get('/:serviceId', (req, res) => {
+router.get('/service/:serviceId', (req, res) => {
   const matchedServiceID = Object.keys(services).find(key => key.toLowerCase() === req.params.serviceId?.toLowerCase());
   const service = services[matchedServiceID];
 
