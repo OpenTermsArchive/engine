@@ -78,6 +78,10 @@ export default async options => {
         if (!schemaOnly && service) {
           service.getTermsTypes()
             .filter(termsType => {
+              if (!service.terms[termsType]?.latest) { // If this terms type has been deleted and there is only a historical record for it, but no current valid declaration
+                return false;
+              }
+
               if (servicesTermsTypes[serviceId] && servicesTermsTypes[serviceId].length > 0) {
                 return servicesTermsTypes[serviceId].includes(termsType);
               }
