@@ -2,7 +2,13 @@
 
 All changes that impact users of this module are documented in this file, in the [Common Changelog](https://common-changelog.org) format with some additional specifications defined in the CONTRIBUTING file. This codebase adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased
+## Unreleased [minor]
+
+_Full changeset and discussions: [#1021](https://github.com/OpenTermsArchive/engine/pull/1021)._
+
+### Changed
+
+- **Breaking:** Update `opentermsarchive/terms-types` dependency; update your declarations [following the instructions in the changelog](https://github.com/OpenTermsArchive/terms-types/blob/main/CHANGELOG.md#100---2023-09-08) for validating declarations
 
 ## 0.30.1 - 2023-09-06
 

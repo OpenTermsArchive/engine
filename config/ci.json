@@ -1,5 +1,5 @@
 {
   "services": {
-    "declarationsPath": "./contrib-declarations/declarations"
+    "declarationsPath": "./demo-declarations/declarations"
   }
 }
