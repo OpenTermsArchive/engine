@@ -107,7 +107,7 @@
     "supertest": "^6.3.3"
   },
   "peerDependencies": {
-    "@opentermsarchive/terms-types": "~1.0.0"
+    "@opentermsarchive/terms-types": "^1.0.0"
   },
   "engines": {
     "node": ">=16.0.0"
