@@ -1,0 +1,9 @@
+{
+  "name": "Open Terms Archive",
+  "documents": {
+    "Privacy Policy": {
+      "fetch": "https://opentermsarchive.org/en/privacy-policy",
+      "select": ".TextContent_textContent__ToW2S"
+    }
+  }
+}

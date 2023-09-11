@@ -1,0 +1,10 @@
+version: '1.0'
+
+services:
+
+   ota:
+      cap_add:
+      - SYS_ADMIN
+      image: opentermsarchive
+      tty: true
+
