@@ -37,7 +37,7 @@ export default async options => {
   const lintFile = lintAndFixFile(options.fix);
 
   describe('Service declarations lint validation', async function () {
-    this.timeout(30000);
+    this.timeout(60000);
 
     servicesToValidate.forEach(serviceId => {
       const service = serviceDeclarations[serviceId];

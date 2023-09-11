@@ -1,5 +1,8 @@
 {
   "services": {
     "declarationsPath": "./demo-declarations/declarations"
+  },
+  "fetcher": {
+    "navigationTimeout": 60000
   }
 }

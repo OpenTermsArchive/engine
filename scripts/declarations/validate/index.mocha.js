@@ -41,7 +41,7 @@ export default async options => {
   }
 
   describe('Service declarations validation', async function () {
-    this.timeout(30000);
+    this.timeout(60000);
     this.slow(SLOW_DOCUMENT_THRESHOLD);
 
     servicesToValidate.forEach(serviceId => {
