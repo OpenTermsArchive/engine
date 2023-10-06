@@ -29,7 +29,7 @@ jobs:
           mongodb-version: 5.0
       - uses: actions/setup-node@v3
         with:
-          node-version: 16
+          node-version: 20
       - run: npm ci
       - name: Run tests (Linux)
         if: ${{ runner.os == 'Linux' }}
@@ -59,7 +59,7 @@ jobs:
           path: ./demo-declarations
       - uses: actions/setup-node@v3
         with:
-          node-version: 16.x
+          node-version: 20
       - run: cd ./demo-declarations && npm install
       - run: npm ci
       - run: ./node_modules/.bin/cross-env NODE_ENV=ci npm run declarations:validate:schema
