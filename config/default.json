@@ -54,7 +54,7 @@
       "updateTemplateId": 7
     }
   },
-  "tracker": {
+  "reporter": {
     "githubIssues": {
       "repository": "OpenTermsArchive/sandbox",
       "label": {

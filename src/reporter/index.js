@@ -13,16 +13,16 @@ const ISSUE_STATE_ALL = 'all';
 const CONTRIBUTE_URL = 'https://contribute.opentermsarchive.org/en/service';
 const GOOGLE_URL = 'https://www.google.com/search?q=';
 
-export default class Tracker {
+export default class Reporter {
   static isRepositoryValid(repository) {
     return repository.includes('/');
   }
 
-  constructor(trackerConfig) {
-    const { repository, label } = trackerConfig.githubIssues;
+  constructor(config) {
+    const { repository, label } = config.githubIssues;
 
-    if (!Tracker.isRepositoryValid(repository)) {
-      throw new Error('tracker.githubIssues.repository should be a string with <owner>/<repo>');
+    if (!Reporter.isRepositoryValid(repository)) {
+      throw new Error('reporter.githubIssues.repository should be a string with <owner>/<repo>');
     }
 
     const [ owner, repo ] = repository.split('/');
@@ -70,7 +70,7 @@ export default class Tracker {
   }
 
   async onInaccessibleContent(error, terms) {
-    const { title, body } = Tracker.formatIssueTitleAndBody({ message: error.toString(), repository: this.repository, terms });
+    const { title, body } = Reporter.formatIssueTitleAndBody({ message: error.toString(), repository: this.repository, terms });
 
     await this.createIssueIfNotExists({
       title,
