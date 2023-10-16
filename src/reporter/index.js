@@ -49,7 +49,7 @@ export default class Reporter {
     });
   }
 
-  async onVersionRecorded(serviceId, type) {
+  async onVersionRecorded({ serviceId, termsType: type }) {
     await this.closeIssueIfExists({
       labels: [this.label.name],
       title: `Fix ${serviceId} - ${type}`,
@@ -57,7 +57,7 @@ export default class Reporter {
     });
   }
 
-  async onVersionNotChanged(serviceId, type) {
+  async onVersionNotChanged({ serviceId, termsType: type }) {
     await this.closeIssueIfExists({
       labels: [this.label.name],
       title: `Fix ${serviceId} - ${type}`,
@@ -65,8 +65,8 @@ export default class Reporter {
     });
   }
 
-  async onFirstVersionRecorded(serviceId, type) {
-    return this.onVersionRecorded(serviceId, type);
+  async onFirstVersionRecorded({ serviceId, termsType: type }) {
+    return this.onVersionRecorded({ serviceId, termsType: type });
   }
 
   async onInaccessibleContent(error, terms) {
