@@ -1,0 +1,67 @@
+[
+  {
+    "name": "403",
+    "color": "0052CC",
+    "description": "Fetching fails with a 403 (forbidden) HTTP code"
+  },
+  {
+    "name": "429",
+    "color": "0052CC",
+    "description": "Fetching fails with a 429 (too many requests) HTTP code"
+  },
+  {
+    "name": "500",
+    "color": "0052CC",
+    "description": "Fetching fails with a 500 (internal server error) HTTP code"
+  },
+  {
+    "name": "502",
+    "color": "0052CC",
+    "description": "Fetching fails with a 502 (bad gateway) HTTP code"
+  },
+  {
+    "name": "503",
+    "color": "0052CC",
+    "description": "Fetching fails with a 503 (service unavailable) HTTP code"
+  },
+  {
+    "name": "certificate expired",
+    "color": "0052CC",
+    "description": "Fetching fails because the domain SSL certificate has expired"
+  },
+  {
+    "name": "EAI_AGAIN",
+    "color": "0052CC",
+    "description": "Fetching fails because the domain fails to resolve on DNS"
+  },
+  {
+    "name": "empty response",
+    "color": "0052CC",
+    "description": "Fetching fails with a “response is empty” error"
+  },
+  {
+    "name": "first certificate",
+    "color": "0052CC",
+    "description": "Fetching fails with an “unable to verify the first certificate” error"
+  },
+  {
+    "name": "redirects",
+    "color": "0052CC",
+    "description": "Fetching fails with a “too many redirects” error"
+  },
+  {
+    "name": "timeout",
+    "color": "0052CC",
+    "description": "Fetching fails with a timeout error"
+  },
+  {
+    "name": "selectors",
+    "color": "FBCA04",
+    "description": "Extraction selectors are outdated"
+  },
+  {
+    "name": "location",
+    "color": "FBCA04",
+    "description": "Fetch location is outdated"
+  }
+]
