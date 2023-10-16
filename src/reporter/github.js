@@ -45,7 +45,11 @@ export default class GitHub {
   }
 
   async createIssue(params) {
-    const { data } = await this.octokit.rest.issues.create({ ...this.commonParams, ...params });
+    const { data } = await this.octokit.rest.issues.create({ ...this.commonParams, ...params }).catch(error => {
+      logger.error(`🤖 Could not create GitHub issue for ${params.title}: ${error}`);
+    });
+
+    logger.info(`🤖 Created GitHub issue for ${params.title}: ${data.html_url}`);
 
     return data;
   }
@@ -55,17 +59,21 @@ export default class GitHub {
   }
 
   async searchIssues({ title, ...searchParams }) {
-    const issues = await this.octokit.paginate(
-      'GET /repos/{owner}/{repo}/issues',
-      {
-        ...this.commonParams,
-        per_page: 100,
-        ...searchParams,
-      },
-      response => response.data,
-    );
+    try {
+      const issues = await this.octokit.paginate(
+        'GET /repos/{owner}/{repo}/issues',
+        {
+          ...this.commonParams,
+          per_page: 100,
+          ...searchParams,
+        },
+        response => response.data,
+      );
 
-    return issues.filter(item => item.title === title);
+      return issues.filter(item => item.title === title);
+    } catch (error) {
+      logger.error(`🤖 Could not find GitHub issue for ${title}: ${error}`);
+    }
   }
 
   async addCommentToIssue(params) {

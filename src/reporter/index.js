@@ -74,20 +74,10 @@ export default class Reporter {
   }
 
   async createIssueIfNotExists({ title, body, labels, comment }) {
-    const existingIssues = await this.github.searchIssues({ title, labels, state: GitHub.ISSUE_STATE_ALL }).catch(error => {
-      logger.error(`🤖 Could not find GitHub issue for ${title}: ${error}`);
-    });
+    const existingIssues = await this.github.searchIssues({ title, labels, state: GitHub.ISSUE_STATE_ALL });
 
     if (!existingIssues?.length) {
-      try {
-        const existingIssue = await this.github.createIssue({ title, body, labels });
-
-        logger.info(`🤖 Creating GitHub issue for ${title}: ${existingIssue.html_url}`);
-
-        return;
-      } catch (e) {
-        logger.error(`🤖 Could not create GitHub issue for ${title}: ${e}`);
-      }
+      return this.github.createIssue({ title, body, labels });
     }
 
     const openedIssues = existingIssues.filter(existingIssue => existingIssue.state === GitHub.ISSUE_STATE_OPEN);
