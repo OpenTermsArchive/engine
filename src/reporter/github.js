@@ -38,20 +38,23 @@ export default class GitHub {
   }
 
   async createLabel(params) {
-    return this.octokit.request('POST /repos/{owner}/{repo}/labels', { ...this.commonParams, ...params })
-      .catch(error => {
-        logger.error(`Could not create label "${params.name}": ${error.toString()}`);
-      });
+    try {
+      return this.octokit.request('POST /repos/{owner}/{repo}/labels', { ...this.commonParams, ...params });
+    } catch (error) {
+      logger.error(`Could not create label "${params.name}": ${error.toString()}`);
+    }
   }
 
   async createIssue(params) {
-    const { data } = await this.octokit.rest.issues.create({ ...this.commonParams, ...params }).catch(error => {
+    try {
+      const { data } = await this.octokit.rest.issues.create({ ...this.commonParams, ...params });
+
+      logger.info(`🤖 Created GitHub issue for ${params.title}: ${data.html_url}`);
+
+      return data;
+    } catch (error) {
       logger.error(`🤖 Could not create GitHub issue for ${params.title}: ${error}`);
-    });
-
-    logger.info(`🤖 Created GitHub issue for ${params.title}: ${data.html_url}`);
-
-    return data;
+    }
   }
 
   async updateIssue(params) {
