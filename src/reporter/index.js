@@ -26,11 +26,24 @@ export default class Reporter {
   }
 
   async initialize() {
-    await this.github.createLabel({ /* eslint-disable-line no-await-in-loop */
-      name: this.label.name,
-      color: this.label.color,
-      description: this.label.description,
-    });
+    const managedLabels = JSON.parse(fs.readFileSync(new URL('./labels.json', import.meta.url)).toString());
+
+    const existingLabels = await this.github.getLabels();
+    const existingLabelsNames = existingLabels.map(label => label.name);
+    const missingLabels = managedLabels.filter(label => !existingLabelsNames.includes(label.name));
+
+    if (missingLabels.length) {
+      console.log('Following required labels are not present on the repository, let\'s create them…', missingLabels.map(label => `"${label.name}"`).join(', '));
+
+      for (const label of missingLabels) {
+        await this.github.createLabel({ /* eslint-disable-line no-await-in-loop */
+          name: label.name,
+          color: label.color,
+          description: `${label.description} - Managed by OTA-Bot`,
+        });
+        console.log(`Label "${label.name}" created`);
+      }
+    }
   }
 
   async onVersionRecorded({ serviceId, termsType: type }) {
