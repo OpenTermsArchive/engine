@@ -6,14 +6,16 @@ import logger from '../logger/index.js';
 
 const { version } = JSON.parse(fs.readFileSync(new URL('../../package.json', import.meta.url)).toString());
 
-const ISSUE_STATE_CLOSED = 'closed';
-const ISSUE_STATE_OPEN = 'open';
-const ISSUE_STATE_ALL = 'all';
-
 const CONTRIBUTE_URL = 'https://contribute.opentermsarchive.org/en/service';
 const GOOGLE_URL = 'https://www.google.com/search?q=';
 
 export default class GitHub {
+  static ISSUE_STATE_CLOSED = 'closed';
+
+  static ISSUE_STATE_OPEN = 'open';
+
+  static ISSUE_STATE_ALL = 'all';
+
   static isRepositoryValid(repository) {
     return repository.includes('/');
   }
@@ -77,7 +79,7 @@ export default class GitHub {
 
   async createIssueIfNotExists({ title, body, labels, comment }) {
     try {
-      const existingIssues = await this.searchIssues({ ...this.commonParams, title, labels, state: ISSUE_STATE_ALL });
+      const existingIssues = await this.searchIssues({ ...this.commonParams, title, labels, state: GitHub.ISSUE_STATE_ALL });
 
       if (!existingIssues.length) {
         const existingIssue = await this.createIssue({ ...this.commonParams, title, body, labels });
@@ -87,7 +89,7 @@ export default class GitHub {
         return;
       }
 
-      const openedIssues = existingIssues.filter(existingIssue => existingIssue.state === ISSUE_STATE_OPEN);
+      const openedIssues = existingIssues.filter(existingIssue => existingIssue.state === GitHub.ISSUE_STATE_OPEN);
       const hasNoneOpened = openedIssues.length === 0;
 
       for (const existingIssue of existingIssues) {
@@ -97,7 +99,7 @@ export default class GitHub {
             await this.octokit.rest.issues.update({
               ...this.commonParams,
               issue_number: existingIssue.number,
-              state: ISSUE_STATE_OPEN,
+              state: GitHub.ISSUE_STATE_OPEN,
             });
             await this.addCommentToIssue({
               ...this.commonParams,
@@ -119,11 +121,11 @@ export default class GitHub {
 
   async closeIssueIfExists({ title, comment, labels }) {
     try {
-      const openedIssues = await this.searchIssues({ ...this.commonParams, title, labels, state: ISSUE_STATE_OPEN });
+      const openedIssues = await this.searchIssues({ ...this.commonParams, title, labels, state: GitHub.ISSUE_STATE_OPEN });
 
       for (const openedIssue of openedIssues) {
         try {
-          await this.octokit.rest.issues.update({ ...this.commonParams, issue_number: openedIssue.number, state: ISSUE_STATE_CLOSED }); // eslint-disable-line no-await-in-loop
+          await this.octokit.rest.issues.update({ ...this.commonParams, issue_number: openedIssue.number, state: GitHub.ISSUE_STATE_CLOSED }); // eslint-disable-line no-await-in-loop
           await this.addCommentToIssue({ ...this.commonParams, issue_number: openedIssue.number, body: comment }); // eslint-disable-line no-await-in-loop
           logger.info(`🤖 GitHub issue closed for ${title}: ${openedIssue.html_url}`);
         } catch (e) {
