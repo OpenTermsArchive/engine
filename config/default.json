@@ -56,7 +56,7 @@
   },
   "reporter": {
     "githubIssues": {
-      "repository": "OpenTermsArchive/sandbox",
+      "repository": "OpenTermsArchive/sandbox-declarations",
       "label": {
         "name": "bot-report",
         "color": "FEF2C0",
