@@ -7,9 +7,25 @@ import GitHub from './github.js';
 const CONTRIBUTE_URL = 'https://contribute.opentermsarchive.org/en/service';
 const GOOGLE_URL = 'https://www.google.com/search?q=';
 
+const ERROR_MESSAGE_TO_ISSUE_LABEL_MAP = {
+  'has no match': 'selectors',
+  'HTTP code 404': 'location',
+  'HTTP code 403': '403',
+  'HTTP code 429': '429',
+  'HTTP code 500': '500',
+  'HTTP code 502': '502',
+  'HTTP code 503': '503',
+  'Timed out after': 'timeout',
+  'getaddrinfo EAI_AGAIN': 'EAI_AGAIN',
+  'Response is empty': 'empty response',
+  'unable to verify the first certificate': 'first certificate',
+  'certificate has expired': 'certificate expired',
+  'maximum redirect reached': 'redirects',
+};
+
 export default class Reporter {
   constructor(config) {
-    const { repository, label } = config.githubIssues;
+    const { repository } = config.githubIssues;
 
     if (!GitHub.isRepositoryValid(repository)) {
       throw new Error('reporter.githubIssues.repository should be a string with <owner>/<repo>');
@@ -18,7 +34,6 @@ export default class Reporter {
     this.github = new GitHub(repository);
     this.cachedIssues = {};
     this.repository = repository;
-    this.label = label;
   }
 
   async initialize() {
@@ -44,7 +59,6 @@ export default class Reporter {
 
   async onVersionRecorded({ serviceId, termsType: type }) {
     await this.closeIssueIfExists({
-      labels: [this.label.name],
       title: `Fix ${serviceId} - ${type}`,
       comment: '🤖 Closed automatically as data was gathered successfully',
     });
@@ -52,7 +66,6 @@ export default class Reporter {
 
   async onVersionNotChanged({ serviceId, termsType: type }) {
     await this.closeIssueIfExists({
-      labels: [this.label.name],
       title: `Fix ${serviceId} - ${type}`,
       comment: '🤖 Closed automatically as version is unchanged but data has been fetched correctly',
     });
@@ -68,7 +81,7 @@ export default class Reporter {
     await this.createIssueIfNotExists({
       title,
       body,
-      labels: [this.label.name],
+      labels: [Reporter.getLabelNameFromError(error)],
       comment: '🤖 Reopened automatically as an error occured',
     });
   }
@@ -108,9 +121,9 @@ export default class Reporter {
     }
   }
 
-  async closeIssueIfExists({ title, comment, labels }) {
+  async closeIssueIfExists({ title, comment }) {
     try {
-      const openedIssues = await this.github.searchIssues({ title, labels, state: GitHub.ISSUE_STATE_OPEN });
+      const openedIssues = await this.github.searchIssues({ title, state: GitHub.ISSUE_STATE_OPEN });
 
       for (const openedIssue of openedIssues) {
         try {
@@ -124,6 +137,10 @@ export default class Reporter {
     } catch (e) {
       logger.error(`🤖 Could not close GitHub issue for ${title}: ${e}`);
     }
+  }
+
+  static getLabelNameFromError(error) {
+    return ERROR_MESSAGE_TO_ISSUE_LABEL_MAP[Object.keys(ERROR_MESSAGE_TO_ISSUE_LABEL_MAP).find(substring => error.toString().includes(substring))];
   }
 
   static formatIssueTitleAndBody({ message, repository, terms }) {
