@@ -22,11 +22,11 @@ export default class Reporter {
   }
 
   async initialize() {
-    const managedLabels = JSON.parse(fs.readFileSync(new URL('./labels.json', import.meta.url)).toString());
+    this.MANAGED_LABELS = JSON.parse(fs.readFileSync(new URL('./labels.json', import.meta.url)).toString());
 
     const existingLabels = await this.github.getLabels();
     const existingLabelsNames = existingLabels.map(label => label.name);
-    const missingLabels = managedLabels.filter(label => !existingLabelsNames.includes(label.name));
+    const missingLabels = this.MANAGED_LABELS.filter(label => !existingLabelsNames.includes(label.name));
 
     if (missingLabels.length) {
       console.log('Following required labels are not present on the repository, let\'s create them…', missingLabels.map(label => `"${label.name}"`).join(', '));
@@ -74,7 +74,7 @@ export default class Reporter {
   }
 
   async createIssueIfNotExists({ title, body, labels, comment }) {
-    const existingIssues = await this.github.searchIssues({ title, labels, state: GitHub.ISSUE_STATE_ALL });
+    const existingIssues = await this.github.searchIssues({ title, state: GitHub.ISSUE_STATE_ALL });
 
     if (!existingIssues?.length) {
       return this.github.createIssue({ title, body, labels });
@@ -86,9 +86,20 @@ export default class Reporter {
       // Open the first one
       const [existingIssue] = existingIssues;
 
+      const managedLabelsNames = this.MANAGED_LABELS.map(label => label.name);
+      const labelsToKeep = existingIssue.labels.filter(label => !managedLabelsNames.includes(label.name));
+
       try {
-        await this.github.updateIssue({ issue_number: existingIssue.number, state: GitHub.ISSUE_STATE_OPEN }); // eslint-disable-line no-await-in-loop
-        await this.github.addCommentToIssue({ issue_number: existingIssue.number, body: `${comment}\n${body}` }); // eslint-disable-line no-await-in-loop
+        await this.github.updateIssue({ // eslint-disable-line no-await-in-loop
+          issue_number: existingIssue.number,
+          labels: [ ...labels, ...labelsToKeep ],
+          state: GitHub.ISSUE_STATE_OPEN,
+        });
+
+        await this.github.addCommentToIssue({ // eslint-disable-line no-await-in-loop
+          issue_number: existingIssue.number,
+          body: `${comment}\n${body}`,
+        });
 
         logger.info(`🤖 Reopened automatically as an error occured for ${title}: ${existingIssue.html_url}`);
       } catch (e) {
