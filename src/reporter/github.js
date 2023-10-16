@@ -6,9 +6,6 @@ import logger from '../logger/index.js';
 
 const { version } = JSON.parse(fs.readFileSync(new URL('../../package.json', import.meta.url)).toString());
 
-const CONTRIBUTE_URL = 'https://contribute.opentermsarchive.org/en/service';
-const GOOGLE_URL = 'https://www.google.com/search?q=';
-
 export default class GitHub {
   static ISSUE_STATE_CLOSED = 'closed';
 
@@ -75,99 +72,5 @@ export default class GitHub {
     const { data } = await this.octokit.rest.issues.createComment({ ...this.commonParams, ...params });
 
     return data;
-  }
-
-  async createIssueIfNotExists({ title, body, labels, comment }) {
-    try {
-      const existingIssues = await this.searchIssues({ ...this.commonParams, title, labels, state: GitHub.ISSUE_STATE_ALL });
-
-      if (!existingIssues.length) {
-        const existingIssue = await this.createIssue({ ...this.commonParams, title, body, labels });
-
-        logger.info(`🤖 Creating GitHub issue for ${title}: ${existingIssue.html_url}`);
-
-        return;
-      }
-
-      const openedIssues = existingIssues.filter(existingIssue => existingIssue.state === GitHub.ISSUE_STATE_OPEN);
-      const hasNoneOpened = openedIssues.length === 0;
-
-      for (const existingIssue of existingIssues) {
-        if (hasNoneOpened) {
-          try {
-            /* eslint-disable no-await-in-loop */
-            await this.octokit.rest.issues.update({
-              ...this.commonParams,
-              issue_number: existingIssue.number,
-              state: GitHub.ISSUE_STATE_OPEN,
-            });
-            await this.addCommentToIssue({
-              ...this.commonParams,
-              issue_number: existingIssue.number,
-              body: `${comment}\n${body}`,
-            });
-            /* eslint-enable no-await-in-loop */
-            logger.info(`🤖 Reopened automatically as an error occured for ${title}: ${existingIssue.html_url}`);
-          } catch (e) {
-            logger.error(`🤖 Could not update GitHub issue ${existingIssue.html_url}: ${e}`);
-          }
-          break;
-        }
-      }
-    } catch (e) {
-      logger.error(`🤖 Could not create GitHub issue for ${title}: ${e}`);
-    }
-  }
-
-  async closeIssueIfExists({ title, comment, labels }) {
-    try {
-      const openedIssues = await this.searchIssues({ ...this.commonParams, title, labels, state: GitHub.ISSUE_STATE_OPEN });
-
-      for (const openedIssue of openedIssues) {
-        try {
-          await this.octokit.rest.issues.update({ ...this.commonParams, issue_number: openedIssue.number, state: GitHub.ISSUE_STATE_CLOSED }); // eslint-disable-line no-await-in-loop
-          await this.addCommentToIssue({ ...this.commonParams, issue_number: openedIssue.number, body: comment }); // eslint-disable-line no-await-in-loop
-          logger.info(`🤖 GitHub issue closed for ${title}: ${openedIssue.html_url}`);
-        } catch (e) {
-          logger.error(`🤖 Could not close GitHub issue ${openedIssue.html_url}: ${e.toString()}`);
-        }
-      }
-    } catch (e) {
-      logger.error(`🤖 Could not close GitHub issue for ${title}: ${e}`);
-    }
-  }
-
-  static formatIssueTitleAndBody({ message, repository, terms }) {
-    const { service: { name }, type } = terms;
-    const json = terms.toPersistence();
-    const title = `Fix ${name} - ${type}`;
-
-    const encodedName = encodeURIComponent(name);
-    const encodedType = encodeURIComponent(type);
-
-    const urlQueryParams = new URLSearchParams({
-      json: JSON.stringify(json),
-      destination: repository,
-      expertMode: 'true',
-      step: '2',
-    });
-
-    const body = `
-These terms are no longer tracked.
-
-${message}
-
-Check what's wrong by:
-- Using the [online contribution tool](${CONTRIBUTE_URL}?${urlQueryParams}).
-${message.includes('404') ? `- [Searching Google](${GOOGLE_URL}%22${encodedName}%22+%22${encodedType}%22) to get for a new URL.` : ''}
-
-And some info about what has already been tracked:
-- See [service declaration JSON file](https://github.com/${repository}/blob/main/declarations/${encodedName}.json).
-`;
-
-    return {
-      title,
-      body,
-    };
   }
 }
