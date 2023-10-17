@@ -137,6 +137,7 @@ export default class Reporter {
       ? `- Latest snapshots:\n  - ${terms.sourceDocuments.map(sourceDocument => `[${sourceDocument.id}](${latestSnapshotBaseUrl}.%20#${sourceDocument.id}.${mime.getExtension(sourceDocument.mimeType)})`).join('\n  - ')}`
       : `- [Latest snapshot](${latestSnapshotBaseUrl}.${mime.getExtension(terms.sourceDocuments[0].mimeType)})`;
 
+    /* eslint-disable no-irregular-whitespace */
     return `
 ## No version of the \`${terms.type}\` of service \`${terms.service.name}\` is recorded anymore since ${currentFormattedDate}
 
@@ -174,6 +175,7 @@ ${latestDeclaration}
 ${latestVersion}
 ${hasSnapshot ? latestSnapshots : ''}
 `;
+  /* eslint-enable no-irregular-whitespace */
   }
 
   static getLabelNameFromError(error) {
