@@ -122,7 +122,7 @@ export default class Reporter {
 
   generateDescription({ error, terms }) {
     const currentFormattedDate = new Date().toLocaleDateString('en-GB', { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric' });
-    const hasSnapshot = Boolean(!terms.sourceDocuments.find(sourceDocument => !sourceDocument.snapshotId));
+    const hasSnapshots = terms.sourceDocuments.every(sourceDocument => sourceDocument.snapshotId);
     const urlQueryParams = new URLSearchParams({
       json: JSON.stringify(terms.toPersistence()),
       destination: this.repositories.declarations,
@@ -140,8 +140,8 @@ export default class Reporter {
     return `
 ## No version of the \`${terms.type}\` of service \`${terms.service.name}\` is recorded anymore since ${currentFormattedDate}
 
-The source document${terms.hasMultipleSourceDocuments ? 's have' : ' has'}${hasSnapshot ? ' ' : ' not '}been recorded in a snapshot, ${hasSnapshot ? 'but ' : 'thus '} [no version can be extracted](https://docs.opentermsarchive.org/#tracking-terms).
-${hasSnapshot ? 'After correction, it might still be possible to recover the missed versions.' : ''}
+The source document${terms.hasMultipleSourceDocuments ? 's have' : ' has'}${hasSnapshots ? ' ' : ' not '}been recorded in a snapshot, ${hasSnapshots ? 'but ' : 'thus '} [no version can be extracted](https://docs.opentermsarchive.org/#tracking-terms).
+${hasSnapshots ? 'After correction, it might still be possible to recover the missed versions.' : ''}
 
 ### What went wrong
 
@@ -172,7 +172,7 @@ If the source documents are accessible in a browser but fetching them always fai
 
 ${latestDeclaration}
 ${latestVersion}
-${hasSnapshot ? latestSnapshots : ''}
+${hasSnapshots ? latestSnapshots : ''}
 `;
   /* eslint-enable no-irregular-whitespace */
   }
