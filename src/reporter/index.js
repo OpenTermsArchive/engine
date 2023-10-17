@@ -40,6 +40,7 @@ export default class Reporter {
 
   async initialize() {
     await this.github.initialize();
+
     this.MANAGED_LABELS = JSON.parse(fs.readFileSync(new URL('./labels.json', import.meta.url)).toString());
 
     const existingLabels = await this.github.getRepositoryLabels();
