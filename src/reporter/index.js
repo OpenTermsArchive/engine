@@ -90,7 +90,7 @@ export default class Reporter {
     }
 
     if (issue.state == GitHub.ISSUE_STATE_CLOSED) {
-      await this.github.openIssue(issue.number);
+      await this.github.openIssue(issue);
     }
 
     const managedLabelsNames = this.MANAGED_LABELS.map(label => label.name);
@@ -100,10 +100,10 @@ export default class Reporter {
       return;
     }
 
-    const labelsNotManagedToKeep = issue.labels.filter(label => !managedLabelsNames.includes(label.name));
+    const labelsNotManagedToKeep = issue.labels.map(label => label.name).filter(label => !managedLabelsNames.includes(label));
 
-    await this.github.updateIssue({ issue_number: issue.number, labels: [ label, ...labelsNotManagedToKeep ] });
-    await this.github.addCommentToIssue({ issue_number: issue.number, body: `${comment}\n${body}` });
+    await this.github.setIssueLabels({ issue, labels: [ label, ...labelsNotManagedToKeep ] });
+    await this.github.addCommentToIssue({ issue, comment: `${comment}\n${body}` });
   }
 
   async closeIssueIfExists({ title, comment }) {
@@ -113,8 +113,8 @@ export default class Reporter {
       return;
     }
 
-    await this.github.addCommentToIssue({ issue_number: openedIssue.number, body: comment });
-    await this.github.closeIssue(openedIssue.number);
+    await this.github.addCommentToIssue({ issue: openedIssue, comment });
+    await this.github.closeIssue(openedIssue);
   }
 
   static getLabelNameFromError(error) {

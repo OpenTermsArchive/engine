@@ -24,7 +24,6 @@ export default class GitHub {
     this.commonParams = {
       owner,
       repo,
-      accept: 'application/vnd.github.v3+json',
     };
   }
 
@@ -56,41 +55,45 @@ export default class GitHub {
     }
   }
 
-  async updateIssue(params) {
+  async setIssueLabels({ issue, labels }) {
     try {
-      const { data } = await this.octokit.request('PATCH /repos/{owner}/{repo}/issues/{issue_number}', { ...this.commonParams, ...params });
+      await this.octokit.request('PUT /repos/{owner}/{repo}/issues/{issue_number}/labels', {
+        ...this.commonParams,
+        issue_number: issue.number,
+        labels,
+      });
 
-      logger.info(`🤖 Updated GitHub issue "${data.title}": ${data.html_url}`);
+      logger.info(`🤖 Updated GitHub issue labels "${issue.title}"`);
     } catch (error) {
-      logger.error(`🤖 Could not update GitHub issue with number "${params.issue_number}": ${error}`);
+      logger.error(`🤖 Could not update GitHub issue "${issue.title}": ${error}`);
     }
   }
 
-  async openIssue(issueId) {
+  async openIssue(issue) {
     try {
-      const { data } = await this.octokit.request('PATCH /repos/{owner}/{repo}/issues/{issue_number}', {
+      await this.octokit.request('PATCH /repos/{owner}/{repo}/issues/{issue_number}', {
         ...this.commonParams,
-        issue_number: issueId,
+        issue_number: issue.number,
         state: GitHub.ISSUE_STATE_OPEN,
       });
 
-      logger.info(`🤖 Opened GitHub issue "${data.title}": ${data.html_url}`);
+      logger.info(`🤖 Opened GitHub issue "${issue.title}": ${issue.html_url}`);
     } catch (error) {
-      logger.error(`🤖 Could not update GitHub issue with number "${issueId}": ${error}`);
+      logger.error(`🤖 Could not update GitHub issue "${issue.title}": ${error}`);
     }
   }
 
-  async closeIssue(issueId) {
+  async closeIssue(issue) {
     try {
-      const { data } = await this.octokit.request('PATCH /repos/{owner}/{repo}/issues/{issue_number}', {
+      await this.octokit.request('PATCH /repos/{owner}/{repo}/issues/{issue_number}', {
         ...this.commonParams,
-        issue_number: issueId,
+        issue_number: issue.number,
         state: GitHub.ISSUE_STATE_CLOSED,
       });
 
-      logger.info(`🤖 Closed GitHub issue "${data.title}": ${data.html_url}`);
+      logger.info(`🤖 Closed GitHub issue "${issue.title}": ${issue.html_url}`);
     } catch (error) {
-      logger.error(`🤖 Could not update GitHub issue with number "${issueId}": ${error}`);
+      logger.error(`🤖 Could not update GitHub issue "${issue.title}": ${error}`);
     }
   }
 
@@ -110,15 +113,19 @@ export default class GitHub {
     }
   }
 
-  async addCommentToIssue(params) {
+  async addCommentToIssue({ issue, comment }) {
     try {
-      const { data } = await this.octokit.request('POST /repos/{owner}/{repo}/issues/{issue_number}/comments', { ...this.commonParams, ...params });
+      const { data } = await this.octokit.request('POST /repos/{owner}/{repo}/issues/{issue_number}/comments', {
+        ...this.commonParams,
+        issue_number: issue.number,
+        body: comment,
+      });
 
-      logger.info(`🤖 Add comment to GitHub issue "${params.issue_number}": ${data.html_url}`);
+      logger.info(`🤖 Add comment to GitHub issue "${issue.title}": ${data.html_url}`);
 
       return data;
     } catch (error) {
-      logger.error(`🤖 Could not add comment to GitHub issue "${params.issue_number}": ${error}`);
+      logger.error(`🤖 Could not add comment to GitHub issue "${issue.title}": ${error}`);
     }
   }
 }
