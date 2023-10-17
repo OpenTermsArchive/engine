@@ -39,7 +39,7 @@ export default class GitHub {
 
       logger.info(`🤖 Created repository label "${params.name}"`);
     } catch (error) {
-      logger.error(`🤖 Could not create label "${params.name}": ${error.toString()}`);
+      logger.error(`🤖 Could not create label "${params.name}": ${error}`);
     }
   }
 
