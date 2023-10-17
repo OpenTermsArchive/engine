@@ -1,7 +1,5 @@
 import fs from 'fs';
 
-import logger from '../logger/index.js';
-
 import GitHub from './github.js';
 
 const CONTRIBUTE_URL = 'https://contribute.opentermsarchive.org/en/service';
