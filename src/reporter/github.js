@@ -20,10 +20,7 @@ export default class GitHub {
   constructor(repository) {
     const [ owner, repo ] = repository.split('/');
 
-    this.octokit = new Octokit({
-      auth: process.env.GITHUB_TOKEN,
-      userAgent: `opentermsarchive/${version}`,
-    });
+    this.octokit = new Octokit({ auth: process.env.GITHUB_TOKEN, userAgent: `opentermsarchive/${version}` });
     this.commonParams = {
       owner,
       repo,
@@ -61,7 +58,7 @@ export default class GitHub {
 
   async updateIssue(params) {
     try {
-      const { data } = await this.octokit.rest.issues.update({ ...this.commonParams, ...params });
+      const { data } = await this.octokit.request('PATCH /repos/{owner}/{repo}/issues/{issue_number}', { ...this.commonParams, ...params });
 
       logger.info(`🤖 Updated GitHub issue "${data.title}": ${data.html_url}`);
     } catch (error) {
@@ -71,7 +68,7 @@ export default class GitHub {
 
   async openIssue(issueId) {
     try {
-      const { data } = await this.octokit.rest.issues.update({
+      const { data } = await this.octokit.request('PATCH /repos/{owner}/{repo}/issues/{issue_number}', {
         ...this.commonParams,
         issue_number: issueId,
         state: GitHub.ISSUE_STATE_OPEN,
@@ -85,7 +82,7 @@ export default class GitHub {
 
   async closeIssue(issueId) {
     try {
-      const { data } = await this.octokit.rest.issues.update({
+      const { data } = await this.octokit.request('PATCH /repos/{owner}/{repo}/issues/{issue_number}', {
         ...this.commonParams,
         issue_number: issueId,
         state: GitHub.ISSUE_STATE_CLOSED,
@@ -99,11 +96,11 @@ export default class GitHub {
 
   async getIssue({ title, ...searchParams }) {
     try {
-      const issues = await this.octokit.paginate(
-        'GET /repos/{owner}/{repo}/issues',
-        { ...this.commonParams, per_page: 100, ...searchParams },
-        response => response.data,
-      );
+      const issues = await this.octokit.paginate('GET /repos/{owner}/{repo}/issues', {
+        ...this.commonParams,
+        per_page: 100,
+        ...searchParams,
+      }, response => response.data);
 
       const [issue] = issues.filter(item => item.title === title); // since only one is expected, utilize the first one
 
@@ -115,7 +112,7 @@ export default class GitHub {
 
   async addCommentToIssue(params) {
     try {
-      const { data } = await this.octokit.rest.issues.createComment({ ...this.commonParams, ...params });
+      const { data } = await this.octokit.request('POST /repos/{owner}/{repo}/issues/{issue_number}/comments', { ...this.commonParams, ...params });
 
       logger.info(`🤖 Add comment to GitHub issue "${params.issue_number}": ${data.html_url}`);
 
