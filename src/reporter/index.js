@@ -50,7 +50,7 @@ export default class Reporter {
         await this.github.createLabel({ /* eslint-disable-line no-await-in-loop */
           name: label.name,
           color: label.color,
-          description: `${label.description} - Managed by OTA-Bot`,
+          description: `${label.description} [managed by Open Terms Archive]`,
         });
         console.log(`Label "${label.name}" created`);
       }
