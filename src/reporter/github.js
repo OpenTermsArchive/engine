@@ -39,26 +39,62 @@ export default class GitHub {
 
   async createLabel(params) {
     try {
-      return this.octokit.request('POST /repos/{owner}/{repo}/labels', { ...this.commonParams, ...params });
+      await this.octokit.request('POST /repos/{owner}/{repo}/labels', { ...this.commonParams, ...params });
+
+      logger.info(`🤖 Created repository label "${params.name}"`);
     } catch (error) {
-      logger.error(`Could not create label "${params.name}": ${error.toString()}`);
+      logger.error(`🤖 Could not create label "${params.name}": ${error.toString()}`);
     }
   }
 
   async createIssue(params) {
     try {
-      const { data } = await this.octokit.rest.issues.create({ ...this.commonParams, ...params });
+      const { data } = await this.octokit.request('POST /repos/{owner}/{repo}/issues', { ...this.commonParams, ...params });
 
-      logger.info(`🤖 Created GitHub issue for ${params.title}: ${data.html_url}`);
+      logger.info(`🤖 Created GitHub issue "${params.title}": ${data.html_url}`);
 
       return data;
     } catch (error) {
-      logger.error(`🤖 Could not create GitHub issue for ${params.title}: ${error}`);
+      logger.error(`🤖 Could not create GitHub issue "${params.title}": ${error}`);
     }
   }
 
   async updateIssue(params) {
-    return this.octokit.rest.issues.update({ ...this.commonParams, ...params });
+    try {
+      const { data } = await this.octokit.rest.issues.update({ ...this.commonParams, ...params });
+
+      logger.info(`🤖 Updated GitHub issue "${data.title}": ${data.html_url}`);
+    } catch (error) {
+      logger.error(`🤖 Could not update GitHub issue with number "${params.issue_number}": ${error}`);
+    }
+  }
+
+  async openIssue(issueId) {
+    try {
+      const { data } = await this.octokit.rest.issues.update({
+        ...this.commonParams,
+        issue_number: issueId,
+        state: GitHub.ISSUE_STATE_OPEN,
+      });
+
+      logger.info(`🤖 Opened GitHub issue "${data.title}": ${data.html_url}`);
+    } catch (error) {
+      logger.error(`🤖 Could not update GitHub issue with number "${issueId}": ${error}`);
+    }
+  }
+
+  async closeIssue(issueId) {
+    try {
+      const { data } = await this.octokit.rest.issues.update({
+        ...this.commonParams,
+        issue_number: issueId,
+        state: GitHub.ISSUE_STATE_CLOSED,
+      });
+
+      logger.info(`🤖 Closed GitHub issue "${data.title}": ${data.html_url}`);
+    } catch (error) {
+      logger.error(`🤖 Could not update GitHub issue with number "${issueId}": ${error}`);
+    }
   }
 
   async searchIssues({ title, ...searchParams }) {
@@ -75,13 +111,19 @@ export default class GitHub {
 
       return issues.filter(item => item.title === title);
     } catch (error) {
-      logger.error(`🤖 Could not find GitHub issue for ${title}: ${error}`);
+      logger.error(`🤖 Could not find GitHub issue "${title}": ${error}`);
     }
   }
 
   async addCommentToIssue(params) {
-    const { data } = await this.octokit.rest.issues.createComment({ ...this.commonParams, ...params });
+    try {
+      const { data } = await this.octokit.rest.issues.createComment({ ...this.commonParams, ...params });
 
-    return data;
+      logger.info(`🤖 Add comment to GitHub issue "${params.issue_number}": ${data.html_url}`);
+
+      return data;
+    } catch (error) {
+      logger.error(`🤖 Could not add comment to GitHub issue "${params.issue_number}": ${error}`);
+    }
   }
 }

@@ -52,7 +52,6 @@ export default class Reporter {
           color: label.color,
           description: `${label.description} [managed by Open Terms Archive]`,
         });
-        console.log(`Label "${label.name}" created`);
       }
     }
   }
@@ -102,40 +101,25 @@ export default class Reporter {
       const managedLabelsNames = this.MANAGED_LABELS.map(label => label.name);
       const labelsToKeep = existingIssue.labels.filter(label => !managedLabelsNames.includes(label.name));
 
-      try {
-        await this.github.updateIssue({ // eslint-disable-line no-await-in-loop
-          issue_number: existingIssue.number,
-          labels: [ ...labels, ...labelsToKeep ],
-          state: GitHub.ISSUE_STATE_OPEN,
-        });
+      await this.github.openIssue(existingIssue.number); // eslint-disable-line no-await-in-loop
+      await this.github.updateIssue({ // eslint-disable-line no-await-in-loop
+        issue_number: existingIssue.number,
+        labels: [ label, ...labelsToKeep ],
+      });
 
-        await this.github.addCommentToIssue({ // eslint-disable-line no-await-in-loop
-          issue_number: existingIssue.number,
-          body: `${comment}\n${body}`,
-        });
-
-        logger.info(`🤖 Reopened automatically as an error occured for ${title}: ${existingIssue.html_url}`);
-      } catch (e) {
-        logger.error(`🤖 Could not update GitHub issue ${existingIssue.html_url}: ${e}`);
-      }
+      await this.github.addCommentToIssue({ // eslint-disable-line no-await-in-loop
+        issue_number: existingIssue.number,
+        body: `${comment}\n${body}`,
+      });
     }
   }
 
   async closeIssueIfExists({ title, comment }) {
-    try {
-      const openedIssues = await this.github.searchIssues({ title, state: GitHub.ISSUE_STATE_OPEN });
+    const openedIssues = await this.github.searchIssues({ title, state: GitHub.ISSUE_STATE_OPEN });
 
-      for (const openedIssue of openedIssues) {
-        try {
-          await this.github.update({ issue_number: openedIssue.number, state: GitHub.ISSUE_STATE_CLOSED }); // eslint-disable-line no-await-in-loop
-          await this.github.addCommentToIssue({ issue_number: openedIssue.number, body: comment }); // eslint-disable-line no-await-in-loop
-          logger.info(`🤖 GitHub issue closed for ${title}: ${openedIssue.html_url}`);
-        } catch (e) {
-          logger.error(`🤖 Could not close GitHub issue ${openedIssue.html_url}: ${e.toString()}`);
-        }
-      }
-    } catch (e) {
-      logger.error(`🤖 Could not close GitHub issue for ${title}: ${e}`);
+    for (const openedIssue of openedIssues) {
+      await this.github.addCommentToIssue({ issue_number: openedIssue.number, body: comment }); // eslint-disable-line no-await-in-loop
+      await this.github.closeIssue(openedIssue.number); // eslint-disable-line no-await-in-loop
     }
   }
 
