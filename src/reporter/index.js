@@ -35,7 +35,6 @@ export default class Reporter {
     }
 
     this.github = new GitHub(repositories.declarations);
-    this.cachedIssues = {};
     this.repositories = repositories;
   }
 
