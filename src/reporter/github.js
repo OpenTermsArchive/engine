@@ -97,19 +97,17 @@ export default class GitHub {
     }
   }
 
-  async searchIssues({ title, ...searchParams }) {
+  async getIssue({ title, ...searchParams }) {
     try {
       const issues = await this.octokit.paginate(
         'GET /repos/{owner}/{repo}/issues',
-        {
-          ...this.commonParams,
-          per_page: 100,
-          ...searchParams,
-        },
+        { ...this.commonParams, per_page: 100, ...searchParams },
         response => response.data,
       );
 
-      return issues.filter(item => item.title === title);
+      const [issue] = issues.filter(item => item.title === title); // since only one is expected, utilize the first one
+
+      return issue;
     } catch (error) {
       logger.error(`🤖 Could not find GitHub issue "${title}": ${error}`);
     }

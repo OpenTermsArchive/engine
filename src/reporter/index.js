@@ -87,41 +87,38 @@ export default class Reporter {
   }
 
   async createIssueIfNotExists({ title, body, label, comment }) {
-    const existingIssues = await this.github.searchIssues({ title, state: GitHub.ISSUE_STATE_ALL });
+    const issue = await this.github.getIssue({ title, state: GitHub.ISSUE_STATE_ALL });
 
-    if (!existingIssues?.length) {
+    if (!issue) {
       return this.github.createIssue({ title, body, labels: [label] });
     }
 
-    const openedIssues = existingIssues.filter(existingIssue => existingIssue.state === GitHub.ISSUE_STATE_OPEN);
-
-    if (!openedIssues.length) {
-      // Open the first one
-      const [existingIssue] = existingIssues;
-
-      const managedLabelsNames = this.MANAGED_LABELS.map(label => label.name);
-      const labelsToKeep = existingIssue.labels.filter(label => !managedLabelsNames.includes(label.name));
-
-      await this.github.openIssue(existingIssue.number); // eslint-disable-line no-await-in-loop
-      await this.github.updateIssue({ // eslint-disable-line no-await-in-loop
-        issue_number: existingIssue.number,
-        labels: [ label, ...labelsToKeep ],
-      });
-
-      await this.github.addCommentToIssue({ // eslint-disable-line no-await-in-loop
-        issue_number: existingIssue.number,
-        body: `${comment}\n${body}`,
-      });
+    if (issue.state == GitHub.ISSUE_STATE_CLOSED) {
+      await this.github.openIssue(issue.number);
     }
+
+    const managedLabelsNames = this.MANAGED_LABELS.map(label => label.name);
+    const [labelManaged] = issue.labels.filter(label => managedLabelsNames.includes(label.name)); // it is assumed that managed labels are exclusive, allowing only one to be present at a time
+
+    if (labelManaged?.name == label) {
+      return;
+    }
+
+    const labelsNotManagedToKeep = issue.labels.filter(label => !managedLabelsNames.includes(label.name));
+
+    await this.github.updateIssue({ issue_number: issue.number, labels: [ label, ...labelsNotManagedToKeep ] });
+    await this.github.addCommentToIssue({ issue_number: issue.number, body: `${comment}\n${body}` });
   }
 
   async closeIssueIfExists({ title, comment }) {
-    const openedIssues = await this.github.searchIssues({ title, state: GitHub.ISSUE_STATE_OPEN });
+    const openedIssue = await this.github.getIssue({ title, state: GitHub.ISSUE_STATE_OPEN });
 
-    for (const openedIssue of openedIssues) {
-      await this.github.addCommentToIssue({ issue_number: openedIssue.number, body: comment }); // eslint-disable-line no-await-in-loop
-      await this.github.closeIssue(openedIssue.number); // eslint-disable-line no-await-in-loop
+    if (!openedIssue) {
+      return;
     }
+
+    await this.github.addCommentToIssue({ issue_number: openedIssue.number, body: comment });
+    await this.github.closeIssue(openedIssue.number);
   }
 
   static getLabelNameFromError(error) {
