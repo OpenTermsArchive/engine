@@ -145,7 +145,7 @@ ${hasSnapshot ? 'After correction, it might still be possible to recover the mis
 
 ### What went wrong
 
-- ${error.toString()}
+- \`${error.reasons.join('`\n- `')}\`
 
 ### How to resume tracking
 
