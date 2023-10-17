@@ -4,8 +4,6 @@ import { Octokit } from 'octokit';
 
 import logger from '../logger/index.js';
 
-const { version } = JSON.parse(fs.readFileSync(new URL('../../package.json', import.meta.url)).toString());
-
 export default class GitHub {
   static ISSUE_STATE_CLOSED = 'closed';
 
@@ -19,6 +17,7 @@ export default class GitHub {
 
   constructor(repository) {
     const [ owner, repo ] = repository.split('/');
+    const { version } = JSON.parse(fs.readFileSync(new URL('../../package.json', import.meta.url)).toString());
 
     this.octokit = new Octokit({ auth: process.env.GITHUB_TOKEN, userAgent: `opentermsarchive/${version}` });
     this.commonParams = {
