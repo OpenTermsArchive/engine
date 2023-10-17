@@ -27,6 +27,12 @@ export default class GitHub {
     };
   }
 
+  async initialize() {
+    const { data } = await this.octokit.request('GET /user', { ...this.commonParams });
+
+    this.authenticatedUser = data.login;
+  }
+
   async getRepositoryLabels() {
     const { data } = await this.octokit.request('GET /repos/{owner}/{repo}/labels', { ...this.commonParams });
 
@@ -102,6 +108,7 @@ export default class GitHub {
       const issues = await this.octokit.paginate('GET /repos/{owner}/{repo}/issues', {
         ...this.commonParams,
         per_page: 100,
+        creator: this.authenticatedUser,
         ...searchParams,
       }, response => response.data);
 
