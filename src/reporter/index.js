@@ -23,7 +23,7 @@ const ERROR_MESSAGE_TO_ISSUE_LABEL_MAP = {
   'maximum redirect reached': 'redirects',
 };
 
-// In the following class, it is assumed that each issue is managed using its name as a unique identifier
+// In the following class, it is assumed that each issue is managed using its title as a unique identifier
 export default class Reporter {
   constructor(config) {
     const { repositories } = config.githubIssues;
