@@ -75,7 +75,7 @@ export default class Reporter {
   }
 
   async onInaccessibleContent(error, terms) {
-    const { title, body } = Reporter.formatIssueTitleAndBody({ message: error.toString(), repository: this.repository, terms });
+    const { title, body } = this.formatIssueTitleAndBody({ message: error.toString(), terms });
 
     await this.createIssueIfNotExists({
       title,
@@ -127,7 +127,7 @@ export default class Reporter {
     return ERROR_MESSAGE_TO_ISSUE_LABEL_MAP[Object.keys(ERROR_MESSAGE_TO_ISSUE_LABEL_MAP).find(substring => error.toString().includes(substring))];
   }
 
-  static formatIssueTitleAndBody({ message, repository, terms }) {
+  formatIssueTitleAndBody({ message, terms }) {
     const { service: { name }, type } = terms;
     const json = terms.toPersistence();
     const title = `Fix ${name} - ${type}`;
@@ -137,7 +137,7 @@ export default class Reporter {
 
     const urlQueryParams = new URLSearchParams({
       json: JSON.stringify(json),
-      destination: repository,
+      destination: this.repository,
       expertMode: 'true',
       step: '2',
     });
@@ -152,7 +152,7 @@ Check what's wrong by:
 ${message.includes('404') ? `- [Searching Google](${GOOGLE_URL}%22${encodedName}%22+%22${encodedType}%22) to get for a new URL.` : ''}
 
 And some info about what has already been tracked:
-- See [service declaration JSON file](https://github.com/${repository}/blob/main/declarations/${encodedName}.json).
+- See [service declaration JSON file](https://github.com/${this.repository}/blob/main/declarations/${encodedName}.json).
 `;
 
     return {
