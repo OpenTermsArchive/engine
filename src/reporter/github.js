@@ -6,9 +6,7 @@ import logger from '../logger/index.js';
 
 export default class GitHub {
   static ISSUE_STATE_CLOSED = 'closed';
-
   static ISSUE_STATE_OPEN = 'open';
-
   static ISSUE_STATE_ALL = 'all';
 
   static isRepositoryValid(repository) {
