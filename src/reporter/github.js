@@ -9,10 +9,6 @@ export default class GitHub {
   static ISSUE_STATE_OPEN = 'open';
   static ISSUE_STATE_ALL = 'all';
 
-  static isRepositoryValid(repository) {
-    return repository.includes('/');
-  }
-
   constructor(repository) {
     const [ owner, repo ] = repository.split('/');
     const { version } = JSON.parse(fs.readFileSync(new URL('../../package.json', import.meta.url)).toString());

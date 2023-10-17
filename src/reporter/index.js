@@ -29,7 +29,7 @@ export default class Reporter {
     const { repositories } = config.githubIssues;
 
     for (const repositoryType of Object.keys(repositories)) {
-      if (!GitHub.isRepositoryValid(repositories[repositoryType])) {
+      if (!repositories[repositoryType].includes('/') || repositories[repositoryType].includes('https://')) {
         throw new Error(`Configuration entry "reporter.githubIssues.repositories.${repositoryType}" is expected to be a string in the format <owner>/<repo>, but received: ${repositories[repositoryType]}`);
       }
     }
