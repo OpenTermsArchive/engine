@@ -55,36 +55,34 @@ export default class Reporter {
     }
   }
 
-  async onVersionRecorded({ serviceId, termsType: type }) {
+  async onVersionRecorded(version) {
     await this.closeIssueIfExists({
-      title: `Fix ${serviceId} - ${type}`,
+      title: Reporter.generateTitleID(version.serviceId, version.termsType),
       comment: '🤖 Closed automatically as data was gathered successfully',
     });
   }
 
-  async onVersionNotChanged({ serviceId, termsType: type }) {
+  async onVersionNotChanged(version) {
     await this.closeIssueIfExists({
-      title: `Fix ${serviceId} - ${type}`,
+      title: Reporter.generateTitleID(version.serviceId, version.termsType),
       comment: '🤖 Closed automatically as version is unchanged but data has been fetched correctly',
     });
   }
 
-  async onFirstVersionRecorded({ serviceId, termsType: type }) {
-    return this.onVersionRecorded({ serviceId, termsType: type });
+  async onFirstVersionRecorded(version) {
+    return this.onVersionRecorded(version);
   }
 
   async onInaccessibleContent(error, terms) {
-    const { title, body } = this.formatIssueTitleAndBody({ message: error.toString(), terms });
-
-    await this.createIssueIfNotExists({
-      title,
-      body,
+    await this.createOrUpdateIssue({
+      title: Reporter.generateTitleID(terms.service.id, terms.type),
+      body: this.formatIssueTitleAndBody({ message: error.toString(), terms }),
       label: Reporter.getLabelNameFromError(error),
       comment: '🤖 Reopened automatically as an error occured',
     });
   }
 
-  async createIssueIfNotExists({ title, body, label, comment }) {
+  async createOrUpdateIssue({ title, body, label, comment }) {
     const issue = await this.github.getIssue({ title, state: GitHub.ISSUE_STATE_ALL });
 
     if (!issue) {
@@ -123,22 +121,24 @@ export default class Reporter {
     return ERROR_MESSAGE_TO_ISSUE_LABEL_MAP[Object.keys(ERROR_MESSAGE_TO_ISSUE_LABEL_MAP).find(substring => error.toString().includes(substring))];
   }
 
+  static generateTitleID(serviceId, type) {
+    return `\`${serviceId}\` ‧ \`${type}\` ‧ not tracked anymore`;
+  }
+
   formatIssueTitleAndBody({ message, terms }) {
     const { service: { name }, type } = terms;
-    const json = terms.toPersistence();
-    const title = `Fix ${name} - ${type}`;
 
     const encodedName = encodeURIComponent(name);
     const encodedType = encodeURIComponent(type);
 
     const urlQueryParams = new URLSearchParams({
-      json: JSON.stringify(json),
+      json: JSON.stringify(terms.toPersistence()),
       destination: this.repository,
       expertMode: 'true',
       step: '2',
     });
 
-    const body = `
+    return `
 These terms are no longer tracked.
 
 ${message}
@@ -150,10 +150,5 @@ ${message.includes('404') ? `- [Searching Google](${GOOGLE_URL}%22${encodedName}
 And some info about what has already been tracked:
 - See [service declaration JSON file](https://github.com/${this.repository}/blob/main/declarations/${encodedName}.json).
 `;
-
-    return {
-      title,
-      body,
-    };
   }
 }
