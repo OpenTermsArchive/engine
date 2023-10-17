@@ -62,14 +62,14 @@ export default class Reporter {
   async onVersionRecorded(version) {
     await this.closeIssueIfExists({
       title: Reporter.generateTitleID(version.serviceId, version.termsType),
-      comment: 'Closed automatically as data was gathered successfully',
+      comment: '**Tracking resumed!** A new version has been recorded.',
     });
   }
 
   async onVersionNotChanged(version) {
     await this.closeIssueIfExists({
       title: Reporter.generateTitleID(version.serviceId, version.termsType),
-      comment: 'Closed automatically as version is unchanged but data has been fetched correctly',
+      comment: '**Tracking resumed!** No changes were detected in the last run.',
     });
   }
 
@@ -80,16 +80,16 @@ export default class Reporter {
   async onInaccessibleContent(error, terms) {
     await this.createOrUpdateIssue({
       title: Reporter.generateTitleID(terms.service.id, terms.type),
-      body: this.generateDescription({ error, terms, hasSnapshot: true }),
+      description: this.generateDescription({ error, terms }),
       label: Reporter.getLabelNameFromError(error),
     });
   }
 
-  async createOrUpdateIssue({ title, body, label }) {
+  async createOrUpdateIssue({ title, description, label }) {
     const issue = await this.github.getIssue({ title, state: GitHub.ISSUE_STATE_ALL });
 
     if (!issue) {
-      return this.github.createIssue({ title, body, labels: [label] });
+      return this.github.createIssue({ title, body: description, labels: [label] });
     }
 
     if (issue.state == GitHub.ISSUE_STATE_CLOSED) {
@@ -106,7 +106,7 @@ export default class Reporter {
     const labelsNotManagedToKeep = issue.labels.map(label => label.name).filter(label => !managedLabelsNames.includes(label));
 
     await this.github.setIssueLabels({ issue, labels: [ label, ...labelsNotManagedToKeep ] });
-    await this.github.addCommentToIssue({ issue, comment: `Updated automatically as an error occured\n- - -\n${body}` });
+    await this.github.addCommentToIssue({ issue, comment: body: description });
   }
 
   async closeIssueIfExists({ title, comment }) {
