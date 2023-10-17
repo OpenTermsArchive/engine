@@ -40,7 +40,7 @@ export default class Reporter {
   async initialize() {
     this.MANAGED_LABELS = JSON.parse(fs.readFileSync(new URL('./labels.json', import.meta.url)).toString());
 
-    const existingLabels = await this.github.getLabels();
+    const existingLabels = await this.github.getRepositoryLabels();
     const existingLabelsNames = existingLabels.map(label => label.name);
     const missingLabels = this.MANAGED_LABELS.filter(label => !existingLabelsNames.includes(label.name));
 
