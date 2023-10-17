@@ -21,7 +21,7 @@ _Full changeset and discussions: [#1025](https://github.com/OpenTermsArchive/eng
 
 ## 0.31.1 - 2023-10-06
 
-_Full changeset and discussions: [#1015](https://github.com/OpenTermsArchive/engine/pull/1024)._
+_Full changeset and discussions: [#1024](https://github.com/OpenTermsArchive/engine/pull/1024)._
 
 ### Added
 
