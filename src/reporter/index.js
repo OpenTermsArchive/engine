@@ -127,7 +127,6 @@ export default class Reporter {
     const urlQueryParams = new URLSearchParams({
       json: JSON.stringify(terms.toPersistence()),
       destination: this.repositories.declarations,
-      expertMode: 'true',
       step: '2',
     });
     const contributionToolUrl = `${CONTRIBUTE_URL}?${urlQueryParams}`;
