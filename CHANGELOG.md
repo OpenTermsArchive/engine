@@ -2,7 +2,22 @@
 
 All changes that impact users of this module are documented in this file, in the [Common Changelog](https://common-changelog.org) format with some additional specifications defined in the CONTRIBUTING file. This codebase adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased
+## Unreleased [minor]
+
+_Full changeset and discussions: [#1025](https://github.com/OpenTermsArchive/engine/pull/1025)._
+
+### Added
+
+- Auto create labels for declarations repository on GitHub
+- Assign a label based on the error type to issues managed by the engine
+
+### Changed
+
+- **Breaking:** Revise the formatting of reported issues, with notable adjustments to the title, transitioning from `Fix <service_id> - <terms_type>` to `<service_id> ‧ <terms_type> ‧ not tracked anymore`
+
+### Removed
+
+- **Breaking:** No longer assign the label `bot-report` to issues managed by the engine
 
 ## 0.31.1 - 2023-10-06
 
