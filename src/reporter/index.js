@@ -45,7 +45,7 @@ export default class Reporter {
     const missingLabels = this.MANAGED_LABELS.filter(label => !existingLabelsNames.includes(label.name));
 
     if (missingLabels.length) {
-      console.log('Following required labels are not present on the repository, let\'s create them…', missingLabels.map(label => `"${label.name}"`).join(', '));
+      console.log(`Following required labels are not present on the repository: ${missingLabels.map(label => `"${label.name}"`).join(', ')}. Creating them…`);
 
       for (const label of missingLabels) {
         await this.github.createLabel({ /* eslint-disable-line no-await-in-loop */
