@@ -122,7 +122,7 @@ export default class Reporter {
   }
 
   generateDescription({ error, terms }) {
-    const currentFormattedDate = new Date().toLocaleDateString('en-GB', { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric' });
+    const currentFormattedDate = new Date().toLocaleDateString('en-GB', { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric', 'timeZoneName': 'short', 'timeZone': 'UTC' });
     const hasSnapshots = terms.sourceDocuments.every(sourceDocument => sourceDocument.snapshotId);
     const contributionToolParams = new URLSearchParams({
       json: JSON.stringify(terms.toPersistence()),
