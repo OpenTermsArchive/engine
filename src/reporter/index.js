@@ -80,16 +80,16 @@ export default class Reporter {
     await this.createIssueIfNotExists({
       title,
       body,
-      labels: [Reporter.getLabelNameFromError(error)],
+      label: Reporter.getLabelNameFromError(error),
       comment: '🤖 Reopened automatically as an error occured',
     });
   }
 
-  async createIssueIfNotExists({ title, body, labels, comment }) {
+  async createIssueIfNotExists({ title, body, label, comment }) {
     const existingIssues = await this.github.searchIssues({ title, state: GitHub.ISSUE_STATE_ALL });
 
     if (!existingIssues?.length) {
-      return this.github.createIssue({ title, body, labels });
+      return this.github.createIssue({ title, body, labels: [label] });
     }
 
     const openedIssues = existingIssues.filter(existingIssue => existingIssue.state === GitHub.ISSUE_STATE_OPEN);
