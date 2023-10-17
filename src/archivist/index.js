@@ -179,6 +179,7 @@ export default class Archivist extends events.EventEmitter {
 
       sourceDocument.content = snapshot.content;
       sourceDocument.mimeType = snapshot.mimeType;
+      sourceDocument.snapshotId = snapshot.id;
       terms.fetchDate = snapshot.fetchDate;
     }));
   }

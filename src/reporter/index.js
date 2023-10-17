@@ -1,9 +1,11 @@
 import fs from 'fs';
 
+import mime from 'mime';
+
 import GitHub from './github.js';
 
 const CONTRIBUTE_URL = 'https://contribute.opentermsarchive.org/en/service';
-const GOOGLE_URL = 'https://www.google.com/search?q=';
+const DOC_URL = 'https://docs.opentermsarchive.org';
 
 const ERROR_MESSAGE_TO_ISSUE_LABEL_MAP = {
   'has no match': 'selectors',
@@ -24,15 +26,17 @@ const ERROR_MESSAGE_TO_ISSUE_LABEL_MAP = {
 // In the following class, it is assumed that each issue is managed using its name as a unique identifier
 export default class Reporter {
   constructor(config) {
-    const { repository } = config.githubIssues;
+    const { repositories } = config.githubIssues;
 
-    if (!GitHub.isRepositoryValid(repository)) {
-      throw new Error('reporter.githubIssues.repository should be a string with <owner>/<repo>');
+    for (const repositoryType of Object.keys(repositories)) {
+      if (!GitHub.isRepositoryValid(repositories[repositoryType])) {
+        throw new Error(`Configuration entry "reporter.githubIssues.repositories.${repositoryType}" is expected to be a string in the format <owner>/<repo>, but received: ${repositories[repositoryType]}`);
+      }
     }
 
-    this.github = new GitHub(repository);
+    this.github = new GitHub(repositories.declarations);
     this.cachedIssues = {};
-    this.repository = repository;
+    this.repositories = repositories;
   }
 
   async initialize() {
@@ -76,13 +80,12 @@ export default class Reporter {
   async onInaccessibleContent(error, terms) {
     await this.createOrUpdateIssue({
       title: Reporter.generateTitleID(terms.service.id, terms.type),
-      body: this.formatIssueTitleAndBody({ message: error.toString(), terms }),
+      body: this.generateDescription({ error, terms, hasSnapshot: true }),
       label: Reporter.getLabelNameFromError(error),
-      comment: 'Reopened automatically as an error occured',
     });
   }
 
-  async createOrUpdateIssue({ title, body, label, comment }) {
+  async createOrUpdateIssue({ title, body, label }) {
     const issue = await this.github.getIssue({ title, state: GitHub.ISSUE_STATE_ALL });
 
     if (!issue) {
@@ -103,7 +106,7 @@ export default class Reporter {
     const labelsNotManagedToKeep = issue.labels.map(label => label.name).filter(label => !managedLabelsNames.includes(label));
 
     await this.github.setIssueLabels({ issue, labels: [ label, ...labelsNotManagedToKeep ] });
-    await this.github.addCommentToIssue({ issue, comment: `${comment}\n${body}` });
+    await this.github.addCommentToIssue({ issue, comment: `Updated automatically as an error occured\n- - -\n${body}` });
   }
 
   async closeIssueIfExists({ title, comment }) {
@@ -117,38 +120,67 @@ export default class Reporter {
     await this.github.closeIssue(openedIssue);
   }
 
+  generateDescription({ error, terms }) {
+    const currentFormattedDate = new Date().toLocaleDateString('en-GB', { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric' });
+    const hasSnapshot = Boolean(!terms.sourceDocuments.find(sourceDocument => !sourceDocument.snapshotId));
+    const urlQueryParams = new URLSearchParams({
+      json: JSON.stringify(terms.toPersistence()),
+      destination: this.repositories.declarations,
+      expertMode: 'true',
+      step: '2',
+    });
+    const contributionToolUrl = `${CONTRIBUTE_URL}?${urlQueryParams}`;
+    const latestDeclaration = `- [Latest declaration](https://github.com/${this.repositories.declarations}/blob/main/declarations/${encodeURIComponent(terms.service.name)}.json)`;
+    const latestVersion = `- [Latest version](https://github.com/${this.repositories.versions}/blob/main/${encodeURIComponent(terms.service.name)}/${encodeURIComponent(terms.type)}.md)`;
+    const latestSnapshotBaseUrl = `https://github.com/${this.repositories.snapshots}/blob/main/${encodeURIComponent(terms.service.name)}/${encodeURIComponent(terms.type)}`;
+    const latestSnapshots = terms.hasMultipleSourceDocuments
+      ? `- Latest snapshots:\n  - ${terms.sourceDocuments.map(sourceDocument => `[${sourceDocument.id}](${latestSnapshotBaseUrl}.%20#${sourceDocument.id}.${mime.getExtension(sourceDocument.mimeType)})`).join('\n  - ')}`
+      : `- [Latest snapshot](${latestSnapshotBaseUrl}.${mime.getExtension(terms.sourceDocuments[0].mimeType)})`;
+
+    return `
+## No version of the \`${terms.type}\` of service \`${terms.service.name}\` is recorded anymore since ${currentFormattedDate}
+
+The source document${terms.hasMultipleSourceDocuments ? 's have' : ' has'}${hasSnapshot ? ' ' : ' not '}been recorded in a snapshot, ${hasSnapshot ? 'but ' : 'thus '} [no version can be extracted](https://docs.opentermsarchive.org/#tracking-terms).
+${hasSnapshot ? 'After correction, it might still be possible to recover the missed versions.' : ''}
+
+### What went wrong
+
+- ${error.toString()}
+
+### How to resume tracking
+
+First of all, check if the source documents are accessible through a web browser:
+
+- [ ] ${terms.sourceDocuments.map(sourceDocument => `[${sourceDocument.location}](${sourceDocument.location})`).join('\n- [ ] ')}
+
+#### If the source documents are accessible through a web browser
+
+- Try [updating the selectors](${contributionToolUrl}).
+- Try [switching client scripts on](${contributionToolUrl}).
+
+#### If the source documents are not accessible anymore
+
+- If the source documents have moved, find their new location and [update it](${contributionToolUrl}).
+- If these terms have been removed, move them from the declaration to its [history file](${DOC_URL}/contributing-terms/#service-history), using the date of this report as the \`validUntil\` value.
+- If the service has closed, move the entire contents of the declaration to its [history file](${DOC_URL}/contributing-terms/#service-history), using the date of this report as the \`validUntil\` value.
+
+#### If none of the above works
+
+If the source documents are accessible in a browser but fetching them always fails from the Open Terms Archive server, this is most likely because the service provider has blocked the Open Terms Archive robots from accessing its content. In this case, updating the declaration will not enable resuming tracking. Only an agreement with the service provider, an engine upgrade, or some technical workarounds provided by the administrator of this collection’s server might resume tracking.
+
+### References
+
+${latestDeclaration}
+${latestVersion}
+${hasSnapshot ? latestSnapshots : ''}
+`;
+  }
+
   static getLabelNameFromError(error) {
     return ERROR_MESSAGE_TO_ISSUE_LABEL_MAP[Object.keys(ERROR_MESSAGE_TO_ISSUE_LABEL_MAP).find(substring => error.toString().includes(substring))];
   }
 
   static generateTitleID(serviceId, type) {
     return `\`${serviceId}\` ‧ \`${type}\` ‧ not tracked anymore`;
-  }
-
-  formatIssueTitleAndBody({ message, terms }) {
-    const { service: { name }, type } = terms;
-
-    const encodedName = encodeURIComponent(name);
-    const encodedType = encodeURIComponent(type);
-
-    const urlQueryParams = new URLSearchParams({
-      json: JSON.stringify(terms.toPersistence()),
-      destination: this.repository,
-      expertMode: 'true',
-      step: '2',
-    });
-
-    return `
-These terms are no longer tracked.
-
-${message}
-
-Check what's wrong by:
-- Using the [online contribution tool](${CONTRIBUTE_URL}?${urlQueryParams}).
-${message.includes('404') ? `- [Searching Google](${GOOGLE_URL}%22${encodedName}%22+%22${encodedType}%22) to get for a new URL.` : ''}
-
-And some info about what has already been tracked:
-- See [service declaration JSON file](https://github.com/${this.repository}/blob/main/declarations/${encodedName}.json).
-`;
   }
 }
