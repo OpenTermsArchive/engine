@@ -58,14 +58,14 @@ export default class Reporter {
   async onVersionRecorded(version) {
     await this.closeIssueIfExists({
       title: Reporter.generateTitleID(version.serviceId, version.termsType),
-      comment: '🤖 Closed automatically as data was gathered successfully',
+      comment: 'Closed automatically as data was gathered successfully',
     });
   }
 
   async onVersionNotChanged(version) {
     await this.closeIssueIfExists({
       title: Reporter.generateTitleID(version.serviceId, version.termsType),
-      comment: '🤖 Closed automatically as version is unchanged but data has been fetched correctly',
+      comment: 'Closed automatically as version is unchanged but data has been fetched correctly',
     });
   }
 
@@ -78,7 +78,7 @@ export default class Reporter {
       title: Reporter.generateTitleID(terms.service.id, terms.type),
       body: this.formatIssueTitleAndBody({ message: error.toString(), terms }),
       label: Reporter.getLabelNameFromError(error),
-      comment: '🤖 Reopened automatically as an error occured',
+      comment: 'Reopened automatically as an error occured',
     });
   }
 
