@@ -4,7 +4,7 @@ import mime from 'mime';
 
 import GitHub from './github.js';
 
-const CONTRIBUTE_URL = 'https://contribute.opentermsarchive.org/en/service';
+const CONTRIBUTION_TOOL_URL = 'https://contribute.opentermsarchive.org/en/service';
 const DOC_URL = 'https://docs.opentermsarchive.org';
 
 const ERROR_MESSAGE_TO_ISSUE_LABEL_MAP = {
@@ -124,12 +124,12 @@ export default class Reporter {
   generateDescription({ error, terms }) {
     const currentFormattedDate = new Date().toLocaleDateString('en-GB', { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric' });
     const hasSnapshots = terms.sourceDocuments.every(sourceDocument => sourceDocument.snapshotId);
-    const urlQueryParams = new URLSearchParams({
+    const contributionToolParams = new URLSearchParams({
       json: JSON.stringify(terms.toPersistence()),
       destination: this.repositories.declarations,
       step: '2',
     });
-    const contributionToolUrl = `${CONTRIBUTE_URL}?${urlQueryParams}`;
+    const contributionToolUrl = `${CONTRIBUTION_TOOL_URL}?${contributionToolParams}`;
     const latestDeclaration = `- [Latest declaration](https://github.com/${this.repositories.declarations}/blob/main/declarations/${encodeURIComponent(terms.service.name)}.json)`;
     const latestVersion = `- [Latest version](https://github.com/${this.repositories.versions}/blob/main/${encodeURIComponent(terms.service.name)}/${encodeURIComponent(terms.type)}.md)`;
     const latestSnapshotBaseUrl = `https://github.com/${this.repositories.snapshots}/blob/main/${encodeURIComponent(terms.service.name)}/${encodeURIComponent(terms.type)}`;
