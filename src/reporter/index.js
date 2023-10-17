@@ -63,14 +63,18 @@ export default class Reporter {
   async onVersionRecorded(version) {
     await this.closeIssueIfExists({
       title: Reporter.generateTitleID(version.serviceId, version.termsType),
-      comment: '**Tracking resumed!** A new version has been recorded.',
+      comment: `### Tracking resumed
+
+A new version has been recorded.`,
     });
   }
 
   async onVersionNotChanged(version) {
     await this.closeIssueIfExists({
       title: Reporter.generateTitleID(version.serviceId, version.termsType),
-      comment: '**Tracking resumed!** No changes were detected in the last run.',
+      comment: `### Tracking resumed
+
+No changes were found in the last run, so no new version has been recorded.`,
     });
   }
 
@@ -130,23 +134,23 @@ export default class Reporter {
       step: '2',
     });
     const contributionToolUrl = `${CONTRIBUTION_TOOL_URL}?${contributionToolParams}`;
-    const latestDeclaration = `- [Latest declaration](https://github.com/${this.repositories.declarations}/blob/main/declarations/${encodeURIComponent(terms.service.name)}.json)`;
-    const latestVersion = `- [Latest version](https://github.com/${this.repositories.versions}/blob/main/${encodeURIComponent(terms.service.name)}/${encodeURIComponent(terms.type)}.md)`;
-    const latestSnapshotBaseUrl = `https://github.com/${this.repositories.snapshots}/blob/main/${encodeURIComponent(terms.service.name)}/${encodeURIComponent(terms.type)}`;
-    const latestSnapshots = terms.hasMultipleSourceDocuments
-      ? `- Latest snapshots:\n  - ${terms.sourceDocuments.map(sourceDocument => `[${sourceDocument.id}](${latestSnapshotBaseUrl}.%20#${sourceDocument.id}.${mime.getExtension(sourceDocument.mimeType)})`).join('\n  - ')}`
-      : `- [Latest snapshot](${latestSnapshotBaseUrl}.${mime.getExtension(terms.sourceDocuments[0].mimeType)})`;
+    const latestDeclarationLink = `[Latest declaration](https://github.com/${this.repositories.declarations}/blob/main/declarations/${encodeURIComponent(terms.service.name)}.json)`;
+    const latestVersionLink = `[Latest version](https://github.com/${this.repositories.versions}/blob/main/${encodeURIComponent(terms.service.name)}/${encodeURIComponent(terms.type)}.md)`;
+    const snapshotsBaseUrl = `https://github.com/${this.repositories.snapshots}/blob/main/${encodeURIComponent(terms.service.name)}/${encodeURIComponent(terms.type)}`;
+    const latestSnapshotsLink = terms.hasMultipleSourceDocuments
+      ? `Latest snapshots:\n  - ${terms.sourceDocuments.map(sourceDocument => `[${sourceDocument.id}](${snapshotsBaseUrl}.%20#${sourceDocument.id}.${mime.getExtension(sourceDocument.mimeType)})`).join('\n  - ')}`
+      : `[Latest snapshot](${snapshotsBaseUrl}.${mime.getExtension(terms.sourceDocuments[0].mimeType)})`;
 
     /* eslint-disable no-irregular-whitespace */
     return `
-## No version of the \`${terms.type}\` of service \`${terms.service.name}\` is recorded anymore since ${currentFormattedDate}
+### No version of the \`${terms.type}\` of service \`${terms.service.name}\` is recorded anymore since ${currentFormattedDate}
 
-The source document${terms.hasMultipleSourceDocuments ? 's have' : ' has'}${hasSnapshots ? ' ' : ' not '}been recorded in a snapshot, ${hasSnapshots ? 'but ' : 'thus '} [no version can be extracted](https://docs.opentermsarchive.org/#tracking-terms).
+The source document${terms.hasMultipleSourceDocuments ? 's have' : ' has'}${hasSnapshots ? ' ' : ' not '}been recorded in ${terms.hasMultipleSourceDocuments ? 'snapshots' : 'a snapshot' }, ${hasSnapshots ? 'but ' : 'thus '} no version can be [extracted](${DOC_URL}/#tracking-terms).
 ${hasSnapshots ? 'After correction, it might still be possible to recover the missed versions.' : ''}
 
 ### What went wrong
 
-- \`${error.reasons.join('`\n- `')}\`
+- ${error.reasons.join('\n- ')}
 
 ### How to resume tracking
 
@@ -171,9 +175,9 @@ If the source documents are accessible in a browser but fetching them always fai
 
 ### References
 
-${latestDeclaration}
-${latestVersion}
-${hasSnapshots ? latestSnapshots : ''}
+- ${latestDeclarationLink}
+- ${latestVersionLink}
+- ${latestSnapshotsLink}
 `;
   /* eslint-enable no-irregular-whitespace */
   }
