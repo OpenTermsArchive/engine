@@ -1,5 +1,3 @@
-import fs from 'fs';
-
 import mime from 'mime';
 
 import GitHub from './github.js';
@@ -44,29 +42,11 @@ export default class Reporter {
   }
 
   async initialize() {
-    await this.github.initialize();
-
-    this.MANAGED_LABELS = JSON.parse(fs.readFileSync(new URL('./labels.json', import.meta.url)).toString());
-
-    const existingLabels = await this.github.getRepositoryLabels();
-    const existingLabelsNames = existingLabels.map(label => label.name);
-    const missingLabels = this.MANAGED_LABELS.filter(label => !existingLabelsNames.includes(label.name));
-
-    if (missingLabels.length) {
-      console.log(`Following required labels are not present on the repository: ${missingLabels.map(label => `"${label.name}"`).join(', ')}. Creating them…`);
-
-      for (const label of missingLabels) {
-        await this.github.createLabel({ /* eslint-disable-line no-await-in-loop */
-          name: label.name,
-          color: label.color,
-          description: `${label.description} [managed by Open Terms Archive]`,
-        });
-      }
-    }
+    return this.github.initialize();
   }
 
   async onVersionRecorded(version) {
-    await this.closeIssueIfExists({
+    await this.github.closeIssueWithCommentIfExists({
       title: Reporter.generateTitleID(version.serviceId, version.termsType),
       comment: `### Tracking resumed
 
@@ -75,7 +55,7 @@ A new version has been recorded.`,
   }
 
   async onVersionNotChanged(version) {
-    await this.closeIssueIfExists({
+    await this.github.closeIssueWithCommentIfExists({
       title: Reporter.generateTitleID(version.serviceId, version.termsType),
       comment: `### Tracking resumed
 
@@ -88,46 +68,11 @@ No changes were found in the last run, so no new version has been recorded.`,
   }
 
   async onInaccessibleContent(error, terms) {
-    await this.createOrUpdateIssue({
+    await this.github.createOrUpdateIssue({
       title: Reporter.generateTitleID(terms.service.id, terms.type),
       description: this.generateDescription({ error, terms }),
       label: getLabelNameFromError(error),
     });
-  }
-
-  async createOrUpdateIssue({ title, description, label }) {
-    const issue = await this.github.getIssue({ title, state: GitHub.ISSUE_STATE_ALL });
-
-    if (!issue) {
-      return this.github.createIssue({ title, description, labels: [label] });
-    }
-
-    if (issue.state == GitHub.ISSUE_STATE_CLOSED) {
-      await this.github.openIssue(issue);
-    }
-
-    const managedLabelsNames = this.MANAGED_LABELS.map(label => label.name);
-    const [managedLabel] = issue.labels.filter(label => managedLabelsNames.includes(label.name)); // it is assumed that only one specific reason for failure is possible at a time, making managed labels mutually exclusive
-
-    if (managedLabel?.name == label) { // if the label is already assigned to the issue, the error is redundant with the one already reported and no further action is necessary
-      return;
-    }
-
-    const labelsNotManagedToKeep = issue.labels.map(label => label.name).filter(label => !managedLabelsNames.includes(label));
-
-    await this.github.setIssueLabels({ issue, labels: [ label, ...labelsNotManagedToKeep ] });
-    await this.github.addCommentToIssue({ issue, comment: description });
-  }
-
-  async closeIssueIfExists({ title, comment }) {
-    const openedIssue = await this.github.getIssue({ title, state: GitHub.ISSUE_STATE_OPEN });
-
-    if (!openedIssue) {
-      return;
-    }
-
-    await this.github.addCommentToIssue({ issue: openedIssue, comment });
-    await this.github.closeIssue(openedIssue);
   }
 
   generateDescription({ error, terms }) {

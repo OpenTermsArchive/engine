@@ -23,6 +23,24 @@ export default class GitHub {
     const { data: user } = await this.octokit.request('GET /user', { ...this.commonParams });
 
     this.authenticatedUserLogin = user.login;
+
+    this.MANAGED_LABELS = JSON.parse(fs.readFileSync(new URL('./labels.json', import.meta.url)).toString());
+
+    const existingLabels = await this.getRepositoryLabels();
+    const existingLabelsNames = existingLabels.map(label => label.name);
+    const missingLabels = this.MANAGED_LABELS.filter(label => !existingLabelsNames.includes(label.name));
+
+    if (missingLabels.length) {
+      logger.info(`🤖 Following required labels are not present on the repository: ${missingLabels.map(label => `"${label.name}"`).join(', ')}. Creating them…`);
+
+      for (const label of missingLabels) {
+        await this.createLabel({ /* eslint-disable-line no-await-in-loop */
+          name: label.name,
+          color: label.color,
+          description: `${label.description} [managed by Open Terms Archive]`,
+        });
+      }
+    }
   }
 
   async getRepositoryLabels() {
@@ -46,12 +64,12 @@ export default class GitHub {
     }
   }
 
-  async createIssue({ title, description, labels }) {
+  async createIssue({ title, description: body, labels }) {
     try {
       const { data: issue } = await this.octokit.request('POST /repos/{owner}/{repo}/issues', {
         ...this.commonParams,
         title,
-        description,
+        body,
         labels,
       });
 
@@ -136,5 +154,41 @@ export default class GitHub {
     } catch (error) {
       logger.error(`🤖 Could not add comment to GitHub issue #${issue.number} "${issue.title}": ${error}`);
     }
+  }
+
+  async closeIssueWithCommentIfExists({ title, comment }) {
+    const openedIssue = await this.getIssue({ title, state: GitHub.ISSUE_STATE_OPEN });
+
+    if (!openedIssue) {
+      return;
+    }
+
+    await this.addCommentToIssue({ issue: openedIssue, comment });
+
+    return this.closeIssue(openedIssue);
+  }
+
+  async createOrUpdateIssue({ title, description, label }) {
+    const issue = await this.getIssue({ title, state: GitHub.ISSUE_STATE_ALL });
+
+    if (!issue) {
+      return this.createIssue({ title, description, labels: [label] });
+    }
+
+    if (issue.state == this.ISSUE_STATE_CLOSED) {
+      await this.openIssue(issue);
+    }
+
+    const managedLabelsNames = this.MANAGED_LABELS.map(label => label.name);
+    const [managedLabel] = issue.labels.filter(label => managedLabelsNames.includes(label.name)); // it is assumed that only one specific reason for failure is possible at a time, making managed labels mutually exclusive
+
+    if (managedLabel?.name == label) { // if the label is already assigned to the issue, the error is redundant with the one already reported and no further action is necessary
+      return;
+    }
+
+    const labelsNotManagedToKeep = issue.labels.map(label => label.name).filter(label => !managedLabelsNames.includes(label));
+
+    await this.setIssueLabels({ issue, labels: [ label, ...labelsNotManagedToKeep ] });
+    await this.addCommentToIssue({ issue, comment: description });
   }
 }
