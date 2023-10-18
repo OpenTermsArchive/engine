@@ -4,6 +4,8 @@ import { Octokit } from 'octokit';
 
 import logger from '../logger/index.js';
 
+export const MANAGED_BY_OTA_MARKER = '[managed by OTA]';
+
 export default class GitHub {
   static ISSUE_STATE_CLOSED = 'closed';
   static ISSUE_STATE_OPEN = 'open';
@@ -41,7 +43,7 @@ export default class GitHub {
         await this.createLabel({ /* eslint-disable-line no-await-in-loop */
           name: label.name,
           color: label.color,
-          description: `${label.description} [managed by Open Terms Archive]`,
+          description: `${label.description} ${MANAGED_BY_OTA_MARKER}`,
         });
       }
     }
