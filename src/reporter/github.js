@@ -10,47 +10,56 @@ export default class GitHub {
   static ISSUE_STATE_ALL = 'all';
 
   constructor(repository) {
-    const [ owner, repo ] = repository.split('/');
     const { version } = JSON.parse(fs.readFileSync(new URL('../../package.json', import.meta.url)).toString());
 
     this.octokit = new Octokit({ auth: process.env.GITHUB_TOKEN, userAgent: `opentermsarchive/${version}` });
-    this.commonParams = {
-      owner,
-      repo,
-    };
+
+    const [ owner, repo ] = repository.split('/');
+
+    this.commonParams = { owner, repo };
   }
 
   async initialize() {
-    const { data } = await this.octokit.request('GET /user', { ...this.commonParams });
+    const { data: user } = await this.octokit.request('GET /user', { ...this.commonParams });
 
-    this.authenticatedUser = data.login;
+    this.authenticatedUserLogin = user.login;
   }
 
   async getRepositoryLabels() {
-    const { data } = await this.octokit.request('GET /repos/{owner}/{repo}/labels', { ...this.commonParams });
+    const { data: labels } = await this.octokit.request('GET /repos/{owner}/{repo}/labels', { ...this.commonParams });
 
-    return data;
+    return labels;
   }
 
-  async createLabel(params) {
+  async createLabel({ name, color, description }) {
     try {
-      await this.octokit.request('POST /repos/{owner}/{repo}/labels', { ...this.commonParams, ...params });
+      await this.octokit.request('POST /repos/{owner}/{repo}/labels', {
+        ...this.commonParams,
+        name,
+        color,
+        description,
+      });
 
-      logger.info(`🤖 Created repository label "${params.name}"`);
+      logger.info(`🤖 Created repository label "${name}"`);
     } catch (error) {
-      logger.error(`🤖 Could not create label "${params.name}": ${error}`);
+      logger.error(`🤖 Could not create label "${name}": ${error}`);
     }
   }
 
-  async createIssue(params) {
+  async createIssue({ title, description, labels }) {
     try {
-      const { data } = await this.octokit.request('POST /repos/{owner}/{repo}/issues', { ...this.commonParams, ...params });
+      const { data: issue } = await this.octokit.request('POST /repos/{owner}/{repo}/issues', {
+        ...this.commonParams,
+        title,
+        description,
+        labels,
+      });
 
-      logger.info(`🤖 Created GitHub issue "${params.title}": ${data.html_url}`);
+      logger.info(`🤖 Created GitHub issue #${issue.number} "${title}": ${issue.html_url}`);
 
-      return data;
+      return issue;
     } catch (error) {
-      logger.error(`🤖 Could not create GitHub issue "${params.title}": ${error}`);
+      logger.error(`🤖 Could not create GitHub issue "${title}": ${error}`);
     }
   }
 
@@ -62,9 +71,9 @@ export default class GitHub {
         labels,
       });
 
-      logger.info(`🤖 Updated GitHub issue labels "${issue.title}"`);
+      logger.info(`🤖 Updated labels to GitHub issue #${issue.number}`);
     } catch (error) {
-      logger.error(`🤖 Could not update GitHub issue "${issue.title}": ${error}`);
+      logger.error(`🤖 Could not update GitHub issue #${issue.number} "${issue.title}": ${error}`);
     }
   }
 
@@ -76,9 +85,9 @@ export default class GitHub {
         state: GitHub.ISSUE_STATE_OPEN,
       });
 
-      logger.info(`🤖 Opened GitHub issue "${issue.title}": ${issue.html_url}`);
+      logger.info(`🤖 Opened GitHub issue #${issue.number}`);
     } catch (error) {
-      logger.error(`🤖 Could not update GitHub issue "${issue.title}": ${error}`);
+      logger.error(`🤖 Could not update GitHub issue #${issue.number} "${issue.title}": ${error}`);
     }
   }
 
@@ -90,9 +99,9 @@ export default class GitHub {
         state: GitHub.ISSUE_STATE_CLOSED,
       });
 
-      logger.info(`🤖 Closed GitHub issue "${issue.title}": ${issue.html_url}`);
+      logger.info(`🤖 Closed GitHub issue #${issue.number}`);
     } catch (error) {
-      logger.error(`🤖 Could not update GitHub issue "${issue.title}": ${error}`);
+      logger.error(`🤖 Could not update GitHub issue #${issue.number} "${issue.title}": ${error}`);
     }
   }
 
@@ -101,11 +110,11 @@ export default class GitHub {
       const issues = await this.octokit.paginate('GET /repos/{owner}/{repo}/issues', {
         ...this.commonParams,
         per_page: 100,
-        creator: this.authenticatedUser,
+        creator: this.authenticatedUserLogin,
         ...searchParams,
       }, response => response.data);
 
-      const [issue] = issues.filter(item => item.title === title); // since only one is expected, utilize the first one
+      const [issue] = issues.filter(item => item.title === title); // since only one is expected, use the first one
 
       return issue;
     } catch (error) {
@@ -113,19 +122,19 @@ export default class GitHub {
     }
   }
 
-  async addCommentToIssue({ issue, comment }) {
+  async addCommentToIssue({ issue, comment: body }) {
     try {
-      const { data } = await this.octokit.request('POST /repos/{owner}/{repo}/issues/{issue_number}/comments', {
+      const { data: comment } = await this.octokit.request('POST /repos/{owner}/{repo}/issues/{issue_number}/comments', {
         ...this.commonParams,
         issue_number: issue.number,
-        body: comment,
+        body,
       });
 
-      logger.info(`🤖 Add comment to GitHub issue "${issue.title}": ${data.html_url}`);
+      logger.info(`🤖 Added comment to GitHub issue #${issue.number}: ${comment.html_url}`);
 
-      return data;
+      return comment;
     } catch (error) {
-      logger.error(`🤖 Could not add comment to GitHub issue "${issue.title}": ${error}`);
+      logger.error(`🤖 Could not add comment to GitHub issue #${issue.number} "${issue.title}": ${error}`);
     }
   }
 }

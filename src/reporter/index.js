@@ -94,7 +94,7 @@ No changes were found in the last run, so no new version has been recorded.`,
     const issue = await this.github.getIssue({ title, state: GitHub.ISSUE_STATE_ALL });
 
     if (!issue) {
-      return this.github.createIssue({ title, body: description, labels: [label] });
+      return this.github.createIssue({ title, description, labels: [label] });
     }
 
     if (issue.state == GitHub.ISSUE_STATE_CLOSED) {
