@@ -111,7 +111,7 @@ No changes were found in the last run, so no new version has been recorded.`,
     const labelsNotManagedToKeep = issue.labels.map(label => label.name).filter(label => !managedLabelsNames.includes(label));
 
     await this.github.setIssueLabels({ issue, labels: [ label, ...labelsNotManagedToKeep ] });
-    await this.github.addCommentToIssue({ issue, comment: body: description });
+    await this.github.addCommentToIssue({ issue, comment: description });
   }
 
   async closeIssueIfExists({ title, comment }) {
@@ -126,7 +126,7 @@ No changes were found in the last run, so no new version has been recorded.`,
   }
 
   generateDescription({ error, terms }) {
-    const currentFormattedDate = new Date().toLocaleDateString('en-GB', { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric', 'timeZoneName': 'short', 'timeZone': 'UTC' });
+    const currentFormattedDate = new Date().toLocaleDateString('en-GB', { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric', timeZoneName: 'short', timeZone: 'UTC' });
     const hasSnapshots = terms.sourceDocuments.every(sourceDocument => sourceDocument.snapshotId);
     const contributionToolParams = new URLSearchParams({
       json: JSON.stringify(terms.toPersistence()),
@@ -145,7 +145,7 @@ No changes were found in the last run, so no new version has been recorded.`,
     return `
 ### No version of the \`${terms.type}\` of service \`${terms.service.name}\` is recorded anymore since ${currentFormattedDate}
 
-The source document${terms.hasMultipleSourceDocuments ? 's have' : ' has'}${hasSnapshots ? ' ' : ' not '}been recorded in ${terms.hasMultipleSourceDocuments ? 'snapshots' : 'a snapshot' }, ${hasSnapshots ? 'but ' : 'thus '} no version can be [extracted](${DOC_URL}/#tracking-terms).
+The source document${terms.hasMultipleSourceDocuments ? 's have' : ' has'}${hasSnapshots ? ' ' : ' not '}been recorded in ${terms.hasMultipleSourceDocuments ? 'snapshots' : 'a snapshot'}, ${hasSnapshots ? 'but ' : 'thus '} no version can be [extracted](${DOC_URL}/#tracking-terms).
 ${hasSnapshots ? 'After correction, it might still be possible to recover the missed versions.' : ''}
 
 ### What went wrong
