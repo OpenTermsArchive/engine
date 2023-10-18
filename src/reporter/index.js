@@ -79,13 +79,16 @@ No changes were found in the last run, so no new version has been recorded.`,
     const date = new Date();
     const currentFormattedDate = date.toLocaleDateString('en-GB', { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric', timeZoneName: 'short', timeZone: 'UTC' });
     const validUntil = date.toISOString().replace(/\.\d+/, ''); // ISO date without milliseconds
+
     const hasSnapshots = terms.sourceDocuments.every(sourceDocument => sourceDocument.snapshotId);
+
     const contributionToolParams = new URLSearchParams({
       json: JSON.stringify(terms.toPersistence()),
       destination: this.repositories.declarations,
       step: '2',
     });
     const contributionToolUrl = `${CONTRIBUTION_TOOL_URL}?${contributionToolParams}`;
+
     const latestDeclarationLink = `[Latest declaration](https://github.com/${this.repositories.declarations}/blob/main/declarations/${encodeURIComponent(terms.service.name)}.json)`;
     const latestVersionLink = `[Latest version](https://github.com/${this.repositories.versions}/blob/main/${encodeURIComponent(terms.service.name)}/${encodeURIComponent(terms.type)}.md)`;
     const snapshotsBaseUrl = `https://github.com/${this.repositories.snapshots}/blob/main/${encodeURIComponent(terms.service.name)}/${encodeURIComponent(terms.type)}`;
@@ -112,8 +115,9 @@ First of all, check if the source documents are accessible through a web browser
 
 #### If the source documents are accessible through a web browser
 
-- Try [updating the selectors](${contributionToolUrl}).
-- Try [switching client scripts on](${contributionToolUrl}).
+[Edit the declaration](${contributionToolUrl}):
+- Try updating the selectors.
+- Try switching client scripts on with expert mode.
 
 #### If the source documents are not accessible anymore
 
