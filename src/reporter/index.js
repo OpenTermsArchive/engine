@@ -130,7 +130,9 @@ No changes were found in the last run, so no new version has been recorded.`,
   }
 
   generateDescription({ error, terms }) {
-    const currentFormattedDate = new Date().toLocaleDateString('en-GB', { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric', timeZoneName: 'short', timeZone: 'UTC' });
+    const date = new Date();
+    const currentFormattedDate = date.toLocaleDateString('en-GB', { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric', timeZoneName: 'short', timeZone: 'UTC' });
+    const validUntil = date.toISOString().replace(/\.\d+/, ''); // ISO date without milliseconds
     const hasSnapshots = terms.sourceDocuments.every(sourceDocument => sourceDocument.snapshotId);
     const contributionToolParams = new URLSearchParams({
       json: JSON.stringify(terms.toPersistence()),
@@ -170,8 +172,8 @@ First of all, check if the source documents are accessible through a web browser
 #### If the source documents are not accessible anymore
 
 - If the source documents have moved, find their new location and [update it](${contributionToolUrl}).
-- If these terms have been removed, move them from the declaration to its [history file](${DOC_URL}/contributing-terms/#service-history), using the date of this report as the \`validUntil\` value.
-- If the service has closed, move the entire contents of the declaration to its [history file](${DOC_URL}/contributing-terms/#service-history), using the date of this report as the \`validUntil\` value.
+- If these terms have been removed, move them from the declaration to its [history file](${DOC_URL}/contributing-terms/#service-history), using \`${validUntil}\` as the \`validUntil\` value.
+- If the service has closed, move the entire contents of the declaration to its [history file](${DOC_URL}/contributing-terms/#service-history), using \`${validUntil}\` as the \`validUntil\` value.
 
 #### If none of the above works
 
