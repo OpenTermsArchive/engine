@@ -17,6 +17,7 @@ const ERROR_MESSAGE_TO_ISSUE_LABEL_MAP = {
   'HTTP code 503': '503',
   'Timed out after': 'timeout',
   'getaddrinfo EAI_AGAIN': 'EAI_AGAIN',
+  'getaddrinfo ENOTFOUND': 'ENOTFOUND',
   'Response is empty': 'empty response',
   'unable to verify the first certificate': 'first certificate',
   'certificate has expired': 'certificate expired',

@@ -35,6 +35,11 @@
     "description": "Fetching fails because the domain fails to resolve on DNS"
   },
   {
+    "name": "ENOTFOUND",
+    "color": "0b08a0",
+    "description": "Fetching fails because the domain fails to resolve on DNS"
+  },
+  {
     "name": "empty response",
     "color": "0b08a0",
     "description": "Fetching fails with a “response is empty” error"
