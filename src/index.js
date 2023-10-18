@@ -4,7 +4,7 @@ import cron from 'croner';
 import Archivist from './archivist/index.js';
 import logger from './logger/index.js';
 import Notifier from './notifier/index.js';
-import Tracker from './tracker/index.js';
+import Reporter from './reporter/index.js';
 
 export default async function track({ services, types, extractOnly, schedule }) {
   const archivist = new Archivist({
@@ -43,10 +43,10 @@ export default async function track({ services, types, extractOnly, schedule }) 
   }
 
   if (process.env.GITHUB_TOKEN) {
-    const tracker = new Tracker(config.get('tracker'));
+    const reporter = new Reporter(config.get('reporter'));
 
-    await tracker.initialize();
-    archivist.attach(tracker);
+    await reporter.initialize();
+    archivist.attach(reporter);
   }
 
   if (!schedule) {

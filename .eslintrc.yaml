@@ -65,6 +65,12 @@ rules:
     - error
     - argsIgnorePattern: next
   no-use-before-define: 0
+  lines-between-class-members:
+    - error
+    - enforce:
+      - blankLine: always
+        prev: method
+        next: method
   padding-line-between-statements:
     - error
     - blankLine: always

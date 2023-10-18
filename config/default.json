@@ -54,13 +54,12 @@
       "updateTemplateId": 7
     }
   },
-  "tracker": {
+  "reporter": {
     "githubIssues": {
-      "repository": "OpenTermsArchive/sandbox",
-      "label": {
-        "name": "bot-report",
-        "color": "FEF2C0",
-        "description": "Automatically created when terms cannot be tracked"
+      "repositories": {
+        "declarations": "OpenTermsArchive/sandbox-declarations",
+        "versions": "OpenTermsArchive/sandbox-versions",
+        "snapshots": "OpenTermsArchive/sandbox-snapshots"
       }
     }
   },
