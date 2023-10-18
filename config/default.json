@@ -54,15 +54,6 @@
       "updateTemplateId": 7
     }
   },
-  "reporter": {
-    "githubIssues": {
-      "repositories": {
-        "declarations": "OpenTermsArchive/sandbox-declarations",
-        "versions": "OpenTermsArchive/sandbox-versions",
-        "snapshots": "OpenTermsArchive/sandbox-snapshots"
-      }
-    }
-  },
   "dataset": {
     "title": "sandbox",
     "versionsRepositoryURL": "https://github.com/OpenTermsArchive/sandbox"

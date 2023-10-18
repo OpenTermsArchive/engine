@@ -2,7 +2,18 @@
 
 All changes that impact users of this module are documented in this file, in the [Common Changelog](https://common-changelog.org) format with some additional specifications defined in the CONTRIBUTING file. This codebase adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased
+## Unreleased [patch]
+
+_Full changeset and discussions: [#1026](https://github.com/OpenTermsArchive/engine/pull/1026)._
+
+### Added
+
+- Ensure `Reporter` configuration is defined before instantiating it
+- Ensure to add links to `versions` and `snapshots` in issues only if repositories are defined in configuration
+
+### Removed
+
+- No longer define default configuration for `Reporter` module
 
 ## 0.32.0 - 2023-10-18
 
@@ -16,6 +27,8 @@ _Full changeset and discussions: [#1025](https://github.com/OpenTermsArchive/eng
 ### Changed
 
 - **Breaking:** Revise the formatting of reported issues, with notable adjustments to the title, transitioning from `Fix <service_id> - <terms_type>` to `<service_id> ‧ <terms_type> ‧ not tracked anymore`
+- **Breaking:** Rename `tracker` module into `reporter`; update your configuration file by renaming `tracker` into `reporter`
+- **Breaking:** Change configuration for `reporter` module; update your `reporter` [configuration accordingly](https://docs.opentermsarchive.org/#configuring)
 
 ### Removed
 

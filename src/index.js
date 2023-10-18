@@ -43,10 +43,14 @@ export default async function track({ services, types, extractOnly, schedule }) 
   }
 
   if (process.env.GITHUB_TOKEN) {
-    const reporter = new Reporter(config.get('reporter'));
+    if (config.has('reporter.githubIssues.repositories.declarations')) {
+      const reporter = new Reporter(config.get('reporter'));
 
-    await reporter.initialize();
-    archivist.attach(reporter);
+      await reporter.initialize();
+      archivist.attach(reporter);
+    } else {
+      logger.warn('Configuration key "reporter.githubIssues.repositories.declarations" was not found; the Reporter module will be ignored\n');
+    }
   }
 
   if (!schedule) {
