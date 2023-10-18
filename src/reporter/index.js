@@ -25,7 +25,7 @@ const ERROR_MESSAGE_TO_ISSUE_LABEL_MAP = {
 };
 
 function getLabelNameFromError(error) {
-  return ERROR_MESSAGE_TO_ISSUE_LABEL_MAP[Object.keys(ERROR_MESSAGE_TO_ISSUE_LABEL_MAP).find(substring => error.toString().includes(substring))];
+  return ERROR_MESSAGE_TO_ISSUE_LABEL_MAP[Object.keys(ERROR_MESSAGE_TO_ISSUE_LABEL_MAP).find(substring => error.toString().includes(substring))] || 'to clarify';
 }
 
 // In the following class, it is assumed that each issue is managed using its title as a unique identifier

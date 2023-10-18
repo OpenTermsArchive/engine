@@ -60,6 +60,11 @@
     "description": "Fetching fails with a timeout error"
   },
   {
+    "name": "to clarify",
+    "color": "0b08a0",
+    "description": "Default failure label"
+  },
+  {
     "name": "selectors",
     "color": "FBCA04",
     "description": "Extraction selectors are outdated"
