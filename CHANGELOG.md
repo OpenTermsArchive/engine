@@ -16,6 +16,8 @@ _Full changeset and discussions: [#1025](https://github.com/OpenTermsArchive/eng
 ### Changed
 
 - **Breaking:** Revise the formatting of reported issues, with notable adjustments to the title, transitioning from `Fix <service_id> - <terms_type>` to `<service_id> ‧ <terms_type> ‧ not tracked anymore`
+- **Breaking:** Rename `tracker` module into `reporter`; update your configuration file by renaming `tracker` into `reporter`
+- **Breaking:** Change configuration for `reporter` module; update your `reporter` [configuration accordingly](https://docs.opentermsarchive.org/#configuring)
 
 ### Removed
 
