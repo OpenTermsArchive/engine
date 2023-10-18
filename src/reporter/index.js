@@ -102,9 +102,9 @@ No changes were found in the last run, so no new version has been recorded.`,
     }
 
     const managedLabelsNames = this.MANAGED_LABELS.map(label => label.name);
-    const [labelManaged] = issue.labels.filter(label => managedLabelsNames.includes(label.name)); // it is assumed that only one specific reason for failure is possible at a time, making managed labels mutually exclusive
+    const [managedLabel] = issue.labels.filter(label => managedLabelsNames.includes(label.name)); // it is assumed that only one specific reason for failure is possible at a time, making managed labels mutually exclusive
 
-    if (labelManaged?.name == label) { // if the label is already assigned to the issue, the error is redundant with the one already reported and no further action is necessary
+    if (managedLabel?.name == label) { // if the label is already assigned to the issue, the error is redundant with the one already reported and no further action is necessary
       return;
     }
 
