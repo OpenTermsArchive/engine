@@ -1,7 +1,9 @@
 export class InaccessibleContentError extends Error {
-  constructor(message) {
-    super(`The documents cannot be accessed or their contents can not be selected:${Array.isArray(message) ? `\n - ${message.join('\n - ')}` : message}`);
+  constructor(reasonOrReasons) {
+    const reasons = [].concat(reasonOrReasons);
+
+    super(`The documents cannot be accessed or their contents can not be selected:${`\n - ${reasons.join('\n - ')}`}`);
     this.name = 'InaccessibleContentError';
-    this.reasons = Array.isArray(message) ? message : [message];
+    this.reasons = reasons;
   }
 }
