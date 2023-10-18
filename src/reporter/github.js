@@ -20,9 +20,13 @@ export default class GitHub {
   }
 
   async initialize() {
-    const { data: user } = await this.octokit.request('GET /user', { ...this.commonParams });
+    try {
+      const { data: user } = await this.octokit.request('GET /user', { ...this.commonParams });
 
-    this.authenticatedUserLogin = user.login;
+      this.authenticatedUserLogin = user.login;
+    } catch (error) {
+      logger.error(`🤖 Could not get authenticated user: ${error}`);
+    }
 
     this.MANAGED_LABELS = JSON.parse(fs.readFileSync(new URL('./labels.json', import.meta.url)).toString());
 
@@ -44,9 +48,13 @@ export default class GitHub {
   }
 
   async getRepositoryLabels() {
-    const { data: labels } = await this.octokit.request('GET /repos/{owner}/{repo}/labels', { ...this.commonParams });
+    try {
+      const { data: labels } = await this.octokit.request('GET /repos/{owner}/{repo}/labels', { ...this.commonParams });
 
-    return labels;
+      return labels;
+    } catch (error) {
+      logger.error(`🤖 Could get labels: ${error}`);
+    }
   }
 
   async createLabel({ name, color, description }) {
