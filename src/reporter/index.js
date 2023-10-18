@@ -23,6 +23,10 @@ const ERROR_MESSAGE_TO_ISSUE_LABEL_MAP = {
   'maximum redirect reached': 'redirects',
 };
 
+function getLabelNameFromError(error) {
+  return ERROR_MESSAGE_TO_ISSUE_LABEL_MAP[Object.keys(ERROR_MESSAGE_TO_ISSUE_LABEL_MAP).find(substring => error.toString().includes(substring))];
+}
+
 // In the following class, it is assumed that each issue is managed using its title as a unique identifier
 export default class Reporter {
   constructor(config) {
@@ -86,7 +90,7 @@ No changes were found in the last run, so no new version has been recorded.`,
     await this.createOrUpdateIssue({
       title: Reporter.generateTitleID(terms.service.id, terms.type),
       description: this.generateDescription({ error, terms }),
-      label: Reporter.getLabelNameFromError(error),
+      label: getLabelNameFromError(error),
     });
   }
 
@@ -180,10 +184,6 @@ If the source documents are accessible in a browser but fetching them always fai
 - ${latestSnapshotsLink}
 `;
   /* eslint-enable no-irregular-whitespace */
-  }
-
-  static getLabelNameFromError(error) {
-    return ERROR_MESSAGE_TO_ISSUE_LABEL_MAP[Object.keys(ERROR_MESSAGE_TO_ISSUE_LABEL_MAP).find(substring => error.toString().includes(substring))];
   }
 
   static generateTitleID(serviceId, type) {
