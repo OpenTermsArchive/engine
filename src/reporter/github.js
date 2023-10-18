@@ -1,8 +1,10 @@
-import fs from 'fs';
+import { createRequire } from 'module';
 
 import { Octokit } from 'octokit';
 
 import logger from '../logger/index.js';
+
+const require = createRequire(import.meta.url);
 
 export const MANAGED_BY_OTA_MARKER = '[managed by OTA]';
 
@@ -12,7 +14,7 @@ export default class GitHub {
   static ISSUE_STATE_ALL = 'all';
 
   constructor(repository) {
-    const { version } = JSON.parse(fs.readFileSync(new URL('../../package.json', import.meta.url)).toString());
+    const { version } = require('../../package.json');
 
     this.octokit = new Octokit({ auth: process.env.GITHUB_TOKEN, userAgent: `opentermsarchive/${version}` });
 
@@ -30,7 +32,7 @@ export default class GitHub {
       logger.error(`🤖 Could not get authenticated user: ${error}`);
     }
 
-    this.MANAGED_LABELS = JSON.parse(fs.readFileSync(new URL('./labels.json', import.meta.url)).toString());
+    this.MANAGED_LABELS = require('./labels.json');
 
     const existingLabels = await this.getRepositoryLabels();
     const existingLabelsNames = existingLabels.map(label => label.name);
