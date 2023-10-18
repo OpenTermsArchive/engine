@@ -132,8 +132,8 @@ If the source documents are accessible in a browser but fetching them always fai
 ### References
 
 - ${latestDeclarationLink}
-- ${latestVersionLink}
-- ${latestSnapshotsLink}
+${this.repositories.versions ? `- ${latestVersionLink}` : ''}
+${this.repositories.snapshots ? `- ${latestSnapshotsLink}` : ''} 
 `;
   /* eslint-enable no-irregular-whitespace */
   }
