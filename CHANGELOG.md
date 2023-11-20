@@ -54,6 +54,8 @@ _Full changeset and discussions: [#1021](https://github.com/OpenTermsArchive/eng
 
 ## 0.30.1 - 2023-09-06
 
+_Full changeset and discussions: [#1020](https://github.com/OpenTermsArchive/engine/pull/1020)._
+
 ### Fixed
 
 - Fix validation for removed terms types
@@ -122,7 +124,7 @@ _Full changeset and discussions: [#996](https://github.com/OpenTermsArchive/engi
 
 ### Changed
 
-- Change URL to engine repo from ambanum/OpenTermsArchive to OpenTermsArchive/engine
+- Change URL to engine repo from `ambanum/OpenTermsArchive` to `OpenTermsArchive/engine`
 - Replace documentation with links to the documentation website to avoid redundancy
 
 ## 0.26.0 - 2023-02-20
