@@ -111,3 +111,61 @@ This privacy policy explains how, why and under what conditions the Open Terms A
 "
 }
 ```
+
+### Solution C
+
+This solution aims at allowing caching and providing metadata through standard HTTP methods. By redirecting to the canonical version name instead of replying with the applicable content, we enable proxies, the server and the user agent to leverage ETags cache the actual content, which might be several hundreds of kB. It also enables the client to know the time of record of the version.
+
+#### Base URL
+
+`<collection host>/api/:version`
+
+#### Endpoint
+
+##### `GET /version/:serviceId/:termsType/:date.md`
+
+Identifies the Markdown content of the version of the terms that was applicable at the given date and provides its contents.
+
+##### Parameters
+
+| Parameter | Type   | Description            |
+| --------- | ------ | ---------------------- |
+| serviceId | URL-encoded string | The ID of the service |
+| termsType | URL-encoded string | The name of terms type |
+| date | URL-encoded ISO 8601 datetime string | The date and time for which the version is requested |
+
+Note about the date:
+- A full date and time is required, and not a simple date (such as `2023-10-24`), to avoid ambiguities on days where a version changed, and timezone differences between client and server.
+- To get the latest version available, simply use the current date as parameter.
+
+##### Returns
+
+- HTTP 200 with the Markdown content as body when a version is found for this exact date
+- HTTP 302 with the content when a version is applicable at this date, with the `Location` field of the response giving the exact date
+- HTTP 404 Not Found with JSON content `{"error": "No version found for date <requested-date>"}` for a date that is anterior to the first available version
+- HTTP 400 Bad Request with JSON content `{"error": "Requested version is in the future"}` if the date is in the future.
+
+##### Example
+
+```
+GET /version/Open%20Terms%20Archive/Privacy%20Policy/2023-10-24T14%3A41%3A42.381Z.md
+```
+```text
+HTTP 302
+Location: <host>/version/Open%20Terms%20Archive/Privacy%20Policy/2023-09-26T12%3A43%3A39.238Z.md
+```
+```GET
+/version/Open%20Terms%20Archive/Privacy%20Policy/2023-09-26T12%3A43%3A39.238Z.md
+```
+```markdown
+HTTP 200
+- - -
+Privacy Policy
+==============
+
+Last updated: September 26, 2023
+
+This privacy policy explains how, why and under what conditions the Open Terms Archive (OTA) site collects personal information and how it is used. Our privacy policy will change over time. And of course, we also record the changes of [our own documents](https://github.com/OpenTermsArchive/demo-versions/tree/main/Open%20Terms%20Archive) 😉
+
+…
+```
