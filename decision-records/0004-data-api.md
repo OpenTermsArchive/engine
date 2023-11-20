@@ -10,7 +10,7 @@ The need to extend the current API comes as part of our collaboration with Terms
 
 The terms annotated by ToS;DR are currently taken from original web documents stored on the ToS;DR server database. Open Terms Archive provides a significantly higher quality source for terms, for example by cleaning up all content that is not related to the terms, combining documents scattered across several pages, or normalising PDF documents into Markdown.
 
-To allow the transition from historical ToS;DR's crawler and database to the publicly accessible OTA datasets, ToS;DR requires access to the content of the versions through an API. This RFC outlines the proposed solutions.
+To allow the transition from historical ToS;DR's crawler and database to the publicly accessible Open Terms Archive collections, ToS;DR requires access to the content of the versions. Datasets are not satisfactory as they are produced on a weekly basis, whereas a workflow supporting annotation of just-added terms is required by ToS;DR. This RFC outlines possible implementations of an API providing this data.
 
 ## Proposed solutions
 
@@ -32,17 +32,18 @@ Return the Markdown content of the version of the terms that was applicable at t
 | --------- | ------ | ---------------------- |
 | serviceId | URL-encoded string | The ID of the service |
 | termsType | URL-encoded string | The name of terms type |
-| date | URL-encoded ISO date string | The date for which you want the version. This date should not be in the futur |
+| date | URL-encoded ISO 8601 datetime string | The date and time for which the version is requested |
 
 Note about the date:
+- A full date and time is required, and not a simple date (such as `2023-10-24`), to avoid ambiguities on days where a version changed, and timezone differences between client and server.
 - It is not required that this date matches exactly the fetch date of a version. As versions are fetched at a periodic interval, the version that will be returned will be the one that was applicable at the provided date.
 - To get the latest version available, simply use the current date as parameter.
 
 ##### Returns
 
-- A raw markdown content when a version was found for this date
-- A HTTP 404 for a date that is anterior of the first available version
-- A HTTP 400 Bad Request, if the date is in the futur
+- HTTP 200 with the Markdown content as body when a version is found for this date
+- HTTP 404 Not Found with JSON content `{"error": "No version found for date <requested-date>"}` for a date that is anterior to the first available version
+- HTTP 400 Bad Request with JSON content `{"error": "Requested version is in the future"}` if the date is in the future.
 
 ##### Example
 
@@ -50,6 +51,8 @@ Note about the date:
 GET /version/Open%20Terms%20Archive/Privacy%20Policy/2023-10-24T14%3A41%3A42.381Z.md
 ```
 ```markdown
+HTTP 200
+- - -
 Privacy Policy
 ==============
 
@@ -81,14 +84,15 @@ Returns a JSON object containing the version content valid for the given date al
 | date | URL-encoded ISO 8601 datetime string | The date and time for which the version is requested |
 
 Note about the date:
+- A full date and time is required, and not a simple date (such as `2023-10-24`), to avoid ambiguities on days where a version changed, and timezone differences between client and server.
 - It is not required that this date matches exactly the fetch date of a version. As versions are fetched at a periodic interval, the version that will be returned will be the one that was applicable at the provided date.
 - To get the latest version available, simply use the current date as parameter.
 
 ##### Returns
 
-- A raw markdown content when a version was found for this date
-- A HTTP 404 for a date that is anterior of the first available version
-- A HTTP 400 Bad Request, if the date is in the futur
+- HTTP 200 with a JSON object containing the Markdown content as body when a version is found for this date
+- HTTP 404 Not Found with JSON content `{"error": "No version found for date <requested-date>"}` for a date that is anterior to the first available version
+- HTTP 400 Bad Request with JSON content `{"error": "Requested version is in the future"}` if the date is in the future.
 
 ##### Example
 
