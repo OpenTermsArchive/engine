@@ -82,7 +82,7 @@ const router = express.Router();
  *                     description: The name of the service.
  *                   terms:
  *                     type: array
- *                     description: Information that enables tracking the content of agreements defined by the service provider.
+ *                     description: The declared terms types for this service.
  *                     items:
  *                       type: object
  *                       properties:
