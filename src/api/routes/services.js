@@ -72,12 +72,29 @@ const router = express.Router();
  *             schema:
  *               type: array
  *               items:
- *                 $ref: '#/components/schemas/Service'
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: string
+ *                     description: The ID of the service.
+ *                   name:
+ *                     type: string
+ *                     description: The name of the service.
+ *                   terms:
+ *                     type: array
+ *                     description: Information that enables tracking the content of agreements defined by the service provider.
+ *                     items:
+ *                       type: object
+ *                       properties:
+ *                         type:
+ *                           type: string
+ *                           description: The type of terms.
  */
 router.get('/services', (req, res) => {
   res.status(200).json(Object.values(services).map(service => ({
     id: service.id,
     name: service.name,
+    terms: service.getTermsTypes().map(type => ({ type })),
   })));
 });
 
