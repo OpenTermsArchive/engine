@@ -37,6 +37,20 @@ describe('Services API', () => {
         expect(service).to.have.property('name');
       });
     });
+
+    it('each service should have a terms array', () => {
+      response.body.forEach(service => {
+        expect(service).to.have.property('terms').that.is.an('array');
+      });
+    });
+
+    it('each terms should have a type', () => {
+      response.body.forEach(service => {
+        service.terms.forEach(terms => {
+          expect(terms).to.have.property('type');
+        });
+      });
+    });
   });
 
   describe('GET /service/:serviceId', () => {
