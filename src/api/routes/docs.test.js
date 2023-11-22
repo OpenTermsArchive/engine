@@ -57,7 +57,6 @@ describe('Docs API', () => {
     context('When requested as HTML', () => {
       before(async () => {
         response = await request(app).get(`${basePath}/v1/docs/`);
-        console.log(response);
       });
 
       it('responds with 200 status code', () => {
