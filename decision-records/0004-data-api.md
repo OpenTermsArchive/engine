@@ -14,7 +14,7 @@ To allow the transition from historical ToS;DR's crawler and database to the pub
 
 ## Proposed solutions
 
-### Solution A:
+### Solution A
 
 #### Base URL
 
@@ -63,7 +63,7 @@ This privacy policy explains how, why and under what conditions the Open Terms A
 …
 ```
 
-### Solution B:
+### Solution B
 
 #### Base URL
 
