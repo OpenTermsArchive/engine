@@ -102,17 +102,9 @@ GET /version/Open%20Terms%20Archive/Privacy%20Policy/2023-10-24T14%3A41%3A42.381
 ```json
 {
   "fetchDate": "2023-10-20T06:30:00.381Z",
+  "snapshotsIds": ["c0dac2866fb2cdef7f8b98cc260177ac43df273b"],
   "id": "c0dac2866fb2cdef7f8b98cc260177ac43df273b",
-  "content": "
-Privacy Policy
-==============
-
-Last updated: September 26, 2023
-
-This privacy policy explains how, why and under what conditions the Open Terms Archive (OTA) site collects personal information and how it is used. Our privacy policy will change over time. And of course, we also record the changes of [our own documents](https://github.com/OpenTermsArchive/demo-versions/tree/main/Open%20Terms%20Archive) 😉
-
-…
-"
+  "content": "\nPrivacy Policy\n==============\nLast updated: September 26, 2023\nThis privacy policy explains how, why and under what conditions the Open Terms Archive (OTA) site collects personal information and how it is used. Our privacy policy will change over time. And of course, we also record the changes of [our own documents](https://github.com/OpenTermsArchive/demo-versions/tree/main/Open%20Terms%20Archive) 😉\n…\n"
 }
 ```
 
