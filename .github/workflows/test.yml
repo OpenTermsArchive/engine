@@ -62,4 +62,5 @@ jobs:
           node-version: 20
       - run: cd ./demo-declarations && npm install
       - run: npm ci
+      - run: ./node_modules/.bin/cross-env NODE_ENV=ci npm run declarations:lint
       - run: ./node_modules/.bin/cross-env NODE_ENV=ci npm run declarations:validate:schema
