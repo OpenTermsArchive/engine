@@ -1,4 +1,4 @@
-# Define how to expose version through the collection metadata API
+# Expose versions data through the collection API
 
 - Date: 2023-10-25
 
