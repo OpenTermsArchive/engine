@@ -165,3 +165,140 @@ This privacy policy explains how, why and under what conditions the Open Terms A
 
 …
 ```
+
+### Solution D
+
+Solution D is a combination of all A, B and C aiming at keeping the best parts of each:
+
+- A for ease of content access
+- B for metadata extensibility
+- C for performance capabilities
+
+It has the added benefit of being possibly split in implementation in two parts, which are made clear in the proposal.
+
+#### Base URL
+
+`<collection host>/api/:version`
+
+#### Endpoint with JSON content-type
+
+##### `GET /version/:serviceId/:termsType/:date`
+
+Return the contents of the version of the terms that was applicable at the given date, with metadata, in JSON format.
+
+##### Parameters
+
+| Parameter | Type   | Description            |
+| --------- | ------ | ---------------------- |
+| serviceId | URL-encoded string | The ID of the service |
+| termsType | URL-encoded string | The name of terms type |
+| date | URL-encoded ISO 8601 datetime string | The date and time for which the version is requested |
+
+Note about the date:
+- A full date and time is required, and not a simple date (such as `2023-10-24`), to avoid ambiguities on days where a version changed, and timezone differences between client and server.
+- To get the latest version available, simply use the current date as parameter.
+
+##### Returns
+
+- HTTP 200 with a JSON object as body when a version is found for this exact date, containing metadata and a `content` property with the Markdown content, JSON-escaped
+- HTTP 302 with the content when a version is applicable at this date, with the `Location` field of the response giving the exact date
+- HTTP 404 Not Found with JSON content `{"error": "No version found for date <requested-date>"}` for a date that is anterior to the first available version
+- HTTP 400 Bad Request with JSON content `{"error": "Requested date <requested-date> is in the future, no version can exist there"}` if the date is in the future.
+
+##### Example
+
+<details>
+
+```
+GET /version/Open%20Terms%20Archive/Privacy%20Policy/2023-10-24T14%3A41%3A42.381Z
+```
+```
+HTTP 302
+Location: <host>/version/Open%20Terms%20Archive/Privacy%20Policy/2023-09-26T12%3A43%3A39.238Z
+```
+```
+GET /version/Open%20Terms%20Archive/Privacy%20Policy/2023-09-26T12%3A43%3A39.238Z
+```
+```json
+HTTP 200
+ETag: c0dac2866fb2cdef7f8b98cc260177ac43df273b
+- - -
+{
+  "fetchDate": "2023-09-20T12:30:00.381Z",
+  "snapshotsIds": ["c0dac2866fb2cdef7f8b98cc260177ac43df273b"],
+  "id": "c0dac2866fb2cdef7f8b98cc260177ac43df273b",
+  "content": "\nPrivacy Policy\n==============\nLast updated: September 26, 2023\nThis privacy policy explains how, why and under what conditions the Open Terms Archive (OTA) site collects personal information and how it is used. Our privacy policy will change over time. And of course, we also record the changes of [our own documents](https://github.com/OpenTermsArchive/demo-versions/tree/main/Open%20Terms%20Archive) 😉\n…\n"
+}
+```
+```
+GET /version/Open%20Terms%20Archive/Privacy%20Policy/2023-09-26T12%3A43%3A39.238Z
+If-none-match: c0dac2866fb2cdef7f8b98cc260177ac43df273b
+```
+```json
+HTTP 304
+```
+
+</details>
+
+#### Endpoint with Markdown content-type
+
+##### `GET /version/:serviceId/:termsType/:date.md`
+
+Return the contents of the version of the terms that was applicable at the given date in Markdown format.
+
+##### Parameters
+
+| Parameter | Type   | Description            |
+| --------- | ------ | ---------------------- |
+| serviceId | URL-encoded string | The ID of the service |
+| termsType | URL-encoded string | The name of terms type |
+| date | URL-encoded ISO 8601 datetime string | The date and time for which the version is requested |
+
+Note about the date:
+- A full date and time is required, and not a simple date (such as `2023-10-24`), to avoid ambiguities on days where a version changed, and timezone differences between client and server.
+- To get the latest version available, simply use the current date as parameter.
+
+##### Returns
+
+- HTTP 200 with the Markdown content as body when a version is found for this exact date
+- HTTP 302 with the content when a version is applicable at this date, with the `Location` field of the response giving the exact date
+- HTTP 404 Not Found with Markdown content `# Error\n\n_No version found for date <requested-date>_` for a date that is anterior to the first available version
+- HTTP 400 Bad Request with JSON content `# Error\n\n_Requested date <requested-date> is in the future, no version can exist there_` if the date is in the future.
+
+##### Examples
+
+<details>
+
+```
+GET /version/Open%20Terms%20Archive/Privacy%20Policy/2023-10-24T14%3A41%3A42.381Z.md
+```
+```
+HTTP 302
+Location: <host>/version/Open%20Terms%20Archive/Privacy%20Policy/2023-09-26T12%3A43%3A39.238Z.md
+```
+```
+GET /version/Open%20Terms%20Archive/Privacy%20Policy/2023-09-26T12%3A43%3A39.238Z.md
+```
+```markdown
+HTTP 200
+ETag: c0dac2866fb2cdef7f8b98cc260177ac43df273b
+- - -
+Privacy Policy
+==============
+
+Last updated: September 26, 2023
+
+This privacy policy explains how, why and under what conditions the Open Terms Archive (OTA) site collects personal information and how it is used. Our privacy policy will change over time. And of course, we also record the changes of [our own documents](https://github.com/OpenTermsArchive/demo-versions/tree/main/Open%20Terms%20Archive) 😉
+
+…
+```
+```
+GET /version/Open%20Terms%20Archive/Privacy%20Policy/2023-09-26T12%3A43%3A39.238Z.md
+If-none-match: c0dac2866fb2cdef7f8b98cc260177ac43df273b
+```
+
+```markdown
+HTTP 304
+```
+
+</details>
