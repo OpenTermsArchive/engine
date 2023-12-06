@@ -21,6 +21,8 @@ const port = config.get('api.port');
 
 app.listen(port);
 
+if (process.env.NODE_ENV !== 'test') {
   logger.info(`Start Open Terms Archive API on http://localhost:${port}\n`);
+}
 
 export default app;
