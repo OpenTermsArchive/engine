@@ -17,20 +17,36 @@ describe('Versions API', () => {
     let expectedResult;
     let versionsRepository;
     const FETCH_DATE = new Date('2023-01-01T12:00:00Z');
+    const VERSION_COMMON_ATTRIBUTES = {
+      serviceId: 'service-1',
+      termsType: 'Terms of Service',
+      snapshotId: ['snapshot_id'],
+    };
 
     before(async () => {
       versionsRepository = RepositoryFactory.create(config.get('recorder.versions.storage'));
 
       await versionsRepository.initialize();
+
+      await versionsRepository.save(new Version({
+        ...VERSION_COMMON_ATTRIBUTES,
+        content: 'initial content',
+        fetchDate: new Date(new Date(FETCH_DATE).getTime() - 360000000),
+      }));
+
       const version = new Version({
-        serviceId: 'service-1',
-        termsType: 'Terms of Service',
-        content: 'content',
+        ...VERSION_COMMON_ATTRIBUTES,
+        content: 'updated content',
         fetchDate: FETCH_DATE,
-        snapshotId: ['snapshot_id'],
       });
 
       await versionsRepository.save(version);
+
+      await versionsRepository.save(new Version({
+        ...VERSION_COMMON_ATTRIBUTES,
+        content: 'latest content',
+        fetchDate: new Date(new Date(FETCH_DATE).getTime() + 360000000),
+      }));
 
       expectedResult = {
         id: version.id,

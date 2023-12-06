@@ -3,6 +3,7 @@ import helmet from 'helmet';
 
 import docsRouter from './docs.js';
 import servicesRouter from './services.js';
+import versionsRouter from './versions.js';
 
 export default function apiRouter(basePath) {
   const router = express.Router();
@@ -27,6 +28,7 @@ export default function apiRouter(basePath) {
   });
 
   router.use(servicesRouter);
+  router.use(versionsRouter);
 
   return router;
 }

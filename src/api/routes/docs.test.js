@@ -50,6 +50,10 @@ describe('Docs API', () => {
           it('/service/{serviceId}', () => {
             expect(subject).to.have.property('/service/{serviceId}');
           });
+
+          it('/version/{serviceId}/{termsType}/{date}', () => {
+            expect(subject).to.have.property('/version/{serviceId}/{termsType}/{date}');
+          });
         });
       });
     });
