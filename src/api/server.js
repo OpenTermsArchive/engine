@@ -13,9 +13,9 @@ if (process.env.NODE_ENV !== 'test') {
   app.use(loggerMiddleware);
 }
 
-const basePath = `${config.get('api.basePath')}/v1`;
+const BASE_PATH = `${config.get('api.basePath')}/v1`;
 
-app.use(basePath, apiRouter(basePath));
+app.use(BASE_PATH, apiRouter(BASE_PATH));
 app.use(errorsMiddleware);
 
 const port = config.get('api.port');
