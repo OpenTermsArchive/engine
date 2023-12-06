@@ -400,3 +400,7 @@ This privacy policy explains how, why and under what conditions the Open Terms A
 ```
 
 </details>
+
+## Decision Outcome
+
+[After consulting the community](https://github.com/OpenTermsArchive/engine/pull/1028), the solution E is retained. It integrates the content accessibility of Solution A and the metadata extensibility of Solution B. It also avoids introducing early performance optimisations at this stage.
