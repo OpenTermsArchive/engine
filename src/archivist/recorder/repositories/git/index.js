@@ -71,6 +71,13 @@ export default class GitRepository extends RepositoryInterface {
     return this.#toDomain(commit);
   }
 
+  async findByDate(serviceId, termsType, date, documentId) {
+    const filePath = DataMapper.generateFilePath(serviceId, termsType, documentId);
+    const commit = await this.git.getCommit([ `--until=${date?.toISOString()}`, filePath ]);
+
+    return this.#toDomain(commit);
+  }
+
   async findById(recordId) {
     const commit = await this.git.getCommit([recordId]);
 
