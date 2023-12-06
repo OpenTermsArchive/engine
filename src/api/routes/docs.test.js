@@ -10,7 +10,7 @@ describe('Docs API', () => {
   describe('GET /docs', () => {
     let response;
 
-    context('When requested as JSON', () => {
+    context('when requested as JSON', () => {
       before(async () => {
         response = await request(app).get(`${basePath}/v1/docs/`).set('Accept', 'application/json');
       });
@@ -54,7 +54,7 @@ describe('Docs API', () => {
       });
     });
 
-    context('When requested as HTML', () => {
+    context('when requested as HTML', () => {
       before(async () => {
         response = await request(app).get(`${basePath}/v1/docs/`);
       });
