@@ -17,7 +17,10 @@ const basePath = `${config.get('api.basePath')}/v1`;
 app.use(basePath, apiRouter(basePath));
 app.use(errorsMiddleware);
 
-app.listen(config.get('api.port'));
-logger.info('Start Open Terms Archive API\n');
+const port = config.get('api.port');
+
+app.listen(port);
+
+  logger.info(`Start Open Terms Archive API on http://localhost:${port}\n`);
 
 export default app;
