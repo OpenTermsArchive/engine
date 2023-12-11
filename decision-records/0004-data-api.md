@@ -305,7 +305,7 @@ HTTP 304
 
 ### Solution E
 
-Solution E is a combination of solutions A and B without the premature performance optimization of solution C.
+Solution E is the same as solution D without the premature performance optimization introduced in solution C.
 
 #### Base URL
 
@@ -333,7 +333,8 @@ Note about the date:
 
 - HTTP 200 with a JSON object as body when a version is applicable at this date, containing metadata and a `content` property with the Markdown content, JSON-escaped
 - HTTP 404 Not Found with JSON content `{"error": "No version found for date <requested-date>"}` for a date that is anterior to the first available version
-- HTTP 400 Bad Request with JSON content `{"error": "Requested date <requested-date> is in the future, no version can exist there"}` if the date is in the future.
+- HTTP 400 Bad Request with JSON content `{ "error": "<requested-date> is not a valid ISO 8601 date and time" }` if the date is not a valid ISO 8601 date time.
+- HTTP 416 Range Not Satisfiable with JSON content `{ "error": "Requested date <requested-date> is in the future, no version can exist there" }` if the date is in the future.
 
 ##### Example
 
@@ -377,7 +378,8 @@ Note about the date:
 
 - HTTP 200 with the Markdown content as body when a version is applicable at this date
 - HTTP 404 Not Found with Markdown content `# Error\n\n_No version found for date <requested-date>_` for a date that is anterior to the first available version
-- HTTP 400 Bad Request with JSON content `# Error\n\n_Requested date <requested-date> is in the future, no version can exist there_` if the date is in the future.
+- HTTP 400 Bad Request with Markdown content `# Error\n\n_Requested date <requested-date> is not a valid ISO 8601 date time_` if the date is not a valid ISO 8601 date time.
+- HTTP 416 Range Not Satisfiable with Markdown content `# Error\n\n_Requested date <requested-date> is in the future, no version can exist there_` if the date is in the future.
 
 ##### Examples
 
