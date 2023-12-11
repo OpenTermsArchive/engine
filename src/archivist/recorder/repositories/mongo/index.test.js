@@ -391,6 +391,57 @@ describe('MongoRepository', () => {
       });
     });
 
+    describe('#findByDate', () => {
+      context('when there are records for the given service', () => {
+        let recordToFindId;
+        let recordFound;
+
+        context('when a record exists for the requested service and date', () => {
+          const UPDATED_FILE_CONTENT = `${CONTENT} (with additional content to trigger a record)`;
+
+          before(async () => {
+            await subject.save(new Version({
+              serviceId: SERVICE_PROVIDER_ID,
+              termsType: TERMS_TYPE,
+              content: CONTENT,
+              fetchDate: FETCH_DATE_EARLIER,
+              snapshotIds: [SNAPSHOT_ID],
+            }));
+
+            ({ id: recordToFindId } = await subject.save(new Version({
+              serviceId: SERVICE_PROVIDER_ID,
+              termsType: TERMS_TYPE,
+              content: UPDATED_FILE_CONTENT,
+              fetchDate: FETCH_DATE,
+              snapshotIds: [SNAPSHOT_ID],
+            })));
+
+            await subject.save(new Version({
+              serviceId: SERVICE_PROVIDER_ID,
+              termsType: TERMS_TYPE,
+              content: `${CONTENT}CONTENT`,
+              fetchDate: FETCH_DATE_LATER,
+              snapshotIds: [SNAPSHOT_ID],
+            }));
+
+            const oneHourBeforeFetchDateLater = new Date(FETCH_DATE_LATER.getTime() - 60 * 60 * 1000);
+
+            recordFound = await subject.findByDate(SERVICE_PROVIDER_ID, TERMS_TYPE, oneHourBeforeFetchDateLater);
+          });
+
+          after(async () => subject.removeAll());
+
+          it('returns a Version object', () => {
+            expect(recordFound).to.be.an.instanceof(Version);
+          });
+
+          it('returns the latest record id', () => {
+            expect(recordFound.id).to.include(recordToFindId);
+          });
+        });
+      });
+    });
+
     describe('#findAll', () => {
       let records;
       const expectedIds = [];

@@ -1,5 +1,7 @@
 import mime from 'mime';
 
+import { toISODateWithoutMilliseconds } from '../archivist/utils/date.js';
+
 import GitHub from './github.js';
 
 const CONTRIBUTION_TOOL_URL = 'https://contribute.opentermsarchive.org/en/service';
@@ -78,7 +80,7 @@ No changes were found in the last run, so no new version has been recorded.`,
   generateDescription({ error, terms }) {
     const date = new Date();
     const currentFormattedDate = date.toLocaleDateString('en-GB', { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric', timeZoneName: 'short', timeZone: 'UTC' });
-    const validUntil = date.toISOString().replace(/\.\d+/, ''); // ISO date without milliseconds
+    const validUntil = toISODateWithoutMilliseconds(date);
 
     const hasSnapshots = terms.sourceDocuments.every(sourceDocument => sourceDocument.snapshotId);
 

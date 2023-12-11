@@ -2,7 +2,19 @@
 
 All changes that impact users of this module are documented in this file, in the [Common Changelog](https://common-changelog.org) format with some additional specifications defined in the CONTRIBUTING file. This codebase adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased
+## Unreleased [minor]
+
+_Full changeset and discussions: [#1033](https://github.com/OpenTermsArchive/engine/pull/1033)._
+
+> Development of this release was [supported](https://nlnet.nl/project/TOSDR-OTA/) by the [NGI0 Entrust Fund](https://nlnet.nl/entrust), a fund established by [NLnet](https://nlnet.nl/) with financial support from the European Commission's [Next Generation Internet](https://www.ngi.eu) programme, under the aegis of DG CNECT under grant agreement N°101069594.
+
+### Added
+
+- Expose versions data through the collection API ([#1003](https://github.com/OpenTermsArchive/engine/pull/1028)). When using Git as storage for versions, this API relies on the assumption that the commit date matches the author date, introduced in the engine in June 2022 ([#875](https://github.com/OpenTermsArchive/engine/pull/875)). If your collection was created before this date, inconsistencies in the API results may arise. You can verify if your version history includes commits with commit dates differing from author dates by executing the following command at the root of your versions repository: `git log --format="%H %ad %cI" --date=iso-strict | awk '{if ($2 != $3) print "Author date", $2, "and commit date", $3, "mismatch for commit", $1 }'`. You can correct the history with the command: `git rebase --committer-date-is-author-date $(git rev-list --max-parents=0 HEAD)`. Since the entire history will be rewritten, a force push may be required for distributed repositories
+
+### Changed
+
+- Provide a succinct JSON-formatted error message as response in API errors
 
 ## 0.33.1 - 2023-11-28
 

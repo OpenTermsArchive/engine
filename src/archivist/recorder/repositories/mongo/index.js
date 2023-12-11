@@ -58,6 +58,12 @@ export default class MongoRepository extends RepositoryInterface {
     return this.#toDomain(mongoDocument);
   }
 
+  async findByDate(serviceId, termsType, date) {
+    const [mongoDocument] = await this.collection.find({ serviceId, termsType, fetchDate: { $lte: new Date(date) } }).limit(1).sort({ fetchDate: -1 }).toArray(); // `findOne` doesn't support the `sort` method, so even for only one mongo document use `find`
+
+    return this.#toDomain(mongoDocument);
+  }
+
   async findById(recordId) {
     const mongoDocument = await this.collection.findOne({ _id: new ObjectId(recordId) });
 

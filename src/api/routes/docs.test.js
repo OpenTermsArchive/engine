@@ -10,7 +10,7 @@ describe('Docs API', () => {
   describe('GET /docs', () => {
     let response;
 
-    context('When requested as JSON', () => {
+    context('when requested as JSON', () => {
       before(async () => {
         response = await request(app).get(`${basePath}/v1/docs/`).set('Accept', 'application/json');
       });
@@ -50,11 +50,15 @@ describe('Docs API', () => {
           it('/service/{serviceId}', () => {
             expect(subject).to.have.property('/service/{serviceId}');
           });
+
+          it('/version/{serviceId}/{termsType}/{date}', () => {
+            expect(subject).to.have.property('/version/{serviceId}/{termsType}/{date}');
+          });
         });
       });
     });
 
-    context('When requested as HTML', () => {
+    context('when requested as HTML', () => {
       before(async () => {
         response = await request(app).get(`${basePath}/v1/docs/`);
       });

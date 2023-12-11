@@ -1,6 +1,7 @@
 import config from 'config';
 import express from 'express';
 
+import 'express-async-errors';
 import logger from './logger.js';
 import errorsMiddleware from './middlewares/errors.js';
 import loggerMiddleware from './middlewares/logger.js';
@@ -12,12 +13,17 @@ if (process.env.NODE_ENV !== 'test') {
   app.use(loggerMiddleware);
 }
 
-const basePath = `${config.get('api.basePath')}/v1`;
+const BASE_PATH = `${config.get('api.basePath')}/v1`;
 
-app.use(basePath, apiRouter(basePath));
+app.use(BASE_PATH, apiRouter(BASE_PATH));
 app.use(errorsMiddleware);
 
-app.listen(config.get('api.port'));
-logger.info('Start Open Terms Archive API\n');
+const port = config.get('api.port');
+
+app.listen(port);
+
+if (process.env.NODE_ENV !== 'test') {
+  logger.info(`Start Open Terms Archive API on http://localhost:${port}${BASE_PATH}`);
+}
 
 export default app;

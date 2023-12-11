@@ -48,6 +48,20 @@ class RepositoryInterface {
   }
 
   /**
+  * Find the record that was valid on the given date and that matches the given service ID and terms type and optionally the document ID
+  * In case of snapshots, if the record is related to terms extracted from multiple source documents, the document ID is required to find the source snapshot
+  *
+  * @param {string} serviceId - Service ID of record to find
+  * @param {string} termsType - Terms type of record to find
+  * @param {date} date - Datetime on which the record to find was valid
+  * @param {string} [documentId] - Document ID of record to find. Used to identify the source in terms extracted from multiple source documents. Not necessary for terms with a single source document
+  * @returns {Promise<Record>} Promise that will be resolved with the found record or an empty object if none match the given criteria
+  */
+  async findByDate(serviceId, termsType, date, documentId) {
+    throw new Error(`#findByDate method is not implemented in ${this.constructor.name}`);
+  }
+
+  /**
   * Find the record that matches the given record ID
   *
   * @param {string} recordId - Record ID of the record to find

@@ -106,7 +106,7 @@ describe('Services API', () => {
       });
     });
 
-    context('With a case-insensitive service ID parameter', () => {
+    context('with a case-insensitive service ID parameter', () => {
       before(async () => {
         response = await request(app).get(`${basePath}/v1/service/${encodeURI(CASE_INSENSITIVE_SERVICE_ID)}`);
       });
@@ -152,7 +152,7 @@ describe('Services API', () => {
       });
     });
 
-    context('When no matching service is found', () => {
+    context('when no matching service is found', () => {
       before(async () => {
         response = await request(app).get(`${basePath}/v1/service/nonExistentService`);
       });
