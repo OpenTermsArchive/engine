@@ -96,15 +96,15 @@ router.get('/version/:serviceId/:termsType/:date', async (req, res) => {
 
   const version = await versionsRepository.findByDate(serviceId, termsType, requestedDate);
 
-  if (version) {
-    return res.status(200).json({
-      id: version.id,
-      fetchDate: toISODateWithoutMilliseconds(version.fetchDate),
-      content: version.content,
-    });
+  if (!version) {
+    return res.status(404).json({ error: `No version found for date ${date}` });
   }
 
-  return res.status(404).json({ error: `No version found for date ${date}` });
+  return res.status(200).json({
+    id: version.id,
+    fetchDate: toISODateWithoutMilliseconds(version.fetchDate),
+    content: version.content,
+  });
 });
 
 export default router;
