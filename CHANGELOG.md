@@ -14,7 +14,7 @@ _Full changeset and discussions: [#1033](https://github.com/OpenTermsArchive/eng
 
 ### Changed
 
-- Provide a succinct JSON-formatted error message in response to API errors.
+- Provide a succinct JSON-formatted error message as response in API errors
 
 ## 0.33.1 - 2023-11-28
 

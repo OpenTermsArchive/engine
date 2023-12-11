@@ -18,7 +18,7 @@ import { toISODateWithoutMilliseconds } from '../../archivist/utils/date.js';
  *         fetchDate:
  *           type: string
  *           format: date-time
- *           description: The ISO 8601 datetime string when the version was fetched.
+ *           description: The ISO 8601 datetime string when the version was recorded.
  *         id:
  *           type: string
  *           description: The ID of the version.
@@ -34,26 +34,26 @@ const versionsRepository = await RepositoryFactory.create(config.get('recorder.v
  * @swagger
  * /version/{serviceId}/{termsType}/{date}:
  *   get:
- *     summary: Get version for a given date.
+ *     summary: Get a specific version of some terms at a given date.
  *     tags: [Versions]
  *     produces:
  *       - application/json
  *     parameters:
  *       - in: path
  *         name: serviceId
- *         description: The ID of the service.
+ *         description: The ID of the service whose version will be returned.
  *         schema:
  *           type: string
  *         required: true
  *       - in: path
  *         name: termsType
- *         description: The name of terms type.
+ *         description: The type of terms whose version will be returned.
  *         schema:
  *           type: string
  *         required: true
  *       - in: path
  *         name: date
- *         description: The date and time for which the version is requested.
+ *         description: The date and time for which the version is requested, in ISO 8601 format.
  *         schema:
  *           type: string
  *           format: date-time
@@ -66,7 +66,7 @@ const versionsRepository = await RepositoryFactory.create(config.get('recorder.v
  *             schema:
  *               $ref: '#/components/schemas/Version'
  *       404:
- *         description: No version found for the specified date.
+ *         description: No version found for the specified combination of service ID, terms type and date.
  *         content:
  *           application/json:
  *             schema:
@@ -74,9 +74,9 @@ const versionsRepository = await RepositoryFactory.create(config.get('recorder.v
  *               properties:
  *                 error:
  *                   type: string
- *                   description: Error message indicating no version found.
+ *                   description: Error message indicating that no version is found.
  *       416:
- *         description: Requested version is in the future.
+ *         description: The requested date is in the future.
  *         content:
  *           application/json:
  *             schema:
@@ -84,7 +84,7 @@ const versionsRepository = await RepositoryFactory.create(config.get('recorder.v
  *               properties:
  *                 error:
  *                   type: string
- *                   description: Error message indicating the requested date is in the future.
+ *                   description: Error message indicating that the requested date is in the future.
  */
 router.get('/version/:serviceId/:termsType/:date', async (req, res) => {
   const { serviceId, termsType, date } = req.params;

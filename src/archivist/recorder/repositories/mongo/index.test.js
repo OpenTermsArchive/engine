@@ -396,7 +396,7 @@ describe('MongoRepository', () => {
         let recordToFindId;
         let recordFound;
 
-        context('when a record exist for the requested service and date', () => {
+        context('when a record exists for the requested service and date', () => {
           const UPDATED_FILE_CONTENT = `${CONTENT} (with additional content to trigger a record)`;
 
           before(async () => {
