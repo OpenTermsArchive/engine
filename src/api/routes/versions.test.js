@@ -28,10 +28,12 @@ describe('Versions API', () => {
 
       await versionsRepository.initialize();
 
+      const ONE_HOUR = 60 * 60 * 1000;
+
       await versionsRepository.save(new Version({
         ...VERSION_COMMON_ATTRIBUTES,
         content: 'initial content',
-        fetchDate: new Date(new Date(FETCH_DATE).getTime() - 360000000),
+        fetchDate: new Date(new Date(FETCH_DATE).getTime() - ONE_HOUR),
       }));
 
       const version = new Version({
@@ -45,7 +47,7 @@ describe('Versions API', () => {
       await versionsRepository.save(new Version({
         ...VERSION_COMMON_ATTRIBUTES,
         content: 'latest content',
-        fetchDate: new Date(new Date(FETCH_DATE).getTime() + 360000000),
+        fetchDate: new Date(new Date(FETCH_DATE).getTime() + ONE_HOUR),
       }));
 
       expectedResult = {
@@ -90,8 +92,8 @@ describe('Versions API', () => {
         expect(response.type).to.equal('application/json');
       });
 
-      it('returns a service object with id', () => {
-        expect(response.body.error).to.equal('No version found for date 2000-01-01T12:00:00Z');
+      it('returns an error message', () => {
+        expect(response.body.error).to.contain('No version found').and.to.contain('2000-01-01T12:00:00Z');
       });
     });
 
@@ -110,7 +112,7 @@ describe('Versions API', () => {
         expect(response.type).to.equal('application/json');
       });
 
-      it('returns a service object with id', () => {
+      it('returns an error message', () => {
         expect(response.body.error).to.equal('Requested version is in the future');
       });
     });

@@ -424,11 +424,9 @@ describe('MongoRepository', () => {
               snapshotIds: [SNAPSHOT_ID],
             }));
 
-            const updatedDate = new Date(FETCH_DATE_LATER.getTime());
+            const oneHourBeforeFetchDateLater = new Date(FETCH_DATE_LATER.getTime() - 60 * 60 * 1000);
 
-            updatedDate.setTime(updatedDate.getTime() - 60 * 60 * 1000); // Remove one hour to the cloned date
-
-            recordFound = await subject.findByDate(SERVICE_PROVIDER_ID, TERMS_TYPE, updatedDate);
+            recordFound = await subject.findByDate(SERVICE_PROVIDER_ID, TERMS_TYPE, oneHourBeforeFetchDateLater);
           });
 
           after(async () => subject.removeAll());

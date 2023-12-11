@@ -3,29 +3,18 @@ import { expect } from 'chai';
 import { toISODateWithoutMilliseconds } from './date.js';
 
 describe('toISODateWithoutMilliseconds', () => {
-  context('with a valid ISO 8601 date string', () => {
-    it('removes milliseconds', () => {
-      const inputDate = '2023-12-06T12:34:56.789Z';
-      const expectedResult = '2023-12-06T12:34:56Z';
+  const EXPECTED_RESULT = '2023-12-06T12:34:56Z';
+  const INPUTS = {
+    'valid ISO 8601 date string': '2023-12-06T12:34:56.789Z',
+    'parsable date string not in ISO 8601 format': 'Wed, 06 Dec 2023 12:34:56 GMT',
+    'a valid ISO 8601 date string without milliseconds': '2023-12-06T12:34:56Z',
+  };
 
-      expect(toISODateWithoutMilliseconds(inputDate)).to.equal(expectedResult);
-    });
-  });
-
-  context('with a parsable date string not in ISO 8601 format', () => {
-    it('returns an ISO 8601 date string without milliseconds', () => {
-      const inputDate = 'Wed, 06 Dec 2023 12:34:56 GMT';
-      const expectedResult = '2023-12-06T12:34:56Z';
-
-      expect(toISODateWithoutMilliseconds(inputDate)).to.equal(expectedResult);
-    });
-  });
-
-  context('with a valid ISO 8601 date string without milliseconds', () => {
-    it('returns the given date', () => {
-      const inputDate = '2023-12-06T12:34:56Z';
-
-      expect(toISODateWithoutMilliseconds(inputDate)).to.equal(inputDate);
+  Object.entries(INPUTS).forEach(([ description, input ]) => {
+    context(`with ${description}`, () => {
+      it('returns the given date in ISO 8601 format without milliseconds', () => {
+        expect(toISODateWithoutMilliseconds(input)).to.equal(EXPECTED_RESULT);
+      });
     });
   });
 
