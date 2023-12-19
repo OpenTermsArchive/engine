@@ -24,7 +24,7 @@ export default class MongoRepository extends RepositoryInterface {
 
     this.collection = db.collection(this.collectionName);
 
-    await this.collection.createIndex({ serviceId: 1, termsType: 1, fetchDate: -1 });
+    this.collection.createIndex({ serviceId: 1, termsType: 1, fetchDate: -1 });
 
     return this;
   }
