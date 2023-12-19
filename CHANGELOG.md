@@ -6,7 +6,7 @@ All changes that impact users of this module are documented in this file, in the
 
 _Full changeset and discussions: [#1037](https://github.com/OpenTermsArchive/engine/pull/1037)._
 
-> Development of this release was made on a voluntary basis by [@Ndpnt](http://github.com/ndpnt).
+> Development of this release was made on a volunteer basis by [@Ndpnt](http://github.com/ndpnt).
 
 ### Fixed
 
