@@ -2,7 +2,15 @@
 
 All changes that impact users of this module are documented in this file, in the [Common Changelog](https://common-changelog.org) format with some additional specifications defined in the CONTRIBUTING file. This codebase adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased
+## Unreleased [patch]
+
+_Full changeset and discussions: [#1037](https://github.com/OpenTermsArchive/engine/pull/1037)._
+
+> Development of this release was made on a volunteer basis by [@Ndpnt](http://github.com/ndpnt).
+
+### Fixed
+
+- Improve performance for large-scale MongoDB databases
 
 ## 0.34.0 - 2023-12-11
 
