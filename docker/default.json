@@ -1,0 +1,71 @@
+{
+  "services": {
+    "declarationsPath": "./declarations"
+  },
+  "recorder": {
+    "versions": {
+      "storage": {
+        "type": "git",
+        "git": {
+          "path": "./data/versions",
+          "publish": false,
+          "snapshotIdentiferTemplate": "./data/snapshots/%SNAPSHOT_ID",
+          "author": {
+            "name": "Open Terms Archive Bot",
+            "email": "bot@opentermsarchive.org"
+          }
+        }
+      }
+    },
+    "snapshots": {
+      "storage": {
+        "type": "git",
+        "git": {
+          "path": "./data/snapshots",
+          "publish": false,
+          "author": {
+            "name": "Open Terms Archive Bot",
+            "email": "bot@opentermsarchive.org"
+          }
+        },
+        "mongo": {
+          "connectionURI": "mongodb://127.0.0.1:27017",
+          "database": "open-terms-archive",
+          "collection": "snapshots"
+        }
+      }
+    }
+  },
+  "fetcher": {
+    "waitForElementsTimeout": 10000,
+    "navigationTimeout": 30000,
+    "language": "en"
+  },
+  "logger": {
+    "smtp": {
+      "host": "smtp-relay.sendinblue.com",
+      "username": "admin@opentermsarchive.org"
+    },
+    "sendMailOnError": false
+  },
+  "notifier": {
+    "sendInBlue": {
+      "updatesListId": 850,
+      "updateTemplateId": 7
+    }
+  },
+  "tracker": {
+    "githubIssues": {
+      "repository": "OpenTermsArchive/sandbox",
+      "label": {
+        "name": "bot-report",
+        "color": "FEF2C0",
+        "description": "Automatically created by Open Terms Archive when a document cannot be fetched"
+      }
+    }
+  },
+  "dataset": {
+    "title": "Data Archive",
+    "versionsRepositoryURL": "https://github.com/.../"
+  }
+}
