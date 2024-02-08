@@ -5,7 +5,6 @@ on:
     branches-ignore:
       - main # tests will be launched by workflow_call from the "Release" workflow
   pull_request:
-    types: [ opened, reopened ]
   workflow_call:
 
 jobs:
