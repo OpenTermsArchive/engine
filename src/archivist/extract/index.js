@@ -24,6 +24,7 @@ const ciceroMarkTransformer = new CiceroMarkTransformer();
 /**
  * Extract content from source document and convert it to Markdown
  *
+ * @function extract
  * @param {string} sourceDocument - Source document from which to extract content, see {@link ./src/archivist/services/sourceDocument.js}
  * @returns {Promise<string>} Promise which is fulfilled once the content is extracted and converted in Markdown. The promise will resolve into a string containing the extracted content in Markdown format
 */
