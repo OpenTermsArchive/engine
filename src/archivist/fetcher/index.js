@@ -9,6 +9,7 @@ export { FetchDocumentError } from './errors.js';
 /**
  * Fetch a resource from the network, returning a promise which is fulfilled once the response is available
  *
+ * @function fetch
  * @param {Object} params - Fetcher parameters
  * @param {string} params.url - URL of the resource you want to fetch
  * @param {boolean} [params.executeClientScripts] - Enable execution of client scripts. When set to `true`, this property loads the page in a headless browser to load all assets and execute client scripts before returning its content
