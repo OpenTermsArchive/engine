@@ -97,8 +97,8 @@ describe('Services', () => {
       result = await services.load();
     });
 
-    describe('Service A', async () => {
-      await validateServiceWithoutHistory('service_A', expectedServices.service_A);
+    describe('Service·A', async () => {
+      await validateServiceWithoutHistory('service·A', expectedServices.service·A);
     });
 
     describe('Service B', async () => {
@@ -127,11 +127,11 @@ describe('Services', () => {
 
     context('when specifying services to load', async () => {
       before(async () => {
-        result = await services.load([ 'service_A', 'Service B!' ]);
+        result = await services.load([ 'service·A', 'Service B!' ]);
       });
 
       it('loads only the given services', async () => {
-        expect(result).to.have.all.keys('service_A', 'Service B!');
+        expect(result).to.have.all.keys('service·A', 'Service B!');
       });
     });
   });
@@ -266,8 +266,8 @@ describe('Services', () => {
       result = await services.loadWithHistory();
     });
 
-    describe('Service A', async () => {
-      await validateServiceWithHistory('service_A', expectedServices.service_A);
+    describe('Service·A', async () => {
+      await validateServiceWithHistory('service·A', expectedServices.service·A);
     });
 
     describe('Service B', async () => {
@@ -296,11 +296,11 @@ describe('Services', () => {
 
     context('when specifying services to load', async () => {
       before(async () => {
-        result = await services.loadWithHistory([ 'service_A', 'Service B!' ]);
+        result = await services.loadWithHistory([ 'service·A', 'Service B!' ]);
       });
 
       it('loads only the given services', async () => {
-        expect(result).to.have.all.keys('service_A', 'Service B!');
+        expect(result).to.have.all.keys('service·A', 'Service B!');
       });
     });
   });

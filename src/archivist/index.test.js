@@ -35,7 +35,7 @@ async function resetGitRepositories() {
 describe('Archivist', function () {
   this.timeout(10000);
 
-  const SERVICE_A_ID = 'service_A';
+  const SERVICE_A_ID = 'service·A';
   const SERVICE_A_TYPE = 'Terms of Service';
   const SERVICE_A_EXPECTED_SNAPSHOT_FILE_PATH = `${SNAPSHOTS_PATH}/${SERVICE_A_ID}/${SERVICE_A_TYPE}.html`;
   const SERVICE_A_EXPECTED_VERSION_FILE_PATH = `${VERSIONS_PATH}/${SERVICE_A_ID}/${SERVICE_A_TYPE}.md`;
@@ -49,7 +49,7 @@ describe('Archivist', function () {
   let serviceBSnapshotExpectedContent;
   let serviceBVersionExpectedContent;
 
-  const services = [ 'service_A', 'Service B!' ];
+  const services = [ 'service·A', 'Service B!' ];
 
   before(async () => {
     gitVersion = new Git({
@@ -61,8 +61,8 @@ describe('Archivist', function () {
     });
     await gitVersion.initialize();
 
-    serviceASnapshotExpectedContent = await fs.readFile(path.resolve(ROOT_PATH, 'test/fixtures/service_A_terms_snapshot.html'), { encoding: 'utf8' });
-    serviceAVersionExpectedContent = await fs.readFile(path.resolve(ROOT_PATH, 'test/fixtures/service_A_terms.md'), { encoding: 'utf8' });
+    serviceASnapshotExpectedContent = await fs.readFile(path.resolve(ROOT_PATH, 'test/fixtures/service·A_terms_snapshot.html'), { encoding: 'utf8' });
+    serviceAVersionExpectedContent = await fs.readFile(path.resolve(ROOT_PATH, 'test/fixtures/service·A_terms.md'), { encoding: 'utf8' });
     serviceBSnapshotExpectedContent = await fs.readFile(path.resolve(ROOT_PATH, 'test/fixtures/terms.pdf'));
     serviceBVersionExpectedContent = await fs.readFile(path.resolve(ROOT_PATH, 'test/fixtures/termsFromPDF.md'), { encoding: 'utf8' });
   });
@@ -166,7 +166,7 @@ describe('Archivist', function () {
 
             app.services[SERVICE_A_ID].getTerms({ type: SERVICE_A_TYPE }).sourceDocuments[0].contentSelectors = 'h1';
 
-            await app.track({ services: [ 'service_A', 'Service B!' ], extractOnly: true });
+            await app.track({ services: [ 'service·A', 'Service B!' ], extractOnly: true });
 
             const [reExtractedVersionCommit] = await gitVersion.log({ file: SERVICE_A_EXPECTED_VERSION_FILE_PATH });
 
@@ -282,7 +282,7 @@ describe('Archivist', function () {
       let snapshot;
 
       before(async () => {
-        terms = app.services.service_A.getTerms({ type: SERVICE_A_TYPE });
+        terms = app.services.service·A.getTerms({ type: SERVICE_A_TYPE });
         terms.fetchDate = FETCH_DATE;
         terms.sourceDocuments.forEach(async sourceDocument => {
           sourceDocument.content = serviceASnapshotExpectedContent;
@@ -364,7 +364,7 @@ describe('Archivist', function () {
       let version;
 
       before(async () => {
-        terms = app.services.service_A.getTerms({ type: SERVICE_A_TYPE });
+        terms = app.services.service·A.getTerms({ type: SERVICE_A_TYPE });
         terms.fetchDate = FETCH_DATE;
         terms.sourceDocuments.forEach(async sourceDocument => {
           sourceDocument.content = serviceASnapshotExpectedContent;
