@@ -2,6 +2,7 @@ name: Check changelog
 
 on:
   pull_request:
+  workflow_dispatch:
   workflow_call:
     outputs:
       release_type:
