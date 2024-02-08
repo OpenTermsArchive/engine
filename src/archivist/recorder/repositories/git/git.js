@@ -26,7 +26,8 @@ export default class Git {
       .addConfig('core.autocrlf', false)
       .addConfig('push.default', 'current')
       .addConfig('user.name', this.author.name)
-      .addConfig('user.email', this.author.email);
+      .addConfig('user.email', this.author.email)
+      .addConfig('core.quotePath', false); // disable Git's encoding of special characters in pathnames. For example, `service·A` will be encoded as `service\302\267A` without this setting, leading to issues. See https://git-scm.com/docs/git-config#Documentation/git-config.txt-corequotePath
   }
 
   async add(filePath) {
