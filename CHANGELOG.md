@@ -2,15 +2,7 @@
 
 All changes that impact users of this module are documented in this file, in the [Common Changelog](https://common-changelog.org) format with some additional specifications defined in the CONTRIBUTING file. This codebase adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased [patch]
-
-_Full changeset and discussions: [#1040](https://github.com/OpenTermsArchive/engine/pull/1040)._
-
-> Development of this release was made on a volunteer basis by [@jetlime](http://github.com/jetlime).
-
-### Added
-
-- Link the contributing file to the readme of the repository.
+## Unreleased
 
 ## 0.34.1 - 2023-12-19
 
