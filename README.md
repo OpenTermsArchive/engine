@@ -6,10 +6,9 @@ For documentation, visit [docs.opentermsarchive.org](https://docs.opentermsarchi
 
 - - -
 
-## Getting Involved
+## Contribute
 
-If you want to contribute to the Open Terms Archive Engine, please see [CONTRIBUTING](CONTRIBUTING.md) before sending pull requests.
-You can also report bugs or request features by opening an issue.
+To contribute to the Open Terms Archive Engine, please refer to the [contributing guidelines](CONTRIBUTING.md) before submitting pull requests. Bugs can be reported or features requested by opening an issue.
 
 ## License
 
