@@ -4,8 +4,8 @@ First of all, thanks for taking the time to contribute! 🎉👍
 
 - [Workflow](#workflow)
   - [Pull requests](#pull-requests)
-  - [Commit messages](#commit-messages)
   - [Continuous delivery](#continuous-delivery)
+  - [Commit messages](#commit-messages)
   - [Changelog](#changelog)
 - [Development](#development)
   - [Documentation](#documentation)
