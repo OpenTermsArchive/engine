@@ -31,6 +31,8 @@ All pull requests must be reviewed by at least one person who is not their origi
 
 To help reviewers, make sure to describe your pull request with a **clear text explanation** of your changes.
 
+For pull requests of new contributors, if errors or areas for improvement are identified in their contributions, Open Terms Archive team can initially handle them. This is intended to speed up the delivery process and help the contributor acclimatise to the project. As they become more involved and learn more, they will be encouraged to take on more responsibility by implementing the changes themselves. The aim is to support growth and confidence in the contribution to the project while promoting quick delivery.
+
 ### Continuous delivery
 
 GitHub Actions is used to release the package on every merge to the main branch.
