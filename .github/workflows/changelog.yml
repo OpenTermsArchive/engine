@@ -1,12 +1,8 @@
 name: Check changelog
 
 on:
-  push:
-    branches-ignore:
-      - main
-      - push-action/** # Temporary branches created by CasperWA/push-protected@v2 action on release workflow
   pull_request:
-    types: [ opened, reopened ]
+  workflow_dispatch:
   workflow_call:
     outputs:
       release_type:

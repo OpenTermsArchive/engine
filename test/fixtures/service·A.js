@@ -3,8 +3,8 @@ import SourceDocument from '../../src/archivist/services/sourceDocument.js';
 import Terms from '../../src/archivist/services/terms.js';
 
 const service = new Service({
-  id: 'service_A',
-  name: 'Service A',
+  id: 'service·A',
+  name: 'Service·A',
 });
 
 service.addTerms(new Terms({

@@ -1,5 +1,5 @@
 {
-  "name": "Service A",
+  "name": "Service·A",
   "documents": {
     "Terms of Service": {
       "fetch": "https://www.servicea.example/tos",
