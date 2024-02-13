@@ -112,7 +112,9 @@ export default class Archivist extends events.EventEmitter {
       });
     });
 
-    await this.trackingQueue.drain();
+    if (this.trackingQueue.length()) {
+      await this.trackingQueue.drain();
+    }
 
     await Promise.all([ stopHeadlessBrowser(), this.recorder.finalize() ]);
     this.emit('trackingCompleted', servicesIds.length, Service.getNumberOfTerms(this.services, servicesIds), extractOnly);
