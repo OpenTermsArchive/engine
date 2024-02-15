@@ -38,8 +38,10 @@ export default async function track({ services, types, extractOnly, schedule }) 
     return;
   }
 
-  if (process.env.NODE_ENV === 'production') {
+  if (process.env.SENDINBLUE_API_KEY) {
     archivist.attach(new Notifier(archivist.services));
+  } else {
+    logger.warn('Environment variable "SENDINBLUE_API_KEY" was not found; the Notifier module will be ignored');
   }
 
   if (process.env.GITHUB_TOKEN) {
