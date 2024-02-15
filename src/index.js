@@ -51,10 +51,10 @@ export default async function track({ services, types, extractOnly, schedule }) 
       await reporter.initialize();
       archivist.attach(reporter);
     } else {
-      logger.warn('Configuration key "reporter.githubIssues.repositories.declarations" was not found; the Reporter module will be ignored');
+      logger.warn('Configuration key "reporter.githubIssues.repositories.declarations" was not found; issues on the declarations repository cannot be created');
     }
   } else {
-    logger.warn('Environment variable "GITHUB_TOKEN" was not found; the Notifier module will be ignored');
+    logger.warn('Environment variable "GITHUB_TOKEN" was not found; the Reporter module will be ignored');
   }
 
   if (!schedule) {
