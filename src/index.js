@@ -38,8 +38,10 @@ export default async function track({ services, types, extractOnly, schedule }) 
     return;
   }
 
-  if (process.env.NODE_ENV === 'production') {
+  if (process.env.SENDINBLUE_API_KEY) {
     archivist.attach(new Notifier(archivist.services));
+  } else {
+    logger.warn('Environment variable "SENDINBLUE_API_KEY" was not found; the Notifier module will be ignored');
   }
 
   if (process.env.GITHUB_TOKEN) {
@@ -49,8 +51,10 @@ export default async function track({ services, types, extractOnly, schedule }) 
       await reporter.initialize();
       archivist.attach(reporter);
     } else {
-      logger.warn('Configuration key "reporter.githubIssues.repositories.declarations" was not found; the Reporter module will be ignored\n');
+      logger.warn('Configuration key "reporter.githubIssues.repositories.declarations" was not found; the Reporter module will be ignored');
     }
+  } else {
+    logger.warn('Environment variable "GITHUB_TOKEN" was not found; the Notifier module will be ignored');
   }
 
   if (!schedule) {

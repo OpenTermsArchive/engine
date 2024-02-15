@@ -34,7 +34,7 @@ const consoleTransport = new winston.transports.Console();
 
 const transports = [consoleTransport];
 
-if (config.get('logger.sendMailOnError')) {
+if (process.env.SMTP_PASSWORD && config.get('logger.sendMailOnError')) {
   const mailerOptions = {
     to: config.get('logger.sendMailOnError.to'),
     from: config.get('logger.sendMailOnError.from'),
