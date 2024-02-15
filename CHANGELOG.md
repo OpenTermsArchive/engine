@@ -2,7 +2,15 @@
 
 All changes that impact users of this module are documented in this file, in the [Common Changelog](https://common-changelog.org) format with some additional specifications defined in the CONTRIBUTING file. This codebase adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased
+## Unreleased [minor]
+
+_Full changeset and discussions: [#1052](https://github.com/OpenTermsArchive/engine/pull/1052)._
+
+> Development of this release was supported by the [French Ministry for Foreign Affairs](https://www.diplomatie.gouv.fr/fr/politique-etrangere-de-la-france/diplomatie-numerique/) through its ministerial [State Startups incubator](https://beta.gouv.fr/startups/open-terms-archive.html) under the aegis of the Ambassador for Digital Affairs.
+
+### Changed
+
+- **Breaking:** Base the loading of the Notifier module on the presence of required configuration, not on the environment; only define the `SENDINBLUE_API_KEY` environment variable if you want the Notifier to be loaded, avoid relying on `NODE_ENV=production`
 
 ## 0.35.0 - 2024-02-14
 
