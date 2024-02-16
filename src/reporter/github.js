@@ -24,14 +24,6 @@ export default class GitHub {
   }
 
   async initialize() {
-    try {
-      const { data: user } = await this.octokit.request('GET /user', { ...this.commonParams });
-
-      this.authenticatedUserLogin = user.login;
-    } catch (error) {
-      logger.error(`🤖 Could not get authenticated user: ${error}`);
-    }
-
     this.MANAGED_LABELS = require('./labels.json');
 
     const existingLabels = await this.getRepositoryLabels();
@@ -140,7 +132,6 @@ export default class GitHub {
       const issues = await this.octokit.paginate('GET /repos/{owner}/{repo}/issues', {
         ...this.commonParams,
         per_page: 100,
-        creator: this.authenticatedUserLogin,
         ...searchParams,
       }, response => response.data);
 
