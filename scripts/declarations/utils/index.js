@@ -20,7 +20,7 @@ export default class DeclarationUtils {
   }
 
   async getModifiedData() {
-    const modifiedFilePathsAsString = (await this.git.diff([ '-z', '--diff-filter=d', '--name-only', this.defaultBranch, 'HEAD', '--', './declarations' ])).trim(); // -z option is required to avoid pathnames with "unusual" characters to be quoted, but it also replace result separator by the  zero byte character \0
+    const modifiedFilePathsAsString = (await this.git.diff([ '-z', '--diff-filter=d', '--name-only', this.defaultBranch, 'HEAD', '--', './declarations' ])).trim(); // -z option is required to avoid pathnames with "unusual" characters to be quoted, but it also replaces result separator by the  zero byte character \0
 
     const modifiedFilePaths = (modifiedFilePathsAsString ? modifiedFilePathsAsString.split('\0') : []).filter(str => str !== ''); // split on \0 rather than \n due to the -z option of git diff
 
