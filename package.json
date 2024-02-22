@@ -32,7 +32,8 @@
   "scripts": {
     "changelog": "node scripts/changelog/index.js",
     "changelog:get-release-type": "npm run changelog -- --get-release-type",
-    "changelog:update": "npm run changelog -- --update",
+    "changelog:get-version-content": "npm run changelog -- --get-version-content",
+    "changelog:release": "npm run changelog -- --release",
     "changelog:validate": "npm run changelog -- --validate",
     "dataset:generate": "node bin/ota.js dataset",
     "dataset:release": "node bin/ota.js dataset --publish --remove-local-copy",

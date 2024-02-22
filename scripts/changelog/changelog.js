@@ -1,84 +1,89 @@
+import { parser as keepAChangelogParser } from 'keep-a-changelog';
 import semver from 'semver';
 
-import { parser } from './parser.js';
+import ChangelogValidationError from './changelogValidationError.js';
 
-export function checkChangelog(changelogContent) {
-  let changelog;
+export default class Changelog {
+  static FUNDER_REGEX = /^> Development of this release was(.+)$/m;
+  static CHANGESET_LINK_TEMPLATE = PRNumber => `_Full changeset and discussions: [#${PRNumber}](https://github.com/OpenTermsArchive/engine/pull/${PRNumber})._`;
 
-  try {
-    changelog = parser(changelogContent);
-  } catch (error) {
-    throw new Error('Changelog cannot be parsed:', error);
+  constructor(rawContent) {
+    this.rawContent = rawContent;
+    this.changelog = keepAChangelogParser(this.rawContent);
+    this.changelog.format = 'markdownlint';
+    this.releaseType = this.extractReleaseType();
   }
 
-  const unreleased = changelog.findRelease();
+  extractReleaseType() {
+    const unreleasedRegex = /## Unreleased[ ]+\[(major|minor|patch)\]/i;
+    const match = this.rawContent.match(unreleasedRegex);
 
-  if (!unreleased) {
-    throw new Error('Missing Unreleased section');
-  }
-
-  const releaseType = extractReleaseType(changelogContent);
-
-  if (!releaseType) {
-    throw new Error('Invalid or missing release type in the changelog. Please ensure the changelog contains a valid release type (major, minor, or patch)');
-  }
-
-  if (!checkFunder(unreleased.description)) {
-    throw new Error('Missing funder in the Unreleased section');
-  }
-
-  if (Array.from(unreleased.changes.values()).every(change => !change.length)) {
-    throw new Error('Missing changes in the Unreleased section');
-  }
-
-  return true;
-}
-
-export function updateChangelog(changelogContent, PRNumber) {
-  try {
-    const releaseType = extractReleaseType(changelogContent);
-
-    if (!releaseType) {
-      throw new Error('Invalid or missing release type in the changelog. Please ensure the changelog contains a valid release type (major, minor, or patch)');
+    if (match && match[1]) {
+      return match[1].toLowerCase();
     }
 
-    const changelog = parser(changelogContent);
+    return null;
+  }
 
-    const currentVersion = semver.maxSatisfying(changelog.releases.map(release => release.version), '*');
-    const newVersion = semver.inc(currentVersion, releaseType);
+  getReleaseType() {
+    return this.releaseType;
+  }
 
-    const unreleased = changelog.findRelease();
+  getVersionContent(version) {
+    const release = this.changelog.findRelease(version);
+
+    if (!release) {
+      throw new Error(`Version ${version} not found in changelog`);
+    }
+
+    return release.toString();
+  }
+
+  release(PRNumber) {
+    const currentVersion = semver.maxSatisfying(this.changelog.releases.map(release => release.version), '*');
+    const newVersion = semver.inc(currentVersion, this.releaseType);
+
+    const unreleased = this.changelog.findRelease();
+
+    if (!unreleased) {
+      throw new Error('Missing Unreleased section. Cannot convert it into a release');
+    }
 
     unreleased.date = new Date();
     unreleased.setVersion(newVersion);
 
     if (PRNumber) {
-      unreleased.description = `${generatePRLink(PRNumber)}\n\n${unreleased.description}`;
+      unreleased.description = `${Changelog.CHANGESET_LINK_TEMPLATE(PRNumber)}\n\n${unreleased.description}`;
+    }
+  }
+
+  validateUnreleased() {
+    const unreleased = this.changelog.findRelease();
+    const errors = [];
+
+    if (!unreleased) {
+      errors.push(new Error('Missing Unreleased section'));
+      throw new ChangelogValidationError(errors);
     }
 
-    return changelog.toString();
-  } catch (error) {
-    console.error(error.message);
-  }
-}
+    if (!this.releaseType) {
+      errors.push(new Error('Invalid or missing release type for Unreleased section. Please ensure the section contains a valid release type (major, minor, or patch)'));
+    }
 
-export function generatePRLink(PRNumber) {
-  return `_Full changeset and discussions: [#${PRNumber}](https://github.com/OpenTermsArchive/engine/pull/${PRNumber})._`;
-}
+    if (!Changelog.FUNDER_REGEX.test(unreleased.description)) {
+      errors.push(new Error('Missing funder in the Unreleased section'));
+    }
 
-export function checkFunder(description) {
-  const quoteRegex = /^> Development of this release was(.+)$/m;
+    if (!unreleased.changes || Array.from(unreleased.changes.values()).every(change => !change.length)) {
+      errors.push(new Error('Missing changes in the Unreleased section'));
+    }
 
-  return quoteRegex.test(description);
-}
-
-export function extractReleaseType(changelog) {
-  const unreleasedRegex = /## Unreleased[ ]+\[(major|minor|patch)\]/i;
-  const match = changelog.match(unreleasedRegex);
-
-  if (match && match[1]) {
-    return match[1].toLowerCase();
+    if (errors.length) {
+      throw new ChangelogValidationError(errors);
+    }
   }
 
-  return null;
+  toString() {
+    return this.changelog.toString();
+  }
 }

@@ -1,205 +1,165 @@
-import fs from 'fs/promises';
-import path from 'path';
-import { fileURLToPath } from 'url';
+import fs from 'fs';
 
 import chai from 'chai';
+import sinon from 'sinon';
 
-import { checkChangelog, checkFunder, extractReleaseType, generatePRLink } from './changelog.js';
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
+import Changelog from './changelog.js';
+import ChangelogValidationError from './changelogValidationError.js';
 
 const { expect } = chai;
 
-describe.only('Changelog Tests', () => {
-  describe('checkChangelog', () => {
-    it('should return true if changelog is properly formatted', async () => {
-      const changelogContent = await fs.readFile(path.resolve(__dirname, './fixtures/CHANGELOG.md'), 'UTF-8');
+describe.only('Changelog', () => {
+  let changelog;
 
-      expect(checkChangelog(changelogContent)).to.be.true;
-    });
+  beforeEach(() => {
+    // Set up a mock changelog file
+    fs.writeFileSync('test-changelog.md', `
+      # Changelog
+      
+      ## Unreleased [patch]
+      - Some change
+      
+      ## 1.0.0
+      - Initial release
+    `);
 
-    it('should return an error if funder is missing in unreleased section', async () => {
-      const changelogContent = await fs.readFile(path.resolve(__dirname, './fixtures/invalid/missing-funder-CHANGELOG.md'), 'UTF-8');
-
-      expect(() => checkChangelog(changelogContent)).to.throw(Error);
-    });
-
-    it('should return an error if changelog cannot be parsed', async () => {
-      const changelogContent = await fs.readFile(path.resolve(__dirname, './fixtures/invalid/misplaced-description-CHANGELOG.md'), 'UTF-8');
-
-      expect(() => checkChangelog(changelogContent)).to.throw(Error);
-    });
-
-    it('should return an error if changelog cannot be parsed', async () => {
-      const changelogContent = await fs.readFile(path.resolve(__dirname, './fixtures/invalid/missing-change-type-CHANGELOG.md'), 'UTF-8');
-
-      expect(() => checkChangelog(changelogContent)).to.throw(Error);
-    });
-
-    it('should return an error if changelog cannot be parsed', async () => {
-      const changelogContent = await fs.readFile(path.resolve(__dirname, './fixtures/invalid/wrong-unreleased-title-weight-CHANGELOG.md'), 'UTF-8');
-
-      expect(() => checkChangelog(changelogContent)).to.throw(Error);
-    });
-
-    it('should return an error if changelog cannot be parsed', async () => {
-      const changelogContent = await fs.readFile(path.resolve(__dirname, './fixtures/invalid/missing-change-CHANGELOG.md'), 'UTF-8');
-
-      expect(() => checkChangelog(changelogContent)).to.throw(Error);
-    });
+    changelog = new Changelog('test-changelog.md');
   });
 
-  describe('checkFunder', () => {
-    it('should return true if funder is present', () => {
-      const description = `
-Description start text
-
-> Development of this release was supported by the [French Ministry for Foreign Affairs](https://www.diplomatie.gouv.fr/fr/politique-etrangere-de-la-france/diplomatie-numerique/) through its ministerial [State Startups incubator](https://beta.gouv.fr/startups/open-terms-archive.html) under the aegis of the Ambassador for Digital Affairs.
-
-Description end text
-`;
-
-      expect(checkFunder(description)).to.be.true;
-    });
-
-    it('should return false if funder is not present', () => {
-      const description = `
-Description start text
-
-Description end text
-`;
-
-      expect(checkFunder(description)).to.be.false;
-    });
-
-    it('should return false if funder does not respect the expected format', () => {
-      const description = `
-Description start text
-
-> Release was supported by the [French Ministry for Foreign Affairs](https://www.diplomatie.gouv.fr/fr/politique-etrangere-de-la-france/diplomatie-numerique/) through its ministerial [State Startups incubator](https://beta.gouv.fr/startups/open-terms-archive.html) under the aegis of the Ambassador for Digital Affairs.
-
-Description end text
-`;
-
-      expect(checkFunder(description)).to.be.false;
-    });
-
-    it('should return false if funder does not respect the expected format', () => {
-      const description = `
-Description start text
-
-Development of this release was supported by the [French Ministry for Foreign Affairs](https://www.diplomatie.gouv.fr/fr/politique-etrangere-de-la-france/diplomatie-numerique/) through its ministerial [State Startups incubator](https://beta.gouv.fr/startups/open-terms-archive.html) under the aegis of the Ambassador for Digital Affairs.
-
-Description end text
-`;
-
-      expect(checkFunder(description)).to.be.false;
-    });
+  afterEach(() => {
+    // Clean up the mock changelog file
+    fs.unlinkSync('test-changelog.md');
   });
 
-  describe('generatePRLink', () => {
-    it('should generate the correct PR link', () => {
-      const PRNumber = 1056;
-      const expectedLink = '_Full changeset and discussions: [#1056](https://github.com/OpenTermsArchive/engine/pull/1056)._';
-
-      expect(generatePRLink(PRNumber)).to.equal(expectedLink);
-    });
-
-    it('should handle PR numbers as strings', () => {
-      const PRNumber = '999';
-      const expectedLink = '_Full changeset and discussions: [#999](https://github.com/OpenTermsArchive/engine/pull/999)._';
-
-      expect(generatePRLink(PRNumber)).to.equal(expectedLink);
+  describe('constructor', () => {
+    it('should initialize the Changelog instance with correct properties', () => {
+      expect(changelog.path).to.equal('test-changelog.md');
+      expect(changelog.rawContent).to.be.a('string');
+      expect(changelog.changelog).to.be.an('object');
     });
   });
 
   describe('extractReleaseType', () => {
-    it('should return "patch" when the Unreleased section indicates a patch release', () => {
-      const changelog = `
+    it('should return null if Unreleased section is missing', () => {
+      fs.writeFileSync('test-changelog.md', '# Changelog\n');
+      changelog = new Changelog('test-changelog.md');
+      expect(changelog.extractReleaseType()).to.be.null;
+    });
+
+    it('should return null if release type for Unreleased section is missing', () => {
+      fs.writeFileSync('test-changelog.md', `
         # Changelog
-  
+        
+        ## Unreleased
+        - Some change
+      `);
+      changelog = new Changelog('test-changelog.md');
+      expect(changelog.extractReleaseType()).to.be.null;
+    });
+
+    it('should return the correct release type', () => {
+      expect(changelog.extractReleaseType()).to.equal('patch');
+    });
+  });
+
+  describe('getReleaseType', () => {
+    it('should return the release type', () => {
+      expect(changelog.getReleaseType()).to.equal('patch');
+    });
+  });
+
+  describe('getVersionContent', () => {
+    it('should return version content', () => {
+      const versionContent = changelog.getVersionContent('1.0.0');
+
+      expect(versionContent).to.contain('Initial release');
+    });
+
+    it('should throw an error if version is not found', () => {
+      expect(() => changelog.getVersionContent('2.0.0')).to.throw(Error, 'Version 2.0.0 not found in changelog');
+    });
+  });
+
+  describe('release', () => {
+    it('should update the changelog with a new release', () => {
+      const writeFileStub = sinon.stub(fs, 'writeFileSync');
+
+      changelog.release('123');
+      expect(writeFileStub.calledOnce).to.be.true;
+      expect(writeFileStub.firstCall.args[0]).to.equal('test-changelog.md');
+      expect(writeFileStub.firstCall.args[1]).to.contain('## Unreleased');
+      writeFileStub.restore();
+    });
+  });
+
+  describe('validateUnreleased', () => {
+    it('should not throw error if Unreleased section is missing but no release type is required', () => {
+      fs.writeFileSync('test-changelog.md', '# Changelog\n');
+      changelog = new Changelog('test-changelog.md');
+      expect(() => changelog.validateUnreleased(true)).to.not.throw(ChangelogValidationError);
+    });
+
+    it('should not throw error if funder is missing but no release type is required', () => {
+      fs.writeFileSync('test-changelog.md', `
+        # Changelog
+        
+        ## Unreleased
+        - Some change
+      `);
+      changelog = new Changelog('test-changelog.md');
+      expect(() => changelog.validateUnreleased(true)).to.not.throw(ChangelogValidationError);
+    });
+
+    it('should not throw error if changes are missing but no release type is required', () => {
+      fs.writeFileSync('test-changelog.md', `
+        # Changelog
+        
+        ## Unreleased [patch]
+      `);
+      changelog = new Changelog('test-changelog.md');
+      expect(() => changelog.validateUnreleased(true)).to.not.throw(ChangelogValidationError);
+    });
+
+    it('should throw error if Unreleased section is missing and release type is required', () => {
+      fs.writeFileSync('test-changelog.md', '# Changelog\n');
+      changelog = new Changelog('test-changelog.md');
+      expect(() => changelog.validateUnreleased()).to.throw(ChangelogValidationError, 'Missing Unreleased section');
+    });
+
+    it('should throw error if release type for Unreleased section is missing and release type is required', () => {
+      fs.writeFileSync('test-changelog.md', `
+        # Changelog
+        
+        ## Unreleased
+        - Some change
+      `);
+      changelog = new Changelog('test-changelog.md');
+      expect(() => changelog.validateUnreleased()).to.throw(ChangelogValidationError, 'Invalid or missing release type for Unreleased section');
+    });
+
+    it('should throw error if funder is missing and release type is required', () => {
+      fs.writeFileSync('test-changelog.md', `
+        # Changelog
+        
         ## Unreleased [patch]
         - Some change
-      `;
-
-      expect(extractReleaseType(changelog)).to.equal('patch');
+      `);
+      changelog = new Changelog('test-changelog.md');
+      expect(() => changelog.validateUnreleased()).to.throw(ChangelogValidationError, 'Missing funder in the Unreleased section');
     });
 
-    it('should return "minor" when the Unreleased section indicates a minor release', () => {
-      const changelog = `
+    it('should throw error if changes are missing and release type is required', () => {
+      fs.writeFileSync('test-changelog.md', `
         # Changelog
-  
-        ## Unreleased [minor]
-        - Some change
-      `;
-
-      expect(extractReleaseType(changelog)).to.equal('minor');
+        
+        ## Unreleased [patch]
+      `);
+      changelog = new Changelog('test-changelog.md');
+      expect(() => changelog.validateUnreleased()).to.throw(ChangelogValidationError, 'Missing changes in the Unreleased section');
     });
 
-    it('should return "major" when the Unreleased section indicates a major release', () => {
-      const changelog = `
-        # Changelog
-  
-        ## Unreleased [major]
-        - Some change
-      `;
-
-      expect(extractReleaseType(changelog)).to.equal('major');
-    });
-
-    it('should return null if the Unreleased section is not present', () => {
-      const changelog = `
-        # Changelog
-  
-        ## 1.0.0 - 2022-01-01
-        - Some change
-      `;
-
-      expect(extractReleaseType(changelog)).to.be.null;
-    });
-
-    it('should return null if the Unreleased release type is not present', () => {
-      const changelog = `
-        # Changelog
-  
-        ## 1.0.0 - 2022-01-01
-        - Some change
-      `;
-
-      expect(extractReleaseType(changelog)).to.be.null;
-    });
-
-    it('should return null if the release type is invalid', () => {
-      const changelog = `
-        # Changelog
-  
-        ## Unreleased [invalid]
-        - Some change
-      `;
-
-      expect(extractReleaseType(changelog)).to.be.null;
-    });
-
-    it('should handle case-insensitive release types', () => {
-      const changelog = `
-        # Changelog
-  
-        ## Unreleased [PATCH]
-        - Some change
-      `;
-
-      expect(extractReleaseType(changelog)).to.equal('patch');
-    });
-
-    it('should handle whitespace in the Unreleased section', () => {
-      const changelog = `
-        # Changelog
-  
-        ## Unreleased             [patch]
-        - Some change
-      `;
-
-      expect(extractReleaseType(changelog)).to.equal('patch');
+    it('should not throw error if Unreleased section is valid', () => {
+      expect(() => changelog.validateUnreleased()).to.not.throw(ChangelogValidationError);
     });
   });
 });
