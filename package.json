@@ -1,6 +1,6 @@
 {
   "name": "@opentermsarchive/engine",
-  "version": "0.37.1",
+  "version": "8.0.0",
   "description": "Tracks and makes visible changes to the terms of online services",
   "homepage": "https://github.com/OpenTermsArchive/engine#readme",
   "bugs": {
@@ -30,6 +30,9 @@
     ".eslintrc.yaml"
   ],
   "scripts": {
+    "changelog": "node scripts/changelog/index.js",
+    "changelog:update": "npm run changelog -- --update",
+    "changelog:validate": "npm run changelog -- --validate",
     "dataset:generate": "node bin/ota.js dataset",
     "dataset:release": "node bin/ota.js dataset --publish --remove-local-copy",
     "dataset:scheduler": "npm run dataset:release -- --schedule",
