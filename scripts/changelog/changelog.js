@@ -7,8 +7,6 @@ export function checkChangelog(changelogContent) {
 
   try {
     changelog = parser(changelogContent);
-
-    console.log('changelog', changelog.toString());
   } catch (error) {
     throw new Error('Changelog cannot be parsed:', error);
   }

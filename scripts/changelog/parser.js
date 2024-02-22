@@ -7,13 +7,9 @@ export function parser(changelogContent) {
 
   const unreleasedType = extractReleaseType(changelogContent);
 
-  return {
-    unreleasedType,
-    releases: changelog.releases,
-    title: changelog.title,
-    description: changelog.description,
-    toString: changelog.toString,
-  };
+  changelog.unreleasedRegex = unreleasedType;
+
+  return changelog;
 }
 
 export function extractReleaseType(changelogContent) {
