@@ -1,9 +1,11 @@
 import { parser } from 'keep-a-changelog';
 import semver from 'semver';
 
-export function checkChangelog(changelog) {
+export function checkChangelog(changelogContent) {
+  let changelog;
+
   try {
-    changelog = parser(changelog);
+    changelog = parser(changelogContent);
   } catch (error) {
     throw new Error('Changelog cannot be parsed:', error);
   }
@@ -14,7 +16,7 @@ export function checkChangelog(changelog) {
     throw new Error('Missing Unreleased section');
   }
 
-  const releaseType = extractReleaseType(changelog);
+  const releaseType = extractReleaseType(changelogContent);
 
   if (!releaseType) {
     throw new Error('Invalid or missing release type in the changelog. Please ensure the changelog contains a valid release type (major, minor, or patch)');
