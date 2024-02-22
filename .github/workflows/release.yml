@@ -29,9 +29,8 @@ jobs:
 
       - name: Bump package version
         run: |
-          echo "RELEASE_TYPE=$(npm run changelog:get-release-type --silent)" >> $GITHUB_ENV
-          echo "Release type found: '${{ env.RELEASE_TYPE }}'"
-          echo "NEW_VERSION=$(npm --no-git-tag-version version ${{ env.RELEASE_TYPE }})" >> $GITHUB_ENV
+          echo "Release type found: '$(npm run changelog:get-release-type --silent)'"
+          echo "NEW_VERSION=$(npm --no-git-tag-version version $(npm run changelog:get-release-type --silent))" >> $GITHUB_ENV
           
 
       - name: Update changelog unreleased section with new version
