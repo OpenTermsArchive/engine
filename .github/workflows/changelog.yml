@@ -17,6 +17,7 @@ jobs:
       release_type: ${{ steps.set_release_type_output.outputs.release_type }}
     steps:
       - uses: actions/checkout@v4
+      - run: npm ci
       - name: Validate changelog
         run: npm run changelog:validate
       - name: Get release type in changelog
