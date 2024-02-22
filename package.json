@@ -31,6 +31,7 @@
   ],
   "scripts": {
     "changelog": "node scripts/changelog/index.js",
+    "changelog:get-release-type": "npm run changelog -- --get-release-type",
     "changelog:update": "npm run changelog -- --update",
     "changelog:validate": "npm run changelog -- --validate",
     "dataset:generate": "node bin/ota.js dataset",

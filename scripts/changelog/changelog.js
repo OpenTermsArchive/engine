@@ -1,11 +1,14 @@
-import { parser } from 'keep-a-changelog';
 import semver from 'semver';
+
+import { parser } from './parser.js';
 
 export function checkChangelog(changelogContent) {
   let changelog;
 
   try {
     changelog = parser(changelogContent);
+
+    console.log('changelog', changelog.toString());
   } catch (error) {
     throw new Error('Changelog cannot be parsed:', error);
   }
@@ -54,8 +57,6 @@ export function updateChangelog(changelogContent, PRNumber) {
     if (PRNumber) {
       unreleased.description = `${generatePRLink(PRNumber)}\n\n${unreleased.description}`;
     }
-
-    changelog.format = 'markdownlint';
 
     return changelog.toString();
   } catch (error) {
