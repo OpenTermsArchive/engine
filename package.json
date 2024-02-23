@@ -30,6 +30,7 @@
     ".eslintrc.yaml"
   ],
   "scripts": {
+    "changelog": "node scripts/changelog/index.js",
     "dataset:generate": "node bin/ota.js dataset",
     "dataset:release": "node bin/ota.js dataset --publish --remove-local-copy",
     "dataset:scheduler": "npm run dataset:release -- --schedule",
