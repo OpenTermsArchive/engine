@@ -59,6 +59,25 @@ _Full changeset and discussions: #122._
     });
   });
 
+  describe('#cleanUnreleased', () => {
+    context('when "Unreleased" section exists', () => {
+      it('removes the section', async () => {
+        changelog = new Changelog(await fs.readFile(path.resolve(__dirname, './fixtures/changelog-with-unreleased-no-release.md'), 'UTF-8'));
+        changelog.cleanUnreleased();
+        const updatedChangelog = changelog.toString();
+
+        expect(updatedChangelog).to.not.include('## Unreleased');
+      });
+    });
+
+    context('when "Unreleased" section does not exist', () => {
+      it('does not throw any error', async () => {
+        changelog = new Changelog(await fs.readFile(path.resolve(__dirname, './fixtures/changelog-without-unreleased.md'), 'UTF-8'));
+        expect(() => changelog.cleanUnreleased()).to.not.throw();
+      });
+    });
+  });
+
   describe('#release', () => {
     context('with a properly formed changelog', () => {
       it('returns an updated version of the changelog', async () => {

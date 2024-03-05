@@ -28,6 +28,12 @@ export default class Changelog {
     return null;
   }
 
+  cleanUnreleased() {
+    const index = this.changelog.releases.findIndex(release => !release.version);
+
+    this.changelog.releases.splice(index, 1);
+  }
+
   getVersionContent(version) {
     const release = this.changelog.findRelease(version);
 
