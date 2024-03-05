@@ -9,7 +9,7 @@ import ChangelogValidationError from './changelogValidationError.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-describe.only('Changelog', () => {
+describe('Changelog', () => {
   let changelog;
 
   describe('#releaseType', () => {
