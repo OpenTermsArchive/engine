@@ -13,7 +13,7 @@ jobs:
   test:
     uses: "OpenTermsArchive/engine/.github/workflows/test.yml@main"
   release:
-    if: github.event.pull_request.merged == true && !contains(github.event.pull_request.labels.*.name, 'No Release')
+    if: github.event.pull_request.merged == true && needs.changelog.outputs.no_functional_changes != 'true'
     needs: [ changelog, test ]
     runs-on: ubuntu-latest
     steps:
@@ -81,3 +81,26 @@ jobs:
           event-type: engine-release
           repository: OpenTermsArchive/docs
           client-payload: '{"version": "${{ env.NEW_VERSION }}"}'
+
+  clean_changelog:
+    if: github.event.pull_request.merged == true && needs.changelog.outputs.no_functional_changes == 'true'
+    needs: [ changelog ]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.RELEASE_BOT_GITHUB_TOKEN }}
+      
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Configure Git author
+        run: |
+          git config --global user.name "Open Terms Archive Release Bot"
+          git config --global user.email "release-bot@opentermsarchive.org"
+
+      - name: Revert CHANGELOG.md
+        run: |
+          npm run changelog --silent -- --clean-unreleased
+          git commit -m "Clean changelog" CHANGELOG.md
+          git push origin
