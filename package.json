@@ -101,6 +101,7 @@
     "winston-mail": "^2.0.0"
   },
   "devDependencies": {
+    "@commitlint/cli": "^19.0.3",
     "dir-compare": "^4.0.0",
     "keep-a-changelog": "^2.5.3",
     "nock": "^13.2.1",
