@@ -53,6 +53,7 @@ We strive to follow this [recommendation](https://chris.beams.io/posts/git-commi
 We add this additional rule:
 
 - Do not rely on GitHub issue reference numbers in commit messages, as we have no guarantee the host system and its autolinking will be stable in time. Make sure the context is self-explanatory. If an external reference is given, use its full URL.
+- Do not use [conventional commit format](https://www.conventionalcommits.org/en/v1.0.0/#summary) `<type>[optional scope]: <description>`, it will not be allowed, only describe what and why changes were made in one sentence.
 
 ### Changelog
 
