@@ -15,10 +15,6 @@ rules:
   - 2
   - always
   - - sentence-case
-  body-max-line-length:
-  - 2
-  - always
-  - 72
   body-leading-blank:
   - 2
   - always

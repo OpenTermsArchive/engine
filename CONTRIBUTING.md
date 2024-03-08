@@ -48,7 +48,6 @@ We strive to follow this [recommendation](https://chris.beams.io/posts/git-commi
 - [Capitalize the subject line](https://chris.beams.io/posts/git-commit/#capitalize).
 - [Do not end the subject line with a period](https://chris.beams.io/posts/git-commit/#end).
 - [Use the imperative mood in the subject line](https://chris.beams.io/posts/git-commit/#imperative).
-- [Wrap the body at 72 characters](https://chris.beams.io/posts/git-commit/#wrap-72).
 - [Use the body to explain what and why vs. how](https://chris.beams.io/posts/git-commit/#why-not-how).
 
 We add this additional rule:
