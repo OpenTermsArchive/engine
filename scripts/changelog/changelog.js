@@ -45,8 +45,6 @@ export default class Changelog {
   }
 
   release(PRNumber) {
-    this.validateUnreleased();
-
     const unreleased = this.changelog.findRelease();
 
     const latestVersion = semver.maxSatisfying(this.changelog.releases.map(release => release.version), '*');
