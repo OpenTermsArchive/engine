@@ -24,4 +24,4 @@ jobs:
         run: npm ci
 
       - name: Lint commit messages
-        run: npm run commit:lint
+        run: npm run commit-messages:lint
