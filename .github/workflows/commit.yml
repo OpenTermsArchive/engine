@@ -11,5 +11,17 @@ jobs:
   commitlint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: wagoid/commitlint-github-action@v5
+      - name: Checkout "main" branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.base.ref }}
+
+      - name: Checkout the current pull request branch
+        run: git checkout ${{ github.event.pull_request.head.ref }}
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint commit messages
+        run: npm run commit:lint
