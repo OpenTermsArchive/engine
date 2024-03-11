@@ -50,10 +50,13 @@ We strive to follow this [recommendation](https://chris.beams.io/posts/git-commi
 - [Use the imperative mood in the subject line](https://chris.beams.io/posts/git-commit/#imperative).
 - [Use the body to explain what and why vs. how](https://chris.beams.io/posts/git-commit/#why-not-how).
 
-We add this additional rule:
+Except this one:
+
+- ~~[Wrap the body at 72 characters](https://chris.beams.io/posts/git-commit/#wrap-72)~~: As URLs might be used for references in commit messages, the body text is not wrapped to 72 characters to ensure links are clickable in Git user interfaces.
+
+We add these additional rules:
 
 - Do not rely on GitHub issue reference numbers in commit messages, as we have no guarantee the host system and its autolinking will be stable in time. Make sure the context is self-explanatory. If an external reference is given, use its full URL.
-- Do not use [conventional commit format](https://www.conventionalcommits.org/en/v1.0.0/#summary) `<type>[optional scope]: <description>`, it will not be allowed, only describe what and why changes were made in one sentence.
 
 ### Changelog
 
