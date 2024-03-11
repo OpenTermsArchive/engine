@@ -47,6 +47,10 @@ export default class Changelog {
   release(PRNumber) {
     const unreleased = this.changelog.findRelease();
 
+    if (!unreleased) {
+      throw new Error('Missing "Unreleased" section');
+    }
+
     const latestVersion = semver.maxSatisfying(this.changelog.releases.map(release => release.version), '*');
     const newVersion = semver.inc(latestVersion, this.releaseType);
 
