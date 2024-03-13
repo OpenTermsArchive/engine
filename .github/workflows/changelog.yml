@@ -9,7 +9,7 @@ on:
         description: The release type extracted from changelog
         value: ${{ jobs.validate_changelog.outputs.release_type }}
       no_functional_changes:
-        description: A boolean indicating whether there are no functional changes in the changeset
+        description: A boolean signaling that there are no functional changes in the changeset
         value: ${{ jobs.check_functional_changes.outputs.no_functional_changes }}
   
 

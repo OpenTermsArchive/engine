@@ -99,7 +99,7 @@ jobs:
           git config --global user.name "Open Terms Archive Release Bot"
           git config --global user.email "release-bot@opentermsarchive.org"
 
-      - name: Revert CHANGELOG.md
+      - name: Erase unreleased information from changelog
         run: |
           npm run changelog --silent -- --clean-unreleased
           git commit -m "Clean changelog" CHANGELOG.md

@@ -12,7 +12,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 program
   .name('changelog')
-  .description('A command-line utility for managing changelog file')
+  .description('A command-line utility for managing the changelog file')
   .option('--validate', 'Validate the changelog, ensuring it follows the expected format and contains required information')
   .option('--release [PRNumber]', 'Convert the Unreleased section into a new release in the changelog, optionally linking to a pull request with the provided PRNumber')
   .option('--clean-unreleased', 'Remove the Unreleased section')

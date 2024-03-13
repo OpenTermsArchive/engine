@@ -52,7 +52,7 @@ _Full changeset and discussions: #122._
       });
     });
 
-    context('when getting an inexisiting version', () => {
+    context('when getting a non-existing version', () => {
       it('throws an error', () => {
         expect(() => changelog.getVersionContent('2.0.0')).to.throw(Error);
       });
