@@ -63,12 +63,12 @@ The format to use is [Common Changelog](https://common-changelog.org), with the 
 
 1. The `unreleased` section of [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) must be added in the changelog with the addition of a tag to specify which type of release should be published and to foster discussions about it inside pull requests. This tag should be one of the names mandated by SemVer, within brackets: `[patch]`, `[minor]` or `[major]`. For example: `## Unreleased [minor]`.<br>
 For non-functional changes (documentation, CI workflow…) that should not trigger a release, the following content should be added to the changelog:
-  
-  ```
-  ## Unreleased [no-release]
 
-  _Modifications made in this changeset do not alter its behavior or functionality from the perspective of the end user or other interacting systems. It does not add new features, does not enhance existing features, or alters the behavior of the software in a way that affects its use._
-  ```
+```
+## Unreleased [no-release]
+
+_Modifications made in this changeset do not add, remove or alter any behavior, dependency, API or functionality of the software. They only change non-functional parts of the repository, such as the README file or CI workflows._
+```
 
 2. Each listed change must provide an actionable way to adapt the user’s codebase, either directly in the changelog or through instructions or links.
 3. Changes are a single sentence with no punctuation (like all examples given in Common Changelog).

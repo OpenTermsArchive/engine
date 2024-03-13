@@ -4,7 +4,7 @@ All changes that impact users of this module are documented in this file, in the
 
 ## Unreleased [no-release]
 
-_Modifications made in this changeset do not alter its behavior or functionality from the perspective of the end user or other interacting systems. It does not add new features, does not enhance existing features, or alters the behavior of the software in a way that affects its use._
+_Modifications made in this changeset do not add, remove or alter any behavior, dependency, API or functionality of the software. They only change non-functional parts of the repository, such as the README file or CI workflows._
 
 ## 0.37.1 - 2024-02-20
 
