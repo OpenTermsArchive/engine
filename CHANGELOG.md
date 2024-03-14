@@ -2,6 +2,12 @@
 
 All changes that impact users of this module are documented in this file, in the [Common Changelog](https://common-changelog.org) format with some additional specifications defined in the CONTRIBUTING file. This codebase adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased [major]
+
+> Development of this release was supported by the [French Ministry for Foreign Affairs](https://www.diplomatie.gouv.fr/fr/politique-etrangere-de-la-france/diplomatie-numerique/) through its ministerial [State Startups incubator](https://beta.gouv.fr/startups/open-terms-archive.html) under the aegis of the Ambassador for Digital Affairs.
+
+_No code changes were made in this release, it simply signifies that the public API can now [be considered stable](https://semver.org/spec/v2.0.0.html#spec-item-5)._
+
 ## 0.37.1 - 2024-02-20
 
 _Full changeset and discussions: [#1056](https://github.com/OpenTermsArchive/engine/pull/1056)._
