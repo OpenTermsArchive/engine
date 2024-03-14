@@ -73,10 +73,6 @@ export default class Archivist extends events.EventEmitter {
   initQueue() {
     this.trackingQueue = async.queue(this.trackTermsChanges.bind(this), MAX_PARALLEL_TRACKING);
     this.trackingQueue.error(async (error, { terms }) => {
-      if (error.toString().includes('HttpError: API rate limit exceeded for user ID')) {
-        return; // This is an error due to SendInBlue quota, bypass
-      }
-
       if (error instanceof InaccessibleContentError) {
         this.emit('inaccessibleContent', error, terms);
 
