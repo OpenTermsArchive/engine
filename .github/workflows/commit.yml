@@ -1,0 +1,27 @@
+name: Lint commit messages
+
+on: 
+  pull_request:
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  commitlint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout "main" branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.base.ref }}
+
+      - name: Checkout the current pull request branch
+        run: git checkout ${{ github.event.pull_request.head.ref }}
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint commit messages
+        run: npm run commit-messages:lint
