@@ -4,6 +4,7 @@ import semver from 'semver';
 import ChangelogValidationError from './changelogValidationError.js';
 
 export default class Changelog {
+  static NO_CODE_CHANGES_REGEX = /^_No code changes were made in this release(.+)_$/m;
   static FUNDER_REGEX = /^> Development of this release was (?:supported|made on a volunteer basis) by (.+)\.$/m;
   static UNRELEASED_REGEX = /## Unreleased[ ]+\[(major|minor|patch)\]/i;
   static CHANGESET_LINK_REGEX = /^_Full changeset and discussions: (.+)._$/m;
@@ -79,7 +80,7 @@ export default class Changelog {
       errors.push(new Error('Missing funder in the "Unreleased" section'));
     }
 
-    if (!unreleased.changes || Array.from(unreleased.changes.values()).every(change => !change.length)) {
+    if (!Changelog.NO_CODE_CHANGES_REGEX.test(unreleased.description) && (!unreleased.changes || Array.from(unreleased.changes.values()).every(change => !change.length))) {
       errors.push(new Error('Missing or malformed changes in the "Unreleased" section'));
     }
 
