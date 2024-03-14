@@ -44,7 +44,7 @@ describe('Changelog', () => {
 
 _Full changeset and discussions: #122._
 
-> Development of this release was funded by ABC.
+> Development of this release was made on a volunteer basis by a contributor.
 
 ### Added
 

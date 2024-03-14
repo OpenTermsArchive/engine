@@ -14,7 +14,7 @@ _Modifications made in this changeset do not alter its behavior or functionality
 
 _Full changeset and discussions: #122._
 
-> Development of this release was funded by ABC.
+> Development of this release was supported by a funder.
 
 ### Added
 

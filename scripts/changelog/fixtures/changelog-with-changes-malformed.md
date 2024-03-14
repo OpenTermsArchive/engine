@@ -6,7 +6,7 @@ All changes that impact users of this module are documented in this file, in the
 
 _Full changeset and discussions: #123._
 
-> Development of this release was funded by XYZ.
+> Development of this release was supported by a funder.
 
 - New feature 1
 
@@ -14,7 +14,7 @@ _Full changeset and discussions: #123._
 
 _Full changeset and discussions: #122._
 
-> Development of this release was funded by ABC.
+> Development of this release was supported by a funder.
 
 ### Added
 
