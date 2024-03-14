@@ -47,7 +47,8 @@ jobs:
         run: npm ci
 
       - name: Print no release assessment result
-        run: echo "Should this run NOT trigger any release: '${{ needs.check_functional_changes.outputs.no_release }}'"
+        run: |
+          echo "Should this run NOT trigger any release: '${{ needs.check_functional_changes.outputs.no_release }}'"
 
       - name: Validate changelog
         run: npm run changelog --silent -- --validate
