@@ -245,6 +245,76 @@ describe('Archivist', function () {
     });
   });
 
+  describe('Plugin system', () => {
+    const plugin = {};
+
+    describe('#attach', () => {
+      before(async () => {
+        app = new Archivist({
+          recorderConfig: config.get('recorder'),
+          fetcherConfig: config.get('fetcher'),
+        });
+        await app.initialize();
+
+        EVENTS.forEach(event => {
+          const handlerName = `on${event[0].toUpperCase()}${event.substring(1)}`;
+
+          plugin[handlerName] = sinon.spy();
+        });
+
+        app.removeAllListeners('error');
+        expect(app.eventNames()).to.be.empty;
+        app.attach(plugin);
+      });
+
+      EVENTS.forEach(event => {
+        const handlerName = `on${event[0].toUpperCase()}${event.substring(1)}`;
+
+        it(`attaches plugin "${event}" handler`, () => {
+          app.emit(event);
+          expect(plugin[handlerName].calledOnce).to.be.true;
+        });
+      });
+    });
+
+    context('when errors occur within a plugin', () => {
+      let error;
+      let listener;
+      let plugin;
+
+      before(async () => {
+        nock.cleanAll();
+        nock('https://www.servicea.example').get('/tos').reply(200, serviceASnapshotExpectedContent, { 'Content-Type': 'text/html' });
+
+        app = new Archivist({
+          recorderConfig: config.get('recorder'),
+          fetcherConfig: config.get('fetcher'),
+        });
+        await app.initialize();
+
+        plugin = { onFirstVersionRecorded: () => { throw new Error('Plugin error'); } };
+        listener = reason => { error = reason; };
+        process.on('unhandledRejection', listener);
+
+        app.attach(plugin);
+      });
+
+      after(async () => {
+        process.removeListener('unhandledRejection', listener);
+        await resetGitRepositories();
+      });
+
+      it('handles it properly and do not crash the whole execution', done => {
+        app.track({ services: [services[0]] }).then(() => {
+          if (error) {
+            return done(error);
+          }
+          done();
+        });
+      });
+    });
+  });
+
   describe('events', () => {
     const spies = {};
 

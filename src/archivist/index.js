@@ -29,6 +29,7 @@ export const EVENTS = [
   'trackingCompleted',
   'inaccessibleContent',
   'error',
+  'pluginError',
 ];
 
 export default class Archivist extends events.EventEmitter {
@@ -91,7 +92,13 @@ export default class Archivist extends events.EventEmitter {
       const handlerName = `on${event[0].toUpperCase()}${event.substring(1)}`;
 
       if (listener[handlerName]) {
-        this.on(event, listener[handlerName].bind(listener));
+        this.on(event, async (...params) => {
+          try {
+            await listener[handlerName](...params); // Prefer try...catch over .catch() for handling errors to take account both synchronous and asynchronous functions, as .catch() cannot be applied to synchronous functions
+          } catch (error) {
+            this.emit('pluginError', error, listener.constructor.name);
+          }
+        });
       }
     });
   }
