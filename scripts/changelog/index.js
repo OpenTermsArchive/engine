@@ -17,7 +17,7 @@ program
   .option('--release [PRNumber]', 'Convert the Unreleased section into a new release in the changelog, optionally linking to a pull request with the provided PRNumber')
   .option('--clean-unreleased', 'Remove the Unreleased section')
   .option('--get-release-type', 'Get the release type of the Unreleased section in the changelog')
-  .option('--get-version-content [version]', 'Get the content of the given version in the changelog');
+  .option('--get-version-content <version>', 'Get the content of the given version in the changelog');
 
 const options = program.parse(process.argv).opts();
 
