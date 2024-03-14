@@ -13,7 +13,7 @@ jobs:
   test:
     uses: "OpenTermsArchive/engine/.github/workflows/test.yml@main"
   release:
-    if: github.event.pull_request.merged == true
+    if: github.event.pull_request.merged == true && needs.changelog.outputs.no_functional_changes != 'true'
     needs: [ changelog, test ]
     runs-on: ubuntu-latest
     steps:
@@ -22,6 +22,9 @@ jobs:
         with:
           token: ${{ secrets.RELEASE_BOT_GITHUB_TOKEN }}
 
+      - name: Install dependencies
+        run: npm ci
+
       - name: Configure Git author
         run: |
           git config --global user.name "Open Terms Archive Release Bot"
@@ -29,15 +32,11 @@ jobs:
 
       - name: Bump package version
         run: |
-          echo "Release type obtained from the previous job: '${{ needs.changelog.outputs.release_type }}'"
-          echo "NEW_VERSION=$(npm --no-git-tag-version version ${{ needs.changelog.outputs.release_type }})" >> $GITHUB_ENV
+          echo "Release type found: '$(npm run changelog --silent -- --get-release-type)'"
+          echo "NEW_VERSION=$(npm --no-git-tag-version version $(npm run changelog --silent -- --get-release-type))" >> $GITHUB_ENV
 
       - name: Update changelog unreleased section with new version
-        uses: superfaceai/release-changelog-action@v2
-        with:
-          version: ${{ env.NEW_VERSION }}
-          operation: release
-          format: markdownlint
+        run: npm run changelog --silent -- --release ${{ github.event.number }} # github.event.number refers to the pull request number
 
       - name: Commit CHANGELOG.md and package.json changes and create tag
         run: |
@@ -58,17 +57,16 @@ jobs:
         run: git push origin && git push --tags
 
       - name: Read version changelog
-        uses: superfaceai/release-changelog-action@v2
-        id: get-changelog
-        with:
-          version: ${{ env.NEW_VERSION }}
-          operation: read
+        run: |
+          echo "VERSION_CHANGELOG<<EOF" >> $GITHUB_ENV
+          echo "$(npm run changelog --silent -- --get-version-content ${{ env.NEW_VERSION }})" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
 
       - name: Create GitHub release
         uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ env.NEW_VERSION }}
-          body: ${{ steps.get-changelog.outputs.changelog }}
+          body: ${{ env.VERSION_CHANGELOG }}
           token: ${{ secrets.RELEASE_BOT_GITHUB_TOKEN }}
 
       - name: Publish to NPM public repository
@@ -83,3 +81,26 @@ jobs:
           event-type: engine-release
           repository: OpenTermsArchive/docs
           client-payload: '{"version": "${{ env.NEW_VERSION }}"}'
+
+  clean_changelog:
+    if: github.event.pull_request.merged == true && needs.changelog.outputs.no_functional_changes == 'true'
+    needs: [ changelog ]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.RELEASE_BOT_GITHUB_TOKEN }}
+      
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Configure Git author
+        run: |
+          git config --global user.name "Open Terms Archive Release Bot"
+          git config --global user.email "release-bot@opentermsarchive.org"
+
+      - name: Erase unreleased information from changelog
+        run: |
+          npm run changelog --silent -- --clean-unreleased
+          git commit -m "Clean changelog" CHANGELOG.md
+          git push origin

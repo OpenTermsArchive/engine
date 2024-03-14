@@ -1,4 +1,4 @@
-name: Check changelog
+name: Changelog
 
 on:
   pull_request:
@@ -7,23 +7,58 @@ on:
     outputs:
       release_type:
         description: The release type extracted from changelog
-        value: ${{ jobs.check_changelog.outputs.release_type }}
+        value: ${{ jobs.validate_changelog.outputs.release_type }}
+      no_functional_changes:
+        description: A boolean signaling that there are no functional changes in the changeset
+        value: ${{ jobs.check_functional_changes.outputs.no_functional_changes }}
+  
 
 jobs:
-  check_changelog:
+  check_functional_changes:
+    runs-on: [ ubuntu-latest ]
+    outputs:
+      no_functional_changes: ${{ steps.set_no_functional_changes.outputs.no_functional_changes }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Make release type available to subsequent jobs # For backwards compatibility, as this workflow is used in other Open Terms Archive repositories
+        run: |
+          if grep -q "## Unreleased \[no-release\]" CHANGELOG.md; then
+            echo "NO_FUNCTIONAL_CHANGES=true" >> $GITHUB_ENV
+          fi
+      
+      - name: Print result
+        id: set_no_functional_changes
+        run: |
+          echo "no_functional_changes='${{ env.NO_FUNCTIONAL_CHANGES }}'"
+          echo "no_functional_changes=${{ env.NO_FUNCTIONAL_CHANGES }}" >> $GITHUB_OUTPUT
+  
+
+  validate_changelog:
+    if: ${{ needs.check_functional_changes.outputs.no_functional_changes != 'true' }}
+    needs: [ check_functional_changes ]
     runs-on: [ ubuntu-latest ]
     outputs:
       release_type: ${{ steps.set_release_type_output.outputs.release_type }}
     steps:
       - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Print no release assessment result
+        run: |
+          echo "Should this run NOT trigger any release: '${{ needs.check_functional_changes.outputs.no_release }}'"
+
+      - name: Validate changelog
+        run: npm run changelog --silent -- --validate
+
       - name: Get release type in changelog
-        run: echo "RELEASE_TYPE=$(cat CHANGELOG.md | grep -E '^## Unreleased \[(patch|minor|major)\]$' | grep -E -w -o "patch|minor|major" | tr -d '\n')" >> $GITHUB_ENV
-      - name: Make release type available to subsequent jobs
+        run: echo "RELEASE_TYPE=$(npm run changelog --silent -- --get-release-type)" >> $GITHUB_ENV
+
+      - name: Make release type available to subsequent jobs # For backwards compatibility, as this workflow is used in other Open Terms Archive repositories
         if: env.RELEASE_TYPE
         id: set_release_type_output
         run: |
           echo "Found release type '${{ env.RELEASE_TYPE }}'"
           echo "release_type=${{ env.RELEASE_TYPE }}" >> $GITHUB_OUTPUT
-      - name: Fail and display error if no proper release type is found in changelog
-        if: env.RELEASE_TYPE == ''
-        run: echo "No valid release type found in changelog. The title of the 'Unreleased' section must contain one of the following tags '[patch]', '[minor]', '[major]'. For example, '## Unreleased [minor]'."; exit 1
