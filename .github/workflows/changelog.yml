@@ -46,9 +46,8 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Print previous job result
-        run: |
-          echo "Result previous job: '${{ needs.check_functional_changes.outputs.no_release }}'"
+      - name: Print no release assessment result
+        run: echo "Should this run NOT trigger any release: '${{ needs.check_functional_changes.outputs.no_release }}'"
 
       - name: Validate changelog
         run: npm run changelog --silent -- --validate
