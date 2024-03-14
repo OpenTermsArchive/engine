@@ -4,7 +4,7 @@ import semver from 'semver';
 import ChangelogValidationError from './changelogValidationError.js';
 
 export default class Changelog {
-  static FUNDER_REGEX = /^> Development of this release (?:was supported by|was made on a volunteer basis by)(.+)\.$/m;
+  static FUNDER_REGEX = /^> Development of this release was (?:supported|made on a volunteer basis) by (.+)\.$/m;
   static UNRELEASED_REGEX = /## Unreleased[ ]+\[(major|minor|patch)\]/i;
   static CHANGESET_LINK_REGEX = /^_Full changeset and discussions: (.+)._$/m;
   static CHANGESET_LINK_TEMPLATE = PRNumber => `_Full changeset and discussions: [#${PRNumber}](https://github.com/OpenTermsArchive/engine/pull/${PRNumber})._`;
