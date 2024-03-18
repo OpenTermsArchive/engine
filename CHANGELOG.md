@@ -8,7 +8,7 @@ All changes that impact users of this module are documented in this file, in the
 
 ### Changed
 
-- Improve errors handling mechanism to significantly reduce tracking process interruptions caused by errors occurring in plugins
+- Introduce `pluginError` error type to isolate plugin errors from the engine and increase robustness
 
 ## 1.0.0 - 2024-03-14
 
