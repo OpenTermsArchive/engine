@@ -136,4 +136,8 @@ logger.onError = (error, terms) => {
   logger.error({ message: error.stack, serviceId: terms.serviceId, termsType: terms.type });
 };
 
+logger.onPluginError = (error, pluginName) => {
+  logger.error({ message: `Error in "${pluginName}" plugin: ${error.stack}` });
+};
+
 export default logger;

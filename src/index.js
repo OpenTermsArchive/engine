@@ -39,17 +39,25 @@ export default async function track({ services, types, extractOnly, schedule }) 
   }
 
   if (process.env.SENDINBLUE_API_KEY) {
-    archivist.attach(new Notifier(archivist.services));
+    try {
+      archivist.attach(new Notifier(archivist.services));
+    } catch (error) {
+      logger.error('Cannot instantiate the Notifier module; it will be ignored:', error);
+    }
   } else {
     logger.warn('Environment variable "SENDINBLUE_API_KEY" was not found; the Notifier module will be ignored');
   }
 
   if (process.env.GITHUB_TOKEN) {
     if (config.has('reporter.githubIssues.repositories.declarations')) {
-      const reporter = new Reporter(config.get('reporter'));
+      try {
+        const reporter = new Reporter(config.get('reporter'));
 
-      await reporter.initialize();
-      archivist.attach(reporter);
+        await reporter.initialize();
+        archivist.attach(reporter);
+      } catch (error) {
+        logger.error('Cannot instantiate the Reporter module; it will be ignored:', error);
+      }
     } else {
       logger.warn('Configuration key "reporter.githubIssues.repositories.declarations" was not found; issues on the declarations repository cannot be created');
     }

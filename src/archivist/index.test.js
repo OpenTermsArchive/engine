@@ -245,6 +245,80 @@ describe('Archivist', function () {
     });
   });
 
+  describe('Plugin system', () => {
+    const plugin = {};
+
+    describe('#attach', () => {
+      before(async () => {
+        app = new Archivist({
+          recorderConfig: config.get('recorder'),
+          fetcherConfig: config.get('fetcher'),
+        });
+        await app.initialize();
+
+        EVENTS.forEach(event => {
+          const handlerName = `on${event[0].toUpperCase()}${event.substring(1)}`;
+
+          plugin[handlerName] = sinon.spy();
+        });
+
+        app.removeAllListeners('error');
+        expect(app.eventNames()).to.be.empty;
+        app.attach(plugin);
+      });
+
+      EVENTS.forEach(event => {
+        const handlerName = `on${event[0].toUpperCase()}${event.substring(1)}`;
+
+        it(`attaches plugin "${event}" handler`, () => {
+          app.emit(event);
+          expect(plugin[handlerName].calledOnce).to.be.true;
+        });
+      });
+    });
+
+    context('when errors occur within a plugin', () => {
+      let error;
+      let listeners;
+      let plugin;
+
+      before(async () => {
+        nock.cleanAll();
+        nock('https://www.servicea.example').get('/tos').reply(200, serviceASnapshotExpectedContent, { 'Content-Type': 'text/html' });
+
+        app = new Archivist({
+          recorderConfig: config.get('recorder'),
+          fetcherConfig: config.get('fetcher'),
+        });
+        await app.initialize();
+
+        plugin = { onFirstVersionRecorded: () => { throw new Error('Plugin error'); } };
+
+        listeners = process.listeners('unhandledRejection'); // back up listeners
+        process.removeAllListeners('unhandledRejection'); // remove all listeners to avoid exit the process
+
+        process.on('unhandledRejection', reason => { error = reason; });
+
+        app.attach(plugin);
+      });
+
+      after(async () => {
+        process.removeAllListeners('unhandledRejection');
+        listeners.forEach(listener => process.on('unhandledRejection', listener));
+        await resetGitRepositories();
+      });
+
+      it('does not crash the tracking process', done => {
+        app.track({ services: [services[0]] }).then(() => {
+          if (error) {
+            return done(error);
+          }
+          done();
+        });
+      });
+    });
+  });
+
   describe('events', () => {
     const spies = {};
 
