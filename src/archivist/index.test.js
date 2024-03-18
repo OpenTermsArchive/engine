@@ -279,7 +279,7 @@ describe('Archivist', function () {
 
     context('when errors occur within a plugin', () => {
       let error;
-      let listener;
+      let listeners;
       let plugin;
 
       before(async () => {
@@ -293,14 +293,18 @@ describe('Archivist', function () {
         await app.initialize();
 
         plugin = { onFirstVersionRecorded: () => { throw new Error('Plugin error'); } };
-        listener = reason => { error = reason; };
-        process.on('unhandledRejection', listener);
+
+        listeners = process.listeners('unhandledRejection'); // back up listeners
+        process.removeAllListeners('unhandledRejection'); // remove all listeners to avoid exit the process
+
+        process.on('unhandledRejection', reason => { error = reason; });
 
         app.attach(plugin);
       });
 
       after(async () => {
-        process.removeListener('unhandledRejection', listener);
+        process.removeAllListeners('unhandledRejection');
+        listeners.forEach(listener => process.on('unhandledRejection', listener));
         await resetGitRepositories();
       });
 
