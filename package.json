@@ -11,7 +11,7 @@
     "url": "git+https://github.com/OpenTermsArchive/engine.git"
   },
   "license": "EUPL-1.2",
-  "author": "ambanum",
+  "author": "Open Terms Archive contributors",
   "type": "module",
   "exports": {
     ".": "./src/exports.js",
