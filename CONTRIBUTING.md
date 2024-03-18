@@ -65,8 +65,8 @@ All changes to the codebase that impact users must be documented in the [`CHANGE
 The format to use is [Common Changelog](https://common-changelog.org), with the following additional specifications:
 
 1. The `unreleased` section of [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) must be added in the changelog with the addition of a tag to specify which type of release should be published and to foster discussions about it inside pull requests. This tag should be one of the names mandated by SemVer, within brackets: `[patch]`, `[minor]` or `[major]`. For example: `## Unreleased [minor]`.<br>
-For non-functional changes (documentation, CI workflow…) that should not trigger a release, the following content should be added to the changelog:
-
+  - For changes that require an adjustment in the infrastructure, they are considered as a breaking changes in order to notify Collection operators about the need to update their [deployment](https://github.com/OpenTermsArchive/deployment/blob/main/CHANGELOG.md) dependency accordingly.
+  - For non-functional changes (documentation, CI workflow…) that should not trigger a release, the following content should be added to the changelog:
 ```
 ## Unreleased [no-release]
 
