@@ -90,7 +90,7 @@ export default class Archivist extends events.EventEmitter {
       if (listener[handlerName]) {
         this.on(event, async (...params) => {
           try {
-            await listener[handlerName](...params); // Prefer try...catch over .catch() for handling errors to take account both synchronous and asynchronous functions, as .catch() cannot be applied to synchronous functions
+            await listener[handlerName](...params); // Prefer try...catch over .catch() for handling errors to account for both synchronous and asynchronous functions, as .catch() cannot be applied to synchronous functions
           } catch (error) {
             this.emit('pluginError', error, listener.constructor.name);
           }
