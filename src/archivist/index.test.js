@@ -304,7 +304,7 @@ describe('Archivist', function () {
         await resetGitRepositories();
       });
 
-      it('handles it properly and do not crash the whole execution', done => {
+      it('does not crash the tracking process', done => {
         app.track({ services: [services[0]] }).then(() => {
           if (error) {
             return done(error);
