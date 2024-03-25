@@ -40,7 +40,7 @@ describe('GitHub', function () {
 
     after(nock.cleanAll);
 
-    it('should create missing labels', async () => {
+    it('should create missing labels', () => {
       scopes.forEach(scope => expect(scope.isDone()).to.be.true);
     });
   });
@@ -62,11 +62,11 @@ describe('GitHub', function () {
 
     after(nock.cleanAll);
 
-    it('fetches repository labels', async () => {
+    it('fetches repository labels', () => {
       expect(scope.isDone()).to.be.true;
     });
 
-    it('returns the repository labels', async () => {
+    it('returns the repository labels', () => {
       expect(result).to.deep.equal(labels);
     });
   });
@@ -86,7 +86,7 @@ describe('GitHub', function () {
 
     after(nock.cleanAll);
 
-    it('creates the new label', async () => {
+    it('creates the new label', () => {
       expect(scope.isDone()).to.be.true;
     });
   });
@@ -114,11 +114,11 @@ describe('GitHub', function () {
 
     after(nock.cleanAll);
 
-    it('creates the new issue', async () => {
+    it('creates the new issue', () => {
       expect(scope.isDone()).to.be.true;
     });
 
-    it('returns the created issue', async () => {
+    it('returns the created issue', () => {
       expect(result).to.deep.equal(createdIssue);
     });
   });
@@ -160,7 +160,7 @@ describe('GitHub', function () {
 
     after(nock.cleanAll);
 
-    it('opens the issue', async () => {
+    it('opens the issue', () => {
       expect(scope.isDone()).to.be.true;
     });
   });
@@ -181,7 +181,7 @@ describe('GitHub', function () {
 
     after(nock.cleanAll);
 
-    it('closes the issue', async () => {
+    it('closes the issue', () => {
       expect(scope.isDone()).to.be.true;
     });
   });
@@ -209,7 +209,7 @@ describe('GitHub', function () {
       expect(scope.isDone()).to.be.true;
     });
 
-    it('returns the expected issue', async () => {
+    it('returns the expected issue', () => {
       expect(result).to.deep.equal(issue);
     });
   });
@@ -230,7 +230,7 @@ describe('GitHub', function () {
 
     after(nock.cleanAll);
 
-    it('adds the comment to the issue', async () => {
+    it('adds the comment to the issue', () => {
       expect(scope.isDone()).to.be.true;
     });
   });
@@ -394,7 +394,7 @@ describe('GitHub', function () {
         expect(getIssuesScope.isDone()).to.be.true;
       });
 
-      it('creates the issue', async () => {
+      it('creates the issue', () => {
         expect(createIssueScope.isDone()).to.be.true;
       });
     });
