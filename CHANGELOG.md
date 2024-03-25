@@ -8,7 +8,7 @@ All changes that impact users of this module are documented in this file, in the
 
 ### Fixed
 
-- Ensure to reopen associated issue if a terms becomes inaccessible again
+- Ensure to reopen associated issue if terms become inaccessible again
 
 ## 1.1.0 - 2024-03-18
 
