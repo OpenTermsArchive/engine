@@ -178,7 +178,7 @@ export default class GitHub {
       return this.createIssue({ title, description, labels: [label] });
     }
 
-    if (issue.state == this.ISSUE_STATE_CLOSED) {
+    if (issue.state == GitHub.ISSUE_STATE_CLOSED) {
       await this.openIssue(issue);
     }
 
