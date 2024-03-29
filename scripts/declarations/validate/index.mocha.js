@@ -37,7 +37,7 @@ export default async options => {
   if (options.modified) {
     const declarationUtils = new DeclarationUtils(instancePath);
 
-    ({ services: servicesToValidate, servicesTermsTypes } = await declarationUtils.getModifiedServiceTermsTypes());
+    ({ services: servicesToValidate, servicesTermsTypes } = await declarationUtils.getModifiedServicesTermsTypes());
   }
 
   describe('Service declarations validation', async function () {

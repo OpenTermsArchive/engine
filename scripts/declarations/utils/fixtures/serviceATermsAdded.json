@@ -1,0 +1,17 @@
+{
+  "name": "Service",
+  "documents": {
+    "Terms of Service": {
+      "fetch": "https://domain.example/tos",
+      "select": "body"
+    },
+    "Privacy Policy": {
+      "fetch": "https://domain.example/tos",
+      "select": "body"
+    },
+    "Imprint": {
+      "fetch": "https://domain.example/tos",
+      "select": "body"
+    }
+  }
+}

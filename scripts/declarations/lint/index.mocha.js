@@ -31,7 +31,7 @@ export default async options => {
   if (options.modified) {
     const declarationUtils = new DeclarationUtils(instancePath);
 
-    ({ services: servicesToValidate } = await declarationUtils.getModifiedServiceTermsTypes());
+    ({ services: servicesToValidate } = await declarationUtils.getModifiedServicesTermsTypes());
   }
 
   const lintFile = lintAndFixFile(options.fix);

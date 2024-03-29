@@ -1,6 +1,5 @@
 import path from 'path';
 
-import DeepDiff from 'deep-diff';
 import simpleGit from 'simple-git';
 
 export default class DeclarationUtils {
@@ -9,13 +8,17 @@ export default class DeclarationUtils {
     this.defaultBranch = defaultBranch;
   }
 
-  static filePathToServiceId = filePath => path.parse(filePath.replace(/\.history|\.filters/, '')).name;
+  static getServiceIdFromFilePath(filePath) {
+    return path.parse(filePath.replace(/\.history|\.filters/, '')).name;
+  }
 
-  async getJSONFile(path, ref) {
+  async getJSONFromFile(ref, filePath) {
     try {
-      return JSON.parse(await this.git.show([`${ref}:${path}`]));
-    } catch (e) {
-      return {};
+      const fileContent = await this.git.show([`${ref}:${filePath}`]);
+
+      return JSON.parse(fileContent);
+    } catch (error) {
+      return undefined;
     }
   }
 
@@ -24,7 +27,7 @@ export default class DeclarationUtils {
 
     const modifiedFilePaths = (modifiedFilePathsAsString ? modifiedFilePathsAsString.split('\0') : []).filter(str => str !== ''); // split on \0 rather than \n due to the -z option of git diff
 
-    return { modifiedFilePaths, modifiedServicesIds: Array.from(new Set(modifiedFilePaths.map(DeclarationUtils.filePathToServiceId))) };
+    return { modifiedFilePaths, modifiedServicesIds: Array.from(new Set(modifiedFilePaths.map(DeclarationUtils.getServiceIdFromFilePath))) };
   }
 
   async getModifiedServices() {
@@ -33,48 +36,55 @@ export default class DeclarationUtils {
     return modifiedServicesIds;
   }
 
-  async getModifiedServiceTermsTypes() {
-    const { modifiedFilePaths, modifiedServicesIds } = await this.getModifiedData();
+  async getModifiedServicesTermsTypes() {
+    const { modifiedFilePaths } = await this.getModifiedData();
     const servicesTermsTypes = {};
 
     await Promise.all(modifiedFilePaths.map(async modifiedFilePath => {
-      const serviceId = DeclarationUtils.filePathToServiceId(modifiedFilePath);
+      const serviceId = DeclarationUtils.getServiceIdFromFilePath(modifiedFilePath);
 
-      if (!modifiedFilePath.endsWith('.json')) {
-        // Here we should compare AST of both files to detect on which function
-        // change has been made, and then find which terms type depends on this
-        // function.
-        // As this is a complicated process, we will just send back all terms types
-        const declaration = await this.getJSONFile(`declarations/${serviceId}.json`, this.defaultBranch);
+      if (modifiedFilePath.endsWith('.filters.js')) {
+        const declaration = await this.getJSONFromFile(this.defaultBranch, `declarations/${serviceId}.json`);
 
-        return Object.keys(declaration.documents);
-      }
+        // TODO: Implement AST comparison between original and modified "filters" files to detect changes in functions, enabling identification of terms whose types depend on modified functions.
+        // Due to the complexity involved, temporarily returning all term types.
+        servicesTermsTypes[serviceId] = Object.keys(declaration.documents);
 
-      const defaultFile = await this.getJSONFile(modifiedFilePath, this.defaultBranch);
-      const modifiedFile = await this.getJSONFile(modifiedFilePath, 'HEAD');
-
-      const diff = DeepDiff.diff(defaultFile, modifiedFile);
-
-      if (!diff) {
-        // This can happen if only a lint has been applied to a document
         return;
       }
 
-      const modifiedTermsTypes = diff.reduce((acc, { path }) => {
-        if (modifiedFilePath.includes('.history')) {
-          acc.add(path[0]);
-        } else if (path[0] == 'documents') {
-          acc.add(path[1]);
+      const originalService = await this.getJSONFromFile(this.defaultBranch, modifiedFilePath);
+      const modifiedService = await this.getJSONFromFile('HEAD', modifiedFilePath);
+      const modifiedServiceTermsTypes = Object.keys(modifiedService.documents);
+
+      if (!originalService) {
+        servicesTermsTypes[serviceId] = modifiedServiceTermsTypes;
+
+        return;
+      }
+
+      const originalServiceTermsTypes = Object.keys(originalService.documents);
+      const addedTermsTypes = modifiedServiceTermsTypes.filter(termsType => !originalServiceTermsTypes.includes(termsType));
+
+      if (addedTermsTypes.length) {
+        servicesTermsTypes[serviceId] = addedTermsTypes;
+      }
+
+      const potentiallyModifiedTermsTypes = modifiedServiceTermsTypes.filter(termsType => originalServiceTermsTypes.includes(termsType));
+
+      potentiallyModifiedTermsTypes.forEach(termsType => {
+        const areTermsModified = JSON.stringify(originalService.documents[termsType]) != JSON.stringify(modifiedService.documents[termsType]);
+
+        if (!areTermsModified) {
+          return;
         }
 
-        return acc;
-      }, new Set());
-
-      servicesTermsTypes[serviceId] = Array.from(new Set([ ...servicesTermsTypes[serviceId] || [], ...modifiedTermsTypes ]));
+        servicesTermsTypes[serviceId] = [termsType].concat(servicesTermsTypes[serviceId] || []);
+      });
     }));
 
     return {
-      services: modifiedServicesIds,
+      services: Object.keys(servicesTermsTypes),
       servicesTermsTypes,
     };
   }
