@@ -7,7 +7,11 @@ export default class SourceDocument {
     this.filters = filters;
     this.content = content;
     this.mimeType = mimeType;
-    this.id = new URL(location).pathname.split('/').filter(Boolean).join('-');
+    try {
+      this.id = new URL(location).pathname.split('/').filter(Boolean).join('-');
+    } catch (error) {
+      console.log(error.message, location);
+    }
   }
 
   get cssSelectors() {
