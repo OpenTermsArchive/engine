@@ -10,6 +10,11 @@
       "fetch": "https://domain.example/privacy",
       "select": "body",
       "remove": "footer"
+    },
+    "Imprint": {
+      "fetch": "https://domain.example/imprint",
+      "select": "body",
+      "remove": "footer"
     }
   }
 }

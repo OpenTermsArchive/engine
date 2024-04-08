@@ -123,7 +123,7 @@ describe('DeclarationUtils', () => {
         expect(await declarationUtils.getModifiedServicesAndTermsTypes()).to.deep.equal({
           services: [ 'ServiceA', 'ServiceB' ],
           servicesTermsTypes: {
-            ServiceA: [ 'Privacy Policy', 'Terms of Service' ],
+            ServiceA: [ 'Imprint', 'Privacy Policy', 'Terms of Service' ],
             ServiceB: ['Terms of Service'],
           },
         });
