@@ -37,7 +37,7 @@ const removeLatestCommit = async () => {
 };
 
 describe('DeclarationUtils', () => {
-  describe('#getModifiedServicesTermsTypes', () => {
+  describe('#getModifiedServicesAndTermsTypes', () => {
     before(async () => {
       await loadFixtures();
       await setupRepository();
@@ -50,7 +50,7 @@ describe('DeclarationUtils', () => {
       after(() => removeLatestCommit());
 
       it('returns the service ID and the updated terms type', async () => {
-        expect(await declarationUtils.getModifiedServicesTermsTypes()).to.deep.equal({
+        expect(await declarationUtils.getModifiedServicesAndTermsTypes()).to.deep.equal({
           services: ['ServiceA'],
           servicesTermsTypes: { ServiceA: ['Terms of Service'] },
         });
@@ -62,7 +62,7 @@ describe('DeclarationUtils', () => {
       after(() => removeLatestCommit());
 
       it('returns the service ID and the added terms type', async () => {
-        expect(await declarationUtils.getModifiedServicesTermsTypes()).to.deep.equal({
+        expect(await declarationUtils.getModifiedServicesAndTermsTypes()).to.deep.equal({
           services: ['ServiceA'],
           servicesTermsTypes: { ServiceA: ['Imprint'] },
         });
@@ -74,7 +74,7 @@ describe('DeclarationUtils', () => {
       after(() => removeLatestCommit());
 
       it('returns the added service ID along with the associated terms type', async () => {
-        expect(await declarationUtils.getModifiedServicesTermsTypes()).to.deep.equal({
+        expect(await declarationUtils.getModifiedServicesAndTermsTypes()).to.deep.equal({
           services: ['ServiceB'],
           servicesTermsTypes: { ServiceB: ['Terms of Service'] },
         });
@@ -89,7 +89,7 @@ describe('DeclarationUtils', () => {
       });
 
       it('returns no services and no terms types', async () => {
-        expect(await declarationUtils.getModifiedServicesTermsTypes()).to.deep.equal({
+        expect(await declarationUtils.getModifiedServicesAndTermsTypes()).to.deep.equal({
           services: [],
           servicesTermsTypes: {},
         });
@@ -101,7 +101,7 @@ describe('DeclarationUtils', () => {
       after(() => removeLatestCommit());
 
       it('returns no services and no terms types', async () => {
-        expect(await declarationUtils.getModifiedServicesTermsTypes()).to.deep.equal({
+        expect(await declarationUtils.getModifiedServicesAndTermsTypes()).to.deep.equal({
           services: [],
           servicesTermsTypes: {},
         });
@@ -120,7 +120,7 @@ describe('DeclarationUtils', () => {
       });
 
       it('returns the services IDs and the updated terms types', async () => {
-        expect(await declarationUtils.getModifiedServicesTermsTypes()).to.deep.equal({
+        expect(await declarationUtils.getModifiedServicesAndTermsTypes()).to.deep.equal({
           services: [ 'ServiceA', 'ServiceB' ],
           servicesTermsTypes: {
             ServiceA: [ 'Privacy Policy', 'Terms of Service' ],

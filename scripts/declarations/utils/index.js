@@ -36,7 +36,7 @@ export default class DeclarationUtils {
     return modifiedServicesIds;
   }
 
-  async getModifiedServicesTermsTypes() {
+  async getModifiedServicesAndTermsTypes() {
     const { modifiedFilePaths } = await this.getModifiedData();
     const servicesTermsTypes = {};
 
