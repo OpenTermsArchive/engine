@@ -10,7 +10,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 let declarationUtils;
 
-const INSTANCE_PATH = path.resolve(__dirname, './test');
+const SUBJECT_PATH = path.resolve(__dirname, './test');
 
 const FIXTURES = {
   serviceA: { path: './fixtures/serviceA.json' },
@@ -27,7 +27,7 @@ const COMMIT_PATHS = {
 };
 
 const commitChanges = async (filePath, content) => {
-  await fs.writeFile(path.resolve(INSTANCE_PATH, filePath), JSON.stringify(content, null, 2));
+  await fs.writeFile(path.resolve(SUBJECT_PATH, filePath), JSON.stringify(content, null, 2));
   await declarationUtils.git.add(filePath);
   await declarationUtils.git.commit('Update declarations', filePath);
 };
@@ -36,18 +36,18 @@ const removeLatestCommit = async () => {
   await declarationUtils.git.reset('hard', ['HEAD~1']);
 };
 
-describe('DeclarationUtils', () => {
+describe.only('DeclarationUtils', () => {
   describe('#getModifiedServicesAndTermsTypes', () => {
     before(async () => {
       await loadFixtures();
       await setupRepository();
     });
 
-    after(() => fs.rm(INSTANCE_PATH, { recursive: true }));
+    after(() => fs.rm(SUBJECT_PATH, { recursive: true }));
 
     context('when an existing declaration has been modified', () => {
       before(() => commitChanges(COMMIT_PATHS.serviceA, FIXTURES.serviceATermsUpdated.content));
-      after(() => removeLatestCommit());
+      after(removeLatestCommit);
 
       it('returns the service ID and the updated terms type', async () => {
         expect(await declarationUtils.getModifiedServicesAndTermsTypes()).to.deep.equal({
@@ -59,7 +59,7 @@ describe('DeclarationUtils', () => {
 
     context('when new terms are declared in an existing declaration', () => {
       before(() => commitChanges(COMMIT_PATHS.serviceA, FIXTURES.serviceATermsAdded.content));
-      after(() => removeLatestCommit());
+      after(removeLatestCommit);
 
       it('returns the service ID and the added terms type', async () => {
         expect(await declarationUtils.getModifiedServicesAndTermsTypes()).to.deep.equal({
@@ -71,7 +71,7 @@ describe('DeclarationUtils', () => {
 
     context('when a new declaration has been added', () => {
       before(() => commitChanges(COMMIT_PATHS.serviceB, FIXTURES.serviceB.content));
-      after(() => removeLatestCommit());
+      after(removeLatestCommit);
 
       it('returns the added service ID along with the associated terms type', async () => {
         expect(await declarationUtils.getModifiedServicesAndTermsTypes()).to.deep.equal({
@@ -84,7 +84,7 @@ describe('DeclarationUtils', () => {
     context('when a declaration has been removed', () => {
       before(() => removeLatestCommit(declarationUtils.git));
       after(async () => {
-        await fs.mkdir(path.resolve(INSTANCE_PATH, './declarations'), { recursive: true });
+        await fs.mkdir(path.resolve(SUBJECT_PATH, './declarations'), { recursive: true });
         await commitChanges(COMMIT_PATHS.serviceA, FIXTURES.serviceA.content);
       });
 
@@ -98,7 +98,7 @@ describe('DeclarationUtils', () => {
 
     context('when terms are removed from an existing declaration', () => {
       before(() => commitChanges(COMMIT_PATHS.serviceA, FIXTURES.serviceATermsRemoved.content));
-      after(() => removeLatestCommit());
+      after(removeLatestCommit);
 
       it('returns no services and no terms types', async () => {
         expect(await declarationUtils.getModifiedServicesAndTermsTypes()).to.deep.equal({
@@ -141,9 +141,9 @@ async function loadFixtures() {
 }
 
 async function setupRepository() {
-  await fs.mkdir(path.resolve(INSTANCE_PATH, './declarations'), { recursive: true });
+  await fs.mkdir(path.resolve(SUBJECT_PATH, './declarations'), { recursive: true });
 
-  declarationUtils = new DeclarationUtils(INSTANCE_PATH, 'main');
+  declarationUtils = new DeclarationUtils(SUBJECT_PATH, 'main');
   await declarationUtils.git.init();
   await declarationUtils.git.addConfig('user.name', 'Open Terms Archive Testing Bot');
   await declarationUtils.git.addConfig('user.email', 'testing-bot@opentermsarchive.org');
