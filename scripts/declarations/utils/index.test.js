@@ -45,7 +45,7 @@ describe('DeclarationUtils', () => {
 
     after(() => fs.rm(INSTANCE_PATH, { recursive: true }));
 
-    context('when terms has been modified in an existing service', () => {
+    context('when an existing declaration has been modified', () => {
       before(() => commitChanges(COMMIT_PATHS.serviceA, FIXTURES.serviceATermsUpdated.content));
       after(() => removeLatestCommit());
 
@@ -57,7 +57,7 @@ describe('DeclarationUtils', () => {
       });
     });
 
-    context('when terms has been added to an existing service', () => {
+    context('when new terms are declared in an existing declaration', () => {
       before(() => commitChanges(COMMIT_PATHS.serviceA, FIXTURES.serviceATermsAdded.content));
       after(() => removeLatestCommit());
 
@@ -69,7 +69,7 @@ describe('DeclarationUtils', () => {
       });
     });
 
-    context('when a whole service has been added', () => {
+    context('when a new declaration has been added', () => {
       before(() => commitChanges(COMMIT_PATHS.serviceB, FIXTURES.serviceB.content));
       after(() => removeLatestCommit());
 
@@ -81,7 +81,7 @@ describe('DeclarationUtils', () => {
       });
     });
 
-    context('when a service has been removed', () => {
+    context('when a declaration has been removed', () => {
       before(() => removeLatestCommit(declarationUtils.git));
       after(async () => {
         await fs.mkdir(path.resolve(INSTANCE_PATH, './declarations'), { recursive: true });
@@ -96,7 +96,7 @@ describe('DeclarationUtils', () => {
       });
     });
 
-    context('when a terms has been removed from an existing service', () => {
+    context('when terms are removed from an existing declaration', () => {
       before(() => commitChanges(COMMIT_PATHS.serviceA, FIXTURES.serviceATermsRemoved.content));
       after(() => removeLatestCommit());
 
@@ -108,7 +108,7 @@ describe('DeclarationUtils', () => {
       });
     });
 
-    context('when there is a combination of a service updated and a service added', () => {
+    context('when there is a combination of an updated declaration and an added declaration', () => {
       before(async () => {
         await commitChanges(COMMIT_PATHS.serviceA, FIXTURES.serviceAMultipleTermsUpdated.content);
         await commitChanges(COMMIT_PATHS.serviceB, FIXTURES.serviceB.content);
