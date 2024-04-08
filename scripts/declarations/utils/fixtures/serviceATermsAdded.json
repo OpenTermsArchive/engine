@@ -6,11 +6,11 @@
       "select": "body"
     },
     "Privacy Policy": {
-      "fetch": "https://domain.example/tos",
+      "fetch": "https://domain.example/privacy",
       "select": "body"
     },
     "Imprint": {
-      "fetch": "https://domain.example/tos",
+      "fetch": "https://domain.example/imprint",
       "select": "body"
     }
   }
