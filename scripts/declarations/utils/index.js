@@ -18,7 +18,7 @@ export default class DeclarationUtils {
 
       return JSON.parse(fileContent);
     } catch (error) {
-      return undefined;
+      // the file does not exist on the requested branch or it is not parsable
     }
   }
 
