@@ -46,8 +46,7 @@ export default class DeclarationUtils {
       if (modifiedFilePath.endsWith('.filters.js')) {
         const declaration = await this.getJSONFromFile(this.defaultBranch, `declarations/${serviceId}.json`);
 
-        // TODO: Implement AST comparison between original and modified "filters" files to detect changes in functions, enabling identification of terms whose types depend on modified functions.
-        // Due to the complexity involved, temporarily returning all term types.
+         // Considering how rarely filters are used, simply return all term types that could potentially be impacted to spare implementing a function change check
         servicesTermsTypes[serviceId] = Object.keys(declaration.documents);
 
         return;
