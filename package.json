@@ -65,7 +65,6 @@
     "croner": "^4.3.6",
     "cross-env": "^7.0.3",
     "datauri": "^4.1.0",
-    "deep-diff": "^1.0.2",
     "dotenv": "^10.0.0",
     "eslint": "^8.53.0",
     "eslint-config-airbnb-base": "^15.0.0",
