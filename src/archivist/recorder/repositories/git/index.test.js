@@ -18,7 +18,7 @@ const { expect } = chai;
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-const RECORDER_PATH = path.resolve(__dirname, '../../../../..', config.get('recorder.versions.storage.git.path'));
+const RECORDER_PATH = path.resolve(__dirname, '../../../../..', config.get('@opentermsarchive/engine.recorder.versions.storage.git.path'));
 
 const SERVICE_PROVIDER_ID = 'test_service';
 const TERMS_TYPE = 'Terms of Service';
@@ -52,15 +52,15 @@ describe('GitRepository', () => {
       git = new Git({
         path: RECORDER_PATH,
         author: {
-          name: config.get('recorder.versions.storage.git.author.name'),
-          email: config.get('recorder.versions.storage.git.author.email'),
+          name: config.get('@opentermsarchive/engine.recorder.versions.storage.git.author.name'),
+          email: config.get('@opentermsarchive/engine.recorder.versions.storage.git.author.email'),
         },
       });
 
       await git.initialize();
 
       subject = new GitRepository({
-        ...config.get('recorder.versions.storage.git'),
+        ...config.get('@opentermsarchive/engine.recorder.versions.storage.git'),
         path: RECORDER_PATH,
       });
 
@@ -91,7 +91,7 @@ describe('GitRepository', () => {
           ([commit] = await git.log());
         });
 
-        after(async () => subject.removeAll());
+        after(() => subject.removeAll());
 
         it('saves the record', () => {
           expect(numberOfRecordsAfter).to.equal(numberOfRecordsBefore + 1);
@@ -158,7 +158,7 @@ describe('GitRepository', () => {
           ([commit] = await git.log());
         });
 
-        after(async () => subject.removeAll());
+        after(() => subject.removeAll());
 
         it('saves the record', () => {
           expect(numberOfRecordsAfter).to.equal(numberOfRecordsBefore + 1);
@@ -194,7 +194,7 @@ describe('GitRepository', () => {
           numberOfRecordsAfter = (await git.log()).length;
         });
 
-        after(async () => subject.removeAll());
+        after(() => subject.removeAll());
 
         it('does not save the record', () => {
           expect(numberOfRecordsAfter).to.equal(numberOfRecordsBefore);
@@ -232,7 +232,7 @@ describe('GitRepository', () => {
           ([commit] = await git.log());
         });
 
-        after(async () => subject.removeAll());
+        after(() => subject.removeAll());
 
         it('saves the record', () => {
           expect(numberOfRecordsAfter).to.equal(numberOfRecordsBefore + 1);
@@ -263,10 +263,10 @@ describe('GitRepository', () => {
           ([commit] = await git.log());
         });
 
-        after(async () => subject.removeAll());
+        after(() => subject.removeAll());
 
         it('stores snapshot ID', () => {
-          expect(commit.body).to.include(config.get('recorder.versions.storage.git.snapshotIdentiferTemplate').replace(SNAPSHOT_ID_MARKER, SNAPSHOT_ID));
+          expect(commit.body).to.include(config.get('@opentermsarchive/engine.recorder.versions.storage.git.snapshotIdentiferTemplate').replace(SNAPSHOT_ID_MARKER, SNAPSHOT_ID));
         });
 
         it('stores the service ID', () => {
@@ -295,11 +295,11 @@ describe('GitRepository', () => {
           ([commit] = await git.log());
         });
 
-        after(async () => subject.removeAll());
+        after(() => subject.removeAll());
 
         it('stores snapshots IDs', () => {
-          expect(commit.body).to.include(config.get('recorder.versions.storage.git.snapshotIdentiferTemplate').replace(SNAPSHOT_ID_MARKER, SNAPSHOT_ID_1));
-          expect(commit.body).to.include(config.get('recorder.versions.storage.git.snapshotIdentiferTemplate').replace(SNAPSHOT_ID_MARKER, SNAPSHOT_ID_2));
+          expect(commit.body).to.include(config.get('@opentermsarchive/engine.recorder.versions.storage.git.snapshotIdentiferTemplate').replace(SNAPSHOT_ID_MARKER, SNAPSHOT_ID_1));
+          expect(commit.body).to.include(config.get('@opentermsarchive/engine.recorder.versions.storage.git.snapshotIdentiferTemplate').replace(SNAPSHOT_ID_MARKER, SNAPSHOT_ID_2));
         });
 
         it('stores the number of source documents', () => {
@@ -333,7 +333,7 @@ describe('GitRepository', () => {
         (record = await subject.findById(id));
       });
 
-      after(async () => subject.removeAll());
+      after(() => subject.removeAll());
 
       it('returns a Version object', () => {
         expect(record).to.be.an.instanceof(Version);
@@ -412,7 +412,7 @@ describe('GitRepository', () => {
             recordFound = await subject.findByDate(SERVICE_PROVIDER_ID, TERMS_TYPE, oneHourBeforeFetchDateLater);
           });
 
-          after(async () => subject.removeAll());
+          after(() => subject.removeAll());
 
           it('returns a Version object', () => {
             expect(recordFound).to.be.an.instanceof(Version);
@@ -478,7 +478,7 @@ describe('GitRepository', () => {
         (records = await subject.findAll());
       });
 
-      after(async () => subject.removeAll());
+      after(() => subject.removeAll());
 
       it('returns all records', () => {
         expect(records.length).to.equal(3);
@@ -527,7 +527,7 @@ describe('GitRepository', () => {
         (count = await subject.count());
       });
 
-      after(async () => subject.removeAll());
+      after(() => subject.removeAll());
 
       it('returns the proper count', async () => {
         expect(count).to.equal(3);
@@ -562,7 +562,7 @@ describe('GitRepository', () => {
             latestRecord = await subject.findLatest(SERVICE_PROVIDER_ID, TERMS_TYPE);
           });
 
-          after(async () => subject.removeAll());
+          after(() => subject.removeAll());
 
           it('returns a Version object', () => {
             expect(latestRecord).to.be.an.instanceof(Version);
@@ -637,7 +637,7 @@ describe('GitRepository', () => {
         }
       });
 
-      after(async () => subject.removeAll());
+      after(() => subject.removeAll());
 
       it('iterates through all records', async () => {
         expect(ids).to.have.members(expectedIds);
@@ -655,15 +655,15 @@ describe('GitRepository', () => {
       git = new Git({
         path: RECORDER_PATH,
         author: {
-          name: config.get('recorder.snapshots.storage.git.author.name'),
-          email: config.get('recorder.snapshots.storage.git.author.email'),
+          name: config.get('@opentermsarchive/engine.recorder.snapshots.storage.git.author.name'),
+          email: config.get('@opentermsarchive/engine.recorder.snapshots.storage.git.author.email'),
         },
       });
 
       await git.initialize();
 
       subject = new GitRepository({
-        ...config.get('recorder.snapshots.storage.git'),
+        ...config.get('@opentermsarchive/engine.recorder.snapshots.storage.git'),
         path: RECORDER_PATH,
       });
 
@@ -695,7 +695,7 @@ describe('GitRepository', () => {
           ([commit] = await git.log());
         });
 
-        after(async () => subject.removeAll());
+        after(() => subject.removeAll());
 
         it('saves the record', () => {
           expect(numberOfRecordsAfter).to.equal(numberOfRecordsBefore + 1);
@@ -765,7 +765,7 @@ describe('GitRepository', () => {
           ([commit] = await git.log());
         });
 
-        after(async () => subject.removeAll());
+        after(() => subject.removeAll());
 
         it('saves the record', () => {
           expect(numberOfRecordsAfter).to.equal(numberOfRecordsBefore + 1);
@@ -803,7 +803,7 @@ describe('GitRepository', () => {
           numberOfRecordsAfter = (await git.log()).length;
         });
 
-        after(async () => subject.removeAll());
+        after(() => subject.removeAll());
 
         it('does not save the record', () => {
           expect(numberOfRecordsAfter).to.equal(numberOfRecordsBefore);
@@ -831,7 +831,7 @@ describe('GitRepository', () => {
           ([commit] = await git.log());
         });
 
-        after(async () => subject.removeAll());
+        after(() => subject.removeAll());
 
         it('saves the record', () => {
           expect(numberOfRecordsAfter).to.equal(numberOfRecordsBefore + 1);
@@ -863,7 +863,7 @@ describe('GitRepository', () => {
           ([commit] = await git.log());
         });
 
-        after(async () => subject.removeAll());
+        after(() => subject.removeAll());
 
         it('saves the record', () => {
           expect(numberOfRecordsAfter).to.equal(numberOfRecordsBefore + 1);
@@ -899,7 +899,7 @@ describe('GitRepository', () => {
         (record = await subject.findById(id));
       });
 
-      after(async () => subject.removeAll());
+      after(() => subject.removeAll());
 
       it('returns a Snapshot object', () => {
         expect(record).to.be.an.instanceof(Snapshot);
@@ -986,7 +986,7 @@ describe('GitRepository', () => {
         (records = await subject.findAll());
       });
 
-      after(async () => subject.removeAll());
+      after(() => subject.removeAll());
 
       it('returns all records', () => {
         expect(records.length).to.equal(3);
@@ -1035,7 +1035,7 @@ describe('GitRepository', () => {
         (count = await subject.count());
       });
 
-      after(async () => subject.removeAll());
+      after(() => subject.removeAll());
 
       it('returns the proper count', async () => {
         expect(count).to.equal(3);
@@ -1070,7 +1070,7 @@ describe('GitRepository', () => {
             latestRecord = await subject.findLatest(SERVICE_PROVIDER_ID, TERMS_TYPE);
           });
 
-          after(async () => subject.removeAll());
+          after(() => subject.removeAll());
 
           it('returns a Snapshot object', () => {
             expect(latestRecord).to.be.an.instanceof(Snapshot);
@@ -1102,7 +1102,7 @@ describe('GitRepository', () => {
             latestRecord = await subject.findLatest(SERVICE_PROVIDER_ID, TERMS_TYPE);
           });
 
-          after(async () => subject.removeAll());
+          after(() => subject.removeAll());
 
           it('returns the latest record id', () => {
             expect(latestRecord.id).to.include(lastSnapshotId);
@@ -1174,7 +1174,7 @@ describe('GitRepository', () => {
         }
       });
 
-      after(async () => subject.removeAll());
+      after(() => subject.removeAll());
 
       it('iterates through all records', async () => {
         expect(ids).to.have.members(expectedIds);
@@ -1236,14 +1236,14 @@ describe('GitRepository', () => {
       git = new Git({
         path: RECORDER_PATH,
         author: {
-          name: config.get('recorder.versions.storage.git.author.name'),
-          email: config.get('recorder.versions.storage.git.author.email'),
+          name: config.get('@opentermsarchive/engine.recorder.versions.storage.git.author.name'),
+          email: config.get('@opentermsarchive/engine.recorder.versions.storage.git.author.email'),
         },
       });
 
       await git.initialize();
       subject = new GitRepository({
-        ...config.get('recorder.versions.storage.git'),
+        ...config.get('@opentermsarchive/engine.recorder.versions.storage.git'),
         path: RECORDER_PATH,
       });
 
@@ -1266,7 +1266,7 @@ describe('GitRepository', () => {
       /* eslint-enable no-await-in-loop */
     });
 
-    after(async () => subject.removeAll());
+    after(() => subject.removeAll());
 
     describe('Records attributes', () => {
       describe('#isExtractOnly', () => {

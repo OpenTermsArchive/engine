@@ -20,8 +20,8 @@ const { expect } = chai;
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const ROOT_PATH = path.resolve(__dirname, '../../');
-const SNAPSHOTS_PATH = path.resolve(ROOT_PATH, config.get('recorder.snapshots.storage.git.path'));
-const VERSIONS_PATH = path.resolve(ROOT_PATH, config.get('recorder.versions.storage.git.path'));
+const SNAPSHOTS_PATH = path.resolve(ROOT_PATH, config.get('@opentermsarchive/engine.recorder.snapshots.storage.git.path'));
+const VERSIONS_PATH = path.resolve(ROOT_PATH, config.get('@opentermsarchive/engine.recorder.versions.storage.git.path'));
 
 const MIME_TYPE = 'text/html';
 const FETCH_DATE = new Date('2000-01-02T12:00:00.000Z');
@@ -55,8 +55,8 @@ describe('Archivist', function () {
     gitVersion = new Git({
       path: VERSIONS_PATH,
       author: {
-        name: config.get('recorder.versions.storage.git.author.name'),
-        email: config.get('recorder.versions.storage.git.author.email'),
+        name: config.get('@opentermsarchive/engine.recorder.versions.storage.git.author.name'),
+        email: config.get('@opentermsarchive/engine.recorder.versions.storage.git.author.email'),
       },
     });
     await gitVersion.initialize();
@@ -72,8 +72,8 @@ describe('Archivist', function () {
       nock('https://www.servicea.example').get('/tos').reply(200, serviceASnapshotExpectedContent, { 'Content-Type': 'text/html' });
       nock('https://www.serviceb.example').get('/privacy').reply(200, serviceBSnapshotExpectedContent, { 'Content-Type': 'application/pdf' });
       app = new Archivist({
-        recorderConfig: config.get('recorder'),
-        fetcherConfig: config.get('fetcher'),
+        recorderConfig: config.get('@opentermsarchive/engine.recorder'),
+        fetcherConfig: config.get('@opentermsarchive/engine.fetcher'),
       });
       await app.initialize();
     });
@@ -152,8 +152,8 @@ describe('Archivist', function () {
             nock('https://www.servicea.example').get('/tos').reply(200, serviceASnapshotExpectedContent, { 'Content-Type': 'text/html' });
             nock('https://www.serviceb.example').get('/privacy').reply(200, serviceBSnapshotExpectedContent, { 'Content-Type': 'application/pdf' });
             app = new Archivist({
-              recorderConfig: config.get('recorder'),
-              fetcherConfig: config.get('fetcher'),
+              recorderConfig: config.get('@opentermsarchive/engine.recorder'),
+              fetcherConfig: config.get('@opentermsarchive/engine.fetcher'),
             });
 
             await app.initialize();
@@ -212,8 +212,8 @@ describe('Archivist', function () {
             nock('https://www.servicea.example').get('/tos').reply(200, serviceASnapshotExpectedContent, { 'Content-Type': 'text/html' });
             nock('https://www.serviceb.example').get('/privacy').reply(200, serviceBSnapshotExpectedContent, { 'Content-Type': 'application/pdf' });
             app = new Archivist({
-              recorderConfig: config.get('recorder'),
-              fetcherConfig: config.get('fetcher'),
+              recorderConfig: config.get('@opentermsarchive/engine.recorder'),
+              fetcherConfig: config.get('@opentermsarchive/engine.fetcher'),
             });
 
             await app.initialize();
@@ -251,8 +251,8 @@ describe('Archivist', function () {
     describe('#attach', () => {
       before(async () => {
         app = new Archivist({
-          recorderConfig: config.get('recorder'),
-          fetcherConfig: config.get('fetcher'),
+          recorderConfig: config.get('@opentermsarchive/engine.recorder'),
+          fetcherConfig: config.get('@opentermsarchive/engine.fetcher'),
         });
         await app.initialize();
 
@@ -287,8 +287,8 @@ describe('Archivist', function () {
         nock('https://www.servicea.example').get('/tos').reply(200, serviceASnapshotExpectedContent, { 'Content-Type': 'text/html' });
 
         app = new Archivist({
-          recorderConfig: config.get('recorder'),
-          fetcherConfig: config.get('fetcher'),
+          recorderConfig: config.get('@opentermsarchive/engine.recorder'),
+          fetcherConfig: config.get('@opentermsarchive/engine.fetcher'),
         });
         await app.initialize();
 
@@ -338,8 +338,8 @@ describe('Archivist', function () {
 
     before(async () => {
       app = new Archivist({
-        recorderConfig: config.get('recorder'),
-        fetcherConfig: config.get('fetcher'),
+        recorderConfig: config.get('@opentermsarchive/engine.recorder'),
+        fetcherConfig: config.get('@opentermsarchive/engine.fetcher'),
       });
       await app.initialize();
 

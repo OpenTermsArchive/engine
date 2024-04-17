@@ -12,7 +12,7 @@ const MIME_TYPE = 'text/html';
 const FETCH_DATE = new Date('2000-01-01T12:00:00.000Z');
 const FETCH_DATE_LATER = new Date('2000-01-02T12:00:00.000Z');
 
-describe('Recorder', () => {
+describe.only('Recorder', () => {
   const SERVICE_ID = 'test_service';
   const TYPE = 'Terms of Service';
 
@@ -21,7 +21,7 @@ describe('Recorder', () => {
       let recorder;
 
       before(async () => {
-        const options = config.util.cloneDeep(config.recorder);
+        const options = config.util.cloneDeep(config.get('@opentermsarchive/engine.recorder'));
 
         options.versions.storage.type = repositoryType;
         options.snapshots.storage.type = repositoryType;
@@ -30,7 +30,7 @@ describe('Recorder', () => {
         await recorder.initialize();
       });
 
-      after(async () => recorder.finalize());
+      after(() => recorder.finalize());
 
       context('Snapshot', () => {
         describe('#record', () => {
@@ -41,7 +41,7 @@ describe('Recorder', () => {
           let record;
 
           context('when a required param is missing', () => {
-            after(async () => recorder.snapshotsRepository.removeAll());
+            after(() => recorder.snapshotsRepository.removeAll());
 
             Snapshot.REQUIRED_PARAMS.forEach(testedRequiredParam => {
               context(`when "${testedRequiredParam}" is missing`, () => {
@@ -82,7 +82,7 @@ describe('Recorder', () => {
               record = await recorder.snapshotsRepository.findLatest(SERVICE_ID, TYPE);
             });
 
-            after(async () => recorder.snapshotsRepository.removeAll());
+            after(() => recorder.snapshotsRepository.removeAll());
 
             it('records the snapshot with the proper content', async () => {
               expect(await record.content).to.equal(CONTENT);
@@ -120,7 +120,7 @@ describe('Recorder', () => {
               record = await recorder.snapshotsRepository.findLatest(SERVICE_ID, TYPE);
             });
 
-            after(async () => recorder.snapshotsRepository.removeAll());
+            after(() => recorder.snapshotsRepository.removeAll());
 
             it('records the snapshot with the proper content', async () => {
               expect(await record.content).to.equal(UPDATED_CONTENT);
@@ -156,7 +156,7 @@ describe('Recorder', () => {
               record = await recorder.snapshotsRepository.findLatest(SERVICE_ID, TYPE);
             });
 
-            after(async () => recorder.snapshotsRepository.removeAll());
+            after(() => recorder.snapshotsRepository.removeAll());
 
             it('does not record the snapshot', async () => {
               expect(id).to.not.be.ok;
@@ -175,7 +175,7 @@ describe('Recorder', () => {
           let record;
 
           context('when a required param is missing', () => {
-            after(async () => recorder.versionsRepository.removeAll());
+            after(() => recorder.versionsRepository.removeAll());
 
             Version.REQUIRED_PARAMS.forEach(testedRequiredParam => {
               context(`when "${testedRequiredParam}" is missing`, () => {
@@ -216,7 +216,7 @@ describe('Recorder', () => {
               record = await recorder.versionsRepository.findLatest(SERVICE_ID, TYPE);
             });
 
-            after(async () => recorder.versionsRepository.removeAll());
+            after(() => recorder.versionsRepository.removeAll());
 
             it('records the version with the proper content', async () => {
               expect(await record.content).to.equal(CONTENT);
@@ -254,7 +254,7 @@ describe('Recorder', () => {
               record = await recorder.versionsRepository.findLatest(SERVICE_ID, TYPE);
             });
 
-            after(async () => recorder.versionsRepository.removeAll());
+            after(() => recorder.versionsRepository.removeAll());
 
             it('records the version with the proper content', async () => {
               expect(await record.content).to.equal(UPDATED_CONTENT);
@@ -294,7 +294,7 @@ describe('Recorder', () => {
               record = await recorder.versionsRepository.findLatest(SERVICE_ID, TYPE);
             });
 
-            after(async () => recorder.versionsRepository.removeAll());
+            after(() => recorder.versionsRepository.removeAll());
 
             it('does not record any version', async () => {
               expect(id).to.not.be.ok;
@@ -323,7 +323,7 @@ describe('Recorder', () => {
                 record = await recorder.versionsRepository.findLatest(SERVICE_ID, TYPE);
               });
 
-              after(async () => recorder.versionsRepository.removeAll()); after(async () => recorder.versionsRepository.removeAll());
+              after(() => recorder.versionsRepository.removeAll());
 
               it('records the version with the proper content', async () => {
                 expect(await record.content).to.equal(CONTENT);
@@ -362,7 +362,7 @@ describe('Recorder', () => {
                 record = await recorder.versionsRepository.findLatest(SERVICE_ID, TYPE);
               });
 
-              after(async () => recorder.versionsRepository.removeAll());
+              after(() => recorder.versionsRepository.removeAll());
 
               it('records the version with the proper content', async () => {
                 expect(await record.content).to.equal(UPDATED_CONTENT);
@@ -403,7 +403,7 @@ describe('Recorder', () => {
                 record = await recorder.versionsRepository.findLatest(SERVICE_ID, TYPE);
               });
 
-              after(async () => recorder.versionsRepository.removeAll());
+              after(() => recorder.versionsRepository.removeAll());
 
               it('does not record any version', async () => {
                 expect(id).to.not.be.ok;

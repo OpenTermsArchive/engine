@@ -9,7 +9,7 @@ import SourceDocument from './sourceDocument.js';
 import Terms from './terms.js';
 
 const fs = fsApi.promises;
-const declarationsPath = path.resolve(process.cwd(), config.get('services.declarationsPath'));
+const declarationsPath = path.resolve(process.cwd(), config.get('@opentermsarchive/engine.services.declarationsPath'));
 
 export async function load(servicesIdsToLoad = []) {
   let servicesIds = await getDeclaredServicesIds();

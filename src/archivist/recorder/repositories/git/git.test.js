@@ -8,7 +8,7 @@ import config from 'config';
 import Git from './git.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const RECORDER_PATH = path.resolve(__dirname, '../../../../../', config.get('recorder.versions.storage.git.path'));
+const RECORDER_PATH = path.resolve(__dirname, '../../../../../', config.get('@opentermsarchive/engine.recorder.versions.storage.git.path'));
 
 describe('Git', () => {
   const DEFAULT_CONTENT = 'default content';
@@ -19,8 +19,8 @@ describe('Git', () => {
     subject = new Git({
       path: RECORDER_PATH,
       author: {
-        name: config.get('recorder.versions.storage.git.author.name'),
-        email: config.get('recorder.versions.storage.git.author.email'),
+        name: config.get('@opentermsarchive/engine.recorder.versions.storage.git.author.name'),
+        email: config.get('@opentermsarchive/engine.recorder.versions.storage.git.author.email'),
       },
     });
 

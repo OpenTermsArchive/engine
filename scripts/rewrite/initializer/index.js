@@ -36,7 +36,7 @@ export async function initTargetRepo(targetRepoPath) {
   }
   await fs.mkdir(targetRepoPath);
 
-  const targetRepo = await new Git({ path: targetRepoPath, author: config.get('recorder.versions.storage.git.author') });
+  const targetRepo = await new Git({ path: targetRepoPath, author: config.get('@opentermsarchive/engine.recorder.versions.storage.git.author') });
 
   await targetRepo.initialize();
 

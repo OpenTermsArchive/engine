@@ -15,7 +15,7 @@ import MongoRepository from './index.js';
 const { expect } = chai;
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-const { connectionURI } = config.get('recorder.snapshots.storage.mongo');
+const { connectionURI } = config.get('@opentermsarchive/engine.recorder.snapshots.storage.mongo');
 const client = new MongoClient(connectionURI);
 
 const SERVICE_PROVIDER_ID = 'test_service';
@@ -41,12 +41,12 @@ describe('MongoRepository', () => {
 
   context('Version', () => {
     before(async () => {
-      subject = new MongoRepository(config.get('recorder.versions.storage.mongo'));
+      subject = new MongoRepository(config.get('@opentermsarchive/engine.recorder.versions.storage.mongo'));
       await subject.initialize();
       await client.connect();
-      const db = client.db(config.get('recorder.versions.storage.mongo.database'));
+      const db = client.db(config.get('@opentermsarchive/engine.recorder.versions.storage.mongo.database'));
 
-      collection = db.collection(config.get('recorder.versions.storage.mongo.collection'));
+      collection = db.collection(config.get('@opentermsarchive/engine.recorder.versions.storage.mongo.collection'));
     });
 
     describe('#save', () => {
@@ -81,7 +81,7 @@ describe('MongoRepository', () => {
           }));
         });
 
-        after(async () => subject.removeAll());
+        after(() => subject.removeAll());
 
         it('saves the record', () => {
           expect(numberOfRecordsAfter).to.equal(numberOfRecordsBefore + 1);
@@ -156,7 +156,7 @@ describe('MongoRepository', () => {
           }).limit(1).sort({ created_at: -1 }).toArray());
         });
 
-        after(async () => subject.removeAll());
+        after(() => subject.removeAll());
 
         it('saves the record', () => {
           expect(numberOfRecordsAfter).to.equal(numberOfRecordsBefore + 1);
@@ -200,7 +200,7 @@ describe('MongoRepository', () => {
           }).count();
         });
 
-        after(async () => subject.removeAll());
+        after(() => subject.removeAll());
 
         it('does not save the record', () => {
           expect(numberOfRecordsAfter).to.equal(numberOfRecordsBefore);
@@ -248,7 +248,7 @@ describe('MongoRepository', () => {
           }).limit(1).sort({ created_at: -1 }).toArray());
         });
 
-        after(async () => subject.removeAll());
+        after(() => subject.removeAll());
 
         it('saves the record', () => {
           expect(numberOfRecordsAfter).to.equal(numberOfRecordsBefore + 1);
@@ -279,7 +279,7 @@ describe('MongoRepository', () => {
           }));
         });
 
-        after(async () => subject.removeAll());
+        after(() => subject.removeAll());
 
         it('stores snapshot ID', () => {
           const snapshotIds = mongoDocument.snapshotIds.map(id => id.toString());
@@ -315,7 +315,7 @@ describe('MongoRepository', () => {
           }));
         });
 
-        after(async () => subject.removeAll());
+        after(() => subject.removeAll());
 
         it('stores snapshots IDs', () => {
           const snapshotIds = mongoDocument.snapshotIds.map(id => id.toString());
@@ -350,7 +350,7 @@ describe('MongoRepository', () => {
         (record = await subject.findById(id));
       });
 
-      after(async () => subject.removeAll());
+      after(() => subject.removeAll());
 
       it('returns a Version object', () => {
         expect(record).to.be.an.instanceof(Version);
@@ -429,7 +429,7 @@ describe('MongoRepository', () => {
             recordFound = await subject.findByDate(SERVICE_PROVIDER_ID, TERMS_TYPE, oneHourBeforeFetchDateLater);
           });
 
-          after(async () => subject.removeAll());
+          after(() => subject.removeAll());
 
           it('returns a Version object', () => {
             expect(recordFound).to.be.an.instanceof(Version);
@@ -481,7 +481,7 @@ describe('MongoRepository', () => {
         (records = await subject.findAll());
       });
 
-      after(async () => subject.removeAll());
+      after(() => subject.removeAll());
 
       it('returns all records', () => {
         expect(records.length).to.equal(3);
@@ -528,7 +528,7 @@ describe('MongoRepository', () => {
         (count = await subject.count());
       });
 
-      after(async () => subject.removeAll());
+      after(() => subject.removeAll());
 
       it('returns the proper count', async () => {
         expect(count).to.equal(3);
@@ -566,7 +566,7 @@ describe('MongoRepository', () => {
             );
           });
 
-          after(async () => subject.removeAll());
+          after(() => subject.removeAll());
 
           it('returns a Version object', () => {
             expect(latestRecord).to.be.an.instanceof(Version);
@@ -638,7 +638,7 @@ describe('MongoRepository', () => {
         }
       });
 
-      after(async () => subject.removeAll());
+      after(() => subject.removeAll());
 
       it('iterates through all records', async () => {
         expect(ids).to.have.members(expectedIds);
@@ -652,12 +652,12 @@ describe('MongoRepository', () => {
 
   context('Snapshot', () => {
     before(async () => {
-      subject = new MongoRepository(config.get('recorder.snapshots.storage.mongo'));
+      subject = new MongoRepository(config.get('@opentermsarchive/engine.recorder.snapshots.storage.mongo'));
       await subject.initialize();
       await client.connect();
-      const db = client.db(config.get('recorder.snapshots.storage.mongo.database'));
+      const db = client.db(config.get('@opentermsarchive/engine.recorder.snapshots.storage.mongo.database'));
 
-      collection = db.collection(config.get('recorder.snapshots.storage.mongo.collection'));
+      collection = db.collection(config.get('@opentermsarchive/engine.recorder.snapshots.storage.mongo.collection'));
     });
 
     describe('#save', () => {
@@ -693,7 +693,7 @@ describe('MongoRepository', () => {
           }));
         });
 
-        after(async () => subject.removeAll());
+        after(() => subject.removeAll());
 
         it('saves the record', () => {
           expect(numberOfRecordsAfter).to.equal(numberOfRecordsBefore + 1);
@@ -772,7 +772,7 @@ describe('MongoRepository', () => {
           }).limit(1).sort({ created_at: -1 }).toArray());
         });
 
-        after(async () => subject.removeAll());
+        after(() => subject.removeAll());
 
         it('saves the record', () => {
           expect(numberOfRecordsAfter).to.equal(numberOfRecordsBefore + 1);
@@ -816,7 +816,7 @@ describe('MongoRepository', () => {
           }).count();
         });
 
-        after(async () => subject.removeAll());
+        after(() => subject.removeAll());
 
         it('does not save the record', () => {
           expect(numberOfRecordsAfter).to.equal(numberOfRecordsBefore);
@@ -855,7 +855,7 @@ describe('MongoRepository', () => {
           }));
         });
 
-        after(async () => subject.removeAll());
+        after(() => subject.removeAll());
 
         it('saves the record', () => {
           expect(numberOfRecordsAfter).to.equal(numberOfRecordsBefore + 1);
@@ -894,7 +894,7 @@ describe('MongoRepository', () => {
         (record = await subject.findById(id));
       });
 
-      after(async () => subject.removeAll());
+      after(() => subject.removeAll());
 
       it('returns a Snapshot object', () => {
         expect(record).to.be.an.instanceof(Snapshot);
@@ -978,7 +978,7 @@ describe('MongoRepository', () => {
         (records = await subject.findAll());
       });
 
-      after(async () => subject.removeAll());
+      after(() => subject.removeAll());
 
       it('returns all records', () => {
         expect(records.length).to.equal(3);
@@ -1025,7 +1025,7 @@ describe('MongoRepository', () => {
         (count = await subject.count());
       });
 
-      after(async () => subject.removeAll());
+      after(() => subject.removeAll());
 
       it('returns the proper count', async () => {
         expect(count).to.equal(3);
@@ -1063,7 +1063,7 @@ describe('MongoRepository', () => {
             );
           });
 
-          after(async () => subject.removeAll());
+          after(() => subject.removeAll());
 
           it('returns a Snapshot object', () => {
             expect(latestRecord).to.be.an.instanceof(Snapshot);
@@ -1103,7 +1103,7 @@ describe('MongoRepository', () => {
             latestRecord = await subject.findLatest(SERVICE_PROVIDER_ID, TERMS_TYPE);
           });
 
-          after(async () => subject.removeAll());
+          after(() => subject.removeAll());
 
           it('returns the latest record id', () => {
             expect(latestRecord.id).to.include(lastSnapshotId);
@@ -1177,7 +1177,7 @@ describe('MongoRepository', () => {
         }
       });
 
-      after(async () => subject.removeAll());
+      after(() => subject.removeAll());
 
       it('iterates through all records', async () => {
         expect(ids).to.have.members(expectedIds);

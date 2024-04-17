@@ -1,27 +1,29 @@
 {
-  "recorder": {
-    "versions": {
-      "storage": {
-        "git": {
-          "path": "../versions",
-          "publish": true
+  "@opentermsarchive/engine": {
+    "recorder": {
+      "versions": {
+        "storage": {
+          "git": {
+            "path": "../versions",
+            "publish": true
+          }
+        }
+      },
+      "snapshots": {
+        "storage": {
+          "git": {
+            "path": "../snapshots",
+            "publish": true
+          }
         }
       }
     },
-    "snapshots": {
-      "storage": {
-        "git": {
-          "path": "../snapshots",
-          "publish": true
-        }
+    "logger": {
+      "sendMailOnError": {
+        "to": "admin@opentermsarchive.org",
+        "from": "noreply@opentermsarchive.org",
+        "sendWarnings": false
       }
-    }
-  },
-  "logger": {
-    "sendMailOnError": {
-      "to": "admin@opentermsarchive.org",
-      "from": "noreply@opentermsarchive.org",
-      "sendWarnings": false
     }
   }
 }

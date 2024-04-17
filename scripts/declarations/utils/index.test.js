@@ -36,7 +36,7 @@ const removeLatestCommit = async () => {
   await declarationUtils.git.reset('hard', ['HEAD~1']);
 };
 
-describe.only('DeclarationUtils', () => {
+describe('DeclarationUtils', () => {
   describe('#getModifiedServicesAndTermsTypes', () => {
     before(async () => {
       await loadFixtures();
