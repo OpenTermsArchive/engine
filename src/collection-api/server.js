@@ -1,3 +1,5 @@
+import path from 'path';
+
 import config from 'config';
 import express from 'express';
 
@@ -13,7 +15,7 @@ if (process.env.NODE_ENV !== 'test') {
   app.use(loggerMiddleware);
 }
 
-const BASE_PATH = `${config.get('@opentermsarchive/engine.collection-api.basePath')}/v1`;
+const BASE_PATH = path.join('/', config.get('@opentermsarchive/engine.collection-api.basePath'), 'v1');
 
 app.use(BASE_PATH, apiRouter(BASE_PATH));
 app.use(errorsMiddleware);
