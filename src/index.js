@@ -8,8 +8,8 @@ import Reporter from './reporter/index.js';
 
 export default async function track({ services, types, extractOnly, schedule }) {
   const archivist = new Archivist({
-    recorderConfig: config.get('recorder'),
-    fetcherConfig: config.get('fetcher'),
+    recorderConfig: config.get('@opentermsarchive/engine.recorder'),
+    fetcherConfig: config.get('@opentermsarchive/engine.fetcher'),
   });
 
   archivist.attach(logger);
@@ -51,7 +51,7 @@ export default async function track({ services, types, extractOnly, schedule }) 
   if (process.env.GITHUB_TOKEN) {
     if (config.has('reporter.githubIssues.repositories.declarations')) {
       try {
-        const reporter = new Reporter(config.get('reporter'));
+        const reporter = new Reporter(config.get('@opentermsarchive/engine.reporter'));
 
         await reporter.initialize();
         archivist.attach(reporter);

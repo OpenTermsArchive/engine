@@ -18,7 +18,7 @@ const { expect } = chai;
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-const RECORDER_PATH = path.resolve(__dirname, '../../../../..', config.get('recorder.versions.storage.git.path'));
+const RECORDER_PATH = path.resolve(__dirname, '../../../../..', config.get('@opentermsarchive/engine.recorder.versions.storage.git.path'));
 
 const SERVICE_PROVIDER_ID = 'test_service';
 const TERMS_TYPE = 'Terms of Service';
@@ -52,15 +52,15 @@ describe('GitRepository', () => {
       git = new Git({
         path: RECORDER_PATH,
         author: {
-          name: config.get('recorder.versions.storage.git.author.name'),
-          email: config.get('recorder.versions.storage.git.author.email'),
+          name: config.get('@opentermsarchive/engine.recorder.versions.storage.git.author.name'),
+          email: config.get('@opentermsarchive/engine.recorder.versions.storage.git.author.email'),
         },
       });
 
       await git.initialize();
 
       subject = new GitRepository({
-        ...config.get('recorder.versions.storage.git'),
+        ...config.get('@opentermsarchive/engine.recorder.versions.storage.git'),
         path: RECORDER_PATH,
       });
 
@@ -266,7 +266,7 @@ describe('GitRepository', () => {
         after(async () => subject.removeAll());
 
         it('stores snapshot ID', () => {
-          expect(commit.body).to.include(config.get('recorder.versions.storage.git.snapshotIdentiferTemplate').replace(SNAPSHOT_ID_MARKER, SNAPSHOT_ID));
+          expect(commit.body).to.include(config.get('@opentermsarchive/engine.recorder.versions.storage.git.snapshotIdentiferTemplate').replace(SNAPSHOT_ID_MARKER, SNAPSHOT_ID));
         });
 
         it('stores the service ID', () => {
@@ -295,11 +295,11 @@ describe('GitRepository', () => {
           ([commit] = await git.log());
         });
 
-        after(async () => subject.removeAll());
+        after(() => subject.removeAll());
 
         it('stores snapshots IDs', () => {
-          expect(commit.body).to.include(config.get('recorder.versions.storage.git.snapshotIdentiferTemplate').replace(SNAPSHOT_ID_MARKER, SNAPSHOT_ID_1));
-          expect(commit.body).to.include(config.get('recorder.versions.storage.git.snapshotIdentiferTemplate').replace(SNAPSHOT_ID_MARKER, SNAPSHOT_ID_2));
+          expect(commit.body).to.include(config.get('@opentermsarchive/engine.recorder.versions.storage.git.snapshotIdentiferTemplate').replace(SNAPSHOT_ID_MARKER, SNAPSHOT_ID_1));
+          expect(commit.body).to.include(config.get('@opentermsarchive/engine.recorder.versions.storage.git.snapshotIdentiferTemplate').replace(SNAPSHOT_ID_MARKER, SNAPSHOT_ID_2));
         });
 
         it('stores the number of source documents', () => {
@@ -655,15 +655,15 @@ describe('GitRepository', () => {
       git = new Git({
         path: RECORDER_PATH,
         author: {
-          name: config.get('recorder.snapshots.storage.git.author.name'),
-          email: config.get('recorder.snapshots.storage.git.author.email'),
+          name: config.get('@opentermsarchive/engine.recorder.snapshots.storage.git.author.name'),
+          email: config.get('@opentermsarchive/engine.recorder.snapshots.storage.git.author.email'),
         },
       });
 
       await git.initialize();
 
       subject = new GitRepository({
-        ...config.get('recorder.snapshots.storage.git'),
+        ...config.get('@opentermsarchive/engine.recorder.snapshots.storage.git'),
         path: RECORDER_PATH,
       });
 
@@ -1236,14 +1236,14 @@ describe('GitRepository', () => {
       git = new Git({
         path: RECORDER_PATH,
         author: {
-          name: config.get('recorder.versions.storage.git.author.name'),
-          email: config.get('recorder.versions.storage.git.author.email'),
+          name: config.get('@opentermsarchive/engine.recorder.versions.storage.git.author.name'),
+          email: config.get('@opentermsarchive/engine.recorder.versions.storage.git.author.email'),
         },
       });
 
       await git.initialize();
       subject = new GitRepository({
-        ...config.get('recorder.versions.storage.git'),
+        ...config.get('@opentermsarchive/engine.recorder.versions.storage.git'),
         path: RECORDER_PATH,
       });
 

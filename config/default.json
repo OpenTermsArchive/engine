@@ -1,65 +1,67 @@
 {
-  "services": {
-    "declarationsPath": "./declarations"
-  },
-  "recorder": {
-    "versions": {
-      "storage": {
-        "type": "git",
-        "git": {
-          "path": "./data/versions",
-          "publish": false,
-          "snapshotIdentiferTemplate": "./data/snapshots/%SNAPSHOT_ID",
-          "author": {
-            "name": "Open Terms Archive Bot",
-            "email": "bot@opentermsarchive.org"
+  "@opentermsarchive/engine": {
+    "services": {
+      "declarationsPath": "./declarations"
+    },
+    "recorder": {
+      "versions": {
+        "storage": {
+          "type": "git",
+          "git": {
+            "path": "./data/versions",
+            "publish": false,
+            "snapshotIdentiferTemplate": "./data/snapshots/%SNAPSHOT_ID",
+            "author": {
+              "name": "Open Terms Archive Bot",
+              "email": "bot@opentermsarchive.org"
+            }
+          }
+        }
+      },
+      "snapshots": {
+        "storage": {
+          "type": "git",
+          "git": {
+            "path": "./data/snapshots",
+            "publish": false,
+            "author": {
+              "name": "Open Terms Archive Bot",
+              "email": "bot@opentermsarchive.org"
+            }
+          },
+          "mongo": {
+            "connectionURI": "mongodb://127.0.0.1:27017",
+            "database": "open-terms-archive",
+            "collection": "snapshots"
           }
         }
       }
     },
-    "snapshots": {
-      "storage": {
-        "type": "git",
-        "git": {
-          "path": "./data/snapshots",
-          "publish": false,
-          "author": {
-            "name": "Open Terms Archive Bot",
-            "email": "bot@opentermsarchive.org"
-          }
-        },
-        "mongo": {
-          "connectionURI": "mongodb://127.0.0.1:27017",
-          "database": "open-terms-archive",
-          "collection": "snapshots"
-        }
-      }
-    }
-  },
-  "fetcher": {
-    "waitForElementsTimeout": 10000,
-    "navigationTimeout": 30000,
-    "language": "en"
-  },
-  "logger": {
-    "smtp": {
-      "host": "smtp-relay.sendinblue.com",
-      "username": "admin@opentermsarchive.org"
+    "fetcher": {
+      "waitForElementsTimeout": 10000,
+      "navigationTimeout": 30000,
+      "language": "en"
     },
-    "sendMailOnError": false
-  },
-  "notifier": {
-    "sendInBlue": {
-      "updatesListId": 850,
-      "updateTemplateId": 7
+    "logger": {
+      "smtp": {
+        "host": "smtp-relay.sendinblue.com",
+        "username": "admin@opentermsarchive.org"
+      },
+      "sendMailOnError": false
+    },
+    "notifier": {
+      "sendInBlue": {
+        "updatesListId": 850,
+        "updateTemplateId": 7
+      }
+    },
+    "dataset": {
+      "title": "sandbox",
+      "versionsRepositoryURL": "https://github.com/OpenTermsArchive/sandbox"
+    },
+    "api": {
+      "port": 3000,
+      "basePath": "/api"
     }
-  },
-  "dataset": {
-    "title": "sandbox",
-    "versionsRepositoryURL": "https://github.com/OpenTermsArchive/sandbox"
-  },
-  "api": {
-    "port": 3000,
-    "basePath": "/api"
   }
 }

@@ -15,7 +15,7 @@ import MongoRepository from './index.js';
 const { expect } = chai;
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-const { connectionURI } = config.get('recorder.snapshots.storage.mongo');
+const { connectionURI } = config.get('@opentermsarchive/engine.recorder.snapshots.storage.mongo');
 const client = new MongoClient(connectionURI);
 
 const SERVICE_PROVIDER_ID = 'test_service';
@@ -41,12 +41,12 @@ describe('MongoRepository', () => {
 
   context('Version', () => {
     before(async () => {
-      subject = new MongoRepository(config.get('recorder.versions.storage.mongo'));
+      subject = new MongoRepository(config.get('@opentermsarchive/engine.recorder.versions.storage.mongo'));
       await subject.initialize();
       await client.connect();
-      const db = client.db(config.get('recorder.versions.storage.mongo.database'));
+      const db = client.db(config.get('@opentermsarchive/engine.recorder.versions.storage.mongo.database'));
 
-      collection = db.collection(config.get('recorder.versions.storage.mongo.collection'));
+      collection = db.collection(config.get('@opentermsarchive/engine.recorder.versions.storage.mongo.collection'));
     });
 
     describe('#save', () => {
@@ -652,12 +652,12 @@ describe('MongoRepository', () => {
 
   context('Snapshot', () => {
     before(async () => {
-      subject = new MongoRepository(config.get('recorder.snapshots.storage.mongo'));
+      subject = new MongoRepository(config.get('@opentermsarchive/engine.recorder.snapshots.storage.mongo'));
       await subject.initialize();
       await client.connect();
-      const db = client.db(config.get('recorder.snapshots.storage.mongo.database'));
+      const db = client.db(config.get('@opentermsarchive/engine.recorder.snapshots.storage.mongo.database'));
 
-      collection = db.collection(config.get('recorder.snapshots.storage.mongo.collection'));
+      collection = db.collection(config.get('@opentermsarchive/engine.recorder.snapshots.storage.mongo.collection'));
     });
 
     describe('#save', () => {

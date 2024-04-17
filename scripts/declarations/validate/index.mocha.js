@@ -19,7 +19,7 @@ const fs = fsApi.promises;
 const MIN_DOC_LENGTH = 100;
 const SLOW_DOCUMENT_THRESHOLD = 10 * 1000; // number of milliseconds after which a document fetch is considered slow
 
-const declarationsPath = path.resolve(process.cwd(), config.get('services.declarationsPath'));
+const declarationsPath = path.resolve(process.cwd(), config.get('@opentermsarchive/engine.services.declarationsPath'));
 const instancePath = path.resolve(declarationsPath, '../');
 
 export default async options => {
@@ -114,7 +114,7 @@ export default async options => {
                         url: location,
                         executeClientScripts,
                         cssSelectors: sourceDocument.cssSelectors,
-                        config: config.get('fetcher'),
+                        config: config.get('@opentermsarchive/engine.fetcher'),
                       }));
                     });
 
@@ -160,7 +160,7 @@ export default async options => {
                         url: sourceDocument.location,
                         executeClientScripts: sourceDocument.executeClientScripts,
                         cssSelectors: sourceDocument.cssSelectors,
-                        config: config.get('fetcher'),
+                        config: config.get('@opentermsarchive/engine.fetcher'),
                       }));
                       const secondFilteredContent = await extract(sourceDocument);
 

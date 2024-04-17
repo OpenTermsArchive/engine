@@ -54,13 +54,13 @@ let client;
 }());
 
 async function initialize() {
-  client = new MongoClient(config.get('import.mongo.connectionURI'));
+  client = new MongoClient(config.get('@opentermsarchive/engine.import.mongo.connectionURI'));
 
   await client.connect();
-  const db = client.db(config.get('import.mongo.database'));
+  const db = client.db(config.get('@opentermsarchive/engine.import.mongo.database'));
 
-  collection = db.collection(config.get('import.mongo.commitsCollection'));
-  sourceRepository = new Git({ path: path.resolve(ROOT_PATH, config.get('import.sourcePath')) });
+  collection = db.collection(config.get('@opentermsarchive/engine.import.mongo.commitsCollection'));
+  sourceRepository = new Git({ path: path.resolve(ROOT_PATH, config.get('@opentermsarchive/engine.import.sourcePath')) });
 
   await sourceRepository.initialize();
 }

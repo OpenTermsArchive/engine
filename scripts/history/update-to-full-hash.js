@@ -15,18 +15,18 @@ const ROOT_PATH = path.resolve(__dirname, '../../');
   console.time('Total time');
 
   const versionsRepository = new GitRepository({
-    ...config.get('recorder.versions.storage.git'),
+    ...config.get('@opentermsarchive/engine.recorder.versions.storage.git'),
     path: path.resolve(ROOT_PATH, './data/france-elections-versions'),
   });
 
   const versionsTargetRepository = new GitRepository({
-    ...config.get('recorder.versions.storage.git'),
+    ...config.get('@opentermsarchive/engine.recorder.versions.storage.git'),
     prefixMessageToSnapshotId: 'This version was recorded after filtering snapshot https://github.com/OpenTermsArchive/france-elections-snapshots/commit/',
     path: path.resolve(ROOT_PATH, './data/france-elections-versions-hash-updated-test'),
   });
 
   const snapshotsRepository = new GitRepository({
-    ...config.get('recorder.snapshots.storage.git'),
+    ...config.get('@opentermsarchive/engine.recorder.snapshots.storage.git'),
     path: path.resolve(ROOT_PATH, './data/france-elections-snapshots'),
   });
 
