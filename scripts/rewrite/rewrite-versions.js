@@ -21,9 +21,9 @@ const MARKDOWN_MIME_TYPE = 'text/markdown';
 
 export const SNAPSHOTS_SOURCE_PATH = path.resolve(
   ROOT_PATH,
-  config.get('rewrite.snapshotsSourcePath'),
+  config.get('@opentermsarchive/engine.rewrite.snapshotsSourcePath'),
 );
-export const VERSIONS_TARGET_PATH = path.resolve(ROOT_PATH, config.get('recorder.versions.storage.git.path'));
+export const VERSIONS_TARGET_PATH = path.resolve(ROOT_PATH, config.get('@opentermsarchive/engine.recorder.versions.storage.git.path'));
 
 const initialize = process.argv.includes('--init');
 
@@ -42,7 +42,7 @@ let recorder;
 
   await renamer.loadRules();
   const servicesDeclarations = await services.loadWithHistory();
-  const sourceRepo = new Git({ path: SNAPSHOTS_SOURCE_PATH, author: config.get('recorder.snapshots.storage.git.author') });
+  const sourceRepo = new Git({ path: SNAPSHOTS_SOURCE_PATH, author: config.get('@opentermsarchive/engine.recorder.snapshots.storage.git.author') });
 
   await sourceRepo.initialize();
 
@@ -60,11 +60,11 @@ let recorder;
 
   recorder = new Recorder({
     versionsRepository: new GitRepository({
-      ...config.get('recorder.versions.storage.git'),
+      ...config.get('@opentermsarchive/engine.recorder.versions.storage.git'),
       path: VERSIONS_TARGET_PATH,
     }),
     snapshotsRepository: new GitRepository({
-      ...config.get('recorder.snapshots.storage.git'),
+      ...config.get('@opentermsarchive/engine.recorder.snapshots.storage.git'),
       path: SNAPSHOTS_SOURCE_PATH,
     }),
   });

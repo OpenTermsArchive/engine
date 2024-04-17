@@ -48,8 +48,8 @@ describe('Export', () => {
     before(async function () {
       this.timeout(10000);
       repository = new GitRepository({
-        ...config.get('recorder.versions.storage.git'),
-        path: path.resolve(__dirname, '../../../', config.get('recorder.versions.storage.git.path')),
+        ...config.get('@opentermsarchive/engine.recorder.versions.storage.git'),
+        path: path.resolve(__dirname, '../../../', config.get('@opentermsarchive/engine.recorder.versions.storage.git.path')),
       });
 
       await repository.initialize();

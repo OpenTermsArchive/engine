@@ -13,12 +13,12 @@ if (process.env.NODE_ENV !== 'test') {
   app.use(loggerMiddleware);
 }
 
-const BASE_PATH = `${config.get('api.basePath')}/v1`;
+const BASE_PATH = `${config.get('@opentermsarchive/engine.api.basePath')}/v1`;
 
 app.use(BASE_PATH, apiRouter(BASE_PATH));
 app.use(errorsMiddleware);
 
-const port = config.get('api.port');
+const port = config.get('@opentermsarchive/engine.api.port');
 
 app.listen(port);
 

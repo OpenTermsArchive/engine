@@ -12,7 +12,7 @@ ${body({ servicesCount, firstVersionDate, lastVersionDate })}`;
 export function title({ releaseDate }) {
   releaseDate = releaseDate.toLocaleDateString(LOCALE, DATE_OPTIONS);
 
-  const title = config.get('dataset.title');
+  const title = config.get('@opentermsarchive/engine.dataset.title');
 
   return `${title} — ${releaseDate} dataset`;
 }
@@ -21,7 +21,7 @@ export function body({ servicesCount, firstVersionDate, lastVersionDate }) {
   firstVersionDate = firstVersionDate.toLocaleDateString(LOCALE, DATE_OPTIONS);
   lastVersionDate = lastVersionDate.toLocaleDateString(LOCALE, DATE_OPTIONS);
 
-  const versionsRepositoryURL = config.get('dataset.versionsRepositoryURL');
+  const versionsRepositoryURL = config.get('@opentermsarchive/engine.dataset.versionsRepositoryURL');
 
   return `This dataset consolidates the contractual documents of ${servicesCount} service providers, in all their versions that were accessible online between ${firstVersionDate} and ${lastVersionDate}.
 

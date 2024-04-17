@@ -21,7 +21,7 @@ describe('Recorder', () => {
       let recorder;
 
       before(async () => {
-        const options = config.util.cloneDeep(config.recorder);
+        const options = config.util.cloneDeep(config.get('@opentermsarchive/engine.recorder'));
 
         options.versions.storage.type = repositoryType;
         options.snapshots.storage.type = repositoryType;

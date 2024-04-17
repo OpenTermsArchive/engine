@@ -1,49 +1,51 @@
 {
-  "services": {
-    "declarationsPath": "./test/services"
-  },
-  "recorder": {
-    "versions": {
-      "storage": {
-        "git": {
-          "path": "./test/data/versions",
-          "publish": false,
-          "snapshotIdentiferTemplate": "https://github.com/OpenTermsArchive/sandbox-snapshots/commit/%SNAPSHOT_ID",
-          "author": {
-            "name": "Open Terms Archive Testing Bot",
-            "email": "bot@opentermsarchive.org"
+  "@opentermsarchive/engine": {
+    "services": {
+      "declarationsPath": "./test/services"
+    },
+    "recorder": {
+      "versions": {
+        "storage": {
+          "git": {
+            "path": "./test/data/versions",
+            "publish": false,
+            "snapshotIdentiferTemplate": "https://github.com/OpenTermsArchive/sandbox-snapshots/commit/%SNAPSHOT_ID",
+            "author": {
+              "name": "Open Terms Archive Testing Bot",
+              "email": "bot@opentermsarchive.org"
+            }
+          },
+          "mongo": {
+            "connectionURI": "mongodb://127.0.0.1:27017",
+            "database": "open-terms-archive-test",
+            "collection": "versions"
           }
-        },
-        "mongo": {
-          "connectionURI": "mongodb://127.0.0.1:27017",
-          "database": "open-terms-archive-test",
-          "collection": "versions"
+        }
+      },
+      "snapshots": {
+        "storage": {
+          "git": {
+            "path": "./test/data/snapshots",
+            "publish": false,
+            "author": {
+              "name": "Open Terms Archive Testing Bot",
+              "email": "bot@opentermsarchive.org"
+            }
+          },
+          "mongo": {
+            "connectionURI": "mongodb://127.0.0.1:27017",
+            "database": "open-terms-archive-test",
+            "collection": "snapshots"
+          }
         }
       }
     },
-    "snapshots": {
-      "storage": {
-        "git": {
-          "path": "./test/data/snapshots",
-          "publish": false,
-          "author": {
-            "name": "Open Terms Archive Testing Bot",
-            "email": "bot@opentermsarchive.org"
-          }
-        },
-        "mongo": {
-          "connectionURI": "mongodb://127.0.0.1:27017",
-          "database": "open-terms-archive-test",
-          "collection": "snapshots"
-        }
-      }
+    "fetcher": {
+      "waitForElementsTimeout": 1000
+    },
+    "dataset": {
+      "title": "sandbox",
+      "versionsRepositoryURL": "https://github.com/OpenTermsArchive/sandbox-versions"
     }
-  },
-  "fetcher": {
-    "waitForElementsTimeout": 1000
-  },
-  "dataset": {
-    "title": "sandbox",
-    "versionsRepositoryURL": "https://github.com/OpenTermsArchive/sandbox-versions"
   }
 }
