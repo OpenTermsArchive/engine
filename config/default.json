@@ -1,5 +1,5 @@
 {
-  "@opentermsarchive/engine": {
+  "opentermsarchive/engine": {
     "services": {
       "declarationsPath": "./declarations"
     },

@@ -13,7 +13,7 @@ dotenv.config();
 export default async function publish({ archivePath, releaseDate, stats }) {
   const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
 
-  const [ owner, repo ] = url.parse(config.get('@opentermsarchive/engine.dataset.versionsRepositoryURL')).pathname.split('/').filter(component => component);
+  const [ owner, repo ] = url.parse(config.get('opentermsarchive/engine.dataset.versionsRepositoryURL')).pathname.split('/').filter(component => component);
 
   const tagName = `${path.basename(archivePath, path.extname(archivePath))}`; // use archive filename as Git tag
 
