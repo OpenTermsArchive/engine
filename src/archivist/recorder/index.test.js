@@ -12,7 +12,7 @@ const MIME_TYPE = 'text/html';
 const FETCH_DATE = new Date('2000-01-01T12:00:00.000Z');
 const FETCH_DATE_LATER = new Date('2000-01-02T12:00:00.000Z');
 
-describe.only('Recorder', () => {
+describe('Recorder', () => {
   const SERVICE_ID = 'test_service';
   const TYPE = 'Terms of Service';
 
@@ -88,11 +88,11 @@ describe.only('Recorder', () => {
               expect(await record.content).to.equal(CONTENT);
             });
 
-            it('returns the record id', async () => {
+            it('returns the record id', () => {
               expect(record.id).to.include(id);
             });
 
-            it('states that it is the first record', async () => {
+            it('states that it is the first record', () => {
               expect(isFirstRecord).to.be.true;
             });
           });
@@ -126,11 +126,11 @@ describe.only('Recorder', () => {
               expect(await record.content).to.equal(UPDATED_CONTENT);
             });
 
-            it('returns the record id', async () => {
+            it('returns the record id', () => {
               expect(record.id).to.include(id);
             });
 
-            it('states that it is not the first record', async () => {
+            it('states that it is not the first record', () => {
               expect(isFirstRecord).to.be.false;
             });
           });
@@ -158,7 +158,7 @@ describe.only('Recorder', () => {
 
             after(() => recorder.snapshotsRepository.removeAll());
 
-            it('does not record the snapshot', async () => {
+            it('does not record the snapshot', () => {
               expect(id).to.not.be.ok;
             });
           });
@@ -222,11 +222,11 @@ describe.only('Recorder', () => {
               expect(await record.content).to.equal(CONTENT);
             });
 
-            it('returns the record id', async () => {
+            it('returns the record id', () => {
               expect(record.id).to.include(id);
             });
 
-            it('states that it is the first record', async () => {
+            it('states that it is the first record', () => {
               expect(isFirstRecord).to.be.true;
             });
           });
@@ -260,15 +260,15 @@ describe.only('Recorder', () => {
               expect(await record.content).to.equal(UPDATED_CONTENT);
             });
 
-            it('records in the version that it is not an extracted only version', async () => {
+            it('records in the version that it is not an extracted only version', () => {
               expect(record.isExtractOnly).to.equal(false);
             });
 
-            it('returns the record id', async () => {
+            it('returns the record id', () => {
               expect(record.id).to.include(id);
             });
 
-            it('states that it is not the first record', async () => {
+            it('states that it is not the first record', () => {
               expect(isFirstRecord).to.be.false;
             });
           });
@@ -296,7 +296,7 @@ describe.only('Recorder', () => {
 
             after(() => recorder.versionsRepository.removeAll());
 
-            it('does not record any version', async () => {
+            it('does not record any version', () => {
               expect(id).to.not.be.ok;
             });
           });
@@ -329,11 +329,11 @@ describe.only('Recorder', () => {
                 expect(await record.content).to.equal(CONTENT);
               });
 
-              it('returns the record id', async () => {
+              it('returns the record id', () => {
                 expect(record.id).to.include(id);
               });
 
-              it('states that it is the first record', async () => {
+              it('states that it is the first record', () => {
                 expect(isFirstRecord).to.be.true;
               });
             });
@@ -368,15 +368,15 @@ describe.only('Recorder', () => {
                 expect(await record.content).to.equal(UPDATED_CONTENT);
               });
 
-              it('records in the version that it is an extracted only version', async () => {
+              it('records in the version that it is an extracted only version', () => {
                 expect(record.isExtractOnly).to.equal(true);
               });
 
-              it('returns the record id', async () => {
+              it('returns the record id', () => {
                 expect(record.id).to.include(id);
               });
 
-              it('states that it is not the first record', async () => {
+              it('states that it is not the first record', () => {
                 expect(isFirstRecord).to.be.false;
               });
             });
@@ -405,7 +405,7 @@ describe.only('Recorder', () => {
 
               after(() => recorder.versionsRepository.removeAll());
 
-              it('does not record any version', async () => {
+              it('does not record any version', () => {
                 expect(id).to.not.be.ok;
               });
             });

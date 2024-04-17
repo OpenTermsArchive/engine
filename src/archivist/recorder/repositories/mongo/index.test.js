@@ -372,7 +372,7 @@ describe('MongoRepository', () => {
         expect(record.termsType).to.equal(TERMS_TYPE);
       });
 
-      it('returns the content', async () => {
+      it('returns the content', () => {
         expect(record.content).to.equal(CONTENT);
       });
 
@@ -493,7 +493,7 @@ describe('MongoRepository', () => {
         }
       });
 
-      it('returns records in ascending order', async () => {
+      it('returns records in ascending order', () => {
         expect(records.map(record => record.fetchDate)).to.deep.equal([ FETCH_DATE_EARLIER, FETCH_DATE, FETCH_DATE_LATER ]);
       });
     });
@@ -530,7 +530,7 @@ describe('MongoRepository', () => {
 
       after(() => subject.removeAll());
 
-      it('returns the proper count', async () => {
+      it('returns the proper count', () => {
         expect(count).to.equal(3);
       });
     });
@@ -589,7 +589,7 @@ describe('MongoRepository', () => {
           latestRecord = await subject.findLatest(SERVICE_PROVIDER_ID, TERMS_TYPE);
         });
 
-        it('returns null', async () => {
+        it('returns null', () => {
           expect(latestRecord).to.equal(null);
         });
       });
@@ -640,11 +640,11 @@ describe('MongoRepository', () => {
 
       after(() => subject.removeAll());
 
-      it('iterates through all records', async () => {
+      it('iterates through all records', () => {
         expect(ids).to.have.members(expectedIds);
       });
 
-      it('iterates in ascending order', async () => {
+      it('iterates in ascending order', () => {
         expect(fetchDates).to.deep.equal([ FETCH_DATE_EARLIER, FETCH_DATE, FETCH_DATE_LATER ]);
       });
     });
@@ -865,7 +865,7 @@ describe('MongoRepository', () => {
           expect(mongoDocument._id.toString()).to.equal(record.id);
         });
 
-        it('stores the proper content', async () => {
+        it('stores the proper content', () => {
           const isSameContent = Buffer.compare(mongoDocument.content.buffer, PDF_CONTENT) == 0;
 
           expect(isSameContent).to.be.true;
@@ -916,7 +916,7 @@ describe('MongoRepository', () => {
         expect(record.termsType).to.equal(TERMS_TYPE);
       });
 
-      it('returns the content', async () => {
+      it('returns the content', () => {
         expect(record.content).to.equal(CONTENT);
       });
 
@@ -990,7 +990,7 @@ describe('MongoRepository', () => {
         }
       });
 
-      it('returns records in ascending order', async () => {
+      it('returns records in ascending order', () => {
         expect(records.map(record => record.fetchDate)).to.deep.equal([ FETCH_DATE_EARLIER, FETCH_DATE, FETCH_DATE_LATER ]);
       });
     });
@@ -1027,7 +1027,7 @@ describe('MongoRepository', () => {
 
       after(() => subject.removeAll());
 
-      it('returns the proper count', async () => {
+      it('returns the proper count', () => {
         expect(count).to.equal(3);
       });
     });
@@ -1109,7 +1109,7 @@ describe('MongoRepository', () => {
             expect(latestRecord.id).to.include(lastSnapshotId);
           });
 
-          it('returns the latest record content', async () => {
+          it('returns the latest record content', () => {
             const isSameContent = Buffer.compare(latestRecord.content, UPDATED_PDF_CONTENT) == 0;
 
             expect(isSameContent).to.be.true;
@@ -1128,7 +1128,7 @@ describe('MongoRepository', () => {
           latestRecord = await subject.findLatest(SERVICE_PROVIDER_ID, TERMS_TYPE);
         });
 
-        it('returns null', async () => {
+        it('returns null', () => {
           expect(latestRecord).to.equal(null);
         });
       });
@@ -1179,11 +1179,11 @@ describe('MongoRepository', () => {
 
       after(() => subject.removeAll());
 
-      it('iterates through all records', async () => {
+      it('iterates through all records', () => {
         expect(ids).to.have.members(expectedIds);
       });
 
-      it('iterates in ascending order', async () => {
+      it('iterates in ascending order', () => {
         expect(fetchDates).to.deep.equal([ FETCH_DATE_EARLIER, FETCH_DATE, FETCH_DATE_LATER ]);
       });
     });

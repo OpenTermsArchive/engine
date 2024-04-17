@@ -355,7 +355,7 @@ describe('GitRepository', () => {
         expect(record.termsType).to.equal(TERMS_TYPE);
       });
 
-      it('returns the content', async () => {
+      it('returns the content', () => {
         expect(record.content).to.equal(CONTENT);
       });
 
@@ -431,7 +431,7 @@ describe('GitRepository', () => {
           recordFound = await subject.findByDate(SERVICE_PROVIDER_ID, TERMS_TYPE);
         });
 
-        it('returns null', async () => {
+        it('returns null', () => {
           expect(recordFound).to.equal(null);
         });
       });
@@ -490,7 +490,7 @@ describe('GitRepository', () => {
         }
       });
 
-      it('returns records in ascending order', async () => {
+      it('returns records in ascending order', () => {
         expect(records.map(record => record.fetchDate)).to.deep.equal([ FETCH_DATE_EARLIER, FETCH_DATE, FETCH_DATE_LATER ]);
       });
     });
@@ -529,7 +529,7 @@ describe('GitRepository', () => {
 
       after(() => subject.removeAll());
 
-      it('returns the proper count', async () => {
+      it('returns the proper count', () => {
         expect(count).to.equal(3);
       });
     });
@@ -572,7 +572,7 @@ describe('GitRepository', () => {
             expect(latestRecord.id).to.include(lastSnapshotId);
           });
 
-          it('returns the latest record content', async () => {
+          it('returns the latest record content', () => {
             expect(latestRecord.content.toString('utf8')).to.equal(UPDATED_FILE_CONTENT);
           });
         });
@@ -585,7 +585,7 @@ describe('GitRepository', () => {
           latestRecord = await subject.findLatest(SERVICE_PROVIDER_ID, TERMS_TYPE);
         });
 
-        it('returns null', async () => {
+        it('returns null', () => {
           expect(latestRecord).to.equal(null);
         });
       });
@@ -639,11 +639,11 @@ describe('GitRepository', () => {
 
       after(() => subject.removeAll());
 
-      it('iterates through all records', async () => {
+      it('iterates through all records', () => {
         expect(ids).to.have.members(expectedIds);
       });
 
-      it('iterates in ascending order', async () => {
+      it('iterates in ascending order', () => {
         expect(fetchDates).to.deep.equal([ FETCH_DATE_EARLIER, FETCH_DATE, FETCH_DATE_LATER ]);
       });
     });
@@ -921,7 +921,7 @@ describe('GitRepository', () => {
         expect(record.termsType).to.equal(TERMS_TYPE);
       });
 
-      it('returns the content', async () => {
+      it('returns the content', () => {
         expect(record.content).to.equal(CONTENT);
       });
 
@@ -998,7 +998,7 @@ describe('GitRepository', () => {
         }
       });
 
-      it('returns records in ascending order', async () => {
+      it('returns records in ascending order', () => {
         expect(records.map(record => record.fetchDate)).to.deep.equal([ FETCH_DATE_EARLIER, FETCH_DATE, FETCH_DATE_LATER ]);
       });
     });
@@ -1037,7 +1037,7 @@ describe('GitRepository', () => {
 
       after(() => subject.removeAll());
 
-      it('returns the proper count', async () => {
+      it('returns the proper count', () => {
         expect(count).to.equal(3);
       });
     });
@@ -1080,7 +1080,7 @@ describe('GitRepository', () => {
             expect(latestRecord.id).to.include(lastSnapshotId);
           });
 
-          it('returns the latest record content', async () => {
+          it('returns the latest record content', () => {
             expect(latestRecord.content.toString('utf8')).to.equal(UPDATED_FILE_CONTENT);
           });
 
@@ -1108,7 +1108,7 @@ describe('GitRepository', () => {
             expect(latestRecord.id).to.include(lastSnapshotId);
           });
 
-          it('returns the latest record content', async () => {
+          it('returns the latest record content', () => {
             expect(latestRecord.content.toString('utf8')).to.equal(PDF_CONTENT);
           });
 
@@ -1125,7 +1125,7 @@ describe('GitRepository', () => {
           latestRecord = await subject.findLatest(SERVICE_PROVIDER_ID, TERMS_TYPE);
         });
 
-        it('returns null', async () => {
+        it('returns null', () => {
           expect(latestRecord).to.equal(null);
         });
       });
@@ -1176,11 +1176,11 @@ describe('GitRepository', () => {
 
       after(() => subject.removeAll());
 
-      it('iterates through all records', async () => {
+      it('iterates through all records', () => {
         expect(ids).to.have.members(expectedIds);
       });
 
-      it('iterates in ascending order', async () => {
+      it('iterates in ascending order', () => {
         expect(fetchDates).to.deep.equal([ FETCH_DATE_EARLIER, FETCH_DATE, FETCH_DATE_LATER ]);
       });
     });
@@ -1333,7 +1333,7 @@ describe('GitRepository', () => {
         }
       });
 
-      it('returns records in ascending order', async () => {
+      it('returns records in ascending order', () => {
         expect(records.map(record => record.fetchDate)).to.deep.equal(expectedDates);
       });
     });
@@ -1345,7 +1345,7 @@ describe('GitRepository', () => {
         (count = await subject.count());
       });
 
-      it('returns the proper count', async () => {
+      it('returns the proper count', () => {
         expect(count).to.equal(expectedIds.length);
       });
     });
@@ -1361,11 +1361,11 @@ describe('GitRepository', () => {
         }
       });
 
-      it('iterates through all records', async () => {
+      it('iterates through all records', () => {
         expect(ids).to.have.members(expectedIds);
       });
 
-      it('iterates in ascending order', async () => {
+      it('iterates in ascending order', () => {
         expect(fetchDates).to.deep.equal(expectedDates);
       });
     });
