@@ -10,6 +10,7 @@ plugins:
   - chai-friendly
   - import
   - json-format
+  - no-only-tests
 rules:
   arrow-parens:
     - error
@@ -101,6 +102,7 @@ rules:
     - error
     - properties: false
   require-await: 1
+  no-only-tests/no-only-tests: error
 
 overrides:
   - files:
