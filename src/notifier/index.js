@@ -35,7 +35,7 @@ export default class Notifier {
 
   async notifyVersionRecorded(serviceProviderId, termsType, versionId) {
     const sendParams = {
-      templateId: config.get('opentermsarchive/engine.notifier.sendInBlue.updateTemplateId'),
+      templateId: config.get('@opentermsarchive/engine.notifier.sendInBlue.updateTemplateId'),
       params: {
         SERVICE_PROVIDER_NAME: this.serviceProviders[serviceProviderId].name,
         DOCUMENT_TYPE: termsType,
@@ -44,7 +44,7 @@ export default class Notifier {
     };
 
     const lists = [
-      config.get('opentermsarchive/engine.notifier.sendInBlue.updatesListId'),
+      config.get('@opentermsarchive/engine.notifier.sendInBlue.updatesListId'),
     ];
 
     const notificationListName = `${this.serviceProviders[serviceProviderId].name} - ${termsType} - Update`;

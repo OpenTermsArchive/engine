@@ -15,12 +15,12 @@ if (process.env.NODE_ENV !== 'test') {
   app.use(loggerMiddleware);
 }
 
-const BASE_PATH = path.join('/', config.get('opentermsarchive/engine.collection-api.basePath'), 'v1');
+const BASE_PATH = path.join('/', config.get('@opentermsarchive/engine.collection-api.basePath'), 'v1');
 
 app.use(BASE_PATH, apiRouter(BASE_PATH));
 app.use(errorsMiddleware);
 
-const PORT = config.get('opentermsarchive/engine.collection-api.port');
+const PORT = config.get('@opentermsarchive/engine.collection-api.port');
 
 app.listen(PORT);
 

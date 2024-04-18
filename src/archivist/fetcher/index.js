@@ -23,9 +23,9 @@ export { FetchDocumentError } from './errors.js';
 export default async function fetch({
   url, executeClientScripts, cssSelectors,
   config: {
-    navigationTimeout = config.get('opentermsarchive/engine.fetcher.navigationTimeout'),
-    language = config.get('opentermsarchive/engine.fetcher.language'),
-    waitForElementsTimeout = config.get('opentermsarchive/engine.fetcher.waitForElementsTimeout'),
+    navigationTimeout = config.get('@opentermsarchive/engine.fetcher.navigationTimeout'),
+    language = config.get('@opentermsarchive/engine.fetcher.language'),
+    waitForElementsTimeout = config.get('@opentermsarchive/engine.fetcher.waitForElementsTimeout'),
   } = {},
 }) {
   if (executeClientScripts) {
