@@ -44,7 +44,7 @@ export default class DeclarationUtils {
       const serviceId = DeclarationUtils.getServiceIdFromFilePath(modifiedFilePath);
 
       if (modifiedFilePath.endsWith('.history.json')) {
-        return; // Assuming history modifications imply corresponding changes in the service declaration and that the analyse of which terms types of this service have changed will be done when analyzing the related declaration, no further action is required here
+        return; // Assuming history modifications imply corresponding changes in the service declaration and that the analysis of which terms types of this service have changed will be done when analysing the related declaration, no further action is required here
       }
 
       if (modifiedFilePath.endsWith('.filters.js')) {
