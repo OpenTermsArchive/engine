@@ -15,6 +15,7 @@ const SUBJECT_PATH = path.resolve(__dirname, './test');
 const FIXTURES = {
   serviceA: { path: './fixtures/serviceA.json' },
   serviceATermsUpdated: { path: './fixtures/serviceATermsUpdated.json' },
+  serviceATermsUpdatedHistory: { path: './fixtures/serviceATermsUpdated.history.json' },
   serviceAMultipleTermsUpdated: { path: './fixtures/serviceAMultipleTermsUpdated.json' },
   serviceATermsAdded: { path: './fixtures/serviceATermsAdded.json' },
   serviceATermsRemoved: { path: './fixtures/serviceATermsRemoved.json' },
@@ -23,6 +24,7 @@ const FIXTURES = {
 
 const COMMIT_PATHS = {
   serviceA: './declarations/ServiceA.json',
+  serviceAHistory: './declarations/ServiceA.history.json',
   serviceB: './declarations/ServiceB.json',
 };
 
@@ -46,7 +48,10 @@ describe('DeclarationUtils', () => {
     after(() => fs.rm(SUBJECT_PATH, { recursive: true }));
 
     context('when an existing declaration has been modified', () => {
-      before(() => commitChanges(COMMIT_PATHS.serviceA, FIXTURES.serviceATermsUpdated.content));
+      before(async () => {
+        await commitChanges(COMMIT_PATHS.serviceA, FIXTURES.serviceATermsUpdated.content);
+        await commitChanges(COMMIT_PATHS.serviceAHistory, FIXTURES.serviceATermsUpdatedHistory.content);
+      });
       after(removeLatestCommit);
 
       it('returns the service ID and the updated terms type', async () => {

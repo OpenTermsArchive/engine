@@ -1,0 +1,9 @@
+{
+  "Terms of Service": [
+    {
+      "fetch": "https://domain.example/tos",
+      "select": "body",
+      "validUntil": "2024-03-18T18:30:09Z"
+    }
+  ]
+}
