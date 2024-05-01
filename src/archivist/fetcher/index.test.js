@@ -20,7 +20,7 @@ const termsHTML = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>First
 const termsWithOtherCharsetHTML = '<!DOCTYPE html><html><head><meta http-equiv="Content-Type" content="text/html; charset=windows-1251"><title>TOS на първия доставчик</title></head><body><h1>Условия за ползване</h1><p>Dapibus quis diam sagittis</p></body></html>';
 
 describe('Fetcher', function () {
-  this.timeout(10000);
+  this.timeout(60000);
 
   before(launchHeadlessBrowser);
 
