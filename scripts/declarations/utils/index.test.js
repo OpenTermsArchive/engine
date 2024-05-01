@@ -52,7 +52,10 @@ describe('DeclarationUtils', () => {
         await commitChanges(COMMIT_PATHS.serviceA, FIXTURES.serviceATermsUpdated.content);
         await commitChanges(COMMIT_PATHS.serviceAHistory, FIXTURES.serviceATermsUpdatedHistory.content);
       });
-      after(removeLatestCommit);
+      after(async () => {
+        await removeLatestCommit();
+        await removeLatestCommit();
+      });
 
       it('returns the service ID and the updated terms type', async () => {
         expect(await declarationUtils.getModifiedServicesAndTermsTypes()).to.deep.equal({
@@ -87,7 +90,7 @@ describe('DeclarationUtils', () => {
     });
 
     context('when a declaration has been removed', () => {
-      before(() => removeLatestCommit(declarationUtils.git));
+      before(removeLatestCommit);
       after(async () => {
         await fs.mkdir(path.resolve(SUBJECT_PATH, './declarations'), { recursive: true });
         await commitChanges(COMMIT_PATHS.serviceA, FIXTURES.serviceA.content);
