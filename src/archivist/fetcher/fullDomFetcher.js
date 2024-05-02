@@ -2,8 +2,6 @@ import puppeteer from 'puppeteer';
 import puppeteerExtra from 'puppeteer-extra';
 import stealthPlugin from 'puppeteer-extra-plugin-stealth';
 
-import { FetchDocumentError } from './errors.js';
-
 puppeteerExtra.use(stealthPlugin());
 
 let browser;
@@ -26,13 +24,13 @@ export default async function fetch(url, cssSelectors, config) {
     response = await page.goto(url, { waitUntil: 'networkidle0' });
 
     if (!response) {
-      throw new FetchDocumentError(`Response is empty when trying to fetch '${url}'`);
+      throw new Error(`Response is empty when trying to fetch '${url}'`);
     }
 
     const statusCode = response.status();
 
     if (statusCode < 200 || (statusCode >= 300 && statusCode !== 304)) {
-      throw new FetchDocumentError(`Received HTTP code ${statusCode} when trying to fetch '${url}'`);
+      throw new Error(`Received HTTP code ${statusCode} when trying to fetch '${url}'`);
     }
 
     const waitForSelectorsPromises = selectors.map(selector => page.waitForSelector(selector, { timeout: config.waitForElementsTimeout }));
@@ -54,9 +52,9 @@ export default async function fetch(url, cssSelectors, config) {
     };
   } catch (error) {
     if (error instanceof puppeteer.errors.TimeoutError) {
-      throw new FetchDocumentError(`Timed out after ${config.navigationTimeout / 1000} seconds when trying to fetch '${url}'`);
+      throw new Error(`Timed out after ${config.navigationTimeout / 1000} seconds when trying to fetch '${url}'`);
     }
-    throw new FetchDocumentError(error.message);
+    throw new Error(error.message);
   } finally {
     if (page) {
       await page.close();
