@@ -45,7 +45,7 @@ export default class Reporter {
     this.repositories = repositories;
   }
 
-  async initialize() {
+  initialize() {
     return this.github.initialize();
   }
 
@@ -67,7 +67,7 @@ No changes were found in the last run, so no new version has been recorded.`,
     });
   }
 
-  async onFirstVersionRecorded(version) {
+  onFirstVersionRecorded(version) {
     return this.onVersionRecorded(version);
   }
 

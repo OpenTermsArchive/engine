@@ -73,11 +73,11 @@ describe('Fetcher', function () {
             ({ content, mimeType } = await fetch({ url, selectors: 'body' }));
           });
 
-          it('returns the web page content of the given URL', async () => {
+          it('returns the web page content of the given URL', () => {
             expect(content).to.equal(termsHTML);
           });
 
-          it('returns the MIME type of the given URL', async () => {
+          it('returns the MIME type of the given URL', () => {
             expect(mimeType).to.equal('text/html');
           });
 
@@ -86,11 +86,11 @@ describe('Fetcher', function () {
               ({ content, mimeType } = await fetch({ url, selectors: 'body', executeClientScripts: true }));
             });
 
-            it('returns the web page content of the given URL', async () => {
+            it('returns the web page content of the given URL', () => {
               expect(content).to.equal(termsHTML);
             });
 
-            it('returns the MIME type of the given URL', async () => {
+            it('returns the MIME type of the given URL', () => {
               expect(mimeType).to.equal('text/html');
             });
           });
@@ -103,11 +103,11 @@ describe('Fetcher', function () {
             ({ content, mimeType } = await fetch({ url, selectors: NOT_PRESENT_SELECTOR }));
           });
 
-          it('returns the web page content of the given URL', async () => {
+          it('returns the web page content of the given URL', () => {
             expect(content).to.equal(termsHTML);
           });
 
-          it('returns the MIME type of the given URL', async () => {
+          it('returns the MIME type of the given URL', () => {
             expect(mimeType).to.equal('text/html');
           });
 
@@ -116,11 +116,11 @@ describe('Fetcher', function () {
               ({ content, mimeType } = await fetch({ url, selectors: NOT_PRESENT_SELECTOR, executeClientScripts: true }));
             });
 
-            it('returns the web page content of the given URL', async () => {
+            it('returns the web page content of the given URL', () => {
               expect(content).to.equal(termsHTML);
             });
 
-            it('returns the MIME type of the given URL', async () => {
+            it('returns the MIME type of the given URL', () => {
               expect(mimeType).to.equal('text/html');
             });
           });
@@ -136,7 +136,7 @@ describe('Fetcher', function () {
             ({ content } = await fetch({ url, selectors: 'body' }));
           });
 
-          it('returns the web page content of the given URL', async () => {
+          it('returns the web page content of the given URL', () => {
             expect(content).to.equal(termsWithOtherCharsetHTML);
           });
         });
@@ -151,15 +151,15 @@ describe('Fetcher', function () {
           ({ content, mimeType } = await fetch({ url: pdfUrl }));
         });
 
-        it('returns a buffer for PDF content', async () => {
+        it('returns a buffer for PDF content', () => {
           expect(content).to.be.an.instanceOf(Buffer);
         });
 
-        it('returns a blob with the file type', async () => {
+        it('returns a blob with the file type', () => {
           expect(mimeType).to.equal('application/pdf');
         });
 
-        it('returns a blob with the file content', async () => {
+        it('returns a blob with the file content', () => {
           expect(content.equals(expectedPDFContent)).to.be.true;
         });
       });

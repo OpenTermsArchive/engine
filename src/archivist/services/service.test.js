@@ -14,7 +14,7 @@ describe('Service', () => {
   describe('#addTerms', () => {
     let terms;
 
-    before(async () => {
+    before(() => {
       subject = new Service({ id: 'serviceID', name: 'serviceName' });
       terms = new Terms({
         type: TERMS_OF_SERVICE_TYPE,
@@ -23,11 +23,11 @@ describe('Service', () => {
     });
 
     context('when terms have no validity date', () => {
-      before(async () => {
+      before(() => {
         subject.addTerms(terms);
       });
 
-      it('adds the terms as the last valid terms', async () => {
+      it('adds the terms as the last valid terms', () => {
         expect(subject.getTerms({ type: TERMS_OF_SERVICE_TYPE })).to.deep.eql(terms);
       });
     });
@@ -36,7 +36,7 @@ describe('Service', () => {
       let expiredTerms;
       const VALIDITY_DATE = new Date('2020-07-22T11:30:21.000Z');
 
-      before(async () => {
+      before(() => {
         expiredTerms = new Terms({
           type: TERMS_OF_SERVICE_TYPE,
           service: subject,
@@ -46,7 +46,7 @@ describe('Service', () => {
         subject.addTerms(terms);
       });
 
-      it('adds the terms with the proper validity date', async () => {
+      it('adds the terms with the proper validity date', () => {
         expect(subject.getTerms({ type: TERMS_OF_SERVICE_TYPE, date: VALIDITY_DATE })).to.deep.eql(expiredTerms);
       });
     });
@@ -67,7 +67,7 @@ describe('Service', () => {
 
     const latestDeveloperTerms = new Terms({ type: 'Developer Terms' });
 
-    before(async () => {
+    before(() => {
       subject = new Service({ id: 'serviceID', name: 'serviceName' });
       subject.addTerms(firstTermsOfService);
       subject.addTerms(firstPrivacyPolicy);
@@ -77,7 +77,7 @@ describe('Service', () => {
     });
 
     context('when no params are given', () => {
-      it('returns all latest terms', async () => {
+      it('returns all latest terms', () => {
         expect(subject.getTerms()).to.deep.eql([ latestTermsOfService, latestPrivacyPolicy, latestDeveloperTerms ]);
       });
     });
@@ -85,18 +85,18 @@ describe('Service', () => {
     context('when a terms type is given', () => {
       context('when a date is given', () => {
         context('when the terms has no history', () => {
-          it('returns the latest terms according to the given type', async () => {
+          it('returns the latest terms according to the given type', () => {
             expect(subject.getTerms({ type: 'Developer Terms', date: LATEST_DATE })).to.eql(latestDeveloperTerms);
           });
         });
 
         context('when the terms have a history', () => {
-          it('returns the terms according to the given type and date', async () => {
+          it('returns the terms according to the given type and date', () => {
             expect(subject.getTerms({ type: TERMS_OF_SERVICE_TYPE, date: EARLIEST_DATE })).to.eql(firstTermsOfService);
           });
 
           context('when the given date is strictly equal to a terms validity date', () => {
-            it('returns the terms according to the given type with the validity date equal to the given date', async () => {
+            it('returns the terms according to the given type with the validity date equal to the given date', () => {
               expect(subject.getTerms({ type: TERMS_OF_SERVICE_TYPE, date: DATE })).to.eql(firstTermsOfService);
             });
           });
@@ -104,7 +104,7 @@ describe('Service', () => {
       });
 
       context('without a given date', () => {
-        it('returns the latest terms of given type', async () => {
+        it('returns the latest terms of given type', () => {
           expect(subject.getTerms({ type: TERMS_OF_SERVICE_TYPE })).to.eql(latestTermsOfService);
         });
       });
@@ -112,18 +112,18 @@ describe('Service', () => {
 
     context('when only a date is given', () => {
       context('when there is no history', () => {
-        it('returns all latest terms', async () => {
+        it('returns all latest terms', () => {
           expect(subject.getTerms({ date: LATEST_DATE })).to.deep.eql([ latestTermsOfService, latestPrivacyPolicy, latestDeveloperTerms ]);
         });
       });
 
       context('when the terms have a history', () => {
-        it('returns all the terms according to the given date', async () => {
+        it('returns all the terms according to the given date', () => {
           expect(subject.getTerms({ date: EARLIEST_DATE })).to.deep.eql([ firstTermsOfService, firstPrivacyPolicy, latestDeveloperTerms ]);
         });
 
         context('when the given date is strictly equal to a terms validity date', () => {
-          it('returns all the terms with the validity date equal to the given date', async () => {
+          it('returns all the terms with the validity date equal to the given date', () => {
             expect(subject.getTerms({ date: DATE })).to.deep.eql([ firstTermsOfService, firstPrivacyPolicy, latestDeveloperTerms ]);
           });
         });
@@ -135,7 +135,7 @@ describe('Service', () => {
     let termsOfService;
     let privacyPolicy;
 
-    before(async () => {
+    before(() => {
       subject = new Service({ id: 'serviceID', name: 'serviceName' });
 
       termsOfService = new Terms({ type: TERMS_OF_SERVICE_TYPE });
@@ -146,33 +146,33 @@ describe('Service', () => {
     });
 
     context('without any filter', () => {
-      it('returns all service terms types', async () => {
+      it('returns all service terms types', () => {
         expect(subject.getTermsTypes()).to.have.members([ TERMS_OF_SERVICE_TYPE, PRIVACY_POLICY_TYPE ]);
       });
     });
 
     context('with a filter', () => {
-      it('returns filtered terms types', async () => {
+      it('returns filtered terms types', () => {
         expect(subject.getTermsTypes([ PRIVACY_POLICY_TYPE, IMPRINT_TYPE ])).to.deep.equal([PRIVACY_POLICY_TYPE]);
       });
     });
   });
 
   describe('#getNumberOfTerms', () => {
-    before(async () => {
+    before(() => {
       subject = new Service({ id: 'serviceID', name: 'serviceName' });
       subject.addTerms(new Terms({ type: TERMS_OF_SERVICE_TYPE }));
       subject.addTerms(new Terms({ type: PRIVACY_POLICY_TYPE }));
     });
 
     context('without any filter', () => {
-      it('returns the number of all terms types', async () => {
+      it('returns the number of all terms types', () => {
         expect(subject.getNumberOfTerms()).to.equal(2);
       });
     });
 
     context('with a filter', () => {
-      it('returns the number of filtered terms types', async () => {
+      it('returns the number of filtered terms types', () => {
         expect(subject.getNumberOfTerms([ TERMS_OF_SERVICE_TYPE, IMPRINT_TYPE ])).to.equal(1);
       });
     });

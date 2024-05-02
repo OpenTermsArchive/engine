@@ -97,7 +97,7 @@ const additionalFilter = {
       link.remove();
     });
   },
-  removeLinksAsync: async function removeLinksAsync(document) {
+  removeLinksAsync: function removeLinksAsync(document) {
     return new Promise(resolve => {
       setTimeout(() => {
         const links = document.querySelectorAll('a');
@@ -122,15 +122,15 @@ describe('Extract', () => {
       subject = Array.from(webPageDOM.querySelectorAll('a[href]')).map(el => el.href);
     });
 
-    it('converts relative urls', async () => {
+    it('converts relative urls', () => {
       expect(subject).to.include('https://exemple.com/relative/link');
     });
 
-    it('leaves absolute urls untouched', async () => {
+    it('leaves absolute urls untouched', () => {
       expect(subject).to.include('http://absolute.url/link');
     });
 
-    it('leaves invalid urls untouched', async () => {
+    it('leaves invalid urls untouched', () => {
       expect(subject).to.include('http://[INVALID_URL=http://www.example.org/');
     });
   });

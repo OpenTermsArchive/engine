@@ -72,7 +72,7 @@ export default class Archivist extends events.EventEmitter {
 
   initQueue() {
     this.trackingQueue = async.queue(this.trackTermsChanges.bind(this), MAX_PARALLEL_TRACKING);
-    this.trackingQueue.error(async (error, { terms }) => {
+    this.trackingQueue.error((error, { terms }) => {
       if (error instanceof InaccessibleContentError) {
         this.emit('inaccessibleContent', error, terms);
 
@@ -170,7 +170,7 @@ export default class Archivist extends events.EventEmitter {
     }
   }
 
-  async loadSourceDocumentsFromSnapshots(terms) {
+  loadSourceDocumentsFromSnapshots(terms) {
     return Promise.all(terms.sourceDocuments.map(async sourceDocument => {
       const snapshot = await this.recorder.getLatestSnapshot(terms, sourceDocument.id);
 
@@ -232,7 +232,7 @@ export default class Archivist extends events.EventEmitter {
     return record;
   }
 
-  async recordSnapshots(terms) {
+  recordSnapshots(terms) {
     return Promise.all(terms.sourceDocuments.map(async sourceDocument => {
       const record = new Snapshot({
         serviceId: terms.service.id,
