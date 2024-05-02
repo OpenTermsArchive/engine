@@ -43,6 +43,10 @@ export default class DeclarationUtils {
     await Promise.all(modifiedFilePaths.map(async modifiedFilePath => {
       const serviceId = DeclarationUtils.getServiceIdFromFilePath(modifiedFilePath);
 
+      if (modifiedFilePath.endsWith('.history.json')) {
+        return; // Assuming history modifications imply corresponding changes in the service declaration and that the analysis of which terms types of this service have changed will be done when analysing the related declaration, no further action is required here
+      }
+
       if (modifiedFilePath.endsWith('.filters.js')) {
         const declaration = await this.getJSONFromFile(this.defaultBranch, `declarations/${serviceId}.json`);
 

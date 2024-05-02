@@ -15,6 +15,7 @@ const SUBJECT_PATH = path.resolve(__dirname, './test');
 const FIXTURES = {
   serviceA: { path: './fixtures/serviceA.json' },
   serviceATermsUpdated: { path: './fixtures/serviceATermsUpdated.json' },
+  serviceATermsUpdatedHistory: { path: './fixtures/serviceATermsUpdated.history.json' },
   serviceAMultipleTermsUpdated: { path: './fixtures/serviceAMultipleTermsUpdated.json' },
   serviceATermsAdded: { path: './fixtures/serviceATermsAdded.json' },
   serviceATermsRemoved: { path: './fixtures/serviceATermsRemoved.json' },
@@ -23,6 +24,7 @@ const FIXTURES = {
 
 const COMMIT_PATHS = {
   serviceA: './declarations/ServiceA.json',
+  serviceAHistory: './declarations/ServiceA.history.json',
   serviceB: './declarations/ServiceB.json',
 };
 
@@ -36,7 +38,7 @@ const removeLatestCommit = async () => {
   await declarationUtils.git.reset('hard', ['HEAD~1']);
 };
 
-describe.only('DeclarationUtils', () => {
+describe('DeclarationUtils', () => {
   describe('#getModifiedServicesAndTermsTypes', () => {
     before(async () => {
       await loadFixtures();
@@ -46,8 +48,14 @@ describe.only('DeclarationUtils', () => {
     after(() => fs.rm(SUBJECT_PATH, { recursive: true }));
 
     context('when an existing declaration has been modified', () => {
-      before(() => commitChanges(COMMIT_PATHS.serviceA, FIXTURES.serviceATermsUpdated.content));
-      after(removeLatestCommit);
+      before(async () => {
+        await commitChanges(COMMIT_PATHS.serviceA, FIXTURES.serviceATermsUpdated.content);
+        await commitChanges(COMMIT_PATHS.serviceAHistory, FIXTURES.serviceATermsUpdatedHistory.content);
+      });
+      after(async () => {
+        await removeLatestCommit();
+        await removeLatestCommit();
+      });
 
       it('returns the service ID and the updated terms type', async () => {
         expect(await declarationUtils.getModifiedServicesAndTermsTypes()).to.deep.equal({
@@ -82,7 +90,7 @@ describe.only('DeclarationUtils', () => {
     });
 
     context('when a declaration has been removed', () => {
-      before(() => removeLatestCommit(declarationUtils.git));
+      before(removeLatestCommit);
       after(async () => {
         await fs.mkdir(path.resolve(SUBJECT_PATH, './declarations'), { recursive: true });
         await commitChanges(COMMIT_PATHS.serviceA, FIXTURES.serviceA.content);
