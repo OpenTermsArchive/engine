@@ -60,6 +60,11 @@
     "description": "Fetching fails with a timeout error"
   },
   {
+    "name": "empty content",
+    "color": "0b08a0",
+    "description": "Fetching fails because the server returns an empty content"
+  },
+  {
     "name": "to clarify",
     "color": "0496ff",
     "description": "Default failure label"
@@ -73,5 +78,10 @@
     "name": "location",
     "color": "FBCA04",
     "description": "Fetch location is outdated"
+  },
+  {
+    "name": "invalid selector",
+    "color": "FBCA04",
+    "description": "Selector is invalid"
   }
 ]
