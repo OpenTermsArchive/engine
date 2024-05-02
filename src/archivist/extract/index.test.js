@@ -519,5 +519,11 @@ describe('Extract', () => {
     it('extracts content from the given PDF', async () => {
       expect(await extractFromPDF({ content: pdfContent })).to.equal(expectedExtractedContent);
     });
+
+    context('when PDF contains no text', () => {
+      it('throws an InaccessibleContentError error', async () => {
+        await expect(extractFromPDF({ content: await fs.readFile(path.resolve(__dirname, '../../../test/fixtures/termsNoText.pdf')) })).to.be.rejectedWith(InaccessibleContentError, /contains no text/);
+      });
+    });
   });
 });

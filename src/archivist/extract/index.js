@@ -98,11 +98,17 @@ export async function extractFromHTML(sourceDocument) {
   return markdownContent;
 }
 
-export async function extractFromPDF({ content: pdfBuffer }) {
+export async function extractFromPDF({ location, content: pdfBuffer }) {
   try {
     const ciceroMarkdown = await PdfTransformer.toCiceroMark(pdfBuffer);
 
-    return ciceroMarkTransformer.toMarkdown(ciceroMarkdown);
+    const markdownContent = ciceroMarkTransformer.toMarkdown(ciceroMarkdown);
+
+    if (!markdownContent) {
+      throw new InaccessibleContentError(`The PDF file at '${location}' contains no text, it might contain scanned images of text instead of actual text`);
+    }
+
+    return markdownContent;
   } catch (error) {
     if (error.parserError) {
       throw new InaccessibleContentError("Can't parse PDF file");
