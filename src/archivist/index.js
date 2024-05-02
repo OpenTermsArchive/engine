@@ -100,7 +100,10 @@ export default class Archivist extends events.EventEmitter {
   }
 
   async track({ services: servicesIds = this.servicesIds, types: termsTypes = [], extractOnly = false } = {}) {
-    this.emit('trackingStarted', servicesIds.length, Service.getNumberOfTerms(this.services, servicesIds), extractOnly);
+    const numberOfTerms = Service.getNumberOfTerms(this.services, servicesIds, termsTypes);
+
+    this.emit('trackingStarted', servicesIds.length, numberOfTerms, extractOnly);
+
     await Promise.all([ launchHeadlessBrowser(), this.recorder.initialize() ]);
 
     this.trackingQueue.concurrency = extractOnly ? MAX_PARALLEL_EXTRACTING : MAX_PARALLEL_TRACKING;
@@ -120,7 +123,8 @@ export default class Archivist extends events.EventEmitter {
     }
 
     await Promise.all([ stopHeadlessBrowser(), this.recorder.finalize() ]);
-    this.emit('trackingCompleted', servicesIds.length, Service.getNumberOfTerms(this.services, servicesIds), extractOnly);
+
+    this.emit('trackingCompleted', servicesIds.length, numberOfTerms, extractOnly);
   }
 
   async trackTermsChanges({ terms, extractOnly = false }) {
