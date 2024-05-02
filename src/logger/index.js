@@ -129,11 +129,11 @@ logger.onTrackingCompleted = (numberOfServices, numberOfTerms, extractOnly) => {
 };
 
 logger.onInaccessibleContent = ({ message }, terms) => {
-  logger.warn({ message, serviceId: terms.serviceId, termsType: terms.type });
+  logger.warn({ message, serviceId: terms.service.id, termsType: terms.type });
 };
 
 logger.onError = (error, terms) => {
-  logger.error({ message: error.stack, serviceId: terms.serviceId, termsType: terms.type });
+  logger.error({ message: error.stack, serviceId: terms.service.id, termsType: terms.type });
 };
 
 logger.onPluginError = (error, pluginName) => {
