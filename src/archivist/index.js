@@ -146,7 +146,7 @@ export default class Archivist extends events.EventEmitter {
   async fetchSourceDocuments(terms) {
     terms.fetchDate = new Date();
 
-    const inaccessibleContentErrors = [];
+    const fetchDocumentErrors = [];
 
     await Promise.all(terms.sourceDocuments.map(async sourceDocument => {
       const { location: url, executeClientScripts, cssSelectors } = sourceDocument;
@@ -161,12 +161,12 @@ export default class Archivist extends events.EventEmitter {
           throw error;
         }
 
-        inaccessibleContentErrors.push(error.message);
+        fetchDocumentErrors.push(error.message);
       }
     }));
 
-    if (inaccessibleContentErrors.length) {
-      throw new InaccessibleContentError(inaccessibleContentErrors);
+    if (fetchDocumentErrors.length) {
+      throw new InaccessibleContentError(fetchDocumentErrors);
     }
   }
 
