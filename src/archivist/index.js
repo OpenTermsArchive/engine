@@ -99,7 +99,7 @@ export default class Archivist extends events.EventEmitter {
     });
   }
 
-  async track({ services: servicesIds = this.servicesIds, terms: termsTypes = [], extractOnly = false }) {
+  async track({ services: servicesIds = this.servicesIds, types: termsTypes = [], extractOnly = false } = {}) {
     this.emit('trackingStarted', servicesIds.length, Service.getNumberOfTerms(this.services, servicesIds), extractOnly);
     await Promise.all([ launchHeadlessBrowser(), this.recorder.initialize() ]);
 
