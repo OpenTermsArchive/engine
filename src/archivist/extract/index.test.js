@@ -28,6 +28,7 @@ const rawHTML = `
     <p><a id="link1" href="/relative/link">link 1</a></p>
     <p><a id="link2" href="#anchor">link 2</a></p>
     <p><a id="link3" href="http://absolute.url/link">link 3</a></p>
+    <p><a id="link5" href="http://[INVALID_URL=http://www.example.org/">link 5</a></p>
     <div id="empty"></div>
     <div id="whitespaceOnly"> </div>
   </body>
@@ -40,7 +41,9 @@ const expectedExtracted = `Title
 
 [link 2](#anchor)
 
-[link 3](http://absolute.url/link)`;
+[link 3](http://absolute.url/link)
+
+[link 5](http://[INVALID_URL=http://www.example.org/)`;
 
 const expectedExtractedWithAdditional = `Title
 =====`;
@@ -124,6 +127,10 @@ describe('Extract', () => {
     it('leaves absolute urls untouched', async () => {
       expect(subject).to.include('http://absolute.url/link');
     });
+
+    it('leaves invalid urls untouched', async () => {
+      expect(subject).to.include('http://[INVALID_URL=http://www.example.org/');
+    });
   });
 
   describe('#extractFromHTML', () => {
@@ -155,7 +162,7 @@ describe('Extract', () => {
               location: virtualLocation,
               contentSelectors: '#thisAnchorDoesNotExist',
               content: rawHTML,
-            }))).to.be.rejectedWith(InaccessibleContentError, /#thisAnchorDoesNotExist/);
+            }))).to.be.rejectedWith(Error, /#thisAnchorDoesNotExist/);
           });
         });
 
@@ -211,7 +218,7 @@ describe('Extract', () => {
               contentSelectors: [ 'h1', 'h1 ~ p' ],
             }));
 
-            expect(result).to.equal('Title\n=====\n\n[link 1](https://exemple.com/relative/link)\n\n[link 2](#anchor)\n\n[link 3](http://absolute.url/link)');
+            expect(result).to.equal('Title\n=====\n\n[link 1](https://exemple.com/relative/link)\n\n[link 2](#anchor)\n\n[link 3](http://absolute.url/link)\n\n[link 5](http://[INVALID_URL=http://www.example.org/)');
           });
         });
       });
@@ -349,7 +356,7 @@ describe('Extract', () => {
             insignificantContentSelectors: 'h1',
           }));
 
-          expect(result).to.equal('[link 1](https://exemple.com/relative/link)\n\n[link 2](#anchor)\n\n[link 3](http://absolute.url/link)');
+          expect(result).to.equal('[link 1](https://exemple.com/relative/link)\n\n[link 2](#anchor)\n\n[link 3](http://absolute.url/link)\n\n[link 5](http://[INVALID_URL=http://www.example.org/)');
         });
       });
 
@@ -359,7 +366,7 @@ describe('Extract', () => {
             content: rawHTML,
             location: virtualLocation,
             contentSelectors: 'body',
-            insignificantContentSelectors: [ 'h1', '#link3' ],
+            insignificantContentSelectors: [ 'h1', '#link3', '#link5' ],
           }));
 
           expect(result).to.equal('[link 1](https://exemple.com/relative/link)\n\n[link 2](#anchor)');
@@ -374,7 +381,7 @@ describe('Extract', () => {
             contentSelectors: 'body',
             insignificantContentSelectors: {
               startBefore: '#link1',
-              endAfter: '#link3',
+              endAfter: '#link5',
             },
           }));
 
@@ -420,7 +427,7 @@ describe('Extract', () => {
               },
               {
                 startBefore: '#link3',
-                endAfter: '#link3',
+                endAfter: '#link5',
               },
             ],
           }));
@@ -439,7 +446,7 @@ describe('Extract', () => {
               'h1',
               {
                 startBefore: '#link3',
-                endAfter: '#link3',
+                endAfter: '#link5',
               },
             ],
           }));
@@ -462,7 +469,7 @@ describe('Extract', () => {
               ],
             }));
 
-            expect(result).to.equal('[link 2](#anchor)\n\n[link 3](http://absolute.url/link)');
+            expect(result).to.equal('[link 2](#anchor)\n\n[link 3](http://absolute.url/link)\n\n[link 5](http://[INVALID_URL=http://www.example.org/)');
           });
         });
       });

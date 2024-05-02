@@ -135,7 +135,11 @@ function selectRange(webPageDOM, rangeSelector) {
 
 export function convertRelativeURLsToAbsolute(webPageDOM, baseURL) {
   Array.from(webPageDOM.querySelectorAll(LINKS_TO_CONVERT_SELECTOR)).forEach(link => {
-    link.href = url.resolve(baseURL, link.href);
+    try {
+      link.href = url.resolve(baseURL, link.href);
+    } catch (error) {
+      // Leave the URL as is if it's invalid in the source document and can't be converted to an absolute URL
+    }
   });
 }
 
