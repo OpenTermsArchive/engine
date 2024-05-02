@@ -41,6 +41,9 @@ describe('Fetcher', function () {
         if (request.url == '/404') {
           response.writeHead(404, { 'Content-Type': 'text/html' }).write('<!DOCTYPE html><html><body>404</body></html>');
         }
+        if (request.url === '/zero-content') {
+          response.writeHead(200, { 'Content-Type': 'text/html', 'Content-Length': '0' }).write('');
+        }
         if (request.url == '/terms.pdf') {
           expectedPDFContent = fs.readFileSync(path.resolve(__dirname, '../../../test/fixtures/terms.pdf'));
 
@@ -158,6 +161,14 @@ describe('Fetcher', function () {
 
         it('returns a blob with the file content', async () => {
           expect(content.equals(expectedPDFContent)).to.be.true;
+        });
+      });
+
+      context('when server responds with an emtpy content', () => {
+        const zeroContentUrl = `http://127.0.0.1:${SERVER_PORT}/zero-content`;
+
+        it('throws a FetchDocumentError error', async () => {
+          await expect(fetch({ url: zeroContentUrl })).to.be.rejectedWith(FetchDocumentError, /empty content/);
         });
       });
     });

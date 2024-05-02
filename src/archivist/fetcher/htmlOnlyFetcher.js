@@ -33,6 +33,7 @@ export default async function fetch(url, configuration) {
     }
 
     const mimeType = response.headers.get('content-type');
+    const contentLength = response.headers.get('content-length');
     const responseBuffer = await response.arrayBuffer();
     let content;
 
@@ -42,7 +43,7 @@ export default async function fetch(url, configuration) {
       content = Buffer.from(responseBuffer);
     }
 
-    if (!content) {
+    if (contentLength == 0 || !content) {
       throw new FetchDocumentError(`Received an empty content when fetching '${url}'`);
     }
 
