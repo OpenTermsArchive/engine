@@ -7,7 +7,9 @@ import turndownPluginGithubFlavouredMarkdown from 'joplin-turndown-plugin-gfm';
 import jsdom from 'jsdom';
 import mime from 'mime';
 
-import { InaccessibleContentError } from '../errors.js';
+import { ExtractDocumentError } from './errors.js';
+
+export { ExtractDocumentError } from './errors.js';
 
 const { JSDOM } = jsdom;
 const turndownService = new TurndownService();
@@ -29,11 +31,15 @@ const ciceroMarkTransformer = new CiceroMarkTransformer();
  * @returns {Promise<string>} Promise which is fulfilled once the content is extracted and converted in Markdown. The promise will resolve into a string containing the extracted content in Markdown format
 */
 export default async function extract(sourceDocument) {
-  if (sourceDocument.mimeType == mime.getType('pdf')) {
-    return extractFromPDF(sourceDocument);
-  }
+  try {
+    if (sourceDocument.mimeType == mime.getType('pdf')) {
+      return await extractFromPDF(sourceDocument);
+    }
 
-  return extractFromHTML(sourceDocument);
+    return await extractFromHTML(sourceDocument);
+  } catch (error) {
+    throw new ExtractDocumentError(error.message);
+  }
 }
 
 export async function extractFromHTML(sourceDocument) {
@@ -63,7 +69,7 @@ export async function extractFromHTML(sourceDocument) {
       });
       /* eslint-enable no-await-in-loop */
     } catch (error) {
-      throw new InaccessibleContentError(`The filter function "${filterFunction.name}" failed: ${error}`);
+      throw new Error(`The filter function "${filterFunction.name}" failed: ${error}`);
     }
   }
 
@@ -72,7 +78,7 @@ export async function extractFromHTML(sourceDocument) {
   const domFragment = select(webPageDOM, contentSelectors);
 
   if (!domFragment.children.length) {
-    throw new InaccessibleContentError(`The provided selector "${contentSelectors}" has no match in the web page at '${location}'`);
+    throw new Error(`The provided selector "${contentSelectors}" has no match in the web page at '${location}'`);
   }
 
   convertRelativeURLsToAbsolute(domFragment, location);
@@ -92,7 +98,7 @@ export async function extractFromHTML(sourceDocument) {
   const markdownContent = transform(domFragment);
 
   if (!markdownContent) {
-    throw new InaccessibleContentError(`The provided selector "${contentSelectors}" matches an empty content in the web page at '${location}'`);
+    throw new Error(`The provided selector "${contentSelectors}" matches an empty content in the web page at '${location}'`);
   }
 
   return markdownContent;
@@ -105,13 +111,13 @@ export async function extractFromPDF({ location, content: pdfBuffer }) {
     const markdownContent = ciceroMarkTransformer.toMarkdown(ciceroMarkdown);
 
     if (!markdownContent) {
-      throw new InaccessibleContentError(`The PDF file at '${location}' contains no text, it might contain scanned images of text instead of actual text`);
+      throw new Error(`The PDF file at '${location}' contains no text, it might contain scanned images of text instead of actual text`);
     }
 
     return markdownContent;
   } catch (error) {
     if (error.parserError) {
-      throw new InaccessibleContentError("Can't parse PDF file");
+      throw new Error("Can't parse PDF file");
     }
 
     throw error;
@@ -126,11 +132,11 @@ function selectRange(webPageDOM, rangeSelector) {
   const endNode = webPageDOM.querySelector(endBefore || endAfter);
 
   if (!startNode) {
-    throw new InaccessibleContentError(`The "start" selector has no match in document in: ${JSON.stringify(rangeSelector)}`);
+    throw new Error(`The "start" selector has no match in document in: ${JSON.stringify(rangeSelector)}`);
   }
 
   if (!endNode) {
-    throw new InaccessibleContentError(`The "end" selector has no match in document in: ${JSON.stringify(rangeSelector)}`);
+    throw new Error(`The "end" selector has no match in document in: ${JSON.stringify(rangeSelector)}`);
   }
 
   selection[startBefore ? 'setStartBefore' : 'setStartAfter'](startNode);

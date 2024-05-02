@@ -3,7 +3,7 @@ import events from 'events';
 import async from 'async';
 
 import { InaccessibleContentError } from './errors.js';
-import extract from './extract/index.js';
+import extract, { ExtractDocumentError } from './extract/index.js';
 import fetch, { launchHeadlessBrowser, stopHeadlessBrowser, FetchDocumentError } from './fetcher/index.js';
 import Recorder from './recorder/index.js';
 import Snapshot from './recorder/snapshot.js';
@@ -182,12 +182,32 @@ export default class Archivist extends events.EventEmitter {
   }
 
   async extractVersionContent(sourceDocuments) {
-    return (await Promise.all(sourceDocuments.map(async sourceDocument => this.extract(sourceDocument)))).join(Version.SOURCE_DOCUMENTS_SEPARATOR);
+    const extractDocumentErrors = [];
+
+    const result = await Promise.all(sourceDocuments.map(async sourceDocument => {
+      try {
+        return await this.extract(sourceDocument);
+      } catch (error) {
+        if (!(error instanceof ExtractDocumentError)) {
+          throw error;
+        }
+
+        extractDocumentErrors.push(error.message);
+      }
+    }));
+
+    if (extractDocumentErrors.length) {
+      throw new InaccessibleContentError(extractDocumentErrors);
+    }
+
+    return result.join(Version.SOURCE_DOCUMENTS_SEPARATOR);
   }
 
   async recordVersion(terms, extractOnly) {
+    const content = await this.extractVersionContent(terms.sourceDocuments);
+
     const record = new Version({
-      content: await this.extractVersionContent(terms.sourceDocuments),
+      content,
       snapshotIds: terms.sourceDocuments.map(sourceDocuments => sourceDocuments.snapshotId),
       serviceId: terms.service.id,
       termsType: terms.type,
