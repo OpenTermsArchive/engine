@@ -59,9 +59,9 @@
       "title": "sandbox",
       "versionsRepositoryURL": "https://github.com/OpenTermsArchive/sandbox"
     },
-    "api": {
+    "collection-api": {
       "port": 3000,
-      "basePath": "/api"
+      "basePath": "/collection-api"
     }
   }
 }

@@ -7,7 +7,7 @@ import Version from '../../archivist/recorder/version.js';
 import { toISODateWithoutMilliseconds } from '../../archivist/utils/date.js';
 import app from '../server.js';
 
-const basePath = config.get('@opentermsarchive/engine.api.basePath');
+const basePath = config.get('@opentermsarchive/engine.collection-api.basePath');
 
 const { expect } = chai;
 const request = supertest(app);
