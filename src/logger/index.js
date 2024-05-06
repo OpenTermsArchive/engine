@@ -39,15 +39,15 @@ const logger = winston.createLogger({
 });
 
 if (config.get('@opentermsarchive/engine.logger.sendMailOnError')) {
-  if (process.env.SMTP_PASSWORD === undefined) {
-    logger.warn('Environment variable "SMTP_PASSWORD" was not found; log emails cannot be sent');
+  if (process.env.OTA_ENGINE_SMTP_PASSWORD === undefined) {
+    logger.warn('Environment variable "OTA_ENGINE_SMTP_PASSWORD" was not found; log emails cannot be sent');
   } else {
     const mailerOptions = {
       to: config.get('@opentermsarchive/engine.logger.sendMailOnError.to'),
       from: config.get('@opentermsarchive/engine.logger.sendMailOnError.from'),
       host: config.get('@opentermsarchive/engine.logger.smtp.host'),
       username: config.get('@opentermsarchive/engine.logger.smtp.username'),
-      password: process.env.SMTP_PASSWORD,
+      password: process.env.OTA_ENGINE_SMTP_PASSWORD,
       ssl: true,
       timeout: 30 * 1000,
       formatter: args => args[Object.getOwnPropertySymbols(args)[1]], // Returns the full error message, the same visible in the console. It is referenced in the argument object with a Symbol of which we do not have the reference but we know it is the second one.

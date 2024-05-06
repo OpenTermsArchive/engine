@@ -38,17 +38,17 @@ export default async function track({ services, types, extractOnly, schedule }) 
     return;
   }
 
-  if (process.env.SENDINBLUE_API_KEY) {
+  if (process.env.OTA_ENGINE_SENDINBLUE_API_KEY) {
     try {
       archivist.attach(new Notifier(archivist.services));
     } catch (error) {
       logger.error('Cannot instantiate the Notifier module; it will be ignored:', error);
     }
   } else {
-    logger.warn('Environment variable "SENDINBLUE_API_KEY" was not found; the Notifier module will be ignored');
+    logger.warn('Environment variable "OTA_ENGINE_SENDINBLUE_API_KEY" was not found; the Notifier module will be ignored');
   }
 
-  if (process.env.GITHUB_TOKEN) {
+  if (process.env.OTA_ENGINE_GITHUB_TOKEN) {
     if (config.has('reporter.githubIssues.repositories.declarations')) {
       try {
         const reporter = new Reporter(config.get('@opentermsarchive/engine.reporter'));
@@ -62,7 +62,7 @@ export default async function track({ services, types, extractOnly, schedule }) 
       logger.warn('Configuration key "reporter.githubIssues.repositories.declarations" was not found; issues on the declarations repository cannot be created');
     }
   } else {
-    logger.warn('Environment variable "GITHUB_TOKEN" was not found; the Reporter module will be ignored');
+    logger.warn('Environment variable "OTA_ENGINE_GITHUB_TOKEN" was not found; the Reporter module will be ignored');
   }
 
   if (!schedule) {

@@ -16,7 +16,7 @@ export default class GitHub {
   constructor(repository) {
     const { version } = require('../../package.json');
 
-    this.octokit = new Octokit({ auth: process.env.GITHUB_TOKEN, userAgent: `opentermsarchive/${version}` });
+    this.octokit = new Octokit({ auth: process.env.OTA_ENGINE_GITHUB_TOKEN, userAgent: `opentermsarchive/${version}` });
 
     const [ owner, repo ] = repository.split('/');
 

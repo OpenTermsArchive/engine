@@ -89,7 +89,7 @@ _Full changeset and discussions: [#1052](https://github.com/OpenTermsArchive/eng
 
 ### Changed
 
-- **Breaking:** Base the loading of the Notifier module on the presence of required configuration, not on the environment; only define the `SENDINBLUE_API_KEY` environment variable if you want the Notifier to be loaded, avoid relying on `NODE_ENV=production`
+- **Breaking:** Base the loading of the Notifier module on the presence of required configuration, not on the environment; only define the `OTA_ENGINE_SENDINBLUE_API_KEY` environment variable if you want the Notifier to be loaded, avoid relying on `NODE_ENV=production`
 
 ## 0.35.0 - 2024-02-14
 
