@@ -6,7 +6,7 @@ export default class Notifier {
     const defaultClient = sendInBlue.ApiClient.instance;
     const authentication = defaultClient.authentications['api-key'];
 
-    authentication.apiKey = process.env.SENDINBLUE_API_KEY;
+    authentication.apiKey = process.env.OTA_ENGINE_SENDINBLUE_API_KEY;
 
     this.apiInstance = new sendInBlue.TransactionalEmailsApi();
     this.contactsInstance = new sendInBlue.ContactsApi();
