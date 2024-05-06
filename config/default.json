@@ -58,10 +58,6 @@
     "dataset": {
       "title": "sandbox",
       "versionsRepositoryURL": "https://github.com/OpenTermsArchive/sandbox"
-    },
-    "collection-api": {
-      "port": 3000,
-      "basePath": "/collection-api"
     }
   }
 }
