@@ -1,8 +1,6 @@
 import config from 'config';
-import dotenv from 'dotenv';
 import sendInBlue from 'sib-api-v3-sdk';
 
-dotenv.config();
 export default class Notifier {
   constructor(passedServiceProviders) {
     const defaultClient = sendInBlue.ApiClient.instance;
