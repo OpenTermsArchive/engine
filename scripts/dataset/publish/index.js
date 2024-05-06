@@ -3,12 +3,9 @@ import path from 'path';
 import url from 'url';
 
 import config from 'config';
-import dotenv from 'dotenv';
 import { Octokit } from 'octokit';
 
 import * as readme from '../assets/README.template.js';
-
-dotenv.config();
 
 export default async function publish({ archivePath, releaseDate, stats }) {
   const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
