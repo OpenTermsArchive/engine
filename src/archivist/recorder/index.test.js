@@ -323,7 +323,7 @@ describe('Recorder', () => {
                 record = await recorder.versionsRepository.findLatest(SERVICE_ID, TYPE);
               });
 
-              after(() => recorder.versionsRepository.removeAll()); after(() => recorder.versionsRepository.removeAll());
+              after(() => recorder.versionsRepository.removeAll());
 
               it('records the version with the proper content', async () => {
                 expect(await record.content).to.equal(CONTENT);
