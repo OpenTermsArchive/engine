@@ -148,7 +148,7 @@ function selectRange(webPageDOM, rangeSelector) {
 export function convertRelativeURLsToAbsolute(webPageDOM, baseURL) {
   Array.from(webPageDOM.querySelectorAll(LINKS_TO_CONVERT_SELECTOR)).forEach(link => {
     try {
-      link.href = url.resolve(baseURL, link.href);
+      link.href = new URL(link.href, baseURL).href;
     } catch (error) {
       // Leave the URL as is if it's invalid in the source document and can't be converted to an absolute URL
     }
