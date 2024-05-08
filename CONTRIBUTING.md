@@ -172,7 +172,7 @@ There are five ways to handle operational errors:
 - **Log the error — and do nothing else**. If it's a minor error and there’s nothing you can do about, and there is no reason to stop the whole process.
 - **Crash immediately**. If the error cannot be handled and can affect data integrity.
 
-In our case, we consider all `fetch`-related errors as expected, so as operational errors and we handle them by logging but we do not stop the whole process. We handle errors related to the `notifier` in the same way.
+In our case, we consider all `fetch`-related and `extract`-related errors as expected, so as operational errors and we handle them by logging but we do not stop the whole process. We handle errors related to the `notifier` in the same way.
 In contrast, we consider errors from the `recorder` module as fatal, and we crash immediately.
 
 #### Handling programmer errors

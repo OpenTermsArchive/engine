@@ -1,6 +1,6 @@
 export class FetchDocumentError extends Error {
   constructor(message) {
-    super(message);
+    super(`Fetch failed: ${message}`);
     this.name = 'FetchDocumentError';
   }
 }

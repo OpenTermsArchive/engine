@@ -1,5 +1,6 @@
 import config from 'config';
 
+import { FetchDocumentError } from './errors.js';
 import fetchFullDom from './fullDomFetcher.js';
 import fetchHtmlOnly from './htmlOnlyFetcher.js';
 
@@ -28,9 +29,13 @@ export default async function fetch({
     waitForElementsTimeout = config.get('fetcher.waitForElementsTimeout'),
   } = {},
 }) {
-  if (executeClientScripts) {
-    return fetchFullDom(url, cssSelectors, { navigationTimeout, language, waitForElementsTimeout });
-  }
+  try {
+    if (executeClientScripts) {
+      return await fetchFullDom(url, cssSelectors, { navigationTimeout, language, waitForElementsTimeout });
+    }
 
-  return fetchHtmlOnly(url, { navigationTimeout, language });
+    return await fetchHtmlOnly(url, { navigationTimeout, language });
+  } catch (error) {
+    throw new FetchDocumentError(error.message);
+  }
 }

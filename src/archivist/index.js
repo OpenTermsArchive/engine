@@ -3,7 +3,7 @@ import events from 'events';
 import async from 'async';
 
 import { InaccessibleContentError } from './errors.js';
-import extract from './extract/index.js';
+import extract, { ExtractDocumentError } from './extract/index.js';
 import fetch, { launchHeadlessBrowser, stopHeadlessBrowser, FetchDocumentError } from './fetcher/index.js';
 import Recorder from './recorder/index.js';
 import Snapshot from './recorder/snapshot.js';
@@ -72,7 +72,7 @@ export default class Archivist extends events.EventEmitter {
 
   initQueue() {
     this.trackingQueue = async.queue(this.trackTermsChanges.bind(this), MAX_PARALLEL_TRACKING);
-    this.trackingQueue.error(async (error, { terms }) => {
+    this.trackingQueue.error((error, { terms }) => {
       if (error instanceof InaccessibleContentError) {
         this.emit('inaccessibleContent', error, terms);
 
@@ -99,8 +99,11 @@ export default class Archivist extends events.EventEmitter {
     });
   }
 
-  async track({ services: servicesIds = this.servicesIds, terms: termsTypes = [], extractOnly = false }) {
-    this.emit('trackingStarted', servicesIds.length, Service.getNumberOfTerms(this.services, servicesIds), extractOnly);
+  async track({ services: servicesIds = this.servicesIds, types: termsTypes = [], extractOnly = false } = {}) {
+    const numberOfTerms = Service.getNumberOfTerms(this.services, servicesIds, termsTypes);
+
+    this.emit('trackingStarted', servicesIds.length, numberOfTerms, extractOnly);
+
     await Promise.all([ launchHeadlessBrowser(), this.recorder.initialize() ]);
 
     this.trackingQueue.concurrency = extractOnly ? MAX_PARALLEL_EXTRACTING : MAX_PARALLEL_TRACKING;
@@ -120,7 +123,8 @@ export default class Archivist extends events.EventEmitter {
     }
 
     await Promise.all([ stopHeadlessBrowser(), this.recorder.finalize() ]);
-    this.emit('trackingCompleted', servicesIds.length, Service.getNumberOfTerms(this.services, servicesIds), extractOnly);
+
+    this.emit('trackingCompleted', servicesIds.length, numberOfTerms, extractOnly);
   }
 
   async trackTermsChanges({ terms, extractOnly = false }) {
@@ -142,7 +146,7 @@ export default class Archivist extends events.EventEmitter {
   async fetchSourceDocuments(terms) {
     terms.fetchDate = new Date();
 
-    const inaccessibleContentErrors = [];
+    const fetchDocumentErrors = [];
 
     await Promise.all(terms.sourceDocuments.map(async sourceDocument => {
       const { location: url, executeClientScripts, cssSelectors } = sourceDocument;
@@ -157,16 +161,16 @@ export default class Archivist extends events.EventEmitter {
           throw error;
         }
 
-        inaccessibleContentErrors.push(error.message);
+        fetchDocumentErrors.push(error.message);
       }
     }));
 
-    if (inaccessibleContentErrors.length) {
-      throw new InaccessibleContentError(inaccessibleContentErrors);
+    if (fetchDocumentErrors.length) {
+      throw new InaccessibleContentError(fetchDocumentErrors);
     }
   }
 
-  async loadSourceDocumentsFromSnapshots(terms) {
+  loadSourceDocumentsFromSnapshots(terms) {
     return Promise.all(terms.sourceDocuments.map(async sourceDocument => {
       const snapshot = await this.recorder.getLatestSnapshot(terms, sourceDocument.id);
 
@@ -182,12 +186,32 @@ export default class Archivist extends events.EventEmitter {
   }
 
   async extractVersionContent(sourceDocuments) {
-    return (await Promise.all(sourceDocuments.map(async sourceDocument => this.extract(sourceDocument)))).join(Version.SOURCE_DOCUMENTS_SEPARATOR);
+    const extractDocumentErrors = [];
+
+    const result = await Promise.all(sourceDocuments.map(async sourceDocument => {
+      try {
+        return await this.extract(sourceDocument);
+      } catch (error) {
+        if (!(error instanceof ExtractDocumentError)) {
+          throw error;
+        }
+
+        extractDocumentErrors.push(error.message);
+      }
+    }));
+
+    if (extractDocumentErrors.length) {
+      throw new InaccessibleContentError(extractDocumentErrors);
+    }
+
+    return result.join(Version.SOURCE_DOCUMENTS_SEPARATOR);
   }
 
   async recordVersion(terms, extractOnly) {
+    const content = await this.extractVersionContent(terms.sourceDocuments);
+
     const record = new Version({
-      content: await this.extractVersionContent(terms.sourceDocuments),
+      content,
       snapshotIds: terms.sourceDocuments.map(sourceDocuments => sourceDocuments.snapshotId),
       serviceId: terms.service.id,
       termsType: terms.type,
@@ -208,7 +232,7 @@ export default class Archivist extends events.EventEmitter {
     return record;
   }
 
-  async recordSnapshots(terms) {
+  recordSnapshots(terms) {
     return Promise.all(terms.sourceDocuments.map(async sourceDocument => {
       const record = new Snapshot({
         serviceId: terms.service.id,

@@ -22,6 +22,8 @@ const ERROR_MESSAGE_TO_ISSUE_LABEL_MAP = {
   'unable to verify the first certificate': 'first certificate',
   'certificate has expired': 'certificate expired',
   'maximum redirect reached': 'redirects',
+  'not a valid selector': 'invalid selector',
+  'empty content': 'empty content',
 };
 
 function getLabelNameFromError(error) {
@@ -43,7 +45,7 @@ export default class Reporter {
     this.repositories = repositories;
   }
 
-  async initialize() {
+  initialize() {
     return this.github.initialize();
   }
 
@@ -65,7 +67,7 @@ No changes were found in the last run, so no new version has been recorded.`,
     });
   }
 
-  async onFirstVersionRecorded(version) {
+  onFirstVersionRecorded(version) {
     return this.onVersionRecorded(version);
   }
 

@@ -5,8 +5,6 @@ import HttpProxyAgent from 'http-proxy-agent';
 import HttpsProxyAgent from 'https-proxy-agent';
 import nodeFetch, { AbortError } from 'node-fetch';
 
-import { FetchDocumentError } from './errors.js';
-
 export default async function fetch(url, configuration) {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), configuration.navigationTimeout);
@@ -29,10 +27,11 @@ export default async function fetch(url, configuration) {
     response = await nodeFetch(url, nodeFetchOptions);
 
     if (!response.ok) {
-      throw new FetchDocumentError(`Received HTTP code ${response.status} when trying to fetch '${url}'`);
+      throw new Error(`Received HTTP code ${response.status} when trying to fetch '${url}'`);
     }
 
     const mimeType = response.headers.get('content-type');
+    const contentLength = response.headers.get('content-length');
     const responseBuffer = await response.arrayBuffer();
     let content;
 
@@ -42,8 +41,8 @@ export default async function fetch(url, configuration) {
       content = Buffer.from(responseBuffer);
     }
 
-    if (!content) {
-      throw new FetchDocumentError(`Received an empty content when fetching '${url}'`);
+    if (contentLength == 0 || !content) {
+      throw new Error(`Received an empty content when fetching '${url}'`);
     }
 
     return {
@@ -52,10 +51,10 @@ export default async function fetch(url, configuration) {
     };
   } catch (error) {
     if (error instanceof AbortError) {
-      throw new FetchDocumentError(`Timed out after ${configuration.navigationTimeout / 1000} seconds when trying to fetch '${url}'`);
+      throw new Error(`Timed out after ${configuration.navigationTimeout / 1000} seconds when trying to fetch '${url}'`);
     }
 
-    throw new FetchDocumentError(error.message);
+    throw new Error(error.message);
   } finally {
     clearTimeout(timeout);
   }

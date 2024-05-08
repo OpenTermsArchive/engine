@@ -28,8 +28,14 @@ export default class Service {
     return history?.find(entry => new Date(date) <= new Date(entry.validUntil)) || currentlyValidTerms;
   }
 
-  getTermsTypes() {
-    return Object.keys(this.terms);
+  getTermsTypes(termsTypes) {
+    let result = Object.keys(this.terms);
+
+    if (termsTypes) {
+      result = result.filter(item => termsTypes.includes(item));
+    }
+
+    return result;
   }
 
   addTerms(terms) {
@@ -54,8 +60,8 @@ export default class Service {
     return this.terms[termsType].history.map(entry => entry.validUntil);
   }
 
-  getNumberOfTerms() {
-    return this.getTermsTypes().length;
+  getNumberOfTerms(termsTypes) {
+    return this.getTermsTypes(termsTypes).length;
   }
 
   hasHistory() {
@@ -63,7 +69,7 @@ export default class Service {
     return Boolean(Object.keys(this.terms).find(termsType => this.terms[termsType].history));
   }
 
-  static getNumberOfTerms(services, servicesIds) {
-    return servicesIds.reduce((acc, serviceId) => acc + services[serviceId].getNumberOfTerms(), 0);
+  static getNumberOfTerms(services, servicesIds, termsTypes) {
+    return servicesIds.reduce((acc, serviceId) => acc + services[serviceId].getNumberOfTerms(termsTypes), 0);
   }
 }
