@@ -17,10 +17,10 @@ All changes that impact users of this module are documented in this file, in the
 
 ### Fixed
 
-- Prevent engine crashes caused by invalid URLs in source document links
-- Ensure the CLI option `--types` is not ignored
+- Do not crash when source documents links point to invalid URLs
+- Take into account the `--types` CLI option 
 - Fix counts of terms when they are specified via the CLI option `--types`
-- Fixed display issues for service ID and terms type associated with errors
+- Fix display issues for service ID and terms type associated with errors
 
 ## 1.1.3 - 2024-05-02
 
