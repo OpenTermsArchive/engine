@@ -172,7 +172,7 @@ describe('Service', () => {
     });
 
     context('with a filter', () => {
-      it('returns the number of filtered terms types', () => {
+      it('returns the number of terms matching the provided terms types', () => {
         expect(subject.getNumberOfTerms([ TERMS_OF_SERVICE_TYPE, IMPRINT_TYPE ])).to.equal(1);
       });
     });

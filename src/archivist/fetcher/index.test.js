@@ -164,7 +164,7 @@ describe('Fetcher', function () {
         });
       });
 
-      context('when server responds with an emtpy content', () => {
+      context('when server responds with empty content', () => {
         const zeroContentUrl = `http://127.0.0.1:${SERVER_PORT}/zero-content`;
 
         it('throws a FetchDocumentError error', async () => {

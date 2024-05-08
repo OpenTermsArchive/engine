@@ -1,6 +1,6 @@
 export class ExtractDocumentError extends Error {
   constructor(message) {
-    super(`The extraction cannot be done: ${message}`);
+    super(`Extract failed: ${message}`);
     this.name = 'ExtractDocumentError';
   }
 }

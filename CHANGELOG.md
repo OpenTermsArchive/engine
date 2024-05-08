@@ -8,12 +8,12 @@ All changes that impact users of this module are documented in this file, in the
 
 ### Changed
 
-- Consider extraction errors as expected operational errors without crashing the engine
+- Consider extraction errors as expected operational errors instead of crashing the engine
 
 ### Added
 
-- Added label `empty content` to reported issues on GitHub when server returns empty content or when PDF content is unextractable
-- Added label `invalid selector` to reported issues on GitHub when CSS selector is invalid
+- Add label `empty content` to reported issues on GitHub when server returns empty content or when PDF content is unextractable
+- Add label `invalid selector` to reported issues on GitHub when CSS selector is invalid
 
 ### Fixed
 

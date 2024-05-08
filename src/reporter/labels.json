@@ -82,6 +82,6 @@
   {
     "name": "invalid selector",
     "color": "FBCA04",
-    "description": "Selector is invalid"
+    "description": "Some selectors cannot be understood by the engine"
   }
 ]
