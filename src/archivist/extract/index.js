@@ -1,5 +1,3 @@
-import url from 'url';
-
 import ciceroMark from '@accordproject/markdown-cicero';
 import mardownPdf from '@accordproject/markdown-pdf';
 import TurndownService from '@opentermsarchive/turndown';
