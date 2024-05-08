@@ -105,16 +105,12 @@ export async function extractFromHTML(sourceDocument) {
 }
 
 export async function extractFromPDF({ location, content: pdfBuffer }) {
+  let markdownContent;
+
   try {
     const ciceroMarkdown = await PdfTransformer.toCiceroMark(pdfBuffer);
 
-    const markdownContent = ciceroMarkTransformer.toMarkdown(ciceroMarkdown);
-
-    if (!markdownContent) {
-      throw new Error(`The PDF file at '${location}' contains no text, it might contain scanned images of text instead of actual text`);
-    }
-
-    return markdownContent;
+    markdownContent = ciceroMarkTransformer.toMarkdown(ciceroMarkdown);
   } catch (error) {
     if (error.parserError) {
       throw new Error("Can't parse PDF file");
@@ -122,6 +118,12 @@ export async function extractFromPDF({ location, content: pdfBuffer }) {
 
     throw error;
   }
+
+  if (!markdownContent) {
+    throw new Error(`The PDF file at '${location}' contains no text, it might contain scanned images of text instead of actual text`);
+  }
+
+  return markdownContent;
 }
 
 function selectRange(webPageDOM, rangeSelector) {
