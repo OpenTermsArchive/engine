@@ -22,8 +22,8 @@ const ERROR_MESSAGE_TO_ISSUE_LABEL_MAP = {
   'unable to verify the first certificate': 'first certificate',
   'certificate has expired': 'certificate expired',
   'maximum redirect reached': 'redirects',
-  'is not a valid selector': 'invalid selector',
-  'an empty content': 'empty content',
+  'not a valid selector': 'invalid selector',
+  'empty content': 'empty content',
 };
 
 function getLabelNameFromError(error) {
