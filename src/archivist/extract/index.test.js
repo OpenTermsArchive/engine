@@ -525,7 +525,7 @@ describe('Extract', () => {
 
       context('when PDF contains no text', () => {
         it('throws an ExtractDocumentError error', async () => {
-          await expect(extract({ content: await fs.readFile(path.resolve(__dirname, '../../../test/fixtures/termsNoText.pdf')), mimeType: mime.getType('pdf') })).to.be.rejectedWith(ExtractDocumentError, /contains no text/);
+          await expect(extract({ content: await fs.readFile(path.resolve(__dirname, '../../../test/fixtures/termsWithoutText.pdf')), mimeType: mime.getType('pdf') })).to.be.rejectedWith(ExtractDocumentError, /contains no text/);
         });
       });
     });
