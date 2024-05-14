@@ -8,10 +8,10 @@ All changes that impact users of this module are documented in this file, in the
 
 ### Changed
 
-- **Breaking:** All configurations are now nested under the `@opentermsarchive/engine` key. Update your `config/production.json` by wrapping its content like this: `{ @opentermsarchive/engine: { < your previous configuration >}}`.
-- **Breaking:** The `api` configuration key has been renamed to `collection-api`. Update this in your `config/production.json`.
-- **Breaking:** Default values for `port` and `basePath` in `collection-api` have been removed. Specify these configurations explicitly in your `config/production.json`.
-- **Breaking:** All environment variables are now prefixed with `OTA_ENGINE_`. Update variables such as `SENDINBLUE_API_KEY` to `OTA_ENGINE_SENDINBLUE_API_KEY`, `SMTP_PASSWORD` to `OTA_ENGINE_SMTP_PASSWORD`, and `GITHUB_TOKEN` to `OTA_ENGINE_GITHUB_TOKEN`.
+- **Breaking:** Nest all configurations under the `@opentermsarchive/engine` key; wrap the content of `config/production.json` like this: `{ @opentermsarchive/engine: { < your previous configuration >}}`
+- **Breaking:** Rename the `api` configuration key to `collection-api`; update this in your `config/production.json`
+- **Breaking:** Remove default values for `port` and `basePath` in `collection-api`; specify these configurations explicitly in your `config/production.json`
+- **Breaking:** Prefix all environment variables with `OTA_ENGINE_`; rename variables such as `SENDINBLUE_API_KEY` to `OTA_ENGINE_SENDINBLUE_API_KEY`, `SMTP_PASSWORD` to `OTA_ENGINE_SMTP_PASSWORD`, and `GITHUB_TOKEN` to `OTA_ENGINE_GITHUB_TOKEN`
 
 ## 1.3.0 - 2024-05-22
 
