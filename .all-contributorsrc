@@ -1,0 +1,12 @@
+{
+  "projectName": "Open Terms Archive engine",
+  "projectOwner": "OpenTermsArchive",
+  "files": [
+    ".all-contributors.md"
+  ],
+  "contributors": [],
+  "repoType": "github",
+  "commitConvention": "angular",
+  "commitType": "docs",
+  "contributorsPerLine": 7
+}
