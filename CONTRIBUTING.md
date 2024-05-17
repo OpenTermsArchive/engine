@@ -14,7 +14,7 @@ First of all, thanks for taking the time to contribute! 🎉👍
   - [Namespaces](#namespaces)
 - [Practices](#practices)
   - [Errors handling](#errors-handling)
-
+- [List a new contributor](#list-a-new-contributor-in-the-open-terms-archive-website)
 - - -
 
 ## Workflow
@@ -180,3 +180,11 @@ In contrast, we consider errors from the `recorder` module as fatal, and we cras
 **The best way to handle programmer errors is to crash immediately.** Indeed, it is not recommended to attempt to recover from programmer errors — that is, allow the current operation to fail, but keep handling requests. Consider that a programmer error is a case that you didn’t think about when you wrote the original code. How can you be sure that the problem won’t affect the program itself and the data integrity?
 
 This section is highly inspired, and in part extracted, from [this error handling guide](https://console.joyent.com/node-js/production/design/errors).
+
+## List a new contributor in the Open Terms Archive website
+
+We acknowledge the efforts of our contributors by listing them on our [website](https://opentermsarchive.org) and this is made possible by the use of the [All Contributors bot](https://allcontributors.org/docs/en/bot/overview).
+
+That enables adding a contributor with a comment on an issue or pull request, without writing code. To do this, please use the [dedicated issue](https://github.com/OpenTermsArchive/engine/issues/1073) on this repository.
+
+Please read the following [contributing guide](https://github.com/OpenTermsArchive/opentermsarchive.org/blob/main/CONTRIBUTING.md#list-a-new-contributor-in-the-open-terms-archive-website).
