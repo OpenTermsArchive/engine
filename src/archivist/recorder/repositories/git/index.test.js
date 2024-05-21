@@ -646,6 +646,27 @@ describe('GitRepository', () => {
       it('iterates in ascending order', () => {
         expect(fetchDates).to.deep.equal([ FETCH_DATE_EARLIER, FETCH_DATE, FETCH_DATE_LATER ]);
       });
+
+      context('when the repository contains non-record commits (e.g., README, LICENSE)', () => {
+        const iteratedIds = [];
+        let extraCommitId;
+
+        before(async () => {
+          await fs.writeFileSync(path.resolve(subject.path, 'README.md'), '# README');
+          await subject.git.add(path.resolve(subject.path, 'README.md'));
+          extraCommitId = await subject.git.commit({ message: 'Update README', filePath: path.resolve(subject.path, 'README.md') });
+
+          for await (const record of subject.iterate()) {
+            iteratedIds.push(record.id);
+          }
+        });
+
+        after(() => subject.removeAll());
+
+        it('iterates through records only', () => {
+          expect(iteratedIds).to.not.contains(extraCommitId);
+        });
+      });
     });
   });
 
