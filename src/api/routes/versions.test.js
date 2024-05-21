@@ -57,7 +57,7 @@ describe('Versions API', () => {
       };
     });
 
-    after(async () => versionsRepository.removeAll());
+    after(() => versionsRepository.removeAll());
 
     let response;
 

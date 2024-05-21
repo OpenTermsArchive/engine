@@ -100,7 +100,7 @@ export default class GitRepository extends RepositoryInterface {
     }
   }
 
-  async removeAll() {
+  removeAll() {
     return this.git.destroyHistory();
   }
 

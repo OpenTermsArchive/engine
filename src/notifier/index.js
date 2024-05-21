@@ -17,11 +17,11 @@ export default class Notifier {
     this.delayedVersionNotificationsParams = [];
   }
 
-  async onVersionRecorded(record) {
+  onVersionRecorded(record) {
     this.delayedVersionNotificationsParams.push(record);
   }
 
-  async onTrackingCompleted() {
+  onTrackingCompleted() {
     this.delayedVersionNotificationsParams.forEach(async ({ serviceId, termsType, id }) => {
       try {
         await this.notifyVersionRecorded(serviceId, termsType, id);

@@ -28,7 +28,7 @@ const FETCH_DATE = new Date('2000-01-02T12:00:00.000Z');
 let gitVersion;
 let app;
 
-async function resetGitRepositories() {
+function resetGitRepositories() {
   return Promise.all([ app.recorder.snapshotsRepository.removeAll(), app.recorder.versionsRepository.removeAll() ]);
 }
 
@@ -79,7 +79,7 @@ describe('Archivist', function () {
     });
 
     context('when everything works fine', () => {
-      before(async () => app.track({ services }));
+      before(() => app.track({ services }));
 
       after(resetGitRepositories);
 
@@ -118,11 +118,11 @@ describe('Archivist', function () {
 
       after(resetGitRepositories);
 
-      it('records no snapshot for service A', async () => {
+      it('records no snapshot for service A', () => {
         expect(fsApi.existsSync(path.resolve(__dirname, SERVICE_A_EXPECTED_SNAPSHOT_FILE_PATH))).to.be.false;
       });
 
-      it('records no version for service A', async () => {
+      it('records no version for service A', () => {
         expect(fsApi.existsSync(path.resolve(__dirname, SERVICE_A_EXPECTED_VERSION_FILE_PATH))).to.be.false;
       });
 
@@ -182,11 +182,11 @@ describe('Archivist', function () {
             expect(serviceAContent).to.equal('Terms of service with UTF-8 \'çhãràčtęrs"\n========================================');
           });
 
-          it('generates a new version id', async () => {
+          it('generates a new version id', () => {
             expect(reExtractedVersionId).to.not.equal(firstVersionId);
           });
 
-          it('mentions the snapshot id in the changelog', async () => {
+          it('mentions the snapshot id in the changelog', () => {
             expect(reExtractedVersionMessageBody).to.include(originalSnapshotId);
           });
 
@@ -233,11 +233,11 @@ describe('Archivist', function () {
 
           after(resetGitRepositories);
 
-          it('emits an inaccessibleContent event', async () => {
+          it('emits an inaccessibleContent event', () => {
             expect(inaccessibleContentSpy).to.have.been.called;
           });
 
-          it('still extracts the terms of other services', async () => {
+          it('still extracts the terms of other services', () => {
             expect(versionNotChangedSpy).to.have.been.calledWith(versionB);
           });
         });
@@ -355,10 +355,10 @@ describe('Archivist', function () {
       let terms;
       let snapshot;
 
-      before(async () => {
+      before(() => {
         terms = app.services.service·A.getTerms({ type: SERVICE_A_TYPE });
         terms.fetchDate = FETCH_DATE;
-        terms.sourceDocuments.forEach(async sourceDocument => {
+        terms.sourceDocuments.forEach(sourceDocument => {
           sourceDocument.content = serviceASnapshotExpectedContent;
           sourceDocument.mimeType = MIME_TYPE;
         });
@@ -376,7 +376,7 @@ describe('Archivist', function () {
           return resetGitRepositories();
         });
 
-        it('emits "firstSnapshotRecorded" event', async () => {
+        it('emits "firstSnapshotRecorded" event', () => {
           expect(spies.onFirstSnapshotRecorded).to.have.been.calledWith(snapshot);
         });
 
@@ -424,7 +424,7 @@ describe('Archivist', function () {
             return resetGitRepositories();
           });
 
-          it('emits "snapshotNotChanged" event', async () => {
+          it('emits "snapshotNotChanged" event', () => {
             expect(spies.onSnapshotNotChanged).to.have.been.calledWith(snapshot);
           });
 
@@ -472,7 +472,7 @@ describe('Archivist', function () {
           before(async () => {
             await app.recordVersion(terms);
             resetSpiesHistory();
-            terms.sourceDocuments.forEach(async sourceDocument => {
+            terms.sourceDocuments.forEach(sourceDocument => {
               sourceDocument.content = serviceBSnapshotExpectedContent;
             });
             changedVersion = await app.recordVersion(terms);
@@ -484,7 +484,7 @@ describe('Archivist', function () {
             return resetGitRepositories();
           });
 
-          it('emits "versionRecorded" event', async () => {
+          it('emits "versionRecorded" event', () => {
             expect(spies.onVersionRecorded).to.have.been.calledWith(changedVersion);
           });
 
@@ -506,7 +506,7 @@ describe('Archivist', function () {
             return resetGitRepositories();
           });
 
-          it('emits "versionNotChanged" event', async () => {
+          it('emits "versionNotChanged" event', () => {
             expect(spies.onVersionNotChanged).to.have.been.calledWith(version);
           });
 
@@ -516,7 +516,7 @@ describe('Archivist', function () {
     });
 
     context('when tracking changes on new services', () => {
-      before(async () => {
+      before(() => {
         nock('https://www.servicea.example').get('/tos').reply(200, serviceASnapshotExpectedContent, { 'Content-Type': 'text/html' });
         nock('https://www.serviceb.example').get('/privacy').reply(200, serviceBSnapshotExpectedContent, { 'Content-Type': 'application/pdf' });
 

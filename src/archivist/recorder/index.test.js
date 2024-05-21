@@ -30,7 +30,7 @@ describe('Recorder', () => {
         await recorder.initialize();
       });
 
-      after(async () => recorder.finalize());
+      after(() => recorder.finalize());
 
       context('Snapshot', () => {
         describe('#record', () => {
@@ -41,7 +41,7 @@ describe('Recorder', () => {
           let record;
 
           context('when a required param is missing', () => {
-            after(async () => recorder.snapshotsRepository.removeAll());
+            after(() => recorder.snapshotsRepository.removeAll());
 
             Snapshot.REQUIRED_PARAMS.forEach(testedRequiredParam => {
               context(`when "${testedRequiredParam}" is missing`, () => {
@@ -82,17 +82,17 @@ describe('Recorder', () => {
               record = await recorder.snapshotsRepository.findLatest(SERVICE_ID, TYPE);
             });
 
-            after(async () => recorder.snapshotsRepository.removeAll());
+            after(() => recorder.snapshotsRepository.removeAll());
 
             it('records the snapshot with the proper content', async () => {
               expect(await record.content).to.equal(CONTENT);
             });
 
-            it('returns the record id', async () => {
+            it('returns the record id', () => {
               expect(record.id).to.include(id);
             });
 
-            it('states that it is the first record', async () => {
+            it('states that it is the first record', () => {
               expect(isFirstRecord).to.be.true;
             });
           });
@@ -120,17 +120,17 @@ describe('Recorder', () => {
               record = await recorder.snapshotsRepository.findLatest(SERVICE_ID, TYPE);
             });
 
-            after(async () => recorder.snapshotsRepository.removeAll());
+            after(() => recorder.snapshotsRepository.removeAll());
 
             it('records the snapshot with the proper content', async () => {
               expect(await record.content).to.equal(UPDATED_CONTENT);
             });
 
-            it('returns the record id', async () => {
+            it('returns the record id', () => {
               expect(record.id).to.include(id);
             });
 
-            it('states that it is not the first record', async () => {
+            it('states that it is not the first record', () => {
               expect(isFirstRecord).to.be.false;
             });
           });
@@ -156,9 +156,9 @@ describe('Recorder', () => {
               record = await recorder.snapshotsRepository.findLatest(SERVICE_ID, TYPE);
             });
 
-            after(async () => recorder.snapshotsRepository.removeAll());
+            after(() => recorder.snapshotsRepository.removeAll());
 
-            it('does not record the snapshot', async () => {
+            it('does not record the snapshot', () => {
               expect(id).to.not.be.ok;
             });
           });
@@ -175,7 +175,7 @@ describe('Recorder', () => {
           let record;
 
           context('when a required param is missing', () => {
-            after(async () => recorder.versionsRepository.removeAll());
+            after(() => recorder.versionsRepository.removeAll());
 
             Version.REQUIRED_PARAMS.forEach(testedRequiredParam => {
               context(`when "${testedRequiredParam}" is missing`, () => {
@@ -216,17 +216,17 @@ describe('Recorder', () => {
               record = await recorder.versionsRepository.findLatest(SERVICE_ID, TYPE);
             });
 
-            after(async () => recorder.versionsRepository.removeAll());
+            after(() => recorder.versionsRepository.removeAll());
 
             it('records the version with the proper content', async () => {
               expect(await record.content).to.equal(CONTENT);
             });
 
-            it('returns the record id', async () => {
+            it('returns the record id', () => {
               expect(record.id).to.include(id);
             });
 
-            it('states that it is the first record', async () => {
+            it('states that it is the first record', () => {
               expect(isFirstRecord).to.be.true;
             });
           });
@@ -254,21 +254,21 @@ describe('Recorder', () => {
               record = await recorder.versionsRepository.findLatest(SERVICE_ID, TYPE);
             });
 
-            after(async () => recorder.versionsRepository.removeAll());
+            after(() => recorder.versionsRepository.removeAll());
 
             it('records the version with the proper content', async () => {
               expect(await record.content).to.equal(UPDATED_CONTENT);
             });
 
-            it('records in the version that it is not an extracted only version', async () => {
+            it('records in the version that it is not an extracted only version', () => {
               expect(record.isExtractOnly).to.equal(false);
             });
 
-            it('returns the record id', async () => {
+            it('returns the record id', () => {
               expect(record.id).to.include(id);
             });
 
-            it('states that it is not the first record', async () => {
+            it('states that it is not the first record', () => {
               expect(isFirstRecord).to.be.false;
             });
           });
@@ -294,9 +294,9 @@ describe('Recorder', () => {
               record = await recorder.versionsRepository.findLatest(SERVICE_ID, TYPE);
             });
 
-            after(async () => recorder.versionsRepository.removeAll());
+            after(() => recorder.versionsRepository.removeAll());
 
-            it('does not record any version', async () => {
+            it('does not record any version', () => {
               expect(id).to.not.be.ok;
             });
           });
@@ -323,17 +323,17 @@ describe('Recorder', () => {
                 record = await recorder.versionsRepository.findLatest(SERVICE_ID, TYPE);
               });
 
-              after(async () => recorder.versionsRepository.removeAll()); after(async () => recorder.versionsRepository.removeAll());
+              after(() => recorder.versionsRepository.removeAll()); after(() => recorder.versionsRepository.removeAll());
 
               it('records the version with the proper content', async () => {
                 expect(await record.content).to.equal(CONTENT);
               });
 
-              it('returns the record id', async () => {
+              it('returns the record id', () => {
                 expect(record.id).to.include(id);
               });
 
-              it('states that it is the first record', async () => {
+              it('states that it is the first record', () => {
                 expect(isFirstRecord).to.be.true;
               });
             });
@@ -362,21 +362,21 @@ describe('Recorder', () => {
                 record = await recorder.versionsRepository.findLatest(SERVICE_ID, TYPE);
               });
 
-              after(async () => recorder.versionsRepository.removeAll());
+              after(() => recorder.versionsRepository.removeAll());
 
               it('records the version with the proper content', async () => {
                 expect(await record.content).to.equal(UPDATED_CONTENT);
               });
 
-              it('records in the version that it is an extracted only version', async () => {
+              it('records in the version that it is an extracted only version', () => {
                 expect(record.isExtractOnly).to.equal(true);
               });
 
-              it('returns the record id', async () => {
+              it('returns the record id', () => {
                 expect(record.id).to.include(id);
               });
 
-              it('states that it is not the first record', async () => {
+              it('states that it is not the first record', () => {
                 expect(isFirstRecord).to.be.false;
               });
             });
@@ -403,9 +403,9 @@ describe('Recorder', () => {
                 record = await recorder.versionsRepository.findLatest(SERVICE_ID, TYPE);
               });
 
-              after(async () => recorder.versionsRepository.removeAll());
+              after(() => recorder.versionsRepository.removeAll());
 
-              it('does not record any version', async () => {
+              it('does not record any version', () => {
                 expect(id).to.not.be.ok;
               });
             });

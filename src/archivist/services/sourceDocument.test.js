@@ -10,7 +10,7 @@ describe('SourceDocument', () => {
   describe('#getCssSelectors', () => {
     context('with "select" property', () => {
       context('with string selector', () => {
-        it('extracts selectors', async () => {
+        it('extracts selectors', () => {
           const result = new SourceDocument({ location: URL, contentSelectors: 'body' }).cssSelectors;
 
           expect(result).to.deep.equal(['body']);
@@ -18,7 +18,7 @@ describe('SourceDocument', () => {
       });
 
       context('with range selector', () => {
-        it('extracts selectors', async () => {
+        it('extracts selectors', () => {
           const result = new SourceDocument({
             location: URL,
             contentSelectors: {
@@ -32,7 +32,7 @@ describe('SourceDocument', () => {
       });
 
       context('with an array of mixed selectors', () => {
-        it('extracts selectors', async () => {
+        it('extracts selectors', () => {
           const result = new SourceDocument({
             location: URL,
             contentSelectors: [
@@ -51,7 +51,7 @@ describe('SourceDocument', () => {
 
     context('with "remove" property', () => {
       context('with string selector', () => {
-        it('extracts selectors', async () => {
+        it('extracts selectors', () => {
           const result = new SourceDocument({ location: URL, insignificantContentSelectors: 'body' }).cssSelectors;
 
           expect(result).to.deep.equal(['body']);
@@ -59,7 +59,7 @@ describe('SourceDocument', () => {
       });
 
       context('with range selector', () => {
-        it('extracts selectors', async () => {
+        it('extracts selectors', () => {
           const result = new SourceDocument({
             location: URL,
             insignificantContentSelectors: {
@@ -73,7 +73,7 @@ describe('SourceDocument', () => {
       });
 
       context('with an array of mixed selectors', () => {
-        it('extracts selectors', async () => {
+        it('extracts selectors', () => {
           const result = new SourceDocument({
             location: URL,
             insignificantContentSelectors: [
@@ -92,7 +92,7 @@ describe('SourceDocument', () => {
 
     context('with both "select" and "remove" property', () => {
       context('with string selector', () => {
-        it('extracts selectors', async () => {
+        it('extracts selectors', () => {
           const result = new SourceDocument({
             location: URL,
             contentSelectors: 'body',
@@ -104,7 +104,7 @@ describe('SourceDocument', () => {
       });
 
       context('with range selector', () => {
-        it('extracts selectors', async () => {
+        it('extracts selectors', () => {
           const result = new SourceDocument({
             location: URL,
             contentSelectors: {
@@ -127,7 +127,7 @@ describe('SourceDocument', () => {
       });
 
       context('with an array of mixed selectors', () => {
-        it('extracts selectors', async () => {
+        it('extracts selectors', () => {
           const result = new SourceDocument({
             location: URL,
             contentSelectors: [
@@ -160,7 +160,7 @@ describe('SourceDocument', () => {
   });
 
   describe('#toPersistence', () => {
-    it('converts basic source document declarations into JSON representation', async () => {
+    it('converts basic source document declarations into JSON representation', () => {
       const result = new SourceDocument({
         location: URL,
         contentSelectors: 'body',
@@ -177,7 +177,7 @@ describe('SourceDocument', () => {
       expect(result).to.deep.equal(expectedResult);
     });
 
-    it('converts full source document declarations to JSON representation', async () => {
+    it('converts full source document declarations to JSON representation', () => {
       const result = new SourceDocument({
         location: URL,
         contentSelectors: [

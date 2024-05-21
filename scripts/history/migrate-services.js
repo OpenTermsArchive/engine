@@ -198,7 +198,7 @@ async function initialize(migration) {
   ]);
 }
 
-async function finalize(migration) {
+function finalize(migration) {
   return Promise.all([
     migration.from.snapshots.source.finalize(),
     migration.from.snapshots.destination.finalize(),

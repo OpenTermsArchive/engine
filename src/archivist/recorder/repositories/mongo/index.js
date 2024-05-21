@@ -29,7 +29,7 @@ export default class MongoRepository extends RepositoryInterface {
     return this;
   }
 
-  async finalize() {
+  finalize() {
     return this.client.close();
   }
 
@@ -77,7 +77,7 @@ export default class MongoRepository extends RepositoryInterface {
       .map(mongoDocument => this.#toDomain(mongoDocument, { deferContentLoading: true })));
   }
 
-  async count() {
+  count() {
     return this.collection.find().count();
   }
 
@@ -93,7 +93,7 @@ export default class MongoRepository extends RepositoryInterface {
     /* eslint-enable no-await-in-loop */
   }
 
-  async removeAll() {
+  removeAll() {
     return this.collection.deleteMany();
   }
 

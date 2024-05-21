@@ -20,14 +20,14 @@ describe('Version', () => {
 
       describe(`"${requiredParam}"`, () => {
         context('when missing', () => {
-          it('throws an error', async () => {
+          it('throws an error', () => {
             subject = new Version({ ...validParamsExceptTheOneTested });
             expect(subject.validate.bind(subject)).to.throw(RegExp(requiredParam));
           });
         });
 
         context('when null', () => {
-          it('throws an error', async () => {
+          it('throws an error', () => {
             subject = new Version({ ...validParamsExceptTheOneTested, [requiredParam]: null });
             expect(subject.validate.bind(subject)).to.throw(RegExp(requiredParam));
           });
@@ -44,12 +44,12 @@ describe('Version', () => {
       snapshotIds: ['dd263f270b3065e1c18201b49ab898474b357566'],
     };
 
-    before(async () => {
+    before(() => {
       subject = new Version(recordParams);
     });
 
     context('when it is neither defined nor loaded', () => {
-      it('throws an error explaining how to recover', async () => {
+      it('throws an error explaining how to recover', () => {
         try {
           console.log(subject.content);
         } catch (e) {

@@ -67,7 +67,7 @@ async function initialize() {
   await renamer.loadRules();
 }
 
-async function queueWorker({ commit, index, total }) {
+function queueWorker({ commit, index, total }) {
   return async.retry({
     times: MAX_RETRY,
     interval(retryCount) {

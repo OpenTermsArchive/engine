@@ -8,19 +8,19 @@ export default class Recorder {
     this.snapshotsRepository = RepositoryFactory.create(config.snapshots.storage);
   }
 
-  async initialize() {
+  initialize() {
     return Promise.all([ this.versionsRepository.initialize(), this.snapshotsRepository.initialize() ]);
   }
 
-  async finalize() {
+  finalize() {
     return Promise.all([ this.versionsRepository.finalize(), this.snapshotsRepository.finalize() ]);
   }
 
-  async getLatestSnapshot(terms, sourceDocumentId) {
+  getLatestSnapshot(terms, sourceDocumentId) {
     return this.snapshotsRepository.findLatest(terms.service.id, terms.type, terms.hasMultipleSourceDocuments && sourceDocumentId);
   }
 
-  async record(record) {
+  record(record) {
     record.validate();
 
     switch (record.constructor) { // eslint-disable-line default-case

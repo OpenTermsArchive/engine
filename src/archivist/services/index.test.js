@@ -12,7 +12,7 @@ describe('Services', () => {
   describe('#load', () => {
     let result;
 
-    async function validateServiceWithoutHistory(serviceId, expected) {
+    function validateServiceWithoutHistory(serviceId, expected) {
       /* eslint-disable no-loop-func */
       for (const termsType of expected.getTermsTypes()) {
         context(`${termsType}`, () => {
@@ -59,20 +59,20 @@ describe('Services', () => {
                 expect(actualTerms.validUntil).to.be.undefined;
               });
 
-              it('has the proper content selectors', async () => {
+              it('has the proper content selectors', () => {
                 expect(actualContentSelectors).to.equal(expectedContentSelectors);
               });
 
-              it('has the proper insignificant content selectors', async () => {
+              it('has the proper insignificant content selectors', () => {
                 expect(actualInsignificantContentSelectors).to.equal(expectedInsignificantContentSelectors);
               });
 
-              it('has the proper executeClientScripts option', async () => {
+              it('has the proper executeClientScripts option', () => {
                 expect(actualExecuteClientScripts).to.equal(expectedExecuteClientScripts);
               });
 
               if (expectedFilters) {
-                it('has the proper number of filter functions', async () => {
+                it('has the proper number of filter functions', () => {
                   expect(actualFilters.length).to.equal(expectedFilters.length);
                 });
 
@@ -125,12 +125,12 @@ describe('Services', () => {
       await validateServiceWithoutHistory('service_with_multiple_source_documents_terms', expectedServices.service_with_multiple_source_documents_terms);
     });
 
-    context('when specifying services to load', async () => {
+    context('when specifying services to load', () => {
       before(async () => {
         result = await services.load([ 'service·A', 'Service B!' ]);
       });
 
-      it('loads only the given services', async () => {
+      it('loads only the given services', () => {
         expect(result).to.have.all.keys('service·A', 'Service B!');
       });
     });
@@ -139,7 +139,7 @@ describe('Services', () => {
   describe('#loadWithHistory', () => {
     let result;
 
-    async function validateServiceWithHistory(serviceId, expected) {
+    function validateServiceWithHistory(serviceId, expected) {
       /* eslint-disable no-loop-func */
       for (const termsType of expected.getTermsTypes()) {
         context(`${termsType}`, () => {
@@ -201,20 +201,20 @@ describe('Services', () => {
                       } = actualDocumentsForThisDate[index]);
                     });
 
-                    it('has the proper content selectors', async () => {
+                    it('has the proper content selectors', () => {
                       expect(contentSelectorsForThisDate).to.equal(expectedContentSelectors);
                     });
 
-                    it('has the proper insignificant content selectors', async () => {
+                    it('has the proper insignificant content selectors', () => {
                       expect(insignificantContentSelectorsForThisDate).to.equal(expectedInsignificantContentSelectors);
                     });
 
-                    it('has the proper executeClientScripts option', async () => {
+                    it('has the proper executeClientScripts option', () => {
                       expect(actualExecuteClientScriptsForThisDate).to.equal(expectedExecuteClientScriptsForThisDate);
                     });
 
                     if (expectedFiltersForThisDate) {
-                      it('has the proper number of filter functions', async () => {
+                      it('has the proper number of filter functions', () => {
                         expect(actualFiltersForThisDate.length).to.equal(expectedFiltersForThisDate.length);
                       });
 
@@ -231,12 +231,12 @@ describe('Services', () => {
                   });
                 }
               } else {
-                it('has no history', async () => {
+                it('has no history', () => {
                   expect(actualTerms.validUntil).to.be.undefined;
                 });
 
                 if (expectedFilters) {
-                  it('has the proper number of filter functions', async () => {
+                  it('has the proper number of filter functions', () => {
                     expect(actualFilters.length).to.equal(expectedFilters.length);
                   });
 
@@ -294,12 +294,12 @@ describe('Services', () => {
       await validateServiceWithHistory('service_with_multiple_source_documents_terms', expectedServices.service_with_multiple_source_documents_terms);
     });
 
-    context('when specifying services to load', async () => {
+    context('when specifying services to load', () => {
       before(async () => {
         result = await services.loadWithHistory([ 'service·A', 'Service B!' ]);
       });
 
-      it('loads only the given services', async () => {
+      it('loads only the given services', () => {
         expect(result).to.have.all.keys('service·A', 'Service B!');
       });
     });

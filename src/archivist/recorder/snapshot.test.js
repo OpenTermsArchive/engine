@@ -20,14 +20,14 @@ describe('Snapshot', () => {
 
       describe(`"${requiredParam}"`, () => {
         context('when missing', () => {
-          it('throws an error', async () => {
+          it('throws an error', () => {
             subject = new Snapshot({ ...validParamsExceptTheOneTested });
             expect(subject.validate.bind(subject)).to.throw(RegExp(requiredParam));
           });
         });
 
         context('when null', () => {
-          it('throws an error', async () => {
+          it('throws an error', () => {
             subject = new Snapshot({ ...validParamsExceptTheOneTested, [requiredParam]: null });
             expect(subject.validate.bind(subject)).to.throw(RegExp(requiredParam));
           });
@@ -44,12 +44,12 @@ describe('Snapshot', () => {
       fetchDate: new Date('2000-01-01T12:00:00.000Z'),
     };
 
-    before(async () => {
+    before(() => {
       subject = new Snapshot(recordParams);
     });
 
     context('when it is neither defined nor loaded', () => {
-      it('throws an error explaining how to recover', async () => {
+      it('throws an error explaining how to recover', () => {
         try {
           console.log(subject.content);
         } catch (e) {

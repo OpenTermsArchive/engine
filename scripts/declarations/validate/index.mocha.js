@@ -40,7 +40,7 @@ export default async options => {
     ({ services: servicesToValidate, servicesTermsTypes } = await declarationUtils.getModifiedServicesAndTermsTypes());
   }
 
-  describe('Service declarations validation', async function () {
+  describe('Service declarations validation', function () {
     this.timeout(60000);
     this.slow(SLOW_DOCUMENT_THRESHOLD);
 
@@ -53,8 +53,8 @@ export default async options => {
 
       after(stopHeadlessBrowser);
 
-      context(serviceId, async () => {
-        before(async function () {
+      context(serviceId, () => {
+        before(function () {
           if (!service) {
             console.log('      (Tests skipped as declaration has been archived)');
             this.skip();
@@ -100,7 +100,7 @@ export default async options => {
                   let filteredContent;
 
                   context(sourceDocument.location, () => {
-                    before(async function () {
+                    before(function () {
                       if (!terms) {
                         console.log('      (Tests skipped as declaration has been archived)');
                         this.skip();
@@ -129,7 +129,7 @@ export default async options => {
                       expect(filteredContent).to.not.be.empty;
                     });
 
-                    it(`filtered content has at least ${MIN_DOC_LENGTH} characters`, async function checkContentLength() {
+                    it(`filtered content has at least ${MIN_DOC_LENGTH} characters`, function checkContentLength() {
                       if (!sourceDocument.content) {
                         console.log('          [Tests skipped as URL is not fetchable]');
                         this.skip();
