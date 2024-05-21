@@ -60,7 +60,7 @@ We add these additional rules:
 
 ### Changelog
 
-When opening a pull request, it is required to modify the changelog. It must be determined whether the changes made to the codebase impact users or not. These two cases are mutually exclusive and have different implications.
+When opening a pull request, it is required to fill in the changelog. It must be determined whether the changes made to the codebase impact users or not. These two cases are mutually exclusive and have different implications.
 
 #### Changes that impact users
 
