@@ -1,0 +1,21 @@
+{
+  "projectName": "engine",
+  "projectOwner": "OpenTermsArchive",
+  "files": [
+    ".all-contributors.md"
+  ],
+  "contributors": [
+    {
+      "login": "jetlime",
+      "name": "jetlime",
+      "avatar_url": "https://avatars.githubusercontent.com/u/29337128?v=4",
+      "profile": "https://github.com/jetlime",
+      "contributions": [
+        "doc"
+      ]
+    }
+  ],
+  "repoType": "github",
+  "commitConvention": "none",
+  "contributorsPerLine": 7
+}
