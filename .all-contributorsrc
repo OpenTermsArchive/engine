@@ -6,7 +6,7 @@
   ],
   "contributors": [],
   "repoType": "github",
-  "commitConvention": "angular",
+  "commitConvention": "none",
   "commitType": "docs",
   "contributorsPerLine": 7
 }
