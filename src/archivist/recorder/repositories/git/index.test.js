@@ -647,7 +647,7 @@ describe('GitRepository', () => {
         expect(fetchDates).to.deep.equal([ FETCH_DATE_EARLIER, FETCH_DATE, FETCH_DATE_LATER ]);
       });
 
-      context('when the repository contains non-record commits (e.g., README, LICENSE)', () => {
+      context('when the repository contains non-record commits (e.g., README or LICENSE updates)', () => {
         const iteratedIds = [];
         let extraCommitId;
 
