@@ -2,6 +2,17 @@
 
 All changes that impact users of this module are documented in this file, in the [Common Changelog](https://common-changelog.org) format with some additional specifications defined in the CONTRIBUTING file. This codebase adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased [major]
+
+> Development of this release was supported by the [French Ministry for Foreign Affairs](https://www.diplomatie.gouv.fr/fr/politique-etrangere-de-la-france/diplomatie-numerique/) through its ministerial [State Startups incubator](https://beta.gouv.fr/startups/open-terms-archive.html) under the aegis of the Ambassador for Digital Affairs.
+
+### Changed
+
+- **Breaking:** Nest all configurations under the `@opentermsarchive/engine` key; wrap the content of `config/production.json` like this: `{ @opentermsarchive/engine: { < your previous configuration >}}`
+- **Breaking:** Rename the `api` configuration key to `collection-api`; update this in your `config/production.json`
+- **Breaking:** Remove default values for `port` and `basePath` in `collection-api`; specify these configurations explicitly in your `config/production.json`
+- **Breaking:** Prefix all environment variables with `OTA_ENGINE_`; rename variables such as `SENDINBLUE_API_KEY` to `OTA_ENGINE_SENDINBLUE_API_KEY`, `SMTP_PASSWORD` to `OTA_ENGINE_SMTP_PASSWORD`, and `GITHUB_TOKEN` to `OTA_ENGINE_GITHUB_TOKEN`
+
 ## 1.3.0 - 2024-05-22
 
 _Full changeset and discussions: [#1076](https://github.com/OpenTermsArchive/engine/pull/1076)._

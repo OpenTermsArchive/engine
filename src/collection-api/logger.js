@@ -11,12 +11,12 @@ const { combine, timestamp, printf, colorize } = winston.format;
 
 const transports = [new winston.transports.Console()];
 
-if (config.get('logger.sendMailOnError')) {
+if (config.get('@opentermsarchive/engine.logger.sendMailOnError')) {
   transports.push(new winston.transports.Mail({
-    to: config.get('logger.sendMailOnError.to'),
-    from: config.get('logger.sendMailOnError.from'),
-    host: config.get('logger.smtp.host'),
-    username: config.get('logger.smtp.username'),
+    to: config.get('@opentermsarchive/engine.logger.sendMailOnError.to'),
+    from: config.get('@opentermsarchive/engine.logger.sendMailOnError.from'),
+    host: config.get('@opentermsarchive/engine.logger.smtp.host'),
+    username: config.get('@opentermsarchive/engine.logger.smtp.username'),
     password: process.env.SMTP_PASSWORD,
     ssl: true,
     timeout: 30 * 1000,

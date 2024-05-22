@@ -53,15 +53,15 @@ let client;
 }());
 
 async function initialize() {
-  client = new MongoClient(config.get('import.mongo.connectionURI'));
+  client = new MongoClient(config.get('@opentermsarchive/engine.import.mongo.connectionURI'));
 
   await client.connect();
-  const db = client.db(config.get('import.mongo.database'));
+  const db = client.db(config.get('@opentermsarchive/engine.import.mongo.database'));
 
-  snapshotsCollection = db.collection(config.get('import.mongo.snapshotsCollection'));
-  commitsCollection = db.collection(config.get('import.mongo.commitsCollection'));
+  snapshotsCollection = db.collection(config.get('@opentermsarchive/engine.import.mongo.snapshotsCollection'));
+  commitsCollection = db.collection(config.get('@opentermsarchive/engine.import.mongo.commitsCollection'));
 
-  sourceRepository = new Git({ path: path.resolve(ROOT_PATH, config.get('import.sourcePath')) });
+  sourceRepository = new Git({ path: path.resolve(ROOT_PATH, config.get('@opentermsarchive/engine.import.sourcePath')) });
 
   await sourceRepository.initialize();
   await renamer.loadRules();
@@ -119,7 +119,7 @@ function queueDrainHandler(totalToTreat) {
 
 async function getCommitContent({ sha, serviceId, termsType, extension }) {
   const start = performance.now();
-  const url = `https://raw.githubusercontent.com/${config.get('import.githubRepository')}/${sha}/${encodeURI(serviceId)}/${encodeURI(termsType)}.${extension}`;
+  const url = `https://raw.githubusercontent.com/${config.get('@opentermsarchive/engine.import.githubRepository')}/${sha}/${encodeURI(serviceId)}/${encodeURI(termsType)}.${extension}`;
   const response = await nodeFetch(url);
   const end = performance.now();
 

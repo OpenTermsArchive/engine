@@ -1,14 +1,12 @@
 import config from 'config';
-import dotenv from 'dotenv';
 import sendInBlue from 'sib-api-v3-sdk';
 
-dotenv.config();
 export default class Notifier {
   constructor(passedServiceProviders) {
     const defaultClient = sendInBlue.ApiClient.instance;
     const authentication = defaultClient.authentications['api-key'];
 
-    authentication.apiKey = process.env.SENDINBLUE_API_KEY;
+    authentication.apiKey = process.env.OTA_ENGINE_SENDINBLUE_API_KEY;
 
     this.apiInstance = new sendInBlue.TransactionalEmailsApi();
     this.contactsInstance = new sendInBlue.ContactsApi();
@@ -35,7 +33,7 @@ export default class Notifier {
 
   async notifyVersionRecorded(serviceProviderId, termsType, versionId) {
     const sendParams = {
-      templateId: config.get('notifier.sendInBlue.updateTemplateId'),
+      templateId: config.get('@opentermsarchive/engine.notifier.sendInBlue.updateTemplateId'),
       params: {
         SERVICE_PROVIDER_NAME: this.serviceProviders[serviceProviderId].name,
         DOCUMENT_TYPE: termsType,
@@ -44,7 +42,7 @@ export default class Notifier {
     };
 
     const lists = [
-      config.get('notifier.sendInBlue.updatesListId'),
+      config.get('@opentermsarchive/engine.notifier.sendInBlue.updatesListId'),
     ];
 
     const notificationListName = `${this.serviceProviders[serviceProviderId].name} - ${termsType} - Update`;

@@ -1,11 +1,9 @@
 import os from 'os';
 
 import config from 'config';
-import dotenv from 'dotenv';
 import winston from 'winston';
 import 'winston-mail';
 
-dotenv.config();
 const { combine, timestamp, printf, colorize } = winston.format;
 
 const alignedWithColorsAndTime = combine(
@@ -40,16 +38,16 @@ const logger = winston.createLogger({
   rejectionHandlers: transports,
 });
 
-if (config.get('logger.sendMailOnError')) {
-  if (process.env.SMTP_PASSWORD === undefined) {
-    logger.warn('Environment variable "SMTP_PASSWORD" was not found; log emails cannot be sent');
+if (config.get('@opentermsarchive/engine.logger.sendMailOnError')) {
+  if (process.env.OTA_ENGINE_SMTP_PASSWORD === undefined) {
+    logger.warn('Environment variable "OTA_ENGINE_SMTP_PASSWORD" was not found; log emails cannot be sent');
   } else {
     const mailerOptions = {
-      to: config.get('logger.sendMailOnError.to'),
-      from: config.get('logger.sendMailOnError.from'),
-      host: config.get('logger.smtp.host'),
-      username: config.get('logger.smtp.username'),
-      password: process.env.SMTP_PASSWORD,
+      to: config.get('@opentermsarchive/engine.logger.sendMailOnError.to'),
+      from: config.get('@opentermsarchive/engine.logger.sendMailOnError.from'),
+      host: config.get('@opentermsarchive/engine.logger.smtp.host'),
+      username: config.get('@opentermsarchive/engine.logger.smtp.username'),
+      password: process.env.OTA_ENGINE_SMTP_PASSWORD,
       ssl: true,
       timeout: 30 * 1000,
       formatter: args => args[Object.getOwnPropertySymbols(args)[1]], // Returns the full error message, the same visible in the console. It is referenced in the argument object with a Symbol of which we do not have the reference but we know it is the second one.
@@ -62,7 +60,7 @@ if (config.get('logger.sendMailOnError')) {
       subject: `[OTA] Error Report — ${os.hostname()}`,
     }));
 
-    if (config.get('logger.sendMailOnError.sendWarnings')) {
+    if (config.get('@opentermsarchive/engine.logger.sendMailOnError.sendWarnings')) {
       transports.push(new winston.transports.Mail({
         ...mailerOptions,
         level: 'warn',

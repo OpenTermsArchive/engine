@@ -3,17 +3,14 @@ import path from 'path';
 import url from 'url';
 
 import config from 'config';
-import dotenv from 'dotenv';
 import { Octokit } from 'octokit';
 
 import * as readme from '../assets/README.template.js';
 
-dotenv.config();
-
 export default async function publish({ archivePath, releaseDate, stats }) {
-  const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
+  const octokit = new Octokit({ auth: process.env.OTA_ENGINE_GITHUB_TOKEN });
 
-  const [ owner, repo ] = url.parse(config.get('dataset.versionsRepositoryURL')).pathname.split('/').filter(component => component);
+  const [ owner, repo ] = url.parse(config.get('@opentermsarchive/engine.dataset.versionsRepositoryURL')).pathname.split('/').filter(component => component);
 
   const tagName = `${path.basename(archivePath, path.extname(archivePath))}`; // use archive filename as Git tag
 

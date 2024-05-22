@@ -21,7 +21,7 @@ describe('Recorder', () => {
       let recorder;
 
       before(async () => {
-        const options = config.util.cloneDeep(config.recorder);
+        const options = config.util.cloneDeep(config.get('@opentermsarchive/engine.recorder'));
 
         options.versions.storage.type = repositoryType;
         options.snapshots.storage.type = repositoryType;
@@ -323,7 +323,7 @@ describe('Recorder', () => {
                 record = await recorder.versionsRepository.findLatest(SERVICE_ID, TYPE);
               });
 
-              after(() => recorder.versionsRepository.removeAll()); after(() => recorder.versionsRepository.removeAll());
+              after(() => recorder.versionsRepository.removeAll());
 
               it('records the version with the proper content', async () => {
                 expect(await record.content).to.equal(CONTENT);

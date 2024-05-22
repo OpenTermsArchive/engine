@@ -41,22 +41,22 @@ const counters = {
     from: {
       snapshots: {
         source: new GitRepository({
-          ...config.get('recorder.snapshots.storage.git'),
+          ...config.get('@opentermsarchive/engine.recorder.snapshots.storage.git'),
           path: path.resolve(ROOT_PATH, `./data/${CONFIG.from.snapshots}`),
         }),
         destination: new GitRepository({
-          ...config.get('recorder.snapshots.storage.git'),
+          ...config.get('@opentermsarchive/engine.recorder.snapshots.storage.git'),
           path: path.resolve(ROOT_PATH, `./data/${CONFIG.from.snapshots}-migrated`),
         }),
         logger: winston.createLogger({ transports: [ new (winston.transports.File)({ filename: `${__dirname}/logs/${CONFIG.from.snapshots}.log` }), new winston.transports.Console() ], format }),
       },
       versions: {
         source: new GitRepository({
-          ...config.get('recorder.versions.storage.git'),
+          ...config.get('@opentermsarchive/engine.recorder.versions.storage.git'),
           path: path.resolve(ROOT_PATH, `./data/${CONFIG.from.versions}`),
         }),
         destination: new GitRepository({
-          ...config.get('recorder.versions.storage.git'),
+          ...config.get('@opentermsarchive/engine.recorder.versions.storage.git'),
           path: path.resolve(ROOT_PATH, `./data/${CONFIG.from.versions}-migrated`),
           prefixMessageToSnapshotId: CONFIG.from.prefixMessageToSnapshotId,
         }),
@@ -66,22 +66,22 @@ const counters = {
     to: {
       snapshots: {
         source: new GitRepository({
-          ...config.get('recorder.snapshots.storage.git'),
+          ...config.get('@opentermsarchive/engine.recorder.snapshots.storage.git'),
           path: path.resolve(ROOT_PATH, `./data/${CONFIG.to.snapshots}`),
         }),
         destination: new GitRepository({
-          ...config.get('recorder.snapshots.storage.git'),
+          ...config.get('@opentermsarchive/engine.recorder.snapshots.storage.git'),
           path: path.resolve(ROOT_PATH, `./data/${CONFIG.to.snapshots}-migrated`),
         }),
         logger: winston.createLogger({ transports: [ new (winston.transports.File)({ filename: `${__dirname}/logs/${CONFIG.to.snapshots}.log` }), new winston.transports.Console() ], format }),
       },
       versions: {
         source: new GitRepository({
-          ...config.get('recorder.versions.storage.git'),
+          ...config.get('@opentermsarchive/engine.recorder.versions.storage.git'),
           path: path.resolve(ROOT_PATH, `./data/${CONFIG.to.versions}`),
         }),
         destination: new GitRepository({
-          ...config.get('recorder.versions.storage.git'),
+          ...config.get('@opentermsarchive/engine.recorder.versions.storage.git'),
           path: path.resolve(ROOT_PATH, `./data/${CONFIG.to.versions}-migrated`),
           prefixMessageToSnapshotId: CONFIG.to.prefixMessageToSnapshotId,
         }),

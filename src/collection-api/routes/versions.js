@@ -28,7 +28,7 @@ import { toISODateWithoutMilliseconds } from '../../archivist/utils/date.js';
  */
 const router = express.Router();
 
-const versionsRepository = await RepositoryFactory.create(config.get('recorder.versions.storage')).initialize();
+const versionsRepository = await RepositoryFactory.create(config.get('@opentermsarchive/engine.recorder.versions.storage')).initialize();
 
 /**
  * @swagger

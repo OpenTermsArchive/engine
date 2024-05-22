@@ -4,7 +4,7 @@ import request from 'supertest';
 
 import app from '../server.js';
 
-const basePath = config.get('api.basePath');
+const basePath = config.get('@opentermsarchive/engine.collection-api.basePath');
 
 describe('Services API', () => {
   describe('GET /services', () => {

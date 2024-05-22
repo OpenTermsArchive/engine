@@ -13,12 +13,12 @@ if (process.env.NODE_ENV !== 'test') {
   app.use(loggerMiddleware);
 }
 
-const BASE_PATH = `${config.get('api.basePath')}/v1`;
+const BASE_PATH = `/${config.get('@opentermsarchive/engine.collection-api.basePath')}/v1`.replace(/\/\/+/g, '/'); // ensure there are no double slashes
 
 app.use(BASE_PATH, apiRouter(BASE_PATH));
 app.use(errorsMiddleware);
 
-const port = config.get('api.port');
+const port = config.get('@opentermsarchive/engine.collection-api.port');
 
 app.listen(port);
 

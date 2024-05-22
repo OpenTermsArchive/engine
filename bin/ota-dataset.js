@@ -11,7 +11,7 @@ program
   .name('ota dataset')
   .description('Export the versions dataset into a ZIP file and optionally publish it to GitHub releases')
   .option('-f, --file <filename>', 'file name of the generated dataset')
-  .option('-p, --publish', 'publish dataset to GitHub releases on versions repository. Mandatory authentication to GitHub is provided through the `GITHUB_TOKEN` environment variable')
+  .option('-p, --publish', 'publish dataset to GitHub releases on versions repository. Mandatory authentication to GitHub is provided through the `OTA_ENGINE_GITHUB_TOKEN` environment variable')
   .option('-r, --remove-local-copy', 'remove local copy of dataset after publishing. Works only in combination with --publish option')
   .option('--schedule', 'schedule automatic dataset generation');
 
