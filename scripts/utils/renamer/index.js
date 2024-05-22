@@ -18,28 +18,30 @@ export async function loadRules() {
 export function applyRules(serviceId, termsType) {
   const renamedServiceId = renamingRules.serviceNames[serviceId];
 
-  if (renamedServiceId) {
-    console.log(`⌙ Rename service "${serviceId}" to "${renamedServiceId}"`);
-    serviceId = renamedServiceId;
-  }
+  return [].concat(renamedServiceId).map(renamedServiceId => {
+    if (renamedServiceId) {
+      console.log(`⌙ Rename service "${serviceId}" to "${renamedServiceId}"`);
+      serviceId = renamedServiceId;
+    }
 
-  const renamedTermsType = renamingRules.termsTypes[termsType];
+    const renamedTermsType = renamingRules.termsTypes[termsType];
 
-  if (renamedTermsType) {
-    console.log(`⌙ Rename terms type "${termsType}" to "${renamedTermsType}" of "${serviceId}" service`);
-    termsType = renamedTermsType;
-  }
+    if (renamedTermsType) {
+      console.log(`⌙ Rename terms type "${termsType}" to "${renamedTermsType}" of "${serviceId}" service`);
+      termsType = renamedTermsType;
+    }
 
-  const renamedServiceTermsType = renamingRules.termsTypesByService[serviceId]
-    && renamingRules.termsTypesByService[serviceId][termsType];
+    const renamedServiceTermsType = renamingRules.termsTypesByService[serviceId]
+      && renamingRules.termsTypesByService[serviceId][termsType];
 
-  if (renamedServiceTermsType) {
-    console.log(`⌙ Specific rename terms type "${termsType}" to "${renamedServiceTermsType}" of "${serviceId}" service`);
-    termsType = renamedServiceTermsType;
-  }
+    if (renamedServiceTermsType) {
+      console.log(`⌙ Specific rename terms type "${termsType}" to "${renamedServiceTermsType}" of "${serviceId}" service`);
+      termsType = renamedServiceTermsType;
+    }
 
-  return {
-    serviceId,
-    termsType,
-  };
+    return {
+      serviceId,
+      termsType,
+    };
+  });
 }

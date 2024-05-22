@@ -31,27 +31,28 @@ export default async function generate({ archivePath, releaseDate }) {
 
   for await (const version of versionsRepository.iterate()) {
     const { content, fetchDate } = version;
-    const { serviceId, termsType } = renamer.applyRules(version.serviceId, version.termsType);
 
-    if (firstVersionDate > fetchDate) {
-      firstVersionDate = fetchDate;
+    for (const { serviceId, termsType } of renamer.applyRules(version.serviceId, version.termsType)) {
+      if (firstVersionDate > fetchDate) {
+        firstVersionDate = fetchDate;
+      }
+
+      if (fetchDate > lastVersionDate) {
+        lastVersionDate = fetchDate;
+      }
+
+      services.add(serviceId);
+
+      const versionPath = generateVersionPath({ serviceId, termsType, fetchDate });
+
+      logger.info({ message: versionPath, counter: index, hash: version.id });
+
+      archive.stream.append(
+        content,
+        { name: `${archive.basename}/${versionPath}` },
+      );
+      index++;
     }
-
-    if (fetchDate > lastVersionDate) {
-      lastVersionDate = fetchDate;
-    }
-
-    services.add(serviceId);
-
-    const versionPath = generateVersionPath({ serviceId, termsType, fetchDate });
-
-    logger.info({ message: versionPath, counter: index, hash: version.id });
-
-    archive.stream.append(
-      content,
-      { name: `${archive.basename}/${versionPath}` },
-    );
-    index++;
   }
 
   archive.stream.append(
