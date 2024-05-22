@@ -91,7 +91,7 @@ describe('GitRepository', () => {
           ([commit] = await git.log());
         });
 
-        after(async () => subject.removeAll());
+        after(() => subject.removeAll());
 
         it('saves the record', () => {
           expect(numberOfRecordsAfter).to.equal(numberOfRecordsBefore + 1);
@@ -158,7 +158,7 @@ describe('GitRepository', () => {
           ([commit] = await git.log());
         });
 
-        after(async () => subject.removeAll());
+        after(() => subject.removeAll());
 
         it('saves the record', () => {
           expect(numberOfRecordsAfter).to.equal(numberOfRecordsBefore + 1);
@@ -194,7 +194,7 @@ describe('GitRepository', () => {
           numberOfRecordsAfter = (await git.log()).length;
         });
 
-        after(async () => subject.removeAll());
+        after(() => subject.removeAll());
 
         it('does not save the record', () => {
           expect(numberOfRecordsAfter).to.equal(numberOfRecordsBefore);
@@ -232,7 +232,7 @@ describe('GitRepository', () => {
           ([commit] = await git.log());
         });
 
-        after(async () => subject.removeAll());
+        after(() => subject.removeAll());
 
         it('saves the record', () => {
           expect(numberOfRecordsAfter).to.equal(numberOfRecordsBefore + 1);
@@ -263,7 +263,7 @@ describe('GitRepository', () => {
           ([commit] = await git.log());
         });
 
-        after(async () => subject.removeAll());
+        after(() => subject.removeAll());
 
         it('stores snapshot ID', () => {
           expect(commit.body).to.include(config.get('recorder.versions.storage.git.snapshotIdentiferTemplate').replace(SNAPSHOT_ID_MARKER, SNAPSHOT_ID));
@@ -295,7 +295,7 @@ describe('GitRepository', () => {
           ([commit] = await git.log());
         });
 
-        after(async () => subject.removeAll());
+        after(() => subject.removeAll());
 
         it('stores snapshots IDs', () => {
           expect(commit.body).to.include(config.get('recorder.versions.storage.git.snapshotIdentiferTemplate').replace(SNAPSHOT_ID_MARKER, SNAPSHOT_ID_1));
@@ -333,7 +333,7 @@ describe('GitRepository', () => {
         (record = await subject.findById(id));
       });
 
-      after(async () => subject.removeAll());
+      after(() => subject.removeAll());
 
       it('returns a Version object', () => {
         expect(record).to.be.an.instanceof(Version);
@@ -355,7 +355,7 @@ describe('GitRepository', () => {
         expect(record.termsType).to.equal(TERMS_TYPE);
       });
 
-      it('returns the content', async () => {
+      it('returns the content', () => {
         expect(record.content).to.equal(CONTENT);
       });
 
@@ -412,7 +412,7 @@ describe('GitRepository', () => {
             recordFound = await subject.findByDate(SERVICE_PROVIDER_ID, TERMS_TYPE, oneHourBeforeFetchDateLater);
           });
 
-          after(async () => subject.removeAll());
+          after(() => subject.removeAll());
 
           it('returns a Version object', () => {
             expect(recordFound).to.be.an.instanceof(Version);
@@ -431,7 +431,7 @@ describe('GitRepository', () => {
           recordFound = await subject.findByDate(SERVICE_PROVIDER_ID, TERMS_TYPE);
         });
 
-        it('returns null', async () => {
+        it('returns null', () => {
           expect(recordFound).to.equal(null);
         });
       });
@@ -478,7 +478,7 @@ describe('GitRepository', () => {
         (records = await subject.findAll());
       });
 
-      after(async () => subject.removeAll());
+      after(() => subject.removeAll());
 
       it('returns all records', () => {
         expect(records.length).to.equal(3);
@@ -490,7 +490,7 @@ describe('GitRepository', () => {
         }
       });
 
-      it('returns records in ascending order', async () => {
+      it('returns records in ascending order', () => {
         expect(records.map(record => record.fetchDate)).to.deep.equal([ FETCH_DATE_EARLIER, FETCH_DATE, FETCH_DATE_LATER ]);
       });
     });
@@ -527,9 +527,9 @@ describe('GitRepository', () => {
         (count = await subject.count());
       });
 
-      after(async () => subject.removeAll());
+      after(() => subject.removeAll());
 
-      it('returns the proper count', async () => {
+      it('returns the proper count', () => {
         expect(count).to.equal(3);
       });
     });
@@ -562,7 +562,7 @@ describe('GitRepository', () => {
             latestRecord = await subject.findLatest(SERVICE_PROVIDER_ID, TERMS_TYPE);
           });
 
-          after(async () => subject.removeAll());
+          after(() => subject.removeAll());
 
           it('returns a Version object', () => {
             expect(latestRecord).to.be.an.instanceof(Version);
@@ -572,7 +572,7 @@ describe('GitRepository', () => {
             expect(latestRecord.id).to.include(lastSnapshotId);
           });
 
-          it('returns the latest record content', async () => {
+          it('returns the latest record content', () => {
             expect(latestRecord.content.toString('utf8')).to.equal(UPDATED_FILE_CONTENT);
           });
         });
@@ -585,7 +585,7 @@ describe('GitRepository', () => {
           latestRecord = await subject.findLatest(SERVICE_PROVIDER_ID, TERMS_TYPE);
         });
 
-        it('returns null', async () => {
+        it('returns null', () => {
           expect(latestRecord).to.equal(null);
         });
       });
@@ -637,14 +637,35 @@ describe('GitRepository', () => {
         }
       });
 
-      after(async () => subject.removeAll());
+      after(() => subject.removeAll());
 
-      it('iterates through all records', async () => {
+      it('iterates through all records', () => {
         expect(ids).to.have.members(expectedIds);
       });
 
-      it('iterates in ascending order', async () => {
+      it('iterates in ascending order', () => {
         expect(fetchDates).to.deep.equal([ FETCH_DATE_EARLIER, FETCH_DATE, FETCH_DATE_LATER ]);
+      });
+
+      context('when the repository contains non-record commits (e.g., README or LICENSE updates)', () => {
+        const iteratedIds = [];
+        let extraCommitId;
+
+        before(async () => {
+          await fs.writeFileSync(path.resolve(subject.path, 'README.md'), '# README');
+          await subject.git.add(path.resolve(subject.path, 'README.md'));
+          extraCommitId = await subject.git.commit({ message: 'Update README', filePath: path.resolve(subject.path, 'README.md') });
+
+          for await (const record of subject.iterate()) {
+            iteratedIds.push(record.id);
+          }
+        });
+
+        after(() => subject.removeAll());
+
+        it('iterates through records only', () => {
+          expect(iteratedIds).to.not.contains(extraCommitId);
+        });
       });
     });
   });
@@ -695,7 +716,7 @@ describe('GitRepository', () => {
           ([commit] = await git.log());
         });
 
-        after(async () => subject.removeAll());
+        after(() => subject.removeAll());
 
         it('saves the record', () => {
           expect(numberOfRecordsAfter).to.equal(numberOfRecordsBefore + 1);
@@ -765,7 +786,7 @@ describe('GitRepository', () => {
           ([commit] = await git.log());
         });
 
-        after(async () => subject.removeAll());
+        after(() => subject.removeAll());
 
         it('saves the record', () => {
           expect(numberOfRecordsAfter).to.equal(numberOfRecordsBefore + 1);
@@ -803,7 +824,7 @@ describe('GitRepository', () => {
           numberOfRecordsAfter = (await git.log()).length;
         });
 
-        after(async () => subject.removeAll());
+        after(() => subject.removeAll());
 
         it('does not save the record', () => {
           expect(numberOfRecordsAfter).to.equal(numberOfRecordsBefore);
@@ -831,7 +852,7 @@ describe('GitRepository', () => {
           ([commit] = await git.log());
         });
 
-        after(async () => subject.removeAll());
+        after(() => subject.removeAll());
 
         it('saves the record', () => {
           expect(numberOfRecordsAfter).to.equal(numberOfRecordsBefore + 1);
@@ -863,7 +884,7 @@ describe('GitRepository', () => {
           ([commit] = await git.log());
         });
 
-        after(async () => subject.removeAll());
+        after(() => subject.removeAll());
 
         it('saves the record', () => {
           expect(numberOfRecordsAfter).to.equal(numberOfRecordsBefore + 1);
@@ -899,7 +920,7 @@ describe('GitRepository', () => {
         (record = await subject.findById(id));
       });
 
-      after(async () => subject.removeAll());
+      after(() => subject.removeAll());
 
       it('returns a Snapshot object', () => {
         expect(record).to.be.an.instanceof(Snapshot);
@@ -921,7 +942,7 @@ describe('GitRepository', () => {
         expect(record.termsType).to.equal(TERMS_TYPE);
       });
 
-      it('returns the content', async () => {
+      it('returns the content', () => {
         expect(record.content).to.equal(CONTENT);
       });
 
@@ -986,7 +1007,7 @@ describe('GitRepository', () => {
         (records = await subject.findAll());
       });
 
-      after(async () => subject.removeAll());
+      after(() => subject.removeAll());
 
       it('returns all records', () => {
         expect(records.length).to.equal(3);
@@ -998,7 +1019,7 @@ describe('GitRepository', () => {
         }
       });
 
-      it('returns records in ascending order', async () => {
+      it('returns records in ascending order', () => {
         expect(records.map(record => record.fetchDate)).to.deep.equal([ FETCH_DATE_EARLIER, FETCH_DATE, FETCH_DATE_LATER ]);
       });
     });
@@ -1035,9 +1056,9 @@ describe('GitRepository', () => {
         (count = await subject.count());
       });
 
-      after(async () => subject.removeAll());
+      after(() => subject.removeAll());
 
-      it('returns the proper count', async () => {
+      it('returns the proper count', () => {
         expect(count).to.equal(3);
       });
     });
@@ -1070,7 +1091,7 @@ describe('GitRepository', () => {
             latestRecord = await subject.findLatest(SERVICE_PROVIDER_ID, TERMS_TYPE);
           });
 
-          after(async () => subject.removeAll());
+          after(() => subject.removeAll());
 
           it('returns a Snapshot object', () => {
             expect(latestRecord).to.be.an.instanceof(Snapshot);
@@ -1080,7 +1101,7 @@ describe('GitRepository', () => {
             expect(latestRecord.id).to.include(lastSnapshotId);
           });
 
-          it('returns the latest record content', async () => {
+          it('returns the latest record content', () => {
             expect(latestRecord.content.toString('utf8')).to.equal(UPDATED_FILE_CONTENT);
           });
 
@@ -1102,13 +1123,13 @@ describe('GitRepository', () => {
             latestRecord = await subject.findLatest(SERVICE_PROVIDER_ID, TERMS_TYPE);
           });
 
-          after(async () => subject.removeAll());
+          after(() => subject.removeAll());
 
           it('returns the latest record id', () => {
             expect(latestRecord.id).to.include(lastSnapshotId);
           });
 
-          it('returns the latest record content', async () => {
+          it('returns the latest record content', () => {
             expect(latestRecord.content.toString('utf8')).to.equal(PDF_CONTENT);
           });
 
@@ -1125,7 +1146,7 @@ describe('GitRepository', () => {
           latestRecord = await subject.findLatest(SERVICE_PROVIDER_ID, TERMS_TYPE);
         });
 
-        it('returns null', async () => {
+        it('returns null', () => {
           expect(latestRecord).to.equal(null);
         });
       });
@@ -1174,13 +1195,13 @@ describe('GitRepository', () => {
         }
       });
 
-      after(async () => subject.removeAll());
+      after(() => subject.removeAll());
 
-      it('iterates through all records', async () => {
+      it('iterates through all records', () => {
         expect(ids).to.have.members(expectedIds);
       });
 
-      it('iterates in ascending order', async () => {
+      it('iterates in ascending order', () => {
         expect(fetchDates).to.deep.equal([ FETCH_DATE_EARLIER, FETCH_DATE, FETCH_DATE_LATER ]);
       });
     });
@@ -1266,7 +1287,7 @@ describe('GitRepository', () => {
       /* eslint-enable no-await-in-loop */
     });
 
-    after(async () => subject.removeAll());
+    after(() => subject.removeAll());
 
     describe('Records attributes', () => {
       describe('#isExtractOnly', () => {
@@ -1333,7 +1354,7 @@ describe('GitRepository', () => {
         }
       });
 
-      it('returns records in ascending order', async () => {
+      it('returns records in ascending order', () => {
         expect(records.map(record => record.fetchDate)).to.deep.equal(expectedDates);
       });
     });
@@ -1345,7 +1366,7 @@ describe('GitRepository', () => {
         (count = await subject.count());
       });
 
-      it('returns the proper count', async () => {
+      it('returns the proper count', () => {
         expect(count).to.equal(expectedIds.length);
       });
     });
@@ -1361,11 +1382,11 @@ describe('GitRepository', () => {
         }
       });
 
-      it('iterates through all records', async () => {
+      it('iterates through all records', () => {
         expect(ids).to.have.members(expectedIds);
       });
 
-      it('iterates in ascending order', async () => {
+      it('iterates in ascending order', () => {
         expect(fetchDates).to.deep.equal(expectedDates);
       });
     });

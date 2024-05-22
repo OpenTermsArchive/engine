@@ -60,7 +60,7 @@ describe('Terms', () => {
   };
 
   describe('#toPersistence', () => {
-    it('converts terms with single source document to JSON representation', async () => {
+    it('converts terms with single source document to JSON representation', () => {
       const result = new Terms({ service, type: termsType, sourceDocuments: [document1] }).toPersistence();
 
       const expectedResult = {
@@ -71,7 +71,7 @@ describe('Terms', () => {
       expect(result).to.deep.equal(expectedResult);
     });
 
-    it('converts terms with multiple source documents to JSON representation', async () => {
+    it('converts terms with multiple source documents to JSON representation', () => {
       const result = new Terms({ service, type: termsType, sourceDocuments: [ document1, document2 ] }).toPersistence();
 
       const expectedResult = {

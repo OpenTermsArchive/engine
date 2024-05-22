@@ -3,6 +3,8 @@
  * @see {@link https://martinfowler.com/eaaCatalog/repository.html|Repository}
  * @interface
  */
+
+/* eslint-disable require-await */
 class RepositoryInterface {
   /**
   * [Optional] Initialize repository
@@ -122,3 +124,4 @@ class RepositoryInterface {
 }
 
 export default RepositoryInterface;
+/* eslint-enable require-await */

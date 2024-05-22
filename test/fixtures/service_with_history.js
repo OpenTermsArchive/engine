@@ -8,10 +8,10 @@ const service = new Service({
 });
 
 const filters = [
-  async function removeShareButton() {
+  function removeShareButton() {
     return 'last-removeShareButton';
   },
-  async function removePrintButton() {
+  function removePrintButton() {
     return 'last-removePrintButton';
   },
 ];
@@ -65,7 +65,7 @@ const filters = [
         contentSelectors: 'main',
         insignificantContentSelectors: undefined,
         filters: [
-          async function removeShareButton() {
+          function removeShareButton() {
             return 'first-removeShareButton';
           },
         ],
@@ -82,7 +82,7 @@ const filters = [
         contentSelectors: 'main',
         insignificantContentSelectors: undefined,
         filters: [
-          async function removeShareButton() {
+          function removeShareButton() {
             return 'second-removeShareButton';
           },
         ],
@@ -99,10 +99,10 @@ const filters = [
         contentSelectors: 'body',
         insignificantContentSelectors: undefined,
         filters: [
-          async function removeShareButton() {
+          function removeShareButton() {
             return 'second-removeShareButton';
           },
-          async function removePrintButton() {
+          function removePrintButton() {
             return 'second-removePrintButton';
           },
         ],
@@ -119,10 +119,10 @@ const filters = [
         contentSelectors: 'main',
         insignificantContentSelectors: undefined,
         filters: [
-          async function removeShareButton() {
+          function removeShareButton() {
             return 'second-removeShareButton';
           },
-          async function removePrintButton() {
+          function removePrintButton() {
             return 'third-removePrintButton';
           },
         ],
@@ -139,10 +139,10 @@ const filters = [
         contentSelectors: 'main',
         insignificantContentSelectors: undefined,
         filters: [
-          async function removeShareButton() {
+          function removeShareButton() {
             return 'third-removeShareButton';
           },
-          async function removePrintButton() {
+          function removePrintButton() {
             return 'third-removePrintButton';
           },
         ],
@@ -159,10 +159,10 @@ const filters = [
         contentSelectors: 'main',
         insignificantContentSelectors: undefined,
         filters: [
-          async function removeShareButton() {
+          function removeShareButton() {
             return 'third-removeShareButton';
           },
-          async function removePrintButton() {
+          function removePrintButton() {
             return 'last-removePrintButton';
           },
         ],

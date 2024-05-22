@@ -26,7 +26,7 @@ describe('Docs API', () => {
       describe('body response defines', () => {
         let subject;
 
-        before(async () => {
+        before(() => {
           subject = response.body;
         });
 
@@ -39,7 +39,7 @@ describe('Docs API', () => {
         });
 
         describe('with endpoints', () => {
-          before(async () => {
+          before(() => {
             subject = response.body.paths;
           });
 

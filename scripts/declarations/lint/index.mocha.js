@@ -36,7 +36,7 @@ export default async options => {
 
   const lintFile = lintAndFixFile(options.fix);
 
-  describe('Service declarations lint validation', async function () {
+  describe('Service declarations lint validation', function () {
     this.timeout(30000);
 
     servicesToValidate.forEach(serviceId => {
@@ -46,8 +46,8 @@ export default async options => {
       const filtersFilePath = path.join(declarationsPath, `${serviceId}.filters.js`);
       const filtersHistoryFilePath = path.join(declarationsPath, `${serviceId}.filters.history.js`);
 
-      context(serviceId, async () => {
-        before(async function () {
+      context(serviceId, () => {
+        before(function () {
           if (!service) {
             console.log('      (Tests skipped as declaration has been archived)');
             this.skip();

@@ -30,7 +30,7 @@ export default class Git {
       .addConfig('core.quotePath', false); // disable Git's encoding of special characters in pathnames. For example, `service·A` will be encoded as `service\302\267A` without this setting, leading to issues. See https://git-scm.com/docs/git-config#Documentation/git-config.txt-corequotePath
   }
 
-  async add(filePath) {
+  add(filePath) {
     return this.git.add(this.relativePath(filePath));
   }
 
@@ -55,11 +55,11 @@ export default class Git {
     return summary.commit;
   }
 
-  async pushChanges() {
+  pushChanges() {
     return this.git.push();
   }
 
-  async listCommits(options = []) {
+  listCommits(options = []) {
     return this.log([ '--reverse', '--no-merges', '--name-only', ...options ]);
   }
 
@@ -89,11 +89,11 @@ export default class Git {
     return Boolean(result);
   }
 
-  async checkout(options) {
+  checkout(options) {
     return this.git.checkout(options);
   }
 
-  async show(options) {
+  show(options) {
     return this.git.show(options);
   }
 
@@ -107,7 +107,7 @@ export default class Git {
     return (await this.git.show([ shortHash, '--pretty=%H', '-s' ])).trim();
   }
 
-  async restore(path, commit) {
+  restore(path, commit) {
     return this.git.raw([ 'restore', '-s', commit, '--', path ]);
   }
 
