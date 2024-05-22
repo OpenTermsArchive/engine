@@ -88,5 +88,10 @@
   "XfinityResidentialSubscription": "Xfinity Residential Services",
   "XfinityWebServices": "Xfinity Web Services",
   "Youtube": "YouTube",
-  "Verbaudet": "Vertbaudet"
+  "Verbaudet": "Vertbaudet",
+  "OpenAI": [
+    "ChatGPT",
+    "DALL·E"
+  ],
+  "Grok": "xAI"
 }
