@@ -13,9 +13,20 @@
       "contributions": [
         "doc"
       ]
+    },
+    {
+      "login": "LVerneyPEReN",
+      "name": "Lucas Verney",
+      "avatar_url": "https://avatars.githubusercontent.com/u/58298410?v=4",
+      "profile": "https://github.com/LVerneyPEReN",
+      "contributions": [
+        "code",
+        "ideas"
+      ]
     }
   ],
   "repoType": "github",
   "commitConvention": "none",
-  "contributorsPerLine": 7
+  "contributorsPerLine": 7,
+  "commitType": "docs"
 }
