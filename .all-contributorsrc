@@ -41,6 +41,15 @@
       "contributions": [
         "mentoring"
       ]
+    },
+    {
+      "login": "AMustache",
+      "name": "Stache",
+      "avatar_url": "https://avatars.githubusercontent.com/u/5108539?v=4",
+      "profile": "https://stache.cat",
+      "contributions": [
+        "doc"
+      ]
     }
   ],
   "repoType": "github",
