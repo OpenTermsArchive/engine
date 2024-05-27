@@ -50,6 +50,15 @@
       "contributions": [
         "doc"
       ]
+    },
+    {
+      "login": "pdehaye",
+      "name": "Paul-Olivier Dehaye",
+      "avatar_url": "https://avatars.githubusercontent.com/u/3274335?v=4",
+      "profile": "https://hestia.ai/about-us/about-paul-olivier-dehaye",
+      "contributions": [
+        "doc"
+      ]
     }
   ],
   "repoType": "github",
