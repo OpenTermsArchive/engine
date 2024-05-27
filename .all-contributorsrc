@@ -59,6 +59,15 @@
       "contributions": [
         "doc"
       ]
+    },
+    {
+      "login": "guillett",
+      "name": "Thomas Guillet",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1410356?v=4",
+      "profile": "https://github.com/guillett",
+      "contributions": [
+        "doc"
+      ]
     }
   ],
   "repoType": "github",
