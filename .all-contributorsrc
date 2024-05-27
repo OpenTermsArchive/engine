@@ -68,6 +68,16 @@
       "contributions": [
         "doc"
       ]
+    },
+    {
+      "login": "kissaki",
+      "name": "Jan Klass",
+      "avatar_url": "https://avatars.githubusercontent.com/u/93181?v=4",
+      "profile": "https://kcode.de/",
+      "contributions": [
+        "code",
+        "ideas"
+      ]
     }
   ],
   "repoType": "github",
