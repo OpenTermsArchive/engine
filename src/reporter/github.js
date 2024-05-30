@@ -49,7 +49,7 @@ export default class GitHub {
 
       return labels;
     } catch (error) {
-      logger.error(`🤖 Could get labels: ${error}`);
+      logger.error(`🤖 Could not get labels: ${error}`);
     }
   }
 
