@@ -78,5 +78,9 @@ export default async function track({ services, types, extractOnly, schedule }) 
   logger.info('The scheduler is running…');
   logger.info(`Terms will be tracked ${humanReadableSchedule.toLowerCase()} in the timezone of this machine`);
 
-  cron(trackingSchedule, () => archivist.track({ services, types }));
+  cron(
+    trackingSchedule,
+    { protect: job => logger.warn(`Tracking scheduled at ${new Date().toISOString()} were blocked by an unfinished tracking started at ${job.currentRun().toISOString()}`) },
+    () => archivist.track({ services, types }),
+  );
 }
