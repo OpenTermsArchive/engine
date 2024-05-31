@@ -58,7 +58,8 @@
     },
     "dataset": {
       "title": "sandbox",
-      "versionsRepositoryURL": "https://github.com/OpenTermsArchive/sandbox"
+      "versionsRepositoryURL": "https://github.com/OpenTermsArchive/sandbox",
+      "publishingSchedule": "30 8 * * MON"
     }
   }
 }

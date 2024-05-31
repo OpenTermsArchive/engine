@@ -2,7 +2,9 @@
 import './env.js';
 
 import { program } from 'commander';
+import config from 'config';
 import cron from 'croner';
+import cronstrue from 'cronstrue';
 
 import { release } from '../scripts/dataset/index.js';
 import logger from '../src/logger/index.js';
@@ -26,8 +28,11 @@ const options = {
 if (!schedule) {
   await release(options);
 } else {
-  logger.info('The scheduler is running…');
-  logger.info('Dataset will be published every Monday at 08:30 in the timezone of this machine');
+  const trackingSchedule = config.get('@opentermsarchive/engine.dataset.publishingSchedule');
+  const humanReadableSchedule = cronstrue.toString(trackingSchedule);
 
-  cron('30 8 * * MON', () => release(options));
+  logger.info('The scheduler is running…');
+  logger.info(`Dataset will be published ${humanReadableSchedule.toLowerCase()} in the timezone of this machine`);
+
+  cron(config.get('@opentermsarchive/engine.dataset.publishingSchedule'), () => release(options));
 }
