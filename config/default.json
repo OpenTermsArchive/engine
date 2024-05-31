@@ -1,5 +1,6 @@
 {
   "@opentermsarchive/engine": {
+    "trackingSchedule": "30 */6 * * *",
     "services": {
       "declarationsPath": "./declarations"
     },

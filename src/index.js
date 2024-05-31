@@ -1,5 +1,6 @@
 import config from 'config';
 import cron from 'croner';
+import cronstrue from 'cronstrue';
 
 import Archivist from './archivist/index.js';
 import logger from './logger/index.js';
@@ -71,8 +72,11 @@ export default async function track({ services, types, extractOnly, schedule }) 
     return;
   }
 
-  logger.info('The scheduler is running…');
-  logger.info('Terms will be tracked every six hours starting at half past midnight');
+  const trackingSchedule = config.get('@opentermsarchive/engine.trackingSchedule');
+  const humanReadableSchedule = cronstrue.toString(trackingSchedule);
 
-  cron('30 */6 * * *', () => archivist.track({ services, types }));
+  logger.info('The scheduler is running…');
+  logger.info(`Terms will be tracked ${humanReadableSchedule.toLowerCase()} in the timezone of this machine`);
+
+  cron(trackingSchedule, () => archivist.track({ services, types }));
 }
