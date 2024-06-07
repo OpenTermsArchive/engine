@@ -50,7 +50,7 @@ export default async function track({ services, types, extractOnly, schedule }) 
   }
 
   if (process.env.OTA_ENGINE_GITHUB_TOKEN) {
-    if (config.has('reporter.githubIssues.repositories.declarations')) {
+    if (config.has('@opentermsarchive/engine.reporter.githubIssues.repositories.declarations')) {
       try {
         const reporter = new Reporter(config.get('@opentermsarchive/engine.reporter'));
 
