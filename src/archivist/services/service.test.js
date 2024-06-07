@@ -175,6 +175,12 @@ describe('Service', () => {
       it('returns the number of terms matching the provided terms types', () => {
         expect(subject.getNumberOfTerms([ TERMS_OF_SERVICE_TYPE, IMPRINT_TYPE ])).to.equal(1);
       });
+
+      context('when the provided filter is empty', () => {
+        it('returns the number of all terms types', () => {
+          expect(subject.getNumberOfTerms([])).to.equal(2);
+        });
+      });
     });
   });
 });
