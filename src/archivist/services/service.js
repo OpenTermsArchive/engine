@@ -31,7 +31,7 @@ export default class Service {
   getTermsTypes(termsTypes) {
     let result = Object.keys(this.terms);
 
-    if (termsTypes) {
+    if (termsTypes?.length) {
       result = result.filter(item => termsTypes.includes(item));
     }
 
