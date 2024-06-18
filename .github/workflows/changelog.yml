@@ -50,8 +50,10 @@ jobs:
         run: |
           echo "Should this run NOT trigger any release: '${{ needs.check_functional_changes.outputs.no_release }}'"
 
-      - name: Validate changelog
-        run: npm run changelog --silent -- --validate
+      - name: Run Changelog Manager
+        uses: OpenTermsArchive/manage-changelog@v1
+        with:
+          validate: true
 
       - name: Get release type in changelog
         run: echo "RELEASE_TYPE=$(npm run changelog --silent -- --get-release-type)" >> $GITHUB_ENV
