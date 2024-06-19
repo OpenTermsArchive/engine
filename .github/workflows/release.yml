@@ -9,12 +9,12 @@ on:
 
 jobs:
   changelog:
-    uses: "OpenTermsArchive/engine/.github/workflows/changelog.yml@main"
+    uses: "./.github/workflows/changelog.yml"
   test:
     uses: "OpenTermsArchive/engine/.github/workflows/test.yml@main"
   release:
-    if: github.event.pull_request.merged == true && needs.changelog.outputs.no_functional_changes != 'true'
     needs: [ changelog, test ]
+    if: needs.changelog.outputs.release-type != 'no-release'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -22,29 +22,25 @@ jobs:
         with:
           token: ${{ secrets.RELEASE_BOT_GITHUB_TOKEN }}
 
-      - name: Install dependencies
-        run: npm ci
-
       - name: Configure Git author
         run: |
           git config --global user.name "Open Terms Archive Release Bot"
           git config --global user.email "release-bot@opentermsarchive.org"
 
-      - name: Bump package version
-        run: |
-          echo "Release type found: '$(npm run changelog --silent -- --get-release-type)'"
-          echo "NEW_VERSION=$(npm --no-git-tag-version version $(npm run changelog --silent -- --get-release-type))" >> $GITHUB_ENV
+      - name: Release changelog
+        id: release-changelog
+        uses: OpenTermsArchive/changelog-action/release@v0.2.0
 
-      - name: Update changelog unreleased section with new version
-        run: npm run changelog --silent -- --release ${{ github.event.number }} # github.event.number refers to the pull request number
+      - name: Bump package version
+        run: npm --no-git-tag-version version ${{ steps.release-changelog.outputs.version }}
 
       - name: Commit CHANGELOG.md and package.json changes and create tag
         run: |
           git add "package.json"
           git add "package-lock.json"
           git add "CHANGELOG.md"
-          git commit -m "Release ${{ env.NEW_VERSION }}"
-          git tag ${{ env.NEW_VERSION }}
+          git commit -m "Release v${{ steps.release-changelog.outputs.version }}"
+          git tag v${{ steps.release-changelog.outputs.version }}
 
       - name: Run status checks for release commit on temporary branch # Use temporary branch to enable pushing commits to this branch protected by required status checks 
         uses: CasperWA/push-protected@v2
@@ -66,7 +62,7 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ env.NEW_VERSION }}
-          body: ${{ env.VERSION_CHANGELOG }}
+          body: ${{ steps.release-changelog.outputs.content }}
           token: ${{ secrets.RELEASE_BOT_GITHUB_TOKEN }}
 
       - name: Publish to NPM public repository
@@ -83,24 +79,23 @@ jobs:
           client-payload: '{"version": "${{ env.NEW_VERSION }}"}'
 
   clean_changelog:
-    if: github.event.pull_request.merged == true && needs.changelog.outputs.no_functional_changes == 'true'
+    if: needs.changelog.outputs.release-type == 'no-release'
     needs: [ changelog ]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
           token: ${{ secrets.RELEASE_BOT_GITHUB_TOKEN }}
-      
-      - name: Install dependencies
-        run: npm ci
 
       - name: Configure Git author
         run: |
           git config --global user.name "Open Terms Archive Release Bot"
           git config --global user.email "release-bot@opentermsarchive.org"
 
+      - name: Release changelog
+        uses: OpenTermsArchive/changelog-action/release@v0.2.0
+
       - name: Erase unreleased information from changelog
         run: |
-          npm run changelog --silent -- --clean-unreleased
           git commit -m "Clean changelog" CHANGELOG.md
           git push origin
