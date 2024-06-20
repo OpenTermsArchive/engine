@@ -27,7 +27,7 @@ jobs:
           git config --global user.name "Open Terms Archive Release Bot"
           git config --global user.email "release-bot@opentermsarchive.org"
 
-      - name: Release changelog
+      - name: Update changelog for release
         id: release-changelog
         uses: OpenTermsArchive/changelog-action/release@v0.2.0
 
@@ -92,10 +92,10 @@ jobs:
           git config --global user.name "Open Terms Archive Release Bot"
           git config --global user.email "release-bot@opentermsarchive.org"
 
-      - name: Release changelog
+      - name: Update changelog for release
         uses: OpenTermsArchive/changelog-action/release@v0.2.0
 
-      - name: Erase unreleased information from changelog
+      - name: Save changelog
         run: |
           git commit -m "Clean changelog" CHANGELOG.md
           git push origin
