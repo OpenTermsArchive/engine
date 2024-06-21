@@ -52,16 +52,10 @@ jobs:
       - name: Push changes to repository
         run: git push origin && git push --tags
 
-      - name: Read version changelog
-        run: |
-          echo "VERSION_CHANGELOG<<EOF" >> $GITHUB_ENV
-          echo "$(npm run changelog --silent -- --get-version-content ${{ env.NEW_VERSION }})" >> $GITHUB_ENV
-          echo "EOF" >> $GITHUB_ENV
-
       - name: Create GitHub release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: ${{ env.NEW_VERSION }}
+          tag_name: v${{ steps.release-changelog.outputs.version }}
           body: ${{ steps.release-changelog.outputs.content }}
           token: ${{ secrets.RELEASE_BOT_GITHUB_TOKEN }}
 
@@ -76,7 +70,7 @@ jobs:
           token: ${{ secrets.TRIGGER_DOCS_DEPLOY_TOKEN }}
           event-type: engine-release
           repository: OpenTermsArchive/docs
-          client-payload: '{"version": "${{ env.NEW_VERSION }}"}'
+          client-payload: '{"version": "v${{ steps.release-changelog.outputs.version }}"}'
 
   clean_changelog:
     if: needs.changelog.outputs.release-type == 'no-release'
