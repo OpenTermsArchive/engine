@@ -78,6 +78,49 @@
         "code",
         "ideas"
       ]
+    },
+    {
+      "login": "Ndpnt",
+      "name": "Nicolas Dupont",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1098708?v=4",
+      "profile": "https://github.com/Ndpnt",
+      "contributions": [
+        "code",
+        "infra",
+        "doc"
+      ]
+    },
+    {
+      "login": "MattiSG",
+      "name": "Matti Schneider",
+      "avatar_url": "https://avatars.githubusercontent.com/u/222463?v=4",
+      "profile": "https://mattischneider.fr/",
+      "contributions": [
+        "code",
+        "infra",
+        "doc"
+      ]
+    },
+    {
+      "login": "martinratinaud",
+      "name": "Martin Ratinaud",
+      "avatar_url": "https://avatars.githubusercontent.com/u/4191809?v=4",
+      "profile": "http://bit.ly/work-with-martin",
+      "contributions": [
+        "code",
+        "infra",
+        "doc"
+      ]
+    },
+    {
+      "login": "clementbiron",
+      "name": "Clément Biron",
+      "avatar_url": "https://avatars.githubusercontent.com/u/364319?v=4",
+      "profile": "https://clementbiron.com/",
+      "contributions": [
+        "code",
+        "doc"
+      ]
     }
   ],
   "repoType": "github",
