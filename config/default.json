@@ -56,9 +56,22 @@
         "updateTemplateId": 7
       }
     },
+    "reporter": {
+      "githubIssues": {
+        "repositories": {
+          "declarations": "OpenTermsArchive/contrib-declarations"
+        }
+      },
+      "gitlabIssues": {
+        "repositories": {
+          "declarations": "p2b/contrib-declarations"
+        }
+      }
+    },
     "dataset": {
       "title": "sandbox",
       "versionsRepositoryURL": "https://github.com/OpenTermsArchive/sandbox",
+      "versionsRepositoryURLGitLab": "https://gitlab.com/p2b/contrib-versions"
       "publishingSchedule": "30 8 * * MON"
     }
   }
