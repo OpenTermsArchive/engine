@@ -1,29 +1,24 @@
-import { createRequire } from 'module';
-
 import config from 'config';
 import cron from 'croner';
-import cronstrue from 'cronstrue';
 
 import Archivist from './archivist/index.js';
 import logger from './logger/index.js';
 import Notifier from './notifier/index.js';
 import Reporter from './reporter/index.js';
-
-const require = createRequire(import.meta.url);
+import ReporterGitlab from './reporterGitlab/index.js';
 
 export default async function track({ services, types, extractOnly, schedule }) {
   const archivist = new Archivist({
-    recorderConfig: config.get('@opentermsarchive/engine.recorder'),
-    fetcherConfig: config.get('@opentermsarchive/engine.fetcher'),
+    recorderConfig: config.get('recorder'),
+    fetcherConfig: config.get('fetcher'),
   });
 
   archivist.attach(logger);
 
   await archivist.initialize();
 
-  const { version } = require('../package.json');
-
-  logger.info(`Start Open Terms Archive engine v${version}\n`);
+  console.log('Running from src');
+  logger.info('Start Open Terms Archive\n');
 
   if (services?.length) {
     services = services.filter(serviceId => {
@@ -45,32 +40,37 @@ export default async function track({ services, types, extractOnly, schedule }) 
     return;
   }
 
-  if (process.env.OTA_ENGINE_SENDINBLUE_API_KEY) {
-    try {
-      archivist.attach(new Notifier(archivist.services));
-    } catch (error) {
-      logger.error('Cannot instantiate the Notifier module; it will be ignored:', error);
-    }
+  if (process.env.SENDINBLUE_API_KEY) {
+    archivist.attach(new Notifier(archivist.services));
   } else {
-    logger.warn('Environment variable "OTA_ENGINE_SENDINBLUE_API_KEY" was not found; the Notifier module will be ignored');
+    logger.warn('Environment variable "SENDINBLUE_API_KEY" was not found; the Notifier module will be ignored');
   }
 
-  if (process.env.OTA_ENGINE_GITHUB_TOKEN) {
-    if (config.has('@opentermsarchive/engine.reporter.githubIssues.repositories.declarations')) {
-      try {
-        const reporter = new Reporter(config.get('@opentermsarchive/engine.reporter'));
+  if (process.env.GITHUB_TOKEN) {
+    if (config.has('reporter.githubIssues.repositories.declarations')) {
+      const reporter = new Reporter(config.get('reporter'));
 
-        await reporter.initialize();
-        archivist.attach(reporter);
-      } catch (error) {
-        logger.error('Cannot instantiate the Reporter module; it will be ignored:', error);
-      }
+      await reporter.initialize();
+      archivist.attach(reporter);
     } else {
       logger.warn('Configuration key "reporter.githubIssues.repositories.declarations" was not found; issues on the declarations repository cannot be created');
     }
   } else {
-    logger.warn('Environment variable "OTA_ENGINE_GITHUB_TOKEN" was not found; the Reporter module will be ignored');
+    logger.warn('Environment variable "GITHUB_TOKEN" was not found; the Reporter module will be ignored');
   }
+
+   if (process.env.GITLAB_TOKEN) {
+    if (config.has('reporter.gitlabIssues.repositories.declarations')) {
+      const reporter = new ReporterGitlab(config.get('reporter'));
+
+      await reporter.initialize();
+      archivist.attach(reporter);
+    } else {
+      logger.warn('Configuration key "reporter.gitlabIssues.repositories.declarations" was not found; issues on the declarations repository cannot be created');
+    }
+  } else {
+    logger.warn('Environment variable "GITLAB_TOKEN" was not found; the ReporterGitlab module will be ignored');
+  } 
 
   if (!schedule) {
     await archivist.track({ services, types });
@@ -78,15 +78,8 @@ export default async function track({ services, types, extractOnly, schedule }) 
     return;
   }
 
-  const trackingSchedule = config.get('@opentermsarchive/engine.trackingSchedule');
-  const humanReadableSchedule = cronstrue.toString(trackingSchedule);
-
   logger.info('The scheduler is running…');
-  logger.info(`Terms will be tracked ${humanReadableSchedule.toLowerCase()} in the timezone of this machine`);
+  logger.info('Terms will be tracked every six hours starting at half past midnight');
 
-  cron(
-    trackingSchedule,
-    { protect: job => logger.warn(`Tracking scheduled at ${new Date().toISOString()} were blocked by an unfinished tracking started at ${job.currentRun().toISOString()}`) },
-    () => archivist.track({ services, types }),
-  );
+  cron('30 */6 * * *', () => archivist.track({ services, types }));
 }
