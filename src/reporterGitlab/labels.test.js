@@ -2,7 +2,7 @@ import { createRequire } from 'module';
 
 import chai from 'chai';
 
-import { MANAGED_BY_OTA_MARKER } from './github.js';
+import { MANAGED_BY_OTA_MARKER } from './gitlab.js';
 
 const require = createRequire(import.meta.url);
 
