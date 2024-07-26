@@ -2,11 +2,12 @@ import fsApi from 'fs';
 import path from 'path';
 import url from 'url';
 
+import axios from 'axios';
+
 import config from 'config';
 import dotenv from 'dotenv';
-import { Octokit } from 'octokit';
+//import { Octokit } from 'octokit';
 
-import axios from 'axios';
 import FormData from 'form-data';
 
 import * as readme from '../assets/README.templateGitLab.js';

@@ -59,7 +59,7 @@ export default async function track({ services, types, extractOnly, schedule }) 
     logger.warn('Environment variable "GITHUB_TOKEN" was not found; the Reporter module will be ignored');
   }
 
-   if (process.env.GITLAB_TOKEN) {
+  if (process.env.GITLAB_TOKEN) {
     if (config.has('reporter.gitlabIssues.repositories.declarations')) {
       const reporter = new ReporterGitlab(config.get('reporter'));
 
@@ -70,7 +70,7 @@ export default async function track({ services, types, extractOnly, schedule }) 
     }
   } else {
     logger.warn('Environment variable "GITLAB_TOKEN" was not found; the ReporterGitlab module will be ignored');
-  } 
+  }
 
   if (!schedule) {
     await archivist.track({ services, types });

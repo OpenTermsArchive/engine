@@ -14,7 +14,7 @@ export default class GitLab {
   static ISSUE_STATE_ALL = 'all';
 
   constructor(repository) {
-    const { version } = require('../../package.json');
+    //const { version } = require('../../package.json');
 
     const [owner, repo] = repository.split('/');
 
