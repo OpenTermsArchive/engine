@@ -6,6 +6,7 @@ import config from 'config';
 import generateRelease from './export/index.js';
 import logger from './logger/index.js';
 import publishRelease from './publish/index.js';
+import publishReleaseGitLab from './publishGitLab/index.js';
 
 export async function release({ shouldPublish, shouldRemoveLocalCopy, fileName }) {
   const releaseDate = new Date();
@@ -24,13 +25,25 @@ export async function release({ shouldPublish, shouldRemoveLocalCopy, fileName }
 
   logger.info('Start publishing dataset…');
 
-  const releaseUrl = await publishRelease({
-    archivePath,
-    releaseDate,
-    stats,
-  });
+  if (typeof process.env.OTA_ENGINE_GITHUB_TOKEN !== 'undefined') {
+    const releaseUrl = await publishRelease({
+      archivePath,
+      releaseDate,
+      stats,
+    });
 
-  logger.info(`Dataset published to ${releaseUrl}`);
+    logger.info(`Dataset published to ${releaseUrl}`);
+  }
+
+  if (typeof process.env.OTA_ENGINE_GITLAB_RELEASES_TOKEN !== 'undefined') {
+    const releaseUrl = await publishReleaseGitLab({
+      archivePath,
+      releaseDate,
+      stats,
+    });
+    
+    logger.info(`Dataset published to ${releaseUrl}`);
+  }
 
   if (!shouldRemoveLocalCopy) {
     return;
