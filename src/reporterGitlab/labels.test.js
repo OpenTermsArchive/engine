@@ -21,7 +21,7 @@ describe('Reporter GitLab labels', () => {
       });
 
       it('complies with the GitHub constraints for color', () => {
-        const validHexColorRegex = /^\#[0-9a-fA-F]{6}$/; // Regex for a valid 6-digit hexadecimal color code with the `#`
+        const validHexColorRegex = /^#[0-9a-fA-F]{6}$/; // Regex for a valid 6-digit hexadecimal color code with the `#`
 
         expect(validHexColorRegex.test(label.color)).to.be.true;
       });

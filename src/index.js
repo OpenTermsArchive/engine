@@ -66,7 +66,6 @@ export default async function track({ services, types, extractOnly, schedule }) 
       } catch (error) {
         logger.error('Cannot instantiate the Reporter module; it will be ignored:', error);
       }
-      archivist.attach(reporter);
     } else {
       logger.warn('Configuration key "reporter.githubIssues.repositories.declarations" was not found; issues on the declarations repository cannot be created');
     }

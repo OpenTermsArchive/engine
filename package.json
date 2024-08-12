@@ -57,6 +57,7 @@
     "ajv": "^6.12.6",
     "archiver": "^5.3.0",
     "async": "^3.2.2",
+    "axios": "^1.7.2",
     "chai": "^4.3.4",
     "chai-as-promised": "^7.1.1",
     "chai-exclude": "^2.1.0",
@@ -100,8 +101,7 @@
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.0",
     "winston": "^3.3.3",
-    "winston-mail": "^2.0.0",
-    "axios": "^1.7.2"
+    "winston-mail": "^2.0.0"
   },
   "devDependencies": {
     "@commitlint/cli": "^19.0.3",

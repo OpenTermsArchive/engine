@@ -6,7 +6,7 @@ const require = createRequire(import.meta.url);
 
 export const MANAGED_BY_OTA_MARKER = '[managed by OTA]';
 
-const gitlabUrl = "https://gitlab.com/api/v4";
+const gitlabUrl = 'https://gitlab.com/api/v4';
 
 export default class GitLab {
   static ISSUE_STATE_CLOSED = 'closed';
@@ -14,9 +14,9 @@ export default class GitLab {
   static ISSUE_STATE_ALL = 'all';
 
   constructor(repository) {
-    //const { version } = require('../../package.json');
+    // const { version } = require('../../package.json');
 
-    const [owner, repo] = repository.split('/');
+    const [ owner, repo ] = repository.split('/');
 
     this.commonParams = { owner, repo };
   }
@@ -28,12 +28,9 @@ export default class GitLab {
       const repositoryPath = `${this.commonParams.owner}/${this.commonParams.repo}`;
       const response = await axios.get(
         `${gitlabUrl}/projects/${encodeURIComponent(repositoryPath)}`,
-        {
-          headers: {
-            Authorization: `Bearer ${process.env.OTA_ENGINE_GITLAB_TOKEN}`,
-          },
-        },
+        { headers: { Authorization: `Bearer ${process.env.OTA_ENGINE_GITLAB_TOKEN}` } },
       );
+
       this.projectId = response.data.id;
     } catch (error) {
       logger.error(`🤖 Error while obtaining projectId: ${error}`);
@@ -42,19 +39,15 @@ export default class GitLab {
     this.MANAGED_LABELS = require('./labels.json');
 
     const existingLabels = await this.getRepositoryLabels();
-    const existingLabelsNames = existingLabels.map((label) => label.name);
-    const missingLabels = this.MANAGED_LABELS.filter(
-      (label) => !existingLabelsNames.includes(label.name),
-    );
+    const existingLabelsNames = existingLabels.map(label => label.name);
+    const missingLabels = this.MANAGED_LABELS.filter(label => !existingLabelsNames.includes(label.name));
 
     if (missingLabels.length) {
-      logger.info(
-        `🤖 Following required labels are not present on the repository: ${missingLabels.map((label) => `"${label.name}"`).join(', ')}. Creating them…`,
-      );
+      logger.info(`🤖 Following required labels are not present on the repository: ${missingLabels.map(label => `"${label.name}"`).join(', ')}. Creating them…`);
 
       for (const label of missingLabels) {
-        await this.createLabel({
-          /* eslint-disable-line no-await-in-loop */ name: label.name,
+        await this.createLabel({ /* eslint-disable-line no-await-in-loop */
+          name: label.name,
           color: label.color,
           description: `${label.description} ${MANAGED_BY_OTA_MARKER}`,
         });
@@ -65,23 +58,21 @@ export default class GitLab {
   async getRepositoryLabels() {
     try {
       const response = await fetch(
-        `${gitlabUrl}/projects/${this.projectId}/labels?with_counts=true`,
+        `https://gitlab.com/api/v4/projects/4/labels?with_counts=true`,
         {
           method: 'GET',
-          headers: {
-            Authorization: `Bearer ${process.env.OTA_ENGINE_GITLAB_TOKEN}`,
-          },
+          headers: { Authorization: `Bearer ${process.env.OTA_ENGINE_GITLAB_TOKEN}` },
         },
       );
+
       if (response.status == 200) {
         const labels = response.json();
+
         return labels;
-      } else {
-        logger.error(
-          `🤖 Failed to get labels: ${response.status_code} - ${response.text}`,
-        );
-        return null;
       }
+      logger.error(`🤖 Failed to get labels: ${response.status_code} - ${response.text}`);
+
+      return null;
     } catch (error) {
       logger.error(`🤖 Could get labels: ${error}`);
     }
@@ -92,9 +83,9 @@ export default class GitLab {
 
     try {
       const label = {
-        name: name,
-        color: color,
-        description: description,
+        name,
+        color,
+        description,
       };
       const response = await axios.post(
         `${gitlabUrl}/projects/${this.projectId}/labels`,
@@ -106,6 +97,7 @@ export default class GitLab {
           },
         },
       );
+
       logger.info(`🤖 New label created: ${response.data.name}`);
     } catch (error) {
       logger.error(`🤖 Failed to create label: ${error}`);
@@ -117,9 +109,9 @@ export default class GitLab {
 
     try {
       const issue = {
-        title: title,
-        labels: labels,
-        description: description,
+        title,
+        labels,
+        description,
       };
       const response = await axios.post(
         `${gitlabUrl}/projects/${this.projectId}/issues`,
@@ -131,9 +123,8 @@ export default class GitLab {
           },
         },
       );
-      logger.info(
-        `🤖 Created GitLab issue #${response.data.iid} "${title}": ${response.data.web_url}`,
-      );
+
+      logger.info(`🤖 Created GitLab issue #${response.data.iid} "${title}": ${response.data.web_url}`);
 
       return response;
     } catch (error) {
@@ -145,9 +136,7 @@ export default class GitLab {
     const axios = require('axios');
 
     try {
-      const newLabels = {
-        labels: labels,
-      };
+      const newLabels = { labels };
       const response = await axios.put(
         `${gitlabUrl}/projects/${this.projectId}/issues/${issue.iid}`,
         newLabels,
@@ -159,11 +148,11 @@ export default class GitLab {
         },
       );
 
+      logger.debug(`response data: ${response.data}`);
+
       logger.info(`🤖 Updated labels to GitLab issue #${issue.iid}`);
     } catch (error) {
-      logger.error(
-        `🤖 Could not update GitLab issue #${issue.iid} "${issue.title}": ${error}`,
-      );
+      logger.error(`🤖 Could not update GitLab issue #${issue.iid} "${issue.title}": ${error}`);
     }
   }
 
@@ -171,9 +160,7 @@ export default class GitLab {
     const axios = require('axios');
 
     try {
-      const updateIssue = {
-        state_event: 'reopen',
-      };
+      const updateIssue = { state_event: 'reopen' };
       const response = await axios.put(
         `${gitlabUrl}/projects/${this.projectId}/issues/${issue.iid}`,
         updateIssue,
@@ -185,11 +172,11 @@ export default class GitLab {
         },
       );
 
+      logger.debug(`response data: ${response.data}`);
+
       logger.info(`🤖 Opened GitLab issue #${issue.iid}`);
     } catch (error) {
-      logger.error(
-        `🤖 Could not update GitLab issue #${issue.iid} "${issue.title}": ${error}`,
-      );
+      logger.error(`🤖 Could not update GitLab issue #${issue.iid} "${issue.title}": ${error}`);
     }
   }
 
@@ -197,9 +184,7 @@ export default class GitLab {
     const axios = require('axios');
 
     try {
-      const updateIssue = {
-        state_event: 'close',
-      };
+      const updateIssue = { state_event: 'close' };
       const response = await axios.put(
         `${gitlabUrl}/projects/${this.projectId}/issues/${issue.iid}`,
         updateIssue,
@@ -211,11 +196,11 @@ export default class GitLab {
         },
       );
 
+      logger.debug(`response data: ${response.data}`);
+
       logger.info(`🤖 Closed GitLab issue #${issue.iid}`);
     } catch (error) {
-      logger.error(
-        `🤖 Could not update GitLab issue #${issue.iid} "${issue.title}": ${error}`,
-      );
+      logger.error(`🤖 Could not update GitLab issue #${issue.iid} "${issue.title}": ${error}`);
     }
   }
 
@@ -224,20 +209,16 @@ export default class GitLab {
 
     try {
       let apiUrl = `${gitlabUrl}/projects/${this.projectId}/issues?state=${searchParams.state}&per_page=100`;
-      if (searchParams.state == 'all')
-        apiUrl = `${gitlabUrl}/projects/${this.projectId}/issues?per_page=100`;
+
+      if (searchParams.state == 'all') apiUrl = `${gitlabUrl}/projects/${this.projectId}/issues?per_page=100`;
       apiUrl = `${gitlabUrl}/projects/${this.projectId}/issues?search=${encodeURIComponent(title)}&per_page=100`;
-      const response = await axios.get(apiUrl, {
-        headers: {
-          Authorization: `Bearer ${process.env.OTA_ENGINE_GITLAB_TOKEN}`,
-        },
-      });
+      const response = await axios.get(apiUrl, { headers: { Authorization: `Bearer ${process.env.OTA_ENGINE_GITLAB_TOKEN}` } });
       const issues = response.data;
 
-      const [issue] = issues.filter((item) => item.title === title); // since only one is expected, use the first one
+      const [issue] = issues.filter(item => item.title === title); // since only one is expected, use the first one
 
       setTimeout(() => {
-        console.log(title + ' - ' + apiUrl);
+        console.log(`${title} - ${apiUrl}`);
       }, 5000);
 
       return issue;
@@ -248,9 +229,7 @@ export default class GitLab {
 
   async addCommentToIssue({ issue, comment }) {
     const axios = require('axios');
-    const body = {
-      body: comment,
-    };
+    const body = { body: comment };
 
     try {
       const response = await axios.post(
@@ -263,15 +242,12 @@ export default class GitLab {
           },
         },
       );
-      logger.info(
-        `🤖 Added comment to GitLab issue #${issue.iid} ${issue.title}: ${response.data.id}`,
-      );
+
+      logger.info(`🤖 Added comment to GitLab issue #${issue.iid} ${issue.title}: ${response.data.id}`);
 
       return response.data.body;
     } catch (error) {
-      logger.error(
-        `🤖 Could not add comment to GitLab issue #${issue.iid} "${issue.title}": ${error}`,
-      );
+      logger.error(`🤖 Could not add comment to GitLab issue #${issue.iid} "${issue.title}": ${error}`);
     }
   }
 
@@ -301,10 +277,9 @@ export default class GitLab {
       await this.openIssue(issue);
     }
 
-    const managedLabelsNames = this.MANAGED_LABELS.map((label) => label.name);
-    const [managedLabel] = issue.labels.filter((label) =>
-      managedLabelsNames.includes(label.name),
-    ); // it is assumed that only one specific reason for failure is possible at a time, making managed labels mutually exclusive
+    const managedLabelsNames = this.MANAGED_LABELS.map(label => label.name);
+    const [managedLabel] = issue.labels.filter(label =>
+      managedLabelsNames.includes(label.name)); // it is assumed that only one specific reason for failure is possible at a time, making managed labels mutually exclusive
 
     if (managedLabel?.name == label) {
       // if the label is already assigned to the issue, the error is redundant with the one already reported and no further action is necessary
@@ -312,12 +287,12 @@ export default class GitLab {
     }
 
     const labelsNotManagedToKeep = issue.labels
-      .map((label) => label.name)
-      .filter((label) => !managedLabelsNames.includes(label));
+      .map(label => label.name)
+      .filter(label => !managedLabelsNames.includes(label));
 
     await this.setIssueLabels({
       issue,
-      labels: [label, ...labelsNotManagedToKeep],
+      labels: [ label, ...labelsNotManagedToKeep ],
     });
     await this.addCommentToIssue({ issue, comment: description });
   }
