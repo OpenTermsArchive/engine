@@ -41,7 +41,7 @@ export async function release({ shouldPublish, shouldRemoveLocalCopy, fileName }
       releaseDate,
       stats,
     });
-    
+
     logger.info(`Dataset published to ${releaseUrl}`);
   }
 
