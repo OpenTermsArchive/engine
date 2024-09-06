@@ -6,7 +6,7 @@ import GitLab from './gitlab.js';
 
 const CONTRIBUTION_TOOL_URL = 'https://contribute.opentermsarchive.org/';
 const DOC_URL = 'https://docs.opentermsarchive.org';
-const REPO_URL = 'https://gitlab.com/';
+const REPO_URL = process.env.OTA_ENGINE_GITLAB_BASE_URL;
 
 const ERROR_MESSAGE_TO_ISSUE_LABEL_MAP = {
   'has no match': 'selectors',
