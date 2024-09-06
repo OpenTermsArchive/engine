@@ -2,18 +2,19 @@ import fsApi from 'fs';
 import path from 'path';
 import url from 'url';
 
-import axios from 'axios';
 import config from 'config';
 import dotenv from 'dotenv';
 import FormData from 'form-data';
+import nodeFetch from 'node-fetch';
 
+import GitLab from '../../../src/reporterGitlab/gitlab.js';
 import * as readme from '../assets/README.templateGitLab.js';
 import logger from '../logger/index.js';
 
 dotenv.config();
 
-const gitlabAPIUrl = 'https://gitlab.com/api/v4';
-const gitlabUrl = 'https://gitlab.com';
+const gitlabAPIUrl = process.env.OTA_ENGINE_GITLAB_API_BASE_URL;
+const gitlabUrl = process.env.OTA_ENGINE_GITLAB_BASE_URL;
 
 export default async function publishReleaseGitLab({
   archivePath,
@@ -21,8 +22,6 @@ export default async function publishReleaseGitLab({
   stats,
 }) {
   let projectId = null;
-
-  // const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
 
   const [ owner, repo ] = url
     .parse(config.get('@opentermsarchive/engine.dataset.versionsRepositoryURLGitLab'))
@@ -32,37 +31,53 @@ export default async function publishReleaseGitLab({
 
   try {
     const repositoryPath = `${commonParams.owner}/${commonParams.repo}`;
-    const response = await axios.get(
-      `${gitlabAPIUrl}/projects/${encodeURIComponent(repositoryPath)}`,
-      { headers: { Authorization: `Bearer ${process.env.OTA_ENGINE_GITLAB_RELEASES_TOKEN}` } },
-    );
 
-    projectId = response.data.id;
+    const options = GitLab.baseOptionsHttpReq(process.env.OTA_ENGINE_GITLAB_RELEASES_TOKEN);
+
+    options.method = 'GET';
+    options.headers = {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    };
+
+    const response = await nodeFetch(
+      `${gitlabAPIUrl}/projects/${encodeURIComponent(repositoryPath)}`,
+      options,
+    );
+    const res = await response.json();
+
+    projectId = res.id;
   } catch (error) {
-    // logger.error(`🤖  Error while obtaining projectId: ${error}`);
+    logger.error(`🤖  Error while obtaining projectId: ${error}`);
     projectId = null;
   }
 
   const tagName = `${path.basename(archivePath, path.extname(archivePath))}`; // use archive filename as Git tag
 
   try {
-    // First, create the release
-    const releaseResponse = await axios.post(
+    let options = GitLab.baseOptionsHttpReq(process.env.OTA_ENGINE_GITLAB_RELEASES_TOKEN);
+
+    options.method = 'POST';
+    options.body = {
+      ref: 'main',
+      tag_name: tagName,
+      name: readme.title({ releaseDate }),
+      description: readme.body(stats),
+    };
+    options.headers = {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    };
+
+    options.body = JSON.stringify(options.body);
+
+    const releaseResponse = await nodeFetch(
       `${gitlabAPIUrl}/projects/${projectId}/releases`,
-      {
-        ref: 'main',
-        tag_name: tagName,
-        name: readme.title({ releaseDate }),
-        description: readme.body(stats),
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${process.env.OTA_ENGINE_GITLAB_RELEASES_TOKEN}`,
-          'Content-Type': 'application/json',
-        },
-      },
+      options,
     );
-    const releaseId = releaseResponse.data.commit.id;
+    const releaseRes = await releaseResponse.json();
+
+    const releaseId = releaseRes.commit.id;
 
     logger.info(`Created release with releaseId: ${releaseId}`);
 
@@ -76,18 +91,21 @@ export default async function publishReleaseGitLab({
     );
     formData.append('file', fsApi.createReadStream(archivePath), { filename: path.basename(archivePath) });
 
-    const uploadResponse = await axios.post(
-      `${gitlabAPIUrl}/projects/${projectId}/releases/${tagName}/assets/links`,
-      formData,
-      {
-        headers: {
-          ...formData.getHeaders(),
-          Authorization: `Bearer ${process.env.OTA_ENGINE_GITLAB_RELEASES_TOKEN}`,
-        },
-      },
-    );
+    options = GitLab.baseOptionsHttpReq(process.env.OTA_ENGINE_GITLAB_RELEASES_TOKEN);
+    options.method = 'POST';
+    options.headers = {
+      ...formData.getHeaders(),
+      ...options.headers,
+    };
+    options.body = formData;
 
-    const releaseUrl = uploadResponse.data.direct_asset_url;
+    const uploadResponse = await nodeFetch(
+      `${gitlabAPIUrl}/projects/${projectId}/releases/${tagName}/assets/links`,
+      options,
+    );
+    const uploadRes = await uploadResponse.json();
+
+    const releaseUrl = uploadRes.direct_asset_url;
 
     return releaseUrl;
   } catch (error) {
