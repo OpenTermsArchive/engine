@@ -73,7 +73,7 @@ export default async function track({ services, types, extractOnly, schedule }) 
   }
 
   if (!schedule) {
-    await archivist.track({ services, types });
+    await archivist.track({ services, terms: types });
 
     return;
   }
