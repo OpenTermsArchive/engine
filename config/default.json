@@ -59,7 +59,7 @@
     "dataset": {
       "title": "sandbox",
       "versionsRepositoryURL": "https://github.com/OpenTermsArchive/sandbox",
-      "versionsRepositoryURLGitLab": "https://gitlab.com/p2b/contrib-versions",
+      "versionsRepositoryURLGitLab": "https://gitlab.com/ota-sandbox-example/sandbox",
       "publishingSchedule": "30 8 * * MON"
     }
   }
