@@ -99,7 +99,7 @@ export default class Archivist extends events.EventEmitter {
     });
   }
 
-  async track({ services: servicesIds = this.servicesIds, types: termsTypes = [], extractOnly = false } = {}) {
+  async track({ services: servicesIds = this.servicesIds, types: termsTypes = [], extractOnly = false, skipSnapshots = false, skipReadBack = false } = {}) {
     const numberOfTerms = Service.getNumberOfTerms(this.services, servicesIds, termsTypes);
 
     this.emit('trackingStarted', servicesIds.length, numberOfTerms, extractOnly);
@@ -114,7 +114,7 @@ export default class Archivist extends events.EventEmitter {
           return;
         }
 
-        this.trackingQueue.push({ terms: this.services[serviceId].getTerms({ type: termsType }), extractOnly });
+        this.trackingQueue.push({ terms: this.services[serviceId].getTerms({ type: termsType }), extractOnly, skipSnapshots, skipReadBack });
       });
     });
 
@@ -127,13 +127,17 @@ export default class Archivist extends events.EventEmitter {
     this.emit('trackingCompleted', servicesIds.length, numberOfTerms, extractOnly);
   }
 
-  async trackTermsChanges({ terms, extractOnly = false }) {
+  async trackTermsChanges({ terms, extractOnly = false, skipReadBack = false, skipSnapshots = false }) {
     if (!extractOnly) {
       await this.fetchSourceDocuments(terms);
-      await this.recordSnapshots(terms);
+      if (!skipSnapshots) {
+        await this.recordSnapshots(terms);
+      }
     }
 
-    await this.loadSourceDocumentsFromSnapshots(terms);
+    if (!skipSnapshots && !skipReadBack) {
+      await this.loadSourceDocumentsFromSnapshots(terms);
+    }
 
     if (terms.sourceDocuments.filter(sourceDocument => !sourceDocument.content).length) {
       // If some source documents do not have associated snapshots, it is not possible to generate a fully valid version
