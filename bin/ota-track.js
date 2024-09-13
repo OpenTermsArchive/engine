@@ -16,6 +16,9 @@ program
   .option('-s, --services [serviceId...]', 'service IDs of services to track')
   .option('-t, --types [termsType...]', 'terms types to track')
   .option('-e, --extract-only', 'extract versions from existing snapshots with latest declarations and engine, without recording new snapshots')
-  .option('--schedule', 'track automatically at a regular interval');
+  .option('--schedule', 'track automatically at a regular interval')
+  .option('--skipPreRun', 'skip the pre run')
+  .option('--skipReadBack', 'skip the read-back of snapshots')
+  .option('--skipSnapshots', 'skip both the writing and the read-back of the snapshots');
 
 track(program.parse(process.argv).opts());
