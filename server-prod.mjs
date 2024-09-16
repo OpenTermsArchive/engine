@@ -8,7 +8,6 @@ const options = {
   cert: readFileSync('/home/crawler/tls/fullchain.pem'),
 };
 
-import { createServer } from 'http';
 const port = 443;
 createServer(options, handler).listen(port);
 console.log(`listening on port ${port}`);
