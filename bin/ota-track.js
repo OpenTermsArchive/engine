@@ -15,6 +15,7 @@ program
   .description('Retrieve declared documents, record snapshots, extract versions and publish the resulting records')
   .option('-s, --services [serviceId...]', 'service IDs of services to track')
   .option('-t, --types [termsType...]', 'terms types to track')
+  .option('--shard [chunkOf]', 'run only a specific chunk of the serviceIds queue, e.g. "--shard 0/3", "--shard 1/3", "--shard 2/3" will run three equal chunks')
   .option('-e, --extract-only', 'extract versions from existing snapshots with latest declarations and engine, without recording new snapshots')
   .option('--schedule', 'track automatically at a regular interval')
   .option('--skipPreRun', 'skip the pre run')

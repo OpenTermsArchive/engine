@@ -11,7 +11,7 @@ import Reporter from './reporter/index.js';
 
 const require = createRequire(import.meta.url);
 
-export default async function track({ services, types, extractOnly, skipPreRun, skipSnapshots, skipReadBack, schedule }) {
+export default async function track({ services, types, extractOnly, skipPreRun, skipSnapshots, skipReadBack, schedule, shard }) {
     const archivist = new Archivist({
     recorderConfig: config.get('@opentermsarchive/engine.recorder'),
     fetcherConfig: config.get('@opentermsarchive/engine.fetcher'),
@@ -40,7 +40,7 @@ export default async function track({ services, types, extractOnly, skipPreRun, 
   // The result of the extraction step that generates the version from the snapshots may depend on changes to the engine or its dependencies.
   // The process thus starts by only performing the extraction process so that any version following such changes can be labelled (to avoid sending notifications, for example)
   if (!skipPreRun) {
-    await archivist.track({ services, types, extractOnly: true, skipSnapshots });
+    await archivist.track({ services, types, extractOnly: true, skipSnapshots, shard });
   }
 
   if (extractOnly && !skipPreRun) {
