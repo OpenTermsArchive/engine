@@ -40,7 +40,7 @@ export default async function track({ services, types, extractOnly, skipPreRun, 
   // The result of the extraction step that generates the version from the snapshots may depend on changes to the engine or its dependencies.
   // The process thus starts by only performing the extraction process so that any version following such changes can be labelled (to avoid sending notifications, for example)
   if (!skipPreRun) {
-    await archivist.track({ services, types, extractOnly: true, skipSnapshots, shard });
+    await archivist.track({ services, types, extractOnly: true, skipSnapshots, skipReadBack: false /* this is the prerun, skipping readback makes no sense here */, shard });
   }
 
   if (extractOnly && !skipPreRun) {
@@ -75,7 +75,7 @@ export default async function track({ services, types, extractOnly, skipPreRun, 
   }
 
   if (!schedule) {
-    await archivist.track({ services, types, extractOnly, skipSnapshots, skipReadBack });
+    await archivist.track({ services, types, extractOnly, skipSnapshots, skipReadBack, shard });
 
     return;
   }
