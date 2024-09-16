@@ -1,10 +1,15 @@
-import { createServer } from 'http';
-
+import { createServer } from 'https';
+import { readFileSync } from 'fs';
 import config from 'config';
 
 import Archivist from './src/archivist/index.js';
 
-createServer(async (req, res) => {
+const options = {
+  key: readFileSync('/home/crawler/tls/privkey.pem'),
+  cert: readFileSync('/home/crawler/tls/fullchain.pem'),
+};
+
+createServer(options, async (req, res) => {
   // eslint-disable-next-line no-unused-vars
   let body = '';
 
@@ -27,5 +32,5 @@ createServer(async (req, res) => {
     res.write(JSON.stringify(results));
     res.end();
   });
-}).listen(3000);
-console.log('listening on port 3000');
+}).listen(443);
+console.log('listening on port 443');
