@@ -37,6 +37,7 @@ WORKDIR /home/crawler/engine/data/versions
 RUN git commit-graph write --reachable --changed-paths
 WORKDIR /home/crawler/engine
 ENV CACHE_BUST=change-me-to-force-rebuild
+RUN ls
 RUN git pull
 
 RUN . $NVM_DIR/nvm.sh && npm install

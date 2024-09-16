@@ -116,7 +116,9 @@ export default class Archivist extends events.EventEmitter {
             contentSelectors: [ select ]
           }
         ]
-      }
+      },
+      skipSnapshots: true,
+      skipRecording: true
     });
     console.log(sourceDocuments);
     await stopHeadlessBrowser();
@@ -154,8 +156,9 @@ export default class Archivist extends events.EventEmitter {
     this.emit('trackingCompleted', servicesIds.length, numberOfTerms, extractOnly);
   }
 
-  async trackTermsChanges({ terms, extractOnly = false, skipReadBack = false, skipSnapshots = false }) {
-    if (!extractOnly) {
+  async trackTermsChanges({ terms, extractOnly = false, skipReadBack = false, skipSnapshots = false, skipRecording = false }) {
+    console.log('trackTermsChanges', terms, extractOnly, skipReadBack, skipSnapshots);
+      if (!extractOnly) {
       await this.fetchSourceDocuments(terms);
       if (!skipSnapshots) {
         await this.recordSnapshots(terms);
@@ -171,7 +174,9 @@ export default class Archivist extends events.EventEmitter {
       return;
     }
 
-    await this.recordVersion(terms, extractOnly);
+    if (!skipRecording) {
+      await this.recordVersion(terms, extractOnly);
+    }
     return terms.sourceDocuments;
   }
 
