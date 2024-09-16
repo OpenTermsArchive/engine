@@ -35,13 +35,9 @@ WORKDIR /home/crawler/engine/data
 RUN git clone https://github.com/tosdr/tosdr-versions versions
 WORKDIR /home/crawler/engine/data/versions
 RUN git commit-graph write --reachable --changed-paths
-RUN git rev-parse HEAD~5 > .git/shallow
-WORKDIR /home/crawler/engine/data
-RUN git clone https://github.com/tosdr/tosdr-snapshots snapshots
-WORKDIR /home/crawler/engine/data/snapshots
-RUN git commit-graph write --reachable --changed-paths
-RUN git rev-parse HEAD~5 > .git/shallow
 WORKDIR /home/crawler/engine
+ENV CACHE_BUST=change-me-to-force-rebuild
+RUN git pull
 
 RUN . $NVM_DIR/nvm.sh && npm install
 CMD . $NVM_DIR/nvm.sh && node server.mjs
