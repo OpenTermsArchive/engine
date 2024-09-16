@@ -20,7 +20,7 @@ RUN . $NVM_DIR/nvm.sh && nvm alias default $NODE_VERSION
 RUN . $NVM_DIR/nvm.sh && nvm use default
 ENV NODE_PATH $NVM_DIR/v$NODE_VERSION/lib/node_modules
 ENV PATH      $NVM_DIR/v$NODE_VERSION/bin:$PATH
-
+RUN ls
 RUN git clone https://github.com/tosdr/ota-engine engine
 RUN git clone https://github.com/tosdr/tosdr-declarations declarations
 WORKDIR /home/crawler/declarations
@@ -28,11 +28,11 @@ RUN git checkout removals
 RUN git pull
 RUN git commit-graph write --reachable --changed-paths
 WORKDIR /home/crawler/engine
-RUN git checkout crawl-api
+RUN git checkout tosdr-production
 RUN ln -s ../declarations/declarations
 RUN mkdir data
 WORKDIR /home/crawler/engine/data
-RUN git clone https://github.com/tosdr/tosdr-versions versions
+RUN git clone --depth=1 https://github.com/tosdr/tosdr-versions versions
 WORKDIR /home/crawler/engine/data/versions
 RUN git commit-graph write --reachable --changed-paths
 WORKDIR /home/crawler/engine
