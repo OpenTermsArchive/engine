@@ -1,6 +1,6 @@
 import events from 'events';
-
 import async from 'async';
+import showdown from 'showdown';
 
 import { InaccessibleContentError } from './errors.js';
 import extract, { ExtractDocumentError } from './extract/index.js';
@@ -99,6 +99,33 @@ export default class Archivist extends events.EventEmitter {
     });
   }
 
+  async crawl({ fetch, select }) {
+    await launchHeadlessBrowser();
+
+    console.log(fetch);
+    console.log(select);
+
+    const sourceDocuments = await this.trackTermsChanges({
+      terms: {
+        service: {
+          id: 'ephemeral'
+        },
+        sourceDocuments: [
+          {
+            location: fetch,
+            contentSelectors: [ select ]
+          }
+        ]
+      }
+    });
+    console.log(sourceDocuments);
+    await stopHeadlessBrowser();
+    const results = await this.extractVersionContent(sourceDocuments);
+    const converter = new showdown.Converter();
+    const html      = converter.makeHtml(results);
+    return html;
+  }
+
   async track({ services: servicesIds = this.servicesIds, types: termsTypes = [], extractOnly = false, skipSnapshots = false, skipReadBack = false } = {}) {
     const numberOfTerms = Service.getNumberOfTerms(this.services, servicesIds, termsTypes);
 
@@ -144,7 +171,8 @@ export default class Archivist extends events.EventEmitter {
       return;
     }
 
-    return this.recordVersion(terms, extractOnly);
+    await this.recordVersion(terms, extractOnly);
+    return terms.sourceDocuments;
   }
 
   async fetchSourceDocuments(terms) {
