@@ -21,7 +21,6 @@ export async function handler (req, res) {
     body += chunk;
   });
   req.on('end', async () => {
-    res.write(body);
     const options = JSON.parse(body);
 
     console.log(options);
@@ -37,3 +36,4 @@ export async function handler (req, res) {
     res.end();
   });
 }
+
