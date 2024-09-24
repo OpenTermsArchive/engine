@@ -8,7 +8,7 @@ export async function handler (req, res) {
   let body = '';
   const header = req.headers.authorization || '';       // get the auth header
   const token = header.split(/\s+/).pop() || '';        // and the encoded auth token
-  console.log(`checking token ${token} (should match "${process.env.API_SECRET}"`);
+  console.log(`checking token "${token}" (should match "${process.env.API_SECRET}")`);
   if (token !== process.env.API_SECRET) {
     console.log('api token check fail');
     res.writeHead(401);
