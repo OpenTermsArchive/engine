@@ -5,6 +5,12 @@ This codebase is a Node.js module enabling downloading, archiving and publishing
 For documentation, visit [docs.opentermsarchive.org](https://docs.opentermsarchive.org/)
 
 - - -
+## Development
+
+* Run the [`ota-to-postgres` branch of Phoenix](https://github.com/tosdr/edit.tosdr.org/tree/ota-to-postgres?tab=readme-ov-file#development) development setup using `docker compose up` as described in its readme.
+* Don't forget the additional seeding step that runs `docker exec -it db psql -U postgres` and `update documents set url='http://example.com', selector='body'` there.
+* `npm install`
+* `node pg-test.js`
 
 ## Contribute
 
