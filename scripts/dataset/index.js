@@ -15,7 +15,17 @@ export async function release({ shouldPublish, shouldRemoveLocalCopy, fileName }
 
   logger.info('Start exporting dataset…');
 
-  const stats = await generateRelease({ archivePath, releaseDate });
+  const usesGitHub = (typeof process.env.OTA_ENGINE_GITHUB_TOKEN !== 'undefined');
+  const usesGitLab = (typeof process.env.OTA_ENGINE_GITLAB_TOKEN !== 'undefined');
+
+  let versionsRepositoryURL = '';
+  
+  if (usesGitHub)
+    versionsRepositoryURL = config.get('@opentermsarchive/engine.dataset.versionsRepositoryURL');
+  if (usesGitLab)
+    versionsRepositoryURL = config.get('@opentermsarchive/engine.dataset.versionsRepositoryURLGitLab');
+
+  const stats = await generateRelease({ archivePath, releaseDate, versionsRepositoryURL });
 
   logger.info(`Dataset exported in ${archivePath}`);
 
@@ -25,7 +35,7 @@ export async function release({ shouldPublish, shouldRemoveLocalCopy, fileName }
 
   logger.info('Start publishing dataset…');
 
-  if (typeof process.env.OTA_ENGINE_GITHUB_TOKEN !== 'undefined') {
+  if (usesGitHub) {
     const releaseUrl = await publishRelease({
       archivePath,
       releaseDate,
@@ -35,7 +45,7 @@ export async function release({ shouldPublish, shouldRemoveLocalCopy, fileName }
     logger.info(`Dataset published to ${releaseUrl}`);
   }
 
-  if (typeof process.env.OTA_ENGINE_GITLAB_RELEASES_TOKEN !== 'undefined') {
+  if (usesGitLab) {
     const releaseUrl = await publishReleaseGitLab({
       archivePath,
       releaseDate,

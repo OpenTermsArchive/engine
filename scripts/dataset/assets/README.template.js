@@ -3,10 +3,10 @@ import config from 'config';
 const LOCALE = 'en-EN';
 const DATE_OPTIONS = { year: 'numeric', month: 'long', day: 'numeric' };
 
-export default function readme({ releaseDate, servicesCount, firstVersionDate, lastVersionDate }) {
+export default function readme({ releaseDate, servicesCount, firstVersionDate, lastVersionDate, versionsRepositoryURL }) {
   return `# Open Terms Archive — ${title({ releaseDate })}
 
-${body({ servicesCount, firstVersionDate, lastVersionDate })}`;
+${body({ servicesCount, firstVersionDate, lastVersionDate, versionsRepositoryURL })}`;
 }
 
 export function title({ releaseDate }) {
@@ -17,11 +17,9 @@ export function title({ releaseDate }) {
   return `${title} — ${releaseDate} dataset`;
 }
 
-export function body({ servicesCount, firstVersionDate, lastVersionDate }) {
+export function body({ servicesCount, firstVersionDate, lastVersionDate, versionsRepositoryURL }) {
   firstVersionDate = firstVersionDate.toLocaleDateString(LOCALE, DATE_OPTIONS);
   lastVersionDate = lastVersionDate.toLocaleDateString(LOCALE, DATE_OPTIONS);
-
-  const versionsRepositoryURL = config.get('@opentermsarchive/engine.dataset.versionsRepositoryURL');
 
   return `This dataset consolidates the contractual documents of ${servicesCount} service providers, in all their versions that were accessible online between ${firstVersionDate} and ${lastVersionDate}.
 
