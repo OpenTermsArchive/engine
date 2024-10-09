@@ -24,7 +24,7 @@ import FormData from 'form-data';
 import nodeFetch from 'node-fetch';
 
 import GitLab from '../../../src/reporterGitlab/gitlab.js';
-import * as readme from '../assets/README.templateGitLab.js';
+import * as readme from '../assets/README.template.js';
 import logger from '../logger/index.js';
 
 dotenv.config();
