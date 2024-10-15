@@ -36,6 +36,7 @@ const logger = winston.createLogger({
   format: alignedWithColorsAndTime,
   transports,
   rejectionHandlers: transports,
+  exitOnError: true,
 });
 
 if (config.get('@opentermsarchive/engine.logger.sendMailOnError')) {
@@ -51,7 +52,6 @@ if (config.get('@opentermsarchive/engine.logger.sendMailOnError')) {
       ssl: true,
       timeout: 30 * 1000,
       formatter: args => args[Object.getOwnPropertySymbols(args)[1]], // Returns the full error message, the same visible in the console. It is referenced in the argument object with a Symbol of which we do not have the reference but we know it is the second one.
-      exitOnError: true,
     };
 
     transports.push(new winston.transports.Mail({
