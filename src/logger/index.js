@@ -67,13 +67,14 @@ if (config.get('@opentermsarchive/engine.logger.sendMailOnError')) {
         subject: `[OTA] Inaccessible content — ${os.hostname()}`,
       }));
     }
-
-    logger.configure({
-      transports,
-      rejectionHandlers: transports,
-    });
   }
 }
+
+logger.configure({
+  transports,
+  rejectionHandlers: transports,
+  exitOnError: true,
+});
 
 let recordedSnapshotsCount;
 let recordedVersionsCount;
