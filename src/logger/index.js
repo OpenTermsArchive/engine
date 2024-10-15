@@ -39,6 +39,16 @@ const logger = winston.createLogger({
   exitOnError: true,
 });
 
+logger.on('error', err => {
+  if ('smtp' in err) { // Check if err has an `smtp` property, even if it's undefined
+    logger.warn({ message: `Uncaught exception from SMTP mailer detected and treated as an operational error; process will continue running:\n${err.stack}` });
+
+    return; // Prevent process exit
+  }
+
+  return process.exit(1); // Exit process for other errors
+});
+
 if (config.get('@opentermsarchive/engine.logger.sendMailOnError')) {
   if (process.env.OTA_ENGINE_SMTP_PASSWORD === undefined) {
     logger.warn('Environment variable "OTA_ENGINE_SMTP_PASSWORD" was not found; log emails cannot be sent');
