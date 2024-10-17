@@ -8,7 +8,7 @@ All changes that impact users of this module are documented in this file, in the
 
 ### Fixed
 
-- Prevent the engine from exiting on non-critical SMTP errors from the logger
+- Prevent the engine from exiting on SMTP errors from the logger
 
 ## 2.2.1 - 2024-06-07
 
