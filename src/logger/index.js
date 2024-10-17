@@ -28,7 +28,7 @@ const alignedWithColorsAndTime = combine(
   }),
 );
 
-const consoleTransport = new winston.transports.Console(({ silent: process.env.NODE_ENV === 'test' }));
+const consoleTransport = new winston.transports.Console({ silent: process.env.NODE_ENV === 'test' });
 
 const transports = [consoleTransport];
 
@@ -36,6 +36,17 @@ const logger = winston.createLogger({
   format: alignedWithColorsAndTime,
   transports,
   rejectionHandlers: transports,
+  exitOnError: true,
+});
+
+logger.on('error', err => {
+  if ('smtp' in err) { // Check if err has an `smtp` property, even if it's undefined
+    logger.warn({ message: `Uncaught exception from SMTP mailer detected and treated as an operational error; process will continue running:\n${err.stack}` });
+
+    return; // Prevent process exit
+  }
+
+  return process.exit(1); // Exit process for other errors
 });
 
 if (config.get('@opentermsarchive/engine.logger.sendMailOnError')) {
@@ -51,7 +62,6 @@ if (config.get('@opentermsarchive/engine.logger.sendMailOnError')) {
       ssl: true,
       timeout: 30 * 1000,
       formatter: args => args[Object.getOwnPropertySymbols(args)[1]], // Returns the full error message, the same visible in the console. It is referenced in the argument object with a Symbol of which we do not have the reference but we know it is the second one.
-      exitOnError: true,
     };
 
     transports.push(new winston.transports.Mail({
@@ -67,13 +77,14 @@ if (config.get('@opentermsarchive/engine.logger.sendMailOnError')) {
         subject: `[OTA] Inaccessible content — ${os.hostname()}`,
       }));
     }
-
-    logger.configure({
-      transports,
-      rejectionHandlers: transports,
-    });
   }
 }
+
+logger.configure({
+  transports,
+  rejectionHandlers: transports,
+  exitOnError: true,
+});
 
 let recordedSnapshotsCount;
 let recordedVersionsCount;
