@@ -90,7 +90,7 @@
     "mongodb": "^4.9.0",
     "morgan": "^1.10.0",
     "node-fetch": "^3.1.0",
-    "octokit": "^4.0.2",
+    "octokit": "2.0.2",
     "pdfjs-dist": "^2.9.359",
     "puppeteer": "^22.8.1",
     "puppeteer-extra": "^3.3.6",
