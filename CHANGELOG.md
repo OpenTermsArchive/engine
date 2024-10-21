@@ -2,6 +2,13 @@
 
 All changes that impact users of this module are documented in this file, in the [Common Changelog](https://common-changelog.org) format with some additional specifications defined in the CONTRIBUTING file. This codebase adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased [minor]
+
+### Added
+
+- Add GtiLab functionalities
+
+
 ## 2.2.1 - 2024-06-07
 
 _Full changeset and discussions: [#1088](https://github.com/OpenTermsArchive/engine/pull/1088)._
