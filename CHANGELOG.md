@@ -9,7 +9,7 @@ All changes that impact users of this module are documented in this file, in the
 
 ### Changed
 
-- Update @opentermsarchive/terms-types from v1.0.0 to v1.3.0
+- Bump `@opentermsarchive/terms-types` peer dependency to support new types introduced in [v1.3.0](https://github.com/OpenTermsArchive/terms-types/blob/main/CHANGELOG.md#130---2024-08-12)
 
 ## 2.2.2 - 2024-10-21
 
