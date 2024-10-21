@@ -32,21 +32,24 @@ export default class GitHub {
 
   async initialize() {
     this.MANAGED_LABELS = require('./labels.json');
+    try {
+      const existingLabels = await this.getRepositoryLabels();
+      const existingLabelsNames = existingLabels.map(label => label.name);
+      const missingLabels = this.MANAGED_LABELS.filter(label => !existingLabelsNames.includes(label.name));
 
-    const existingLabels = await this.getRepositoryLabels();
-    const existingLabelsNames = existingLabels.map(label => label.name);
-    const missingLabels = this.MANAGED_LABELS.filter(label => !existingLabelsNames.includes(label.name));
+      if (missingLabels.length) {
+        logger.info(`🤖 Following required labels are not present on the repository: ${missingLabels.map(label => `"${label.name}"`).join(', ')}. Creating them…`);
 
-    if (missingLabels.length) {
-      logger.info(`🤖 Following required labels are not present on the repository: ${missingLabels.map(label => `"${label.name}"`).join(', ')}. Creating them…`);
-
-      for (const label of missingLabels) {
-        await this.createLabel({ /* eslint-disable-line no-await-in-loop */
-          name: label.name,
-          color: label.color,
-          description: `${label.description} ${MANAGED_BY_OTA_MARKER}`,
-        });
+        for (const label of missingLabels) {
+          await this.createLabel({ /* eslint-disable-line no-await-in-loop */
+            name: label.name,
+            color: label.color,
+            description: `${label.description} ${MANAGED_BY_OTA_MARKER}`,
+          });
+        }
       }
+    } catch (error) {
+      logger.error(`🤖 Failed to handle repository labels: ${error.message}`);
     }
   }
 
@@ -123,38 +126,51 @@ export default class GitHub {
   }
 
   async closeIssueWithCommentIfExists({ title, comment }) {
-    const openedIssue = await this.getIssue({ title, state: GitHub.ISSUE_STATE_OPEN });
+    try {
+      const openedIssue = await this.getIssue({ title, state: GitHub.ISSUE_STATE_OPEN });
 
-    if (!openedIssue) {
-      return;
+      if (!openedIssue) {
+        return;
+      }
+
+      await this.addCommentToIssue({ issue: openedIssue, comment });
+      await this.closeIssue(openedIssue);
+
+      return logger.info(`🤖 Closed issue #${openedIssue.number}: ${openedIssue.html_url}`);
+    } catch (error) {
+      logger.error(`🤖 Failed to handle issue "${title}": ${error.message}`);
     }
-
-    await this.addCommentToIssue({ issue: openedIssue, comment });
-
-    return this.closeIssue(openedIssue);
   }
 
   async createOrUpdateIssue({ title, description, label }) {
-    const issue = await this.getIssue({ title, state: GitHub.ISSUE_STATE_ALL });
+    try {
+      const issue = await this.getIssue({ title, state: GitHub.ISSUE_STATE_ALL });
 
-    if (!issue) {
-      return this.createIssue({ title, description, labels: [label] });
+      if (!issue) {
+        const createdIssue = await this.createIssue({ title, description, labels: [label] });
+
+        return logger.info(`🤖 Created GitHub issue #${createdIssue.number} "${title}": ${createdIssue.html_url}`);
+      }
+
+      if (issue.state == GitHub.ISSUE_STATE_CLOSED) {
+        await this.openIssue(issue);
+        logger.info(`🤖 Reopen issue #${issue.number}: ${issue.html_url}`);
+      }
+
+      const managedLabelsNames = this.MANAGED_LABELS.map(label => label.name);
+      const [managedLabel] = issue.labels.filter(label => managedLabelsNames.includes(label.name)); // it is assumed that only one specific reason for failure is possible at a time, making managed labels mutually exclusive
+
+      if (managedLabel?.name == label) { // if the label is already assigned to the issue, the error is redundant with the one already reported and no further action is necessary
+        return;
+      }
+
+      const labelsNotManagedToKeep = issue.labels.map(label => label.name).filter(label => !managedLabelsNames.includes(label));
+
+      await this.setIssueLabels({ issue, labels: [ label, ...labelsNotManagedToKeep ] });
+      await this.addCommentToIssue({ issue, comment: description });
+      logger.info(`🤖 Updated issue #${issue.number}: ${issue.html_url}`);
+    } catch (error) {
+      logger.error(`🤖 Failed to handle issue "${title}": ${error.message}`);
     }
-
-    if (issue.state == GitHub.ISSUE_STATE_CLOSED) {
-      await this.openIssue(issue);
-    }
-
-    const managedLabelsNames = this.MANAGED_LABELS.map(label => label.name);
-    const [managedLabel] = issue.labels.filter(label => managedLabelsNames.includes(label.name)); // it is assumed that only one specific reason for failure is possible at a time, making managed labels mutually exclusive
-
-    if (managedLabel?.name == label) { // if the label is already assigned to the issue, the error is redundant with the one already reported and no further action is necessary
-      return;
-    }
-
-    const labelsNotManagedToKeep = issue.labels.map(label => label.name).filter(label => !managedLabelsNames.includes(label));
-
-    await this.setIssueLabels({ issue, labels: [ label, ...labelsNotManagedToKeep ] });
-    await this.addCommentToIssue({ issue, comment: description });
   }
 }
