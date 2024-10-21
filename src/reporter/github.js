@@ -16,7 +16,14 @@ export default class GitHub {
   constructor(repository) {
     const { version } = require('../../package.json');
 
-    this.octokit = new Octokit({ auth: process.env.OTA_ENGINE_GITHUB_TOKEN, userAgent: `opentermsarchive/${version}` });
+    this.octokit = new Octokit({
+      auth: process.env.OTA_ENGINE_GITHUB_TOKEN,
+      userAgent: `opentermsarchive/${version}`,
+      throttle: {
+        onRateLimit: () => false, // Do not retry after hitting a rate limit error
+        onSecondaryRateLimit: () => false, // Do not retry after hitting a secondary rate limit error
+      },
+    });
 
     const [ owner, repo ] = repository.split('/');
 
