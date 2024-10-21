@@ -19,11 +19,9 @@ export async function release({ shouldPublish, shouldRemoveLocalCopy, fileName }
   const usesGitLab = (typeof process.env.OTA_ENGINE_GITLAB_TOKEN !== 'undefined');
 
   let versionsRepositoryURL = '';
-  
-  if (usesGitHub)
-    versionsRepositoryURL = config.get('@opentermsarchive/engine.dataset.versionsRepositoryURL');
-  if (usesGitLab)
-    versionsRepositoryURL = config.get('@opentermsarchive/engine.dataset.versionsRepositoryURLGitLab');
+
+  if (usesGitHub) versionsRepositoryURL = config.get('@opentermsarchive/engine.dataset.versionsRepositoryURL');
+  if (usesGitLab) versionsRepositoryURL = config.get('@opentermsarchive/engine.dataset.versionsRepositoryURLGitLab');
 
   const stats = await generateRelease({ archivePath, releaseDate, versionsRepositoryURL });
 
