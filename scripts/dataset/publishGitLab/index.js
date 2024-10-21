@@ -30,7 +30,6 @@ import logger from '../logger/index.js';
 dotenv.config();
 
 const gitlabAPIUrl = process.env.OTA_ENGINE_GITLAB_API_BASE_URL;
-const gitlabUrl = process.env.OTA_ENGINE_GITLAB_BASE_URL;
 
 export default async function publishReleaseGitLab({
   archivePath,
@@ -97,14 +96,36 @@ export default async function publishReleaseGitLab({
 
     logger.info(`Created release with releaseId: ${releaseId}`);
 
-    // Then, upload the ZIP file as an asset to the release
+    // Upload the package
+    options = GitLab.baseOptionsHttpReq(process.env.OTA_ENGINE_GITLAB_RELEASES_TOKEN);
+    options.method = 'PUT';
+    options.body = fsApi.createReadStream(archivePath);
+
+    // restrict characters to the ones allowed by GitLab APIs
+    const packageName = config.get('@opentermsarchive/engine.dataset.title').replace(/[^a-zA-Z0-9.\-_]/g, '-');
+    const packageVersion = tagName.replace(/[^a-zA-Z0-9.\-_]/g, '-');
+    const packageFileName = archivePath.replace(/[^a-zA-Z0-9.\-_/]/g, '-');
+
+    logger.debug(`packageName: ${packageName}, packageVersion: ${packageVersion} packageFileName: ${packageFileName}`);
+
+    const packageResponse = await nodeFetch(
+      `${gitlabAPIUrl}/projects/${projectId}/packages/generic/${packageName}/${packageVersion}/${packageFileName}?status=default&select=package_file`,
+      options,
+    );
+    const packageRes = await packageResponse.json();
+
+    const packageFilesId = packageRes.id;
+
+    logger.debug(`package file id: ${packageFilesId}`);
+
+    // use the package id to build the download url for the release
+    const publishedPackageUrl = `${config.get('@opentermsarchive/engine.dataset.versionsRepositoryURLGitLab')}/-/package_files/${packageFilesId}/download`;
+
+    // Create the release and link the package
     const formData = new FormData();
 
     formData.append('name', archivePath);
-    formData.append(
-      'url',
-      `${gitlabUrl}/${commonParams.owner}/${commonParams.repo}/-/archive/${tagName}/${archivePath}`,
-    );
+    formData.append('url', publishedPackageUrl);
     formData.append('file', fsApi.createReadStream(archivePath), { filename: path.basename(archivePath) });
 
     options = GitLab.baseOptionsHttpReq(process.env.OTA_ENGINE_GITLAB_RELEASES_TOKEN);
@@ -120,7 +141,6 @@ export default async function publishReleaseGitLab({
       options,
     );
     const uploadRes = await uploadResponse.json();
-
     const releaseUrl = uploadRes.direct_asset_url;
 
     return releaseUrl;
