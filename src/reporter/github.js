@@ -79,28 +79,15 @@ export default class GitHub {
     return issue;
   }
 
-  async setIssueLabels({ issue, labels }) {
-    await this.octokit.request('PUT /repos/{owner}/{repo}/issues/{issue_number}/labels', {
+  async updateIssue(issue, { state, labels }) {
+    const { data: updatedIssue } = await this.octokit.request('PATCH /repos/{owner}/{repo}/issues/{issue_number}', {
       ...this.commonParams,
       issue_number: issue.number,
+      state,
       labels,
     });
-  }
 
-  async openIssue(issue) {
-    await this.octokit.request('PATCH /repos/{owner}/{repo}/issues/{issue_number}', {
-      ...this.commonParams,
-      issue_number: issue.number,
-      state: GitHub.ISSUE_STATE_OPEN,
-    });
-  }
-
-  async closeIssue(issue) {
-    await this.octokit.request('PATCH /repos/{owner}/{repo}/issues/{issue_number}', {
-      ...this.commonParams,
-      issue_number: issue.number,
-      state: GitHub.ISSUE_STATE_CLOSED,
-    });
+    return updatedIssue;
   }
 
   async getIssue({ title, ...searchParams }) {
@@ -110,7 +97,7 @@ export default class GitHub {
       ...searchParams,
     }, response => response.data);
 
-    const [issue] = issues.filter(item => item.title === title); // since only one is expected, use the first one
+    const [issue] = issues.filter(item => item.title === title); // Since only one is expected, use the first one
 
     return issue;
   }
@@ -134,9 +121,10 @@ export default class GitHub {
       }
 
       await this.addCommentToIssue({ issue: openedIssue, comment });
-      await this.closeIssue(openedIssue);
+      logger.info(`Added comment to issue #${openedIssue.number}: ${openedIssue.html_url}`);
 
-      return logger.info(`Closed issue #${openedIssue.number}: ${openedIssue.html_url}`);
+      await this.updateIssue(openedIssue, { state: GitHub.ISSUE_STATE_CLOSED });
+      logger.info(`Closed issue #${openedIssue.number}: ${openedIssue.html_url}`);
     } catch (error) {
       logger.error(`Failed to update issue "${title}": ${error.message}`);
     }
@@ -152,23 +140,22 @@ export default class GitHub {
         return logger.info(`Created issue #${createdIssue.number} "${title}": ${createdIssue.html_url}`);
       }
 
-      if (issue.state == GitHub.ISSUE_STATE_CLOSED) {
-        await this.openIssue(issue);
-        logger.info(`Reopened issue #${issue.number}: ${issue.html_url}`);
-      }
-
       const managedLabelsNames = this.MANAGED_LABELS.map(label => label.name);
-      const [managedLabel] = issue.labels.filter(label => managedLabelsNames.includes(label.name)); // it is assumed that only one specific reason for failure is possible at a time, making managed labels mutually exclusive
+      const labelsNotManagedToKeep = issue.labels.map(label => label.name).filter(label => !managedLabelsNames.includes(label));
+      const [managedLabel] = issue.labels.filter(label => managedLabelsNames.includes(label.name)); // It is assumed that only one specific reason for failure is possible at a time, making managed labels mutually exclusive
 
-      if (managedLabel?.name == label) { // if the label is already assigned to the issue, the error is redundant with the one already reported and no further action is necessary
+      if (issue.state !== GitHub.ISSUE_STATE_CLOSED && managedLabel?.name === label) {
         return;
       }
 
-      const labelsNotManagedToKeep = issue.labels.map(label => label.name).filter(label => !managedLabelsNames.includes(label));
-
-      await this.setIssueLabels({ issue, labels: [ label, ...labelsNotManagedToKeep ] });
-      await this.addCommentToIssue({ issue, comment: description });
+      await this.updateIssue(issue, {
+        state: GitHub.ISSUE_STATE_OPEN,
+        labels: [ label, ...labelsNotManagedToKeep ],
+      });
       logger.info(`Updated issue #${issue.number}: ${issue.html_url}`);
+      await this.addCommentToIssue({ issue, comment: description });
+
+      logger.info(`Added comment to issue #${issue.number}: ${issue.html_url}`);
     } catch (error) {
       logger.error(`Failed to update issue "${title}": ${error.message}`);
     }
