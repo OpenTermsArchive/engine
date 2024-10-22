@@ -6,7 +6,7 @@ All changes that impact users of this module are documented in this file, in the
 
 ### Added
 
-- Add GtiLab functionalities
+- Add GitLab functionalities
 
 ## 2.3.0 - 2024-10-21
 
