@@ -1,6 +1,6 @@
 {
   "name": "@opentermsarchive/engine",
-  "version": "2.2.1",
+  "version": "2.3.0",
   "description": "Tracks and makes visible changes to the terms of online services",
   "homepage": "https://opentermsarchive.org",
   "bugs": {
@@ -99,7 +99,7 @@
     "simple-git": "^3.8.0",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.0",
-    "winston": "^3.3.3",
+    "winston": "^3.9.0",
     "winston-mail": "^2.0.0"
   },
   "devDependencies": {
@@ -115,7 +115,7 @@
     "supertest": "^6.3.3"
   },
   "peerDependencies": {
-    "@opentermsarchive/terms-types": "^1.0.0"
+    "@opentermsarchive/terms-types": "^1.3.0"
   },
   "engines": {
     "node": ">=16.0.0"
