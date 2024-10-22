@@ -38,7 +38,7 @@ export default class GitHub {
       const missingLabels = this.MANAGED_LABELS.filter(label => !existingLabelsNames.includes(label.name));
 
       if (missingLabels.length) {
-        logger.info(`🤖 Following required labels are not present on the repository: ${missingLabels.map(label => `"${label.name}"`).join(', ')}. Creating them…`);
+        logger.info(`Following required labels are not present on the repository: ${missingLabels.map(label => `"${label.name}"`).join(', ')}. Creating them…`);
 
         for (const label of missingLabels) {
           await this.createLabel({ /* eslint-disable-line no-await-in-loop */
@@ -49,7 +49,7 @@ export default class GitHub {
         }
       }
     } catch (error) {
-      logger.error(`🤖 Failed to handle repository labels: ${error.message}`);
+      logger.error(`Failed to handle repository labels: ${error.message}`);
     }
   }
 
@@ -136,9 +136,9 @@ export default class GitHub {
       await this.addCommentToIssue({ issue: openedIssue, comment });
       await this.closeIssue(openedIssue);
 
-      return logger.info(`🤖 Closed issue #${openedIssue.number}: ${openedIssue.html_url}`);
+      return logger.info(`Closed issue #${openedIssue.number}: ${openedIssue.html_url}`);
     } catch (error) {
-      logger.error(`🤖 Failed to handle issue "${title}": ${error.message}`);
+      logger.error(`Failed to update issue "${title}": ${error.message}`);
     }
   }
 
@@ -149,12 +149,12 @@ export default class GitHub {
       if (!issue) {
         const createdIssue = await this.createIssue({ title, description, labels: [label] });
 
-        return logger.info(`🤖 Created GitHub issue #${createdIssue.number} "${title}": ${createdIssue.html_url}`);
+        return logger.info(`Created issue #${createdIssue.number} "${title}": ${createdIssue.html_url}`);
       }
 
       if (issue.state == GitHub.ISSUE_STATE_CLOSED) {
         await this.openIssue(issue);
-        logger.info(`🤖 Reopen issue #${issue.number}: ${issue.html_url}`);
+        logger.info(`Reopened issue #${issue.number}: ${issue.html_url}`);
       }
 
       const managedLabelsNames = this.MANAGED_LABELS.map(label => label.name);
@@ -168,9 +168,9 @@ export default class GitHub {
 
       await this.setIssueLabels({ issue, labels: [ label, ...labelsNotManagedToKeep ] });
       await this.addCommentToIssue({ issue, comment: description });
-      logger.info(`🤖 Updated issue #${issue.number}: ${issue.html_url}`);
+      logger.info(`Updated issue #${issue.number}: ${issue.html_url}`);
     } catch (error) {
-      logger.error(`🤖 Failed to handle issue "${title}": ${error.message}`);
+      logger.error(`Failed to update issue "${title}": ${error.message}`);
     }
   }
 }
