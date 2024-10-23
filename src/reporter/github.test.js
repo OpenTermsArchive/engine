@@ -118,66 +118,6 @@ describe('GitHub', function () {
     });
   });
 
-  describe('#setIssueLabels', () => {
-    let scope;
-    const ISSUE_NUMBER = 123;
-    const LABELS = [ 'bug', 'enhancement' ];
-
-    before(async () => {
-      scope = nock('https://api.github.com')
-        .put(`/repos/owner/repo/issues/${ISSUE_NUMBER}/labels`, { labels: LABELS })
-        .reply(200);
-
-      await github.setIssueLabels({ issue: { number: ISSUE_NUMBER }, labels: LABELS });
-    });
-
-    after(nock.cleanAll);
-
-    it('sets labels on the issue', () => {
-      expect(scope.isDone()).to.be.true;
-    });
-  });
-
-  describe('#openIssue', () => {
-    let scope;
-    const ISSUE = { number: 123 };
-    const EXPECTED_REQUEST_BODY = { state: 'open' };
-
-    before(async () => {
-      scope = nock('https://api.github.com')
-        .patch(`/repos/owner/repo/issues/${ISSUE.number}`, EXPECTED_REQUEST_BODY)
-        .reply(200);
-
-      await github.openIssue(ISSUE);
-    });
-
-    after(nock.cleanAll);
-
-    it('opens the issue', () => {
-      expect(scope.isDone()).to.be.true;
-    });
-  });
-
-  describe('#closeIssue', () => {
-    let scope;
-    const ISSUE = { number: 123 };
-    const EXPECTED_REQUEST_BODY = { state: 'closed' };
-
-    before(async () => {
-      scope = nock('https://api.github.com')
-        .patch(`/repos/owner/repo/issues/${ISSUE.number}`, EXPECTED_REQUEST_BODY)
-        .reply(200);
-
-      await github.closeIssue(ISSUE);
-    });
-
-    after(nock.cleanAll);
-
-    it('closes the issue', () => {
-      expect(scope.isDone()).to.be.true;
-    });
-  });
-
   describe('#getIssue', () => {
     let scope;
     let result;
@@ -376,9 +316,8 @@ describe('GitHub', function () {
       };
 
       context('when issue is closed', () => {
-        let setIssueLabelsScope;
+        let updateIssueScope;
         let addCommentScope;
-        let openIssueScope;
 
         const GITHUB_RESPONSE_FOR_EXISTING_ISSUE = {
           number: 123,
@@ -394,12 +333,8 @@ describe('GitHub', function () {
             .query(true)
             .reply(200, [GITHUB_RESPONSE_FOR_EXISTING_ISSUE]);
 
-          openIssueScope = nock('https://api.github.com')
-            .patch(`/repos/owner/repo/issues/${GITHUB_RESPONSE_FOR_EXISTING_ISSUE.number}`, { state: GitHub.ISSUE_STATE_OPEN })
-            .reply(200);
-
-          setIssueLabelsScope = nock('https://api.github.com')
-            .put(`/repos/owner/repo/issues/${GITHUB_RESPONSE_FOR_EXISTING_ISSUE.number}/labels`, { labels: ['location'] })
+          updateIssueScope = nock('https://api.github.com')
+            .patch(`/repos/owner/repo/issues/${GITHUB_RESPONSE_FOR_EXISTING_ISSUE.number}`, { state: GitHub.ISSUE_STATE_OPEN, labels: ['location'] })
             .reply(200);
 
           addCommentScope = nock('https://api.github.com')
@@ -409,12 +344,8 @@ describe('GitHub', function () {
           await github.createOrUpdateIssue(ISSUE);
         });
 
-        it('reopens the issue', () => {
-          expect(openIssueScope.isDone()).to.be.true;
-        });
-
-        it("updates the issue's label", () => {
-          expect(setIssueLabelsScope.isDone()).to.be.true;
+        it('reopens the issue and its labels', () => {
+          expect(updateIssueScope.isDone()).to.be.true;
         });
 
         it('adds comment to the issue', () => {
@@ -423,9 +354,8 @@ describe('GitHub', function () {
       });
 
       context('when issue is already opened', () => {
-        let setIssueLabelsScope;
         let addCommentScope;
-        let openIssueScope;
+        let updateIssueScope;
 
         const GITHUB_RESPONSE_FOR_EXISTING_ISSUE = {
           number: 123,
@@ -441,12 +371,8 @@ describe('GitHub', function () {
             .query(true)
             .reply(200, [GITHUB_RESPONSE_FOR_EXISTING_ISSUE]);
 
-          openIssueScope = nock('https://api.github.com')
-            .patch(`/repos/owner/repo/issues/${GITHUB_RESPONSE_FOR_EXISTING_ISSUE.number}`, { state: GitHub.ISSUE_STATE_OPEN })
-            .reply(200);
-
-          setIssueLabelsScope = nock('https://api.github.com')
-            .put(`/repos/owner/repo/issues/${GITHUB_RESPONSE_FOR_EXISTING_ISSUE.number}/labels`, { labels: ['location'] })
+          updateIssueScope = nock('https://api.github.com')
+            .patch(`/repos/owner/repo/issues/${GITHUB_RESPONSE_FOR_EXISTING_ISSUE.number}`, { state: GitHub.ISSUE_STATE_OPEN, labels: ['location'] })
             .reply(200);
 
           addCommentScope = nock('https://api.github.com')
@@ -456,12 +382,8 @@ describe('GitHub', function () {
           await github.createOrUpdateIssue(ISSUE);
         });
 
-        it('does not change the issue state', () => {
-          expect(openIssueScope.isDone()).to.be.false;
-        });
-
-        it("updates the issue's label", () => {
-          expect(setIssueLabelsScope.isDone()).to.be.true;
+        it("updates the issue's labels", () => {
+          expect(updateIssueScope.isDone()).to.be.true;
         });
 
         it('adds comment to the issue', () => {
