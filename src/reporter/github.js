@@ -165,7 +165,6 @@ export default class GitHub {
 
       const updatedIssue = await this.updateIssue(issue, { state: GitHub.ISSUE_STATE_CLOSED });
 
-      this.issuesCache.set(updatedIssue.title, updatedIssue);
       logger.info(`Closed issue with comment #${updatedIssue.number}: ${updatedIssue.html_url}`);
     } catch (error) {
       logger.error(`Failed to close issue with comment "${title}": ${error.stack}`);
@@ -194,7 +193,6 @@ export default class GitHub {
 
       await this.addCommentToIssue({ issue, comment: description });
 
-      this.issuesCache.set(updatedIssue.title, updatedIssue);
       logger.info(`Updated issue with comment #${updatedIssue.number}: ${updatedIssue.html_url}`);
     } catch (error) {
       logger.error(`Failed to update issue "${title}": ${error.stack}`);
