@@ -28,6 +28,24 @@ export default class GitHub {
     const [ owner, repo ] = repository.split('/');
 
     this.commonParams = { owner, repo };
+
+    this.issuesCache = new Map();
+    this._issuesPromise = null;
+  }
+
+  get issues() {
+    if (!this._issuesPromise) {
+      logger.info('Loading issues from GitHub…');
+      this._issuesPromise = this.loadAllIssues();
+    }
+
+    return this._issuesPromise;
+  }
+
+  clearCache() {
+    this.issuesCache.clear();
+    this._issuesPromise = null;
+    logger.info('Issues cache cleared');
   }
 
   async initialize() {
@@ -53,6 +71,33 @@ export default class GitHub {
     }
   }
 
+  async loadAllIssues() {
+    try {
+      const issues = await this.octokit.paginate('GET /repos/{owner}/{repo}/issues', {
+        ...this.commonParams,
+        state: GitHub.ISSUE_STATE_ALL,
+        per_page: 100,
+      });
+
+      const onlyIssues = issues.filter(issue => !issue.pull_request); // Filter out pull requests since GitHub treats them as a special type of issue
+
+      onlyIssues.forEach(issue => {
+        const cachedIssue = this.issuesCache.get(issue.title);
+
+        if (!cachedIssue || new Date(issue.created_at) < new Date(cachedIssue.created_at)) { // Only work on the oldest issue if there are duplicates, in order to consolidate the longest history possible
+          this.issuesCache.set(issue.title, issue);
+        }
+      });
+
+      logger.info(`Cached ${onlyIssues.length} issues from the GitHub repository`);
+
+      return this.issuesCache;
+    } catch (error) {
+      logger.error(`Failed to load issues: ${error.message}`);
+      throw error;
+    }
+  }
+
   async getRepositoryLabels() {
     const { data: labels } = await this.octokit.request('GET /repos/{owner}/{repo}/labels', { ...this.commonParams });
 
@@ -68,6 +113,10 @@ export default class GitHub {
     });
   }
 
+  async getIssue(title) {
+    return (await this.issues).get(title);
+  }
+
   async createIssue({ title, description: body, labels }) {
     const { data: issue } = await this.octokit.request('POST /repos/{owner}/{repo}/issues', {
       ...this.commonParams,
@@ -75,6 +124,8 @@ export default class GitHub {
       body,
       labels,
     });
+
+    this.issuesCache.set(issue.title, issue);
 
     return issue;
   }
@@ -87,19 +138,9 @@ export default class GitHub {
       labels,
     });
 
+    this.issuesCache.set(updatedIssue.title, updatedIssue);
+
     return updatedIssue;
-  }
-
-  async getIssue({ title, ...searchParams }) {
-    const issues = await this.octokit.paginate('GET /repos/{owner}/{repo}/issues', {
-      ...this.commonParams,
-      per_page: 100,
-      ...searchParams,
-    }, response => response.data);
-
-    const [issue] = issues.filter(item => item.title === title); // Since only one is expected, use the first one
-
-    return issue;
   }
 
   async addCommentToIssue({ issue, comment: body }) {
@@ -114,25 +155,25 @@ export default class GitHub {
 
   async closeIssueWithCommentIfExists({ title, comment }) {
     try {
-      const openedIssue = await this.getIssue({ title, state: GitHub.ISSUE_STATE_OPEN });
+      const issue = await this.getIssue(title);
 
-      if (!openedIssue) {
+      if (!issue || issue.state == GitHub.ISSUE_STATE_CLOSED) {
         return;
       }
 
-      await this.addCommentToIssue({ issue: openedIssue, comment });
-      logger.info(`Added comment to issue #${openedIssue.number}: ${openedIssue.html_url}`);
+      await this.addCommentToIssue({ issue, comment });
 
-      await this.updateIssue(openedIssue, { state: GitHub.ISSUE_STATE_CLOSED });
-      logger.info(`Closed issue #${openedIssue.number}: ${openedIssue.html_url}`);
+      const updatedIssue = await this.updateIssue(issue, { state: GitHub.ISSUE_STATE_CLOSED });
+
+      logger.info(`Closed issue with comment #${updatedIssue.number}: ${updatedIssue.html_url}`);
     } catch (error) {
-      logger.error(`Failed to update issue "${title}": ${error.message}`);
+      logger.error(`Failed to close issue with comment "${title}": ${error.stack}`);
     }
   }
 
   async createOrUpdateIssue({ title, description, label }) {
     try {
-      const issue = await this.getIssue({ title, state: GitHub.ISSUE_STATE_ALL });
+      const issue = await this.getIssue(title);
 
       if (!issue) {
         const createdIssue = await this.createIssue({ title, description, labels: [label] });
@@ -148,16 +189,13 @@ export default class GitHub {
         return;
       }
 
-      await this.updateIssue(issue, {
-        state: GitHub.ISSUE_STATE_OPEN,
-        labels: [ label, ...labelsNotManagedToKeep ],
-      });
-      logger.info(`Updated issue #${issue.number}: ${issue.html_url}`);
+      const updatedIssue = await this.updateIssue(issue, { state: GitHub.ISSUE_STATE_OPEN, labels: [ label, ...labelsNotManagedToKeep ] });
+
       await this.addCommentToIssue({ issue, comment: description });
 
-      logger.info(`Added comment to issue #${issue.number}: ${issue.html_url}`);
+      logger.info(`Updated issue with comment #${updatedIssue.number}: ${updatedIssue.html_url}`);
     } catch (error) {
-      logger.error(`Failed to update issue "${title}": ${error.message}`);
+      logger.error(`Failed to update issue "${title}": ${error.stack}`);
     }
   }
 }
