@@ -189,7 +189,7 @@ export default class GitHub {
         return;
       }
 
-      const updatedIssue = await this.updateIssue(issue, { state: GitHub.ISSUE_STATE_OPEN, labels: [ label, ...labelsNotManagedToKeep ].filter(label => label) });
+      const updatedIssue = await this.updateIssue(issue, { state: GitHub.ISSUE_STATE_OPEN, labels: [ label, ...labelsNotManagedToKeep ] });
 
       await this.addCommentToIssue({ issue, comment: description });
 
