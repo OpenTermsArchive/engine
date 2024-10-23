@@ -8,7 +8,7 @@ All changes that impact users of this module are documented in this file, in the
 
 ### Fixed
 
-- Merge state and label updates on reported issues to reduce API calls and avoid inconsistent state
+- Reduce API calls and avoid inconsistent states on GitHub issues reports
 
 ## 2.3.1 - 2024-10-22
 
