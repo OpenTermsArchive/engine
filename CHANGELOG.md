@@ -6,7 +6,7 @@ All changes that impact users of this module are documented in this file, in the
 
 > Development of this release was supported by the [French Ministry for Foreign Affairs](https://www.diplomatie.gouv.fr/fr/politique-etrangere-de-la-france/diplomatie-numerique/) through its ministerial [State Startups incubator](https://beta.gouv.fr/startups/open-terms-archive.html) under the aegis of the Ambassador for Digital Affairs.
 
-## Fixed
+### Fixed
 
 - Reduce GitHub API calls in issues reporter
 
