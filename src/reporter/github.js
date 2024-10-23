@@ -69,7 +69,7 @@ export default class GitHub {
       onlyIssues.forEach(issue => {
         const cachedIssue = this.issuesCache.get(issue.title);
 
-        if (!cachedIssue || new Date(issue.created_at) < new Date(cachedIssue.created_at)) { // Only cache the oldest issue if there are duplicates
+        if (!cachedIssue || new Date(issue.created_at) < new Date(cachedIssue.created_at)) { // Only work on the oldest issue if there are duplicates, in order to consolidate the longest history possible
           this.issuesCache.set(issue.title, issue);
         }
       });

@@ -91,7 +91,7 @@ describe('GitHub', function () {
       expect(scope.isDone()).to.be.true;
     });
 
-    it('throws error when creating label fails', async () => {
+    it('throws an error when creating a label fails', async () => {
       nock('https://api.github.com')
         .post('/repos/owner/repo/labels')
         .reply(400, { message: 'Bad Request' });
@@ -175,7 +175,7 @@ describe('GitHub', function () {
       expect(scope.isDone()).to.be.true;
     });
 
-    it('throws error when adding comment fails', async () => {
+    it('throws an error when adding a comment fails', async () => {
       nock('https://api.github.com')
         .post(`/repos/owner/repo/issues/${ISSUE_NUMBER}/comments`)
         .reply(400, { message: 'Bad Request' });
@@ -354,11 +354,11 @@ describe('GitHub', function () {
             expect(updateIssueScope.isDone()).to.be.true;
           });
 
-          it('adds comment to the issue', () => {
+          it('adds a comment to the issue', () => {
             expect(addCommentScope.isDone()).to.be.true;
           });
         });
-        context('when the reason unchanged', () => {
+        context('when the reason did not change', () => {
           let addCommentScope;
           let updateIssueScope;
 
@@ -379,11 +379,11 @@ describe('GitHub', function () {
             github.issuesCache.set(EXISTING_OPEN_ISSUE.title, EXISTING_OPEN_ISSUE);
           });
 
-          it("does not attempt to updates the issue's labels", () => {
+          it('does not attempt to updates the issue’s labels', () => {
             expect(updateIssueScope.isDone()).to.be.false;
           });
 
-          it('does not attempt to add comment to the issue', () => {
+          it('does not attempt to add any comment to the issue', () => {
             expect(addCommentScope.isDone()).to.be.false;
           });
         });
