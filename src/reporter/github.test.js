@@ -22,7 +22,7 @@ describe('GitHub', function () {
       .get('/repos/owner/repo/issues')
       .query(true)
       .reply(200, [ EXISTING_OPEN_ISSUE, EXISTING_CLOSED_ISSUE ]);
-    await github.refreshIssuesCache();
+    await github.clearCache();
   });
 
   describe('#initialize', () => {
@@ -143,15 +143,22 @@ describe('GitHub', function () {
   });
 
   describe('#getIssue', () => {
+    before(() => {
+      nock('https://api.github.com')
+        .get('/repos/owner/repo/issues')
+        .query(true)
+        .reply(200, [ EXISTING_OPEN_ISSUE, EXISTING_CLOSED_ISSUE ]);
+    });
+
     context('when the issue exists in the cache', () => {
-      it('returns the cached issue', () => {
-        expect(github.getIssue(EXISTING_OPEN_ISSUE.title)).to.deep.equal(EXISTING_OPEN_ISSUE);
+      it('returns the cached issue', async () => {
+        expect(await github.getIssue(EXISTING_OPEN_ISSUE.title)).to.deep.equal(EXISTING_OPEN_ISSUE);
       });
     });
 
     context('when the issue does not exist in the cache', () => {
-      it('returns null', () => {
-        expect(github.getIssue('Non-existent Issue')).to.be.null;
+      it('returns undefined', async () => {
+        expect(await github.getIssue('Non-existent Issue')).to.be.undefined;
       });
     });
   });
@@ -264,7 +271,7 @@ describe('GitHub', function () {
   });
 
   describe('#createOrUpdateIssue', () => {
-    before(async () => {
+    before(() => {
       github.MANAGED_LABELS = require('./labels.json');
     });
 
@@ -315,7 +322,7 @@ describe('GitHub', function () {
         });
 
         after(() => {
-          github.issuesCache.delete(EXISTING_CLOSED_ISSUE);
+          github.issuesCache.delete(EXISTING_CLOSED_ISSUE.title);
           github.issuesCache.set(EXISTING_CLOSED_ISSUE.title, EXISTING_CLOSED_ISSUE);
         });
 

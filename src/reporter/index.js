@@ -50,7 +50,7 @@ export default class Reporter {
   }
 
   onTrackingStarted() {
-    return this.github.refreshIssuesCache();
+    return this.github.clearCache();
   }
 
   async onVersionRecorded(version) {

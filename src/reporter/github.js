@@ -30,7 +30,22 @@ export default class GitHub {
     this.commonParams = { owner, repo };
 
     this.issuesCache = new Map();
-    this.cacheLoadedPromise = null;
+    this._issuesPromise = null;
+  }
+
+  get issues() {
+    if (!this._issuesPromise) {
+      logger.info('Loading issues from GitHub…');
+      this._issuesPromise = this.loadAllIssues();
+    }
+
+    return this._issuesPromise;
+  }
+
+  clearCache() {
+    this.issuesCache.clear();
+    this._issuesPromise = null;
+    logger.info('Issues cache cleared');
   }
 
   async initialize() {
@@ -74,29 +89,13 @@ export default class GitHub {
         }
       });
 
-      logger.info(`Cached ${onlyIssues.length} issues from the repository`);
+      logger.info(`Cached ${onlyIssues.length} issues from the GitHub repository`);
+
+      return this.issuesCache;
     } catch (error) {
       logger.error(`Failed to load issues: ${error.message}`);
+      throw error;
     }
-  }
-
-  async refreshIssuesCache() {
-    try {
-      logger.info('Refreshing issues cache from GitHub…');
-      this.issuesCache.clear();
-      this.cacheLoadedPromise = this.loadAllIssues();
-      await this.cacheLoadedPromise;
-      logger.info('Issues cache refreshed successfully');
-    } catch (error) {
-      logger.error(`Failed to refresh issues cache: ${error.message}`);
-    }
-  }
-
-  async ensureCacheLoaded() {
-    if (!this.cacheLoadedPromise) {
-      this.cacheLoadedPromise = this.loadAllIssues();
-    }
-    await this.cacheLoadedPromise;
   }
 
   async getRepositoryLabels() {
@@ -114,9 +113,11 @@ export default class GitHub {
     });
   }
 
-  async createIssue({ title, description: body, labels }) {
-    await this.ensureCacheLoaded();
+  async getIssue(title) {
+    return (await this.issues).get(title);
+  }
 
+  async createIssue({ title, description: body, labels }) {
     const { data: issue } = await this.octokit.request('POST /repos/{owner}/{repo}/issues', {
       ...this.commonParams,
       title,
@@ -130,8 +131,6 @@ export default class GitHub {
   }
 
   async updateIssue(issue, { state, labels }) {
-    await this.ensureCacheLoaded();
-
     const { data: updatedIssue } = await this.octokit.request('PATCH /repos/{owner}/{repo}/issues/{issue_number}', {
       ...this.commonParams,
       issue_number: issue.number,
@@ -144,13 +143,7 @@ export default class GitHub {
     return updatedIssue;
   }
 
-  getIssue(title) {
-    return this.issuesCache.get(title) || null;
-  }
-
   async addCommentToIssue({ issue, comment: body }) {
-    await this.ensureCacheLoaded();
-
     const { data: comment } = await this.octokit.request('POST /repos/{owner}/{repo}/issues/{issue_number}/comments', {
       ...this.commonParams,
       issue_number: issue.number,
@@ -162,9 +155,7 @@ export default class GitHub {
 
   async closeIssueWithCommentIfExists({ title, comment }) {
     try {
-      await this.ensureCacheLoaded();
-
-      const issue = this.getIssue(title);
+      const issue = await this.getIssue(title);
 
       if (!issue || issue.state == GitHub.ISSUE_STATE_CLOSED) {
         return;
@@ -183,9 +174,7 @@ export default class GitHub {
 
   async createOrUpdateIssue({ title, description, label }) {
     try {
-      await this.ensureCacheLoaded();
-
-      const issue = this.getIssue(title);
+      const issue = await this.getIssue(title);
 
       if (!issue) {
         const createdIssue = await this.createIssue({ title, description, labels: [label] });
@@ -194,7 +183,6 @@ export default class GitHub {
       }
 
       const managedLabelsNames = this.MANAGED_LABELS.map(label => label.name);
-
       const labelsNotManagedToKeep = issue.labels.map(label => label.name).filter(label => !managedLabelsNames.includes(label));
       const [managedLabel] = issue.labels.filter(label => managedLabelsNames.includes(label.name)); // It is assumed that only one specific reason for failure is possible at a time, making managed labels mutually exclusive
 
