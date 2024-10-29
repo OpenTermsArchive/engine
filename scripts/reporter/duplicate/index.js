@@ -60,7 +60,7 @@ async function removeDuplicateIssues() {
           owner,
           repo,
           issue_number: issue.number,
-          body: `Closing duplicate issue. Original issue: #${originalIssue.number}`,
+          body: `This issue is detected as duplicate as it has the same title as #${originalIssue.number}. It most likely was created accidentally by an engine older than [v2.3.2](https://github.com/OpenTermsArchive/engine/releases/tag/v2.3.2). Closing automatically.`,
         });
 
         counter++;
