@@ -47,7 +47,7 @@ export default async function publishReleaseGitLab({
 
     projectId = res.id;
   } catch (error) {
-    logger.error(`🤖  Error while obtaining projectId: ${error}`);
+    logger.error(`Error while obtaining projectId: ${error}`);
     projectId = null;
   }
 
