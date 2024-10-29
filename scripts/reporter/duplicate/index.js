@@ -5,10 +5,11 @@ import { Octokit } from 'octokit';
 async function removeDuplicateIssues() {
   try {
     const repository = config.get('@opentermsarchive/engine.reporter.githubIssues.repositories.declarations');
-    if (!repository) {
-      throw new Error('Repository configuration is not set');
+
+    if (!repository.includes('/') || repository.includes('https://')) {
+      throw new Error(`Configuration entry "reporter.githubIssues.repositories.declarations" is expected to be a string in the format <owner>/<repo>, but received: "${repository}"`);
     }
-    
+
     const [ owner, repo ] = repository.split('/');
 
     const octokit = new Octokit({ auth: process.env.OTA_ENGINE_GITHUB_TOKEN });
