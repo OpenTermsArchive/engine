@@ -12,10 +12,17 @@ describe('GitHub', function () {
 
   let MANAGED_LABELS;
   let github;
+  const EXISTING_OPEN_ISSUE = { number: 1, title: 'Opened issue', description: 'Issue description', state: GitHub.ISSUE_STATE_OPEN, labels: [{ name: 'location' }] };
+  const EXISTING_CLOSED_ISSUE = { number: 2, title: 'Closed issue', description: 'Issue description', state: GitHub.ISSUE_STATE_CLOSED, labels: [{ name: '403' }] };
 
-  before(() => {
+  before(async () => {
     MANAGED_LABELS = require('./labels.json');
     github = new GitHub('owner/repo');
+    nock('https://api.github.com')
+      .get('/repos/owner/repo/issues')
+      .query(true)
+      .reply(200, [ EXISTING_OPEN_ISSUE, EXISTING_CLOSED_ISSUE ]);
+    await github.clearCache();
   });
 
   describe('#initialize', () => {
@@ -71,137 +78,88 @@ describe('GitHub', function () {
   });
 
   describe('#createLabel', () => {
-    let scope;
     const LABEL = { name: 'new_label', color: 'ffffff' };
 
-    before(async () => {
-      scope = nock('https://api.github.com')
+    afterEach(nock.cleanAll);
+
+    it('creates the new label successfully', async () => {
+      const scope = nock('https://api.github.com')
         .post('/repos/owner/repo/labels', body => body.name === LABEL.name)
         .reply(200, LABEL);
 
       await github.createLabel(LABEL);
+      expect(scope.isDone()).to.be.true;
     });
 
-    after(nock.cleanAll);
+    it('throws an error when creating a label fails', async () => {
+      nock('https://api.github.com')
+        .post('/repos/owner/repo/labels')
+        .reply(400, { message: 'Bad Request' });
 
-    it('creates the new label', () => {
-      expect(scope.isDone()).to.be.true;
+      await expect(github.createLabel(LABEL)).to.be.rejected;
     });
   });
 
   describe('#createIssue', () => {
     let scope;
     let result;
+
     const ISSUE = {
       title: 'New Issue',
       description: 'Description of the new issue',
-      labels: ['bug'],
+      labels: [{ name: 'bug' }],
     };
     const CREATED_ISSUE = { number: 123, ...ISSUE };
 
     before(async () => {
       scope = nock('https://api.github.com')
-        .post('/repos/owner/repo/issues', request => request.title === ISSUE.title && request.body === ISSUE.description && request.labels[0] === ISSUE.labels[0])
+        .post('/repos/owner/repo/issues', request =>
+          request.title === ISSUE.title && request.body === ISSUE.description && request.labels[0].name === ISSUE.labels[0].name)
         .reply(200, CREATED_ISSUE);
 
       result = await github.createIssue(ISSUE);
     });
 
-    after(nock.cleanAll);
+    after(() => {
+      nock.cleanAll();
+      github.issuesCache.delete(ISSUE.title);
+    });
 
     it('creates the new issue', () => {
       expect(scope.isDone()).to.be.true;
     });
 
-    it('returns the created issue', () => {
+    it('returns the newly created issue', () => {
       expect(result).to.deep.equal(CREATED_ISSUE);
     });
-  });
 
-  describe('#setIssueLabels', () => {
-    let scope;
-    const ISSUE_NUMBER = 123;
-    const LABELS = [ 'bug', 'enhancement' ];
+    it('throws error when creating issue fails', async () => {
+      nock('https://api.github.com')
+        .post('/repos/owner/repo/issues')
+        .reply(400, { message: 'Bad Request' });
 
-    before(async () => {
-      scope = nock('https://api.github.com')
-        .put(`/repos/owner/repo/issues/${ISSUE_NUMBER}/labels`, { labels: LABELS })
-        .reply(200);
-
-      await github.setIssueLabels({ issue: { number: ISSUE_NUMBER }, labels: LABELS });
-    });
-
-    after(nock.cleanAll);
-
-    it('sets labels on the issue', () => {
-      expect(scope.isDone()).to.be.true;
-    });
-  });
-
-  describe('#openIssue', () => {
-    let scope;
-    const ISSUE = { number: 123 };
-    const EXPECTED_REQUEST_BODY = { state: 'open' };
-
-    before(async () => {
-      scope = nock('https://api.github.com')
-        .patch(`/repos/owner/repo/issues/${ISSUE.number}`, EXPECTED_REQUEST_BODY)
-        .reply(200);
-
-      await github.openIssue(ISSUE);
-    });
-
-    after(nock.cleanAll);
-
-    it('opens the issue', () => {
-      expect(scope.isDone()).to.be.true;
-    });
-  });
-
-  describe('#closeIssue', () => {
-    let scope;
-    const ISSUE = { number: 123 };
-    const EXPECTED_REQUEST_BODY = { state: 'closed' };
-
-    before(async () => {
-      scope = nock('https://api.github.com')
-        .patch(`/repos/owner/repo/issues/${ISSUE.number}`, EXPECTED_REQUEST_BODY)
-        .reply(200);
-
-      await github.closeIssue(ISSUE);
-    });
-
-    after(nock.cleanAll);
-
-    it('closes the issue', () => {
-      expect(scope.isDone()).to.be.true;
+      await expect(github.createIssue(ISSUE)).to.be.rejected;
     });
   });
 
   describe('#getIssue', () => {
-    let scope;
-    let result;
-
-    const ISSUE = { number: 123, title: 'Test Issue' };
-    const ANOTHER_ISSUE = { number: 124, title: 'Test Issue 2' };
-
-    before(async () => {
-      scope = nock('https://api.github.com')
+    before(() => {
+      nock('https://api.github.com')
         .get('/repos/owner/repo/issues')
         .query(true)
-        .reply(200, [ ISSUE, ANOTHER_ISSUE ]);
-
-      result = await github.getIssue({ title: ISSUE.title });
+        .reply(200, [ EXISTING_OPEN_ISSUE, EXISTING_CLOSED_ISSUE ]);
     });
 
-    after(nock.cleanAll);
-
-    it('searches for the issue', () => {
-      expect(scope.isDone()).to.be.true;
+    context('when the issue exists in the cache', () => {
+      it('returns the cached issue', async () => {
+        expect(await github.getIssue(EXISTING_OPEN_ISSUE.title)).to.deep.equal(EXISTING_OPEN_ISSUE);
+      });
     });
 
-    it('returns the expected issue', () => {
-      expect(result).to.deep.equal(ISSUE);
+    context('when the issue does not exist in the cache', () => {
+      it('returns undefined', async () => {
+        expect(await github.getIssue('Non-existent Issue')).to.be.undefined;
+      });
     });
   });
 
@@ -223,35 +181,33 @@ describe('GitHub', function () {
     it('adds the comment to the issue', () => {
       expect(scope.isDone()).to.be.true;
     });
+
+    it('throws an error when adding a comment fails', async () => {
+      nock('https://api.github.com')
+        .post(`/repos/owner/repo/issues/${ISSUE_NUMBER}/comments`)
+        .reply(400, { message: 'Bad Request' });
+
+      await expect(github.addCommentToIssue({ issue: { number: ISSUE_NUMBER }, comment: COMMENT })).to.be.rejected;
+    });
   });
 
   describe('#closeIssueWithCommentIfExists', () => {
     after(nock.cleanAll);
 
     context('when the issue exists and is open', () => {
-      const ISSUE = {
-        number: 123,
-        title: 'Open Issue',
-        state: GitHub.ISSUE_STATE_OPEN,
-      };
       let addCommentScope;
       let closeIssueScope;
 
       before(async () => {
-        nock('https://api.github.com')
-          .get('/repos/owner/repo/issues')
-          .query(true)
-          .reply(200, [ISSUE]);
-
         addCommentScope = nock('https://api.github.com')
-          .post(`/repos/owner/repo/issues/${ISSUE.number}/comments`)
+          .post(`/repos/owner/repo/issues/${EXISTING_OPEN_ISSUE.number}/comments`)
           .reply(200);
 
         closeIssueScope = nock('https://api.github.com')
-          .patch(`/repos/owner/repo/issues/${ISSUE.number}`, { state: GitHub.ISSUE_STATE_CLOSED })
+          .patch(`/repos/owner/repo/issues/${EXISTING_OPEN_ISSUE.number}`, { state: GitHub.ISSUE_STATE_CLOSED })
           .reply(200);
 
-        await github.closeIssueWithCommentIfExists({ title: ISSUE.title, comment: 'Closing comment' });
+        await github.closeIssueWithCommentIfExists({ title: EXISTING_OPEN_ISSUE.title, comment: 'Closing comment' });
       });
 
       it('adds comment to the issue', () => {
@@ -264,29 +220,19 @@ describe('GitHub', function () {
     });
 
     context('when the issue exists and is closed', () => {
-      const ISSUE = {
-        number: 123,
-        title: 'Closed Issue',
-        state: GitHub.ISSUE_STATE_CLOSED,
-      };
       let addCommentScope;
       let closeIssueScope;
 
       before(async () => {
-        nock('https://api.github.com')
-          .get('/repos/owner/repo/issues')
-          .query(true)
-          .reply(200, []);
-
         addCommentScope = nock('https://api.github.com')
-          .post(`/repos/owner/repo/issues/${ISSUE.number}/comments`)
+          .post(`/repos/owner/repo/issues/${EXISTING_CLOSED_ISSUE.number}/comments`)
           .reply(200);
 
         closeIssueScope = nock('https://api.github.com')
-          .patch(`/repos/owner/repo/issues/${ISSUE.number}`, { state: GitHub.ISSUE_STATE_CLOSED })
+          .patch(`/repos/owner/repo/issues/${EXISTING_CLOSED_ISSUE.number}`, { state: GitHub.ISSUE_STATE_CLOSED })
           .reply(200);
 
-        await github.closeIssueWithCommentIfExists({ title: ISSUE.title, comment: 'Closing comment' });
+        await github.closeIssueWithCommentIfExists({ title: EXISTING_CLOSED_ISSUE.title, comment: 'Closing comment' });
       });
 
       it('does not add comment', () => {
@@ -303,11 +249,6 @@ describe('GitHub', function () {
       let closeIssueScope;
 
       before(async () => {
-        nock('https://api.github.com')
-          .get('/repos/owner/repo/issues')
-          .query(true)
-          .reply(200, []);
-
         addCommentScope = nock('https://api.github.com')
           .post(/\/repos\/owner\/repo\/issues\/\d+\/comments/)
           .reply(200);
@@ -330,12 +271,8 @@ describe('GitHub', function () {
   });
 
   describe('#createOrUpdateIssue', () => {
-    before(async () => {
-      nock('https://api.github.com')
-        .get('/repos/owner/repo/labels')
-        .reply(200, MANAGED_LABELS);
-
-      await github.initialize();
+    before(() => {
+      github.MANAGED_LABELS = require('./labels.json');
     });
 
     context('when the issue does not exist', () => {
@@ -347,11 +284,6 @@ describe('GitHub', function () {
       };
 
       before(async () => {
-        nock('https://api.github.com')
-          .get('/repos/owner/repo/issues')
-          .query(true)
-          .reply(200, []); // Simulate that there is no issues on the repository
-
         createIssueScope = nock('https://api.github.com')
           .post('/repos/owner/repo/issues', {
             title: ISSUE_TO_CREATE.title,
@@ -363,58 +295,39 @@ describe('GitHub', function () {
         await github.createOrUpdateIssue(ISSUE_TO_CREATE);
       });
 
+      afterEach(() => {
+        github.issuesCache.delete(ISSUE_TO_CREATE.title);
+      });
+
       it('creates the issue', () => {
         expect(createIssueScope.isDone()).to.be.true;
       });
     });
 
     context('when the issue already exists', () => {
-      const ISSUE = {
-        title: 'Existing Issue',
-        description: 'New comment',
-        label: 'location',
-      };
-
       context('when issue is closed', () => {
-        let setIssueLabelsScope;
+        let updateIssueScope;
         let addCommentScope;
-        let openIssueScope;
-
-        const GITHUB_RESPONSE_FOR_EXISTING_ISSUE = {
-          number: 123,
-          title: ISSUE.title,
-          description: ISSUE.description,
-          labels: [{ name: 'selectors' }],
-          state: GitHub.ISSUE_STATE_CLOSED,
-        };
 
         before(async () => {
-          nock('https://api.github.com')
-            .get('/repos/owner/repo/issues')
-            .query(true)
-            .reply(200, [GITHUB_RESPONSE_FOR_EXISTING_ISSUE]);
-
-          openIssueScope = nock('https://api.github.com')
-            .patch(`/repos/owner/repo/issues/${GITHUB_RESPONSE_FOR_EXISTING_ISSUE.number}`, { state: GitHub.ISSUE_STATE_OPEN })
-            .reply(200);
-
-          setIssueLabelsScope = nock('https://api.github.com')
-            .put(`/repos/owner/repo/issues/${GITHUB_RESPONSE_FOR_EXISTING_ISSUE.number}/labels`, { labels: ['location'] })
+          updateIssueScope = nock('https://api.github.com')
+            .patch(`/repos/owner/repo/issues/${EXISTING_CLOSED_ISSUE.number}`, { state: GitHub.ISSUE_STATE_OPEN, labels: ['location'] })
             .reply(200);
 
           addCommentScope = nock('https://api.github.com')
-            .post(`/repos/owner/repo/issues/${GITHUB_RESPONSE_FOR_EXISTING_ISSUE.number}/comments`, { body: ISSUE.description })
+            .post(`/repos/owner/repo/issues/${EXISTING_CLOSED_ISSUE.number}/comments`, { body: EXISTING_CLOSED_ISSUE.description })
             .reply(200);
 
-          await github.createOrUpdateIssue(ISSUE);
+          await github.createOrUpdateIssue({ title: EXISTING_CLOSED_ISSUE.title, description: EXISTING_CLOSED_ISSUE.description, label: 'location' });
         });
 
-        it('reopens the issue', () => {
-          expect(openIssueScope.isDone()).to.be.true;
+        after(() => {
+          github.issuesCache.delete(EXISTING_CLOSED_ISSUE.title);
+          github.issuesCache.set(EXISTING_CLOSED_ISSUE.title, EXISTING_CLOSED_ISSUE);
         });
 
-        it("updates the issue's label", () => {
-          expect(setIssueLabelsScope.isDone()).to.be.true;
+        it('reopens the issue and updates its labels', () => {
+          expect(updateIssueScope.isDone()).to.be.true;
         });
 
         it('adds comment to the issue', () => {
@@ -423,49 +336,63 @@ describe('GitHub', function () {
       });
 
       context('when issue is already opened', () => {
-        let setIssueLabelsScope;
-        let addCommentScope;
-        let openIssueScope;
+        context('when the reason is new', () => {
+          let addCommentScope;
+          let updateIssueScope;
 
-        const GITHUB_RESPONSE_FOR_EXISTING_ISSUE = {
-          number: 123,
-          title: ISSUE.title,
-          description: ISSUE.description,
-          labels: [{ name: 'selectors' }],
-          state: GitHub.ISSUE_STATE_OPEN,
-        };
+          before(async () => {
+            updateIssueScope = nock('https://api.github.com')
+              .patch(`/repos/owner/repo/issues/${EXISTING_OPEN_ISSUE.number}`, { state: GitHub.ISSUE_STATE_OPEN, labels: ['404'] })
+              .reply(200);
 
-        before(async () => {
-          nock('https://api.github.com')
-            .get('/repos/owner/repo/issues')
-            .query(true)
-            .reply(200, [GITHUB_RESPONSE_FOR_EXISTING_ISSUE]);
+            addCommentScope = nock('https://api.github.com')
+              .post(`/repos/owner/repo/issues/${EXISTING_OPEN_ISSUE.number}/comments`, { body: EXISTING_OPEN_ISSUE.description })
+              .reply(200);
 
-          openIssueScope = nock('https://api.github.com')
-            .patch(`/repos/owner/repo/issues/${GITHUB_RESPONSE_FOR_EXISTING_ISSUE.number}`, { state: GitHub.ISSUE_STATE_OPEN })
-            .reply(200);
+            await github.createOrUpdateIssue({ title: EXISTING_OPEN_ISSUE.title, description: EXISTING_OPEN_ISSUE.description, label: '404' });
+          });
 
-          setIssueLabelsScope = nock('https://api.github.com')
-            .put(`/repos/owner/repo/issues/${GITHUB_RESPONSE_FOR_EXISTING_ISSUE.number}/labels`, { labels: ['location'] })
-            .reply(200);
+          after(() => {
+            github.issuesCache.delete(EXISTING_OPEN_ISSUE.title);
+            github.issuesCache.set(EXISTING_OPEN_ISSUE.title, EXISTING_OPEN_ISSUE);
+          });
 
-          addCommentScope = nock('https://api.github.com')
-            .post(`/repos/owner/repo/issues/${GITHUB_RESPONSE_FOR_EXISTING_ISSUE.number}/comments`, { body: ISSUE.description })
-            .reply(200);
+          it("updates the issue's labels", () => {
+            expect(updateIssueScope.isDone()).to.be.true;
+          });
 
-          await github.createOrUpdateIssue(ISSUE);
+          it('adds a comment to the issue', () => {
+            expect(addCommentScope.isDone()).to.be.true;
+          });
         });
+        context('when the reason did not change', () => {
+          let addCommentScope;
+          let updateIssueScope;
 
-        it('does not change the issue state', () => {
-          expect(openIssueScope.isDone()).to.be.false;
-        });
+          before(async () => {
+            updateIssueScope = nock('https://api.github.com')
+              .patch(`/repos/owner/repo/issues/${EXISTING_OPEN_ISSUE.number}`, { state: GitHub.ISSUE_STATE_OPEN, labels: EXISTING_OPEN_ISSUE.labels })
+              .reply(200);
 
-        it("updates the issue's label", () => {
-          expect(setIssueLabelsScope.isDone()).to.be.true;
-        });
+            addCommentScope = nock('https://api.github.com')
+              .post(`/repos/owner/repo/issues/${EXISTING_OPEN_ISSUE.number}/comments`, { body: EXISTING_OPEN_ISSUE.description })
+              .reply(200);
 
-        it('adds comment to the issue', () => {
-          expect(addCommentScope.isDone()).to.be.true;
+            await github.createOrUpdateIssue({ title: EXISTING_OPEN_ISSUE.title, description: EXISTING_OPEN_ISSUE.description, label: EXISTING_OPEN_ISSUE.labels[0].name });
+          });
+
+          after(() => {
+            github.issuesCache.delete(EXISTING_OPEN_ISSUE.title);
+            github.issuesCache.set(EXISTING_OPEN_ISSUE.title, EXISTING_OPEN_ISSUE);
+          });
+
+          it('does not attempt to updates the issue’s labels', () => {
+            expect(updateIssueScope.isDone()).to.be.false;
+          });
+
+          it('does not attempt to add any comment to the issue', () => {
+            expect(addCommentScope.isDone()).to.be.false;
+          });
         });
       });
     });

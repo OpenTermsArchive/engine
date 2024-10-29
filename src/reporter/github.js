@@ -16,182 +16,186 @@ export default class GitHub {
   constructor(repository) {
     const { version } = require('../../package.json');
 
-    this.octokit = new Octokit({ auth: process.env.OTA_ENGINE_GITHUB_TOKEN, userAgent: `opentermsarchive/${version}` });
+    this.octokit = new Octokit({
+      auth: process.env.OTA_ENGINE_GITHUB_TOKEN,
+      userAgent: `opentermsarchive/${version}`,
+      throttle: {
+        onRateLimit: () => false, // Do not retry after hitting a rate limit error
+        onSecondaryRateLimit: () => false, // Do not retry after hitting a secondary rate limit error
+      },
+    });
 
     const [ owner, repo ] = repository.split('/');
 
     this.commonParams = { owner, repo };
+
+    this.issuesCache = new Map();
+    this._issuesPromise = null;
+  }
+
+  get issues() {
+    if (!this._issuesPromise) {
+      logger.info('Loading issues from GitHub…');
+      this._issuesPromise = this.loadAllIssues();
+    }
+
+    return this._issuesPromise;
+  }
+
+  clearCache() {
+    this.issuesCache.clear();
+    this._issuesPromise = null;
+    logger.info('Issues cache cleared');
   }
 
   async initialize() {
     this.MANAGED_LABELS = require('./labels.json');
+    try {
+      const existingLabels = await this.getRepositoryLabels();
+      const existingLabelsNames = existingLabels.map(label => label.name);
+      const missingLabels = this.MANAGED_LABELS.filter(label => !existingLabelsNames.includes(label.name));
 
-    const existingLabels = await this.getRepositoryLabels();
-    const existingLabelsNames = existingLabels.map(label => label.name);
-    const missingLabels = this.MANAGED_LABELS.filter(label => !existingLabelsNames.includes(label.name));
+      if (missingLabels.length) {
+        logger.info(`Following required labels are not present on the repository: ${missingLabels.map(label => `"${label.name}"`).join(', ')}. Creating them…`);
 
-    if (missingLabels.length) {
-      logger.info(`🤖 Following required labels are not present on the repository: ${missingLabels.map(label => `"${label.name}"`).join(', ')}. Creating them…`);
-
-      for (const label of missingLabels) {
-        await this.createLabel({ /* eslint-disable-line no-await-in-loop */
-          name: label.name,
-          color: label.color,
-          description: `${label.description} ${MANAGED_BY_OTA_MARKER}`,
-        });
+        for (const label of missingLabels) {
+          await this.createLabel({ /* eslint-disable-line no-await-in-loop */
+            name: label.name,
+            color: label.color,
+            description: `${label.description} ${MANAGED_BY_OTA_MARKER}`,
+          });
+        }
       }
+    } catch (error) {
+      logger.error(`Failed to handle repository labels: ${error.message}`);
+    }
+  }
+
+  async loadAllIssues() {
+    try {
+      const issues = await this.octokit.paginate('GET /repos/{owner}/{repo}/issues', {
+        ...this.commonParams,
+        state: GitHub.ISSUE_STATE_ALL,
+        per_page: 100,
+      });
+
+      const onlyIssues = issues.filter(issue => !issue.pull_request); // Filter out pull requests since GitHub treats them as a special type of issue
+
+      onlyIssues.forEach(issue => {
+        const cachedIssue = this.issuesCache.get(issue.title);
+
+        if (!cachedIssue || new Date(issue.created_at) < new Date(cachedIssue.created_at)) { // Only work on the oldest issue if there are duplicates, in order to consolidate the longest history possible
+          this.issuesCache.set(issue.title, issue);
+        }
+      });
+
+      logger.info(`Cached ${onlyIssues.length} issues from the GitHub repository`);
+
+      return this.issuesCache;
+    } catch (error) {
+      logger.error(`Failed to load issues: ${error.message}`);
+      throw error;
     }
   }
 
   async getRepositoryLabels() {
-    try {
-      const { data: labels } = await this.octokit.request('GET /repos/{owner}/{repo}/labels', { ...this.commonParams });
+    const { data: labels } = await this.octokit.request('GET /repos/{owner}/{repo}/labels', { ...this.commonParams });
 
-      return labels;
-    } catch (error) {
-      logger.error(`🤖 Could not get labels: ${error}`);
-    }
+    return labels;
   }
 
   async createLabel({ name, color, description }) {
-    try {
-      await this.octokit.request('POST /repos/{owner}/{repo}/labels', {
-        ...this.commonParams,
-        name,
-        color,
-        description,
-      });
+    await this.octokit.request('POST /repos/{owner}/{repo}/labels', {
+      ...this.commonParams,
+      name,
+      color,
+      description,
+    });
+  }
 
-      logger.info(`🤖 Created repository label "${name}"`);
-    } catch (error) {
-      logger.error(`🤖 Could not create label "${name}": ${error}`);
-    }
+  async getIssue(title) {
+    return (await this.issues).get(title);
   }
 
   async createIssue({ title, description: body, labels }) {
-    try {
-      const { data: issue } = await this.octokit.request('POST /repos/{owner}/{repo}/issues', {
-        ...this.commonParams,
-        title,
-        body,
-        labels,
-      });
+    const { data: issue } = await this.octokit.request('POST /repos/{owner}/{repo}/issues', {
+      ...this.commonParams,
+      title,
+      body,
+      labels,
+    });
 
-      logger.info(`🤖 Created GitHub issue #${issue.number} "${title}": ${issue.html_url}`);
+    this.issuesCache.set(issue.title, issue);
 
-      return issue;
-    } catch (error) {
-      logger.error(`🤖 Could not create GitHub issue "${title}": ${error}`);
-    }
+    return issue;
   }
 
-  async setIssueLabels({ issue, labels }) {
-    try {
-      await this.octokit.request('PUT /repos/{owner}/{repo}/issues/{issue_number}/labels', {
-        ...this.commonParams,
-        issue_number: issue.number,
-        labels,
-      });
+  async updateIssue(issue, { state, labels }) {
+    const { data: updatedIssue } = await this.octokit.request('PATCH /repos/{owner}/{repo}/issues/{issue_number}', {
+      ...this.commonParams,
+      issue_number: issue.number,
+      state,
+      labels,
+    });
 
-      logger.info(`🤖 Updated labels to GitHub issue #${issue.number}`);
-    } catch (error) {
-      logger.error(`🤖 Could not update GitHub issue #${issue.number} "${issue.title}": ${error}`);
-    }
-  }
+    this.issuesCache.set(updatedIssue.title, updatedIssue);
 
-  async openIssue(issue) {
-    try {
-      await this.octokit.request('PATCH /repos/{owner}/{repo}/issues/{issue_number}', {
-        ...this.commonParams,
-        issue_number: issue.number,
-        state: GitHub.ISSUE_STATE_OPEN,
-      });
-
-      logger.info(`🤖 Opened GitHub issue #${issue.number}`);
-    } catch (error) {
-      logger.error(`🤖 Could not update GitHub issue #${issue.number} "${issue.title}": ${error}`);
-    }
-  }
-
-  async closeIssue(issue) {
-    try {
-      await this.octokit.request('PATCH /repos/{owner}/{repo}/issues/{issue_number}', {
-        ...this.commonParams,
-        issue_number: issue.number,
-        state: GitHub.ISSUE_STATE_CLOSED,
-      });
-
-      logger.info(`🤖 Closed GitHub issue #${issue.number}`);
-    } catch (error) {
-      logger.error(`🤖 Could not update GitHub issue #${issue.number} "${issue.title}": ${error}`);
-    }
-  }
-
-  async getIssue({ title, ...searchParams }) {
-    try {
-      const issues = await this.octokit.paginate('GET /repos/{owner}/{repo}/issues', {
-        ...this.commonParams,
-        per_page: 100,
-        ...searchParams,
-      }, response => response.data);
-
-      const [issue] = issues.filter(item => item.title === title); // since only one is expected, use the first one
-
-      return issue;
-    } catch (error) {
-      logger.error(`🤖 Could not find GitHub issue "${title}": ${error}`);
-    }
+    return updatedIssue;
   }
 
   async addCommentToIssue({ issue, comment: body }) {
-    try {
-      const { data: comment } = await this.octokit.request('POST /repos/{owner}/{repo}/issues/{issue_number}/comments', {
-        ...this.commonParams,
-        issue_number: issue.number,
-        body,
-      });
+    const { data: comment } = await this.octokit.request('POST /repos/{owner}/{repo}/issues/{issue_number}/comments', {
+      ...this.commonParams,
+      issue_number: issue.number,
+      body,
+    });
 
-      logger.info(`🤖 Added comment to GitHub issue #${issue.number}: ${comment.html_url}`);
-
-      return comment;
-    } catch (error) {
-      logger.error(`🤖 Could not add comment to GitHub issue #${issue.number} "${issue.title}": ${error}`);
-    }
+    return comment;
   }
 
   async closeIssueWithCommentIfExists({ title, comment }) {
-    const openedIssue = await this.getIssue({ title, state: GitHub.ISSUE_STATE_OPEN });
+    try {
+      const issue = await this.getIssue(title);
 
-    if (!openedIssue) {
-      return;
+      if (!issue || issue.state == GitHub.ISSUE_STATE_CLOSED) {
+        return;
+      }
+
+      await this.addCommentToIssue({ issue, comment });
+
+      const updatedIssue = await this.updateIssue(issue, { state: GitHub.ISSUE_STATE_CLOSED });
+
+      logger.info(`Closed issue with comment #${updatedIssue.number}: ${updatedIssue.html_url}`);
+    } catch (error) {
+      logger.error(`Failed to close issue with comment "${title}": ${error.stack}`);
     }
-
-    await this.addCommentToIssue({ issue: openedIssue, comment });
-
-    return this.closeIssue(openedIssue);
   }
 
   async createOrUpdateIssue({ title, description, label }) {
-    const issue = await this.getIssue({ title, state: GitHub.ISSUE_STATE_ALL });
+    try {
+      const issue = await this.getIssue(title);
 
-    if (!issue) {
-      return this.createIssue({ title, description, labels: [label] });
+      if (!issue) {
+        const createdIssue = await this.createIssue({ title, description, labels: [label] });
+
+        return logger.info(`Created issue #${createdIssue.number} "${title}": ${createdIssue.html_url}`);
+      }
+
+      const managedLabelsNames = this.MANAGED_LABELS.map(label => label.name);
+      const labelsNotManagedToKeep = issue.labels.map(label => label.name).filter(label => !managedLabelsNames.includes(label));
+      const [managedLabel] = issue.labels.filter(label => managedLabelsNames.includes(label.name)); // It is assumed that only one specific reason for failure is possible at a time, making managed labels mutually exclusive
+
+      if (issue.state !== GitHub.ISSUE_STATE_CLOSED && managedLabel?.name === label) {
+        return;
+      }
+
+      const updatedIssue = await this.updateIssue(issue, { state: GitHub.ISSUE_STATE_OPEN, labels: [ label, ...labelsNotManagedToKeep ] });
+
+      await this.addCommentToIssue({ issue, comment: description });
+
+      logger.info(`Updated issue with comment #${updatedIssue.number}: ${updatedIssue.html_url}`);
+    } catch (error) {
+      logger.error(`Failed to update issue "${title}": ${error.stack}`);
     }
-
-    if (issue.state == GitHub.ISSUE_STATE_CLOSED) {
-      await this.openIssue(issue);
-    }
-
-    const managedLabelsNames = this.MANAGED_LABELS.map(label => label.name);
-    const [managedLabel] = issue.labels.filter(label => managedLabelsNames.includes(label.name)); // it is assumed that only one specific reason for failure is possible at a time, making managed labels mutually exclusive
-
-    if (managedLabel?.name == label) { // if the label is already assigned to the issue, the error is redundant with the one already reported and no further action is necessary
-      return;
-    }
-
-    const labelsNotManagedToKeep = issue.labels.map(label => label.name).filter(label => !managedLabelsNames.includes(label));
-
-    await this.setIssueLabels({ issue, labels: [ label, ...labelsNotManagedToKeep ] });
-    await this.addCommentToIssue({ issue, comment: description });
   }
 }

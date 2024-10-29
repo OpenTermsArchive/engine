@@ -49,6 +49,10 @@ export default class Reporter {
     return this.github.initialize();
   }
 
+  onTrackingStarted() {
+    return this.github.clearCache();
+  }
+
   async onVersionRecorded(version) {
     await this.github.closeIssueWithCommentIfExists({
       title: Reporter.generateTitleID(version.serviceId, version.termsType),

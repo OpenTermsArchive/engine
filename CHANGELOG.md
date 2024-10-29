@@ -8,6 +8,46 @@ All changes that impact users of this module are documented in this file, in the
 
 - Add GitLab functionalities
 
+## 2.4.0 - 2024-10-24
+
+_Full changeset and discussions: [#1114](https://github.com/OpenTermsArchive/engine/pull/1114)._
+
+> Development of this release was supported by the [French Ministry for Foreign Affairs](https://www.diplomatie.gouv.fr/fr/politique-etrangere-de-la-france/diplomatie-numerique/) through its ministerial [State Startups incubator](https://beta.gouv.fr/startups/open-terms-archive.html) under the aegis of the Ambassador for Digital Affairs.
+
+### Changed
+
+- Add `Service Level Agreement` terms type, introduced in [`terms-types@1.4.0`](https://github.com/OpenTermsArchive/terms-types/blob/main/CHANGELOG.md#140---2024-10-24)
+
+## 2.3.3 - 2024-10-23
+
+_Full changeset and discussions: [#1113](https://github.com/OpenTermsArchive/engine/pull/1113)._
+
+> Development of this release was supported by the [French Ministry for Foreign Affairs](https://www.diplomatie.gouv.fr/fr/politique-etrangere-de-la-france/diplomatie-numerique/) through its ministerial [State Startups incubator](https://beta.gouv.fr/startups/open-terms-archive.html) under the aegis of the Ambassador for Digital Affairs.
+
+### Fixed
+
+- Reduce GitHub API calls in issues reporter
+
+## 2.3.2 - 2024-10-23
+
+_Full changeset and discussions: [#1112](https://github.com/OpenTermsArchive/engine/pull/1112)._
+
+> Development of this release was supported by the [French Ministry for Foreign Affairs](https://www.diplomatie.gouv.fr/fr/politique-etrangere-de-la-france/diplomatie-numerique/) through its ministerial [State Startups incubator](https://beta.gouv.fr/startups/open-terms-archive.html) under the aegis of the Ambassador for Digital Affairs.
+
+### Fixed
+
+- Reduce API calls and avoid inconsistent states on GitHub issues reports
+
+## 2.3.1 - 2024-10-22
+
+_Full changeset and discussions: [#1111](https://github.com/OpenTermsArchive/engine/pull/1111)._
+
+> Development of this release was supported by the [French Ministry for Foreign Affairs](https://www.diplomatie.gouv.fr/fr/politique-etrangere-de-la-france/diplomatie-numerique/) through its ministerial [State Startups incubator](https://beta.gouv.fr/startups/open-terms-archive.html) under the aegis of the Ambassador for Digital Affairs.
+
+### Fixed
+
+- Prevent duplicate issues on GitHub reports
+
 ## 2.3.0 - 2024-10-21
 
 _Full changeset and discussions: [#1110](https://github.com/OpenTermsArchive/engine/pull/1110)._
