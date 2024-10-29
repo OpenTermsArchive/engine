@@ -30,43 +30,44 @@ async function removeDuplicateIssues() {
 
     for (const issue of onlyIssues) {
       if (!issuesByTitle.has(issue.title)) {
-        issuesByTitle.set(issue.title, issue);
-        continue;
-      }
-
-      const existingIssue = issuesByTitle.get(issue.title);
-
-      console.log(`Found duplicate for issue "${issue.title}"`);
-
-      let issueToClose;
-
-      if (new Date(issue.created_at) > new Date(existingIssue.created_at)) {
-        issueToClose = issue;
+        issuesByTitle.set(issue.title, [issue]);
       } else {
-        issueToClose = existingIssue;
-        issuesByTitle.set(issue.title, issue);
+        issuesByTitle.get(issue.title).push(issue);
       }
-
-      await octokit.request('PATCH /repos/{owner}/{repo}/issues/{issue_number}', { /* eslint-disable-line no-await-in-loop */
-        owner,
-        repo,
-        issue_number: issueToClose.number,
-        state: 'closed',
-      });
-
-      await octokit.request('POST /repos/{owner}/{repo}/issues/{issue_number}/comments', { /* eslint-disable-line no-await-in-loop */
-        owner,
-        repo,
-        issue_number: issueToClose.number,
-        body: 'Closed duplicate issue.',
-      });
-
-      counter++;
-      console.log(`Closed issue #${issueToClose.number}: ${issueToClose.html_url}`);
     }
 
-    console.log(`Removed ${counter} issues`);
-    console.log('Duplicate removal process completed');
+    for (const [ title, duplicateIssues ] of issuesByTitle) {
+      if (duplicateIssues.length === 1) continue;
+
+      const originalIssue = duplicateIssues.reduce((oldest, current) => (new Date(current.created_at) < new Date(oldest.created_at) ? current : oldest));
+
+      console.log(`\nFound ${duplicateIssues.length - 1} duplicates for issue #${originalIssue.number} "${title}"`);
+
+      for (const issue of duplicateIssues) {
+        if (issue.number === originalIssue.number) {
+          continue;
+        }
+
+        await octokit.request('PATCH /repos/{owner}/{repo}/issues/{issue_number}', { /* eslint-disable-line no-await-in-loop */
+          owner,
+          repo,
+          issue_number: issue.number,
+          state: 'closed',
+        });
+
+        await octokit.request('POST /repos/{owner}/{repo}/issues/{issue_number}/comments', { /* eslint-disable-line no-await-in-loop */
+          owner,
+          repo,
+          issue_number: issue.number,
+          body: `Closing duplicate issue. Original issue: #${originalIssue.number}`,
+        });
+
+        counter++;
+        console.log(`Closed issue #${issue.number}: ${issue.html_url}`);
+      }
+    }
+
+    console.log(`\nDuplicate removal process completed; ${counter} issues closed`);
   } catch (error) {
     console.log(`Failed to remove duplicate issues: ${error.stack}`);
     process.exit(1);
