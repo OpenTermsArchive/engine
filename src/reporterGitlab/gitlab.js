@@ -40,11 +40,11 @@ export default class GitLab {
       if (response.ok) {
         this.projectId = res.id;
       } else {
-        logger.error(`🤖 Error while obtaining projectId: ${JSON.strinfigy(res)}`);
+        logger.error(`Error while obtaining projectId: ${JSON.strinfigy(res)}`);
         this.projectId = null;
       }
     } catch (error) {
-      logger.error(`🤖 Error while obtaining projectId: ${error}`);
+      logger.error(`Error while obtaining projectId: ${error}`);
       this.projectId = null;
     }
     this.MANAGED_LABELS = require('./labels.json');
@@ -54,7 +54,7 @@ export default class GitLab {
     const missingLabels = this.MANAGED_LABELS.filter(label => !existingLabelsNames.includes(label.name));
 
     if (missingLabels.length) {
-      logger.info(`🤖 Following required labels are not present on the repository: ${missingLabels.map(label => `"${label.name}"`).join(', ')}. Creating them…`);
+      logger.info(`The following required labels are not present on the repository: ${missingLabels.map(label => `"${label.name}"`).join(', ')}. Creating them…`);
 
       for (const label of missingLabels) {
         await this.createLabel({ /* eslint-disable-line no-await-in-loop */
@@ -79,11 +79,11 @@ export default class GitLab {
         return res;
       }
 
-      logger.error(`🤖 Failed to get labels: ${response.status} - ${JSON.stringify(res)}`);
+      logger.error(`Failed to get labels: ${response.status} - ${JSON.stringify(res)}`);
 
       return null;
     } catch (error) {
-      logger.error(`🤖 Could get labels: ${error}`);
+      logger.error(`Could not get labels: ${error}`);
     }
   }
 
@@ -112,12 +112,12 @@ export default class GitLab {
       const res = await response.json();
 
       if (response.ok) {
-        logger.info(`🤖 New label created: ${res.name} , color: ${res.color}`);
+        logger.info(`New label created: ${res.name} , color: ${res.color}`);
       } else {
         logger.error(`createLabel response: ${JSON.stringify(res)}`);
       }
     } catch (error) {
-      logger.error(`🤖 Failed to create label: ${error}`);
+      logger.error(`Failed to create label: ${error}`);
     }
   }
 
@@ -146,14 +146,14 @@ export default class GitLab {
       const res = await response.json();
 
       if (response.ok) {
-        logger.info(`🤖 Created GitLab issue #${res.iid} "${title}": ${res.web_url}`);
+        logger.info(`Created GitLab issue #${res.iid} "${title}": ${res.web_url}`);
 
         return res;
       }
 
       logger.error(`createIssue response: ${JSON.stringify(res)}`);
     } catch (error) {
-      logger.error(`🤖 Could not create GitLab issue "${title}": ${error}`);
+      logger.error(`Could not create GitLab issue "${title}": ${error}`);
     }
   }
 
@@ -177,12 +177,12 @@ export default class GitLab {
       const res = await response.json();
 
       if (response.ok) {
-        logger.info(`🤖 Updated labels to GitLab issue #${issue.iid}`);
+        logger.info(`Updated labels to GitLab issue #${issue.iid}`);
       } else {
         logger.error(`setIssueLabels response: ${JSON.stringify(res)}`);
       }
     } catch (error) {
-      logger.error(`🤖 Could not update GitLab issue #${issue.iid} "${issue.title}": ${error}`);
+      logger.error(`Could not update GitLab issue #${issue.iid} "${issue.title}": ${error}`);
     }
   }
 
@@ -205,12 +205,12 @@ export default class GitLab {
       const res = await response.json();
 
       if (response.ok) {
-        logger.info(`🤖 Opened GitLab issue #${res.iid}`);
+        logger.info(`Opened GitLab issue #${res.iid}`);
       } else {
         logger.error(`openIssue response: ${JSON.stringify(res)}`);
       }
     } catch (error) {
-      logger.error(`🤖 Could not update GitLab issue #${issue.iid} "${issue.title}": ${error}`);
+      logger.error(`Could not update GitLab issue #${issue.iid} "${issue.title}": ${error}`);
     }
   }
 
@@ -234,12 +234,12 @@ export default class GitLab {
       const res = await response.json();
 
       if (response.ok) {
-        logger.info(`🤖 Closed GitLab issue #${issue.iid}`);
+        logger.info(`Closed GitLab issue #${issue.iid}`);
       } else {
         logger.error(`closeIssue response: ${JSON.stringify(res)}`);
       }
     } catch (error) {
-      logger.error(`🤖 Could not update GitLab issue #${issue.iid} "${issue.title}": ${error}`);
+      logger.error(`Could not update GitLab issue #${issue.iid} "${issue.title}": ${error}`);
     }
   }
 
@@ -268,7 +268,7 @@ export default class GitLab {
 
       logger.error(`openIssue response: ${JSON.stringify(res)}`);
     } catch (error) {
-      logger.error(`🤖 Could not find GitLab issue "${title}": ${error}`);
+      logger.error(`Could not find GitLab issue "${title}": ${error}`);
     }
   }
 
@@ -292,14 +292,14 @@ export default class GitLab {
       const res = await response.json();
 
       if (response.ok) {
-        logger.info(`🤖 Added comment to GitLab issue #${issue.iid} ${issue.title}: ${res.id}`);
+        logger.info(`Added comment to GitLab issue #${issue.iid} ${issue.title}: ${res.id}`);
 
         return res.body;
       }
 
       logger.error(`openIssue response: ${JSON.stringify(res)}`);
     } catch (error) {
-      logger.error(`🤖 Could not add comment to GitLab issue #${issue.iid} "${issue.title}": ${error}`);
+      logger.error(`Could not add comment to GitLab issue #${issue.iid} "${issue.title}": ${error}`);
     }
   }
 
