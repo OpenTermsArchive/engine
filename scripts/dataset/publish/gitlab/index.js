@@ -1,6 +1,5 @@
 import fsApi from 'fs';
 import path from 'path';
-import url from 'url';
 
 import config from 'config';
 import dotenv from 'dotenv';
@@ -21,10 +20,10 @@ export default async function publish({
   let projectId = null;
   const gitlabAPIUrl = config.get('@opentermsarchive/engine.dataset.apiBaseURL');
 
-  const [ owner, repo ] = url
-    .parse(config.get('@opentermsarchive/engine.dataset.versionsRepositoryURLGitLab'))
-    .pathname.split('/')
-    .filter(component => component);
+  const [ owner, repo ] = new URL(config.get('@opentermsarchive/engine.dataset.versionsRepositoryURLGitLab'))
+    .pathname
+    .split('/')
+    .filter(Boolean);
   const commonParams = { owner, repo };
 
   try {
