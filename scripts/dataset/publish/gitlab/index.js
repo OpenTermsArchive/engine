@@ -7,20 +7,19 @@ import dotenv from 'dotenv';
 import FormData from 'form-data';
 import nodeFetch from 'node-fetch';
 
-import GitLab from '../../../src/reporterGitlab/gitlab.js';
-import * as readme from '../assets/README.template.js';
-import logger from '../logger/index.js';
+import GitLab from '../../../../src/reporter/gitlab/index.js';
+import * as readme from '../../assets/README.template.js';
+import logger from '../../logger/index.js';
 
 dotenv.config();
 
-const gitlabAPIUrl = process.env.OTA_ENGINE_GITLAB_API_BASE_URL;
-
-export default async function publishReleaseGitLab({
+export default async function publish({
   archivePath,
   releaseDate,
   stats,
 }) {
   let projectId = null;
+  const gitlabAPIUrl = config.get('@opentermsarchive/engine.dataset.apiBaseURL');
 
   const [ owner, repo ] = url
     .parse(config.get('@opentermsarchive/engine.dataset.versionsRepositoryURLGitLab'))

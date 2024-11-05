@@ -16,7 +16,7 @@ const fs = fsApi.promises;
 
 const ARCHIVE_FORMAT = 'zip'; // for supported formats, see https://www.archiverjs.com/docs/archive-formats
 
-export default async function generate({ archivePath, releaseDate, versionsRepositoryURL }) {
+export default async function generate({ archivePath, releaseDate }) {
   const versionsRepository = await RepositoryFactory.create(config.get('@opentermsarchive/engine.recorder.versions.storage')).initialize();
 
   const archive = await initializeArchive(archivePath);
@@ -61,7 +61,6 @@ export default async function generate({ archivePath, releaseDate, versionsRepos
       releaseDate,
       firstVersionDate,
       lastVersionDate,
-      versionsRepositoryURL,
     }),
     { name: `${archive.basename}/README.md` },
   );
