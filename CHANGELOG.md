@@ -8,6 +8,16 @@ All changes that impact users of this module are documented in this file, in the
 
 - Add GitLab functionalities
 
+## 2.5.0 - 2024-10-29
+
+_Full changeset and discussions: [#1115](https://github.com/OpenTermsArchive/engine/pull/1115)._
+
+> Development of this release was supported by the [French Ministry for Foreign Affairs](https://www.diplomatie.gouv.fr/fr/politique-etrangere-de-la-france/diplomatie-numerique/) through its ministerial [State Startups incubator](https://beta.gouv.fr/startups/open-terms-archive.html) under the aegis of the Ambassador for Digital Affairs.
+
+### Added
+
+- Add script to remove duplicate issues in GitHub reports
+
 ## 2.4.0 - 2024-10-24
 
 _Full changeset and discussions: [#1114](https://github.com/OpenTermsArchive/engine/pull/1114)._
