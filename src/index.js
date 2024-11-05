@@ -8,7 +8,6 @@ import Archivist from './archivist/index.js';
 import logger from './logger/index.js';
 import Notifier from './notifier/index.js';
 import Reporter from './reporter/index.js';
-import ReporterGitlab from './reporterGitlab/index.js';
 
 const require = createRequire(import.meta.url);
 
@@ -56,8 +55,8 @@ export default async function track({ services, types, extractOnly, schedule }) 
     logger.warn('Environment variable "OTA_ENGINE_SENDINBLUE_API_KEY" was not found; the Notifier module will be ignored');
   }
 
-  if (process.env.OTA_ENGINE_GITHUB_TOKEN) {
-    if (config.has('@opentermsarchive/engine.reporter.githubIssues.repositories.declarations')) {
+  if (process.env.OTA_ENGINE_GITHUB_TOKEN || process.env.OTA_ENGINE_GITLAB_TOKEN) {
+    if (config.has('@opentermsarchive/engine.reporter.repositories.declarations')) {
       try {
         const reporter = new Reporter(config.get('@opentermsarchive/engine.reporter'));
 
@@ -67,27 +66,10 @@ export default async function track({ services, types, extractOnly, schedule }) 
         logger.error('Cannot instantiate the Reporter module; it will be ignored:', error);
       }
     } else {
-      logger.warn('Configuration key "reporter.githubIssues.repositories.declarations" was not found; issues on the declarations repository cannot be created');
+      logger.warn('Configuration key "reporter.repositories.declarations" was not found; issues on the declarations repository cannot be created');
     }
   } else {
-    logger.warn('Environment variable "OTA_ENGINE_GITHUB_TOKEN" was not found; the Reporter module will be ignored');
-  }
-
-  if (process.env.OTA_ENGINE_GITLAB_TOKEN) {
-    if (config.has('@opentermsarchive/engine.reporter.gitlabIssues.repositories.declarations')) {
-      try {
-        const reporter = new ReporterGitlab(config.get('@opentermsarchive/engine.reporter'));
-
-        await reporter.initialize();
-        archivist.attach(reporter);
-      } catch (error) {
-        logger.error('Cannot instantiate the ReporterGitlab module; it will be ignored:', error);
-      }
-    } else {
-      logger.warn('Configuration key "reporter.gitlabIssues.repositories.declarations" was not found; issues on the declarations repository cannot be created');
-    }
-  } else {
-    logger.warn('Environment variable "OTA_ENGINE_GITLAB_TOKEN" was not found; the ReporterGitlab module will be ignored');
+    logger.warn('Environment variable with token for GitHub or GitLab was not found; the Reporter module will be ignored');
   }
 
   if (!schedule) {

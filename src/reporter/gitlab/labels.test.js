@@ -2,7 +2,7 @@ import { createRequire } from 'module';
 
 import chai from 'chai';
 
-import { MANAGED_BY_OTA_MARKER } from './gitlab.js';
+import { MANAGED_BY_OTA_MARKER } from './index.js';
 
 const require = createRequire(import.meta.url);
 
@@ -21,7 +21,7 @@ describe('Reporter GitLab labels', () => {
       });
 
       it('complies with the GitLab constraints for color', () => {
-        const validHexColorRegex = /^#[0-9a-fA-F]{6}$/; // Regex for a valid 6-digit hexadecimal color code with the `#`
+        const validHexColorRegex = /^#[0-9a-fA-F]{6}$/;
 
         expect(validHexColorRegex.test(label.color)).to.be.true;
       });

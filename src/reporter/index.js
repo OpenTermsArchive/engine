@@ -2,7 +2,7 @@ import mime from 'mime';
 
 import { toISODateWithoutMilliseconds } from '../archivist/utils/date.js';
 
-import GitHub from './github.js';
+import { createReporter } from './factory.js';
 
 const CONTRIBUTION_TOOL_URL = 'https://contribute.opentermsarchive.org/en/service';
 const DOC_URL = 'https://docs.opentermsarchive.org';
@@ -33,28 +33,28 @@ function getLabelNameFromError(error) {
 // In the following class, it is assumed that each issue is managed using its title as a unique identifier
 export default class Reporter {
   constructor(config) {
-    const { repositories } = config.githubIssues;
+    const { repositories } = config;
 
     for (const repositoryType of Object.keys(repositories)) {
       if (!repositories[repositoryType].includes('/') || repositories[repositoryType].includes('https://')) {
-        throw new Error(`Configuration entry "reporter.githubIssues.repositories.${repositoryType}" is expected to be a string in the format <owner>/<repo>, but received: "${repositories[repositoryType]}"`);
+        throw new Error(`Configuration entry "reporter.repositories.${repositoryType}" is expected to be a string in the format <owner>/<repo>, but received: "${repositories[repositoryType]}"`);
       }
     }
 
-    this.github = new GitHub(repositories.declarations);
+    this.reporter = createReporter(config);
     this.repositories = repositories;
   }
 
   initialize() {
-    return this.github.initialize();
+    return this.reporter.initialize();
   }
 
   onTrackingStarted() {
-    return this.github.clearCache();
+    return this.reporter.clearCache();
   }
 
   async onVersionRecorded(version) {
-    await this.github.closeIssueWithCommentIfExists({
+    await this.reporter.closeIssueWithCommentIfExists({
       title: Reporter.generateTitleID(version.serviceId, version.termsType),
       comment: `### Tracking resumed
 
@@ -63,7 +63,7 @@ A new version has been recorded.`,
   }
 
   async onVersionNotChanged(version) {
-    await this.github.closeIssueWithCommentIfExists({
+    await this.reporter.closeIssueWithCommentIfExists({
       title: Reporter.generateTitleID(version.serviceId, version.termsType),
       comment: `### Tracking resumed
 
@@ -76,7 +76,7 @@ No changes were found in the last run, so no new version has been recorded.`,
   }
 
   async onInaccessibleContent(error, terms) {
-    await this.github.createOrUpdateIssue({
+    await this.reporter.createOrUpdateIssue({
       title: Reporter.generateTitleID(terms.service.id, terms.type),
       description: this.generateDescription({ error, terms }),
       label: getLabelNameFromError(error),
@@ -97,9 +97,9 @@ No changes were found in the last run, so no new version has been recorded.`,
     });
     const contributionToolUrl = `${CONTRIBUTION_TOOL_URL}?${contributionToolParams}`;
 
-    const latestDeclarationLink = `[Latest declaration](https://github.com/${this.repositories.declarations}/blob/main/declarations/${encodeURIComponent(terms.service.name)}.json)`;
-    const latestVersionLink = `[Latest version](https://github.com/${this.repositories.versions}/blob/main/${encodeURIComponent(terms.service.name)}/${encodeURIComponent(terms.type)}.md)`;
-    const snapshotsBaseUrl = `https://github.com/${this.repositories.snapshots}/blob/main/${encodeURIComponent(terms.service.name)}/${encodeURIComponent(terms.type)}`;
+    const latestDeclarationLink = `[Latest declaration](${this.reporter.generateDeclarationURL(terms.service.name)})`;
+    const latestVersionLink = `[Latest version](${this.reporter.generateVersionURL(terms.service.name, terms.type)})`;
+    const snapshotsBaseUrl = this.reporter.generateSnapshotsBaseUrl(terms.service.name, terms.type);
     const latestSnapshotsLink = terms.hasMultipleSourceDocuments
       ? `Latest snapshots:\n  - ${terms.sourceDocuments.map(sourceDocument => `[${sourceDocument.id}](${snapshotsBaseUrl}.%20#${sourceDocument.id}.${mime.getExtension(sourceDocument.mimeType)})`).join('\n  - ')}`
       : `[Latest snapshot](${snapshotsBaseUrl}.${mime.getExtension(terms.sourceDocuments[0].mimeType)})`;

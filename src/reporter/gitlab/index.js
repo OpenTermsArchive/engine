@@ -4,25 +4,27 @@ import HttpProxyAgent from 'http-proxy-agent';
 import HttpsProxyAgent from 'https-proxy-agent';
 import nodeFetch from 'node-fetch';
 
-import logger from '../logger/index.js';
+import logger from '../../logger/index.js';
 
 const require = createRequire(import.meta.url);
 
 export const MANAGED_BY_OTA_MARKER = '[managed by OTA]';
+const BASE_URL = 'https://gitlab.com';
+const API_BASE_URL = 'https://gitlab.com/api/v4';
 
 export default class GitLab {
   static ISSUE_STATE_CLOSED = 'closed';
   static ISSUE_STATE_OPEN = 'opened';
   static ISSUE_STATE_ALL = 'all';
 
-  constructor(repository) {
+  constructor(repository, baseURL = BASE_URL, apiBaseURL = API_BASE_URL) {
     const [ owner, repo ] = repository.split('/');
 
     this.commonParams = { owner, repo };
     this.projectId = null;
-    const gitlabUrl = process.env.OTA_ENGINE_GITLAB_API_BASE_URL;
-
-    this.gitlabUrl = gitlabUrl;
+    this.baseURL = baseURL;
+    console.log('this.baseURL', this.baseURL);
+    this.apiBaseURL = apiBaseURL;
   }
 
   async initialize() {
@@ -31,7 +33,7 @@ export default class GitLab {
     try {
       const repositoryPath = `${this.commonParams.owner}/${this.commonParams.repo}`;
       const response = await nodeFetch(
-        `${this.gitlabUrl}/projects/${encodeURIComponent(repositoryPath)}`,
+        `${this.apiBaseURL}/projects/${encodeURIComponent(repositoryPath)}`,
         options,
       );
 
@@ -47,6 +49,7 @@ export default class GitLab {
       logger.error(`Error while obtaining projectId: ${error}`);
       this.projectId = null;
     }
+
     this.MANAGED_LABELS = require('./labels.json');
 
     const existingLabels = await this.getRepositoryLabels();
@@ -70,9 +73,10 @@ export default class GitLab {
     try {
       const options = GitLab.baseOptionsHttpReq();
       const response = await nodeFetch(
-        `${this.gitlabUrl}/projects/${this.projectId}/labels?with_counts=true`,
+        `${this.apiBaseURL}/projects/${this.projectId}/labels?with_counts=true`,
         options,
       );
+
       const res = await response.json();
 
       if (response.ok) {
@@ -105,7 +109,7 @@ export default class GitLab {
       };
 
       const response = await nodeFetch(
-        `${this.gitlabUrl}/projects/${this.projectId}/labels`,
+        `${this.apiBaseURL}/projects/${this.projectId}/labels`,
         options,
       );
 
@@ -139,7 +143,7 @@ export default class GitLab {
       };
 
       const response = await nodeFetch(
-        `${this.gitlabUrl}/projects/${this.projectId}/issues`,
+        `${this.apiBaseURL}/projects/${this.projectId}/issues`,
         options,
       );
 
@@ -170,7 +174,7 @@ export default class GitLab {
 
     try {
       const response = await nodeFetch(
-        `${this.gitlabUrl}/projects/${this.projectId}/issues/${issue.iid}`,
+        `${this.apiBaseURL}/projects/${this.projectId}/issues/${issue.iid}`,
         options,
       );
 
@@ -199,7 +203,7 @@ export default class GitLab {
 
     try {
       const response = await nodeFetch(
-        `${this.gitlabUrl}/projects/${this.projectId}/issues/${issue.iid}`,
+        `${this.apiBaseURL}/projects/${this.projectId}/issues/${issue.iid}`,
         options,
       );
       const res = await response.json();
@@ -228,7 +232,7 @@ export default class GitLab {
 
     try {
       const response = await nodeFetch(
-        `${this.gitlabUrl}/projects/${this.projectId}/issues/${issue.iid}`,
+        `${this.apiBaseURL}/projects/${this.projectId}/issues/${issue.iid}`,
         options,
       );
       const res = await response.json();
@@ -245,10 +249,10 @@ export default class GitLab {
 
   async getIssue({ title, ...searchParams }) {
     try {
-      let apiUrl = `${this.gitlabUrl}/projects/${this.projectId}/issues?state=${searchParams.state}&per_page=100`;
+      let apiUrl = `${this.apiBaseURL}/projects/${this.projectId}/issues?state=${searchParams.state}&per_page=100`;
 
-      if (searchParams.state == 'all') apiUrl = `${this.gitlabUrl}/projects/${this.projectId}/issues?per_page=100`;
-      apiUrl = `${this.gitlabUrl}/projects/${this.projectId}/issues?search=${encodeURIComponent(title)}&per_page=100`;
+      if (searchParams.state == 'all') apiUrl = `${this.apiBaseURL}/projects/${this.projectId}/issues?per_page=100`;
+      apiUrl = `${this.apiBaseURL}/projects/${this.projectId}/issues?search=${encodeURIComponent(title)}&per_page=100`;
 
       const options = GitLab.baseOptionsHttpReq();
 
@@ -286,7 +290,7 @@ export default class GitLab {
 
     try {
       const response = await nodeFetch(
-        `${this.gitlabUrl}/projects/${this.projectId}/issues/${issue.iid}/notes`,
+        `${this.apiBaseURL}/projects/${this.projectId}/issues/${issue.iid}/notes`,
         options,
       );
       const res = await response.json();
@@ -362,5 +366,17 @@ export default class GitLab {
     options.headers = { Authorization: `Bearer ${token}` };
 
     return options;
+  }
+
+  generateDeclarationURL(serviceName) {
+    return `${this.baseURL}/${this.commonParams.owner}/${this.commonParams.repo}/-/blob/main/declarations/${encodeURIComponent(serviceName)}.json`;
+  }
+
+  generateVersionURL(serviceName, termsType) {
+    return `${this.baseURL}/${this.commonParams.owner}/${this.commonParams.repo}/-/blob/main/${encodeURIComponent(serviceName)}/${encodeURIComponent(serviceName, termsType)}.md`;
+  }
+
+  generateSnapshotsBaseUrl(serviceName, termsType) {
+    return `${this.baseURL}/${this.commonParams.owner}/${this.commonParams.repo}/-/blob/main/${encodeURIComponent(serviceName)}/${encodeURIComponent(termsType)}`;
   }
 }
