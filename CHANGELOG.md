@@ -6,8 +6,8 @@ All changes that impact users of this module are documented in this file, in the
 
 ### Added
 
-- Add support for GitLab as an alternative platform to GitHub for issue reporting
-- Add support for GitLab as an alternative platform to GitHub for publishing datasets
+- Add support for GitLab for issue reporting
+- Add support for GitLab Releases for publishing datasets
 
 ## 2.5.0 - 2024-10-29
 
