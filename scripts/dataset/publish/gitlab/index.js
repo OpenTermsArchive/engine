@@ -20,7 +20,7 @@ export default async function publish({
   let projectId = null;
   const gitlabAPIUrl = config.get('@opentermsarchive/engine.dataset.apiBaseURL');
 
-  const [ owner, repo ] = new URL(config.get('@opentermsarchive/engine.dataset.versionsRepositoryURLGitLab'))
+  const [ owner, repo ] = new URL(config.get('@opentermsarchive/engine.dataset.versionsRepositoryURL'))
     .pathname
     .split('/')
     .filter(Boolean);
@@ -101,7 +101,7 @@ export default async function publish({
     logger.debug(`package file id: ${packageFilesId}`);
 
     // use the package id to build the download url for the release
-    const publishedPackageUrl = `${config.get('@opentermsarchive/engine.dataset.versionsRepositoryURLGitLab')}/-/package_files/${packageFilesId}/download`;
+    const publishedPackageUrl = `${config.get('@opentermsarchive/engine.dataset.versionsRepositoryURL')}/-/package_files/${packageFilesId}/download`;
 
     // Create the release and link the package
     const formData = new FormData();
