@@ -1,6 +1,7 @@
 import mime from 'mime';
 
 import { toISODateWithoutMilliseconds } from '../archivist/utils/date.js';
+import logger from '../logger/index.js';
 
 import { createReporter } from './factory.js';
 
@@ -33,16 +34,53 @@ function getLabelNameFromError(error) {
 // In the following class, it is assumed that each issue is managed using its title as a unique identifier
 export default class Reporter {
   constructor(config) {
-    const { repositories } = config;
+    const normalizedConfig = Reporter.normalizeConfig(config);
 
-    for (const repositoryType of Object.keys(repositories)) {
-      if (!repositories[repositoryType].includes('/') || repositories[repositoryType].includes('https://')) {
-        throw new Error(`Configuration entry "reporter.repositories.${repositoryType}" is expected to be a string in the format <owner>/<repo>, but received: "${repositories[repositoryType]}"`);
-      }
+    Reporter.validateConfiguration(normalizedConfig.repositories);
+
+    this.reporter = createReporter(normalizedConfig);
+    this.repositories = normalizedConfig.repositories;
+  }
+
+  /**
+   * Support for legacy config format where reporter configuration was nested under "githubIssues"
+   * Example:
+   *
+   * ```json
+   * {
+   *   "githubIssues": {
+   *     "repositories": {
+   *       "declarations": "OpenTermsArchive/sandbox-declarations"
+   *     }
+   *   }
+   * }
+   * ```
+   *
+   * @deprecated
+   */
+  static normalizeConfig(config) {
+    if (config.githubIssues) {
+      logger.warn('The "reporter.githubIssues" key is deprecated; please see configuration documentation for the new format: https://docs.opentermsarchive.org/#configuring');
+
+      return {
+        type: 'github',
+        repositories: config.githubIssues.repositories,
+      };
     }
 
-    this.reporter = createReporter(config);
-    this.repositories = repositories;
+    return config;
+  }
+
+  static validateConfiguration(repositories) {
+    if (!repositories?.declarations) {
+      throw new Error('Required configuration key "reporter.repositories.declarations" was not found; issues on the declarations repository cannot be created');
+    }
+
+    for (const [ type, repo ] of Object.entries(repositories)) {
+      if (!repo.includes('/') || repo.includes('https://')) {
+        throw new Error(`Configuration entry "reporter.repositories.${type}" is expected to be a string in the format <owner>/<repo>, but received: "${repo}"`);
+      }
+    }
   }
 
   initialize() {

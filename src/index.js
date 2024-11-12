@@ -56,17 +56,13 @@ export default async function track({ services, types, extractOnly, schedule }) 
   }
 
   if (process.env.OTA_ENGINE_GITHUB_TOKEN || process.env.OTA_ENGINE_GITLAB_TOKEN) {
-    if (config.has('@opentermsarchive/engine.reporter.repositories.declarations')) {
-      try {
-        const reporter = new Reporter(config.get('@opentermsarchive/engine.reporter'));
+    try {
+      const reporter = new Reporter(config.get('@opentermsarchive/engine.reporter'));
 
-        await reporter.initialize();
-        archivist.attach(reporter);
-      } catch (error) {
-        logger.error('Cannot instantiate the Reporter module; it will be ignored:', error);
-      }
-    } else {
-      logger.warn('Configuration key "reporter.repositories.declarations" was not found; issues on the declarations repository cannot be created');
+      await reporter.initialize();
+      archivist.attach(reporter);
+    } catch (error) {
+      logger.error('Cannot instantiate the Reporter module; it will be ignored:', error);
     }
   } else {
     logger.warn('Environment variable with token for GitHub or GitLab was not found; the Reporter module will be ignored');
