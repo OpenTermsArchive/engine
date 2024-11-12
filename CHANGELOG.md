@@ -4,7 +4,7 @@ All changes that impact users of this module are documented in this file, in the
 
 ## Unreleased [minor]
 
-> Development of this release was supported by the European Commission’s [Joint Research Centre](https://commission.europa.eu/about-european-commission/departments-and-executive-agencies/joint-research-centre_en) and the [French Ministry for Foreign Affairs](https://www.diplomatie.gouv.fr/fr/politique-etrangere-de-la-france/diplomatie-numerique/) through its ministerial [State Startups incubator](https://beta.gouv.fr/startups/open-terms-archive.html) under the aegis of the Ambassador for Digital Affairs.
+> Development of this release was supported by the [European Union](https://commission.europa.eu/) and the [French Ministry for Foreign Affairs](https://www.diplomatie.gouv.fr/fr/politique-etrangere-de-la-france/diplomatie-numerique/) through its ministerial [State Startups incubator](https://beta.gouv.fr/startups/open-terms-archive.html) under the aegis of the Ambassador for Digital Affairs.
 
 ### Added
 
