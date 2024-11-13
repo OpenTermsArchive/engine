@@ -262,7 +262,6 @@ export default class GitLab {
       const res = await response.json();
 
       if (response.ok) {
-        logger.debug(`response data: ${JSON.stringify(res)}`);
         const issues = res;
 
         const [issue] = issues.filter(item => item.title === title); // since only one is expected, use the first one
