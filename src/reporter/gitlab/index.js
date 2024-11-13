@@ -379,4 +379,9 @@ export default class GitLab {
   generateSnapshotsBaseUrl(serviceName, termsType) {
     return `${this.baseURL}/${this.commonParams.owner}/${this.commonParams.repo}/-/blob/main/${encodeURIComponent(serviceName)}/${encodeURIComponent(termsType)}`;
   }
+
+  // GitLab API responses are not cached unlike GitHub, so this method only exists to satisfy the Reporter interface contract
+  clearCache() { /* eslint-disable-line class-methods-use-this */
+    logger.debug('Cache clearing not implemented for GitLab reporter as it is not needed');
+  }
 }
