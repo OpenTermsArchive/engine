@@ -43,7 +43,7 @@ export default class Reporter {
   }
 
   /**
-   * Support for legacy config format where reporter configuration was nested under "githubIssues"
+   * Support for legacy config format where reporter configuration was nested under `githubIssues`
    * Example:
    *
    * ```json
