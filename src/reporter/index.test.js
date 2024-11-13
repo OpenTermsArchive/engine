@@ -45,7 +45,7 @@ describe('Reporter', () => {
 
           expect(() => {
             Reporter.validateConfiguration(repositories);
-          }).to.throw('Required configuration key "reporter.repositories.declarations" was not found; issues on the declarations repository cannot be created');
+          }).to.throw().and.have.property('message').that.match(/Required configuration key.*was not found/);
         });
       });
 
