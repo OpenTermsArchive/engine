@@ -2,6 +2,14 @@
 
 All changes that impact users of this module are documented in this file, in the [Common Changelog](https://common-changelog.org) format with some additional specifications defined in the CONTRIBUTING file. This codebase adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased [minor]
+
+> Development of this release was supported by the [French Ministry for Foreign Affairs](https://www.diplomatie.gouv.fr/fr/politique-etrangere-de-la-france/diplomatie-numerique/) through its ministerial [State Startups incubator](https://beta.gouv.fr/startups/open-terms-archive.html) under the aegis of the Ambassador for Digital Affairs.
+
+### Changed
+
+- Delegate prefixing logs with dates to process manager in production environment; to maintain dates with PM2, use either [the `--time` CLI option](https://pm2.keymetrics.io/docs/usage/log-management/#auto-prefixing-logs-with-date) or [the `log_date_format` configuration file option](https://pm2.keymetrics.io/docs/usage/application-declaration/#log-files)
+
 ## 2.6.0 - 2024-11-19
 
 _Full changeset and discussions: [#1116](https://github.com/OpenTermsArchive/engine/pull/1116)._
