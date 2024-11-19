@@ -3,7 +3,7 @@ import { createRequire } from 'module';
 import { expect } from 'chai';
 import nock from 'nock';
 
-import GitHub from './github.js';
+import GitHub from './index.js';
 
 const require = createRequire(import.meta.url);
 

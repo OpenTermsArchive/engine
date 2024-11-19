@@ -2,7 +2,7 @@ import { createRequire } from 'module';
 
 import { Octokit } from 'octokit';
 
-import logger from '../logger/index.js';
+import logger from '../../logger/index.js';
 
 const require = createRequire(import.meta.url);
 
@@ -14,7 +14,7 @@ export default class GitHub {
   static ISSUE_STATE_ALL = 'all';
 
   constructor(repository) {
-    const { version } = require('../../package.json');
+    const { version } = require('../../../package.json');
 
     this.octokit = new Octokit({
       auth: process.env.OTA_ENGINE_GITHUB_TOKEN,
@@ -197,5 +197,17 @@ export default class GitHub {
     } catch (error) {
       logger.error(`Failed to update issue "${title}": ${error.stack}`);
     }
+  }
+
+  generateDeclarationURL(serviceName) {
+    return `https://github.com/${this.commonParams.owner}/${this.commonParams.repo}/blob/main/declarations/${encodeURIComponent(serviceName)}.json`;
+  }
+
+  generateVersionURL(serviceName, termsType) {
+    return `https://github.com/${this.commonParams.owner}/${this.commonParams.repo}/blob/main/${encodeURIComponent(serviceName)}/${encodeURIComponent(termsType)}.md`;
+  }
+
+  generateSnapshotsBaseUrl(serviceName, termsType) {
+    return `https://github.com/${this.commonParams.owner}/${this.commonParams.repo}/blob/main/${encodeURIComponent(serviceName)}/${encodeURIComponent(termsType)}`;
   }
 }
