@@ -11,5 +11,5 @@ export default function publishRelease({ archivePath, releaseDate, stats }) {
     return publishGitLab({ archivePath, releaseDate, stats });
   }
 
-  throw new Error('No GitHub or GitLab token found in environment variables (OTA_ENGINE_GITHUB_TOKEN or OTA_ENGINE_GITLAB_TOKEN). Cannot publish the dataset without authentication.');
+  throw new Error('No GitHub nor GitLab token found in environment variables (OTA_ENGINE_GITHUB_TOKEN or OTA_ENGINE_GITLAB_TOKEN). Cannot publish the dataset without authentication.');
 }
