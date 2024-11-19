@@ -10,7 +10,9 @@ logger.format = combine(
   printf(({ level, message, counter, hash, timestamp }) => {
     const prefix = counter && hash ? `${counter.toString().padEnd(6)} ${hash.padEnd(40)}` : '';
 
-    return `${timestamp} ${level.padEnd(15)} ${prefix.padEnd(50)} ${message}`;
+    const timestampPrefix = process.env.NODE_ENV !== 'production' ? `${timestamp} ` : '';
+
+    return `${timestampPrefix}${level.padEnd(15)} ${prefix.padEnd(50)} ${message}`;
   }),
 );
 
