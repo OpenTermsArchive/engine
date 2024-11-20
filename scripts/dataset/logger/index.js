@@ -7,7 +7,7 @@ const { combine, timestamp, printf, colorize } = winston.format;
 
 logger.format = combine(
   colorize(),
-  timestamp({ format: 'YYYY-MM-DDTHH:MM:SSZ' }),
+  timestamp({ format: 'YYYY-MM-DDTHH:mm:ssZ' }),
   printf(({ level, message, counter, hash, timestamp }) => {
     const prefix = counter && hash ? `${counter.toString().padEnd(6)} ${hash.padEnd(40)}` : '';
 
