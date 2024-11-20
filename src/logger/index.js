@@ -16,7 +16,7 @@ const alignedWithColorsAndTime = combine(
 
     const truncatedPrefix = servicePrefix.length > 75 ? `${servicePrefix.slice(0, 74)}…` : servicePrefix;
 
-    const timestampPrefix = process.env.NODE_ENV !== 'production' ? `${timestamp} ` : '';
+    const timestampPrefix = config.get('@opentermsarchive/engine.logger.timestampPrefix') ? `${timestamp} ` : '';
 
     return `${timestampPrefix}${level.padEnd(15)} ${truncatedPrefix.padEnd(75)} ${message}`;
   }),

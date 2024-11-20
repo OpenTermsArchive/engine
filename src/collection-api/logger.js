@@ -32,7 +32,7 @@ const logger = winston.createLogger({
     colorize(),
     timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
     printf(({ level, message, timestamp }) => {
-      const timestampPrefix = process.env.NODE_ENV !== 'production' ? `${timestamp} ` : '';
+      const timestampPrefix = config.get('@opentermsarchive/engine.logger.timestampPrefix') ? `${timestamp} ` : '';
 
       return `${timestampPrefix}${level.padEnd(15)} ${message}`;
     }),

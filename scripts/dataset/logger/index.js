@@ -1,3 +1,4 @@
+import config from 'config';
 import winston from 'winston';
 
 import logger from '../../../src/logger/index.js';
@@ -10,7 +11,7 @@ logger.format = combine(
   printf(({ level, message, counter, hash, timestamp }) => {
     const prefix = counter && hash ? `${counter.toString().padEnd(6)} ${hash.padEnd(40)}` : '';
 
-    const timestampPrefix = process.env.NODE_ENV !== 'production' ? `${timestamp} ` : '';
+    const timestampPrefix = config.get('@opentermsarchive/engine.logger.timestampPrefix') ? `${timestamp} ` : '';
 
     return `${timestampPrefix}${level.padEnd(15)} ${prefix.padEnd(50)} ${message}`;
   }),

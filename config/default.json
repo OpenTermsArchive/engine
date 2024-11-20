@@ -48,7 +48,8 @@
         "host": "smtp-relay.sendinblue.com",
         "username": "admin@opentermsarchive.org"
       },
-      "sendMailOnError": false
+      "sendMailOnError": false,
+      "timestampPrefix": true
     },
     "notifier": {
       "sendInBlue": {
