@@ -6,9 +6,9 @@ All changes that impact users of this module are documented in this file, in the
 
 > Development of this release was supported by the [French Ministry for Foreign Affairs](https://www.diplomatie.gouv.fr/fr/politique-etrangere-de-la-france/diplomatie-numerique/) through its ministerial [State Startups incubator](https://beta.gouv.fr/startups/open-terms-archive.html) under the aegis of the Ambassador for Digital Affairs.
 
-### Changed
+### Added
 
-- Delegate prefixing logs with dates to process manager in production environment; to maintain dates with PM2, use either [the `--time` CLI option](https://pm2.keymetrics.io/docs/usage/log-management/#auto-prefixing-logs-with-date) or [the `log_date_format` configuration file option](https://pm2.keymetrics.io/docs/usage/application-declaration/#log-files)
+- Add configuration option to toggle timestamp prefix in logs; set `@opentermsarchive/engine.logger.timestampPrefix` to `true` or `false` in your configuration file to control this feature.
 
 ## 2.6.0 - 2024-11-19
 
