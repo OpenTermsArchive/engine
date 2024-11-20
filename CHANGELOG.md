@@ -8,7 +8,7 @@ All changes that impact users of this module are documented in this file, in the
 
 ### Added
 
-- Add configuration option to toggle timestamp prefix in logs; set `@opentermsarchive/engine.logger.timestampPrefix` to `true` or `false` in your configuration file to control this feature.
+- Add configuration option to toggle timestamp prefix in logs; set [`@opentermsarchive/engine.logger.timestampPrefix` to `true` or `false` in your configuration file](https://docs.opentermsarchive.org/#configuring) to control this feature.
 
 ## 2.6.0 - 2024-11-19
 
