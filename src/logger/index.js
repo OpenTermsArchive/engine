@@ -8,23 +8,17 @@ const { combine, timestamp, printf, colorize } = winston.format;
 
 const alignedWithColorsAndTime = combine(
   colorize(),
-  timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
+  timestamp({ format: 'YYYY-MM-DDTHH:MM:SSZ' }),
   printf(({ level, message, timestamp, serviceId, termsType, documentId }) => {
-    let prefix = '';
+    const servicePrefix = serviceId && termsType
+      ? `${serviceId} — ${termsType}${documentId ? `:${documentId}` : ''}`
+      : '';
 
-    if (serviceId && termsType) {
-      prefix = `${serviceId} — ${termsType}`;
-    }
+    const truncatedPrefix = servicePrefix.length > 75 ? `${servicePrefix.slice(0, 74)}…` : servicePrefix;
 
-    if (documentId) {
-      prefix = `${prefix}:${documentId}`;
-    }
+    const timestampPrefix = config.get('@opentermsarchive/engine.logger.timestampPrefix') ? `${timestamp} ` : '';
 
-    if (prefix.length > 75) {
-      prefix = `${prefix.substring(0, 74)}…`;
-    }
-
-    return `${timestamp} ${level.padEnd(15)} ${prefix.padEnd(75)} ${message}`;
+    return `${timestampPrefix}${level.padEnd(15)} ${truncatedPrefix.padEnd(75)} ${message}`;
   }),
 );
 

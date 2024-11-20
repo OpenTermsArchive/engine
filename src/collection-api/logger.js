@@ -30,8 +30,12 @@ if (config.get('@opentermsarchive/engine.logger.sendMailOnError')) {
 const logger = winston.createLogger({
   format: combine(
     colorize(),
-    timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
-    printf(({ level, message, timestamp }) => `${timestamp} ${level.padEnd(15)} ${message}`),
+    timestamp({ format: 'YYYY-MM-DDTHH:MM:SSZ' }),
+    printf(({ level, message, timestamp }) => {
+      const timestampPrefix = config.get('@opentermsarchive/engine.logger.timestampPrefix') ? `${timestamp} ` : '';
+
+      return `${timestampPrefix}${level.padEnd(15)} ${message}`;
+    }),
   ),
   transports,
   rejectionHandlers: transports,
