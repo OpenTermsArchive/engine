@@ -18,7 +18,10 @@ export default class Git {
       await fs.mkdir(this.path, { recursive: true });
     }
 
-    this.git = simpleGit(this.path, { maxConcurrentProcesses: 1 });
+    this.git = simpleGit(this.path, {
+      trimmed: true,
+      maxConcurrentProcesses: 1,
+    });
 
     await this.git.init();
 
@@ -103,8 +106,8 @@ export default class Git {
     return this.git.clean('f', '-d');
   }
 
-  async getFullHash(shortHash) {
-    return (await this.git.show([ shortHash, '--pretty=%H', '-s' ])).trim();
+  getFullHash(shortHash) {
+    return this.git.show([ shortHash, '--pretty=%H', '-s' ]);
   }
 
   restore(path, commit) {
