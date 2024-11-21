@@ -64,11 +64,11 @@ export default class Git {
   }
 
   listCommits(options = []) {
-    return this.log([ '--reverse', '--no-merges', '--name-only', ...options ]);
+    return this.log([ '--reverse', '--no-merges', '--name-only', ...options ]); // Returns all commits in chronological order (`--reverse`), excluding merge commits (`--no-merges`), with modified files names (`--name-only`)
   }
 
   async getCommit(options) {
-    const [commit] = await this.listCommits([ '-1', ...options ]);
+    const [commit] = await this.listCommits([ '-1', ...options ]); // Returns only the most recent commit matching the given options
 
     return commit;
   }
