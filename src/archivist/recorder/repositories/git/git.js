@@ -125,6 +125,10 @@ export default class Git {
     return path.relative(this.path, absolutePath); // Git needs a path relative to the .git directory, not an absolute one
   }
 
+  async listFiles(path) {
+    return (await this.git.raw([ 'ls-files', path ])).split('\n');
+  }
+
   async writeCommitGraph() {
     await this.git.raw([ 'commit-graph', 'write', '--reachable', '--changed-paths' ]);
   }
