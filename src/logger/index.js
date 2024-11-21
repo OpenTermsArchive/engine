@@ -8,7 +8,7 @@ const { combine, timestamp, printf, colorize } = winston.format;
 
 const alignedWithColorsAndTime = combine(
   colorize(),
-  timestamp({ format: 'YYYY-MM-DDTHH:MM:SSZ' }),
+  timestamp({ format: 'YYYY-MM-DDTHH:mm:ssZ' }),
   printf(({ level, message, timestamp, serviceId, termsType, documentId }) => {
     const servicePrefix = serviceId && termsType
       ? `${serviceId} — ${termsType}${documentId ? `:${documentId}` : ''}`
