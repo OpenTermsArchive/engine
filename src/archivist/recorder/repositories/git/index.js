@@ -29,6 +29,7 @@ export default class GitRepository extends RepositoryInterface {
   async initialize() {
     await this.git.initialize();
     await this.git.cleanUp(); // Drop all uncommitted changes and remove all leftover files that may be present if the process was killed aggressively
+    await this.git.writeCommitGraph(); // Create or replace the commit graph with a new one to ensure it's fully consistent
 
     return this;
   }
@@ -56,12 +57,12 @@ export default class GitRepository extends RepositoryInterface {
     return record;
   }
 
-  finalize() {
-    if (!this.needsPublication) {
-      return;
+  async finalize() {
+    if (this.needsPublication) {
+      await this.git.pushChanges();
     }
 
-    return this.git.pushChanges();
+    return this.git.updateCommitGraph();
   }
 
   async findLatest(serviceId, termsType, documentId) {

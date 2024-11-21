@@ -30,7 +30,8 @@ export default class Git {
       .addConfig('push.default', 'current')
       .addConfig('user.name', this.author.name)
       .addConfig('user.email', this.author.email)
-      .addConfig('core.quotePath', false); // disable Git's encoding of special characters in pathnames. For example, `service·A` will be encoded as `service\302\267A` without this setting, leading to issues. See https://git-scm.com/docs/git-config#Documentation/git-config.txt-corequotePath
+      .addConfig('core.quotePath', false) // Disable Git's encoding of special characters in pathnames. For example, `service·A` will be encoded as `service\302\267A` without this setting, leading to issues. See https://git-scm.com/docs/git-config#Documentation/git-config.txt-corequotePath
+      .addConfig('core.commitGraph', true); // Enable `commit-graph` feature for efficient commit data storage, improving performance of operations like `git log`
   }
 
   add(filePath) {
@@ -122,5 +123,13 @@ export default class Git {
 
   relativePath(absolutePath) {
     return path.relative(this.path, absolutePath); // Git needs a path relative to the .git directory, not an absolute one
+  }
+
+  async writeCommitGraph() {
+    await this.git.raw([ 'commit-graph', 'write', '--reachable', '--changed-paths' ]);
+  }
+
+  async updateCommitGraph() {
+    await this.git.raw([ 'commit-graph', 'write', '--reachable', '--changed-paths', '--append' ]);
   }
 }
