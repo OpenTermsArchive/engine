@@ -28,6 +28,7 @@ export const EVENTS = [
   'trackingStarted',
   'trackingCompleted',
   'inaccessibleContent',
+  'info',
   'error',
   'pluginError',
 ];
@@ -45,6 +46,7 @@ export default class Archivist extends events.EventEmitter {
   }
 
   async initialize() {
+    this.emit('info', 'Initializing engine…');
     if (this.services) {
       return;
     }
@@ -66,6 +68,8 @@ export default class Archivist extends events.EventEmitter {
       await this.recorder.finalize().then(() => console.log('Recorder finalized'));
       process.exit(1);
     });
+
+    this.emit('info', 'Initialization completed');
 
     return this;
   }
