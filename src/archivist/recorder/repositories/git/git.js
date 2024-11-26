@@ -46,7 +46,7 @@ export default class Git {
       process.env.GIT_AUTHOR_DATE = commitDate;
       process.env.GIT_COMMITTER_DATE = commitDate;
 
-      summary = await this.git.commit(message, filePath);
+      summary = await this.git.commit(message, filePath, ['--no-verify']); // Skip pre-commit and commit-msg hooks, as commits are programmatically managed, to optimize performance
     } finally {
       process.env.GIT_AUTHOR_DATE = '';
       process.env.GIT_COMMITTER_DATE = '';
