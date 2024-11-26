@@ -144,7 +144,13 @@ export default class Archivist extends events.EventEmitter {
       return;
     }
 
-    return this.recordVersion(terms, extractOnly);
+    await this.recordVersion(terms, extractOnly);
+
+    terms.sourceDocuments.forEach(sourceDocument => {
+      sourceDocument.content = null; // Reduce memory usage by clearing no longer needed large content strings
+      sourceDocument.mimeType = null; // …and associated MIME type
+      sourceDocument.snapshotId = null; // …and associated snapshot ID for consistency
+    });
   }
 
   async fetchSourceDocuments(terms) {
