@@ -18,7 +18,10 @@ export default class Git {
       await fs.mkdir(this.path, { recursive: true });
     }
 
-    this.git = simpleGit(this.path, { maxConcurrentProcesses: 1 });
+    this.git = simpleGit(this.path, {
+      trimmed: true,
+      maxConcurrentProcesses: 1,
+    });
 
     await this.git.init();
 
@@ -27,7 +30,8 @@ export default class Git {
       .addConfig('push.default', 'current')
       .addConfig('user.name', this.author.name)
       .addConfig('user.email', this.author.email)
-      .addConfig('core.quotePath', false); // disable Git's encoding of special characters in pathnames. For example, `service·A` will be encoded as `service\302\267A` without this setting, leading to issues. See https://git-scm.com/docs/git-config#Documentation/git-config.txt-corequotePath
+      .addConfig('core.quotePath', false) // Disable Git's encoding of special characters in pathnames. For example, `service·A` will be encoded as `service\302\267A` without this setting, leading to issues. See https://git-scm.com/docs/git-config#Documentation/git-config.txt-corequotePath
+      .addConfig('core.commitGraph', true); // Enable `commit-graph` feature for efficient commit data storage, improving performance of operations like `git log`
   }
 
   add(filePath) {
@@ -42,7 +46,7 @@ export default class Git {
       process.env.GIT_AUTHOR_DATE = commitDate;
       process.env.GIT_COMMITTER_DATE = commitDate;
 
-      summary = await this.git.commit(message, filePath);
+      summary = await this.git.commit(message, filePath, ['--no-verify']); // Skip pre-commit and commit-msg hooks, as commits are programmatically managed, to optimize performance
     } finally {
       process.env.GIT_AUTHOR_DATE = '';
       process.env.GIT_COMMITTER_DATE = '';
@@ -60,11 +64,11 @@ export default class Git {
   }
 
   listCommits(options = []) {
-    return this.log([ '--reverse', '--no-merges', '--name-only', ...options ]);
+    return this.log([ '--reverse', '--no-merges', '--name-only', ...options ]); // Returns all commits in chronological order (`--reverse`), excluding merge commits (`--no-merges`), with modified files names (`--name-only`)
   }
 
   async getCommit(options) {
-    const [commit] = await this.listCommits([ '-1', ...options ]);
+    const [commit] = await this.listCommits([ '-1', ...options ]); // Returns only the most recent commit matching the given options
 
     return commit;
   }
@@ -103,8 +107,8 @@ export default class Git {
     return this.git.clean('f', '-d');
   }
 
-  async getFullHash(shortHash) {
-    return (await this.git.show([ shortHash, '--pretty=%H', '-s' ])).trim();
+  getFullHash(shortHash) {
+    return this.git.show([ shortHash, '--pretty=%H', '-s' ]);
   }
 
   restore(path, commit) {
@@ -119,5 +123,17 @@ export default class Git {
 
   relativePath(absolutePath) {
     return path.relative(this.path, absolutePath); // Git needs a path relative to the .git directory, not an absolute one
+  }
+
+  async listFiles(path) {
+    return (await this.git.raw([ 'ls-files', path ])).split('\n');
+  }
+
+  async writeCommitGraph() {
+    await this.git.raw([ 'commit-graph', 'write', '--reachable', '--changed-paths' ]);
+  }
+
+  async updateCommitGraph() {
+    await this.git.raw([ 'commit-graph', 'write', '--reachable', '--changed-paths', '--append' ]);
   }
 }

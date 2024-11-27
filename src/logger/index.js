@@ -4,6 +4,8 @@ import config from 'config';
 import winston from 'winston';
 import 'winston-mail';
 
+import { formatDuration } from './utils.js';
+
 const { combine, timestamp, printf, colorize } = winston.format;
 
 const alignedWithColorsAndTime = combine(
@@ -82,6 +84,7 @@ logger.configure({
 
 let recordedSnapshotsCount;
 let recordedVersionsCount;
+let trackingStartTime;
 
 logger.onFirstSnapshotRecorded = ({ serviceId, termsType, documentId, id }) => {
   logger.info({ message: `Recorded first snapshot with id ${id}`, serviceId, termsType, documentId });
@@ -119,14 +122,17 @@ logger.onTrackingStarted = (numberOfServices, numberOfTerms, extractOnly) => {
   }
   recordedSnapshotsCount = 0;
   recordedVersionsCount = 0;
+  trackingStartTime = Date.now();
 };
 
 logger.onTrackingCompleted = (numberOfServices, numberOfTerms, extractOnly) => {
+  const duration = formatDuration(Date.now() - trackingStartTime);
+
   if (extractOnly) {
-    logger.info(`Examined ${numberOfTerms} terms from ${numberOfServices} services for extraction`);
+    logger.info(`Examined ${numberOfTerms} terms from ${numberOfServices} services for extraction in ${duration}`);
     logger.info(`Recorded ${recordedVersionsCount} new versions\n`);
   } else {
-    logger.info(`Tracked changes of ${numberOfTerms} terms from ${numberOfServices} services`);
+    logger.info(`Tracked changes of ${numberOfTerms} terms from ${numberOfServices} services in ${duration}`);
     logger.info(`Recorded ${recordedSnapshotsCount} new snapshots and ${recordedVersionsCount} new versions\n`);
   }
 };
@@ -137,6 +143,10 @@ logger.onInaccessibleContent = ({ message }, terms) => {
 
 logger.onError = (error, terms) => {
   logger.error({ message: error.stack, serviceId: terms.service.id, termsType: terms.type });
+};
+
+logger.onInfo = message => {
+  logger.info({ message });
 };
 
 logger.onPluginError = (error, pluginName) => {
