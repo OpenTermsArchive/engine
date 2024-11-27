@@ -8,7 +8,7 @@ All changes that impact users of this module are documented in this file, in the
 
 ### Changed
 
-- Optimize performance when Git is used as storage repository
+- Optimize performance for Git storage
 
 ## 2.7.1 - 2024-11-21
 
