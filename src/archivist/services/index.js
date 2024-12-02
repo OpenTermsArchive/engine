@@ -1,4 +1,4 @@
-import fsApi from 'fs';
+import fs from 'fs/promises';
 import path from 'path';
 import { pathToFileURL } from 'url';
 
@@ -8,8 +8,8 @@ import Service from './service.js';
 import SourceDocument from './sourceDocument.js';
 import Terms from './terms.js';
 
-const fs = fsApi.promises;
-const declarationsPath = path.resolve(process.cwd(), config.get('@opentermsarchive/engine.services.declarationsPath'));
+export const DECLARATIONS_PATH = './declarations';
+const declarationsPath = path.resolve(process.cwd(), config.get('@opentermsarchive/engine.collectionPath'), DECLARATIONS_PATH);
 
 export async function load(servicesIdsToLoad = []) {
   let servicesIds = await getDeclaredServicesIds();

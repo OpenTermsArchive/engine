@@ -16,8 +16,8 @@ const ESLINT_CONFIG_PATH = path.join(ROOT_PATH, '.eslintrc.yaml');
 const eslint = new ESLint({ overrideConfigFile: ESLINT_CONFIG_PATH, fix: false });
 const eslintWithFix = new ESLint({ overrideConfigFile: ESLINT_CONFIG_PATH, fix: true });
 
-const declarationsPath = path.resolve(process.cwd(), config.get('@opentermsarchive/engine.services.declarationsPath'));
-const instancePath = path.resolve(declarationsPath, '../');
+const instancePath = path.resolve(process.cwd(), config.get('@opentermsarchive/engine.collectionPath'));
+const declarationsPath = path.resolve(instancePath, services.DECLARATIONS_PATH);
 
 export default async options => {
   let servicesToValidate = options.services || [];

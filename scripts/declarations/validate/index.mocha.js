@@ -19,8 +19,8 @@ const fs = fsApi.promises;
 const MIN_DOC_LENGTH = 100;
 const SLOW_DOCUMENT_THRESHOLD = 10 * 1000; // number of milliseconds after which a document fetch is considered slow
 
-const declarationsPath = path.resolve(process.cwd(), config.get('@opentermsarchive/engine.services.declarationsPath'));
-const instancePath = path.resolve(declarationsPath, '../');
+const instancePath = path.resolve(process.cwd(), config.get('@opentermsarchive/engine.collectionPath'));
+const declarationsPath = path.resolve(instancePath, services.DECLARATIONS_PATH);
 
 export default async options => {
   const schemaOnly = options.schemaOnly || false;
