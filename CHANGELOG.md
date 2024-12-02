@@ -2,6 +2,14 @@
 
 All changes that impact users of this module are documented in this file, in the [Common Changelog](https://common-changelog.org) format with some additional specifications defined in the CONTRIBUTING file. This codebase adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased [major]
+
+> Development of this release was supported by the [French Ministry for Foreign Affairs](https://www.diplomatie.gouv.fr/fr/politique-etrangere-de-la-france/diplomatie-numerique/) through its ministerial [State Startups incubator](https://beta.gouv.fr/startups/open-terms-archive.html) under the aegis of the Ambassador for Digital Affairs.
+
+### Changed
+
+- **Breaking:** Updated peer dependency `@opentermsarchive/terms-types` to `v2.0.0`; in your declarations, if you define a specific version of this library, ensure to also upgrade it to `v2.0.0` to avoid compatibility issues; see [terms-types@2.0.0](https://github.com/OpenTermsArchive/terms-types/blob/main/CHANGELOG.md#200---2024-12-02) for details
+
 ## 2.7.2 - 2024-11-27
 
 _Full changeset and discussions: [#1121](https://github.com/OpenTermsArchive/engine/pull/1121)._
