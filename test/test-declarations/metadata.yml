@@ -14,7 +14,7 @@ jurisdictions:
   - EU
 governance:
   hosts: 
-    - name: Computer test
+    - name: Localhost
   administrators:
     - name: Open Terms Archive
       url: https://opentermsarchive.org/

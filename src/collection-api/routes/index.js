@@ -32,6 +32,7 @@ export default async function apiRouter(basePath) {
 
   const services = await Services.load();
 
+  router.use(await metadataRouter(services));
   router.use(servicesRouter(services));
   router.use(versionsRouter);
 
