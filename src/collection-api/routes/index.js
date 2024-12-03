@@ -1,3 +1,6 @@
+import path from 'path';
+
+import config from 'config';
 import express from 'express';
 import helmet from 'helmet';
 
@@ -30,9 +33,10 @@ export default async function apiRouter(basePath) {
     res.json({ message: 'Welcome to an instance of the Open Terms Archive API. Documentation is available at /docs. Learn more on Open Terms Archive on https://opentermsarchive.org.' });
   });
 
+  const collectionPath = path.resolve(process.cwd(), config.get('@opentermsarchive/engine.collectionPath'));
   const services = await Services.load();
 
-  router.use(await metadataRouter(services));
+  router.use(await metadataRouter(collectionPath, services));
   router.use(servicesRouter(services));
   router.use(versionsRouter);
 

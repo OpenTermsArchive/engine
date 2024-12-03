@@ -1,7 +1,6 @@
 import fs from 'fs/promises';
 import path from 'path';
 
-import config from 'config';
 import express from 'express';
 import yaml from 'js-yaml';
 
@@ -128,9 +127,9 @@ import Service from '../../archivist/services/service.js';
  *           format: uri
  *           description: URL to the organization's logo
  */
-export default async function metadataRouter(services) {
+export default async function metadataRouter(collectionPath, services) {
   const router = express.Router();
-  const collectionPath = path.resolve(process.cwd(), config.get('@opentermsarchive/engine.collectionPath'));
+
   const STATIC_METADATA = yaml.load(await fs.readFile(path.join(collectionPath, '/metadata.yml'), 'utf8'));
   const { version: engineVersion } = JSON.parse(await fs.readFile(new URL('../../../package.json', import.meta.url)));
 
