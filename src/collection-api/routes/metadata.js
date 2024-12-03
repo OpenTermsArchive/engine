@@ -154,8 +154,8 @@ export default async function metadataRouter(services) {
     };
 
     res.json({
-      ...dynamicMetadata,
       ...STATIC_METADATA,
+      ...dynamicMetadata,
     });
   });
 
