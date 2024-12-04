@@ -1,9 +1,7 @@
 {
   "@opentermsarchive/engine": {
     "trackingSchedule": "30 */12 * * *",
-    "services": {
-      "declarationsPath": "./declarations"
-    },
+    "collectionPath": "./",
     "recorder": {
       "versions": {
         "storage": {

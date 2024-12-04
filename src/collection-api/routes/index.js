@@ -1,11 +1,17 @@
+import path from 'path';
+
+import config from 'config';
 import express from 'express';
 import helmet from 'helmet';
 
+import * as Services from '../../archivist/services/index.js';
+
 import docsRouter from './docs.js';
+import metadataRouter from './metadata.js';
 import servicesRouter from './services.js';
 import versionsRouter from './versions.js';
 
-export default function apiRouter(basePath) {
+export default async function apiRouter(basePath) {
   const router = express.Router();
 
   const defaultDirectives = helmet.contentSecurityPolicy.getDefaultDirectives();
@@ -27,7 +33,11 @@ export default function apiRouter(basePath) {
     res.json({ message: 'Welcome to an instance of the Open Terms Archive API. Documentation is available at /docs. Learn more on Open Terms Archive on https://opentermsarchive.org.' });
   });
 
-  router.use(servicesRouter);
+  const collectionPath = path.resolve(process.cwd(), config.get('@opentermsarchive/engine.collectionPath'));
+  const services = await Services.load();
+
+  router.use(await metadataRouter(collectionPath, services));
+  router.use(servicesRouter(services));
   router.use(versionsRouter);
 
   return router;

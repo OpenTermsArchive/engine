@@ -1,8 +1,6 @@
 {
   "@opentermsarchive/engine": {
-    "services": {
-      "declarationsPath": "./test/services"
-    },
+    "collectionPath": "./test/test-declarations",
     "recorder": {
       "versions": {
         "storage": {

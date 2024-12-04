@@ -1,9 +1,5 @@
 import express from 'express';
 
-import * as Services from '../../archivist/services/index.js';
-
-const services = await Services.load();
-
 /**
  * @swagger
  * tags:
@@ -54,106 +50,108 @@ const services = await Services.load();
  *                       items:
  *                         type: string
  */
-const router = express.Router();
+export default function servicesRouter(services) {
+  const router = express.Router();
 
-/**
- * @swagger
- * /services:
- *   get:
- *     summary: Enumerate all services.
- *     tags: [Services]
- *     produces:
- *       - application/json
- *     responses:
- *       200:
- *         description: A JSON array of all services.
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 type: object
- *                 properties:
- *                   id:
- *                     type: string
- *                     description: The ID of the service.
- *                   name:
- *                     type: string
- *                     description: The name of the service.
- *                   terms:
- *                     type: array
- *                     description: The declared terms types for this service.
- *                     items:
- *                       type: object
- *                       properties:
- *                         type:
- *                           type: string
- *                           description: The type of terms.
- */
-router.get('/services', (req, res) => {
-  res.status(200).json(Object.values(services).map(service => ({
-    id: service.id,
-    name: service.name,
-    terms: service.getTermsTypes().map(type => ({ type })),
-  })));
-});
-
-/**
- * @swagger
- * /service/{serviceId}:
- *   get:
- *     summary: Retrieve the declaration of a specific service through its ID.
- *     tags: [Services]
- *     produces:
- *       - application/json
- *     parameters:
- *       - in: path
- *         name: serviceId
- *         description: The ID of the service.
- *         schema:
- *           type: string
- *         required: true
- *         examples:
- *             service-1:
- *               value: service-1
- *               summary: Simple service ID
- *             service-2:
- *               value: Service 2!
- *               summary: Service ID with spaces and special characters
- *     responses:
- *       200:
- *         description: The full JSON declaration of the service with the given ID.
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Service'
- *       404:
- *         description: No service matching the provided ID is found.
- */
-router.get('/service/:serviceId', (req, res) => {
-  const matchedServiceID = Object.keys(services).find(key => key.toLowerCase() === req.params.serviceId?.toLowerCase());
-  const service = services[matchedServiceID];
-
-  if (!service) {
-    res.status(404).send('Service not found');
-
-    return;
-  }
-
-  res.status(200).json({
-    id: service.id,
-    name: service.name,
-    terms: service.getTerms().map(terms => ({
-      type: terms.type,
-      sourceDocuments: terms.sourceDocuments.map(({ location, contentSelectors, insignificantContentSelectors, filters, executeClientScripts }) => ({
-        location,
-        contentSelectors,
-        insignificantContentSelectors,
-        executeClientScripts,
-        filters: filters?.map(filter => filter.name),
-      })),
-    })),
+  /**
+   * @swagger
+   * /services:
+   *   get:
+   *     summary: Enumerate all services.
+   *     tags: [Services]
+   *     produces:
+   *       - application/json
+   *     responses:
+   *       200:
+   *         description: A JSON array of all services.
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: array
+   *               items:
+   *                 type: object
+   *                 properties:
+   *                   id:
+   *                     type: string
+   *                     description: The ID of the service.
+   *                   name:
+   *                     type: string
+   *                     description: The name of the service.
+   *                   terms:
+   *                     type: array
+   *                     description: The declared terms types for this service.
+   *                     items:
+   *                       type: object
+   *                       properties:
+   *                         type:
+   *                           type: string
+   *                           description: The type of terms.
+   */
+  router.get('/services', (req, res) => {
+    res.status(200).json(Object.values(services).map(service => ({
+      id: service.id,
+      name: service.name,
+      terms: service.getTermsTypes().map(type => ({ type })),
+    })));
   });
-});
 
-export default router;
+  /**
+   * @swagger
+   * /service/{serviceId}:
+   *   get:
+   *     summary: Retrieve the declaration of a specific service through its ID.
+   *     tags: [Services]
+   *     produces:
+   *       - application/json
+   *     parameters:
+   *       - in: path
+   *         name: serviceId
+   *         description: The ID of the service.
+   *         schema:
+   *           type: string
+   *         required: true
+   *         examples:
+   *             service-1:
+   *               value: service-1
+   *               summary: Simple service ID
+   *             service-2:
+   *               value: Service 2!
+   *               summary: Service ID with spaces and special characters
+   *     responses:
+   *       200:
+   *         description: The full JSON declaration of the service with the given ID.
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/Service'
+   *       404:
+   *         description: No service matching the provided ID is found.
+   */
+  router.get('/service/:serviceId', (req, res) => {
+    const matchedServiceID = Object.keys(services).find(key => key.toLowerCase() === req.params.serviceId?.toLowerCase());
+    const service = services[matchedServiceID];
+
+    if (!service) {
+      res.status(404).send('Service not found');
+
+      return;
+    }
+
+    res.status(200).json({
+      id: service.id,
+      name: service.name,
+      terms: service.getTerms().map(terms => ({
+        type: terms.type,
+        sourceDocuments: terms.sourceDocuments.map(({ location, contentSelectors, insignificantContentSelectors, filters, executeClientScripts }) => ({
+          location,
+          contentSelectors,
+          insignificantContentSelectors,
+          executeClientScripts,
+          filters: filters?.map(filter => filter.name),
+        })),
+      })),
+    });
+  });
+
+  return router;
+}

@@ -70,6 +70,6 @@ export default class Service {
   }
 
   static getNumberOfTerms(services, servicesIds, termsTypes) {
-    return servicesIds.reduce((acc, serviceId) => acc + services[serviceId].getNumberOfTerms(termsTypes), 0);
+    return (servicesIds || Object.keys(services)).reduce((acc, serviceId) => acc + services[serviceId].getNumberOfTerms(termsTypes), 0);
   }
 }
