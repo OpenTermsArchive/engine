@@ -58,6 +58,10 @@ const PACKAGE_JSON_PATH = '../../../package.json';
  *           type: string
  *           format: uri
  *           description: URL to the snapshots repository
+ *         donations:
+ *           type: string
+ *           format: uri
+ *           description: URL to the donations page
  *         logo:
  *           type: string
  *           format: uri
@@ -94,41 +98,23 @@ const PACKAGE_JSON_PATH = '../../../package.json';
  *                 description: The date when tracking ended for this period
  *         governance:
  *           type: object
- *           properties:
- *             hosts:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/Organization'
- *             administrators:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/Organization'
- *             curators:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/Organization'
- *             maintainers:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/Organization'
- *             sponsors:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/Organization'
- *     Organization:
- *       type: object
- *       properties:
- *         name:
- *           type: string
- *           description: Name of the organization
- *         url:
- *           type: string
- *           format: uri
- *           description: URL to the organization's website
- *         logo:
- *           type: string
- *           format: uri
- *           description: URL to the organization's logo
+ *           additionalProperties:
+ *             type: object
+ *             properties:
+ *               url:
+ *                 type: string
+ *                 format: uri
+ *                 description: URL to the entity's website
+ *               logo:
+ *                 type: string
+ *                 format: uri
+ *                 description: URL to the entity's logo
+ *               roles:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                   enum: [host, administrator, curator, maintainer, sponsor]
+ *                   description: Roles of the entity within the governance
  */
 export default async function metadataRouter(collectionPath, services) {
   const router = express.Router();
