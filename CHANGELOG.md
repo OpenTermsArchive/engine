@@ -18,7 +18,7 @@ _Full changeset and discussions: [#1123](https://github.com/OpenTermsArchive/eng
 
 ### Added
 
-- Expose collection metadata through the collection API; requires a [metadata file](https://docs.opentermsarchive.org/collections/metadata/) at the root of your collection folder
+- **Breaking:** Expose collection metadata through the collection API; ensure to add the required [metadata file](https://docs.opentermsarchive.org/collections/metadata/) at the root of your collection folder
 
 ### Changed
 
