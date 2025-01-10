@@ -249,10 +249,9 @@ export default class GitLab {
 
   async getIssue({ title, ...searchParams }) {
     try {
-      let apiUrl = `${this.apiBaseURL}/projects/${this.projectId}/issues?state=${searchParams.state}&per_page=100`;
+      let apiUrl = `${this.apiBaseURL}/projects/${this.projectId}/issues?search=${encodeURIComponent(title)}&state=${searchParams.state}&per_page=100`;
 
-      if (searchParams.state == 'all') apiUrl = `${this.apiBaseURL}/projects/${this.projectId}/issues?per_page=100`;
-      apiUrl = `${this.apiBaseURL}/projects/${this.projectId}/issues?search=${encodeURIComponent(title)}&per_page=100`;
+      if (searchParams.state == 'all') apiUrl = `${this.apiBaseURL}/projects/${this.projectId}/issues?search=${encodeURIComponent(title)}&per_page=100`;
 
       const options = GitLab.baseOptionsHttpReq();
 
