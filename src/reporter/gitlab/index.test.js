@@ -212,7 +212,33 @@ describe('GitLab', function () {
         .get(`/projects/${PROJECT_ID}/issues?search=${encodeURIComponent(ISSUE.title)}&per_page=100`)
         .reply(200, [ ISSUE, ANOTHER_ISSUE ]);
 
-      result = await gitlab.getIssue({ title: ISSUE.title });
+      result = await gitlab.getIssue({ title: ISSUE.title, state: GitLab.ISSUE_STATE_ALL });
+    });
+
+    after(nock.cleanAll);
+
+    it('searches for the issue', () => {
+      expect(scope.isDone()).to.be.true;
+    });
+
+    it('returns the expected issue', () => {
+      expect(result).to.deep.equal(ISSUE);
+    });
+  });
+
+  describe('#getIssueWithStatus', () => {
+    let scope;
+    let result;
+
+    const ISSUE = { number: 123, title: 'Test Issue', state: 'opened' };
+    const ANOTHER_ISSUE = { number: 124, title: 'Test Issue 2', state: 'opened' };
+
+    before(async () => {
+      scope = nock(gitlab.apiBaseURL)
+        .get(`/projects/${PROJECT_ID}/issues?search=${encodeURIComponent(ISSUE.title)}&state=${GitLab.ISSUE_STATE_OPEN}&per_page=100`)
+        .reply(200, [ ISSUE, ANOTHER_ISSUE ]);
+
+      result = await gitlab.getIssue({ title: ISSUE.title, state: GitLab.ISSUE_STATE_OPEN });
     });
 
     after(nock.cleanAll);
@@ -265,7 +291,7 @@ describe('GitLab', function () {
 
       before(async () => {
         nock(gitlab.apiBaseURL)
-          .get(`/projects/${PROJECT_ID}/issues?search=${encodeURIComponent(ISSUE.title)}&per_page=100`)
+          .get(`/projects/${PROJECT_ID}/issues?search=${encodeURIComponent(ISSUE.title)}&state=${GitLab.ISSUE_STATE_OPEN}&per_page=100`)
           .reply(200, [ISSUE]);
 
         addCommentScope = nock(gitlab.apiBaseURL)
