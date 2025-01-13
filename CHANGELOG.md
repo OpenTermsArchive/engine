@@ -4,6 +4,8 @@ All changes that impact users of this module are documented in this file, in the
 
 ## Unreleased [minor]
 
+> Development of this release was supported by the [European Union](https://commission.europa.eu/).
+
 ### Fixed
 - Fix functionality of filtering by status for the issues list on GitLab
 
