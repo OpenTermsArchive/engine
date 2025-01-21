@@ -39,7 +39,7 @@ jobs:
     strategy:
       matrix:
         operating_system: 
-          - ubuntu-latest 
+          - ubuntu-22.04 # Using Ubuntu 22.04 due to AppArmor restrictions in newer versions (23.10+) that interfere with Puppeteer's sandbox functionality. See https://pptr.dev/troubleshooting#issues-with-apparmor-on-ubuntu
           - windows-latest
           - macos-latest
       fail-fast: false # run tests on other operating systems even if one fails
