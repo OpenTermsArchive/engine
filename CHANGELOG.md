@@ -2,6 +2,13 @@
 
 All changes that impact users of this module are documented in this file, in the [Common Changelog](https://common-changelog.org) format with some additional specifications defined in the CONTRIBUTING file. This codebase adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased [patch]
+
+> Development of this release was supported by the [European Union](https://commission.europa.eu/).
+
+### Fixed
+- Fix functionality of filtering by status for the issues list on GitLab
+
 ## 4.0.1 - 2024-12-11
 
 _Full changeset and discussions: [#1124](https://github.com/OpenTermsArchive/engine/pull/1124)._
