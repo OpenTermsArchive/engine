@@ -193,7 +193,6 @@ function assertValid(schema, subject) {
     const jsonLines = sourceMap.json.split('\n');
 
     validator.errors.forEach(error => {
-      console.log('error', error);
       errorMessage += `\n\n${validator.errorsText([error])}`;
       const errorPointer = sourceMap.pointers[error.dataPath];
 
