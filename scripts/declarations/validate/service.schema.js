@@ -67,7 +67,10 @@ const schema = {
     singleSourceDocumentTerms: {
       allOf: [
         { $ref: '#/definitions/sourceDocument' },
-        { required: [ 'fetch', 'select' ] },
+        {
+          type: 'object',
+          required: [ 'fetch', 'select' ],
+        },
       ],
     },
     multipleSourceDocumentsTerms: {

@@ -34,5 +34,7 @@ export default function specsRouter(basePath) {
     return swaggerUi.setup(specs)(req, res);
   });
 
+  router.specs = specs;
+
   return router;
 }

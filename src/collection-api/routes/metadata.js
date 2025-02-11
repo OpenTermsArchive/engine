@@ -19,6 +19,7 @@ const PACKAGE_JSON_PATH = '../../../package.json';
  *     Metadata:
  *       type: object
  *       description: Collection metadata
+ *       additionalProperties: false
  *       properties:
  *         id:
  *           type: string
@@ -69,18 +70,21 @@ const PACKAGE_JSON_PATH = '../../../package.json';
  *           description: URL to the collection logo
  *         languages:
  *           type: array
+ *           description: List of ISO 639-1 (two-letter) language codes representing languages allowed by the collection
  *           items:
  *             type: string
- *           description: List of ISO 639 language codes representing languages allowed by the collection
+ *             format: iso639-1
  *         jurisdictions:
  *           type: array
+ *           description: List of ISO 3166-2 country codes representing jurisdictions covered by the collection
  *           items:
  *             type: string
- *           description: List of ISO 3166-2 country codes representing jurisdictions covered by the collection
+ *             format: iso3166-2
  *         trackingPeriods:
  *           type: array
  *           items:
  *             type: object
+ *             additionalProperties: false
  *             properties:
  *               startDate:
  *                 type: string
@@ -88,6 +92,7 @@ const PACKAGE_JSON_PATH = '../../../package.json';
  *                 description: The date when tracking started for this period
  *               schedule:
  *                 type: string
+ *                 format: cron-expression
  *                 description: A cron expression defining when terms are tracked (e.g. "0 0 * * *" for daily at midnight)
  *               serverLocation:
  *                 type: string
@@ -100,6 +105,7 @@ const PACKAGE_JSON_PATH = '../../../package.json';
  *           type: object
  *           additionalProperties:
  *             type: object
+ *             additionalProperties: false
  *             properties:
  *               url:
  *                 type: string
@@ -115,6 +121,11 @@ const PACKAGE_JSON_PATH = '../../../package.json';
  *                   type: string
  *                   enum: [host, administrator, curator, maintainer, sponsor]
  *                   description: Roles of the entity within the governance
+ *         i18n:
+ *           type: object
+ *           description: Internationalization of any of the Metadata properties (except i18n itself) for different language codes
+ *           additionalProperties:
+ *             type: object
  */
 export default async function metadataRouter(collectionPath, services) {
   const router = express.Router();
