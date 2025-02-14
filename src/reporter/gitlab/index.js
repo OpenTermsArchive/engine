@@ -42,7 +42,7 @@ export default class GitLab {
       if (response.ok) {
         this.projectId = res.id;
       } else {
-        logger.error(`Error while obtaining projectId: ${JSON.strinfigy(res)}`);
+        logger.error(`Error while obtaining projectId: ${JSON.stringify(res)}`);
         this.projectId = null;
       }
     } catch (error) {
