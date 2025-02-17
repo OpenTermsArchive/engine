@@ -2,6 +2,7 @@ import fsApi from 'fs';
 import path from 'path';
 
 import Ajv from 'ajv';
+import addFormats from 'ajv-formats';
 import { expect } from 'chai';
 import config from 'config';
 import jsonSourceMap from 'json-source-map';
@@ -178,10 +179,9 @@ export default async options => {
   run();
 };
 
-const validator = new Ajv({
-  allErrors: true,
-  jsonPointers: true,
-});
+const validator = new Ajv({ allErrors: true });
+
+addFormats(validator);
 
 function assertValid(schema, subject) {
   const valid = validator.validate(schema, subject);
@@ -193,7 +193,6 @@ function assertValid(schema, subject) {
     const jsonLines = sourceMap.json.split('\n');
 
     validator.errors.forEach(error => {
-      console.log('error', error);
       errorMessage += `\n\n${validator.errorsText([error])}`;
       const errorPointer = sourceMap.pointers[error.dataPath];
 
