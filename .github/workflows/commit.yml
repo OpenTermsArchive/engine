@@ -18,7 +18,9 @@ jobs:
           ref: ${{ github.event.pull_request.base.ref }}
 
       - name: Checkout the current pull request branch
-        run: git checkout ${{ github.event.pull_request.head.ref }}
+        run: |
+          git fetch --no-tags origin +refs/pull/${{ github.event.pull_request.number }}/head:${{ github.event.pull_request.head.ref }}
+          git checkout ${{ github.event.pull_request.head.ref }}
 
       - name: Install dependencies
         run: npm ci
