@@ -35,7 +35,7 @@ export async function runMochaTests(mocha, testPath) {
   }
 }
 
-process.on('unhandledRejection', reason => { // Mocha catches unhandled rejection from the user code and re-emits them to the process (see https://github.com/mochajs/mocha/blob/master/lib/runner.js#L198)
+process.on('unhandledRejection', reason => { // Mocha catches unhandled rejection from the user code and re-emits them to the process
   throw reason; // Re-throw them so that the validation command fails in these cases (for example, if there is a syntax error when parsing JSON declaration files)
 });
 
