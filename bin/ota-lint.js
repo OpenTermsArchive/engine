@@ -12,7 +12,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const LINT_TEST_FILEPATH = '../scripts/declarations/lint/index.mocha.js';
 const LINT_PATH = path.resolve(__dirname, LINT_TEST_FILEPATH);
 
-// Mocha catches unhandled rejection from the user code and re-emits them to the process (see https://github.com/mochajs/mocha/blob/master/lib/runner.js#L198)
+// Mocha catches unhandled rejection from the user code and re-emits them to the process
 process.on('unhandledRejection', reason => {
   // Re-throw them so that the validation command fails in these cases (for example, if there is a syntax error when parsing JSON declaration files)
   throw reason;
