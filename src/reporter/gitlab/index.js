@@ -18,9 +18,7 @@ export default class GitLab {
   static ISSUE_STATE_ALL = 'all';
 
   constructor(repository, baseURL = BASE_URL, apiBaseURL = API_BASE_URL) {
-    const [ owner, repo ] = repository.split('/');
-
-    this.commonParams = { owner, repo };
+    this.repositoryPath = repository;
     this.projectId = null;
     this.baseURL = baseURL;
     console.log('this.baseURL', this.baseURL);
@@ -31,9 +29,8 @@ export default class GitLab {
     const options = GitLab.baseOptionsHttpReq();
 
     try {
-      const repositoryPath = `${this.commonParams.owner}/${this.commonParams.repo}`;
       const response = await nodeFetch(
-        `${this.apiBaseURL}/projects/${encodeURIComponent(repositoryPath)}`,
+        `${this.apiBaseURL}/projects/${encodeURIComponent(this.repositoryPath)}`,
         options,
       );
 
@@ -42,7 +39,7 @@ export default class GitLab {
       if (response.ok) {
         this.projectId = res.id;
       } else {
-        logger.error(`Error while obtaining projectId: ${JSON.strinfigy(res)}`);
+        logger.error(`Error while obtaining projectId: ${JSON.stringify(res)}`);
         this.projectId = null;
       }
     } catch (error) {
@@ -367,15 +364,15 @@ export default class GitLab {
   }
 
   generateDeclarationURL(serviceName) {
-    return `${this.baseURL}/${this.commonParams.owner}/${this.commonParams.repo}/-/blob/main/declarations/${encodeURIComponent(serviceName)}.json`;
+    return `${this.baseURL}/${this.repositoryPath}/-/blob/main/declarations/${encodeURIComponent(serviceName)}.json`;
   }
 
   generateVersionURL(serviceName, termsType) {
-    return `${this.baseURL}/${this.commonParams.owner}/${this.commonParams.repo}/-/blob/main/${encodeURIComponent(serviceName)}/${encodeURIComponent(serviceName, termsType)}.md`;
+    return `${this.baseURL}/${this.repositoryPath}/-/blob/main/${encodeURIComponent(serviceName)}/${encodeURIComponent(serviceName, termsType)}.md`;
   }
 
   generateSnapshotsBaseUrl(serviceName, termsType) {
-    return `${this.baseURL}/${this.commonParams.owner}/${this.commonParams.repo}/-/blob/main/${encodeURIComponent(serviceName)}/${encodeURIComponent(termsType)}`;
+    return `${this.baseURL}/${this.repositoryPath}/-/blob/main/${encodeURIComponent(serviceName)}/${encodeURIComponent(termsType)}`;
   }
 
   // GitLab API responses are not cached unlike GitHub, so this method only exists to satisfy the Reporter interface contract
