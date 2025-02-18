@@ -1,6 +1,6 @@
 # Open Terms Archive Engine
 
-This codebase is a Node.js module enabling downloading, archiving and publishing versions of documents obtained online. It can be used independently from the Open Terms Archive ecosystem. For a high-level overview of Open Terms Archive’s wider goals and processes, please read its [public homepage](https://opentermsarchive.org).
+This codebase is a Node.js module enabling downloading, archiving and publishing versions of terms obtained online. It can be used independently from the Open Terms Archive ecosystem. For a high-level overview of Open Terms Archive’s wider goals and processes, please read its [public homepage](https://opentermsarchive.org).
 
 For documentation, visit [docs.opentermsarchive.org](https://docs.opentermsarchive.org/)
 
