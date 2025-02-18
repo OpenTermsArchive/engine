@@ -50,14 +50,14 @@ export default class DeclarationUtils {
       if (modifiedFilePath.endsWith('.filters.js')) {
         const declaration = await this.getJSONFromFile(this.defaultBranch, `declarations/${serviceId}.json`);
 
-        servicesTermsTypes[serviceId] = Object.keys(declaration.documents); // Considering how rarely filters are used, simply return all term types that could potentially be impacted to spare implementing a function change check
+        servicesTermsTypes[serviceId] = Object.keys(declaration.terms); // Considering how rarely filters are used, simply return all term types that could potentially be impacted to spare implementing a function change check
 
         return;
       }
 
       const originalService = await this.getJSONFromFile(this.defaultBranch, modifiedFilePath);
       const modifiedService = await this.getJSONFromFile('HEAD', modifiedFilePath);
-      const modifiedServiceTermsTypes = Object.keys(modifiedService.documents);
+      const modifiedServiceTermsTypes = Object.keys(modifiedService.terms);
 
       if (!originalService) {
         servicesTermsTypes[serviceId] = modifiedServiceTermsTypes;
@@ -65,11 +65,11 @@ export default class DeclarationUtils {
         return;
       }
 
-      const originalServiceTermsTypes = Object.keys(originalService.documents);
+      const originalServiceTermsTypes = Object.keys(originalService.terms);
 
       modifiedServiceTermsTypes.forEach(termsType => {
         const areTermsAdded = !originalServiceTermsTypes.includes(termsType);
-        const areTermsModified = JSON.stringify(originalService.documents[termsType]) != JSON.stringify(modifiedService.documents[termsType]);
+        const areTermsModified = JSON.stringify(originalService.terms[termsType]) != JSON.stringify(modifiedService.terms[termsType]);
 
         if (!areTermsAdded && !areTermsModified) {
           return;

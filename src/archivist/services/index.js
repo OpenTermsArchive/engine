@@ -21,7 +21,7 @@ export async function load(servicesIdsToLoad = []) {
   const services = {};
 
   await Promise.all(servicesIds.map(async serviceId => {
-    const { name, documents: terms } = await loadServiceDeclaration(serviceId);
+    const { name, terms } = await loadServiceDeclaration(serviceId);
 
     const service = new Service({ id: serviceId, name });
 
@@ -220,9 +220,9 @@ async function loadServiceHistoryFiles(serviceId) {
     }
   }
 
-  Object.keys(serviceDeclaration.documents).forEach(termsType => {
+  Object.keys(serviceDeclaration.terms).forEach(termsType => {
     serviceHistory[termsType] = serviceHistory[termsType] || [];
-    serviceHistory[termsType].push(serviceDeclaration.documents[termsType]);
+    serviceHistory[termsType].push(serviceDeclaration.terms[termsType]);
   });
 
   sortHistory(serviceHistory);

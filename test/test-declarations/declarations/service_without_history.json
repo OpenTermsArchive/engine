@@ -1,6 +1,6 @@
 {
   "name": "Service without history",
-  "documents": {
+  "terms": {
     "Terms of Service": {
       "fetch": "https://www.service-without-history.example/tos",
       "select": "body",

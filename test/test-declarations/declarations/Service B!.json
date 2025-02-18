@@ -1,6 +1,6 @@
 {
   "name": "Service B!",
-  "documents": {
+  "terms": {
     "Privacy Policy": {
       "fetch": "https://www.serviceb.example/privacy",
       "select": "body"

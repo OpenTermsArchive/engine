@@ -65,7 +65,7 @@ describe('Terms', () => {
 
       const expectedResult = {
         name: service.name,
-        documents: { [termsType]: document1AsJSON },
+        terms: { [termsType]: document1AsJSON },
       };
 
       expect(result).to.deep.equal(expectedResult);
@@ -76,7 +76,7 @@ describe('Terms', () => {
 
       const expectedResult = {
         name: service.name,
-        documents: { [termsType]: { combine: [ document1AsJSON, document2AsJSON ] } },
+        terms: { [termsType]: { combine: [ document1AsJSON, document2AsJSON ] } },
       };
 
       expect(result).to.deep.equal(expectedResult);
