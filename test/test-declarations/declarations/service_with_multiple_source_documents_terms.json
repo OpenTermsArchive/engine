@@ -1,6 +1,6 @@
 {
   "name": "Service with terms with multiple source documents",
-  "documents": {
+  "terms": {
     "Community Guidelines": {
       "combine": [
         {

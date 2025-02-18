@@ -1,6 +1,6 @@
 {
   "name": "Service with filters history",
-  "documents": {
+  "terms": {
     "Terms of Service": {
       "fetch": "https://www.service-with-filters-history.example/terms",
       "select": "main",

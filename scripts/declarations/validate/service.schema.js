@@ -24,14 +24,14 @@ const schema = {
   type: 'object',
   additionalProperties: false,
   title: 'Service declaration',
-  required: [ 'name', 'documents' ],
+  required: [ 'name', 'terms' ],
   properties: {
     name: {
       type: 'string',
       title: 'Service public name',
       examples: ['Facebook'],
     },
-    documents: {
+    terms: {
       type: 'object',
       properties: termsProperties(),
       propertyNames: { enum: AVAILABLE_TYPES_NAME },

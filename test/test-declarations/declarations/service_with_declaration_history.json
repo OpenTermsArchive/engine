@@ -1,6 +1,6 @@
 {
   "name": "Service with declaration history",
-  "documents": {
+  "terms": {
     "Terms of Service": {
       "fetch": "https://www.service-with-declaration-history.example/terms",
       "select": "main",

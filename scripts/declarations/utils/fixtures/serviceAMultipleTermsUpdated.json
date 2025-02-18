@@ -1,6 +1,6 @@
 {
   "name": "Service",
-  "documents": {
+  "terms": {
     "Terms of Service": {
       "fetch": "https://domain.example/tos",
       "select": "body",

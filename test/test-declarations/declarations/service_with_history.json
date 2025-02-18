@@ -1,6 +1,6 @@
 {
   "name": "Service with history",
-  "documents": {
+  "terms": {
     "Terms of Service": {
       "fetch": "https://www.service-with-history.example/terms",
       "select": "main",

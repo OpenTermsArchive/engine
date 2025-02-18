@@ -16,7 +16,7 @@ export default class Terms {
   toPersistence() {
     return {
       name: this.service.name,
-      documents: {
+      terms: {
         [this.type]: this.hasMultipleSourceDocuments
           ? { combine: this.sourceDocuments.map(sourceDocument => sourceDocument.toPersistence()) }
           : this.sourceDocuments[0].toPersistence(),
