@@ -10,7 +10,21 @@ _Full changeset and discussions: [#1137](https://github.com/OpenTermsArchive/eng
 
 ### Changed
 
-- **Breaking:** Rename `documents` key to `terms` in service declarations for vocabulary consistency; update your service declarations accordingly. You can update your declarations by executing the following command at the root of your declarations folder: `find . -name "*.json" -type f -exec sed -i 's/"documents":/"terms":/g' {} +` for Unix-like systems, or `find . -name "*.json" -type f -exec sed -i '' 's/"documents":/"terms":/g' {} +` for macOS
+- **Breaking:** Rename `documents` key to `terms` in service declarations for vocabulary consistency; to update your declarations:
+
+  For Unix-like systems:
+
+  ```bash
+  find . -name "*.json" -type f -exec sed -i 's/"documents":/"terms":/g' {} +
+  ```
+
+  For macOS:
+
+  ```bash
+  find . -name "*.json" -type f -exec sed -i '' 's/"documents":/"terms":/g' {} +
+  ```
+
+  ⚠️ Note: When updating the engine on your declarations repositories, the validation of modified declarations will fail once. This is expected and can be safely ignored
 
 ## 4.2.0 - 2025-02-17
 
