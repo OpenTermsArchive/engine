@@ -71,7 +71,12 @@ describe('Metadata file validation', () => {
         return `- ${basePath}: "${actualValue}" ${formatMessages[error.params.format]}`;
       }
 
-      let message = `- ${basePath}: "${actualValue}" ${error.message}`;
+      let message = `- ${basePath}:`;
+
+      if (actualValue !== undefined && typeof actualValue !== 'object') {
+        message += ` "${actualValue}"`;
+      }
+      message += ` ${error.message}`;
 
       if (error.keyword === 'enum') {
         message += ` "${error.params.allowedValues.join('", "')}"`;
