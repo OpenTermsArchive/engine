@@ -20,6 +20,12 @@ const PACKAGE_JSON_PATH = '../../../package.json';
  *       type: object
  *       description: Collection metadata
  *       additionalProperties: false
+ *       required:
+ *         - id
+ *         - name
+ *         - tagline
+ *         - languages
+ *         - jurisdictions
  *       properties:
  *         id:
  *           type: string
@@ -85,6 +91,10 @@ const PACKAGE_JSON_PATH = '../../../package.json';
  *           items:
  *             type: object
  *             additionalProperties: false
+ *             required:
+ *               - startDate
+ *               - schedule
+ *               - serverLocation
  *             properties:
  *               startDate:
  *                 type: string
@@ -106,6 +116,8 @@ const PACKAGE_JSON_PATH = '../../../package.json';
  *           additionalProperties:
  *             type: object
  *             additionalProperties: false
+ *             required:
+ *               - roles
  *             properties:
  *               url:
  *                 type: string
