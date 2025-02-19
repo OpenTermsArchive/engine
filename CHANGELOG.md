@@ -28,7 +28,7 @@ _Full changeset and discussions: [#1137](https://github.com/OpenTermsArchive/eng
   find . -name "*.json" -type f -exec sed -i '' 's/"documents":/"terms":/g' {} +
   ```
 
-  ⚠️ Note: When updating the engine on your declarations repositories, the validation of modified declarations will fail once. This is expected and can be safely ignored
+  ⚠️ Note: when updating the engine, CI checks of modified declarations will fail once. This is expected and can be safely ignored
 
 ## 4.2.0 - 2025-02-17
 
