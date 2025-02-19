@@ -113,6 +113,7 @@ const PACKAGE_JSON_PATH = '../../../package.json';
  *                 description: The date when tracking ended for this period
  *         governance:
  *           type: object
+ *           description: Map of organizations involved in the collection's governance, with organization names as keys
  *           additionalProperties:
  *             type: object
  *             additionalProperties: false
@@ -129,10 +130,10 @@ const PACKAGE_JSON_PATH = '../../../package.json';
  *                 description: URL to the entity's logo
  *               roles:
  *                 type: array
+ *                 description: Roles of the entity within the governance, see [collection governance](https://docs.opentermsarchive.org/collections/reference/governance/)
  *                 items:
  *                   type: string
  *                   enum: [host, administrator, curator, maintainer, sponsor]
- *                   description: Roles of the entity within the governance
  *         i18n:
  *           type: object
  *           description: Internationalization of any of the Metadata properties (except i18n itself) for different language codes
