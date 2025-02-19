@@ -2,6 +2,10 @@
 
 All changes that impact users of this module are documented in this file, in the [Common Changelog](https://common-changelog.org) format with some additional specifications defined in the CONTRIBUTING file. This codebase adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased [no-release]
+
+_Modifications made in this changeset do not add, remove or alter any behavior, dependency, API or functionality of the software. They only change non-functional parts of the repository, such as the README file or CI workflows._
+
 ## 5.0.0 - 2025-02-18
 
 _Full changeset and discussions: [#1137](https://github.com/OpenTermsArchive/engine/pull/1137)._
@@ -10,7 +14,21 @@ _Full changeset and discussions: [#1137](https://github.com/OpenTermsArchive/eng
 
 ### Changed
 
-- **Breaking:** Rename `documents` key to `terms` in service declarations for vocabulary consistency; update your service declarations accordingly. You can update your declarations by executing the following command at the root of your declarations folder: `find . -name "*.json" -type f -exec sed -i 's/"documents":/"terms":/g' {} +` for Unix-like systems, or `find . -name "*.json" -type f -exec sed -i '' 's/"documents":/"terms":/g' {} +` for macOS
+- **Breaking:** Rename `documents` key to `terms` in service declarations for vocabulary consistency; to update your declarations:
+
+  For Unix-like systems:
+
+  ```bash
+  find . -name "*.json" -type f -exec sed -i 's/"documents":/"terms":/g' {} +
+  ```
+
+  For macOS:
+
+  ```bash
+  find . -name "*.json" -type f -exec sed -i '' 's/"documents":/"terms":/g' {} +
+  ```
+
+  ⚠️ Note: when updating the engine, CI checks of modified declarations will fail once. This is expected and can be safely ignored
 
 ## 4.2.0 - 2025-02-17
 
