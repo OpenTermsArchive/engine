@@ -30,15 +30,15 @@ const PACKAGE_JSON_PATH = '../../../package.json';
  *         id:
  *           type: string
  *           description: Unique identifier derived from name (acronyms, dash-separated).
- *           example: pga
+ *           example: demo
  *         name:
  *           type: string
  *           description: Display name of the collection.
- *           example: Platform Governance Archive
+ *           example: Demo Collection
  *         tagline:
  *           type: string
  *           description: Concise description of collection topic.
- *           example: Major global social media services
+ *           example: Services used by Open Terms Archive
  *         languages:
  *           type: array
  *           description: List of [ISO 639-1 (two-letter)](https://en.wikipedia.org/wiki/ISO_639) language codes representing languages allowed in the collection.
@@ -57,13 +57,9 @@ const PACKAGE_JSON_PATH = '../../../package.json';
  *           type: string
  *           description: Detailed description of the collection
  *           example: |
- *             The **Platform Governance Archive** (PGA) collection tracks the terms of major global social media services.
+ *             The **Demo** collection tracks changes to the terms of use of services used by Open Terms Archive.
  *
- *             This data is maintained and analysed by the [Platform Governance Archive](https://www.platformgovernancearchive.org/) at the Universität Bremen's [Center for Media Communication and Information Research (ZeMKI)](https://www.uni-bremen.de/zemki).
- *
- *             This initiative offers researchers, journalists and citizens the tools to analyze how platforms structure and regulate communication and interaction in our societies.
- *
- *             It also aims to promote greater transparency and accountability of these powerful digital services.
+ *             This provides a reference collection for best practices and enables the Open Terms Archive Core Team to be a user of the software it produces.
  *         totalTerms:
  *           type: integer
  *           description: Total number of terms tracked in the collection.
@@ -80,22 +76,22 @@ const PACKAGE_JSON_PATH = '../../../package.json';
  *           type: string
  *           format: uri
  *           description: URL to the dataset releases.
- *           example: https://github.com/OpenTermsArchive/pga-versions/releases
+ *           example: https://github.com/OpenTermsArchive/demo-versions/releases
  *         declarations:
  *           type: string
  *           format: uri
  *           description: URL to the declarations repository.
- *           example: https://github.com/OpenTermsArchive/pga-declarations
+ *           example: https://github.com/OpenTermsArchive/demo-declarations
  *         versions:
  *           type: string
  *           format: uri
  *           description: URL to the versions repository.
- *           example: https://github.com/OpenTermsArchive/pga-versions
+ *           example: https://github.com/OpenTermsArchive/demo-versions
  *         snapshots:
  *           type: string
  *           format: uri
  *           description: URL to the snapshots repository.
- *           example: https://github.com/OpenTermsArchive/pga-snapshots
+ *           example: https://github.com/OpenTermsArchive/demo-snapshots
  *         donations:
  *           type: string
  *           format: uri
@@ -104,7 +100,8 @@ const PACKAGE_JSON_PATH = '../../../package.json';
  *         logo:
  *           type: string
  *           format: uri
- *           description: URL to the collection's logo. Optimized PNG transparent image (min width 240px).
+ *           description: URL to the collection's logo. Optimized PNG transparent image (minimum width 240px).
+ *           example: https://opentermsarchive.org/images/logo/logo-open-terms-archive-black.png
  *         trackingPeriods:
  *           type: array
  *           items:
@@ -127,8 +124,8 @@ const PACKAGE_JSON_PATH = '../../../package.json';
  *                 example: 0 0 * * *
  *               serverLocation:
  *                 type: string
- *                 description: The geographic location of the tracking server (city name, ISO 3166-2 country code).
- *                 example: London, GB
+ *                 description: The geographic location of the tracking server (city name and ISO 3166-2 country code).
+ *                 example: Paris, FR
  *               endDate:
  *                 type: string
  *                 format: date
@@ -151,7 +148,7 @@ const PACKAGE_JSON_PATH = '../../../package.json';
  *               logo:
  *                 type: string
  *                 format: uri
- *                 description: URL to the entity's logo. Optimized PNG transparent image (min width 240px).
+ *                 description: URL to the entity's logo. Optimized PNG transparent image (minimum width 240px).
  *                 example: https://opentermsarchive.org/images/logo/logo-open-terms-archive-black.png
  *               roles:
  *                 type: array
@@ -163,6 +160,14 @@ const PACKAGE_JSON_PATH = '../../../package.json';
  *         i18n:
  *           type: object
  *           description: Internationalization of any of the Metadata properties (except i18n itself) for different language codes
+ *           example: |
+ *             fr:
+ *               name: Démo
+ *               tagline: Services utilisés par Open Terms Archive
+ *               governance:
+ *                 Ministry for Europe and Foreign Affairs:
+ *                   name: Ministère de l'Europe et des Affaires étrangères
+ *                   url: https://www.diplomatie.gouv.fr
  *           additionalProperties:
  *             type: object
  */
