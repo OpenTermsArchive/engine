@@ -38,7 +38,7 @@ const PACKAGE_JSON_PATH = '../../../package.json';
  *         tagline:
  *           type: string
  *           description: Concise description of collection topic.
- *           example: Services used by Open Terms Archive
+ *           example: Services used by Open Terms Archive
  *         languages:
  *           type: array
  *           description: List of [ISO 639-1 (two-letter)](https://en.wikipedia.org/wiki/ISO_639) language codes representing languages allowed in the collection.
@@ -57,9 +57,9 @@ const PACKAGE_JSON_PATH = '../../../package.json';
  *           type: string
  *           description: Detailed description of the collection
  *           example: |
- *             The **Demo** collection tracks changes to the terms of use of services used by Open Terms Archive.
+ *             The **Demo** collection tracks changes to the terms of use of services used by Open Terms Archive.
  *
- *             This provides a reference collection for best practices and enables the Open Terms Archive Core Team to be a user of the software it produces.
+ *             This provides a reference collection for best practices and enables the Open Terms Archive Core Team to be a user of the software it produces.
  *         totalTerms:
  *           type: integer
  *           description: Total number of terms tracked in the collection.
@@ -104,6 +104,7 @@ const PACKAGE_JSON_PATH = '../../../package.json';
  *           example: https://opentermsarchive.org/images/logo/logo-open-terms-archive-black.png
  *         trackingPeriods:
  *           type: array
+ *           description: List of time periods during which terms were tracked, with their tracking configuration. Gaps between periods indicate times when tracking was interrupted.
  *           items:
  *             type: object
  *             additionalProperties: false
@@ -133,7 +134,7 @@ const PACKAGE_JSON_PATH = '../../../package.json';
  *                 example: 2023-12-01
  *         governance:
  *           type: object
- *           description: Map of organizations involved in the collection's governance, with organization names as keys
+ *           description: Map of organizations involved in the collection's governance, with organization names as keys and governance objects as values.
  *           additionalProperties:
  *             type: object
  *             additionalProperties: false
