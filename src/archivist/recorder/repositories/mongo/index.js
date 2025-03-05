@@ -34,14 +34,14 @@ export default class MongoRepository extends RepositoryInterface {
   }
 
   async save(record) {
-    const { serviceId, termsType } = record;
+    const { serviceId, termsType, documentId } = record;
 
     if (record.isFirstRecord === undefined || record.isFirstRecord === null) {
-      record.isFirstRecord = !await this.collection.findOne({ serviceId, termsType });
+      record.isFirstRecord = !await this.collection.findOne({ serviceId, termsType, documentId });
     }
 
     const documentFields = await this.#toPersistence(record);
-    const previousRecord = await this.findLatest(serviceId, termsType);
+    const previousRecord = await this.findLatest(serviceId, termsType, documentId);
 
     if (previousRecord?.content == documentFields.content) {
       return Object(null);
@@ -54,14 +54,26 @@ export default class MongoRepository extends RepositoryInterface {
     return record;
   }
 
-  async findLatest(serviceId, termsType) {
-    const [mongoDocument] = await this.collection.find({ serviceId, termsType }).limit(1).sort({ fetchDate: -1 }).toArray(); // `findOne` doesn't support the `sort` method, so even for only one mongo document use `find`
+  async findLatest(serviceId, termsType, documentId) {
+    const query = { serviceId, termsType };
+
+    if (documentId !== undefined) {
+      query.documentId = documentId;
+    }
+
+    const [mongoDocument] = await this.collection.find(query).limit(1).sort({ fetchDate: -1 }).toArray(); // `findOne` doesn't support the `sort` method, so even for only one mongo document use `find`
 
     return this.#toDomain(mongoDocument);
   }
 
-  async findByDate(serviceId, termsType, date) {
-    const [mongoDocument] = await this.collection.find({ serviceId, termsType, fetchDate: { $lte: new Date(date) } }).limit(1).sort({ fetchDate: -1 }).toArray(); // `findOne` doesn't support the `sort` method, so even for only one mongo document use `find`
+  async findByDate(serviceId, termsType, date, documentId) {
+    const query = { serviceId, termsType, fetchDate: { $lte: new Date(date) } };
+
+    if (documentId !== undefined) {
+      query.documentId = documentId;
+    }
+
+    const [mongoDocument] = await this.collection.find(query).limit(1).sort({ fetchDate: -1 }).toArray(); // `findOne` doesn't support the `sort` method, so even for only one mongo document use `find`
 
     return this.#toDomain(mongoDocument);
   }
