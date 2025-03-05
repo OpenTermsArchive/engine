@@ -41,7 +41,10 @@ describe('Metadata file validation', () => {
 
     metadata = yaml.load(metadataContent, { schema: yaml.CORE_SCHEMA }); // Use CORE_SCHEMA to parse dates as strings rather than JavaScript Date objects
 
-    const ajv = new Ajv({ allErrors: true });
+    const ajv = new Ajv({
+      allErrors: true,
+      strict: false, // Allow to ignore OpenAPI-specific keywords that aren't part of the JSON Schema specification (like `example`)
+    });
 
     addFormats(ajv);
 
