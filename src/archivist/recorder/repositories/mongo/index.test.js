@@ -332,6 +332,30 @@ describe('MongoRepository', () => {
           expect(mongoDocument.termsType).to.include(TERMS_TYPE);
         });
       });
+
+      context('when document ID is specified', () => {
+        before(async () => {
+          (record = await subject.save(new Version({
+            serviceId: SERVICE_PROVIDER_ID,
+            termsType: TERMS_TYPE,
+            documentId: DOCUMENT_ID,
+            content: CONTENT,
+            fetchDate: FETCH_DATE,
+            snapshotIds: [SNAPSHOT_ID],
+          })));
+
+          (mongoDocument = await collection.findOne({
+            serviceId: SERVICE_PROVIDER_ID,
+            termsType: TERMS_TYPE,
+          }));
+        });
+
+        after(() => subject.removeAll());
+
+        it('stores the document ID', () => {
+          expect(mongoDocument.documentId).to.equal(DOCUMENT_ID);
+        });
+      });
     });
 
     describe('#findById', () => {
@@ -437,6 +461,46 @@ describe('MongoRepository', () => {
 
           it('returns the latest record id', () => {
             expect(recordFound.id).to.include(recordToFindId);
+          });
+        });
+
+        context('when document ID is specified', () => {
+          let recordFound;
+          const DIFFERENT_DOCUMENT_ID = 'other-document';
+          const UPDATED_CONTENT = `${CONTENT} (with additional content)`;
+
+          before(async () => {
+            await subject.save(new Version({
+              serviceId: SERVICE_PROVIDER_ID,
+              termsType: TERMS_TYPE,
+              documentId: DOCUMENT_ID,
+              content: CONTENT,
+              fetchDate: FETCH_DATE,
+              snapshotIds: [SNAPSHOT_ID],
+            }));
+
+            await subject.save(new Version({
+              serviceId: SERVICE_PROVIDER_ID,
+              termsType: TERMS_TYPE,
+              documentId: DIFFERENT_DOCUMENT_ID,
+              content: UPDATED_CONTENT,
+              fetchDate: FETCH_DATE_LATER,
+              snapshotIds: [SNAPSHOT_ID],
+            }));
+
+            recordFound = await subject.findByDate(
+              SERVICE_PROVIDER_ID,
+              TERMS_TYPE,
+              FETCH_DATE_LATER,
+              DOCUMENT_ID,
+            );
+          });
+
+          after(() => subject.removeAll());
+
+          it('returns only records matching the document ID', () => {
+            expect(recordFound.documentId).to.equal(DOCUMENT_ID);
+            expect(recordFound.content).to.equal(CONTENT);
           });
         });
       });
@@ -578,6 +642,44 @@ describe('MongoRepository', () => {
 
           it('returns the latest record content', async () => {
             expect((await latestRecord.content).toString('utf8')).to.equal(UPDATED_CONTENT);
+          });
+        });
+
+        context('when document ID is specified', () => {
+          let latestRecord;
+          const DIFFERENT_DOCUMENT_ID = 'other-document';
+
+          before(async () => {
+            await subject.save(new Version({
+              serviceId: SERVICE_PROVIDER_ID,
+              termsType: TERMS_TYPE,
+              documentId: DOCUMENT_ID,
+              content: CONTENT,
+              fetchDate: FETCH_DATE_LATER,
+              snapshotIds: [SNAPSHOT_ID],
+            }));
+
+            await subject.save(new Version({
+              serviceId: SERVICE_PROVIDER_ID,
+              termsType: TERMS_TYPE,
+              documentId: DIFFERENT_DOCUMENT_ID,
+              content: CONTENT,
+              fetchDate: FETCH_DATE,
+              snapshotIds: [SNAPSHOT_ID],
+            }));
+
+            latestRecord = await subject.findLatest(
+              SERVICE_PROVIDER_ID,
+              TERMS_TYPE,
+              DIFFERENT_DOCUMENT_ID,
+            );
+          });
+
+          after(() => subject.removeAll());
+
+          it('returns only records matching the document ID', () => {
+            expect(latestRecord.documentId).to.equal(DIFFERENT_DOCUMENT_ID);
+            expect(latestRecord.fetchDate).to.deep.equal(FETCH_DATE);
           });
         });
       });
@@ -1117,6 +1219,44 @@ describe('MongoRepository', () => {
 
           it('returns the latest record mime type', () => {
             expect(latestRecord.mimeType).to.equal(PDF_MIME_TYPE);
+          });
+        });
+
+        context('when document ID is specified', () => {
+          let latestRecord;
+          const DIFFERENT_DOCUMENT_ID = 'other-document';
+
+          before(async () => {
+            await subject.save(new Snapshot({
+              serviceId: SERVICE_PROVIDER_ID,
+              termsType: TERMS_TYPE,
+              documentId: DOCUMENT_ID,
+              content: CONTENT,
+              fetchDate: FETCH_DATE_LATER,
+              mimeType: HTML_MIME_TYPE,
+            }));
+
+            await subject.save(new Snapshot({
+              serviceId: SERVICE_PROVIDER_ID,
+              termsType: TERMS_TYPE,
+              documentId: DIFFERENT_DOCUMENT_ID,
+              content: CONTENT,
+              fetchDate: FETCH_DATE,
+              mimeType: HTML_MIME_TYPE,
+            }));
+
+            latestRecord = await subject.findLatest(
+              SERVICE_PROVIDER_ID,
+              TERMS_TYPE,
+              DIFFERENT_DOCUMENT_ID,
+            );
+          });
+
+          after(() => subject.removeAll());
+
+          it('returns only records matching the document ID', () => {
+            expect(latestRecord.documentId).to.equal(DIFFERENT_DOCUMENT_ID);
+            expect(latestRecord.fetchDate).to.deep.equal(FETCH_DATE);
           });
         });
       });
