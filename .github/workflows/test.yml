@@ -61,3 +61,29 @@ jobs:
       - run: npm ci
       - run: ./node_modules/.bin/cross-env NODE_ENV=ci npm run declarations:lint
       - run: ./node_modules/.bin/cross-env NODE_ENV=ci npm run declarations:validate:schema
+
+  validate_metadata:
+    strategy:
+      matrix:
+        operating_system: 
+          - ubuntu-22.04
+          - windows-latest
+          - macos-latest
+      fail-fast: false
+
+    runs-on: ${{ matrix.operating_system }}
+
+    steps:
+      - run: |
+          git config --global core.autocrlf false
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: OpenTermsArchive/demo-declarations
+          path: ./demo-declarations
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: cd ./demo-declarations && npm install
+      - run: npm ci
+      - run: ./node_modules/.bin/cross-env NODE_ENV=ci npm run metadata:validate
