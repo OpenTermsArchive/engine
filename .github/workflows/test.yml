@@ -10,7 +10,7 @@ jobs:
     strategy:
       matrix:
         operating_system: 
-          - ubuntu-22.04 # Specify latest Ubuntu version with MongoDB preinstalled as for Ubuntu-22.04 MongoDB is not currently available. See https://github.com/actions/runner-images/issues/5490
+          - ubuntu-22.04
           - windows-latest
           - macos-latest
       fail-fast: false # run tests on other operating systems even if one fails
@@ -22,8 +22,6 @@ jobs:
           git config --global core.autocrlf false
       - uses: actions/checkout@v4
       - uses: ankane/setup-mongodb@v1
-        with:
-          mongodb-version: 5.0
       - uses: actions/setup-node@v4
         with:
           node-version: 20
