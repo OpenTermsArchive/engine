@@ -5,6 +5,7 @@ import RepositoryFactory from '../../archivist/recorder/repositories/factory.js'
 import { toISODateWithoutMilliseconds } from '../../archivist/utils/date.js';
 
 /**
+ * @private
  * @swagger
  * tags:
  *   name: Versions
@@ -24,13 +25,14 @@ import { toISODateWithoutMilliseconds } from '../../archivist/utils/date.js';
  *           description: The ID of the version.
  *         content:
  *           type: string
- *           description: The JSON-escaped Markdown content of the version.
+ *           description: The JSON-escaped Markdown content of the version
  */
 const router = express.Router();
 
 const versionsRepository = await RepositoryFactory.create(config.get('@opentermsarchive/engine.recorder.versions.storage')).initialize();
 
 /**
+ * @private
  * @swagger
  * /version/{serviceId}/{termsType}/{date}:
  *   get:

@@ -57,6 +57,7 @@ export default class Reporter {
    * ```
    *
    * @deprecated
+   * @private
    */
   static normalizeConfig(config) {
     if (config.githubIssues) {
