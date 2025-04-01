@@ -5,6 +5,8 @@ import turndownPluginGithubFlavouredMarkdown from 'joplin-turndown-plugin-gfm';
 import jsdom from 'jsdom';
 import mime from 'mime';
 
+import SourceDocument from '../services/sourceDocument.js';
+
 import { ExtractDocumentError } from './errors.js';
 
 export { ExtractDocumentError } from './errors.js';
@@ -23,11 +25,11 @@ const ciceroMarkTransformer = new CiceroMarkTransformer();
 
 /**
  * Extract content from source document and convert it to Markdown
- *
  * @function extract
- * @param {string} sourceDocument - Source document from which to extract content, see {@link ./src/archivist/services/sourceDocument.js}
- * @returns {Promise<string>} Promise which is fulfilled once the content is extracted and converted in Markdown. The promise will resolve into a string containing the extracted content in Markdown format
-*/
+ * @param   {string}          sourceDocument Source document from which to extract content, see {@link SourceDocument}
+ * @returns {Promise<string>}                Promise which is fulfilled once the content is extracted and converted in Markdown. The promise will resolve into a string containing the extracted content in Markdown format
+ * @async
+ */
 export default async function extract(sourceDocument) {
   try {
     if (sourceDocument.mimeType == mime.getType('pdf')) {

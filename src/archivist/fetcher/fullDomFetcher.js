@@ -63,11 +63,10 @@ export default async function fetch(url, cssSelectors, config) {
 }
 
 /**
- * Launches a headless browser instance if one is not already running
+ * Launches a headless browser instance using Puppeteer if one is not already running. Returns the existing browser instance if one is already running, otherwise creates and returns a new instance.
+ * @function launchHeadlessBrowser
+ * @returns {Promise<puppeteer.Browser>} The Puppeteer browser instance.
  * @async
- * @returns {Promise<Browser>} The Puppeteer browser instance
- * @description Initializes and returns a headless browser instance using Puppeteer.
- * If a browser instance already exists, returns the existing instance instead of creating a new one.
  */
 export async function launchHeadlessBrowser() {
   if (browser) {
@@ -80,11 +79,10 @@ export async function launchHeadlessBrowser() {
 }
 
 /**
- * Stops the headless browser instance if one is running
- * @async
+ * Stops the headless browser instance if one is running. If no instance exists, it does nothing.
+ * @function stopHeadlessBrowser
  * @returns {Promise<void>}
- * @description Closes the browser instance
- * If no browser instance exists, this function does nothing.
+ * @async
  */
 export async function stopHeadlessBrowser() {
   if (!browser) {
