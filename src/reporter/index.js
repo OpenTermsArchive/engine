@@ -44,8 +44,7 @@ export default class Reporter {
 
   /**
    * Support for legacy config format where reporter configuration was nested under `githubIssues`
-   * Example:
-   *
+   * @example
    * ```json
    * {
    *   "githubIssues": {
@@ -55,7 +54,8 @@ export default class Reporter {
    *   }
    * }
    * ```
-   *
+   * @param   {object} config - The configuration object to normalize
+   * @returns {object}        The normalized configuration object
    * @deprecated
    * @private
    */

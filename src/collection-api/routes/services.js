@@ -1,6 +1,8 @@
 import express from 'express';
 
 /**
+ * @param   {object}         services The services to be exposed by the API
+ * @returns {express.Router}          The router instance
  * @swagger
  * tags:
  *   name: Services

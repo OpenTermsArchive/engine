@@ -1,6 +1,5 @@
 /**
  * Abstract Class Record.
- *
  * @class Record
  * @private
  */

@@ -10,6 +10,9 @@ const METADATA_FILENAME = 'metadata.yml';
 const PACKAGE_JSON_PATH = '../../../package.json';
 
 /**
+ * @param   {string}         collectionPath The path to the collection
+ * @param   {object}         services       The services of the collection
+ * @returns {express.Router}                The router instance
  * @swagger
  * tags:
  *   name: Metadata
