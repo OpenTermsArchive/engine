@@ -1,7 +1,7 @@
 /**
  * Abstract Class Record.
- *
  * @class Record
+ * @private
  */
 export default class Record {
   #content;

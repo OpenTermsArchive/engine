@@ -1,5 +1,6 @@
 extends:
   - airbnb-base
+  - plugin:jsdoc/recommended-error
 parserOptions:
   ecmaVersion: 2022
 env:
@@ -11,7 +12,16 @@ plugins:
   - import
   - json-format
   - no-only-tests
+  - jsdoc
 rules:
+  jsdoc/require-jsdoc: 0
+  jsdoc/check-tag-names:
+    - error
+    - definedTags:
+      - swagger
+  jsdoc/check-line-alignment: 
+    - error
+    - always
   arrow-parens:
     - error
     - as-needed

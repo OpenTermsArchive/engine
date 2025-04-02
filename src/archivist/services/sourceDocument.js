@@ -1,4 +1,18 @@
 export default class SourceDocument {
+  /**
+   * Represents a source document containing web content and metadata for extraction.
+   * Includes the document location, selectors for content inclusion/exclusion,
+   * content filters, raw content data, and MIME type information.
+   * @class SourceDocument
+   * @param {object}                    params                               The source document parameters
+   * @param {string}                    params.location                      The URL location of the document
+   * @param {boolean}                   params.executeClientScripts          Whether to execute client-side scripts
+   * @param {(string | object | Array)} params.contentSelectors              CSS selectors for content to include
+   * @param {(string | object | Array)} params.insignificantContentSelectors CSS selectors for content to exclude
+   * @param {Array}                     params.filters                       Array of filters to apply
+   * @param {string}                    params.content                       The document content
+   * @param {string}                    params.mimeType                      The MIME type of the content
+   */
   constructor({ location, executeClientScripts, contentSelectors, insignificantContentSelectors, filters, content, mimeType }) {
     this.location = location;
     this.executeClientScripts = executeClientScripts;
