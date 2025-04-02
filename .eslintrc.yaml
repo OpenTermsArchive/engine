@@ -15,6 +15,10 @@ plugins:
   - jsdoc
 rules:
   jsdoc/require-jsdoc: 0
+  jsdoc/check-tag-names:
+    - error
+    - definedTags:
+      - swagger
   jsdoc/check-line-alignment: 
     - error
     - always
