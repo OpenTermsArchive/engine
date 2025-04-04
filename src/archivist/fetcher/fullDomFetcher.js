@@ -1,8 +1,8 @@
-import { TimeoutError } from 'puppeteer';
-import puppeteer from 'puppeteer-extra';
-import stealthPlugin from 'puppeteer-extra-plugin-stealth';
+import fs from 'fs';
+import os from 'os';
+import path from 'path';
 
-puppeteer.use(stealthPlugin());
+import { chromium, errors } from 'patchright';
 
 let browser;
 
@@ -21,7 +21,7 @@ export default async function fetch(url, cssSelectors, config) {
     await page.setDefaultNavigationTimeout(config.navigationTimeout);
     await page.setExtraHTTPHeaders({ 'Accept-Language': config.language });
 
-    response = await page.goto(url, { waitUntil: 'networkidle0' });
+    response = await page.goto(url);
 
     if (!response) {
       throw new Error(`Response is empty when trying to fetch '${url}'`);
@@ -51,7 +51,7 @@ export default async function fetch(url, cssSelectors, config) {
       content: await page.content(),
     };
   } catch (error) {
-    if (error instanceof TimeoutError) {
+    if (error instanceof errors.TimeoutError) {
       throw new Error(`Timed out after ${config.navigationTimeout / 1000} seconds when trying to fetch '${url}'`);
     }
     throw new Error(error.message);
@@ -62,28 +62,38 @@ export default async function fetch(url, cssSelectors, config) {
   }
 }
 
-/**
- * Launches a headless browser instance using Puppeteer if one is not already running. Returns the existing browser instance if one is already running, otherwise creates and returns a new instance.
- * @function launchHeadlessBrowser
- * @returns {Promise<puppeteer.Browser>} The Puppeteer browser instance.
- * @async
- */
 export async function launchHeadlessBrowser() {
   if (browser) {
     return browser;
   }
 
-  browser = await puppeteer.launch({ headless: true });
+  const options = {
+    channel: 'chrome',
+    viewport: null,
+  };
+
+  if (process.env.http_proxy) {
+    const proxyUrl = new URL(process.env.http_proxy);
+
+    options.proxy = {
+      server: proxyUrl.origin,
+      username: proxyUrl.username,
+      password: proxyUrl.password,
+    };
+  }
+  if (process.env.PLAYWRIGHT_NO_SANDBOX) {
+    options.args = [ '--no-sandbox', '--disable-setuid-sandbox' ];
+  }
+  if (process.env.PLAYWRIGHT_NO_HEADLESS) {
+    options.headless = false;
+  }
+  const userDataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ota'));
+
+  browser = await chromium.launchPersistentContext(userDataDir, options);
 
   return browser;
 }
 
-/**
- * Stops the headless browser instance if one is running. If no instance exists, it does nothing.
- * @function stopHeadlessBrowser
- * @returns {Promise<void>}
- * @async
- */
 export async function stopHeadlessBrowser() {
   if (!browser) {
     return;
