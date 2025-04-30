@@ -33,6 +33,7 @@ describe('GitHub', function () {
 
       nock('https://api.github.com')
         .get('/repos/owner/repo/labels')
+        .query(true)
         .reply(200, existingLabels);
 
       const missingLabels = MANAGED_LABELS.slice(-2);
@@ -61,6 +62,7 @@ describe('GitHub', function () {
     before(async () => {
       scope = nock('https://api.github.com')
         .get('/repos/owner/repo/labels')
+        .query(true)
         .reply(200, LABELS);
 
       result = await github.getRepositoryLabels();
