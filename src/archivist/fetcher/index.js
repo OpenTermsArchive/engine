@@ -1,12 +1,15 @@
+import Bottleneck from 'bottleneck';
 import config from 'config';
 
 import { FetchDocumentError } from './errors.js';
 import fetchFullDom from './fullDomFetcher.js';
 import fetchHtmlOnly from './htmlOnlyFetcher.js';
-import throttler from './throttler.js';
 
 export { launchHeadlessBrowser, stopHeadlessBrowser } from './fullDomFetcher.js';
 export { FetchDocumentError } from './errors.js';
+
+// We'll store a limiter per domain
+const domainLimiters = new Map();
 
 /**
  * Fetch a resource from the network, returning a promise which is fulfilled once the response is available
@@ -31,15 +34,32 @@ export default async function fetch({
   } = {},
 }) {
   try {
-    // Wait for throttling before making the request
-    await throttler.waitForDomain(url);
+    const domain = new URL(url).hostname;
+    const limiter = getLimiterForDomain(domain);
 
-    if (executeClientScripts) {
-      return await fetchFullDom(url, cssSelectors, { navigationTimeout, language, waitForElementsTimeout });
-    }
+    return limiter.schedule(async () => {
+      console.log('Making a request to', url);
+      if (executeClientScripts) {
+        return await fetchFullDom(url, cssSelectors, { navigationTimeout, language, waitForElementsTimeout });
+      }
 
-    return await fetchHtmlOnly(url, { navigationTimeout, language });
+      return await fetchHtmlOnly(url, { navigationTimeout, language });
+    });
   } catch (error) {
     throw new FetchDocumentError(error.message);
   }
+}
+
+function getLimiterForDomain(domain) {
+  if (!domainLimiters.has(domain)) {
+    // Create a limiter that allows 1 request every 5 seconds
+    const limiter = new Bottleneck({
+      minTime: 2000, // 2 seconds between jobs
+      maxConcurrent: 1, // Only 1 request at a time per domain
+    });
+
+    domainLimiters.set(domain, limiter);
+  }
+
+  return domainLimiters.get(domain);
 }
