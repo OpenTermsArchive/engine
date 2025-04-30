@@ -13,6 +13,7 @@ class Throttler {
     const timeToWait = Math.max(0, lastRequest + this.minIntervalMs - now);
 
     if (timeToWait > 0) {
+      console.log('Waiting for', timeToWait, 'ms to make a request to', domain);
       await new Promise(resolve => {
         setTimeout(resolve, timeToWait);
       });
