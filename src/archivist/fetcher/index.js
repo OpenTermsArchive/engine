@@ -33,21 +33,21 @@ export default async function fetch({
     waitForElementsTimeout = config.get('@opentermsarchive/engine.fetcher.waitForElementsTimeout'),
   } = {},
 }) {
-  try {
-    const domain = new URL(url).hostname;
-    const limiter = getLimiterForDomain(domain);
+  const domain = new URL(url).hostname;
+  const limiter = getLimiterForDomain(domain);
 
-    return limiter.schedule(async () => {
+  return limiter.schedule(async () => {
+    try {
       console.log('Making a request to', url);
       if (executeClientScripts) {
         return await fetchFullDom(url, cssSelectors, { navigationTimeout, language, waitForElementsTimeout });
       }
 
       return await fetchHtmlOnly(url, { navigationTimeout, language });
-    });
-  } catch (error) {
-    throw new FetchDocumentError(error.message);
-  }
+    } catch (error) {
+      throw new FetchDocumentError(error.message);
+    }
+  });
 }
 
 function getLimiterForDomain(domain) {
