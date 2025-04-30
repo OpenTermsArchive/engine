@@ -3,6 +3,7 @@ import config from 'config';
 import { FetchDocumentError } from './errors.js';
 import fetchFullDom from './fullDomFetcher.js';
 import fetchHtmlOnly from './htmlOnlyFetcher.js';
+import throttler from './throttler.js';
 
 export { launchHeadlessBrowser, stopHeadlessBrowser } from './fullDomFetcher.js';
 export { FetchDocumentError } from './errors.js';
@@ -30,6 +31,9 @@ export default async function fetch({
   } = {},
 }) {
   try {
+    // Wait for throttling before making the request
+    await throttler.waitForDomain(url);
+
     if (executeClientScripts) {
       return await fetchFullDom(url, cssSelectors, { navigationTimeout, language, waitForElementsTimeout });
     }

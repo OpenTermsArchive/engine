@@ -39,7 +39,7 @@ export default async function track({ services, types, extractOnly, schedule }) 
 
   // The result of the extraction step that generates the version from the snapshots may depend on changes to the engine or its dependencies.
   // The process thus starts by only performing the extraction process so that any version following such changes can be labelled (to avoid sending notifications, for example)
-  await archivist.track({ services, types, extractOnly: true });
+  // await archivist.track({ services, types, extractOnly: true });
 
   if (extractOnly) {
     return;
