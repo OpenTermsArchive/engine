@@ -8,7 +8,7 @@ All changes that impact users of this module are documented in this file, in the
 
 ### Fixed
 
-- Fix creation of labels for proper issues reporting with GitHub reporter
+- Fix creation of issues labels for GitHub repositories with over 30 labels
 
 ## 5.0.3 - 2025-03-10
 
