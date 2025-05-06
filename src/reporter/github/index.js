@@ -99,7 +99,10 @@ export default class GitHub {
   }
 
   async getRepositoryLabels() {
-    const { data: labels } = await this.octokit.request('GET /repos/{owner}/{repo}/labels', { ...this.commonParams });
+    const labels = await this.octokit.paginate('GET /repos/{owner}/{repo}/labels', {
+      ...this.commonParams,
+      per_page: 100,
+    });
 
     return labels;
   }
