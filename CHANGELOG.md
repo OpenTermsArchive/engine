@@ -18,7 +18,7 @@ _Full changeset and discussions: [#1147](https://github.com/OpenTermsArchive/eng
 
 ### Fixed
 
-- Ensure all ESLint dependencies are installed in production environments, as they are used for linting declarations.
+- Enable declarations linting in production environments
 
 ## 5.0.4 - 2025-05-06
 
