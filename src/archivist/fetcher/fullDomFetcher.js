@@ -21,7 +21,7 @@ export default async function fetch(url, cssSelectors, config) {
     await page.setDefaultNavigationTimeout(config.navigationTimeout);
     await page.setExtraHTTPHeaders({ 'Accept-Language': config.language });
 
-    response = await page.goto(url, { waitUntil: 'networkidle0' });
+    response = await page.goto(url, { waitUntil: 'load' }); // Using `load` instead of `networkidle0` as it's more reliable and faster. The 'load' event fires when the page and all its resources (stylesheets, scripts, images) have finished loading. `networkidle0` can be problematic as it waits for 500ms of network inactivity, which may never occur on dynamic pages and then triggers a navigation timeout.
 
     if (!response) {
       throw new Error(`Response is empty when trying to fetch '${url}'`);
