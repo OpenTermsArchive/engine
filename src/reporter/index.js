@@ -147,7 +147,7 @@ No changes were found in the last run, so no new version has been recorded.`,
     return `
 ### No version of the \`${terms.type}\` of service \`${terms.service.name}\` is recorded anymore since ${currentFormattedDate}
 
-The source document${terms.hasMultipleSourceDocuments ? 's have' : ' has'}${hasSnapshots ? ' ' : ' not '}been recorded in ${terms.hasMultipleSourceDocuments ? 'snapshots' : 'a snapshot'}, ${hasSnapshots ? 'but ' : 'thus '} no version can be [extracted](${DOC_URL}/#tracking-terms).
+The source document${terms.hasMultipleSourceDocuments ? 's have' : ' has'}${hasSnapshots ? ' ' : ' not '}been recorded in ${terms.hasMultipleSourceDocuments ? 'snapshots' : 'a snapshot'}, ${hasSnapshots ? 'but ' : 'thus '} no version can be [extracted](${DOC_URL}/concepts/main/#tracking-terms).
 ${hasSnapshots ? 'After correction, it might still be possible to recover the missed versions.' : ''}
 
 ### What went wrong
@@ -169,7 +169,7 @@ First of all, check if the source documents are accessible through a web browser
 #### If the source documents are not accessible anymore
 
 - If the source documents have moved, find their new location and [update it](${contributionToolUrl}).
-- If these terms have been removed, move them from the declaration to its [history file](${DOC_URL}/contributing-terms/#service-history), using \`${validUntil}\` as the \`validUntil\` value.
+- If these terms have been removed, move them from the declaration to its [history file](${DOC_URL}/terms/explanation/declarations-maintenance/#service-history-reference), using \`${validUntil}\` as the \`validUntil\` value.
 - If the service has closed, move the entire contents of the declaration to its [history file](${DOC_URL}/contributing-terms/#service-history), using \`${validUntil}\` as the \`validUntil\` value.
 
 #### If none of the above works
