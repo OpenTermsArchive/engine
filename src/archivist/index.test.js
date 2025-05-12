@@ -8,6 +8,8 @@ import nock from 'nock';
 import sinon from 'sinon';
 import sinonChai from 'sinon-chai';
 
+import { InaccessibleContentError } from './errors.js';
+import { FetchDocumentError } from './fetcher/index.js';
 import Git from './recorder/repositories/git/git.js';
 
 import Archivist, { EVENTS } from './index.js';
@@ -240,6 +242,100 @@ describe('Archivist', function () {
           it('still extracts the terms of other services', () => {
             expect(versionNotChangedSpy).to.have.been.calledWith(versionB);
           });
+        });
+      });
+    });
+  });
+
+  describe('#handleTrackingError', () => {
+    let errorSpy;
+    let warnSpy;
+    let inaccessibleContentSpy;
+    let pushSpy;
+    let terms;
+    let app;
+    const retryableError = new FetchDocumentError(FetchDocumentError.LIKELY_TRANSIENT_ERRORS[0]);
+
+    before(async () => {
+      app = new Archivist({
+        recorderConfig: config.get('@opentermsarchive/engine.recorder'),
+        fetcherConfig: config.get('@opentermsarchive/engine.fetcher'),
+      });
+      await app.initialize();
+    });
+
+    beforeEach(() => {
+      errorSpy = sinon.spy();
+      warnSpy = sinon.spy();
+      inaccessibleContentSpy = sinon.spy();
+      pushSpy = sinon.spy(app.trackingQueue, 'push');
+      app.on('error', errorSpy);
+      app.on('warn', warnSpy);
+      app.on('inaccessibleContent', inaccessibleContentSpy);
+
+      terms = {
+        service: { id: 'test-service' },
+        type: 'test-type',
+        sourceDocuments: [
+          { location: 'https://example.com/doc1' },
+          { location: 'https://example.com/doc2' },
+        ],
+      };
+    });
+
+    afterEach(() => {
+      errorSpy.resetHistory();
+      warnSpy.resetHistory();
+      inaccessibleContentSpy.resetHistory();
+      pushSpy.restore();
+    });
+
+    context('with an InaccessibleContentError', () => {
+      context('when error may be transient', () => {
+        beforeEach(() => {
+          const error = new InaccessibleContentError([retryableError]);
+
+          app.handleTrackingError(error, { terms });
+        });
+
+        it('does not emit an error event', () => {
+          expect(errorSpy).to.not.have.been.called;
+        });
+
+        it('does not emit an inaccessibleContent event', () => {
+          expect(inaccessibleContentSpy).to.not.have.been.called;
+        });
+
+        it('emits a warning', () => {
+          expect(warnSpy).to.have.been.called;
+        });
+
+        it('pushes terms to tracking queue for retry', () => {
+          expect(pushSpy).to.have.been.calledWith({ terms, isRetry: true });
+        });
+      });
+
+      context('when error comes from a retry', () => {
+        beforeEach(() => {
+          const error = new InaccessibleContentError([retryableError]);
+
+          app.handleTrackingError(error, { terms, isRetry: true });
+        });
+
+        it('does not emit an error event', () => {
+          expect(errorSpy).to.not.have.been.called;
+        });
+
+        it('does not emit a warning', () => {
+          expect(warnSpy).to.not.have.been.called;
+        });
+
+        it('emits an inaccessibleContent event with error and terms', () => {
+          expect(inaccessibleContentSpy).to.have.been.called;
+        });
+
+        it('does not push terms to tracking queue for retry', () => {
+          expect(pushSpy).to.not.have.been.called;
         });
       });
     });
