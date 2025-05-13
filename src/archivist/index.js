@@ -29,6 +29,7 @@ export const EVENTS = [
   'trackingCompleted',
   'inaccessibleContent',
   'info',
+  'warn',
   'error',
   'pluginError',
 ];
@@ -76,15 +77,35 @@ export default class Archivist extends events.EventEmitter {
 
   initQueue() {
     this.trackingQueue = async.queue(this.trackTermsChanges.bind(this), MAX_PARALLEL_TRACKING);
-    this.trackingQueue.error((error, { terms }) => {
-      if (error instanceof InaccessibleContentError) {
-        this.emit('inaccessibleContent', error, terms);
+    this.trackingQueue.error(this.handleTrackingError.bind(this));
+  }
 
-        return;
-      }
+  handleTrackingError(error, { terms, isRetry }) {
+    if (!(error instanceof InaccessibleContentError)) {
+      this.emit('error', {
+        message: error.stack,
+        serviceId: terms.service.id,
+        termsType: terms.type,
+      });
 
-      this.emit('error', error, terms);
-    });
+      return;
+    }
+
+    const isErrorLikelyTransient = error.errors.some(err => err instanceof FetchDocumentError && err.mayBeTransient);
+
+    if (isErrorLikelyTransient && !isRetry) {
+      this.emit('warn', {
+        message: `The documents cannot be accessed due to the following likely transient errors:\n- ${error.errors.map(err => err.message).join('\n- ')}\nA new attempt will be made once the current tracking is complete`,
+        serviceId: terms.service.id,
+        termsType: terms.type,
+      });
+
+      this.trackingQueue.push({ terms, isRetry: true });
+
+      return;
+    }
+
+    this.emit('inaccessibleContent', error, terms);
   }
 
   attach(listener) {
@@ -171,7 +192,7 @@ export default class Archivist extends events.EventEmitter {
           throw error;
         }
 
-        fetchDocumentErrors.push(error.message);
+        fetchDocumentErrors.push(error);
       }
     }));
 
@@ -206,7 +227,7 @@ export default class Archivist extends events.EventEmitter {
           throw error;
         }
 
-        extractDocumentErrors.push(error.message);
+        extractDocumentErrors.push(error);
       }
     }));
 

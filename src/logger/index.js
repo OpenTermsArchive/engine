@@ -141,13 +141,19 @@ logger.onInaccessibleContent = ({ message }, terms) => {
   logger.warn({ message, serviceId: terms.service.id, termsType: terms.type });
 };
 
-logger.onError = (error, terms) => {
-  logger.error({ message: error.stack, serviceId: terms.service.id, termsType: terms.type });
+const createLogHandler = level => params => {
+  if (typeof params === 'string') {
+    logger[level]({ message: params });
+  } else {
+    const { serviceId, termsType, documentId, id, message } = params;
+
+    logger[level]({ message, serviceId, termsType, documentId, id });
+  }
 };
 
-logger.onInfo = message => {
-  logger.info({ message });
-};
+logger.onError = createLogHandler('error');
+logger.onInfo = createLogHandler('info');
+logger.onWarn = createLogHandler('warn');
 
 logger.onPluginError = (error, pluginName) => {
   logger.error({ message: `Error in "${pluginName}" plugin: ${error.stack}` });
