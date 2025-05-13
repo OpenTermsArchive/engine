@@ -3,6 +3,8 @@ import path from 'path';
 
 import simpleGit from 'simple-git';
 
+import { parseTrailers, formatTrailers } from './trailers.js';
+
 process.env.LC_ALL = 'en_GB'; // Ensure git messages will be in English as some errors are handled by analysing the message content
 
 const fs = fsApi.promises;
@@ -38,7 +40,7 @@ export default class Git {
     return this.git.add(this.relativePath(filePath));
   }
 
-  async commit({ filePath, message, date = new Date() }) {
+  async commit({ filePath, message, date = new Date(), trailers = {} }) {
     const commitDate = new Date(date).toISOString();
     let summary;
 
@@ -46,7 +48,10 @@ export default class Git {
       process.env.GIT_AUTHOR_DATE = commitDate;
       process.env.GIT_COMMITTER_DATE = commitDate;
 
-      summary = await this.git.commit(message, filePath, ['--no-verify']); // Skip pre-commit and commit-msg hooks, as commits are programmatically managed, to optimize performance
+      const trailersSection = formatTrailers(trailers);
+      const finalMessage = trailersSection ? `${message}\n\n${trailersSection}` : message;
+
+      summary = await this.git.commit(finalMessage, filePath, ['--no-verify']); // Skip pre-commit and commit-msg hooks, as commits are programmatically managed, to optimize performance
     } finally {
       process.env.GIT_AUTHOR_DATE = '';
       process.env.GIT_COMMITTER_DATE = '';
@@ -70,14 +75,23 @@ export default class Git {
   async getCommit(options) {
     const [commit] = await this.listCommits([ '-1', ...options ]); // Returns only the most recent commit matching the given options
 
+    if (commit) {
+      commit.trailers = parseTrailers(commit.body);
+    }
+
     return commit;
   }
 
   async log(options = []) {
     try {
       const logSummary = await this.git.log(options);
+      const commits = logSummary.all;
 
-      return logSummary.all;
+      commits.forEach(commit => {
+        commit.trailers = parseTrailers(commit.body);
+      });
+
+      return commits;
     } catch (error) {
       if (/unknown revision or path not in the working tree|does not have any commits yet/.test(error.message)) {
         return [];
