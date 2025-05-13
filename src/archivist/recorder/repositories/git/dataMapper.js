@@ -24,7 +24,7 @@ const MULTIPLE_SOURCE_DOCUMENTS_PREFIX = 'This version was recorded after extrac
 export const COMMIT_MESSAGE_PREFIXES_REGEXP = new RegExp(`^(${Object.values(COMMIT_MESSAGE_PREFIXES).join('|')})`);
 
 export function toPersistence(record, snapshotIdentiferTemplate) {
-  const { serviceId, termsType, documentId, isExtractOnly, snapshotIds = [], mimeType, isFirstRecord } = record;
+  const { serviceId, termsType, documentId, isExtractOnly, snapshotIds = [], mimeType, isFirstRecord, metadata } = record;
 
   let prefix = isExtractOnly ? COMMIT_MESSAGE_PREFIXES.extractOnly : COMMIT_MESSAGE_PREFIXES.update;
 
@@ -46,11 +46,12 @@ export function toPersistence(record, snapshotIdentiferTemplate) {
     message: `${subject}\n\n${documentIdMessage || ''}\n\n${snapshotIdsMessage || ''}`,
     content: record.content,
     filePath,
+    metadata,
   };
 }
 
 export function toDomain(commit) {
-  const { hash, date, message, body, diff } = commit;
+  const { hash, date, message, body, diff, trailers = {} } = commit;
 
   const modifiedFilesInCommit = diff.files.map(({ file }) => file);
 
@@ -70,6 +71,7 @@ export function toDomain(commit) {
     documentId,
     fetchDate: new Date(date),
     isFirstRecord: message.startsWith(COMMIT_MESSAGE_PREFIXES.startTracking) || message.startsWith(COMMIT_MESSAGE_PREFIXES.deprecated_startTracking),
+    metadata: { ...trailers },
   };
 
   const mimeTypeValue = mime.getType(relativeFilePath);

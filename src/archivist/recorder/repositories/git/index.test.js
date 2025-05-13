@@ -41,6 +41,11 @@ const HTML_MIME_TYPE = mime.getType('html');
 const PDF_MIME_TYPE = mime.getType('pdf');
 const PDF_CONTENT = fs.readFileSync(path.resolve(__dirname, '../../../../../test/fixtures/terms.pdf'), { encoding: 'utf8' });
 
+const METADATA = {
+  fetcher: 'test-fetcher',
+  'engine-version': '5.0.0',
+};
+
 describe('GitRepository', () => {
   let git;
   let subject;
@@ -314,6 +319,26 @@ describe('GitRepository', () => {
           expect(commit.message).to.include(TERMS_TYPE);
         });
       });
+
+      context('when metadata is provided', () => {
+        before(async () => {
+          ({ id, isFirstRecord } = await subject.save(new Version({
+            serviceId: SERVICE_PROVIDER_ID,
+            termsType: TERMS_TYPE,
+            content: CONTENT,
+            fetchDate: FETCH_DATE,
+            metadata: METADATA,
+          })));
+
+          ([commit] = await git.log());
+        });
+
+        after(() => subject.removeAll());
+
+        it('stores metadata as commit trailers', () => {
+          expect(commit.trailers).to.deep.equal(METADATA);
+        });
+      });
     });
 
     describe('#findById', () => {
@@ -328,6 +353,7 @@ describe('GitRepository', () => {
           fetchDate: FETCH_DATE,
           snapshotIds: [SNAPSHOT_ID],
           mimeType: HTML_MIME_TYPE,
+          metadata: METADATA,
         })));
 
         (record = await subject.findById(id));
@@ -365,6 +391,10 @@ describe('GitRepository', () => {
 
       it('returns the snapshot ID', () => {
         expect(record.snapshotIds).to.deep.equal([SNAPSHOT_ID]);
+      });
+
+      it('returns metadata', () => {
+        expect(record.metadata).to.deep.equal(METADATA);
       });
 
       context('when requested record does not exist', () => {
@@ -433,6 +463,28 @@ describe('GitRepository', () => {
 
         it('returns null', () => {
           expect(recordFound).to.equal(null);
+        });
+      });
+
+      context('when metadata is provided', () => {
+        let record;
+
+        before(async () => {
+          await subject.save(new Version({
+            serviceId: SERVICE_PROVIDER_ID,
+            termsType: TERMS_TYPE,
+            content: CONTENT,
+            fetchDate: FETCH_DATE,
+            metadata: METADATA,
+          }));
+
+          record = await subject.findByDate(SERVICE_PROVIDER_ID, TERMS_TYPE, FETCH_DATE);
+        });
+
+        after(() => subject.removeAll());
+
+        it('retrieves metadata', () => {
+          expect(record.metadata).to.deep.equal(METADATA);
         });
       });
     });
@@ -557,6 +609,7 @@ describe('GitRepository', () => {
               content: UPDATED_FILE_CONTENT,
               fetchDate: FETCH_DATE,
               snapshotIds: [SNAPSHOT_ID],
+              metadata: METADATA,
             })));
 
             latestRecord = await subject.findLatest(SERVICE_PROVIDER_ID, TERMS_TYPE);
@@ -574,6 +627,10 @@ describe('GitRepository', () => {
 
           it('returns the latest record content', () => {
             expect(latestRecord.content.toString('utf8')).to.equal(UPDATED_FILE_CONTENT);
+          });
+
+          it('returns metadata', () => {
+            expect(latestRecord.metadata).to.deep.equal(METADATA);
           });
         });
       });
@@ -901,6 +958,28 @@ describe('GitRepository', () => {
           expect(mime.getType(EXPECTED_PDF_SNAPSHOT_FILE_PATH)).to.equal(PDF_MIME_TYPE);
         });
       });
+
+      context('when metadata is provided', () => {
+        before(async () => {
+          ({ id, isFirstRecord } = await subject.save(new Snapshot({
+            serviceId: SERVICE_PROVIDER_ID,
+            termsType: TERMS_TYPE,
+            documentId: DOCUMENT_ID,
+            content: CONTENT,
+            fetchDate: FETCH_DATE,
+            mimeType: HTML_MIME_TYPE,
+            metadata: METADATA,
+          })));
+
+          ([commit] = await git.log());
+        });
+
+        after(() => subject.removeAll());
+
+        it('stores metadata as commit trailers', () => {
+          expect(commit.trailers).to.deep.equal(METADATA);
+        });
+      });
     });
 
     describe('#findById', () => {
@@ -915,6 +994,7 @@ describe('GitRepository', () => {
           content: CONTENT,
           fetchDate: FETCH_DATE,
           mimeType: HTML_MIME_TYPE,
+          metadata: METADATA,
         })));
 
         (record = await subject.findById(id));
@@ -956,6 +1036,10 @@ describe('GitRepository', () => {
 
       it('returns the document ID', () => {
         expect(record.documentId).to.equal(DOCUMENT_ID);
+      });
+
+      it('returns metadata', () => {
+        expect(record.metadata).to.deep.equal(METADATA);
       });
 
       context('when requested record does not exist', () => {
@@ -1086,6 +1170,7 @@ describe('GitRepository', () => {
               content: UPDATED_FILE_CONTENT,
               mimeType: HTML_MIME_TYPE,
               fetchDate: FETCH_DATE,
+              metadata: METADATA,
             })));
 
             latestRecord = await subject.findLatest(SERVICE_PROVIDER_ID, TERMS_TYPE);
@@ -1107,6 +1192,10 @@ describe('GitRepository', () => {
 
           it('returns the latest record mime type', () => {
             expect(latestRecord.mimeType).to.equal(HTML_MIME_TYPE);
+          });
+
+          it('returns metadata', () => {
+            expect(latestRecord.metadata).to.deep.equal(METADATA);
           });
         });
 
@@ -1203,6 +1292,29 @@ describe('GitRepository', () => {
 
       it('iterates in ascending order', () => {
         expect(fetchDates).to.deep.equal([ FETCH_DATE_EARLIER, FETCH_DATE, FETCH_DATE_LATER ]);
+      });
+    });
+
+    context('when metadata is provided', () => {
+      let record;
+
+      before(async () => {
+        await subject.save(new Snapshot({
+          serviceId: SERVICE_PROVIDER_ID,
+          termsType: TERMS_TYPE,
+          content: CONTENT,
+          fetchDate: FETCH_DATE,
+          mimeType: HTML_MIME_TYPE,
+          metadata: METADATA,
+        }));
+
+        record = await subject.findByDate(SERVICE_PROVIDER_ID, TERMS_TYPE, FETCH_DATE);
+      });
+
+      after(() => subject.removeAll());
+
+      it('retrieves metadata', () => {
+        expect(record.metadata).to.deep.equal(METADATA);
       });
     });
   });
