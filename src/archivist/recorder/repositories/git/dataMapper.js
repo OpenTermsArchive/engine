@@ -68,16 +68,20 @@ export function toDomain(commit) {
     serviceId: path.dirname(relativeFilePath),
     termsType,
     documentId,
-    mimeType: mime.getType(relativeFilePath),
     fetchDate: new Date(date),
     isFirstRecord: message.startsWith(COMMIT_MESSAGE_PREFIXES.startTracking) || message.startsWith(COMMIT_MESSAGE_PREFIXES.deprecated_startTracking),
-    isExtractOnly: message.startsWith(COMMIT_MESSAGE_PREFIXES.extractOnly) || message.startsWith(COMMIT_MESSAGE_PREFIXES.deprecated_refilter),
-    snapshotIds: snapshotIdsMatch || [],
   };
 
-  if (attributes.mimeType == mime.getType('markdown')) {
+  const mimeTypeValue = mime.getType(relativeFilePath);
+
+  if (mimeTypeValue == mime.getType('markdown')) {
+    attributes.isExtractOnly = message.startsWith(COMMIT_MESSAGE_PREFIXES.extractOnly) || message.startsWith(COMMIT_MESSAGE_PREFIXES.deprecated_refilter);
+    attributes.snapshotIds = snapshotIdsMatch;
+
     return new Version(attributes);
   }
+
+  attributes.mimeType = mimeTypeValue;
 
   return new Snapshot(attributes);
 }
