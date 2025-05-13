@@ -95,7 +95,7 @@ export default class Archivist extends events.EventEmitter {
 
     if (isErrorLikelyTransient && !isRetry) {
       this.emit('warn', {
-message: `The documents cannot be accessed due to the following likely transient errors:\n- ${error.errors.map(err => err.message).join('\n- ')}\nA new attempt will be made once the current tracking is complete`,
+        message: `The documents cannot be accessed due to the following likely transient errors:\n- ${error.errors.map(err => err.message).join('\n- ')}\nA new attempt will be made once the current tracking is complete`,
         serviceId: terms.service.id,
         termsType: terms.type,
       });
