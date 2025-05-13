@@ -277,6 +277,7 @@ export default class Archivist extends events.EventEmitter {
         metadata: {
           'x-engine-version': process.env.npm_package_version,
           'x-fetcher': sourceDocument.fetcher,
+          'x-source-document-location': sourceDocument.location,
         },
       });
 
