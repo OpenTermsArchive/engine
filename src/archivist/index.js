@@ -249,6 +249,7 @@ export default class Archivist extends events.EventEmitter {
       termsType: terms.type,
       fetchDate: terms.fetchDate,
       isExtractOnly: extractOnly,
+      metadata: { 'x-engine-version': process.env.npm_package_version },
     });
 
     await this.recorder.record(record);
@@ -274,6 +275,7 @@ export default class Archivist extends events.EventEmitter {
         content: sourceDocument.content,
         mimeType: sourceDocument.mimeType,
         metadata: {
+          'x-engine-version': process.env.npm_package_version,
           'x-fetcher': sourceDocument.fetcher,
         },
       });
