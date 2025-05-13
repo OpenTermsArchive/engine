@@ -7,7 +7,7 @@ import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import iconv from 'iconv-lite';
 
-import fetch, { launchHeadlessBrowser, stopHeadlessBrowser, FetchDocumentError } from './index.js';
+import fetch, { launchHeadlessBrowser, stopHeadlessBrowser, FetchDocumentError, FETCHER_TYPES } from './index.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -31,6 +31,8 @@ describe('Fetcher', function () {
     let expectedPDFContent;
 
     before(done => {
+      let blockCount = 0;
+
       temporaryServer = http.createServer((request, response) => {
         if (request.url === '/') {
           response.writeHead(200, { 'Content-Type': 'text/html' }).write(termsHTML);
@@ -46,8 +48,18 @@ describe('Fetcher', function () {
         }
         if (request.url == '/terms.pdf') {
           expectedPDFContent = fs.readFileSync(path.resolve(__dirname, '../../../test/fixtures/terms.pdf'));
-
           response.writeHead(200, { 'Content-Type': 'application/pdf' }).write(expectedPDFContent);
+        }
+        if (request.url === '/block-once') {
+          if (blockCount === 0) {
+            blockCount++;
+            response.writeHead(403, { 'Content-Type': 'text/html' }).write('<!DOCTYPE html><html><body>Access Denied - Bot Detected</body></html>');
+          } else {
+            response.writeHead(200, { 'Content-Type': 'text/html' }).write(termsHTML);
+          }
+        }
+        if (request.url === '/always-block') {
+          response.writeHead(403, { 'Content-Type': 'text/html' }).write('<!DOCTYPE html><html><body>Access Denied - Bot Detected</body></html>');
         }
 
         return response.end();
@@ -66,11 +78,12 @@ describe('Fetcher', function () {
       context('when html page is available', () => {
         let content;
         let mimeType;
+        let fetcher;
         const url = `http://127.0.0.1:${SERVER_PORT}`;
 
         context('when expected selectors are present', () => {
           before(async () => {
-            ({ content, mimeType } = await fetch({ url, cssSelectors: 'body' }));
+            ({ content, mimeType, fetcher } = await fetch({ url, cssSelectors: 'body' }));
           });
 
           it('returns the web page content of the given URL', () => {
@@ -81,9 +94,13 @@ describe('Fetcher', function () {
             expect(mimeType).to.equal('text/html');
           });
 
+          it('uses HTML-only fetcher by default', () => {
+            expect(fetcher).to.equal(FETCHER_TYPES.HTML_ONLY);
+          });
+
           context('with client script enabled', () => {
             before(async () => {
-              ({ content, mimeType } = await fetch({ url, cssSelectors: 'body', executeClientScripts: true }));
+              ({ content, mimeType, fetcher } = await fetch({ url, cssSelectors: 'body', executeClientScripts: true }));
             });
 
             it('returns the web page content of the given URL', () => {
@@ -92,6 +109,10 @@ describe('Fetcher', function () {
 
             it('returns the MIME type of the given URL', () => {
               expect(mimeType).to.equal('text/html');
+            });
+
+            it('uses full DOM fetcher when client scripts are enabled', () => {
+              expect(fetcher).to.equal(FETCHER_TYPES.FULL_DOM);
             });
           });
         });
@@ -100,7 +121,7 @@ describe('Fetcher', function () {
           const NOT_PRESENT_SELECTOR = 'h2';
 
           before(async () => {
-            ({ content, mimeType } = await fetch({ url, cssSelectors: NOT_PRESENT_SELECTOR }));
+            ({ content, mimeType, fetcher } = await fetch({ url, cssSelectors: NOT_PRESENT_SELECTOR }));
           });
 
           it('returns the web page content of the given URL', () => {
@@ -111,9 +132,13 @@ describe('Fetcher', function () {
             expect(mimeType).to.equal('text/html');
           });
 
+          it('uses HTML-only fetcher by default', () => {
+            expect(fetcher).to.equal(FETCHER_TYPES.HTML_ONLY);
+          });
+
           context('with client script enabled', () => {
             before(async () => {
-              ({ content, mimeType } = await fetch({ url, cssSelectors: NOT_PRESENT_SELECTOR, executeClientScripts: true }));
+              ({ content, mimeType, fetcher } = await fetch({ url, cssSelectors: NOT_PRESENT_SELECTOR, executeClientScripts: true }));
             });
 
             it('returns the web page content of the given URL', () => {
@@ -123,21 +148,30 @@ describe('Fetcher', function () {
             it('returns the MIME type of the given URL', () => {
               expect(mimeType).to.equal('text/html');
             });
+
+            it('uses full DOM fetcher when client scripts are enabled', () => {
+              expect(fetcher).to.equal(FETCHER_TYPES.FULL_DOM);
+            });
           });
         });
       });
 
       context('when html page is in different charset', () => {
         let content;
+        let fetcher;
         const url = `http://127.0.0.1:${SERVER_PORT}/other-charset`;
 
         context('when expected selectors are present', () => {
           before(async () => {
-            ({ content } = await fetch({ url, cssSelectors: 'body' }));
+            ({ content, fetcher } = await fetch({ url, cssSelectors: 'body' }));
           });
 
           it('returns the web page content of the given URL', () => {
             expect(content).to.equal(termsWithOtherCharsetHTML);
+          });
+
+          it('uses HTML-only fetcher by default', () => {
+            expect(fetcher).to.equal(FETCHER_TYPES.HTML_ONLY);
           });
         });
       });
@@ -145,10 +179,11 @@ describe('Fetcher', function () {
       context('when url targets a PDF file', () => {
         let content;
         let mimeType;
+        let fetcher;
         const pdfUrl = `http://127.0.0.1:${SERVER_PORT}/terms.pdf`;
 
         before(async () => {
-          ({ content, mimeType } = await fetch({ url: pdfUrl }));
+          ({ content, mimeType, fetcher } = await fetch({ url: pdfUrl }));
         });
 
         it('returns a buffer for PDF content', () => {
@@ -161,6 +196,10 @@ describe('Fetcher', function () {
 
         it('returns a blob with the file content', () => {
           expect(content.equals(expectedPDFContent)).to.be.true;
+        });
+
+        it('returns the fetcher used to fetch the PDF file', () => {
+          expect(fetcher).to.equal(FETCHER_TYPES.HTML_ONLY);
         });
       });
 
@@ -243,6 +282,20 @@ describe('Fetcher', function () {
               await expect(fetch({ url: untrustedRootSslUrl, executeClientScripts: true })).to.be.rejectedWith(FetchDocumentError);
             });
           });
+        });
+      });
+
+      describe('when bot blocking is detected', () => {
+        it('falls back to full DOM fetcher when bot blocking is detected', async () => {
+          const { content, mimeType, fetcher } = await fetch({ url: `http://127.0.0.1:${SERVER_PORT}/block-once` });
+
+          expect(content).to.equal(termsHTML);
+          expect(mimeType).to.equal('text/html');
+          expect(fetcher).to.equal(FETCHER_TYPES.FULL_DOM);
+        });
+
+        it('still throws FetchDocumentError if both fetchers fail', async () => {
+          await expect(fetch({ url: `http://127.0.0.1:${SERVER_PORT}/always-block` })).to.be.rejectedWith(FetchDocumentError);
         });
       });
     });
