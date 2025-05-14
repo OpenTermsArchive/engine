@@ -17,7 +17,7 @@ export function toPersistence(record) {
 }
 
 export function toDomain(mongoDocument) {
-  const { _id, serviceId, termsType, documentId, fetchDate, mimeType, isExtractOnly, isRefilter, isFirstRecord, snapshotIds } = mongoDocument;
+  const { _id, serviceId, termsType, documentId, fetchDate, mimeType, isExtractOnly, isRefilter, isFirstRecord, snapshotIds, metadata } = mongoDocument;
 
   const attributes = {
     id: _id.toString(),
@@ -29,6 +29,7 @@ export function toDomain(mongoDocument) {
     isFirstRecord: Boolean(isFirstRecord),
     isExtractOnly: Boolean(isExtractOnly) || Boolean(isRefilter),
     snapshotIds: snapshotIds?.map(snapshotId => snapshotId.toString()) || [],
+    metadata,
   };
 
   if (snapshotIds) {
