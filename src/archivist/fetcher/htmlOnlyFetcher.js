@@ -5,14 +5,14 @@ import HttpProxyAgent from 'http-proxy-agent';
 import HttpsProxyAgent from 'https-proxy-agent';
 import nodeFetch, { AbortError } from 'node-fetch';
 
-export default async function fetch(url, configuration) {
+export default async function fetch(url, config) {
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), configuration.navigationTimeout);
+  const timeout = setTimeout(() => controller.abort(), config.navigationTimeout);
 
   const nodeFetchOptions = {
     signal: controller.signal,
     credentials: 'include',
-    headers: { 'Accept-Language': configuration.language },
+    headers: { 'Accept-Language': config.language },
   };
 
   if (url.startsWith('https:') && process.env.HTTPS_PROXY) {
@@ -51,7 +51,7 @@ export default async function fetch(url, configuration) {
     };
   } catch (error) {
     if (error instanceof AbortError) {
-      throw new Error(`Timed out after ${configuration.navigationTimeout / 1000} seconds when trying to fetch '${url}'`);
+      throw new Error(`Timed out after ${config.navigationTimeout / 1000} seconds when trying to fetch '${url}'`);
     }
 
     throw new Error(error.message);
