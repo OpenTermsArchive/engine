@@ -33,7 +33,7 @@ export default async function fetch(url, cssSelectors, config) {
       throw new Error(`Received HTTP code ${statusCode} when trying to fetch '${url}'`);
     }
 
-    const waitForSelectorsPromises = selectors.filter(selector => selector).map(selector => page.waitForSelector(selector, { timeout: config.waitForElementsTimeout }));
+    const waitForSelectorsPromises = selectors.filter(Boolean).map(selector => page.waitForSelector(selector, { timeout: config.waitForElementsTimeout }));
 
     // We expect all elements to be present on the page…
     await Promise.all(waitForSelectorsPromises).catch(error => {
