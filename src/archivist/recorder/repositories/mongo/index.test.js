@@ -34,6 +34,11 @@ const PDF_CONTENT = fs.readFileSync(path.resolve(__dirname, '../../../../../test
 const UPDATED_PDF_CONTENT = fs.readFileSync(path.resolve(__dirname, '../../../../../test/fixtures/termsModified.pdf'));
 const PDF_MIME_TYPE = mime.getType('pdf');
 
+const METADATA = {
+  fetcher: 'test-fetcher',
+  'engine-version': '5.0.0',
+};
+
 let collection;
 
 describe('MongoRepository', () => {
@@ -57,10 +62,10 @@ describe('MongoRepository', () => {
 
       context('when it is the first record', () => {
         before(async () => {
-          numberOfRecordsBefore = await collection.find({
+          numberOfRecordsBefore = await collection.countDocuments({
             serviceId: SERVICE_PROVIDER_ID,
             termsType: TERMS_TYPE,
-          }).count();
+          });
 
           (record = await subject.save(new Version({
             serviceId: SERVICE_PROVIDER_ID,
@@ -68,12 +73,13 @@ describe('MongoRepository', () => {
             content: CONTENT,
             fetchDate: FETCH_DATE,
             snapshotIds: [SNAPSHOT_ID],
+            metadata: METADATA,
           })));
 
-          numberOfRecordsAfter = await collection.find({
+          numberOfRecordsAfter = await collection.countDocuments({
             serviceId: SERVICE_PROVIDER_ID,
             termsType: TERMS_TYPE,
-          }).count();
+          });
 
           (mongoDocument = await collection.findOne({
             serviceId: SERVICE_PROVIDER_ID,
@@ -132,10 +138,10 @@ describe('MongoRepository', () => {
             snapshotIds: [SNAPSHOT_ID],
           })));
 
-          numberOfRecordsBefore = await collection.find({
+          numberOfRecordsBefore = await collection.countDocuments({
             serviceId: SERVICE_PROVIDER_ID,
             termsType: TERMS_TYPE,
-          }).count();
+          });
 
           (record = await subject.save(new Version({
             serviceId: SERVICE_PROVIDER_ID,
@@ -145,10 +151,10 @@ describe('MongoRepository', () => {
             snapshotIds: [SNAPSHOT_ID],
           })));
 
-          numberOfRecordsAfter = await collection.find({
+          numberOfRecordsAfter = await collection.countDocuments({
             serviceId: SERVICE_PROVIDER_ID,
             termsType: TERMS_TYPE,
-          }).count();
+          });
 
           ([mongoDocument] = await collection.find({
             serviceId: SERVICE_PROVIDER_ID,
@@ -181,10 +187,10 @@ describe('MongoRepository', () => {
             snapshotIds: [SNAPSHOT_ID],
           }));
 
-          numberOfRecordsBefore = await collection.find({
+          numberOfRecordsBefore = await collection.countDocuments({
             serviceId: SERVICE_PROVIDER_ID,
             termsType: TERMS_TYPE,
-          }).count();
+          });
 
           (record = await subject.save(new Version({
             serviceId: SERVICE_PROVIDER_ID,
@@ -194,10 +200,10 @@ describe('MongoRepository', () => {
             snapshotIds: [SNAPSHOT_ID],
           })));
 
-          numberOfRecordsAfter = await collection.find({
+          numberOfRecordsAfter = await collection.countDocuments({
             serviceId: SERVICE_PROVIDER_ID,
             termsType: TERMS_TYPE,
-          }).count();
+          });
         });
 
         after(() => subject.removeAll());
@@ -223,10 +229,10 @@ describe('MongoRepository', () => {
             snapshotIds: [SNAPSHOT_ID],
           })); // An extracted only version cannot be the first record
 
-          numberOfRecordsBefore = await collection.find({
+          numberOfRecordsBefore = await collection.countDocuments({
             serviceId: SERVICE_PROVIDER_ID,
             termsType: TERMS_TYPE,
-          }).count();
+          });
 
           (record = await subject.save(new Version({
             serviceId: SERVICE_PROVIDER_ID,
@@ -237,10 +243,10 @@ describe('MongoRepository', () => {
             isExtractOnly: true,
           })));
 
-          numberOfRecordsAfter = await collection.find({
+          numberOfRecordsAfter = await collection.countDocuments({
             serviceId: SERVICE_PROVIDER_ID,
             termsType: TERMS_TYPE,
-          }).count();
+          });
 
           ([mongoDocument] = await collection.find({
             serviceId: SERVICE_PROVIDER_ID,
@@ -356,6 +362,29 @@ describe('MongoRepository', () => {
           expect(mongoDocument.documentId).to.equal(DOCUMENT_ID);
         });
       });
+
+      context('when metadata is provided', () => {
+        before(async () => {
+          await subject.save(new Version({
+            serviceId: SERVICE_PROVIDER_ID,
+            termsType: TERMS_TYPE,
+            content: CONTENT,
+            fetchDate: FETCH_DATE,
+            metadata: METADATA,
+          }));
+
+          (mongoDocument = await collection.findOne({
+            serviceId: SERVICE_PROVIDER_ID,
+            termsType: TERMS_TYPE,
+          }));
+        });
+
+        after(() => subject.removeAll());
+
+        it('stores metadata as commit trailers', () => {
+          expect(mongoDocument.metadata).to.deep.equal(METADATA);
+        });
+      });
     });
 
     describe('#findById', () => {
@@ -369,6 +398,7 @@ describe('MongoRepository', () => {
           content: CONTENT,
           fetchDate: FETCH_DATE,
           snapshotIds: [SNAPSHOT_ID],
+          metadata: METADATA,
         })));
 
         (record = await subject.findById(id));
@@ -406,6 +436,10 @@ describe('MongoRepository', () => {
 
       it('returns the snapshot ID', () => {
         expect(record.snapshotIds).to.deep.equal([SNAPSHOT_ID]);
+      });
+
+      it('returns the metadata', () => {
+        expect(record.metadata).to.deep.equal(METADATA);
       });
 
       context('when requested record does not exist', () => {
@@ -502,6 +536,28 @@ describe('MongoRepository', () => {
             expect(recordFound.documentId).to.equal(DOCUMENT_ID);
             expect(recordFound.content).to.equal(CONTENT);
           });
+        });
+      });
+
+      context('when metadata is provided', () => {
+        let record;
+
+        before(async () => {
+          await subject.save(new Version({
+            serviceId: SERVICE_PROVIDER_ID,
+            termsType: TERMS_TYPE,
+            content: CONTENT,
+            fetchDate: FETCH_DATE,
+            metadata: METADATA,
+          }));
+
+          record = await subject.findByDate(SERVICE_PROVIDER_ID, TERMS_TYPE, FETCH_DATE);
+        });
+
+        after(() => subject.removeAll());
+
+        it('retrieves metadata', () => {
+          expect(record.metadata).to.deep.equal(METADATA);
         });
       });
     });
@@ -695,6 +751,28 @@ describe('MongoRepository', () => {
           expect(latestRecord).to.equal(null);
         });
       });
+
+      context('when metadata is provided', () => {
+        let record;
+
+        before(async () => {
+          await subject.save(new Version({
+            serviceId: SERVICE_PROVIDER_ID,
+            termsType: TERMS_TYPE,
+            content: CONTENT,
+            fetchDate: FETCH_DATE,
+            metadata: METADATA,
+          }));
+
+          record = await subject.findLatest(SERVICE_PROVIDER_ID, TERMS_TYPE);
+        });
+
+        after(() => subject.removeAll());
+
+        it('retrieves metadata', () => {
+          expect(record.metadata).to.deep.equal(METADATA);
+        });
+      });
     });
 
     describe('#iterate', () => {
@@ -770,10 +848,10 @@ describe('MongoRepository', () => {
 
       context('when it is the first record', () => {
         before(async () => {
-          numberOfRecordsBefore = await collection.find({
+          numberOfRecordsBefore = await collection.countDocuments({
             serviceId: SERVICE_PROVIDER_ID,
             termsType: TERMS_TYPE,
-          }).count();
+          });
 
           (record = await subject.save(new Snapshot({
             serviceId: SERVICE_PROVIDER_ID,
@@ -784,10 +862,10 @@ describe('MongoRepository', () => {
             fetchDate: FETCH_DATE,
           })));
 
-          numberOfRecordsAfter = await collection.find({
+          numberOfRecordsAfter = await collection.countDocuments({
             serviceId: SERVICE_PROVIDER_ID,
             termsType: TERMS_TYPE,
-          }).count();
+          });
 
           (mongoDocument = await collection.findOne({
             serviceId: SERVICE_PROVIDER_ID,
@@ -850,10 +928,10 @@ describe('MongoRepository', () => {
             fetchDate: FETCH_DATE,
           })));
 
-          numberOfRecordsBefore = await collection.find({
+          numberOfRecordsBefore = await collection.countDocuments({
             serviceId: SERVICE_PROVIDER_ID,
             termsType: TERMS_TYPE,
-          }).count();
+          });
 
           (record = await subject.save(new Snapshot({
             serviceId: SERVICE_PROVIDER_ID,
@@ -863,10 +941,10 @@ describe('MongoRepository', () => {
             fetchDate: FETCH_DATE,
           })));
 
-          numberOfRecordsAfter = await collection.find({
+          numberOfRecordsAfter = await collection.countDocuments({
             serviceId: SERVICE_PROVIDER_ID,
             termsType: TERMS_TYPE,
-          }).count();
+          });
 
           ([mongoDocument] = await collection.find({
             serviceId: SERVICE_PROVIDER_ID,
@@ -899,10 +977,10 @@ describe('MongoRepository', () => {
             fetchDate: FETCH_DATE,
           }));
 
-          numberOfRecordsBefore = await collection.find({
+          numberOfRecordsBefore = await collection.countDocuments({
             serviceId: SERVICE_PROVIDER_ID,
             termsType: TERMS_TYPE,
-          }).count();
+          });
 
           (record = await subject.save(new Snapshot({
             serviceId: SERVICE_PROVIDER_ID,
@@ -912,10 +990,10 @@ describe('MongoRepository', () => {
             fetchDate: FETCH_DATE_LATER,
           })));
 
-          numberOfRecordsAfter = await collection.find({
+          numberOfRecordsAfter = await collection.countDocuments({
             serviceId: SERVICE_PROVIDER_ID,
             termsType: TERMS_TYPE,
-          }).count();
+          });
         });
 
         after(() => subject.removeAll());
@@ -931,12 +1009,12 @@ describe('MongoRepository', () => {
 
       context('with PDF document', () => {
         before(async () => {
-          numberOfRecordsBefore = await collection.find({
+          numberOfRecordsBefore = await collection.countDocuments({
             serviceId: SERVICE_PROVIDER_ID,
             termsType: TERMS_TYPE,
             content: PDF_CONTENT,
             mimeType: PDF_MIME_TYPE,
-          }).count();
+          });
 
           (record = await subject.save(new Snapshot({
             serviceId: SERVICE_PROVIDER_ID,
@@ -946,10 +1024,10 @@ describe('MongoRepository', () => {
             fetchDate: FETCH_DATE,
           })));
 
-          numberOfRecordsAfter = await collection.find({
+          numberOfRecordsAfter = await collection.countDocuments({
             serviceId: SERVICE_PROVIDER_ID,
             termsType: TERMS_TYPE,
-          }).count();
+          });
 
           (mongoDocument = await collection.findOne({
             serviceId: SERVICE_PROVIDER_ID,
@@ -991,9 +1069,10 @@ describe('MongoRepository', () => {
           content: CONTENT,
           fetchDate: FETCH_DATE,
           mimeType: HTML_MIME_TYPE,
+          metadata: METADATA,
         })));
 
-        (record = await subject.findById(id));
+        record = await subject.findById(id);
       });
 
       after(() => subject.removeAll());
@@ -1032,6 +1111,10 @@ describe('MongoRepository', () => {
 
       it('returns the document ID', () => {
         expect(record.documentId).to.equal(DOCUMENT_ID);
+      });
+
+      it('returns the metadata', () => {
+        expect(record.metadata).to.deep.equal(METADATA);
       });
 
       context('when requested record does not exist', () => {
@@ -1270,6 +1353,29 @@ describe('MongoRepository', () => {
 
         it('returns null', () => {
           expect(latestRecord).to.equal(null);
+        });
+      });
+
+      context('when metadata is provided', () => {
+        let record;
+
+        before(async () => {
+          await subject.save(new Snapshot({
+            serviceId: SERVICE_PROVIDER_ID,
+            termsType: TERMS_TYPE,
+            content: CONTENT,
+            fetchDate: FETCH_DATE,
+            mimeType: HTML_MIME_TYPE,
+            metadata: METADATA,
+          }));
+
+          record = await subject.findLatest(SERVICE_PROVIDER_ID, TERMS_TYPE);
+        });
+
+        after(() => subject.removeAll());
+
+        it('retrieves metadata', () => {
+          expect(record.metadata).to.deep.equal(METADATA);
         });
       });
     });

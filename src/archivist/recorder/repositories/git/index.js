@@ -41,12 +41,12 @@ export default class GitRepository extends RepositoryInterface {
       record.isFirstRecord = !await this.#isTracked(serviceId, termsType, documentId);
     }
 
-    const { message, content, filePath: relativeFilePath } = await this.#toPersistence(record);
+    const { message, content, filePath: relativeFilePath, metadata } = await this.#toPersistence(record);
 
     const filePath = path.join(this.path, relativeFilePath);
 
     await GitRepository.writeFile({ filePath, content });
-    const sha = await this.#commit({ filePath, message, date: fetchDate });
+    const sha = await this.#commit({ filePath, message, date: fetchDate, trailers: metadata });
 
     if (!sha) {
       return Object(null);
@@ -153,11 +153,11 @@ export default class GitRepository extends RepositoryInterface {
     return filePath;
   }
 
-  async #commit({ filePath, message, date }) {
+  async #commit({ filePath, message, date, trailers }) {
     try {
       await this.git.add(filePath);
 
-      return await this.git.commit({ filePath, message, date });
+      return await this.git.commit({ filePath, message, date, trailers });
     } catch (error) {
       throw new Error(`Could not commit ${filePath} with message "${message}" due to error: "${error}"`);
     }

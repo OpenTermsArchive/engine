@@ -183,10 +183,11 @@ export default class Archivist extends events.EventEmitter {
       const { location: url, executeClientScripts, cssSelectors } = sourceDocument;
 
       try {
-        const { mimeType, content } = await this.fetch({ url, executeClientScripts, cssSelectors });
+        const { mimeType, content, fetcher } = await this.fetch({ url, executeClientScripts, cssSelectors });
 
         sourceDocument.content = content;
         sourceDocument.mimeType = mimeType;
+        sourceDocument.fetcher = fetcher;
       } catch (error) {
         if (!(error instanceof FetchDocumentError)) {
           throw error;
@@ -248,6 +249,7 @@ export default class Archivist extends events.EventEmitter {
       termsType: terms.type,
       fetchDate: terms.fetchDate,
       isExtractOnly: extractOnly,
+      metadata: { 'x-engine-version': process.env.npm_package_version },
     });
 
     await this.recorder.record(record);
@@ -272,6 +274,11 @@ export default class Archivist extends events.EventEmitter {
         fetchDate: terms.fetchDate,
         content: sourceDocument.content,
         mimeType: sourceDocument.mimeType,
+        metadata: {
+          'x-engine-version': process.env.npm_package_version,
+          'x-fetcher': sourceDocument.fetcher,
+          'x-source-document-location': sourceDocument.location,
+        },
       });
 
       await this.recorder.record(record);

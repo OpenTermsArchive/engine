@@ -90,7 +90,7 @@ export default class MongoRepository extends RepositoryInterface {
   }
 
   count() {
-    return this.collection.find().count();
+    return this.collection.countDocuments();
   }
 
   async* iterate() {
