@@ -96,18 +96,19 @@ if (config.get('@opentermsarchive/engine.logger.sendMailOnError')) {
                   CPU Load (1/5/15 min): ${os.loadavg().map(load =>
     `${Math.min(100, (load / os.cpus().length) * 100).toFixed(1)}%`).join(' / ')}<br>
                   Total Memory: ${(os.totalmem() / (1024 * 1024 * 1024)).toFixed(2)} GB<br>
-                  Free Memory: ${(os.freemem() / (1024 * 1024 * 1024)).toFixed(2)} GB<br>
-                  Server IP: ${collection.host}
+                  Free Memory: ${(os.freemem() / (1024 * 1024 * 1024)).toFixed(2)} GB${collection.host ? `<br>
+                  Server IP: ${collection.host}` : ''}
                 </div>
               </div>
 
               <div style="background-color: #f8f9fa; border-radius: 8px; padding: 15px; margin-bottom: 0;">
                 <h2 style="color: #198754; margin: 0 0 0 0; font-size: 20px; border-bottom: 2px solid #198754; padding-bottom: 8px;">Helpful commands</h2>
                 <ul style="list-style-type: none; padding-left: 0; margin: 0;">
+                  ${collection.host && collection.hostConfig?.ansible_user ? `
                   <li style="margin: 0; padding: 0">
                     <strong style="display: block; margin-bottom: 0;">Connect to the server:</strong>
                     <code style="maring: 0; font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace; background-color: #ffffff; border: 1px solid #dee2e6; border-radius: 4px; padding: 6px 10px; display: inline-block; color: #212529; cursor: text; user-select: all; -webkit-user-select: all; -moz-user-select: all; -ms-user-select: all;">ssh ${collection.hostConfig.ansible_user}@${collection.host}</code>
-                  </li>
+                  </li>` : ''}
 
                   <li style="margin: 0; padding: 0">
                     <strong style="display: block; margin-bottom: 0;">List processes on the server:</strong>
