@@ -16,6 +16,7 @@ const LIKELY_BOT_BLOCKING_ERRORS = [
   'HTTP code 403',
   'HTTP code 406',
   'HTTP code 502',
+  'ECONNRESET',
 ];
 
 /**
