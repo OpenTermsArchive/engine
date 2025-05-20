@@ -2,6 +2,7 @@ import config from 'config';
 import cron from 'croner';
 import cronstrue from 'cronstrue';
 
+import { getCollection } from './archivist/collection/index.js';
 import Archivist from './archivist/index.js';
 import logger from './logger/index.js';
 import Notifier from './notifier/index.js';
@@ -17,7 +18,10 @@ export default async function track({ services, types, extractOnly, schedule }) 
 
   await archivist.initialize();
 
-  logger.info(`Start Open Terms Archive engine v${process.env.npm_package_version}\n`);
+  const collection = await getCollection();
+  const collectionName = collection?.name ? ` for ${collection.name} collection` : '';
+
+  logger.info(`Start Open Terms Archive engine v${process.env.npm_package_version}${collectionName}\n`);
 
   if (services?.length) {
     services = services.filter(serviceId => {
