@@ -9,30 +9,52 @@ const INVENTORY_FILENAME = 'deployment/inventory.yml';
 
 class Collection {
   metadata;
+  id;
+  name;
   inventory;
   host;
+  hostConfig;
   collectionPath;
 
   constructor() {
     this.collectionPath = path.resolve(process.cwd(), config.get('@opentermsarchive/engine.collectionPath'));
   }
 
+  async loadYamlFile(filename) {
+    try {
+      const content = await fs.readFile(path.join(this.collectionPath, filename), 'utf8');
+
+      return { content: yaml.load(content), error: null };
+    } catch (error) {
+      return { content: null, error };
+    }
+  }
+
   async initialize() {
-    const [ metadataContent, inventoryContent ] = await Promise.all([
-      fs.readFile(path.join(this.collectionPath, METADATA_FILENAME), 'utf8'),
-      fs.readFile(path.join(this.collectionPath, INVENTORY_FILENAME), 'utf8'),
+    const [ metadata, inventory ] = await Promise.all([
+      this.loadYamlFile(METADATA_FILENAME),
+      this.loadYamlFile(INVENTORY_FILENAME),
     ]);
 
-    const [ metadata, inventory ] = [ yaml.load(metadataContent), yaml.load(inventoryContent) ];
-    const [host] = Object.keys(inventory.all.hosts);
+    [ metadata, inventory ].forEach(result => {
+      if (result.error && result.error.code !== 'ENOENT') { // Allow inventory and metadata files to be optional, but throw an error if they exist but are invalid
+        throw result.error;
+      }
+    });
 
-    this.metadata = metadata;
-    this.inventory = inventory;
+    if (metadata.content) {
+      this.metadata = metadata.content;
+      this.id = metadata.content.id;
+      this.name = metadata.content.name;
+    }
 
-    this.id = metadata.id;
-    this.name = metadata.name;
-    this.host = host;
-    this.hostConfig = inventory.all.hosts[host];
+    if (inventory.content) {
+      const [host] = Object.keys(inventory.content.all.hosts);
+
+      this.inventory = inventory.content;
+      this.host = host;
+      this.hostConfig = inventory.content.all.hosts[host];
+    }
 
     return this;
   }
