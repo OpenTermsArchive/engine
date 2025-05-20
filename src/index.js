@@ -1,5 +1,3 @@
-import { createRequire } from 'module';
-
 import config from 'config';
 import cron from 'croner';
 import cronstrue from 'cronstrue';
@@ -8,8 +6,6 @@ import Archivist from './archivist/index.js';
 import logger from './logger/index.js';
 import Notifier from './notifier/index.js';
 import Reporter from './reporter/index.js';
-
-const require = createRequire(import.meta.url);
 
 export default async function track({ services, types, extractOnly, schedule }) {
   const archivist = new Archivist({
@@ -21,9 +17,7 @@ export default async function track({ services, types, extractOnly, schedule }) 
 
   await archivist.initialize();
 
-  const { version } = require('../package.json');
-
-  logger.info(`Start Open Terms Archive engine v${version}\n`);
+  logger.info(`Start Open Terms Archive engine v${process.env.npm_package_version}\n`);
 
   if (services?.length) {
     services = services.filter(serviceId => {

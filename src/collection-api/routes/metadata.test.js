@@ -1,5 +1,3 @@
-import fs from 'fs/promises';
-
 import { expect } from 'chai';
 import config from 'config';
 import request from 'supertest';
@@ -7,7 +5,7 @@ import request from 'supertest';
 import app from '../server.js';
 
 const basePath = config.get('@opentermsarchive/engine.collection-api.basePath');
-const { version: engineVersion } = JSON.parse(await fs.readFile(new URL('../../../package.json', import.meta.url)));
+const engineVersion = process.env.npm_package_version;
 
 const EXPECTED_RESPONSE = {
   totalServices: 7,

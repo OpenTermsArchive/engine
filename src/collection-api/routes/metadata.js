@@ -7,7 +7,6 @@ import yaml from 'js-yaml';
 import Service from '../../archivist/services/service.js';
 
 const METADATA_FILENAME = 'metadata.yml';
-const PACKAGE_JSON_PATH = '../../../package.json';
 
 /**
  * @param   {string}         collectionPath The path to the collection
@@ -179,7 +178,7 @@ export default async function metadataRouter(collectionPath, services) {
   const router = express.Router();
 
   const STATIC_METADATA = yaml.load(await fs.readFile(path.join(collectionPath, METADATA_FILENAME), 'utf8'));
-  const { version: engineVersion } = JSON.parse(await fs.readFile(new URL(PACKAGE_JSON_PATH, import.meta.url)));
+  const engineVersion = process.env.npm_package_version;
 
   /**
    * @swagger
