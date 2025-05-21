@@ -4,8 +4,8 @@ import path from 'path';
 import config from 'config';
 import yaml from 'js-yaml';
 
-const METADATA_FILENAME = 'metadata.yml';
-const INVENTORY_FILENAME = 'deployment/inventory.yml';
+export const METADATA_FILE = 'metadata.yml';
+export const INVENTORY_FILE = 'deployment/inventory.yml';
 
 class Collection {
   metadata;
@@ -28,8 +28,8 @@ class Collection {
 
   async initialize() {
     const fileLoadingPromises = await Promise.allSettled([
-      this.loadYamlFile(METADATA_FILENAME),
-      this.loadYamlFile(INVENTORY_FILENAME),
+      this.loadYamlFile(METADATA_FILE),
+      this.loadYamlFile(INVENTORY_FILE),
     ]);
 
     const [ metadata, inventory ] = fileLoadingPromises.map(({ status, value, reason }) => {

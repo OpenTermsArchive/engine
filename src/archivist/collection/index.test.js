@@ -4,10 +4,12 @@ import path from 'path';
 import { expect } from 'chai';
 import config from 'config';
 
+import { METADATA_FILE, INVENTORY_FILE } from './index.js';
+
 describe('Collection', () => {
   const testCollectionPath = path.resolve(process.cwd(), config.get('@opentermsarchive/engine.collectionPath'));
-  const metadataPath = path.join(testCollectionPath, 'metadata.yml');
-  const inventoryPath = path.join(testCollectionPath, 'deployment/inventory.yml');
+  const metadataPath = path.join(testCollectionPath, METADATA_FILE);
+  const inventoryPath = path.join(testCollectionPath, INVENTORY_FILE);
   let metadataBackup;
   let getCollection;
   let collection;
