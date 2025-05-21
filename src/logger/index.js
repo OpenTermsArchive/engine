@@ -63,7 +63,7 @@ if (config.get('@opentermsarchive/engine.logger.sendMailOnError')) {
       timeout: 30 * 1000,
       html: false,
       formatter({ message, level }) {
-        const isError = level === 'error';
+        const isError = level.includes('error');
         const titleColor = isError ? '#dc3545' : '#ffc107';
         const titleText = isError ? 'Error details' : 'Warning details';
 
