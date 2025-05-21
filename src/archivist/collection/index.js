@@ -21,39 +21,41 @@ class Collection {
   }
 
   async loadYamlFile(filename) {
-    try {
-      const content = await fs.readFile(path.join(this.collectionPath, filename), 'utf8');
+    const content = await fs.readFile(path.join(this.collectionPath, filename), 'utf8');
 
-      return { content: yaml.load(content), error: null };
-    } catch (error) {
-      return { content: null, error };
-    }
+    return yaml.load(content);
   }
 
   async initialize() {
-    const [ metadata, inventory ] = await Promise.all([
+    const fileLoadingPromises = await Promise.allSettled([
       this.loadYamlFile(METADATA_FILENAME),
       this.loadYamlFile(INVENTORY_FILENAME),
     ]);
 
-    [ metadata, inventory ].forEach(result => {
-      if (result.error && result.error.code !== 'ENOENT') { // Allow inventory and metadata files to be optional, but throw an error if they exist but are invalid
-        throw result.error;
+    const [ metadata, inventory ] = fileLoadingPromises.map(({ status, value, reason }) => {
+      if (status === 'fulfilled') {
+        return value;
       }
+
+      if (reason && reason.code !== 'ENOENT') { // Ignore missing files errors (inventory and metadata are optional), but throw other errors like invalid YAML
+        throw reason;
+      }
+
+      return null;
     });
 
-    if (metadata.content) {
-      this.metadata = metadata.content;
-      this.id = metadata.content.id;
-      this.name = metadata.content.name;
+    if (metadata) {
+      this.metadata = metadata;
+      this.id = metadata.id;
+      this.name = metadata.name;
     }
 
-    if (inventory.content) {
-      const [host] = Object.keys(inventory.content.all.hosts);
+    if (inventory) {
+      const [host] = Object.keys(inventory.all.hosts);
 
-      this.inventory = inventory.content;
+      this.inventory = inventory;
       this.host = host;
-      this.hostConfig = inventory.content.all.hosts[host];
+      this.hostConfig = inventory.all.hosts[host];
     }
 
     return this;
