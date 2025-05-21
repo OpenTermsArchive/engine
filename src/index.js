@@ -19,9 +19,9 @@ export default async function track({ services, types, extractOnly, schedule }) 
   await archivist.initialize();
 
   const collection = await getCollection();
-  const collectionName = collection?.name ? ` for ${collection.name} collection` : '';
+  const collectionName = collection?.name ? ` with ${collection.name} collection` : '';
 
-  logger.info(`Start Open Terms Archive engine v${process.env.npm_package_version}${collectionName}\n`);
+  logger.info(`Start engine v${process.env.npm_package_version}${collectionName}\n`);
 
   if (services?.length) {
     services = services.filter(serviceId => {
