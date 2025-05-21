@@ -1,18 +1,11 @@
-import fs from 'fs/promises';
-import path from 'path';
-
 import express from 'express';
-import yaml from 'js-yaml';
 
 import Service from '../../archivist/services/service.js';
 
-const METADATA_FILENAME = 'metadata.yml';
-const PACKAGE_JSON_PATH = '../../../package.json';
-
 /**
- * @param   {string}         collectionPath The path to the collection
- * @param   {object}         services       The services of the collection
- * @returns {express.Router}                The router instance
+ * @param   {object}         collection The collection
+ * @param   {object}         services   The services of the collection
+ * @returns {express.Router}            The router instance
  * @swagger
  * tags:
  *   name: Metadata
@@ -175,11 +168,9 @@ const PACKAGE_JSON_PATH = '../../../package.json';
  *           additionalProperties:
  *             type: object
  */
-export default async function metadataRouter(collectionPath, services) {
+export default function metadataRouter(collection, services) {
   const router = express.Router();
-
-  const STATIC_METADATA = yaml.load(await fs.readFile(path.join(collectionPath, METADATA_FILENAME), 'utf8'));
-  const { version: engineVersion } = JSON.parse(await fs.readFile(new URL(PACKAGE_JSON_PATH, import.meta.url)));
+  const engineVersion = process.env.npm_package_version;
 
   /**
    * @swagger
@@ -201,7 +192,7 @@ export default async function metadataRouter(collectionPath, services) {
     };
 
     res.json({
-      ...STATIC_METADATA,
+      ...collection.metadata,
       ...dynamicMetadata,
     });
   });

@@ -1,9 +1,7 @@
-import path from 'path';
-
-import config from 'config';
 import express from 'express';
 import helmet from 'helmet';
 
+import { getCollection } from '../../archivist/collection/index.js';
 import * as Services from '../../archivist/services/index.js';
 
 import docsRouter from './docs.js';
@@ -33,10 +31,10 @@ export default async function apiRouter(basePath) {
     res.json({ message: 'Welcome to an instance of the Open Terms Archive API. Documentation is available at /docs. Learn more on Open Terms Archive on https://opentermsarchive.org.' });
   });
 
-  const collectionPath = path.resolve(process.cwd(), config.get('@opentermsarchive/engine.collectionPath'));
   const services = await Services.load();
+  const collection = await getCollection();
 
-  router.use(await metadataRouter(collectionPath, services));
+  router.use(await metadataRouter(collection, services));
   router.use(servicesRouter(services));
   router.use(versionsRouter);
 
