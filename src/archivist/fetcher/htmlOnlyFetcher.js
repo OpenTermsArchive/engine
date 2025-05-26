@@ -50,7 +50,7 @@ export default async function fetch(url, config) {
     };
   } catch (error) {
     if (error.type == 'system') { // Node-fetch wraps system-level errors (ENOTFOUND, ECONNREFUSED, ECONNRESET, etc.) with type 'system' and includes the original error code
-      throw new Error(`Network system error ${error.code} failed to connect to '${url}'`);
+      throw new Error(`Network system error ${error.code} occurred when trying to fetch '${url}'`);
     }
 
     if (error instanceof AbortError) {
