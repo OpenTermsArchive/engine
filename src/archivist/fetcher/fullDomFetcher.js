@@ -33,7 +33,16 @@ export default async function fetch(url, cssSelectors, config) {
       throw new Error(`Received HTTP code ${statusCode} when trying to fetch '${url}'`);
     }
 
-    const waitForSelectorsPromises = selectors.filter(Boolean).map(selector => page.waitForSelector(selector, { timeout: config.waitForElementsTimeout }));
+    const waitForSelectorsPromises = selectors.filter(Boolean).map(selector =>
+      page.waitForFunction(
+        cssSelector => {
+          const element = document.querySelector(cssSelector); // eslint-disable-line no-undef
+
+          return element?.textContent.trim().length; // Ensures element exists and contains non-empty text, as an empty element may indicate content is still loading
+        },
+        { timeout: config.waitForElementsTimeout },
+        selector,
+      ));
 
     // We expect all elements to be present on the page…
     await Promise.all(waitForSelectorsPromises).catch(error => {
