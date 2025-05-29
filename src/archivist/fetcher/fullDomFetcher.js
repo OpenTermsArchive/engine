@@ -38,7 +38,7 @@ export default async function fetch(url, cssSelectors, config) {
         cssSelector => {
           const element = document.querySelector(cssSelector); // eslint-disable-line no-undef
 
-          return element && element.textContent.trim().length; // Ensures element exists and contains non-empty text. An empty element may indicate content is still loading
+          return element?.textContent.trim().length; // Ensures element exists and contains non-empty text, as an empty element may indicate content is still loading
         },
         { timeout: config.waitForElementsTimeout },
         selector,
