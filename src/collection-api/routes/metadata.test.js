@@ -1,11 +1,15 @@
+import { createRequire } from 'module';
+
 import { expect } from 'chai';
 import config from 'config';
 import request from 'supertest';
 
 import app from '../server.js';
 
+const require = createRequire(import.meta.url);
+const { version: PACKAGE_VERSION } = require('../../../package.json');
+
 const basePath = config.get('@opentermsarchive/engine.collection-api.basePath');
-const engineVersion = process.env.npm_package_version;
 
 const EXPECTED_RESPONSE = {
   totalServices: 7,
@@ -80,7 +84,7 @@ describe('Metadata API', () => {
     it('returns expected metadata object', () => {
       expect(response.body).to.deep.equal({
         ...EXPECTED_RESPONSE,
-        engineVersion,
+        engineVersion: PACKAGE_VERSION,
       });
     });
   });
