@@ -1,3 +1,5 @@
+import { createRequire } from 'module';
+
 import config from 'config';
 import cron from 'croner';
 import cronstrue from 'cronstrue';
@@ -7,6 +9,9 @@ import Archivist from './archivist/index.js';
 import logger from './logger/index.js';
 import Notifier from './notifier/index.js';
 import Reporter from './reporter/index.js';
+
+const require = createRequire(import.meta.url);
+const { version: PACKAGE_VERSION } = require('../package.json');
 
 export default async function track({ services, types, extractOnly, schedule }) {
   const archivist = new Archivist({
@@ -21,7 +26,7 @@ export default async function track({ services, types, extractOnly, schedule }) 
   const collection = await getCollection();
   const collectionName = collection?.name ? ` with ${collection.name} collection` : '';
 
-  logger.info(`Start engine v${process.env.npm_package_version}${collectionName}\n`);
+  logger.info(`Start engine v${PACKAGE_VERSION}${collectionName}\n`);
 
   if (services?.length) {
     services = services.filter(serviceId => {
