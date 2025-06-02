@@ -56,7 +56,7 @@ describe('Full DOM Fetcher', function () {
     });
   });
 
-  describe('Headless browser specific features', () => {
+  describe('#fetch', () => {
     const config = { navigationTimeout: 1000, waitForElementsTimeout: 1000, language: 'en' };
 
     it('waits for dynamically injected elements to appear in the DOM', async () => {
