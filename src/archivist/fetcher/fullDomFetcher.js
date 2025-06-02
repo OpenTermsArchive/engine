@@ -1,4 +1,3 @@
-import { TimeoutError } from 'puppeteer';
 import puppeteer from 'puppeteer-extra';
 import stealthPlugin from 'puppeteer-extra-plugin-stealth';
 
@@ -60,7 +59,7 @@ export default async function fetch(url, cssSelectors, config) {
       content: await page.content(),
     };
   } catch (error) {
-    if (error instanceof TimeoutError) {
+    if (error.name === 'TimeoutError') {
       throw new Error(`Timed out after ${config.navigationTimeout / 1000} seconds when trying to fetch '${url}'`);
     }
     throw new Error(error.message);
