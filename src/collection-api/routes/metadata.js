@@ -1,6 +1,11 @@
+import { createRequire } from 'module';
+
 import express from 'express';
 
 import Service from '../../archivist/services/service.js';
+
+const require = createRequire(import.meta.url);
+const { version: PACKAGE_VERSION } = require('../../../package.json');
 
 /**
  * @param   {object}         collection The collection
@@ -170,7 +175,6 @@ import Service from '../../archivist/services/service.js';
  */
 export default function metadataRouter(collection, services) {
   const router = express.Router();
-  const engineVersion = process.env.npm_package_version;
 
   /**
    * @swagger
@@ -188,7 +192,7 @@ export default function metadataRouter(collection, services) {
     const dynamicMetadata = {
       totalServices: Object.keys(services).length,
       totalTerms: Service.getNumberOfTerms(services),
-      engineVersion,
+      engineVersion: PACKAGE_VERSION,
     };
 
     res.json({

@@ -1,4 +1,5 @@
 import events from 'events';
+import { createRequire } from 'module';
 
 import async from 'async';
 
@@ -10,6 +11,9 @@ import Snapshot from './recorder/snapshot.js';
 import Version from './recorder/version.js';
 import * as services from './services/index.js';
 import Service from './services/service.js';
+
+const require = createRequire(import.meta.url);
+const { version: PACKAGE_VERSION } = require('../../package.json');
 
 // The parallel handling feature is currently set to a parallelism of 1 on terms tracking
 // because when it's higher there are two issues:
@@ -249,7 +253,7 @@ export default class Archivist extends events.EventEmitter {
       termsType: terms.type,
       fetchDate: terms.fetchDate,
       isExtractOnly: extractOnly,
-      metadata: { 'x-engine-version': process.env.npm_package_version },
+      metadata: { 'x-engine-version': PACKAGE_VERSION },
     });
 
     await this.recorder.record(record);
@@ -275,7 +279,7 @@ export default class Archivist extends events.EventEmitter {
         content: sourceDocument.content,
         mimeType: sourceDocument.mimeType,
         metadata: {
-          'x-engine-version': process.env.npm_package_version,
+          'x-engine-version': PACKAGE_VERSION,
           'x-fetcher': sourceDocument.fetcher,
           'x-source-document-location': sourceDocument.location,
         },
