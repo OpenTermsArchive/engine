@@ -1,77 +1,87 @@
 [
   {
-    "name": "403",
-    "color": "#0b08a0",
+    "name": "page access forbidden",
+    "color": "#FFFFFF",
     "description": "Fetching fails with a 403 (forbidden) HTTP code"
   },
   {
-    "name": "429",
-    "color": "#0b08a0",
+    "name": "too many requests",
+    "color": "#FFFFFF",
     "description": "Fetching fails with a 429 (too many requests) HTTP code"
   },
   {
-    "name": "500",
-    "color": "#0b08a0",
+    "name": "server error",
+    "color": "#FFFFFF",
     "description": "Fetching fails with a 500 (internal server error) HTTP code"
   },
   {
-    "name": "502",
-    "color": "#0b08a0",
+    "name": "invalid server response",
+    "color": "#FFFFFF",
     "description": "Fetching fails with a 502 (bad gateway) HTTP code"
   },
   {
-    "name": "503",
-    "color": "#0b08a0",
+    "name": "server unavailable",
+    "color": "#FFFFFF",
     "description": "Fetching fails with a 503 (service unavailable) HTTP code"
   },
   {
-    "name": "certificate expired",
-    "color": "#0b08a0",
+    "name": "SSL certificate expired",
+    "color": "#FFFFFF",
     "description": "Fetching fails because the domain SSL certificate has expired"
   },
   {
-    "name": "EAI_AGAIN",
-    "color": "#0b08a0",
+    "name": "DNS lookup failed",
+    "color": "#FFFFFF",
     "description": "Fetching fails because the domain fails to resolve on DNS"
   },
   {
-    "name": "ENOTFOUND",
-    "color": "#0b08a0",
+    "name": "DNS resolution failed",
+    "color": "#FFFFFF",
     "description": "Fetching fails because the domain fails to resolve on DNS"
   },
   {
     "name": "empty response",
-    "color": "#0b08a0",
+    "color": "#FFFFFF",
     "description": "Fetching fails with a “response is empty” error"
   },
   {
-    "name": "first certificate",
-    "color": "#0b08a0",
+    "name": "SSL certificate invalid",
+    "color": "#FFFFFF",
     "description": "Fetching fails with an “unable to verify the first certificate” error"
   },
   {
-    "name": "redirects",
-    "color": "#0b08a0",
+    "name": "too many redirects",
+    "color": "#FFFFFF",
     "description": "Fetching fails with a “too many redirects” error"
   },
   {
-    "name": "timeout",
-    "color": "#0b08a0",
+    "name": "page load timeout",
+    "color": "#FFFFFF",
     "description": "Fetching fails with a timeout error"
   },
   {
+    "name": "empty content",
+    "color": "#FFFFFF",
+    "description": "Fetching fails because the server returns an empty content"
+  },
+  {
     "name": "to clarify",
-    "color": "#0496ff",
+    "color": "#FFFFFF",
     "description": "Default failure label"
   },
   {
-    "name": "selectors",
-    "color": "#FBCA04",
+    "name": "page structure changed",
+    "color": "#FFFFFF",
     "description": "Extraction selectors are outdated"
   },
   {
-    "name": "location",
-    "color": "#FBCA04",
+    "name": "page not found",
+    "color": "#FFFFFF",
     "description": "Fetch location is outdated"
+  },
+  {
+    "name": "invalid selector",
+    "color": "#FFFFFF",
+    "description": "Some selectors cannot be understood by the engine"
   }
 ]
