@@ -27,8 +27,27 @@ const ERROR_MESSAGE_TO_ISSUE_LABEL_MAP = {
   'empty content': 'empty content',
 };
 
+const ERROR_MESSAGES_NEED_INTERVENTION = [
+  'has no match',
+  'HTTP code 404',
+];
+
+const ERROR_MESSAGES_TO_NEED_INTERVENTION_LABEL_MAP = ERROR_MESSAGES_NEED_INTERVENTION.reduce((acc, message) => {
+  acc[message] = '⚠ needs intervention';
+
+  return acc;
+}, {});
+
 function getLabelNameFromError(error) {
   return ERROR_MESSAGE_TO_ISSUE_LABEL_MAP[Object.keys(ERROR_MESSAGE_TO_ISSUE_LABEL_MAP).find(substring => error.toString().includes(substring))] || 'to clarify';
+}
+
+function hasErrorToNeedIntervention(error) {
+  return ERROR_MESSAGES_NEED_INTERVENTION.some(message => error.toString().includes(message));
+}
+
+function getLabelNameFromErrorToNeedIntervention(error) {
+  return ERROR_MESSAGES_TO_NEED_INTERVENTION_LABEL_MAP[Object.keys(ERROR_MESSAGES_TO_NEED_INTERVENTION_LABEL_MAP).find(substring => error.toString().includes(substring))] || 'to clarify';
 }
 
 // In the following class, it is assumed that each issue is managed using its title as a unique identifier
@@ -115,10 +134,16 @@ No changes were found in the last run, so no new version has been recorded.`,
   }
 
   async onInaccessibleContent(error, terms) {
+    const labels = [getLabelNameFromError(error)];
+
+    if (hasErrorToNeedIntervention(error)) {
+      labels.push(getLabelNameFromErrorToNeedIntervention(error));
+    }
+
     await this.reporter.createOrUpdateIssue({
       title: Reporter.generateTitleID(terms.service.id, terms.type),
       description: this.generateDescription({ error, terms }),
-      label: getLabelNameFromError(error),
+      label: labels,
     });
   }
 

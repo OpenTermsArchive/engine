@@ -174,25 +174,25 @@ export default class GitHub {
     }
   }
 
-  async createOrUpdateIssue({ title, description, label }) {
+  async createOrUpdateIssue({ title, description, labels }) {
     try {
       const issue = await this.getIssue(title);
 
       if (!issue) {
-        const createdIssue = await this.createIssue({ title, description, labels: [label] });
+        const createdIssue = await this.createIssue({ title, description, labels });
 
         return logger.info(`Created issue #${createdIssue.number} "${title}": ${createdIssue.html_url}`);
       }
 
       const managedLabelsNames = this.MANAGED_LABELS.map(label => label.name);
       const labelsNotManagedToKeep = issue.labels.map(label => label.name).filter(label => !managedLabelsNames.includes(label));
-      const [managedLabel] = issue.labels.filter(label => managedLabelsNames.includes(label.name)); // It is assumed that only one specific reason for failure is possible at a time, making managed labels mutually exclusive
+      const managedLabels = issue.labels.filter(label => managedLabelsNames.includes(label.name));
 
-      if (issue.state !== GitHub.ISSUE_STATE_CLOSED && managedLabel?.name === label) {
+      if (issue.state !== GitHub.ISSUE_STATE_CLOSED && managedLabels.some(ml => labels.includes(ml.name))) {
         return;
       }
 
-      const updatedIssue = await this.updateIssue(issue, { state: GitHub.ISSUE_STATE_OPEN, labels: [ label, ...labelsNotManagedToKeep ] });
+      const updatedIssue = await this.updateIssue(issue, { state: GitHub.ISSUE_STATE_OPEN, labels: [ labels, ...labelsNotManagedToKeep ] });
 
       await this.addCommentToIssue({ issue, comment: description });
 
