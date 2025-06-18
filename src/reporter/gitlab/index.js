@@ -8,7 +8,7 @@ import logger from '../../logger/index.js';
 
 const require = createRequire(import.meta.url);
 
-export const MANAGED_BY_OTA_MARKER = '[managed by OTA]';
+export const MANAGED_BY_OTA_MARKER = '- Auto-managed by OTA engine';
 const BASE_URL = 'https://gitlab.com';
 const API_BASE_URL = 'https://gitlab.com/api/v4';
 
