@@ -83,5 +83,10 @@
     "name": "invalid selector",
     "color": "#FFFFFF",
     "description": "Some selectors cannot be understood by the engine"
+  },
+  {
+    "name": "⚠ needs intervention",
+    "color": "#FDD42A",
+    "description": "Can be corrected by contributors"
   }
 ]

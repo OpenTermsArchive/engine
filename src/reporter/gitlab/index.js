@@ -330,17 +330,16 @@ export default class GitLab {
     }
 
     const managedLabelsNames = this.MANAGED_LABELS.map(label => label.name);
-    const [managedLabel] = issue.labels.filter(label =>
-      managedLabelsNames.includes(label.name)); // it is assumed that only one specific reason for failure is possible at a time, making managed labels mutually exclusive
-
-    if (managedLabel?.name == label) {
-      // if the label is already assigned to the issue, the error is redundant with the one already reported and no further action is necessary
-      return;
-    }
-
     const labelsNotManagedToKeep = issue.labels
       .map(label => label.name)
       .filter(label => !managedLabelsNames.includes(label));
+    const managedLabels = issue.labels.filter(label =>
+      managedLabelsNames.includes(label.name));
+
+    if (managedLabels.some(ml => ml.name == label)) {
+      // if the label is already assigned to the issue, the error is redundant with the one already reported and no further action is necessary
+      return;
+    }
 
     await this.setIssueLabels({
       issue,
