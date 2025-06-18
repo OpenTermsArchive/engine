@@ -6,7 +6,7 @@ import logger from '../../logger/index.js';
 
 const require = createRequire(import.meta.url);
 
-export const MANAGED_BY_OTA_MARKER = '[managed by OTA]';
+export const MANAGED_BY_OTA_MARKER = '- Auto-managed by OTA engine';
 
 export default class GitHub {
   static ISSUE_STATE_CLOSED = 'closed';
