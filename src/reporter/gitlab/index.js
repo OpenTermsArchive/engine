@@ -21,7 +21,6 @@ export default class GitLab {
     this.repositoryPath = repository;
     this.projectId = null;
     this.baseURL = baseURL;
-    console.log('this.baseURL', this.baseURL);
     this.apiBaseURL = apiBaseURL;
   }
 
