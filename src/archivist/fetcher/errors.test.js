@@ -30,7 +30,6 @@ describe('FetchDocumentError', () => {
 
     describe('non-transient errors', () => {
       [
-        'HTTP code 403',
         'HTTP code 404',
         'HTTP code 429',
       ].forEach(errorMessage => {

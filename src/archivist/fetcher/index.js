@@ -12,13 +12,6 @@ export const FETCHER_TYPES = {
   HTML_ONLY: 'htmlOnly',
 };
 
-const LIKELY_BOT_BLOCKING_ERRORS = [
-  'HTTP code 403',
-  'HTTP code 406',
-  'HTTP code 502',
-  'ECONNRESET',
-];
-
 /**
  * Fetch a resource from the network, returning a promise which is fulfilled once the response is available
  * @function fetch
@@ -70,9 +63,7 @@ async function fetchWithFallback(url, cssSelectors, fetcherConfig) {
   try {
     return await fetchWithHtmlOnly(url, fetcherConfig);
   } catch (error) {
-    const isBotBlockingError = LIKELY_BOT_BLOCKING_ERRORS.some(code => error.message.includes(code));
-
-    if (!isBotBlockingError || fetcherConfig.executeClientScripts === false) {
+    if (!error.mayBeBotBlocking || fetcherConfig.executeClientScripts === false) {
       throw error;
     }
 
@@ -81,15 +72,23 @@ async function fetchWithFallback(url, cssSelectors, fetcherConfig) {
 }
 
 async function fetchWithFullDom(url, cssSelectors, fetcherConfig) {
-  return {
-    ...await fetchFullDom(url, cssSelectors, fetcherConfig),
-    fetcher: FETCHER_TYPES.FULL_DOM,
-  };
+  try {
+    return {
+      ...await fetchFullDom(url, cssSelectors, fetcherConfig),
+      fetcher: FETCHER_TYPES.FULL_DOM,
+    };
+  } catch (error) {
+    throw new FetchDocumentError(error.message);
+  }
 }
 
 async function fetchWithHtmlOnly(url, fetcherConfig) {
-  return {
-    ...await fetchHtmlOnly(url, fetcherConfig),
-    fetcher: FETCHER_TYPES.HTML_ONLY,
-  };
+  try {
+    return {
+      ...await fetchHtmlOnly(url, fetcherConfig),
+      fetcher: FETCHER_TYPES.HTML_ONLY,
+    };
+  } catch (error) {
+    throw new FetchDocumentError(error.message);
+  }
 }
