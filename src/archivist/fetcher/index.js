@@ -72,15 +72,23 @@ async function fetchWithFallback(url, cssSelectors, fetcherConfig) {
 }
 
 async function fetchWithFullDom(url, cssSelectors, fetcherConfig) {
-  return {
-    ...await fetchFullDom(url, cssSelectors, fetcherConfig),
-    fetcher: FETCHER_TYPES.FULL_DOM,
-  };
+  try {
+    return {
+      ...await fetchFullDom(url, cssSelectors, fetcherConfig),
+      fetcher: FETCHER_TYPES.FULL_DOM,
+    };
+  } catch (error) {
+    throw new FetchDocumentError(error.message);
+  }
 }
 
 async function fetchWithHtmlOnly(url, fetcherConfig) {
-  return {
-    ...await fetchHtmlOnly(url, fetcherConfig),
-    fetcher: FETCHER_TYPES.HTML_ONLY,
-  };
+  try {
+    return {
+      ...await fetchHtmlOnly(url, fetcherConfig),
+      fetcher: FETCHER_TYPES.HTML_ONLY,
+    };
+  } catch (error) {
+    throw new FetchDocumentError(error.message);
+  }
 }
