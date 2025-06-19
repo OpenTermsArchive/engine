@@ -1,76 +1,76 @@
 [
   {
-    "name": "page access forbidden",
+    "name": "page access restriction",
     "color": "#FFFFFF",
-    "description": "Fetching fails with a 403 (forbidden) HTTP code"
+    "description": "Fetching failed with a 403 (forbidden) HTTP code"
   },
   {
-    "name": "too many requests",
+    "name": "request limit exceeded",
     "color": "#FFFFFF",
-    "description": "Fetching fails with a 429 (too many requests) HTTP code"
+    "description": "Fetching failed with a 429 (too many requests) HTTP code"
   },
   {
     "name": "server error",
     "color": "#FFFFFF",
-    "description": "Fetching fails with a 500 (internal server error) HTTP code"
+    "description": "Fetching failed with a 500 (internal server error) HTTP code"
   },
   {
-    "name": "invalid server response",
+    "name": "server response failure",
     "color": "#FFFFFF",
-    "description": "Fetching fails with a 502 (bad gateway) HTTP code"
+    "description": "Fetching failed with a 502 (bad gateway) HTTP code"
   },
   {
-    "name": "server unavailable",
+    "name": "server unavailability",
     "color": "#FFFFFF",
-    "description": "Fetching fails with a 503 (service unavailable) HTTP code"
+    "description": "Fetching failed with a 503 (service unavailable) HTTP code"
   },
   {
-    "name": "SSL certificate expired",
+    "name": "SSL certificate expiration",
     "color": "#FFFFFF",
-    "description": "Fetching fails because the domain SSL certificate has expired"
+    "description": "Fetching failed because the domain SSL certificate has expired"
   },
   {
-    "name": "DNS lookup failed",
+    "name": "DNS lookup failure",
     "color": "#FFFFFF",
-    "description": "Fetching fails because the domain fails to resolve on DNS"
+    "description": "Fetching failed because the domain temporarily failed to resolve on DNS"
   },
   {
-    "name": "DNS resolution failed",
+    "name": "DNS resolution failure",
     "color": "#FFFFFF",
-    "description": "Fetching fails because the domain fails to resolve on DNS"
+    "description": "Fetching failed because the domain fails to resolve on DNS"
   },
   {
     "name": "empty response",
     "color": "#FFFFFF",
-    "description": "Fetching fails with a “response is empty” error"
+    "description": "Fetching failed because server returned an empty response body"
   },
   {
-    "name": "SSL certificate invalid",
+    "name": "SSL certificate invalidity",
     "color": "#FFFFFF",
-    "description": "Fetching fails with an “unable to verify the first certificate” error"
+    "description": "Fetching failed because SSL certificate verification failed"
   },
   {
     "name": "too many redirects",
     "color": "#FFFFFF",
-    "description": "Fetching fails with a “too many redirects” error"
+    "description": "Fetching failed because too many redirects detected"
   },
   {
     "name": "page load timeout",
     "color": "#FFFFFF",
-    "description": "Fetching fails with a timeout error"
+    "description": "Fetching failed with a timeout error"
   },
   {
     "name": "empty content",
     "color": "#FFFFFF",
-    "description": "Fetching fails because the server returns an empty content"
+    "description": "Fetching failed because the server returns an empty content"
   },
   {
-    "name": "to clarify",
+    "name": "unknown failure reason",
     "color": "#FFFFFF",
-    "description": "Default failure label"
+    "description": "Fetching failed for an undetermined reason that needs investigation"
   },
   {
-    "name": "page structure changed",
+    "name": "page structure change",
     "color": "#FFFFFF",
     "description": "Extraction selectors are outdated"
   },
@@ -87,6 +87,6 @@
   {
     "name": "⚠ needs intervention",
     "color": "#FDD42A",
-    "description": "Can be corrected by contributors"
+    "description": "Requires contributors intervention to restore tracking"
   }
 ]
