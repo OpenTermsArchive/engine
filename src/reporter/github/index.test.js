@@ -1,13 +1,11 @@
-import { createRequire } from 'module';
-
 import { expect } from 'chai';
 import nock from 'nock';
 
+import { LABELS } from '../labels.js';
+
 import GitHub from './index.js';
 
-const require = createRequire(import.meta.url);
-
-describe('GitHub', function () {
+describe.only('GitHub', function () {
   this.timeout(5000);
 
   let MANAGED_LABELS;
@@ -16,7 +14,7 @@ describe('GitHub', function () {
   const EXISTING_CLOSED_ISSUE = { number: 2, title: 'Closed issue', description: 'Issue description', state: GitHub.ISSUE_STATE_CLOSED, labels: [{ name: '403' }] };
 
   before(async () => {
-    MANAGED_LABELS = require('./labels.json');
+    MANAGED_LABELS = Object.values(LABELS);
     github = new GitHub('owner/repo');
     nock('https://api.github.com')
       .get('/repos/owner/repo/issues')
@@ -272,9 +270,9 @@ describe('GitHub', function () {
     });
   });
 
-  describe('#createOrUpdateIssue', () => {
+  describe.only('#createOrUpdateIssue', () => {
     before(() => {
-      github.MANAGED_LABELS = require('./labels.json');
+      github.MANAGED_LABELS = Object.values(LABELS);
     });
 
     context('when the issue does not exist', () => {

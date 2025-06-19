@@ -11,8 +11,8 @@ const MAX_LABEL_DESCRIPTION_LENGTH = Math.min(
   GitLab.MAX_LABEL_DESCRIPTION_LENGTH,
 );
 
-describe('Reporter GitHub labels', () => {
-  LABELS.forEach(label => {
+describe.only('Reporter GitHub labels', () => {
+  Object.values(LABELS).forEach(label => {
     describe(`"${label.name}"`, () => {
       it('complies with the max description length of supported platforms', () => {
         const descriptionLength = label.description.length + MANAGED_BY_OTA_MARKER.length;

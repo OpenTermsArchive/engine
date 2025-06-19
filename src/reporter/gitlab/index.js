@@ -43,7 +43,7 @@ export default class GitLab {
       this.projectId = null;
     }
 
-    this.MANAGED_LABELS = LABELS;
+    this.MANAGED_LABELS = Object.values(LABELS);
 
     const existingLabels = await this.getRepositoryLabels();
     const existingLabelsNames = existingLabels.map(label => label.name);

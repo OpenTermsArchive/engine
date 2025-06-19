@@ -49,7 +49,7 @@ export default class GitHub {
   }
 
   async initialize() {
-    this.MANAGED_LABELS = LABELS;
+    this.MANAGED_LABELS = Object.values(LABELS);
     try {
       const existingLabels = await this.getRepositoryLabels();
       const existingLabelsNames = existingLabels.map(label => label.name);

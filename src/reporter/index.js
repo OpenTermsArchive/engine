@@ -4,27 +4,28 @@ import { toISODateWithoutMilliseconds } from '../archivist/utils/date.js';
 import logger from '../logger/index.js';
 
 import { createReporter } from './factory.js';
+import { LABELS } from './labels.js';
 
 const CONTRIBUTION_TOOL_URL = 'https://contribute.opentermsarchive.org/en/service';
 const DOC_URL = 'https://docs.opentermsarchive.org';
 
 const ERROR_MESSAGE_TO_ISSUE_LABEL_MAP = {
-  'has no match': 'page structure changed',
-  'HTTP code 404': 'page not found',
-  'HTTP code 403': 'page access forbidden',
-  'HTTP code 429': 'too many requests',
-  'HTTP code 500': 'server error',
-  'HTTP code 502': 'invalid server response',
-  'HTTP code 503': 'server unavailable',
-  'Timed out after': 'page load timeout',
-  'getaddrinfo EAI_AGAIN': 'DNS lookup failed',
-  'getaddrinfo ENOTFOUND': 'DNS resolution failed',
-  'Response is empty': 'empty response',
-  'unable to verify the first certificate': 'SSL certificate invalid',
-  'certificate has expired': 'SSL certificate expired',
-  'maximum redirect reached': 'too many redirects',
-  'not a valid selector': 'invalid selector',
-  'empty content': 'empty content',
+  'has no match': LABELS.PAGE_STRUCTURE_CHANGE.name,
+  'HTTP code 404': LABELS.PAGE_NOT_FOUND.name,
+  'HTTP code 403': LABELS.HTTP_403.name,
+  'HTTP code 429': LABELS.HTTP_429.name,
+  'HTTP code 500': LABELS.HTTP_500.name,
+  'HTTP code 502': LABELS.HTTP_502.name,
+  'HTTP code 503': LABELS.HTTP_503.name,
+  'Timed out after': LABELS.PAGE_LOAD_TIMEOUT.name,
+  'getaddrinfo EAI_AGAIN': LABELS.DNS_LOOKUP_FAILURE.name,
+  'getaddrinfo ENOTFOUND': LABELS.DNS_RESOLUTION_FAILURE.name,
+  'Response is empty': LABELS.EMPTY_RESPONSE.name,
+  'unable to verify the first certificate': LABELS.SSL_INVALID.name,
+  'certificate has expired': LABELS.SSL_EXPIRED.name,
+  'maximum redirect reached': LABELS.TOO_MANY_REDIRECTS.name,
+  'not a valid selector': LABELS.INVALID_SELECTOR.name,
+  'empty content': LABELS.EMPTY_CONTENT.name,
 };
 
 const ERROR_MESSAGES_NEED_INTERVENTION = [
@@ -33,13 +34,13 @@ const ERROR_MESSAGES_NEED_INTERVENTION = [
 ];
 
 const ERROR_MESSAGES_TO_NEED_INTERVENTION_LABEL_MAP = ERROR_MESSAGES_NEED_INTERVENTION.reduce((acc, message) => {
-  acc[message] = '⚠ needs intervention';
+  acc[message] = LABELS.NEEDS_INTERVENTION.name;
 
   return acc;
 }, {});
 
 function getLabelNameFromError(error) {
-  return ERROR_MESSAGE_TO_ISSUE_LABEL_MAP[Object.keys(ERROR_MESSAGE_TO_ISSUE_LABEL_MAP).find(substring => error.toString().includes(substring))] || 'to clarify';
+  return ERROR_MESSAGE_TO_ISSUE_LABEL_MAP[Object.keys(ERROR_MESSAGE_TO_ISSUE_LABEL_MAP).find(substring => error.toString().includes(substring))] || LABELS.UNKNOWN_FAILURE.name;
 }
 
 function hasErrorToNeedIntervention(error) {
@@ -47,7 +48,7 @@ function hasErrorToNeedIntervention(error) {
 }
 
 function getLabelNameFromErrorToNeedIntervention(error) {
-  return ERROR_MESSAGES_TO_NEED_INTERVENTION_LABEL_MAP[Object.keys(ERROR_MESSAGES_TO_NEED_INTERVENTION_LABEL_MAP).find(substring => error.toString().includes(substring))] || 'to clarify';
+  return ERROR_MESSAGES_TO_NEED_INTERVENTION_LABEL_MAP[Object.keys(ERROR_MESSAGES_TO_NEED_INTERVENTION_LABEL_MAP).find(substring => error.toString().includes(substring))] || LABELS.UNKNOWN_FAILURE.name;
 }
 
 // In the following class, it is assumed that each issue is managed using its title as a unique identifier
@@ -137,7 +138,7 @@ No changes were found in the last run, so no new version has been recorded.`,
     const labels = [getLabelNameFromError(error)];
 
     if (hasErrorToNeedIntervention(error)) {
-      labels.push(getLabelNameFromErrorToNeedIntervention(error));
+      labels.push(getLabelNameFromErrorToNeedIntervention(error)); // Pourquoi si compliqué ? if true, on rajoute jsute le LABELS.NEEDS_INTERVENTION.name
     }
 
     await this.reporter.createOrUpdateIssue({
@@ -199,7 +200,7 @@ First of all, check if the source documents are accessible through a web browser
 
 #### If none of the above works
 
-If the source documents are accessible in a browser but fetching them always fails from the Open Terms Archive server, this is most likely because the service provider has blocked the Open Terms Archive robots from accessing its content. In this case, updating the declaration will not enable resuming tracking. Only an agreement with the service provider, an engine upgrade, or some technical workarounds provided by the administrator of this collection’s server might resume tracking.
+If the source documents are accessible in a browser but fetching them always fails from the Open Terms Archive server, this is most likely because the service provider has blocked the Open Terms Archive robots from accessing its content. In this case, updating the declaration will not enable resuming tracking. Only an agreement with the service provider, an engine upgrade, or some technical workarounds provided by the administrator of this collection's server might resume tracking.
 
 ### References
 
