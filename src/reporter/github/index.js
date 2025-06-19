@@ -3,15 +3,15 @@ import { createRequire } from 'module';
 import { Octokit } from 'octokit';
 
 import logger from '../../logger/index.js';
+import { LABELS, MANAGED_BY_OTA_MARKER } from '../labels.js';
 
 const require = createRequire(import.meta.url);
-
-export const MANAGED_BY_OTA_MARKER = '- Auto-managed by OTA engine';
 
 export default class GitHub {
   static ISSUE_STATE_CLOSED = 'closed';
   static ISSUE_STATE_OPEN = 'open';
   static ISSUE_STATE_ALL = 'all';
+  static MAX_LABEL_DESCRIPTION_LENGTH = 100;
 
   constructor(repository) {
     const { version } = require('../../../package.json');
@@ -49,7 +49,7 @@ export default class GitHub {
   }
 
   async initialize() {
-    this.MANAGED_LABELS = require('./labels.json');
+    this.MANAGED_LABELS = LABELS;
     try {
       const existingLabels = await this.getRepositoryLabels();
       const existingLabelsNames = existingLabels.map(label => label.name);

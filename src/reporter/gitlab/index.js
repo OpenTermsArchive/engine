@@ -1,14 +1,10 @@
-import { createRequire } from 'module';
-
 import HttpProxyAgent from 'http-proxy-agent';
 import HttpsProxyAgent from 'https-proxy-agent';
 import nodeFetch from 'node-fetch';
 
 import logger from '../../logger/index.js';
+import { LABELS, MANAGED_BY_OTA_MARKER } from '../labels.js';
 
-const require = createRequire(import.meta.url);
-
-export const MANAGED_BY_OTA_MARKER = '- Auto-managed by OTA engine';
 const BASE_URL = 'https://gitlab.com';
 const API_BASE_URL = 'https://gitlab.com/api/v4';
 
@@ -16,6 +12,7 @@ export default class GitLab {
   static ISSUE_STATE_CLOSED = 'closed';
   static ISSUE_STATE_OPEN = 'opened';
   static ISSUE_STATE_ALL = 'all';
+  static MAX_LABEL_DESCRIPTION_LENGTH = 255;
 
   constructor(repository, baseURL = BASE_URL, apiBaseURL = API_BASE_URL) {
     this.repositoryPath = repository;
@@ -46,7 +43,7 @@ export default class GitLab {
       this.projectId = null;
     }
 
-    this.MANAGED_LABELS = require('./labels.json');
+    this.MANAGED_LABELS = LABELS;
 
     const existingLabels = await this.getRepositoryLabels();
     const existingLabelsNames = existingLabels.map(label => label.name);
@@ -58,7 +55,7 @@ export default class GitLab {
       for (const label of missingLabels) {
         await this.createLabel({ /* eslint-disable-line no-await-in-loop */
           name: label.name,
-          color: label.color,
+          color: `#${label.color}`,
           description: `${label.description} ${MANAGED_BY_OTA_MARKER}`,
         });
       }
