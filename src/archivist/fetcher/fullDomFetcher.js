@@ -20,6 +20,11 @@ export default async function fetch(url, cssSelectors, config) {
     await page.setDefaultNavigationTimeout(config.navigationTimeout);
     await page.setExtraHTTPHeaders({ 'Accept-Language': config.language });
 
+    await page.setCacheEnabled(false); // Disable cache to ensure fresh content on each fetch and prevent stale data from previous requests
+    const client = await page.target().createCDPSession();
+
+    await client.send('Network.clearBrowserCookies'); // Clear cookies to ensure clean state between fetches and prevent session persistence across different URLs
+
     response = await page.goto(url, { waitUntil: 'load' }); // Using `load` instead of `networkidle0` as it's more reliable and faster. The 'load' event fires when the page and all its resources (stylesheets, scripts, images) have finished loading. `networkidle0` can be problematic as it waits for 500ms of network inactivity, which may never occur on dynamic pages and then triggers a navigation timeout.
 
     if (!response) {
