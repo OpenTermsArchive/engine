@@ -48,15 +48,11 @@ export default async function fetch({
     executeClientScripts,
   };
 
-  try {
-    if (executeClientScripts) {
-      return await fetchWithFullDom(url, cssSelectors, fetcherConfig);
-    }
-
-    return await fetchWithFallback(url, cssSelectors, fetcherConfig);
-  } catch (error) {
-    throw new FetchDocumentError(error.message);
+  if (executeClientScripts) {
+    return fetchWithFullDom(url, cssSelectors, fetcherConfig);
   }
+
+  return fetchWithFallback(url, cssSelectors, fetcherConfig);
 }
 
 async function fetchWithFallback(url, cssSelectors, fetcherConfig) {
