@@ -55,7 +55,11 @@ export default async function fetch({
 
     return await fetchWithFallback(url, cssSelectors, fetcherConfig);
   } catch (error) {
-    throw new FetchDocumentError(error.message);
+    if (error.name !== 'FetchDocumentError') {
+      throw new FetchDocumentError(error.message);
+    }
+
+    throw error;
   }
 }
 
