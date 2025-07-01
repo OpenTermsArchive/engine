@@ -206,7 +206,7 @@ export default class GitHub {
       const managedLabels = issue.labels.filter(label => managedLabelsNames.includes(label.name));
 
       if (issue.state !== GitHub.ISSUE_STATE_CLOSED && labels.every(label => managedLabels.some(managedLabel => managedLabel.name === label))) {
-        return;
+        return; // if all requested labels are already assigned to the issue, the error is redundant with the one already reported and no further action is necessary
       }
 
       const updatedIssue = await this.updateIssue(issue, { state: GitHub.ISSUE_STATE_OPEN, labels: [ ...labels, ...labelsNotManagedToKeep ] });
