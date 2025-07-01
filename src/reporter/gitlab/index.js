@@ -3,7 +3,7 @@ import HttpsProxyAgent from 'https-proxy-agent';
 import nodeFetch from 'node-fetch';
 
 import logger from '../../logger/index.js';
-import { LABELS, MANAGED_BY_OTA_MARKER } from '../labels.js';
+import { LABELS, MANAGED_BY_OTA_MARKER, DEPRECATED_MANAGED_BY_OTA_MARKER } from '../labels.js';
 
 const BASE_URL = 'https://gitlab.com';
 const API_BASE_URL = 'https://gitlab.com/api/v4';
@@ -43,22 +43,35 @@ export default class GitLab {
       this.projectId = null;
     }
 
-    this.MANAGED_LABELS = LABELS;
+    this.MANAGED_LABELS = Object.values(LABELS);
+    try {
+      const existingLabels = await this.getRepositoryLabels();
+      const labelsToRemove = existingLabels.filter(label => label.description && label.description.includes(DEPRECATED_MANAGED_BY_OTA_MARKER));
 
-    const existingLabels = await this.getRepositoryLabels();
-    const existingLabelsNames = existingLabels.map(label => label.name);
-    const missingLabels = this.MANAGED_LABELS.filter(label => !existingLabelsNames.includes(label.name));
+      if (labelsToRemove.length) {
+        logger.info(`Removing labels with deprecated markers: ${labelsToRemove.map(label => `"${label.name}"`).join(', ')}`);
 
-    if (missingLabels.length) {
-      logger.info(`The following required labels are not present on the repository: ${missingLabels.map(label => `"${label.name}"`).join(', ')}. Creating them…`);
-
-      for (const label of missingLabels) {
-        await this.createLabel({ /* eslint-disable-line no-await-in-loop */
-          name: label.name,
-          color: `#${label.color}`,
-          description: `${label.description} ${MANAGED_BY_OTA_MARKER}`,
-        });
+        for (const label of labelsToRemove) {
+          await this.deleteLabel(label.name); /* eslint-disable-line no-await-in-loop */
+        }
       }
+
+      const existingLabelsNames = existingLabels.map(label => label.name);
+      const missingLabels = this.MANAGED_LABELS.filter(label => !existingLabelsNames.includes(label.name));
+
+      if (missingLabels.length) {
+        logger.info(`Following required labels are not present on the repository: ${missingLabels.map(label => `"${label.name}"`).join(', ')}. Creating them…`);
+
+        for (const label of missingLabels) {
+          await this.createLabel({ /* eslint-disable-line no-await-in-loop */
+            name: label.name,
+            color: `#${label.color}`,
+            description: `${label.description} ${MANAGED_BY_OTA_MARKER}`,
+          });
+        }
+      }
+    } catch (error) {
+      logger.error(`Failed to handle repository labels: ${error.message}`);
     }
   }
 
@@ -115,6 +128,29 @@ export default class GitLab {
       }
     } catch (error) {
       logger.error(`Failed to create label: ${error}`);
+    }
+  }
+
+  async deleteLabel(name) {
+    try {
+      const options = GitLab.baseOptionsHttpReq();
+
+      options.method = 'DELETE';
+
+      const response = await nodeFetch(
+        `${this.apiBaseURL}/projects/${this.projectId}/labels/${encodeURIComponent(name)}`,
+        options,
+      );
+
+      if (response.ok) {
+        logger.info(`Label deleted: ${name}`);
+      } else {
+        const res = await response.json();
+
+        logger.error(`deleteLabel response: ${JSON.stringify(res)}`);
+      }
+    } catch (error) {
+      logger.error(`Failed to delete label: ${error}`);
     }
   }
 
@@ -314,34 +350,39 @@ export default class GitLab {
     return this.closeIssue(issue);
   }
 
-  async createOrUpdateIssue({ title, description, label }) {
-    const issue = await this.getIssue({ title, state: GitLab.ISSUE_STATE_ALL });
+  async createOrUpdateIssue({ title, description, labels }) {
+    try {
+      const issue = await this.getIssue({ title, state: GitLab.ISSUE_STATE_ALL });
 
-    if (!issue) {
-      return this.createIssue({ title, description, labels: [label] });
+      if (!issue) {
+        const createdIssue = await this.createIssue({ title, description, labels });
+
+        return logger.info(`Created GitLab issue #${createdIssue.iid} "${title}": ${createdIssue.web_url}`);
+      }
+
+      const managedLabelsNames = this.MANAGED_LABELS.map(label => label.name);
+      const labelsNotManagedToKeep = issue.labels.map(label => label.name).filter(label => !managedLabelsNames.includes(label));
+      const managedLabels = issue.labels.filter(label => managedLabelsNames.includes(label.name));
+
+      if (issue.state !== GitLab.ISSUE_STATE_CLOSED && labels.every(label => managedLabels.some(managedLabel => managedLabel.name === label))) {
+        return; // if all requested labels are already assigned to the issue, the error is redundant with the one already reported and no further action is necessary
+      }
+
+      if (issue.state == GitLab.ISSUE_STATE_CLOSED) {
+        await this.openIssue(issue);
+      }
+
+      await this.setIssueLabels({
+        issue,
+        labels: [ ...labels, ...labelsNotManagedToKeep ],
+      });
+
+      await this.addCommentToIssue({ issue, comment: description });
+
+      logger.info(`Updated GitLab issue with comment #${issue.iid}: ${issue.web_url}`);
+    } catch (error) {
+      logger.error(`Failed to update GitLab issue "${title}": ${error.stack}`);
     }
-
-    if (issue.state == GitLab.ISSUE_STATE_CLOSED) {
-      await this.openIssue(issue);
-    }
-
-    const managedLabelsNames = this.MANAGED_LABELS.map(label => label.name);
-    const labelsNotManagedToKeep = issue.labels
-      .map(label => label.name)
-      .filter(label => !managedLabelsNames.includes(label));
-    const managedLabels = issue.labels.filter(label =>
-      managedLabelsNames.includes(label.name));
-
-    if (managedLabels.some(ml => ml.name == label)) {
-      // if the label is already assigned to the issue, the error is redundant with the one already reported and no further action is necessary
-      return;
-    }
-
-    await this.setIssueLabels({
-      issue,
-      labels: [ label, ...labelsNotManagedToKeep ],
-    });
-    await this.addCommentToIssue({ issue, comment: description });
   }
 
   static baseOptionsHttpReq(token = process.env.OTA_ENGINE_GITLAB_TOKEN) {
@@ -363,7 +404,7 @@ export default class GitLab {
   }
 
   generateVersionURL(serviceName, termsType) {
-    return `${this.baseURL}/${this.repositoryPath}/-/blob/main/${encodeURIComponent(serviceName)}/${encodeURIComponent(serviceName, termsType)}.md`;
+    return `${this.baseURL}/${this.repositoryPath}/-/blob/main/${encodeURIComponent(serviceName)}/${encodeURIComponent(termsType)}.md`;
   }
 
   generateSnapshotsBaseUrl(serviceName, termsType) {

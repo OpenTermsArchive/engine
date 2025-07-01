@@ -1,11 +1,9 @@
-import { createRequire } from 'module';
-
 import { expect } from 'chai';
 import nock from 'nock';
 
-import GitLab from './index.js';
+import { LABELS } from '../labels.js';
 
-const require = createRequire(import.meta.url);
+import GitLab from './index.js';
 
 describe('GitLab', function () {
   this.timeout(5000);
@@ -15,7 +13,7 @@ describe('GitLab', function () {
   const PROJECT_ID = '4';
 
   before(() => {
-    MANAGED_LABELS = require('./labels.json');
+    MANAGED_LABELS = Object.values(LABELS);
     gitlab = new GitLab('owner/repo');
   });
 
@@ -400,12 +398,14 @@ describe('GitLab', function () {
       await gitlab.initialize();
     });
 
+    after(nock.cleanAll);
+
     context('when the issue does not exist', () => {
       let createIssueScope;
       const ISSUE_TO_CREATE = {
         title: 'New Issue',
         description: 'Description of the new issue',
-        label: 'bug',
+        labels: ['empty response'],
       };
 
       before(async () => {
@@ -419,7 +419,7 @@ describe('GitLab', function () {
             {
               title: ISSUE_TO_CREATE.title,
               description: ISSUE_TO_CREATE.description,
-              labels: [ISSUE_TO_CREATE.label],
+              labels: ISSUE_TO_CREATE.labels,
             },
           )
           .reply(200, { iid: 123, web_url: 'https://example.com/test/test' });
@@ -436,7 +436,7 @@ describe('GitLab', function () {
       const ISSUE = {
         title: 'Existing Issue',
         description: 'New comment',
-        label: 'location',
+        labels: ['page access restriction'],
       };
 
       context('when issue is closed', () => {
@@ -448,7 +448,7 @@ describe('GitLab', function () {
           iid: 123,
           title: ISSUE.title,
           description: ISSUE.description,
-          labels: [{ name: 'selectors' }],
+          labels: [{ name: 'empty content' }],
           state: GitLab.ISSUE_STATE_CLOSED,
         };
 
@@ -456,7 +456,7 @@ describe('GitLab', function () {
         const responseIssuereopened = { iid: 123 };
         const responseSetLabels = {
           iid: 123,
-          labels: ['location'],
+          labels: ['page access restriction'],
         };
         const responseAddcomment = { iid: 123, id: 23, body: ISSUE.description };
         const { iid } = GITLAB_RESPONSE_FOR_EXISTING_ISSUE;
@@ -471,7 +471,7 @@ describe('GitLab', function () {
             .reply(200, responseIssuereopened);
 
           setIssueLabelsScope = nock(gitlab.apiBaseURL)
-            .put(`/projects/${PROJECT_ID}/issues/${iid}`, { labels: ['location'] })
+            .put(`/projects/${PROJECT_ID}/issues/${iid}`, { labels: ['page access restriction'] })
             .reply(200, responseSetLabels);
 
           addCommentScope = nock(gitlab.apiBaseURL)
@@ -499,53 +499,170 @@ describe('GitLab', function () {
         let addCommentScope;
         let openIssueScope;
 
-        const GITLAB_RESPONSE_FOR_EXISTING_ISSUE = {
-          number: 123,
-          title: ISSUE.title,
-          description: ISSUE.description,
-          labels: [{ name: 'selectors' }],
-          state: GitLab.ISSUE_STATE_OPEN,
-        };
+        context('when the reason is new', () => {
+          const GITLAB_RESPONSE_FOR_EXISTING_ISSUE = {
+            iid: 123,
+            title: ISSUE.title,
+            description: ISSUE.description,
+            labels: [{ name: 'empty content' }],
+            state: GitLab.ISSUE_STATE_OPEN,
+          };
 
-        const EXPECTED_REQUEST_BODY = { state_event: 'reopen' };
-        const responseIssuereopened = { iid: 123 };
-        const responseSetLabels = {
-          iid: 123,
-          labels: ['location'],
-        };
-        const responseAddcomment = { iid: 123, id: 23, body: ISSUE.description };
-        const { iid } = GITLAB_RESPONSE_FOR_EXISTING_ISSUE;
+          const EXPECTED_REQUEST_BODY = { state_event: 'reopen' };
+          const responseIssuereopened = { iid: 123 };
+          const responseSetLabels = {
+            iid: 123,
+            labels: ['page access restriction'],
+          };
+          const responseAddcomment = { iid: 123, id: 23, body: ISSUE.description };
+          const { iid } = GITLAB_RESPONSE_FOR_EXISTING_ISSUE;
 
-        before(async () => {
-          nock(gitlab.apiBaseURL)
-            .get(`/projects/${PROJECT_ID}/issues?search=${encodeURIComponent(ISSUE.title)}&per_page=100`)
-            .reply(200, [GITLAB_RESPONSE_FOR_EXISTING_ISSUE]);
+          before(async () => {
+            nock(gitlab.apiBaseURL)
+              .get(`/projects/${PROJECT_ID}/issues?search=${encodeURIComponent(ISSUE.title)}&per_page=100`)
+              .reply(200, [GITLAB_RESPONSE_FOR_EXISTING_ISSUE]);
 
-          openIssueScope = nock(gitlab.apiBaseURL)
-            .put(`/projects/${PROJECT_ID}/issues/${iid}`, EXPECTED_REQUEST_BODY)
-            .reply(200, responseIssuereopened);
+            openIssueScope = nock(gitlab.apiBaseURL)
+              .put(`/projects/${PROJECT_ID}/issues/${iid}`, EXPECTED_REQUEST_BODY)
+              .reply(200, responseIssuereopened);
 
-          setIssueLabelsScope = nock(gitlab.apiBaseURL)
-            .put(`/projects/${PROJECT_ID}/issues/${iid}`, { labels: ['location'] })
-            .reply(200, responseSetLabels);
+            setIssueLabelsScope = nock(gitlab.apiBaseURL)
+              .put(`/projects/${PROJECT_ID}/issues/${iid}`, { labels: ['page access restriction'] })
+              .reply(200, responseSetLabels);
 
-          addCommentScope = nock(gitlab.apiBaseURL)
-            .post(`/projects/${PROJECT_ID}/issues/${iid}/notes`, { body: ISSUE.description })
-            .reply(200, responseAddcomment);
+            addCommentScope = nock(gitlab.apiBaseURL)
+              .post(`/projects/${PROJECT_ID}/issues/${iid}/notes`, { body: ISSUE.description })
+              .reply(200, responseAddcomment);
 
-          await gitlab.createOrUpdateIssue(ISSUE);
+            await gitlab.createOrUpdateIssue(ISSUE);
+          });
+
+          it('does not change the issue state', () => {
+            expect(openIssueScope.isDone()).to.be.false;
+          });
+
+          it("updates the issue's label", () => {
+            expect(setIssueLabelsScope.isDone()).to.be.true;
+          });
+
+          it('adds comment to the issue', () => {
+            expect(addCommentScope.isDone()).to.be.true;
+          });
         });
 
-        it('does not change the issue state', () => {
-          expect(openIssueScope.isDone()).to.be.false;
+        context('when all requested labels are already present', () => {
+          let setIssueLabelsScope;
+          let addCommentScope;
+          let openIssueScope;
+
+          const GITLAB_RESPONSE_FOR_EXISTING_ISSUE = {
+            iid: 123,
+            title: ISSUE.title,
+            description: ISSUE.description,
+            labels: [{ name: 'page access restriction' }, { name: 'server error' }],
+            state: GitLab.ISSUE_STATE_OPEN,
+          };
+
+          const { iid } = GITLAB_RESPONSE_FOR_EXISTING_ISSUE;
+
+          before(async () => {
+            nock(gitlab.apiBaseURL)
+              .get(`/projects/${PROJECT_ID}/issues?search=${encodeURIComponent(ISSUE.title)}&per_page=100`)
+              .reply(200, [GITLAB_RESPONSE_FOR_EXISTING_ISSUE]);
+
+            openIssueScope = nock(gitlab.apiBaseURL)
+              .put(`/projects/${PROJECT_ID}/issues/${iid}`)
+              .reply(200);
+
+            setIssueLabelsScope = nock(gitlab.apiBaseURL)
+              .put(`/projects/${PROJECT_ID}/issues/${iid}`)
+              .reply(200);
+
+            addCommentScope = nock(gitlab.apiBaseURL)
+              .post(`/projects/${PROJECT_ID}/issues/${iid}/notes`)
+              .reply(200);
+
+            await gitlab.createOrUpdateIssue({
+              title: ISSUE.title,
+              description: ISSUE.description,
+              labels: [ 'page access restriction', 'server error' ],
+            });
+          });
+
+          it('does not change the issue state', () => {
+            expect(openIssueScope.isDone()).to.be.false;
+          });
+
+          it('does not attempt to update the issue labels', () => {
+            expect(setIssueLabelsScope.isDone()).to.be.false;
+          });
+
+          it('does not attempt to add any comment to the issue', () => {
+            expect(addCommentScope.isDone()).to.be.false;
+          });
         });
 
-        it("updates the issue's label", () => {
-          expect(setIssueLabelsScope.isDone()).to.be.true;
-        });
+        context('when some but not all requested labels are present', () => {
+          let setIssueLabelsScope;
+          let addCommentScope;
+          let openIssueScope;
 
-        it('adds comment to the issue', () => {
-          expect(addCommentScope.isDone()).to.be.true;
+          before(() => {
+            nock.cleanAll();
+          });
+
+          const GITLAB_RESPONSE_FOR_EXISTING_ISSUE = {
+            iid: 123,
+            title: ISSUE.title,
+            description: ISSUE.description,
+            labels: [{ name: 'page access restriction' }],
+            state: GitLab.ISSUE_STATE_OPEN,
+          };
+
+          const EXPECTED_REQUEST_BODY = { state_event: 'reopen' };
+          const responseIssuereopened = { iid: 123 };
+          const responseSetLabels = {
+            iid: 123,
+            labels: [ 'page access restriction', 'empty content' ],
+          };
+          const responseAddcomment = { iid: 123, id: 23, body: ISSUE.description };
+          const { iid } = GITLAB_RESPONSE_FOR_EXISTING_ISSUE;
+
+          before(async () => {
+            nock(gitlab.apiBaseURL)
+              .get(`/projects/${PROJECT_ID}/issues?search=${encodeURIComponent(ISSUE.title)}&per_page=100`)
+              .reply(200, [GITLAB_RESPONSE_FOR_EXISTING_ISSUE]);
+
+            openIssueScope = nock(gitlab.apiBaseURL)
+              .put(`/projects/${PROJECT_ID}/issues/${iid}`, EXPECTED_REQUEST_BODY)
+              .reply(200, responseIssuereopened);
+
+            setIssueLabelsScope = nock(gitlab.apiBaseURL)
+              .put(`/projects/${PROJECT_ID}/issues/${iid}`, { labels: [ 'page access restriction', 'empty content' ] })
+              .reply(200, responseSetLabels);
+
+            addCommentScope = nock(gitlab.apiBaseURL)
+              .post(`/projects/${PROJECT_ID}/issues/${iid}/notes`, { body: ISSUE.description })
+              .reply(200, responseAddcomment);
+
+            await gitlab.createOrUpdateIssue({
+              title: ISSUE.title,
+              description: ISSUE.description,
+              labels: [ 'page access restriction', 'empty content' ],
+            });
+          });
+
+          it('does not change the issue state', () => {
+            expect(openIssueScope.isDone()).to.be.false;
+          });
+
+          it("updates the issue's labels", () => {
+            expect(setIssueLabelsScope.isDone()).to.be.true;
+          });
+
+          it('adds comment to the issue', () => {
+            expect(addCommentScope.isDone()).to.be.true;
+          });
         });
       });
     });
