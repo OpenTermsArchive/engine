@@ -4,31 +4,32 @@ import { toISODateWithoutMilliseconds } from '../archivist/utils/date.js';
 import logger from '../logger/index.js';
 
 import { createReporter } from './factory.js';
+import { LABELS } from './labels.js';
 
 const CONTRIBUTION_TOOL_URL = 'https://contribute.opentermsarchive.org/en/service';
 const DOC_URL = 'https://docs.opentermsarchive.org';
 
-const ERROR_MESSAGE_TO_ISSUE_LABEL_MAP = {
-  'has no match': 'selectors',
-  'HTTP code 404': 'location',
-  'HTTP code 403': '403',
-  'HTTP code 429': '429',
-  'HTTP code 500': '500',
-  'HTTP code 502': '502',
-  'HTTP code 503': '503',
-  'Timed out after': 'timeout',
-  EAI_AGAIN: 'EAI_AGAIN',
-  ENOTFOUND: 'ENOTFOUND',
-  'Response is empty': 'empty response',
-  'unable to verify the first certificate': 'first certificate',
-  'certificate has expired': 'certificate expired',
-  'maximum redirect reached': 'redirects',
-  'not a valid selector': 'invalid selector',
-  'empty content': 'empty content',
+const ERROR_MESSAGE_TO_ISSUE_LABELS_MAP = {
+  'has no match': [ LABELS.PAGE_STRUCTURE_CHANGE.name, LABELS.NEEDS_INTERVENTION.name ],
+  'HTTP code 404': [ LABELS.PAGE_NOT_FOUND.name, LABELS.NEEDS_INTERVENTION.name ],
+  'HTTP code 403': [LABELS.HTTP_403.name],
+  'HTTP code 429': [LABELS.HTTP_429.name],
+  'HTTP code 500': [LABELS.HTTP_500.name],
+  'HTTP code 502': [LABELS.HTTP_502.name],
+  'HTTP code 503': [LABELS.HTTP_503.name],
+  'Timed out after': [LABELS.PAGE_LOAD_TIMEOUT.name],
+  EAI_AGAIN: [LABELS.DNS_LOOKUP_FAILURE.name],
+  ENOTFOUND: [LABELS.DNS_RESOLUTION_FAILURE.name],
+  'Response is empty': [LABELS.EMPTY_RESPONSE.name],
+  'unable to verify the first certificate': [LABELS.SSL_INVALID.name],
+  'certificate has expired': [LABELS.SSL_EXPIRED.name],
+  'maximum redirect reached': [LABELS.TOO_MANY_REDIRECTS.name],
+  'not a valid selector': [LABELS.INVALID_SELECTOR.name],
+  'empty content': [LABELS.EMPTY_CONTENT.name],
 };
 
-function getLabelNameFromError(error) {
-  return ERROR_MESSAGE_TO_ISSUE_LABEL_MAP[Object.keys(ERROR_MESSAGE_TO_ISSUE_LABEL_MAP).find(substring => error.toString().includes(substring))] || 'to clarify';
+function getLabelNamesFromError(error) {
+  return ERROR_MESSAGE_TO_ISSUE_LABELS_MAP[Object.keys(ERROR_MESSAGE_TO_ISSUE_LABELS_MAP).find(substring => error.toString().includes(substring))] || [LABELS.UNKNOWN_FAILURE.name];
 }
 
 // In the following class, it is assumed that each issue is managed using its title as a unique identifier
@@ -118,7 +119,7 @@ No changes were found in the last run, so no new version has been recorded.`,
     await this.reporter.createOrUpdateIssue({
       title: Reporter.generateTitleID(terms.service.id, terms.type),
       description: this.generateDescription({ error, terms }),
-      label: getLabelNameFromError(error),
+      labels: getLabelNamesFromError(error),
     });
   }
 

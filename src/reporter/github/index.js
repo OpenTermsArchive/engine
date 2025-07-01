@@ -3,15 +3,15 @@ import { createRequire } from 'module';
 import { Octokit } from 'octokit';
 
 import logger from '../../logger/index.js';
+import { LABELS, MANAGED_BY_OTA_MARKER, DEPRECATED_MANAGED_BY_OTA_MARKER } from '../labels.js';
 
 const require = createRequire(import.meta.url);
-
-export const MANAGED_BY_OTA_MARKER = '[managed by OTA]';
 
 export default class GitHub {
   static ISSUE_STATE_CLOSED = 'closed';
   static ISSUE_STATE_OPEN = 'open';
   static ISSUE_STATE_ALL = 'all';
+  static MAX_LABEL_DESCRIPTION_LENGTH = 100;
 
   constructor(repository) {
     const { version } = require('../../../package.json');
@@ -49,9 +49,19 @@ export default class GitHub {
   }
 
   async initialize() {
-    this.MANAGED_LABELS = require('./labels.json');
+    this.MANAGED_LABELS = Object.values(LABELS);
     try {
       const existingLabels = await this.getRepositoryLabels();
+      const labelsToRemove = existingLabels.filter(label => label.description && label.description.includes(DEPRECATED_MANAGED_BY_OTA_MARKER));
+
+      if (labelsToRemove.length) {
+        logger.info(`Removing labels with deprecated markers: ${labelsToRemove.map(label => `"${label.name}"`).join(', ')}`);
+
+        for (const label of labelsToRemove) {
+          await this.deleteLabel(label.name); /* eslint-disable-line no-await-in-loop */
+        }
+      }
+
       const existingLabelsNames = existingLabels.map(label => label.name);
       const missingLabels = this.MANAGED_LABELS.filter(label => !existingLabelsNames.includes(label.name));
 
@@ -116,6 +126,13 @@ export default class GitHub {
     });
   }
 
+  async deleteLabel(name) {
+    await this.octokit.request('DELETE /repos/{owner}/{repo}/labels/{name}', {
+      ...this.commonParams,
+      name,
+    });
+  }
+
   async getIssue(title) {
     return (await this.issues).get(title);
   }
@@ -174,25 +191,25 @@ export default class GitHub {
     }
   }
 
-  async createOrUpdateIssue({ title, description, label }) {
+  async createOrUpdateIssue({ title, description, labels }) {
     try {
       const issue = await this.getIssue(title);
 
       if (!issue) {
-        const createdIssue = await this.createIssue({ title, description, labels: [label] });
+        const createdIssue = await this.createIssue({ title, description, labels });
 
         return logger.info(`Created issue #${createdIssue.number} "${title}": ${createdIssue.html_url}`);
       }
 
       const managedLabelsNames = this.MANAGED_LABELS.map(label => label.name);
       const labelsNotManagedToKeep = issue.labels.map(label => label.name).filter(label => !managedLabelsNames.includes(label));
-      const [managedLabel] = issue.labels.filter(label => managedLabelsNames.includes(label.name)); // It is assumed that only one specific reason for failure is possible at a time, making managed labels mutually exclusive
+      const managedLabels = issue.labels.filter(label => managedLabelsNames.includes(label.name));
 
-      if (issue.state !== GitHub.ISSUE_STATE_CLOSED && managedLabel?.name === label) {
-        return;
+      if (issue.state !== GitHub.ISSUE_STATE_CLOSED && labels.every(label => managedLabels.some(managedLabel => managedLabel.name === label))) {
+        return; // if all requested labels are already assigned to the issue, the error is redundant with the one already reported and no further action is necessary
       }
 
-      const updatedIssue = await this.updateIssue(issue, { state: GitHub.ISSUE_STATE_OPEN, labels: [ label, ...labelsNotManagedToKeep ] });
+      const updatedIssue = await this.updateIssue(issue, { state: GitHub.ISSUE_STATE_OPEN, labels: [ ...labels, ...labelsNotManagedToKeep ] });
 
       await this.addCommentToIssue({ issue, comment: description });
 
