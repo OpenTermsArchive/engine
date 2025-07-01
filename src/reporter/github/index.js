@@ -188,11 +188,11 @@ export default class GitHub {
       const labelsNotManagedToKeep = issue.labels.map(label => label.name).filter(label => !managedLabelsNames.includes(label));
       const managedLabels = issue.labels.filter(label => managedLabelsNames.includes(label.name));
 
-      if (issue.state !== GitHub.ISSUE_STATE_CLOSED && managedLabels.some(ml => labels.includes(ml.name))) {
+      if (issue.state !== GitHub.ISSUE_STATE_CLOSED && labels.every(label => managedLabels.some(managedLabel => managedLabel.name === label))) {
         return;
       }
 
-      const updatedIssue = await this.updateIssue(issue, { state: GitHub.ISSUE_STATE_OPEN, labels: [ labels, ...labelsNotManagedToKeep ] });
+      const updatedIssue = await this.updateIssue(issue, { state: GitHub.ISSUE_STATE_OPEN, labels: [ ...labels, ...labelsNotManagedToKeep ] });
 
       await this.addCommentToIssue({ issue, comment: description });
 
