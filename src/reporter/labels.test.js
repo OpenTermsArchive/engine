@@ -12,7 +12,7 @@ const MAX_LABEL_DESCRIPTION_LENGTH = Math.min(
 );
 
 describe('Reporter GitHub labels', () => {
-  LABELS.forEach(label => {
+  Object.values(LABELS).forEach(label => {
     describe(`"${label.name}"`, () => {
       it('complies with the max description length of supported platforms', () => {
         const descriptionLength = label.description.length + MANAGED_BY_OTA_MARKER.length;

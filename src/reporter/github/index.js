@@ -3,7 +3,7 @@ import { createRequire } from 'module';
 import { Octokit } from 'octokit';
 
 import logger from '../../logger/index.js';
-import { LABELS, MANAGED_BY_OTA_MARKER } from '../labels.js';
+import { LABELS, MANAGED_BY_OTA_MARKER, DEPRECATED_MANAGED_BY_OTA_MARKER } from '../labels.js';
 
 const require = createRequire(import.meta.url);
 
@@ -49,9 +49,19 @@ export default class GitHub {
   }
 
   async initialize() {
-    this.MANAGED_LABELS = LABELS;
+    this.MANAGED_LABELS = Object.values(LABELS);
     try {
       const existingLabels = await this.getRepositoryLabels();
+      const labelsToRemove = existingLabels.filter(label => label.description && label.description.includes(DEPRECATED_MANAGED_BY_OTA_MARKER));
+
+      if (labelsToRemove.length) {
+        logger.info(`Removing labels with deprecated markers: ${labelsToRemove.map(label => `"${label.name}"`).join(', ')}`);
+
+        for (const label of labelsToRemove) {
+          await this.deleteLabel(label.name); /* eslint-disable-line no-await-in-loop */
+        }
+      }
+
       const existingLabelsNames = existingLabels.map(label => label.name);
       const missingLabels = this.MANAGED_LABELS.filter(label => !existingLabelsNames.includes(label.name));
 
@@ -113,6 +123,13 @@ export default class GitHub {
       name,
       color,
       description,
+    });
+  }
+
+  async deleteLabel(name) {
+    await this.octokit.request('DELETE /repos/{owner}/{repo}/labels/{name}', {
+      ...this.commonParams,
+      name,
     });
   }
 

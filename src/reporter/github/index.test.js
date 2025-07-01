@@ -1,22 +1,20 @@
-import { createRequire } from 'module';
-
 import { expect } from 'chai';
 import nock from 'nock';
 
-import GitHub from './index.js';
+import { LABELS } from '../labels.js';
 
-const require = createRequire(import.meta.url);
+import GitHub from './index.js';
 
 describe('GitHub', function () {
   this.timeout(5000);
 
   let MANAGED_LABELS;
   let github;
-  const EXISTING_OPEN_ISSUE = { number: 1, title: 'Opened issue', description: 'Issue description', state: GitHub.ISSUE_STATE_OPEN, labels: [{ name: 'location' }] };
-  const EXISTING_CLOSED_ISSUE = { number: 2, title: 'Closed issue', description: 'Issue description', state: GitHub.ISSUE_STATE_CLOSED, labels: [{ name: '403' }] };
+  const EXISTING_OPEN_ISSUE = { number: 1, title: 'Opened issue', description: 'Issue description', state: GitHub.ISSUE_STATE_OPEN, labels: [{ name: 'page access restriction' }, { name: 'server error' }] };
+  const EXISTING_CLOSED_ISSUE = { number: 2, title: 'Closed issue', description: 'Issue description', state: GitHub.ISSUE_STATE_CLOSED, labels: [{ name: 'empty content' }] };
 
   before(async () => {
-    MANAGED_LABELS = require('./labels.json');
+    MANAGED_LABELS = Object.values(LABELS);
     github = new GitHub('owner/repo');
     nock('https://api.github.com')
       .get('/repos/owner/repo/issues')
@@ -274,7 +272,7 @@ describe('GitHub', function () {
 
   describe('#createOrUpdateIssue', () => {
     before(() => {
-      github.MANAGED_LABELS = require('./labels.json');
+      github.MANAGED_LABELS = Object.values(LABELS);
     });
 
     context('when the issue does not exist', () => {
@@ -282,7 +280,7 @@ describe('GitHub', function () {
       const ISSUE_TO_CREATE = {
         title: 'New Issue',
         description: 'Description of the new issue',
-        label: 'bug',
+        labels: ['empty response'],
       };
 
       before(async () => {
@@ -290,7 +288,7 @@ describe('GitHub', function () {
           .post('/repos/owner/repo/issues', {
             title: ISSUE_TO_CREATE.title,
             body: ISSUE_TO_CREATE.description,
-            labels: [ISSUE_TO_CREATE.label],
+            labels: ISSUE_TO_CREATE.labels,
           })
           .reply(200, { number: 123 });
 
@@ -313,14 +311,14 @@ describe('GitHub', function () {
 
         before(async () => {
           updateIssueScope = nock('https://api.github.com')
-            .patch(`/repos/owner/repo/issues/${EXISTING_CLOSED_ISSUE.number}`, { state: GitHub.ISSUE_STATE_OPEN, labels: ['location'] })
+            .patch(`/repos/owner/repo/issues/${EXISTING_CLOSED_ISSUE.number}`, { state: GitHub.ISSUE_STATE_OPEN, labels: ['page access restriction'] })
             .reply(200);
 
           addCommentScope = nock('https://api.github.com')
             .post(`/repos/owner/repo/issues/${EXISTING_CLOSED_ISSUE.number}/comments`, { body: EXISTING_CLOSED_ISSUE.description })
             .reply(200);
 
-          await github.createOrUpdateIssue({ title: EXISTING_CLOSED_ISSUE.title, description: EXISTING_CLOSED_ISSUE.description, label: 'location' });
+          await github.createOrUpdateIssue({ title: EXISTING_CLOSED_ISSUE.title, description: EXISTING_CLOSED_ISSUE.description, labels: ['page access restriction'] });
         });
 
         after(() => {
@@ -344,14 +342,14 @@ describe('GitHub', function () {
 
           before(async () => {
             updateIssueScope = nock('https://api.github.com')
-              .patch(`/repos/owner/repo/issues/${EXISTING_OPEN_ISSUE.number}`, { state: GitHub.ISSUE_STATE_OPEN, labels: ['404'] })
+              .patch(`/repos/owner/repo/issues/${EXISTING_OPEN_ISSUE.number}`, { state: GitHub.ISSUE_STATE_OPEN, labels: ['empty content'] })
               .reply(200);
 
             addCommentScope = nock('https://api.github.com')
               .post(`/repos/owner/repo/issues/${EXISTING_OPEN_ISSUE.number}/comments`, { body: EXISTING_OPEN_ISSUE.description })
               .reply(200);
 
-            await github.createOrUpdateIssue({ title: EXISTING_OPEN_ISSUE.title, description: EXISTING_OPEN_ISSUE.description, label: '404' });
+            await github.createOrUpdateIssue({ title: EXISTING_OPEN_ISSUE.title, description: EXISTING_OPEN_ISSUE.description, labels: ['empty content'] });
           });
 
           after(() => {
@@ -367,25 +365,27 @@ describe('GitHub', function () {
             expect(addCommentScope.isDone()).to.be.true;
           });
         });
-        context('when the reason did not change', () => {
+
+        context('when all requested labels are already present', () => {
           let addCommentScope;
           let updateIssueScope;
 
           before(async () => {
             updateIssueScope = nock('https://api.github.com')
-              .patch(`/repos/owner/repo/issues/${EXISTING_OPEN_ISSUE.number}`, { state: GitHub.ISSUE_STATE_OPEN, labels: EXISTING_OPEN_ISSUE.labels })
+              .patch(`/repos/owner/repo/issues/${EXISTING_OPEN_ISSUE.number}`)
               .reply(200);
 
             addCommentScope = nock('https://api.github.com')
-              .post(`/repos/owner/repo/issues/${EXISTING_OPEN_ISSUE.number}/comments`, { body: EXISTING_OPEN_ISSUE.description })
+              .post(`/repos/owner/repo/issues/${EXISTING_OPEN_ISSUE.number}/comments`)
               .reply(200);
 
-            await github.createOrUpdateIssue({ title: EXISTING_OPEN_ISSUE.title, description: EXISTING_OPEN_ISSUE.description, label: EXISTING_OPEN_ISSUE.labels[0].name });
+            await github.createOrUpdateIssue({ title: EXISTING_OPEN_ISSUE.title, description: EXISTING_OPEN_ISSUE.description, labels: [ 'page access restriction', 'server error' ] });
           });
 
           after(() => {
-            github.issuesCache.delete(EXISTING_OPEN_ISSUE.title);
             github.issuesCache.set(EXISTING_OPEN_ISSUE.title, EXISTING_OPEN_ISSUE);
+
+            nock.cleanAll();
           });
 
           it('does not attempt to updates the issue’s labels', () => {
@@ -394,6 +394,37 @@ describe('GitHub', function () {
 
           it('does not attempt to add any comment to the issue', () => {
             expect(addCommentScope.isDone()).to.be.false;
+          });
+        });
+
+        context('when some but not all requested labels are present', () => {
+          let addCommentScope;
+          let updateIssueScope;
+
+          before(async () => {
+            updateIssueScope = nock('https://api.github.com')
+              .patch(`/repos/owner/repo/issues/${EXISTING_OPEN_ISSUE.number}`, { state: GitHub.ISSUE_STATE_OPEN, labels: [ 'page access restriction', 'empty content' ] })
+              .reply(200);
+
+            addCommentScope = nock('https://api.github.com')
+              .post(`/repos/owner/repo/issues/${EXISTING_OPEN_ISSUE.number}/comments`, { body: EXISTING_OPEN_ISSUE.description })
+              .reply(200);
+
+            await github.createOrUpdateIssue({ title: EXISTING_OPEN_ISSUE.title, description: EXISTING_OPEN_ISSUE.description, labels: [ 'page access restriction', 'empty content' ] });
+          });
+
+          after(() => {
+            github.issuesCache.set(EXISTING_OPEN_ISSUE.title, EXISTING_OPEN_ISSUE);
+
+            nock.cleanAll();
+          });
+
+          it("updates the issue's labels", () => {
+            expect(updateIssueScope.isDone()).to.be.true;
+          });
+
+          it('adds a comment to the issue', () => {
+            expect(addCommentScope.isDone()).to.be.true;
           });
         });
       });
