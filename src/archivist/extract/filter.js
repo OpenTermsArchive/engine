@@ -5,6 +5,7 @@ export default async function filter(webPageDOM, sourceDocument) {
   convertRelativeURLsToAbsolute(webPageDOM, sourceDocument.location);
   removeUnwantedElements(webPageDOM);
   updateProtectedLinks(webPageDOM);
+
   webPageDOM.remove(sourceDocument.insignificantContentSelectors);
 
   return webPageDOM;

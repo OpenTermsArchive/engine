@@ -61,9 +61,9 @@ const rawHTMLWithCommonChangingItems = `
     <style>body { background: blue }</style>
     <script>console.log("test")</script>
     <h1>Title</h1>
-    <p><a id="link1" href="/relative/link">link 1</a></p>
+    <p><a id="link1" href="/relative/link?utm_source=test&id=123">link 1</a></p>
     <p><a id="link2" href="#anchor">link 2</a></p>
-    <p><a id="link3" href="http://absolute.url/link">link 3</a></p>
+    <p><a id="link3" href="http://absolute.url/link?keep=me">link 3</a></p>
     <p><a id="link4" href="">link 4</a></p>
     <p><img src="https://exemple.com/image.jpg?width=100&quality=80" alt="test"/></p>
     <a href="/cdn-cgi/l/email-protection#3b4c52555f484f495e5a56154b49524d5a584215484f5a4f5e565e554f7b4c52555f484f495e5a5615585456">[email&#160;protected]</a>
@@ -148,6 +148,34 @@ describe('Extract', () => {
           expect(result).to.include('email protected');
           expect(result).to.not.include('3b4c52555f484f495e5a56154b49524d5a584215484f5a4f5e565e554f7b4c52555f484f495e5a5615585456');
           expect(result).to.not.include('2d4e4243594c4e596d4e4459545e4e424259034858');
+        });
+
+        it('removes specified query parameters from links and images', async () => {
+          const result = await extract(new SourceDocument({
+            content: rawHTMLWithCommonChangingItems,
+            location: virtualLocation,
+            contentSelectors: 'body',
+            removeQueryParams: [ 'utm_source', 'width' ],
+          }));
+
+          expect(result).to.include('https://exemple.com/relative/link?id=123');
+          expect(result).to.include('http://absolute.url/link?keep=me');
+          expect(result).to.include('https://exemple.com/image.jpg?quality=80');
+          expect(result).to.not.include('utm_source=test');
+          expect(result).to.not.include('width=100');
+        });
+
+        it('keeps all query parameters when none are specified for removal', async () => {
+          const result = await extract(new SourceDocument({
+            content: rawHTMLWithCommonChangingItems,
+            location: virtualLocation,
+            contentSelectors: 'body',
+          }));
+
+          expect(result).to.include('utm_source=test');
+          expect(result).to.include('width=100');
+          expect(result).to.include('quality=80');
+          expect(result).to.include('keep=me');
         });
 
         context('with a synchronous filter', () => {
