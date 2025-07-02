@@ -56,7 +56,8 @@ export default class GitLab {
         }
       }
 
-      const existingLabelsNames = existingLabels.map(label => label.name);
+      const updatedExistingLabels = labelsToRemove.length ? await this.getRepositoryLabels() : existingLabels; // Refresh labels after deletion, only if needed
+      const existingLabelsNames = updatedExistingLabels.map(label => label.name);
       const missingLabels = this.MANAGED_LABELS.filter(label => !existingLabelsNames.includes(label.name));
 
       if (missingLabels.length) {
