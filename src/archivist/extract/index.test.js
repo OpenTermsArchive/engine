@@ -3,18 +3,16 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 
 import chai from 'chai';
-import jsdom from 'jsdom';
 import mime from 'mime';
 
 import SourceDocument from '../services/sourceDocument.js';
 
 import { ExtractDocumentError } from './errors.js';
 
-import extract, { convertRelativeURLsToAbsolute } from './index.js';
+import extract from './index.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const fs = fsApi.promises;
-const { JSDOM } = jsdom;
 const { expect } = chai;
 
 const virtualLocation = 'https://exemple.com/main';
@@ -67,6 +65,7 @@ const rawHTMLWithCommonChangingItems = `
     <p><a id="link2" href="#anchor">link 2</a></p>
     <p><a id="link3" href="http://absolute.url/link">link 3</a></p>
     <p><a id="link4" href="">link 4</a></p>
+    <p><img src="https://exemple.com/image.jpg?width=100&quality=80" alt="test"/></p>
     <a href="/cdn-cgi/l/email-protection#3b4c52555f484f495e5a56154b49524d5a584215484f5a4f5e565e554f7b4c52555f484f495e5a5615585456">[email&#160;protected]</a>
     <p><a href="/cdn-cgi/l/email-protection#2d4e4243594c4e596d4e4459545e4e424259034858">conta<span>[email&#160;protected]</span></a></p>
   </body>
@@ -83,6 +82,8 @@ const expectedExtractedWithCommonChangingItems = `Title
 [link 3](http://absolute.url/link)
 
 link 4
+
+![test](https://exemple.com/image.jpg?width=100&quality=80)
 
 [\\[email protected\\]](https://exemple.com/cdn-cgi/l/email-protection)
 
@@ -112,31 +113,70 @@ const additionalFilter = {
 };
 
 describe('Extract', () => {
-  describe('#convertRelativeURLsToAbsolute', () => {
-    let subject;
-
-    before(() => {
-      const { document: webPageDOM } = new JSDOM(rawHTML).window;
-
-      convertRelativeURLsToAbsolute(webPageDOM, virtualLocation);
-      subject = Array.from(webPageDOM.querySelectorAll('a[href]')).map(el => el.href);
-    });
-
-    it('converts relative urls', () => {
-      expect(subject).to.include('https://exemple.com/relative/link');
-    });
-
-    it('leaves absolute urls untouched', () => {
-      expect(subject).to.include('http://absolute.url/link');
-    });
-
-    it('leaves invalid urls untouched', () => {
-      expect(subject).to.include('http://[INVALID_URL=http://www.example.org/');
-    });
-  });
-
   describe('#extract', () => {
     context('from HTML content', () => {
+      describe('Filter', () => {
+        it('applies filters to convert relative URLs to absolute', async () => {
+          const result = await extract(new SourceDocument({
+            content: rawHTML,
+            location: virtualLocation,
+            contentSelectors: 'body',
+          }));
+
+          expect(result).to.include('https://exemple.com/relative/link');
+          expect(result).to.include('http://absolute.url/link');
+        });
+
+        it('applies filters to remove unwanted elements', async () => {
+          const result = await extract(new SourceDocument({
+            content: rawHTMLWithCommonChangingItems,
+            location: virtualLocation,
+            contentSelectors: 'body',
+          }));
+
+          expect(result).to.not.include('background: red');
+          expect(result).to.not.include('console.log');
+        });
+
+        it('applies filters to update protected links', async () => {
+          const result = await extract(new SourceDocument({
+            content: rawHTMLWithCommonChangingItems,
+            location: virtualLocation,
+            contentSelectors: 'body',
+          }));
+
+          expect(result).to.include('email protected');
+          expect(result).to.not.include('3b4c52555f484f495e5a56154b49524d5a584215484f5a4f5e565e554f7b4c52555f484f495e5a5615585456');
+          expect(result).to.not.include('2d4e4243594c4e596d4e4459545e4e424259034858');
+        });
+
+        context('with a synchronous filter', () => {
+          it('extracts content from the given HTML also with given additional filter', async () => {
+            const result = await extract(new SourceDocument({
+              content: rawHTML,
+              location: virtualLocation,
+              contentSelectors: 'body',
+              filters: [additionalFilter.removeLinks],
+            }));
+
+            expect(result).to.equal(expectedExtractedWithAdditional);
+          });
+        });
+
+        context('with an asynchronous filter', () => {
+          it('extracts content from the given HTML also with given additional filter', async () => {
+            const result = await extract(new SourceDocument({
+              content: rawHTML,
+              location: virtualLocation,
+              contentSelectors: 'body',
+              filters: [additionalFilter.removeLinksAsync],
+            }));
+
+            expect(result).to.equal(expectedExtractedWithAdditional);
+          });
+        });
+      });
+
       describe('Select', () => {
         context('with string selector', () => {
           it('extracts content from the given HTML with common changing items', async () => {
@@ -474,34 +514,6 @@ describe('Extract', () => {
 
               expect(result).to.equal('[link 2](#anchor)\n\n[link 3](http://absolute.url/link)\n\n[link 5](http://[INVALID_URL=http://www.example.org/)');
             });
-          });
-        });
-      });
-
-      describe('Filter', () => {
-        context('with a synchronous filter', () => {
-          it('extracts content from the given HTML also with given additional filter', async () => {
-            const result = await extract(new SourceDocument({
-              content: rawHTML,
-              location: virtualLocation,
-              contentSelectors: 'body',
-              filters: [additionalFilter.removeLinks],
-            }));
-
-            expect(result).to.equal(expectedExtractedWithAdditional);
-          });
-        });
-
-        context('with an asynchronous filter', () => {
-          it('extracts content from the given HTML also with given additional filter', async () => {
-            const result = await extract(new SourceDocument({
-              content: rawHTML,
-              location: virtualLocation,
-              contentSelectors: 'body',
-              filters: [additionalFilter.removeLinksAsync],
-            }));
-
-            expect(result).to.equal(expectedExtractedWithAdditional);
           });
         });
       });
