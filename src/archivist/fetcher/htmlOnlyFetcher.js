@@ -4,6 +4,8 @@ import HttpProxyAgent from 'http-proxy-agent';
 import HttpsProxyAgent from 'https-proxy-agent';
 import nodeFetch, { AbortError } from 'node-fetch';
 
+import { resolveProxyConfiguration } from './proxyUtils.js';
+
 export default async function fetch(url, config) {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), config.navigationTimeout);
@@ -14,10 +16,12 @@ export default async function fetch(url, config) {
     headers: { 'Accept-Language': config.language },
   };
 
-  if (url.startsWith('https:') && process.env.HTTPS_PROXY) {
-    nodeFetchOptions.agent = new HttpsProxyAgent(process.env.HTTPS_PROXY);
-  } else if (url.startsWith('http:') && process.env.HTTP_PROXY) {
-    nodeFetchOptions.agent = new HttpProxyAgent(process.env.HTTP_PROXY);
+  const { httpProxy, httpsProxy } = resolveProxyConfiguration();
+
+  if (url.startsWith('https:') && httpsProxy) {
+    nodeFetchOptions.agent = new HttpsProxyAgent(httpsProxy);
+  } else if (url.startsWith('http:') && httpProxy) {
+    nodeFetchOptions.agent = new HttpProxyAgent(httpProxy);
   }
 
   let response;
