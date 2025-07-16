@@ -24,7 +24,7 @@ const ERROR_MESSAGE_TO_ISSUE_LABELS_MAP = {
   'unable to verify the first certificate': [LABELS.SSL_INVALID.name],
   'certificate has expired': [LABELS.SSL_EXPIRED.name],
   'maximum redirect reached': [LABELS.TOO_MANY_REDIRECTS.name],
-  'not a valid selector': [LABELS.INVALID_SELECTOR.name],
+  'not a valid selector': [ LABELS.INVALID_SELECTOR.name, LABELS.NEEDS_INTERVENTION.name ],
   'empty content': [LABELS.EMPTY_CONTENT.name],
 };
 
