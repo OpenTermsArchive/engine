@@ -58,7 +58,7 @@ export const LABELS = {
     color: 'FFFFFF',
     description: 'Fetching failed because of too many redirects',
   },
-  PAGE_LOAD_TIMEOUT: {
+  DOCUMENT_LOAD_TIMEOUT: {
     name: 'document load timed out',
     color: 'FFFFFF',
     description: 'Fetching failed with a timeout error',
@@ -73,12 +73,12 @@ export const LABELS = {
     color: 'FFFFFF',
     description: 'Fetching failed for an undetermined reason that needs investigation',
   },
-  PAGE_STRUCTURE_CHANGE: {
+  DOCUMENT_STRUCTURE_CHANGE: {
     name: 'document structure changed',
     color: 'FFFFFF',
     description: 'Extraction selectors are outdated',
   },
-  PAGE_NOT_FOUND: {
+  DOCUMENT_NOT_FOUND: {
     name: 'document not found',
     color: 'FFFFFF',
     description: 'Fetch location is outdated',
