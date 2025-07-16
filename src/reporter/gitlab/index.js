@@ -57,7 +57,28 @@ export default class GitLab {
       }
 
       const updatedExistingLabels = labelsToRemove.length ? await this.getRepositoryLabels() : existingLabels; // Refresh labels after deletion, only if needed
-      const existingLabelsNames = updatedExistingLabels.map(label => label.name);
+      const managedLabelsNames = this.MANAGED_LABELS.map(label => label.name);
+
+      // Remove managed labels that are no longer in the MANAGED_LABELS list
+      const obsoleteManagedLabels = updatedExistingLabels.filter(label =>
+        label.description
+        && label.description.includes(MANAGED_BY_OTA_MARKER)
+        && !managedLabelsNames.includes(label.name));
+
+      if (obsoleteManagedLabels.length) {
+        logger.info(`Removing obsolete managed labels: ${obsoleteManagedLabels.map(label => `"${label.name}"`).join(', ')}`);
+
+        for (const label of obsoleteManagedLabels) {
+          await this.deleteLabel(label.name); /* eslint-disable-line no-await-in-loop */
+        }
+      }
+
+      // Refresh labels after obsolete removal
+      const finalExistingLabels = obsoleteManagedLabels.length ? await this.getRepositoryLabels() : updatedExistingLabels;
+      const existingLabelsNames = finalExistingLabels.map(label => label.name);
+      const existingLabelsMap = new Map(finalExistingLabels.map(label => [ label.name, label ]));
+
+      // Find labels that need to be created
       const missingLabels = this.MANAGED_LABELS.filter(label => !existingLabelsNames.includes(label.name));
 
       if (missingLabels.length) {
@@ -65,6 +86,32 @@ export default class GitLab {
 
         for (const label of missingLabels) {
           await this.createLabel({ /* eslint-disable-line no-await-in-loop */
+            name: label.name,
+            color: `#${label.color}`,
+            description: `${label.description} ${MANAGED_BY_OTA_MARKER}`,
+          });
+        }
+      }
+
+      // Update existing labels if description or color changed
+      const labelsToUpdate = this.MANAGED_LABELS.filter(label => {
+        const existingLabel = existingLabelsMap.get(label.name);
+
+        if (!existingLabel) {
+          return false;
+        }
+
+        const expectedDescription = `${label.description} ${MANAGED_BY_OTA_MARKER}`;
+        const expectedColor = `#${label.color}`;
+
+        return existingLabel.description !== expectedDescription || existingLabel.color !== expectedColor;
+      });
+
+      if (labelsToUpdate.length) {
+        logger.info(`Updating labels with changed descriptions: ${labelsToUpdate.map(label => `"${label.name}"`).join(', ')}`);
+
+        for (const label of labelsToUpdate) {
+          await this.updateLabel({ /* eslint-disable-line no-await-in-loop */
             name: label.name,
             color: `#${label.color}`,
             description: `${label.description} ${MANAGED_BY_OTA_MARKER}`,
@@ -152,6 +199,40 @@ export default class GitLab {
       }
     } catch (error) {
       logger.error(`Failed to delete label: ${error}`);
+    }
+  }
+
+  async updateLabel({ name, color, description }) {
+    try {
+      const label = {
+        name,
+        color,
+        description,
+      };
+
+      const options = GitLab.baseOptionsHttpReq();
+
+      options.method = 'PUT';
+      options.body = JSON.stringify(label);
+      options.headers = {
+        'Content-Type': 'application/json',
+        ...options.headers,
+      };
+
+      const response = await nodeFetch(
+        `${this.apiBaseURL}/projects/${this.projectId}/labels/${encodeURIComponent(name)}`,
+        options,
+      );
+
+      const res = await response.json();
+
+      if (response.ok) {
+        logger.info(`Label updated: ${res.name}, color: ${res.color}`);
+      } else {
+        logger.error(`updateLabel response: ${JSON.stringify(res)}`);
+      }
+    } catch (error) {
+      logger.error(`Failed to update label: ${error}`);
     }
   }
 
