@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import nock from 'nock';
 
-import { LABELS } from '../labels.js';
+import { LABELS, MANAGED_BY_OTA_MARKER } from '../labels.js';
 
 import GitLab from './index.js';
 
@@ -18,34 +18,128 @@ describe('GitLab', function () {
   });
 
   describe('#initialize', () => {
-    const scopes = [];
+    context('when some labels are missing', () => {
+      const scopes = [];
 
-    before(async () => {
-      const existingLabels = MANAGED_LABELS.slice(0, -2);
+      before(async () => {
+        const existingLabels = MANAGED_LABELS.slice(0, -2).map(label => ({
+          ...label,
+          description: `${label.description} ${MANAGED_BY_OTA_MARKER}`,
+        }));
 
-      nock(gitlab.apiBaseURL)
-        .get(`/projects/${encodeURIComponent('owner/repo')}`)
-        .reply(200, { id: PROJECT_ID });
+        nock(gitlab.apiBaseURL)
+          .get(`/projects/${encodeURIComponent('owner/repo')}`)
+          .reply(200, { id: PROJECT_ID });
 
-      nock(gitlab.apiBaseURL)
-        .get(`/projects/${PROJECT_ID}/labels?with_counts=true`)
-        .reply(200, existingLabels);
+        nock(gitlab.apiBaseURL)
+          .get(`/projects/${PROJECT_ID}/labels?with_counts=true`)
+          .reply(200, existingLabels);
 
-      const missingLabels = MANAGED_LABELS.slice(-2);
+        const missingLabels = MANAGED_LABELS.slice(-2);
 
-      for (const label of missingLabels) {
-        scopes.push(nock(gitlab.apiBaseURL)
-          .post(`/projects/${PROJECT_ID}/labels`)
-          .reply(200, { name: label.name }));
-      }
+        for (const label of missingLabels) {
+          scopes.push(nock(gitlab.apiBaseURL)
+            .post(`/projects/${PROJECT_ID}/labels`)
+            .reply(200, { name: label.name }));
+        }
 
-      await gitlab.initialize();
+        await gitlab.initialize();
+      });
+
+      after(nock.cleanAll);
+
+      it('should create missing labels', () => {
+        scopes.forEach(scope => expect(scope.isDone()).to.be.true);
+      });
     });
 
-    after(nock.cleanAll);
+    context('when some labels are obsolete', () => {
+      const deleteScopes = [];
 
-    it('should create missing labels', () => {
-      scopes.forEach(scope => expect(scope.isDone()).to.be.true);
+      before(async () => {
+        const existingLabels = [
+          ...MANAGED_LABELS.map(label => ({
+            ...label,
+            description: `${label.description} ${MANAGED_BY_OTA_MARKER}`,
+          })),
+          // Add an obsolete label that should be removed
+          {
+            name: 'obsolete label',
+            color: '#FF0000',
+            description: `This label is no longer used ${MANAGED_BY_OTA_MARKER}`,
+          },
+        ];
+
+        nock(gitlab.apiBaseURL)
+          .get(`/projects/${encodeURIComponent('owner/repo')}`)
+          .reply(200, { id: PROJECT_ID });
+
+        nock(gitlab.apiBaseURL)
+          .get(`/projects/${PROJECT_ID}/labels?with_counts=true`)
+          .reply(200, existingLabels);
+
+        // Mock the delete call for the obsolete label
+        deleteScopes.push(nock(gitlab.apiBaseURL)
+          .delete(`/projects/${PROJECT_ID}/labels/${encodeURIComponent('obsolete label')}`)
+          .reply(200));
+
+        // Mock the second getRepositoryLabels call after deletion
+        nock(gitlab.apiBaseURL)
+          .get(`/projects/${PROJECT_ID}/labels?with_counts=true`)
+          .reply(200, MANAGED_LABELS.map(label => ({
+            ...label,
+            description: `${label.description} ${MANAGED_BY_OTA_MARKER}`,
+          })));
+
+        await gitlab.initialize();
+      });
+
+      after(nock.cleanAll);
+
+      it('should remove obsolete managed labels', () => {
+        deleteScopes.forEach(scope => expect(scope.isDone()).to.be.true);
+      });
+    });
+
+    context('when some labels have changed descriptions', () => {
+      const updateScopes = [];
+
+      before(async () => {
+        const originalTestLabels = MANAGED_LABELS.slice(-2);
+        const testLabels = originalTestLabels.map(label => ({
+          ...label,
+          description: `${label.description} - obsolete description`,
+        }));
+
+        nock(gitlab.apiBaseURL)
+          .get(`/projects/${encodeURIComponent('owner/repo')}`)
+          .reply(200, { id: PROJECT_ID });
+
+        nock(gitlab.apiBaseURL)
+          .persist()
+          .get(`/projects/${PROJECT_ID}/labels?with_counts=true`)
+          .reply(200, [ ...MANAGED_LABELS.slice(0, -2), ...testLabels ].map(label => ({
+            ...label,
+            description: `${label.description} ${MANAGED_BY_OTA_MARKER}`,
+          })));
+
+        for (const label of originalTestLabels) {
+          updateScopes.push(nock(gitlab.apiBaseURL)
+            .put(`/projects/${PROJECT_ID}/labels/${encodeURIComponent(label.name)}`, body =>
+              body.description === `${label.description} ${MANAGED_BY_OTA_MARKER}`)
+            .reply(200, { name: label.name, color: `#${label.color}` }));
+        }
+
+        await gitlab.initialize();
+      });
+
+      after(() => {
+        nock.cleanAll();
+      });
+
+      it('should update labels with changed descriptions', () => {
+        updateScopes.forEach(scope => expect(scope.isDone()).to.be.true);
+      });
     });
   });
 

@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import nock from 'nock';
 
-import { LABELS } from '../labels.js';
+import { LABELS, MANAGED_BY_OTA_MARKER } from '../labels.js';
 
 import GitHub from './index.js';
 
@@ -24,31 +24,119 @@ describe('GitHub', function () {
   });
 
   describe('#initialize', () => {
-    const scopes = [];
+    context('when some labels are missing', () => {
+      const scopes = [];
 
-    before(async () => {
-      const existingLabels = MANAGED_LABELS.slice(0, -2);
+      before(async () => {
+        const existingLabels = MANAGED_LABELS.slice(0, -2).map(label => ({
+          ...label,
+          description: `${label.description} ${MANAGED_BY_OTA_MARKER}`,
+        }));
 
-      nock('https://api.github.com')
-        .get('/repos/owner/repo/labels')
-        .query(true)
-        .reply(200, existingLabels);
+        nock('https://api.github.com')
+          .get('/repos/owner/repo/labels')
+          .query(true)
+          .reply(200, existingLabels);
 
-      const missingLabels = MANAGED_LABELS.slice(-2);
+        const missingLabels = MANAGED_LABELS.slice(-2);
 
-      for (const label of missingLabels) {
-        scopes.push(nock('https://api.github.com')
-          .post('/repos/owner/repo/labels', body => body.name === label.name)
-          .reply(200, label));
-      }
+        for (const label of missingLabels) {
+          scopes.push(nock('https://api.github.com')
+            .post('/repos/owner/repo/labels', body => body.name === label.name)
+            .reply(200, label));
+        }
 
-      await github.initialize();
+        await github.initialize();
+      });
+
+      after(nock.cleanAll);
+
+      it('should create missing labels', () => {
+        scopes.forEach(scope => expect(scope.isDone()).to.be.true);
+      });
     });
 
-    after(nock.cleanAll);
+    context('when some labels are obsolete', () => {
+      const deleteScopes = [];
 
-    it('should create missing labels', () => {
-      scopes.forEach(scope => expect(scope.isDone()).to.be.true);
+      before(async () => {
+        const existingLabels = [
+          ...MANAGED_LABELS.map(label => ({
+            ...label,
+            description: `${label.description} ${MANAGED_BY_OTA_MARKER}`,
+          })),
+          // Add an obsolete label that should be removed
+          {
+            name: 'obsolete label',
+            color: 'FF0000',
+            description: `This label is no longer used ${MANAGED_BY_OTA_MARKER}`,
+          },
+        ];
+
+        nock('https://api.github.com')
+          .get('/repos/owner/repo/labels')
+          .query(true)
+          .reply(200, existingLabels);
+
+        // Mock the delete call for the obsolete label
+        deleteScopes.push(nock('https://api.github.com')
+          .delete('/repos/owner/repo/labels/obsolete%20label')
+          .reply(200));
+
+        // Mock the second getRepositoryLabels call after deletion
+        nock('https://api.github.com')
+          .get('/repos/owner/repo/labels')
+          .query(true)
+          .reply(200, MANAGED_LABELS.map(label => ({
+            ...label,
+            description: `${label.description} ${MANAGED_BY_OTA_MARKER}`,
+          })));
+
+        await github.initialize();
+      });
+
+      after(nock.cleanAll);
+
+      it('should remove obsolete managed labels', () => {
+        deleteScopes.forEach(scope => expect(scope.isDone()).to.be.true);
+      });
+    });
+
+    context('when some labels have changed descriptions', () => {
+      const updateScopes = [];
+
+      before(async () => {
+        const originalTestLabels = MANAGED_LABELS.slice(-2);
+        const testLabels = originalTestLabels.map(label => ({
+          ...label,
+          description: `${label.description} - obsolete description`,
+        }));
+
+        nock('https://api.github.com')
+          .persist()
+          .get('/repos/owner/repo/labels')
+          .query(true)
+          .reply(200, [ ...MANAGED_LABELS.slice(0, -2), ...testLabels ].map(label => ({
+            ...label,
+            description: `${label.description} ${MANAGED_BY_OTA_MARKER}`,
+          })));
+
+        for (const label of originalTestLabels) {
+          updateScopes.push(nock('https://api.github.com')
+            .patch(`/repos/owner/repo/labels/${encodeURIComponent(label.name)}`, body =>
+              body.description === `${label.description} ${MANAGED_BY_OTA_MARKER}`)
+            .reply(200, label));
+        }
+        await github.initialize();
+      });
+
+      after(() => {
+        nock.cleanAll();
+      });
+
+      it('should update labels with changed descriptions', () => {
+        updateScopes.forEach(scope => expect(scope.isDone()).to.be.true);
+      });
     });
   });
 
