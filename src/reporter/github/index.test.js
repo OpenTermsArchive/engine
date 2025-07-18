@@ -10,8 +10,8 @@ describe('GitHub', function () {
 
   let MANAGED_LABELS;
   let github;
-  const EXISTING_OPEN_ISSUE = { number: 1, title: 'Opened issue', description: 'Issue description', state: GitHub.ISSUE_STATE_OPEN, labels: [{ name: 'page access restriction' }, { name: 'server error' }] };
-  const EXISTING_CLOSED_ISSUE = { number: 2, title: 'Closed issue', description: 'Issue description', state: GitHub.ISSUE_STATE_CLOSED, labels: [{ name: 'empty content' }] };
+  const EXISTING_OPEN_ISSUE = { number: 1, title: 'Opened issue', description: 'Issue description', state: GitHub.ISSUE_STATE_OPEN, labels: [{ name: LABELS.HTTP_403.name }] };
+  const EXISTING_CLOSED_ISSUE = { number: 2, title: 'Closed issue', description: 'Issue description', state: GitHub.ISSUE_STATE_CLOSED, labels: [{ name: LABELS.EMPTY_CONTENT.name }] };
 
   before(async () => {
     MANAGED_LABELS = Object.values(LABELS);
@@ -368,7 +368,7 @@ describe('GitHub', function () {
       const ISSUE_TO_CREATE = {
         title: 'New Issue',
         description: 'Description of the new issue',
-        labels: ['empty response'],
+        labels: [LABELS.EMPTY_RESPONSE.name],
       };
 
       before(async () => {
@@ -399,14 +399,14 @@ describe('GitHub', function () {
 
         before(async () => {
           updateIssueScope = nock('https://api.github.com')
-            .patch(`/repos/owner/repo/issues/${EXISTING_CLOSED_ISSUE.number}`, { state: GitHub.ISSUE_STATE_OPEN, labels: ['page access restriction'] })
+            .patch(`/repos/owner/repo/issues/${EXISTING_CLOSED_ISSUE.number}`, { state: GitHub.ISSUE_STATE_OPEN, labels: [LABELS.HTTP_403.name] })
             .reply(200);
 
           addCommentScope = nock('https://api.github.com')
             .post(`/repos/owner/repo/issues/${EXISTING_CLOSED_ISSUE.number}/comments`, { body: EXISTING_CLOSED_ISSUE.description })
             .reply(200);
 
-          await github.createOrUpdateIssue({ title: EXISTING_CLOSED_ISSUE.title, description: EXISTING_CLOSED_ISSUE.description, labels: ['page access restriction'] });
+          await github.createOrUpdateIssue({ title: EXISTING_CLOSED_ISSUE.title, description: EXISTING_CLOSED_ISSUE.description, labels: [LABELS.HTTP_403.name] });
         });
 
         after(() => {
@@ -430,14 +430,14 @@ describe('GitHub', function () {
 
           before(async () => {
             updateIssueScope = nock('https://api.github.com')
-              .patch(`/repos/owner/repo/issues/${EXISTING_OPEN_ISSUE.number}`, { state: GitHub.ISSUE_STATE_OPEN, labels: ['empty content'] })
+              .patch(`/repos/owner/repo/issues/${EXISTING_OPEN_ISSUE.number}`, { state: GitHub.ISSUE_STATE_OPEN, labels: [LABELS.EMPTY_CONTENT.name] })
               .reply(200);
 
             addCommentScope = nock('https://api.github.com')
               .post(`/repos/owner/repo/issues/${EXISTING_OPEN_ISSUE.number}/comments`, { body: EXISTING_OPEN_ISSUE.description })
               .reply(200);
 
-            await github.createOrUpdateIssue({ title: EXISTING_OPEN_ISSUE.title, description: EXISTING_OPEN_ISSUE.description, labels: ['empty content'] });
+            await github.createOrUpdateIssue({ title: EXISTING_OPEN_ISSUE.title, description: EXISTING_OPEN_ISSUE.description, labels: [LABELS.EMPTY_CONTENT.name] });
           });
 
           after(() => {
@@ -467,7 +467,7 @@ describe('GitHub', function () {
               .post(`/repos/owner/repo/issues/${EXISTING_OPEN_ISSUE.number}/comments`)
               .reply(200);
 
-            await github.createOrUpdateIssue({ title: EXISTING_OPEN_ISSUE.title, description: EXISTING_OPEN_ISSUE.description, labels: [ 'page access restriction', 'server error' ] });
+            await github.createOrUpdateIssue({ title: EXISTING_OPEN_ISSUE.title, description: EXISTING_OPEN_ISSUE.description, labels: [LABELS.HTTP_403.name] });
           });
 
           after(() => {
@@ -491,14 +491,14 @@ describe('GitHub', function () {
 
           before(async () => {
             updateIssueScope = nock('https://api.github.com')
-              .patch(`/repos/owner/repo/issues/${EXISTING_OPEN_ISSUE.number}`, { state: GitHub.ISSUE_STATE_OPEN, labels: [ 'page access restriction', 'empty content' ] })
+              .patch(`/repos/owner/repo/issues/${EXISTING_OPEN_ISSUE.number}`, { state: GitHub.ISSUE_STATE_OPEN, labels: [ LABELS.HTTP_403.name, LABELS.NEEDS_INTERVENTION.name ] })
               .reply(200);
 
             addCommentScope = nock('https://api.github.com')
               .post(`/repos/owner/repo/issues/${EXISTING_OPEN_ISSUE.number}/comments`, { body: EXISTING_OPEN_ISSUE.description })
               .reply(200);
 
-            await github.createOrUpdateIssue({ title: EXISTING_OPEN_ISSUE.title, description: EXISTING_OPEN_ISSUE.description, labels: [ 'page access restriction', 'empty content' ] });
+            await github.createOrUpdateIssue({ title: EXISTING_OPEN_ISSUE.title, description: EXISTING_OPEN_ISSUE.description, labels: [ LABELS.HTTP_403.name, LABELS.NEEDS_INTERVENTION.name ] });
           });
 
           after(() => {

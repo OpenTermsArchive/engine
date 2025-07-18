@@ -118,10 +118,16 @@ describe('GitLab', function () {
         nock(gitlab.apiBaseURL)
           .persist()
           .get(`/projects/${PROJECT_ID}/labels?with_counts=true`)
-          .reply(200, [ ...MANAGED_LABELS.slice(0, -2), ...testLabels ].map(label => ({
-            ...label,
-            description: `${label.description} ${MANAGED_BY_OTA_MARKER}`,
-          })));
+          .reply(200, [
+            ...MANAGED_LABELS.slice(0, -2).map(label => ({
+              ...label,
+              description: `${label.description} ${MANAGED_BY_OTA_MARKER}`,
+            })),
+            ...testLabels.map(label => ({
+              ...label,
+              description: `${label.description} ${MANAGED_BY_OTA_MARKER}`,
+            })),
+          ]);
 
         for (const label of originalTestLabels) {
           updateScopes.push(nock(gitlab.apiBaseURL)
@@ -499,7 +505,7 @@ describe('GitLab', function () {
       const ISSUE_TO_CREATE = {
         title: 'New Issue',
         description: 'Description of the new issue',
-        labels: ['empty response'],
+        labels: [LABELS.EMPTY_RESPONSE.name],
       };
 
       before(async () => {
@@ -530,7 +536,7 @@ describe('GitLab', function () {
       const ISSUE = {
         title: 'Existing Issue',
         description: 'New comment',
-        labels: ['page access restriction'],
+        labels: [LABELS.HTTP_403.name],
       };
 
       context('when issue is closed', () => {
@@ -542,7 +548,7 @@ describe('GitLab', function () {
           iid: 123,
           title: ISSUE.title,
           description: ISSUE.description,
-          labels: [{ name: 'empty content' }],
+          labels: [{ name: LABELS.EMPTY_CONTENT.name }],
           state: GitLab.ISSUE_STATE_CLOSED,
         };
 
@@ -550,7 +556,7 @@ describe('GitLab', function () {
         const responseIssuereopened = { iid: 123 };
         const responseSetLabels = {
           iid: 123,
-          labels: ['page access restriction'],
+          labels: [LABELS.HTTP_403.name],
         };
         const responseAddcomment = { iid: 123, id: 23, body: ISSUE.description };
         const { iid } = GITLAB_RESPONSE_FOR_EXISTING_ISSUE;
@@ -565,7 +571,7 @@ describe('GitLab', function () {
             .reply(200, responseIssuereopened);
 
           setIssueLabelsScope = nock(gitlab.apiBaseURL)
-            .put(`/projects/${PROJECT_ID}/issues/${iid}`, { labels: ['page access restriction'] })
+            .put(`/projects/${PROJECT_ID}/issues/${iid}`, { labels: [LABELS.HTTP_403.name] })
             .reply(200, responseSetLabels);
 
           addCommentScope = nock(gitlab.apiBaseURL)
@@ -598,7 +604,7 @@ describe('GitLab', function () {
             iid: 123,
             title: ISSUE.title,
             description: ISSUE.description,
-            labels: [{ name: 'empty content' }],
+            labels: [{ name: LABELS.EMPTY_CONTENT.name }],
             state: GitLab.ISSUE_STATE_OPEN,
           };
 
@@ -606,7 +612,7 @@ describe('GitLab', function () {
           const responseIssuereopened = { iid: 123 };
           const responseSetLabels = {
             iid: 123,
-            labels: ['page access restriction'],
+            labels: [LABELS.HTTP_403.name],
           };
           const responseAddcomment = { iid: 123, id: 23, body: ISSUE.description };
           const { iid } = GITLAB_RESPONSE_FOR_EXISTING_ISSUE;
@@ -621,7 +627,7 @@ describe('GitLab', function () {
               .reply(200, responseIssuereopened);
 
             setIssueLabelsScope = nock(gitlab.apiBaseURL)
-              .put(`/projects/${PROJECT_ID}/issues/${iid}`, { labels: ['page access restriction'] })
+              .put(`/projects/${PROJECT_ID}/issues/${iid}`, { labels: [LABELS.HTTP_403.name] })
               .reply(200, responseSetLabels);
 
             addCommentScope = nock(gitlab.apiBaseURL)
@@ -653,7 +659,7 @@ describe('GitLab', function () {
             iid: 123,
             title: ISSUE.title,
             description: ISSUE.description,
-            labels: [{ name: 'page access restriction' }, { name: 'server error' }],
+            labels: [{ name: LABELS.HTTP_403.name }],
             state: GitLab.ISSUE_STATE_OPEN,
           };
 
@@ -679,7 +685,7 @@ describe('GitLab', function () {
             await gitlab.createOrUpdateIssue({
               title: ISSUE.title,
               description: ISSUE.description,
-              labels: [ 'page access restriction', 'server error' ],
+              labels: [LABELS.HTTP_403.name],
             });
           });
 
@@ -709,7 +715,7 @@ describe('GitLab', function () {
             iid: 123,
             title: ISSUE.title,
             description: ISSUE.description,
-            labels: [{ name: 'page access restriction' }],
+            labels: [{ name: LABELS.HTTP_403.name }],
             state: GitLab.ISSUE_STATE_OPEN,
           };
 
@@ -717,7 +723,7 @@ describe('GitLab', function () {
           const responseIssuereopened = { iid: 123 };
           const responseSetLabels = {
             iid: 123,
-            labels: [ 'page access restriction', 'empty content' ],
+            labels: [ LABELS.HTTP_403.name, LABELS.EMPTY_CONTENT.name ],
           };
           const responseAddcomment = { iid: 123, id: 23, body: ISSUE.description };
           const { iid } = GITLAB_RESPONSE_FOR_EXISTING_ISSUE;
@@ -732,7 +738,7 @@ describe('GitLab', function () {
               .reply(200, responseIssuereopened);
 
             setIssueLabelsScope = nock(gitlab.apiBaseURL)
-              .put(`/projects/${PROJECT_ID}/issues/${iid}`, { labels: [ 'page access restriction', 'empty content' ] })
+              .put(`/projects/${PROJECT_ID}/issues/${iid}`, { labels: [ LABELS.HTTP_403.name, LABELS.EMPTY_CONTENT.name ] })
               .reply(200, responseSetLabels);
 
             addCommentScope = nock(gitlab.apiBaseURL)
@@ -742,7 +748,7 @@ describe('GitLab', function () {
             await gitlab.createOrUpdateIssue({
               title: ISSUE.title,
               description: ISSUE.description,
-              labels: [ 'page access restriction', 'empty content' ],
+              labels: [ LABELS.HTTP_403.name, LABELS.EMPTY_CONTENT.name ],
             });
           });
 
