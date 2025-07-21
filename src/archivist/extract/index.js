@@ -35,6 +35,9 @@ export default async function extract(sourceDocument) {
     if (sourceDocument.mimeType == mime.getType('pdf')) {
       return await extractFromPDF(sourceDocument);
     }
+    if (sourceDocument.mimeType == mime.getType('txt') || sourceDocument.mimeType == mime.getType('md')) {
+      return await extractFromMd(sourceDocument);
+    }
 
     return await extractFromHTML(sourceDocument);
   } catch (error) {
@@ -118,6 +121,14 @@ export async function extractFromPDF({ location, content: pdfBuffer }) {
 
   if (!markdownContent) {
     throw new Error(`The PDF file at '${location}' contains no text, it might contain scanned images of text instead of actual text`);
+  }
+
+  return markdownContent;
+}
+
+export async function extractFromMd({ location, content: markdownContent }) {
+  if (!markdownContent) {
+    throw new Error(`The markdown file at '${location}' contains no text`);
   }
 
   return markdownContent;
