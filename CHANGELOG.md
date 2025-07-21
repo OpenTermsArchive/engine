@@ -4,7 +4,7 @@ All changes that impact users of this module are documented in this file, in the
 
 ## Unreleased [minor]
 
-> Development of this release was supported by the [French Ministry for Foreign Affairs](https://www.diplomatie.gouv.fr/fr/politique-etrangere-de-la-france/diplomatie-numerique/) through its ministerial [State Startups incubator](https://beta.gouv.fr/startups/open-terms-archive.html) under the aegis of the Ambassador for Digital Affairs.
+> Development of this release was supported by the [Lab Platform Governance, Media and Technology](https://platform-governance.org) (PGMT), Centre for Media, Communication and Information Research (ZeMKI), University of Bremen as part of the project [Governance: Private ordering of ComAI through corporate communication and policies](https://comai.space/en/projects/p4-governance-private-ordering-of-comai-through-corporate-communication-and-policies/) in the research unit [Communicative AI](https://comai.space/en/), funded by the German Research Foundation (DFG) ([Grant No. 516511468)](https://gepris.dfg.de/gepris/projekt/544643936?language=en).
 
 ### Changed
 
