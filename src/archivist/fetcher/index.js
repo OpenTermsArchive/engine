@@ -27,7 +27,7 @@ export const FETCHER_TYPES = {
  * @throws {FetchDocumentError} When the fetch operation fails
  * @async
  */
-export default async function fetch({
+export default function fetch({
   url,
   executeClientScripts,
   cssSelectors,
