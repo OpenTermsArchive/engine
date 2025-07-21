@@ -96,13 +96,11 @@ export default class MongoRepository extends RepositoryInterface {
   async* iterate() {
     const cursor = this.collection.find().sort({ fetchDate: 1 });
 
-    /* eslint-disable no-await-in-loop */
     while (await cursor.hasNext()) {
       const mongoDocument = await cursor.next();
 
       yield this.#toDomain(mongoDocument);
     }
-    /* eslint-enable no-await-in-loop */
   }
 
   removeAll() {

@@ -140,7 +140,7 @@ async function rewriteSnapshots(repository, records, idsMapping, logger) {
   let i = 1;
 
   for (const record of records) {
-    const { id: recordId } = await repository.save(record); // eslint-disable-line no-await-in-loop
+    const { id: recordId } = await repository.save(record);
 
     idsMapping[record.id] = recordId; // Saves the mapping between the old ID and the new one.
 
@@ -166,7 +166,7 @@ async function rewriteVersions(repository, records, idsMapping, logger) {
 
     record.snapshotId = newSnapshotId;
 
-    const { id: recordId } = await repository.save(record); // eslint-disable-line no-await-in-loop
+    const { id: recordId } = await repository.save(record);
 
     if (recordId) {
       logger.info({ message: `Migrated version with new ID: ${recordId}`, serviceId: record.serviceId, type: record.termsType, id: record.id, current: i++, total: records.length });

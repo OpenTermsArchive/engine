@@ -52,7 +52,7 @@ export default class GitLab {
         logger.info(`Removing labels with deprecated markers: ${labelsToRemove.map(label => `"${label.name}"`).join(', ')}`);
 
         for (const label of labelsToRemove) {
-          await this.deleteLabel(label.name); /* eslint-disable-line no-await-in-loop */
+          await this.deleteLabel(label.name);
         }
       }
 
@@ -82,7 +82,7 @@ export default class GitLab {
         logger.info(`Following required labels are not present on the repository: ${missingLabels.map(label => `"${label.name}"`).join(', ')}. Creating them…`);
 
         for (const label of missingLabels) {
-          await this.createLabel({ /* eslint-disable-line no-await-in-loop */
+          await this.createLabel({
             name: label.name,
             color: `#${label.color}`,
             description: `${label.description} ${MANAGED_BY_OTA_MARKER}`,

@@ -187,7 +187,7 @@ export default class Archivist extends events.EventEmitter {
       const { location: url, executeClientScripts, cssSelectors } = sourceDocument;
 
       try {
-        const { mimeType, content, fetcher } = await this.fetch({ url, executeClientScripts, cssSelectors }); // eslint-disable-line no-await-in-loop
+        const { mimeType, content, fetcher } = await this.fetch({ url, executeClientScripts, cssSelectors });
 
         sourceDocument.content = content;
         sourceDocument.mimeType = mimeType;

@@ -64,7 +64,6 @@ let recorder;
   const filteredCommits = commits.filter(({ message }) =>
     message.match(/^(Start tracking|Update)/));
 
-  /* eslint-disable no-await-in-loop */
   /* eslint-disable no-continue */
   for (const commit of filteredCommits) {
     console.log(Date.now(), commit.hash, commit.date, commit.message);
