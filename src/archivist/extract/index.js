@@ -59,7 +59,6 @@ export async function extractFromHTML(sourceDocument) {
 
   for (const filterFunction of serviceSpecificFilters) {
     try {
-      // We want this to be made in series
       await filterFunction(webPageDOM, {
         fetch: location,
         select: contentSelectors,
