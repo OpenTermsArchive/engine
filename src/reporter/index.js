@@ -10,21 +10,21 @@ const CONTRIBUTION_TOOL_URL = 'https://contribute.opentermsarchive.org/en/servic
 const DOC_URL = 'https://docs.opentermsarchive.org';
 
 const ERROR_MESSAGE_TO_ISSUE_LABELS_MAP = {
-  'has no match': [ LABELS.PAGE_STRUCTURE_CHANGE.name, LABELS.NEEDS_INTERVENTION.name ],
-  'HTTP code 404': [ LABELS.PAGE_NOT_FOUND.name, LABELS.NEEDS_INTERVENTION.name ],
+  'has no match': [ LABELS.DOCUMENT_STRUCTURE_CHANGE.name, LABELS.NEEDS_INTERVENTION.name ],
+  'HTTP code 404': [ LABELS.DOCUMENT_NOT_FOUND.name, LABELS.NEEDS_INTERVENTION.name ],
   'HTTP code 403': [LABELS.HTTP_403.name],
   'HTTP code 429': [LABELS.HTTP_429.name],
   'HTTP code 500': [LABELS.HTTP_500.name],
   'HTTP code 502': [LABELS.HTTP_502.name],
   'HTTP code 503': [LABELS.HTTP_503.name],
-  'Timed out after': [LABELS.PAGE_LOAD_TIMEOUT.name],
+  'Timed out after': [LABELS.DOCUMENT_LOAD_TIMEOUT.name],
   EAI_AGAIN: [LABELS.DNS_LOOKUP_FAILURE.name],
   ENOTFOUND: [LABELS.DNS_RESOLUTION_FAILURE.name],
   'Response is empty': [LABELS.EMPTY_RESPONSE.name],
   'unable to verify the first certificate': [LABELS.SSL_INVALID.name],
   'certificate has expired': [LABELS.SSL_EXPIRED.name],
   'maximum redirect reached': [LABELS.TOO_MANY_REDIRECTS.name],
-  'not a valid selector': [LABELS.INVALID_SELECTOR.name],
+  'not a valid selector': [ LABELS.INVALID_SELECTOR.name, LABELS.NEEDS_INTERVENTION.name ],
   'empty content': [LABELS.EMPTY_CONTENT.name],
 };
 

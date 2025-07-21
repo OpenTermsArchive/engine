@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import nock from 'nock';
 
-import { LABELS } from '../labels.js';
+import { LABELS, MANAGED_BY_OTA_MARKER } from '../labels.js';
 
 import GitHub from './index.js';
 
@@ -10,8 +10,8 @@ describe('GitHub', function () {
 
   let MANAGED_LABELS;
   let github;
-  const EXISTING_OPEN_ISSUE = { number: 1, title: 'Opened issue', description: 'Issue description', state: GitHub.ISSUE_STATE_OPEN, labels: [{ name: 'page access restriction' }, { name: 'server error' }] };
-  const EXISTING_CLOSED_ISSUE = { number: 2, title: 'Closed issue', description: 'Issue description', state: GitHub.ISSUE_STATE_CLOSED, labels: [{ name: 'empty content' }] };
+  const EXISTING_OPEN_ISSUE = { number: 1, title: 'Opened issue', description: 'Issue description', state: GitHub.ISSUE_STATE_OPEN, labels: [{ name: LABELS.HTTP_403.name }] };
+  const EXISTING_CLOSED_ISSUE = { number: 2, title: 'Closed issue', description: 'Issue description', state: GitHub.ISSUE_STATE_CLOSED, labels: [{ name: LABELS.EMPTY_CONTENT.name }] };
 
   before(async () => {
     MANAGED_LABELS = Object.values(LABELS);
@@ -24,31 +24,119 @@ describe('GitHub', function () {
   });
 
   describe('#initialize', () => {
-    const scopes = [];
+    context('when some labels are missing', () => {
+      const scopes = [];
 
-    before(async () => {
-      const existingLabels = MANAGED_LABELS.slice(0, -2);
+      before(async () => {
+        const existingLabels = MANAGED_LABELS.slice(0, -2).map(label => ({
+          ...label,
+          description: `${label.description} ${MANAGED_BY_OTA_MARKER}`,
+        }));
 
-      nock('https://api.github.com')
-        .get('/repos/owner/repo/labels')
-        .query(true)
-        .reply(200, existingLabels);
+        nock('https://api.github.com')
+          .get('/repos/owner/repo/labels')
+          .query(true)
+          .reply(200, existingLabels);
 
-      const missingLabels = MANAGED_LABELS.slice(-2);
+        const missingLabels = MANAGED_LABELS.slice(-2);
 
-      for (const label of missingLabels) {
-        scopes.push(nock('https://api.github.com')
-          .post('/repos/owner/repo/labels', body => body.name === label.name)
-          .reply(200, label));
-      }
+        for (const label of missingLabels) {
+          scopes.push(nock('https://api.github.com')
+            .post('/repos/owner/repo/labels', body => body.name === label.name)
+            .reply(200, label));
+        }
 
-      await github.initialize();
+        await github.initialize();
+      });
+
+      after(nock.cleanAll);
+
+      it('should create missing labels', () => {
+        scopes.forEach(scope => expect(scope.isDone()).to.be.true);
+      });
     });
 
-    after(nock.cleanAll);
+    context('when some labels are obsolete', () => {
+      const deleteScopes = [];
 
-    it('should create missing labels', () => {
-      scopes.forEach(scope => expect(scope.isDone()).to.be.true);
+      before(async () => {
+        const existingLabels = [
+          ...MANAGED_LABELS.map(label => ({
+            ...label,
+            description: `${label.description} ${MANAGED_BY_OTA_MARKER}`,
+          })),
+          // Add an obsolete label that should be removed
+          {
+            name: 'obsolete label',
+            color: 'FF0000',
+            description: `This label is no longer used ${MANAGED_BY_OTA_MARKER}`,
+          },
+        ];
+
+        nock('https://api.github.com')
+          .get('/repos/owner/repo/labels')
+          .query(true)
+          .reply(200, existingLabels);
+
+        // Mock the delete call for the obsolete label
+        deleteScopes.push(nock('https://api.github.com')
+          .delete('/repos/owner/repo/labels/obsolete%20label')
+          .reply(200));
+
+        // Mock the second getRepositoryLabels call after deletion
+        nock('https://api.github.com')
+          .get('/repos/owner/repo/labels')
+          .query(true)
+          .reply(200, MANAGED_LABELS.map(label => ({
+            ...label,
+            description: `${label.description} ${MANAGED_BY_OTA_MARKER}`,
+          })));
+
+        await github.initialize();
+      });
+
+      after(nock.cleanAll);
+
+      it('should remove obsolete managed labels', () => {
+        deleteScopes.forEach(scope => expect(scope.isDone()).to.be.true);
+      });
+    });
+
+    context('when some labels have changed descriptions', () => {
+      const updateScopes = [];
+
+      before(async () => {
+        const originalTestLabels = MANAGED_LABELS.slice(-2);
+        const testLabels = originalTestLabels.map(label => ({
+          ...label,
+          description: `${label.description} - obsolete description`,
+        }));
+
+        nock('https://api.github.com')
+          .persist()
+          .get('/repos/owner/repo/labels')
+          .query(true)
+          .reply(200, [ ...MANAGED_LABELS.slice(0, -2), ...testLabels ].map(label => ({
+            ...label,
+            description: `${label.description} ${MANAGED_BY_OTA_MARKER}`,
+          })));
+
+        for (const label of originalTestLabels) {
+          updateScopes.push(nock('https://api.github.com')
+            .patch(`/repos/owner/repo/labels/${encodeURIComponent(label.name)}`, body =>
+              body.description === `${label.description} ${MANAGED_BY_OTA_MARKER}`)
+            .reply(200, label));
+        }
+        await github.initialize();
+      });
+
+      after(() => {
+        nock.cleanAll();
+      });
+
+      it('should update labels with changed descriptions', () => {
+        updateScopes.forEach(scope => expect(scope.isDone()).to.be.true);
+      });
     });
   });
 
@@ -280,7 +368,7 @@ describe('GitHub', function () {
       const ISSUE_TO_CREATE = {
         title: 'New Issue',
         description: 'Description of the new issue',
-        labels: ['empty response'],
+        labels: [LABELS.EMPTY_RESPONSE.name],
       };
 
       before(async () => {
@@ -311,14 +399,14 @@ describe('GitHub', function () {
 
         before(async () => {
           updateIssueScope = nock('https://api.github.com')
-            .patch(`/repos/owner/repo/issues/${EXISTING_CLOSED_ISSUE.number}`, { state: GitHub.ISSUE_STATE_OPEN, labels: ['page access restriction'] })
+            .patch(`/repos/owner/repo/issues/${EXISTING_CLOSED_ISSUE.number}`, { state: GitHub.ISSUE_STATE_OPEN, labels: [LABELS.HTTP_403.name] })
             .reply(200);
 
           addCommentScope = nock('https://api.github.com')
             .post(`/repos/owner/repo/issues/${EXISTING_CLOSED_ISSUE.number}/comments`, { body: EXISTING_CLOSED_ISSUE.description })
             .reply(200);
 
-          await github.createOrUpdateIssue({ title: EXISTING_CLOSED_ISSUE.title, description: EXISTING_CLOSED_ISSUE.description, labels: ['page access restriction'] });
+          await github.createOrUpdateIssue({ title: EXISTING_CLOSED_ISSUE.title, description: EXISTING_CLOSED_ISSUE.description, labels: [LABELS.HTTP_403.name] });
         });
 
         after(() => {
@@ -342,14 +430,14 @@ describe('GitHub', function () {
 
           before(async () => {
             updateIssueScope = nock('https://api.github.com')
-              .patch(`/repos/owner/repo/issues/${EXISTING_OPEN_ISSUE.number}`, { state: GitHub.ISSUE_STATE_OPEN, labels: ['empty content'] })
+              .patch(`/repos/owner/repo/issues/${EXISTING_OPEN_ISSUE.number}`, { state: GitHub.ISSUE_STATE_OPEN, labels: [LABELS.EMPTY_CONTENT.name] })
               .reply(200);
 
             addCommentScope = nock('https://api.github.com')
               .post(`/repos/owner/repo/issues/${EXISTING_OPEN_ISSUE.number}/comments`, { body: EXISTING_OPEN_ISSUE.description })
               .reply(200);
 
-            await github.createOrUpdateIssue({ title: EXISTING_OPEN_ISSUE.title, description: EXISTING_OPEN_ISSUE.description, labels: ['empty content'] });
+            await github.createOrUpdateIssue({ title: EXISTING_OPEN_ISSUE.title, description: EXISTING_OPEN_ISSUE.description, labels: [LABELS.EMPTY_CONTENT.name] });
           });
 
           after(() => {
@@ -379,7 +467,7 @@ describe('GitHub', function () {
               .post(`/repos/owner/repo/issues/${EXISTING_OPEN_ISSUE.number}/comments`)
               .reply(200);
 
-            await github.createOrUpdateIssue({ title: EXISTING_OPEN_ISSUE.title, description: EXISTING_OPEN_ISSUE.description, labels: [ 'page access restriction', 'server error' ] });
+            await github.createOrUpdateIssue({ title: EXISTING_OPEN_ISSUE.title, description: EXISTING_OPEN_ISSUE.description, labels: [LABELS.HTTP_403.name] });
           });
 
           after(() => {
@@ -403,14 +491,14 @@ describe('GitHub', function () {
 
           before(async () => {
             updateIssueScope = nock('https://api.github.com')
-              .patch(`/repos/owner/repo/issues/${EXISTING_OPEN_ISSUE.number}`, { state: GitHub.ISSUE_STATE_OPEN, labels: [ 'page access restriction', 'empty content' ] })
+              .patch(`/repos/owner/repo/issues/${EXISTING_OPEN_ISSUE.number}`, { state: GitHub.ISSUE_STATE_OPEN, labels: [ LABELS.HTTP_403.name, LABELS.NEEDS_INTERVENTION.name ] })
               .reply(200);
 
             addCommentScope = nock('https://api.github.com')
               .post(`/repos/owner/repo/issues/${EXISTING_OPEN_ISSUE.number}/comments`, { body: EXISTING_OPEN_ISSUE.description })
               .reply(200);
 
-            await github.createOrUpdateIssue({ title: EXISTING_OPEN_ISSUE.title, description: EXISTING_OPEN_ISSUE.description, labels: [ 'page access restriction', 'empty content' ] });
+            await github.createOrUpdateIssue({ title: EXISTING_OPEN_ISSUE.title, description: EXISTING_OPEN_ISSUE.description, labels: [ LABELS.HTTP_403.name, LABELS.NEEDS_INTERVENTION.name ] });
           });
 
           after(() => {

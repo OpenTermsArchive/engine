@@ -51,7 +51,7 @@ export default class GitHub {
   async initialize() {
     this.MANAGED_LABELS = Object.values(LABELS);
     try {
-      const existingLabels = await this.getRepositoryLabels();
+      let existingLabels = await this.getRepositoryLabels();
       const labelsToRemove = existingLabels.filter(label => label.description && label.description.includes(DEPRECATED_MANAGED_BY_OTA_MARKER));
 
       if (labelsToRemove.length) {
@@ -62,8 +62,26 @@ export default class GitHub {
         }
       }
 
-      const updatedExistingLabels = labelsToRemove.length ? await this.getRepositoryLabels() : existingLabels; // Refresh labels after deletion, only if needed
-      const existingLabelsNames = updatedExistingLabels.map(label => label.name);
+      if (labelsToRemove.length) {
+        existingLabels = await this.getRepositoryLabels();
+      }
+
+      const managedLabelsNames = this.MANAGED_LABELS.map(label => label.name);
+      const obsoleteManagedLabels = existingLabels.filter(label => label.description?.includes(MANAGED_BY_OTA_MARKER) && !managedLabelsNames.includes(label.name));
+
+      if (obsoleteManagedLabels.length) {
+        logger.info(`Removing obsolete managed labels: ${obsoleteManagedLabels.map(label => `"${label.name}"`).join(', ')}`);
+
+        for (const label of obsoleteManagedLabels) {
+          await this.deleteLabel(label.name);
+        }
+      }
+
+      if (obsoleteManagedLabels.length) {
+        existingLabels = await this.getRepositoryLabels();
+      }
+
+      const existingLabelsNames = existingLabels.map(label => label.name);
       const missingLabels = this.MANAGED_LABELS.filter(label => !existingLabelsNames.includes(label.name));
 
       if (missingLabels.length) {
@@ -71,6 +89,30 @@ export default class GitHub {
 
         for (const label of missingLabels) {
           await this.createLabel({
+            name: label.name,
+            color: label.color,
+            description: `${label.description} ${MANAGED_BY_OTA_MARKER}`,
+          });
+        }
+      }
+
+      const labelsToUpdate = this.MANAGED_LABELS.filter(label => {
+        const existingLabel = existingLabels.find(existingLabel => existingLabel.name === label.name);
+
+        if (!existingLabel) {
+          return false;
+        }
+
+        const expectedDescription = `${label.description} ${MANAGED_BY_OTA_MARKER}`;
+
+        return existingLabel.description !== expectedDescription || existingLabel.color !== label.color;
+      });
+
+      if (labelsToUpdate.length) {
+        logger.info(`Updating labels with changed descriptions: ${labelsToUpdate.map(label => `"${label.name}"`).join(', ')}`);
+
+        for (const label of labelsToUpdate) {
+          await this.updateLabel({
             name: label.name,
             color: label.color,
             description: `${label.description} ${MANAGED_BY_OTA_MARKER}`,
@@ -131,6 +173,15 @@ export default class GitHub {
     await this.octokit.request('DELETE /repos/{owner}/{repo}/labels/{name}', {
       ...this.commonParams,
       name,
+    });
+  }
+
+  async updateLabel({ name, color, description }) {
+    await this.octokit.request('PATCH /repos/{owner}/{repo}/labels/{name}', {
+      ...this.commonParams,
+      name,
+      color,
+      description,
     });
   }
 
