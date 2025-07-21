@@ -48,14 +48,14 @@ async function removeDuplicateIssues() {
         continue;
       }
 
-      await octokit.request('PATCH /repos/{owner}/{repo}/issues/{issue_number}', { /* eslint-disable-line no-await-in-loop */
+      await octokit.request('PATCH /repos/{owner}/{repo}/issues/{issue_number}', {
         owner,
         repo,
         issue_number: issue.number,
         state: 'closed',
       });
 
-      await octokit.request('POST /repos/{owner}/{repo}/issues/{issue_number}/comments', { /* eslint-disable-line no-await-in-loop */
+      await octokit.request('POST /repos/{owner}/{repo}/issues/{issue_number}/comments', {
         owner,
         repo,
         issue_number: issue.number,

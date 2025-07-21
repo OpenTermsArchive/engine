@@ -113,6 +113,7 @@ rules:
     - properties: false
   require-await: 1
   no-only-tests/no-only-tests: error
+  no-await-in-loop: 0
 
 overrides:
   - files:

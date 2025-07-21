@@ -59,7 +59,6 @@ export async function extractFromHTML(sourceDocument) {
 
   for (const filterFunction of serviceSpecificFilters) {
     try {
-      /* eslint-disable no-await-in-loop */
       // We want this to be made in series
       await filterFunction(webPageDOM, {
         fetch: location,
@@ -67,7 +66,6 @@ export async function extractFromHTML(sourceDocument) {
         remove: insignificantContentSelectors,
         filter: serviceSpecificFilters.map(filter => filter.name),
       });
-      /* eslint-enable no-await-in-loop */
     } catch (error) {
       throw new Error(`The filter function "${filterFunction.name}" failed: ${error}`);
     }

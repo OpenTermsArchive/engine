@@ -1382,7 +1382,6 @@ describe('GitRepository', () => {
 
       await subject.initialize();
 
-      /* eslint-disable no-await-in-loop */
       for (const commit of Object.values(commits)) {
         const { path: relativeFilePath, date, content, message } = commit;
         const filePath = path.join(RECORDER_PATH, relativeFilePath);
@@ -1396,7 +1395,6 @@ describe('GitRepository', () => {
         expectedIds.push(sha);
         expectedDates.push(date);
       }
-      /* eslint-enable no-await-in-loop */
     });
 
     after(() => subject.removeAll());

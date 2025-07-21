@@ -42,7 +42,7 @@ let client;
   let counter = 1;
 
   for (const commit of filteredCommits.reverse()) { // reverse array to insert most recent commits first
-    await collection.updateOne({ hash: commit.hash }, { $set: { ...commit } }, { upsert: true }); // eslint-disable-line no-await-in-loop
+    await collection.updateOne({ hash: commit.hash }, { $set: { ...commit } }, { upsert: true });
 
     if (counter % 1000 == 0) {
       logger.info({ message: ' ', current: counter, total: totalCommitToLoad });
