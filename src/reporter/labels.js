@@ -6,12 +6,12 @@ export const LABELS = {
   DNS_LOOKUP_FAILURE: {
     name: 'domain lookup failed',
     color: 'FFFFFF',
-    description: 'Fetching failed because the domain temporarily failed to resolve on DNS',
+    description: 'Fetching failed because the request to DNS servers timed out',
   },
   DNS_RESOLUTION_FAILURE: {
     name: 'domain resolution failed',
     color: 'FFFFFF',
-    description: 'Fetching failed because the domain fails to resolve on DNS',
+    description: 'Fetching failed because the domain name failed to resolve',
   },
   DOCUMENT_LOAD_TIMEOUT: {
     name: 'document load timed out',
