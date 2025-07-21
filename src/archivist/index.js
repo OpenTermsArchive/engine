@@ -183,11 +183,11 @@ export default class Archivist extends events.EventEmitter {
 
     const fetchDocumentErrors = [];
 
-    await Promise.all(terms.sourceDocuments.map(async sourceDocument => {
+    for (const sourceDocument of terms.sourceDocuments) {
       const { location: url, executeClientScripts, cssSelectors } = sourceDocument;
 
       try {
-        const { mimeType, content, fetcher } = await this.fetch({ url, executeClientScripts, cssSelectors });
+        const { mimeType, content, fetcher } = await this.fetch({ url, executeClientScripts, cssSelectors }); // eslint-disable-line no-await-in-loop
 
         sourceDocument.content = content;
         sourceDocument.mimeType = mimeType;
@@ -199,7 +199,7 @@ export default class Archivist extends events.EventEmitter {
 
         fetchDocumentErrors.push(error);
       }
-    }));
+    }
 
     if (fetchDocumentErrors.length) {
       throw new InaccessibleContentError(fetchDocumentErrors);
