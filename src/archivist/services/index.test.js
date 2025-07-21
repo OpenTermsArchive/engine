@@ -78,7 +78,7 @@ describe('Services', () => {
 
                 for (let indexFilter = 0; indexFilter < expectedFilters.length; indexFilter++) {
                   it(`has the proper "${expectedFilters[indexFilter].name}" filter function`, async () => {
-                    expect(await actualFilters[indexFilter]()).equal(await expectedFilters[indexFilter]()); // eslint-disable-line no-await-in-loop
+                    expect(await actualFilters[indexFilter]()).equal(await expectedFilters[indexFilter]());
                   });
                 }
               } else {
@@ -220,7 +220,7 @@ describe('Services', () => {
 
                       for (let indexFilter = 0; indexFilter < expectedFiltersForThisDate.length; indexFilter++) {
                         it(`has the proper "${expectedFiltersForThisDate[indexFilter].name}" filter function`, async () => {
-                          expect(await actualFiltersForThisDate[indexFilter]()).equal(await expectedFiltersForThisDate[indexFilter]()); // eslint-disable-line no-await-in-loop
+                          expect(await actualFiltersForThisDate[indexFilter]()).equal(await expectedFiltersForThisDate[indexFilter]());
                         });
                       }
                     } else {
@@ -246,7 +246,7 @@ describe('Services', () => {
                     indexFilter++
                   ) {
                     it(`has the proper "${expectedFilters[indexFilter].name}" filter function`, async () => {
-                      expect(await actualFilters[indexFilter]()).equal(await expectedFilters[indexFilter]()); // eslint-disable-line no-await-in-loop
+                      expect(await actualFilters[indexFilter]()).equal(await expectedFilters[indexFilter]());
                     });
                   }
                 } else {

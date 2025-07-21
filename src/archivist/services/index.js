@@ -50,7 +50,7 @@ async function loadServiceFilters(serviceId, filterNames) {
   }
 
   const filterFilePath = `${serviceId}.filters.js`;
-  const serviceFilters = await import(pathToFileURL(path.join(declarationsPath, filterFilePath))); // eslint-disable-line no-await-in-loop
+  const serviceFilters = await import(pathToFileURL(path.join(declarationsPath, filterFilePath)));
 
   return filterNames.map(filterName => serviceFilters[filterName]);
 }
@@ -74,7 +74,7 @@ async function loadServiceDocument(service, termsType, termsTypeDeclaration) {
         remove: sourceDocumentInsignificantContentSelectors,
       } = sourceDocument;
 
-      const sourceDocumentFilters = await loadServiceFilters(service.id, sourceDocumentFilterNames); // eslint-disable-line no-await-in-loop
+      const sourceDocumentFilters = await loadServiceFilters(service.id, sourceDocumentFilterNames);
 
       sourceDocuments.push(new SourceDocument({
         location: sourceDocumentLocation || location,
@@ -101,7 +101,7 @@ export async function loadWithHistory(servicesIds = []) {
   const services = await load(servicesIds);
 
   for (const serviceId of Object.keys(services)) {
-    const { declarations, filters } = await loadServiceHistoryFiles(serviceId); // eslint-disable-line no-await-in-loop
+    const { declarations, filters } = await loadServiceHistoryFiles(serviceId);
 
     for (const termsType of Object.keys(declarations)) {
       const termsTypeDeclarationEntries = declarations[termsType];
@@ -145,7 +145,7 @@ export async function loadWithHistory(servicesIds = []) {
               remove: sourceDocumentInsignificantContentSelectors,
             } = sourceDocument;
 
-            const sourceDocumentFilters = await loadServiceFilters(serviceId, sourceDocumentFilterNames); // eslint-disable-line no-await-in-loop
+            const sourceDocumentFilters = await loadServiceFilters(serviceId, sourceDocumentFilterNames);
 
             sourceDocuments.push(new SourceDocument({
               location: sourceDocumentLocation || declarationForThisDate.fetch,
