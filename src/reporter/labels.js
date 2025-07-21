@@ -26,7 +26,7 @@ export const LABELS = {
   DOCUMENT_STRUCTURE_CHANGE: {
     name: 'document structure changed',
     color: 'FFFFFF',
-    description: 'Extraction selectors are outdated',
+    description: 'Selectors do not match any content in the document',
   },
   EMPTY_CONTENT: {
     name: 'document was empty',
@@ -76,7 +76,7 @@ export const LABELS = {
   SSL_INVALID: {
     name: 'certificate was invalid',
     color: 'FFFFFF',
-    description: 'Fetching failed because SSL certificate verification failed',
+    description: 'Fetching failed because the domain SSL certificate failed to verify',
   },
   TOO_MANY_REDIRECTS: {
     name: 'redirected too many times',
@@ -84,7 +84,7 @@ export const LABELS = {
     description: 'Fetching failed because of too many redirects',
   },
   UNKNOWN_FAILURE: {
-    name: 'failed for unknown reason',
+    name: 'failed for an unknown reason',
     color: 'FFFFFF',
     description: 'Fetching failed for an undetermined reason that needs investigation',
   },
