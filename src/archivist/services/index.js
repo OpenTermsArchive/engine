@@ -4,6 +4,8 @@ import { pathToFileURL } from 'url';
 
 import config from 'config';
 
+import * as exposedFilters from '../extract/exposedFilters.js';
+
 import Service from './service.js';
 import SourceDocument from './sourceDocument.js';
 import Terms from './terms.js';
@@ -77,16 +79,27 @@ async function loadServiceFilters(serviceId, filterNames) {
     return undefined;
   }
 
-  const serviceFilters = await import(pathToFileURL(path.join(declarationsPath, `${serviceId}${FILTERS_SUFFIX}${JS_EXT}`)));
+  let serviceFilters = {};
+  const serviceFiltersPath = path.join(declarationsPath, `${serviceId}${FILTERS_SUFFIX}${JS_EXT}`);
+
+  if (await fileExists(serviceFiltersPath)) {
+    serviceFilters = await import(pathToFileURL(serviceFiltersPath));
+  }
 
   const filters = filterNames.map(filterItem => {
     if (typeof filterItem === 'string') {
-      return serviceFilters[filterItem];
+      return exposedFilters[filterItem] || serviceFilters[filterItem];
     }
 
     if (typeof filterItem === 'object' && filterItem !== null) {
       const [ filterName, params ] = Object.entries(filterItem)[0]; // Handle object-based filter config; extract filter name and parameters from single-entry object like { "removeQueryParam": "h" }
-      const wrappedFunction = (webPageDOM, context) => serviceFilters[filterName](webPageDOM, params, context);
+      const filterFunction = exposedFilters[filterName] || serviceFilters[filterName];
+
+      if (!filterFunction) {
+        return undefined;
+      }
+
+      const wrappedFunction = (webPageDOM, context) => filterFunction(webPageDOM, params, context);
 
       Object.defineProperty(wrappedFunction, 'name', { value: filterName });
 
