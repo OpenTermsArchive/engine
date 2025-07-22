@@ -11,244 +11,235 @@ import Terms from './terms.js';
 export const DECLARATIONS_PATH = './declarations';
 const declarationsPath = path.resolve(process.cwd(), config.get('@opentermsarchive/engine.collectionPath'), DECLARATIONS_PATH);
 
+const JSON_EXT = '.json';
+const JS_EXT = '.js';
+const HISTORY_SUFFIX = '.history';
+const FILTERS_SUFFIX = '.filters';
+
 export async function load(servicesIdsToLoad = []) {
-  let servicesIds = await getDeclaredServicesIds();
-
-  if (servicesIdsToLoad.length) {
-    servicesIds = servicesIds.filter(serviceId => serviceId.match(new RegExp(`^${servicesIdsToLoad.join('|')}$`, 'g')));
-  }
-
+  const allServicesIds = await getDeclaredServicesIds();
+  const servicesIds = servicesIdsToLoad.length ? allServicesIds.filter(serviceId => servicesIdsToLoad.includes(serviceId)) : allServicesIds;
   const services = {};
 
   await Promise.all(servicesIds.map(async serviceId => {
-    const { name, terms } = await loadServiceDeclaration(serviceId);
-
-    const service = new Service({ id: serviceId, name });
-
-    await Promise.all(Object.keys(terms).map(termsType => loadServiceDocument(service, termsType, terms[termsType])));
-
-    services[serviceId] = service;
+    services[serviceId] = await createServiceFromDeclaration(serviceId);
   }));
 
   return services;
 }
 
+async function createServiceFromDeclaration(serviceId) {
+  const { name, terms: termsDeclarations } = await loadServiceDeclaration(serviceId);
+  const service = new Service({ id: serviceId, name });
+
+  await Promise.all(Object.entries(termsDeclarations).map(async ([ termsType, termsDeclaration ]) => {
+    const sourceDocuments = await createSourceDocuments(service.id, termsDeclaration);
+
+    service.addTerms(new Terms({ service, type: termsType, sourceDocuments }));
+  }));
+
+  return service;
+}
+
 async function loadServiceDeclaration(serviceId) {
-  const jsonDeclarationFilePath = path.join(declarationsPath, `${serviceId}.json`);
-  const rawServiceDeclaration = await fs.readFile(jsonDeclarationFilePath);
+  const filePath = path.join(declarationsPath, `${serviceId}${JSON_EXT}`);
 
   try {
-    return JSON.parse(rawServiceDeclaration);
+    return JSON.parse(await fs.readFile(filePath));
   } catch (error) {
-    throw new Error(`The "${serviceId}" service declaration is malformed and cannot be parsed in ${jsonDeclarationFilePath}`);
+    throw new Error(`The "${serviceId}" service declaration is malformed and cannot be parsed in ${filePath}`);
   }
+}
+
+async function createSourceDocuments(serviceId, termsDeclaration) {
+  if (!termsDeclaration.combine) {
+    return [new SourceDocument({
+      location: termsDeclaration.fetch,
+      executeClientScripts: termsDeclaration.executeClientScripts,
+      contentSelectors: termsDeclaration.select,
+      insignificantContentSelectors: termsDeclaration.remove,
+      filters: await loadServiceFilters(serviceId, termsDeclaration.filter),
+    })];
+  }
+
+  return Promise.all(termsDeclaration.combine.map(async sourceDocumentDeclaration =>
+    new SourceDocument({
+      location: sourceDocumentDeclaration.fetch ?? termsDeclaration.fetch,
+      executeClientScripts: sourceDocumentDeclaration.executeClientScripts ?? termsDeclaration.executeClientScripts,
+      contentSelectors: sourceDocumentDeclaration.select ?? termsDeclaration.select,
+      insignificantContentSelectors: sourceDocumentDeclaration.remove ?? termsDeclaration.remove,
+      filters: await loadServiceFilters(serviceId, sourceDocumentDeclaration.filter ?? termsDeclaration.filter),
+    })));
 }
 
 async function loadServiceFilters(serviceId, filterNames) {
   if (!filterNames) {
-    return;
+    return undefined;
   }
 
-  const filterFilePath = `${serviceId}.filters.js`;
-  const serviceFilters = await import(pathToFileURL(path.join(declarationsPath, filterFilePath)));
+  const serviceFilters = await import(pathToFileURL(path.join(declarationsPath, `${serviceId}${FILTERS_SUFFIX}${JS_EXT}`)));
+  const filters = filterNames.map(filterName => serviceFilters[filterName]);
 
-  return filterNames.map(filterName => serviceFilters[filterName]);
-}
-
-async function loadServiceDocument(service, termsType, termsTypeDeclaration) {
-  const { filter: filterNames, fetch: location, executeClientScripts, select: contentSelectors, remove: insignificantContentSelectors, combine } = termsTypeDeclaration;
-
-  const sourceDocuments = [];
-
-  const filters = await loadServiceFilters(service.id, filterNames);
-
-  if (!combine) {
-    sourceDocuments.push(new SourceDocument({ location, executeClientScripts, contentSelectors, insignificantContentSelectors, filters }));
-  } else {
-    for (const sourceDocument of combine) {
-      const {
-        filter: sourceDocumentFilterNames,
-        fetch: sourceDocumentLocation,
-        executeClientScripts: sourceDocumentExecuteClientScripts,
-        select: sourceDocumentContentSelectors,
-        remove: sourceDocumentInsignificantContentSelectors,
-      } = sourceDocument;
-
-      const sourceDocumentFilters = await loadServiceFilters(service.id, sourceDocumentFilterNames);
-
-      sourceDocuments.push(new SourceDocument({
-        location: sourceDocumentLocation || location,
-        executeClientScripts: (sourceDocumentExecuteClientScripts === undefined || sourceDocumentExecuteClientScripts === null ? executeClientScripts : sourceDocumentExecuteClientScripts),
-        contentSelectors: sourceDocumentContentSelectors || contentSelectors,
-        insignificantContentSelectors: sourceDocumentInsignificantContentSelectors || insignificantContentSelectors,
-        filters: sourceDocumentFilters || filters,
-      }));
-    }
-  }
-
-  service.addTerms(new Terms({ service, type: termsType, sourceDocuments }));
+  return filters;
 }
 
 async function getDeclaredServicesIds() {
   const fileNames = await fs.readdir(declarationsPath);
 
-  const servicesFileNames = fileNames.filter(fileName => path.extname(fileName) == '.json' && !fileName.includes('.history.json'));
-
-  return servicesFileNames.map(serviceFileName => path.basename(serviceFileName, '.json'));
+  return fileNames
+    .filter(fileName => fileName.endsWith(JSON_EXT) && !fileName.includes(`${HISTORY_SUFFIX}${JSON_EXT}`))
+    .map(fileName => path.basename(fileName, JSON_EXT));
 }
 
 export async function loadWithHistory(servicesIds = []) {
   const services = await load(servicesIds);
 
-  for (const serviceId of Object.keys(services)) {
-    const { declarations, filters } = await loadServiceHistoryFiles(serviceId);
-
-    for (const termsType of Object.keys(declarations)) {
-      const termsTypeDeclarationEntries = declarations[termsType];
-      const filterNames = [...new Set(termsTypeDeclarationEntries.flatMap(declaration => declaration.filter))].filter(Boolean);
-      const allHistoryDates = extractHistoryDates({ termsTypeDeclarationEntries, filters, filterNames });
-
-      const latestValidTerms = termsTypeDeclarationEntries.find(entry => !entry.validUntil);
-
-      allHistoryDates.forEach(async date => {
-        const declarationForThisDate = termsTypeDeclarationEntries.find(entry => new Date(date) <= new Date(entry.validUntil)) || latestValidTerms;
-        const { filter: declarationForThisDateFilterNames, combine } = declarationForThisDate;
-
-        const sourceDocuments = [];
-        let actualFilters;
-
-        if (declarationForThisDateFilterNames) {
-          actualFilters = declarationForThisDateFilterNames.map(filterName => {
-            const currentlyValidFilters = filters[filterName].find(entry => !entry.validUntil);
-            const validFilterForThisDate = filters[filterName].find(entry => new Date(date) <= new Date(entry.validUntil))
-              || currentlyValidFilters;
-
-            return validFilterForThisDate.filter;
-          });
-        }
-
-        if (!combine) {
-          sourceDocuments.push(new SourceDocument({
-            location: declarationForThisDate.fetch,
-            executeClientScripts: declarationForThisDate.executeClientScripts,
-            contentSelectors: declarationForThisDate.select,
-            insignificantContentSelectors: declarationForThisDate.remove,
-            filters: actualFilters,
-          }));
-        } else {
-          for (const sourceDocument of combine) {
-            const {
-              filter: sourceDocumentFilterNames,
-              fetch: sourceDocumentLocation,
-              executeClientScripts: sourceDocumentExecuteClientScripts,
-              select: sourceDocumentContentSelectors,
-              remove: sourceDocumentInsignificantContentSelectors,
-            } = sourceDocument;
-
-            const sourceDocumentFilters = await loadServiceFilters(serviceId, sourceDocumentFilterNames);
-
-            sourceDocuments.push(new SourceDocument({
-              location: sourceDocumentLocation || declarationForThisDate.fetch,
-              executeClientScripts: (sourceDocumentExecuteClientScripts === undefined || sourceDocumentExecuteClientScripts === null ? declarationForThisDate.executeClientScripts : sourceDocumentExecuteClientScripts),
-              contentSelectors: sourceDocumentContentSelectors || declarationForThisDate.select,
-              insignificantContentSelectors: sourceDocumentInsignificantContentSelectors || declarationForThisDate.remove,
-              filters: sourceDocumentFilters || actualFilters,
-            }));
-          }
-        }
-
-        services[serviceId].addTerms(new Terms({
-          service: services[serviceId],
-          type: termsType,
-          sourceDocuments,
-          validUntil: date,
-        }));
-      });
-    }
-  }
+  await Promise.all(Object.keys(services).map(serviceId => addHistoryToService(services[serviceId])));
 
   return services;
 }
 
-function extractHistoryDates({ filters, filterNames, termsTypeDeclarationEntries }) {
-  const allHistoryDates = [];
+async function addHistoryToService(service) {
+  const { declarations, filters } = await loadServiceHistoryFiles(service.id);
 
-  Object.keys(filters).forEach(filterName => {
-    if (filterNames.includes(filterName)) {
-      filters[filterName].forEach(({ validUntil }) => allHistoryDates.push(validUntil));
-    }
+  await Promise.all(Object.entries(declarations).map(([ termsType, declarationEntries ]) => addTermsHistory(service, service.id, termsType, declarationEntries, filters)));
+}
+
+async function addTermsHistory(service, serviceId, termsType, declarationEntries, filters) {
+  const filterNames = [...new Set(declarationEntries.flatMap(d => d.filter))].filter(Boolean);
+  const historyDates = extractHistoryDates({ termsTypeDeclarationEntries: declarationEntries, filters, filterNames });
+  const latestValidTerms = declarationEntries.find(entry => !entry.validUntil);
+
+  await Promise.all(historyDates.map(date => createTermsForDate(service, serviceId, termsType, date, declarationEntries, filters, latestValidTerms)));
+}
+
+async function createTermsForDate(service, serviceId, termsType, date, declarationEntries, filters, latestValidTerms) {
+  const declaration = declarationEntries.find(entry => new Date(date) <= new Date(entry.validUntil)) || latestValidTerms;
+  const actualFilters = resolveFiltersForDate(date, declaration.filter, filters);
+  const sourceDocuments = await createHistorySourceDocuments(serviceId, declaration, actualFilters);
+
+  service.addTerms(new Terms({
+    service,
+    type: termsType,
+    sourceDocuments,
+    validUntil: date,
+  }));
+}
+
+function resolveFiltersForDate(date, filterNames, filters) {
+  return filterNames?.map(filterName => {
+    const filterHistory = filters[filterName];
+    const historicalFilter = filterHistory?.find(entry => new Date(date) <= new Date(entry.validUntil));
+    const currentFilter = filterHistory?.find(entry => !entry.validUntil);
+
+    return (historicalFilter || currentFilter)?.filter;
   });
+}
 
-  termsTypeDeclarationEntries.forEach(({ validUntil }) => allHistoryDates.push(validUntil));
+function createHistorySourceDocuments(serviceId, termsDeclaration, actualFilters) {
+  if (!termsDeclaration.combine) {
+    return [new SourceDocument({
+      location: termsDeclaration.fetch,
+      executeClientScripts: termsDeclaration.executeClientScripts,
+      contentSelectors: termsDeclaration.select,
+      insignificantContentSelectors: termsDeclaration.remove,
+      filters: actualFilters,
+    })];
+  }
 
-  const sortedDates = allHistoryDates.sort((a, b) => new Date(a) - new Date(b));
-  const uniqSortedDates = [...new Set(sortedDates)];
+  return Promise.all(termsDeclaration.combine.map(async sourceDocument => {
+    const filters = await loadServiceFilters(serviceId, sourceDocument.filter) || actualFilters;
 
-  return uniqSortedDates;
+    return new SourceDocument({
+      location: sourceDocument.fetch || termsDeclaration.fetch,
+      executeClientScripts: sourceDocument.executeClientScripts ?? termsDeclaration.executeClientScripts,
+      contentSelectors: sourceDocument.select || termsDeclaration.select,
+      insignificantContentSelectors: sourceDocument.remove || termsDeclaration.remove,
+      filters,
+    });
+  }));
+}
+
+function extractHistoryDates({ filters, filterNames, termsTypeDeclarationEntries }) {
+  const filterDates = Object.entries(filters)
+    .filter(([filterName]) => filterNames.includes(filterName))
+    .flatMap(([ , filterEntries ]) => filterEntries.map(({ validUntil }) => validUntil))
+    .filter(Boolean);
+
+  const declarationDates = termsTypeDeclarationEntries
+    .map(({ validUntil }) => validUntil)
+    .filter(Boolean);
+
+  return [...new Set([ ...filterDates, ...declarationDates ])].sort((a, b) => new Date(a) - new Date(b));
 }
 
 function sortHistory(history = {}) {
-  Object.keys(history).forEach(entry => {
-    history[entry].sort((a, b) => new Date(a.validUntil) - new Date(b.validUntil));
-  });
+  Object.values(history).forEach(entries => entries.sort((a, b) => new Date(a.validUntil) - new Date(b.validUntil)));
 }
 
 async function loadServiceHistoryFiles(serviceId) {
-  const serviceFileName = path.join(declarationsPath, `${serviceId}.json`);
-  const jsonDeclarationFilePath = await fs.readFile(serviceFileName);
-  let serviceDeclaration;
+  const serviceDeclaration = await loadServiceDeclaration(serviceId);
+  const filePaths = getHistoryFilePaths(serviceId);
 
-  try {
-    serviceDeclaration = JSON.parse(jsonDeclarationFilePath);
-  } catch (e) {
-    throw new Error(`The "${path.basename(jsonDeclarationFilePath, '.json')}" service declaration is malformed and cannot be parsed in ${jsonDeclarationFilePath}`);
-  }
+  const [ serviceHistory, serviceFiltersHistory ] = await Promise.all([
+    loadServiceHistory(filePaths.history),
+    loadServiceFiltersHistory(filePaths.filtersHistory, filePaths.filters),
+  ]);
 
-  const serviceHistoryFileName = path.join(declarationsPath, `${serviceId}.history.json`);
-  const serviceFiltersFileName = path.join(declarationsPath, `${serviceId}.filters.js`);
-  const serviceFiltersHistoryFileName = path.join(declarationsPath, `${serviceId}.filters.history.js`);
-
-  let serviceHistory = {};
-  const serviceFiltersHistory = {};
-  let serviceFiltersHistoryModule;
-
-  if (await fileExists(serviceHistoryFileName)) {
-    try {
-      serviceHistory = JSON.parse(await fs.readFile(serviceHistoryFileName));
-    } catch (e) {
-      throw new Error(`The "${path.basename(serviceHistoryFileName, '.json')}" service declaration is malformed and cannot be parsed in ${serviceHistoryFileName}`);
-    }
-  }
-
-  Object.keys(serviceDeclaration.terms).forEach(termsType => {
+  Object.entries(serviceDeclaration.terms).forEach(([ termsType, declaration ]) => {
     serviceHistory[termsType] = serviceHistory[termsType] || [];
-    serviceHistory[termsType].push(serviceDeclaration.terms[termsType]);
+    serviceHistory[termsType].push(declaration);
   });
 
   sortHistory(serviceHistory);
-
-  if (await fileExists(serviceFiltersHistoryFileName)) {
-    serviceFiltersHistoryModule = await import(pathToFileURL(serviceFiltersHistoryFileName));
-    Object.keys(serviceFiltersHistoryModule).forEach(filterName => {
-      serviceFiltersHistory[filterName] = serviceFiltersHistoryModule[filterName];
-    });
-  }
-
-  if (await fileExists(serviceFiltersFileName)) {
-    const serviceFilters = await import(pathToFileURL(serviceFiltersFileName));
-
-    Object.keys(serviceFilters).forEach(filterName => {
-      serviceFiltersHistory[filterName] = serviceFiltersHistory[filterName] || [];
-      serviceFiltersHistory[filterName].push({ filter: serviceFilters[filterName] });
-    });
-  }
-
   sortHistory(serviceFiltersHistory);
 
+  return { declarations: serviceHistory, filters: serviceFiltersHistory };
+}
+
+function getHistoryFilePaths(serviceId) {
+  const basePath = path.join(declarationsPath, serviceId);
+
   return {
-    declarations: serviceHistory || {},
-    filters: serviceFiltersHistory || {},
+    history: `${basePath}${HISTORY_SUFFIX}${JSON_EXT}`,
+    filters: `${basePath}${FILTERS_SUFFIX}${JS_EXT}`,
+    filtersHistory: `${basePath}${FILTERS_SUFFIX}${HISTORY_SUFFIX}${JS_EXT}`,
   };
+}
+
+async function loadServiceHistory(historyFilePath) {
+  if (!(await fileExists(historyFilePath))) return {};
+
+  try {
+    return JSON.parse(await fs.readFile(historyFilePath));
+  } catch (error) {
+    const fileName = path.basename(historyFilePath, JSON_EXT);
+
+    throw new Error(`The "${fileName}" service declaration is malformed and cannot be parsed in ${historyFilePath}`);
+  }
+}
+
+async function loadServiceFiltersHistory(filtersHistoryPath, filtersPath) {
+  const filtersHistory = {};
+
+  // Load filters history
+  if (await fileExists(filtersHistoryPath)) {
+    const historyModule = await import(pathToFileURL(filtersHistoryPath));
+
+    Object.assign(filtersHistory, historyModule);
+  }
+
+  // Load current filters
+  if (await fileExists(filtersPath)) {
+    const filtersModule = await import(pathToFileURL(filtersPath));
+
+    Object.entries(filtersModule).forEach(([ filterName, filter ]) => {
+      filtersHistory[filterName] = filtersHistory[filterName] || [];
+      filtersHistory[filterName].push({ filter });
+    });
+  }
+
+  return filtersHistory;
 }
 
 async function fileExists(filePath) {
@@ -256,9 +247,7 @@ async function fileExists(filePath) {
     await fs.access(filePath);
 
     return true;
-  } catch (error) {
-    if (error.code === 'ENOENT') {
-      return false;
-    }
+  } catch {
+    return false;
   }
 }
