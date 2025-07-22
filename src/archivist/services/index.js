@@ -78,7 +78,23 @@ async function loadServiceFilters(serviceId, filterNames) {
   }
 
   const serviceFilters = await import(pathToFileURL(path.join(declarationsPath, `${serviceId}${FILTERS_SUFFIX}${JS_EXT}`)));
-  const filters = filterNames.map(filterName => serviceFilters[filterName]);
+
+  const filters = filterNames.map(filterItem => {
+    if (typeof filterItem === 'string') {
+      return serviceFilters[filterItem];
+    }
+
+    if (typeof filterItem === 'object' && filterItem !== null) {
+      const [ filterName, params ] = Object.entries(filterItem)[0]; // Handle object-based filter config; extract filter name and parameters from single-entry object like { "removeQueryParam": "h" }
+      const wrappedFunction = (webPageDOM, context) => serviceFilters[filterName](webPageDOM, params, context);
+
+      Object.defineProperty(wrappedFunction, 'name', { value: filterName });
+
+      return wrappedFunction;
+    }
+
+    return undefined;
+  });
 
   return filters;
 }
