@@ -10,7 +10,7 @@ All changes that impact users of this module are documented in this file, in the
 
 ### Added
 
-- Add support for parameterized filters in service declarations using object syntax; to pass parameters to curstom filters (with following signature: `customFilter(document, params, context)`), use the following syntax:
+- Add support for parameterized filters in service declarations using object syntax; to pass parameters to curstom filters (with following signature: `customFilter(document, params, documentDeclaration)`), use the following syntax:
 
   ```json
   "filter": [
