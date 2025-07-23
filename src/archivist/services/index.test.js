@@ -1,4 +1,5 @@
 import fs from 'fs/promises';
+import path from 'path';
 
 import chai from 'chai';
 import sinon from 'sinon';
@@ -186,7 +187,7 @@ describe('Services', () => {
       it('reads from correct file path', async () => {
         await loadServiceDeclaration(serviceId);
 
-        expect(readFile).to.have.been.calledWith(sinon.match(filePath => filePath.endsWith('/serviceA.json')));
+        expect(readFile).to.have.been.calledWith(sinon.match(filePath => filePath.endsWith(`${path.sep}serviceA.json`)));
       });
     });
 
@@ -239,7 +240,7 @@ describe('Services', () => {
       it('checks for file existence', async () => {
         await loadServiceFilters(serviceId);
 
-        expect(access).to.have.been.calledWith(sinon.match(filePath => filePath.endsWith('/serviceWithoutFilters.filters.js')));
+        expect(access).to.have.been.calledWith(sinon.match(filePath => filePath.endsWith(`${path.sep}serviceWithoutFilters.filters.js`)));
       });
     });
 
