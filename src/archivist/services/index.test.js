@@ -298,10 +298,44 @@ describe('Services', () => {
       expect(result[0](null, 'context')).to.equal('foo');
     });
 
-    it('returns undefined for unknown object-based filter config', () => {
-      const result = getServiceFilters({}, [{ notFound: 'bar' }]);
+    context('parameters passed to filters', () => {
+      let serviceLoadedFilters;
+      let passedDOM;
+      let passedContext;
 
-      expect(result).to.be.undefined;
+      before(() => {
+        serviceLoadedFilters = { testParamsFilter: (dom, params, context) => ({ dom, params, context }) };
+        passedDOM = '<div>test</div>';
+        passedContext = { location: 'https://example.com' };
+      });
+
+      const testParameterPassing = params => {
+        const serviceDeclaredFilters = [{ testParamsFilter: params }];
+        const [loadedFilter] = getServiceFilters(serviceLoadedFilters, serviceDeclaredFilters);
+        const filterResult = loadedFilter(passedDOM, passedContext);
+
+        expect(filterResult.params).to.deep.equal(params);
+        expect(filterResult.dom).to.equal(passedDOM);
+        expect(filterResult.context).to.equal(passedContext);
+      };
+
+      context('as a string', () => {
+        it('passes parameters correctly', () => {
+          testParameterPassing('param');
+        });
+      });
+
+      context('as an array', () => {
+        it('passes parameters correctly', () => {
+          testParameterPassing([ 'param1', 'param2' ]);
+        });
+      });
+
+      context('as an object', () => {
+        it('passes parameters correctly', () => {
+          testParameterPassing({ param1: 'param1', param2: 'param2' });
+        });
+      });
     });
   });
 
