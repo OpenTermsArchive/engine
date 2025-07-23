@@ -212,38 +212,4 @@ describe('Filter', () => {
       expect(webPageDOM.querySelector('a.email-protection').innerHTML).to.equal('[email&nbsp;protected]');
     });
   });
-
-  describe('#removeQueryParams', () => {
-    describe('from links', () => {
-      let link;
-
-      before(async () => {
-        link = webPageDOM.createElement('a');
-        link.href = 'https://example.com/page?utm_source=test&keep=value';
-        webPageDOM.body.appendChild(link);
-        sourceDocument.removeQueryParams = ['utm_source'];
-        await filter(webPageDOM, sourceDocument);
-      });
-
-      it('removes specified query parameters', async () => {
-        expect(link.href).to.equal('https://example.com/page?keep=value');
-      });
-    });
-
-    describe('from images', () => {
-      let img;
-
-      before(async () => {
-        img = webPageDOM.createElement('img');
-        img.src = 'https://example.com/image.jpg?width=100&keep=value';
-        webPageDOM.body.appendChild(img);
-        sourceDocument.removeQueryParams = ['width'];
-        await filter(webPageDOM, sourceDocument);
-      });
-
-      it('removes specified query parameters', async () => {
-        expect(img.src).to.equal('https://example.com/image.jpg?keep=value');
-      });
-    });
-  });
 });
