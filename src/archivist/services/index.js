@@ -30,7 +30,7 @@ export async function load(servicesIdsToLoad = []) {
   return services;
 }
 
-async function createServiceFromDeclaration(serviceId) {
+export async function createServiceFromDeclaration(serviceId) {
   const { name, terms: termsDeclarations } = await loadServiceDeclaration(serviceId);
   const service = new Service({ id: serviceId, name });
 
@@ -43,7 +43,7 @@ async function createServiceFromDeclaration(serviceId) {
   return service;
 }
 
-async function loadServiceDeclaration(serviceId) {
+export async function loadServiceDeclaration(serviceId) {
   const filePath = path.join(declarationsPath, `${serviceId}${JSON_EXT}`);
 
   try {
@@ -53,14 +53,16 @@ async function loadServiceDeclaration(serviceId) {
   }
 }
 
-async function createSourceDocuments(serviceId, termsDeclaration) {
+export async function createSourceDocuments(serviceId, termsDeclaration) {
+  const serviceFilters = await loadServiceFilters(serviceId);
+
   if (!termsDeclaration.combine) {
     return [new SourceDocument({
       location: termsDeclaration.fetch,
       executeClientScripts: termsDeclaration.executeClientScripts,
       contentSelectors: termsDeclaration.select,
       insignificantContentSelectors: termsDeclaration.remove,
-      filters: await loadServiceFilters(serviceId, termsDeclaration.filter),
+      filters: await getServiceFilters(serviceFilters, termsDeclaration.filter),
     })];
   }
 
@@ -70,49 +72,52 @@ async function createSourceDocuments(serviceId, termsDeclaration) {
       executeClientScripts: sourceDocumentDeclaration.executeClientScripts ?? termsDeclaration.executeClientScripts,
       contentSelectors: sourceDocumentDeclaration.select ?? termsDeclaration.select,
       insignificantContentSelectors: sourceDocumentDeclaration.remove ?? termsDeclaration.remove,
-      filters: await loadServiceFilters(serviceId, sourceDocumentDeclaration.filter ?? termsDeclaration.filter),
+      filters: await getServiceFilters(serviceFilters, sourceDocumentDeclaration.filter ?? termsDeclaration.filter),
     })));
 }
 
-async function loadServiceFilters(serviceId, filterNames) {
+export async function loadServiceFilters(serviceId) {
+  const serviceFiltersPath = path.join(declarationsPath, `${serviceId}${FILTERS_SUFFIX}${JS_EXT}`);
+
+  if (await fileExists(serviceFiltersPath)) {
+    return import(pathToFileURL(serviceFiltersPath));
+  }
+
+  return {};
+}
+
+export function getServiceFilters(serviceFilters, filterNames) {
   if (!filterNames) {
     return undefined;
   }
 
-  let serviceFilters = {};
-  const serviceFiltersPath = path.join(declarationsPath, `${serviceId}${FILTERS_SUFFIX}${JS_EXT}`);
+  const filters = filterNames.reduce((filters, filterItem) => {
+    let filterFunction;
 
-  if (await fileExists(serviceFiltersPath)) {
-    serviceFilters = await import(pathToFileURL(serviceFiltersPath));
-  }
-
-  const filters = filterNames.map(filterItem => {
     if (typeof filterItem === 'string') {
-      return exposedFilters[filterItem] || serviceFilters[filterItem];
-    }
+      filterFunction = exposedFilters[filterItem] || serviceFilters[filterItem];
+    } else if (typeof filterItem === 'object' && filterItem !== null) {
+      const [ filterName, params ] = Object.entries(filterItem)[0];
+      const baseFunction = exposedFilters[filterName] || serviceFilters[filterName];
 
-    if (typeof filterItem === 'object' && filterItem !== null) {
-      const [ filterName, params ] = Object.entries(filterItem)[0]; // Handle object-based filter config; extract filter name and parameters from single-entry object like { "removeQueryParam": "h" }
-      const filterFunction = exposedFilters[filterName] || serviceFilters[filterName];
+      if (baseFunction) {
+        const wrappedFilter = (webPageDOM, context) => baseFunction(webPageDOM, params, context);
 
-      if (!filterFunction) {
-        return undefined;
+        Object.defineProperty(wrappedFilter, 'name', { value: filterName });
+        filterFunction = wrappedFilter;
       }
-
-      const wrappedFunction = (webPageDOM, context) => filterFunction(webPageDOM, params, context);
-
-      Object.defineProperty(wrappedFunction, 'name', { value: filterName });
-
-      return wrappedFunction;
+    }
+    if (filterFunction) {
+      filters.push(filterFunction);
     }
 
-    return undefined;
-  });
+    return filters;
+  }, []);
 
-  return filters;
+  return filters.length ? filters : undefined;
 }
 
-async function getDeclaredServicesIds() {
+export async function getDeclaredServicesIds() {
   const fileNames = await fs.readdir(declarationsPath);
 
   return fileNames
@@ -165,7 +170,9 @@ function resolveFiltersForDate(date, filterNames, filters) {
   });
 }
 
-function createHistorySourceDocuments(serviceId, termsDeclaration, actualFilters) {
+async function createHistorySourceDocuments(serviceId, termsDeclaration, actualFilters) {
+  const serviceFilters = await loadServiceFilters(serviceId);
+
   if (!termsDeclaration.combine) {
     return [new SourceDocument({
       location: termsDeclaration.fetch,
@@ -177,7 +184,7 @@ function createHistorySourceDocuments(serviceId, termsDeclaration, actualFilters
   }
 
   return Promise.all(termsDeclaration.combine.map(async sourceDocument => {
-    const filters = await loadServiceFilters(serviceId, sourceDocument.filter) || actualFilters;
+    const filters = await getServiceFilters(serviceFilters, sourceDocument.filter) || actualFilters;
 
     return new SourceDocument({
       location: sourceDocument.fetch || termsDeclaration.fetch,
@@ -251,14 +258,12 @@ async function loadServiceHistory(historyFilePath) {
 async function loadServiceFiltersHistory(filtersHistoryPath, filtersPath) {
   const filtersHistory = {};
 
-  // Load filters history
   if (await fileExists(filtersHistoryPath)) {
     const historyModule = await import(pathToFileURL(filtersHistoryPath));
 
     Object.assign(filtersHistory, historyModule);
   }
 
-  // Load current filters
   if (await fileExists(filtersPath)) {
     const filtersModule = await import(pathToFileURL(filtersPath));
 
