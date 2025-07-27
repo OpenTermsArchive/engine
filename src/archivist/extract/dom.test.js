@@ -168,39 +168,45 @@ describe('createWebPageDOM', () => {
 
       expect(paragraph.textContent).to.equal('Central paragraph');
     });
-    it('throws an error when the start selector has no match', () => {
+
+    it('throws a clear error when the startBefore selector has no match', () => {
+      const rangeSelector = {
+        startBefore: '.nonexistent',
+        endBefore: '.conclusion',
+      };
+
+      expect(() => document.selectRange(rangeSelector)).to.throw('"start" selector has no match');
+      expect(() => document.selectRange(rangeSelector)).to.throw(JSON.stringify(rangeSelector));
+    });
+
+    it('throws a clear error when the startAfter selector has no match', () => {
       const rangeSelector = {
         startAfter: '.nonexistent',
         endBefore: '.conclusion',
       };
 
-      expect(() => document.selectRange(rangeSelector)).to.throw('The "start" selector has no match in document');
+      expect(() => document.selectRange(rangeSelector)).to.throw('"start" selector has no match');
+      expect(() => document.selectRange(rangeSelector)).to.throw(JSON.stringify(rangeSelector));
     });
 
-    it('throws an error when the end selector has no match', () => {
+    it('throws a clear error when the endBefore selector has no match', () => {
       const rangeSelector = {
         startAfter: '.introduction',
         endBefore: '.nonexistent',
       };
 
-      expect(() => document.selectRange(rangeSelector)).to.throw('The "end" selector has no match in document');
-    });
-
-    it('includes the selector in the error message when the start selector fails', () => {
-      const rangeSelector = {
-        startAfter: '.missing',
-        endBefore: '.conclusion',
-      };
-
+      expect(() => document.selectRange(rangeSelector)).to.throw('"end" selector has no match');
       expect(() => document.selectRange(rangeSelector)).to.throw(JSON.stringify(rangeSelector));
     });
 
-    it('includes the selector in the error message when the end selector fails', () => {
+
+    it('throws a clear error when the endAfter selector has no match', () => {
       const rangeSelector = {
         startAfter: '.introduction',
-        endBefore: '.missing',
+        endAfter: '.nonexistent',
       };
 
+      expect(() => document.selectRange(rangeSelector)).to.throw('"end" selector has no match');
       expect(() => document.selectRange(rangeSelector)).to.throw(JSON.stringify(rangeSelector));
     });
   });
