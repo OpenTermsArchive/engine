@@ -179,11 +179,11 @@ describe('Filter', () => {
       await filter(webPageDOM, sourceDocument);
     });
 
-    it('removes script elements', async () => {
+    it('removes script elements', () => {
       expect(webPageDOM.querySelector('script')).to.be.null;
     });
 
-    it('removes style elements', async () => {
+    it('removes style elements', () => {
       expect(webPageDOM.querySelector('style')).to.be.null;
     });
   });
@@ -199,11 +199,11 @@ describe('Filter', () => {
       await filter(webPageDOM, sourceDocument);
     });
 
-    it('updates link destination', async () => {
+    it('updates link destination', () => {
       expect(webPageDOM.querySelector('a.email-protection').href).to.equal('https://example.com/email-protection');
     });
 
-    it('updates link content', async () => {
+    it('updates link content', () => {
       expect(webPageDOM.querySelector('a.email-protection').innerHTML).to.equal('[email&nbsp;protected]');
     });
   });
