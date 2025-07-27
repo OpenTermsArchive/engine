@@ -19,9 +19,9 @@ describe('createWebPageDOM', () => {
         </header>
         <main>
           <article id="content">
-            <p class="intro">Introduction paragraph</p>
-            <p class="body">Body paragraph</p>
-            <p class="outro">Conclusion paragraph</p>
+            <p class="introduction">Introduction paragraph</p>
+            <p class="central">Central paragraph</p>
+            <p class="conclusion">Conclusion paragraph</p>
           </article>
           <aside class="sidebar">
             <div class="widget">Widget content</div>
@@ -56,7 +56,7 @@ describe('createWebPageDOM', () => {
 
   describe('#select', () => {
     it('returns elements using CSS selectors', () => {
-      const fragment = document.select('p.intro');
+      const fragment = document.select('p.introduction');
       const paragraph = fragment.querySelector('p');
 
       expect(paragraph.textContent).to.equal('Introduction paragraph');
@@ -70,7 +70,7 @@ describe('createWebPageDOM', () => {
     });
 
     it('returns elements using an array of CSS selectors', () => {
-      const fragment = document.select([ 'h1', '.intro' ]);
+      const fragment = document.select([ 'h1', '.introduction' ]);
       const heading = fragment.querySelector('h1');
       const paragraph = fragment.querySelector('p');
 
@@ -80,13 +80,13 @@ describe('createWebPageDOM', () => {
 
     it('returns content using a range selector object', () => {
       const rangeSelector = {
-        startAfter: '.intro',
-        endBefore: '.outro',
+        startAfter: '.introduction',
+        endBefore: '.conclusion',
       };
       const fragment = document.select(rangeSelector);
       const paragraph = fragment.querySelector('p');
 
-      expect(paragraph.textContent).to.equal('Body paragraph');
+      expect(paragraph.textContent).to.equal('Central paragraph');
     });
 
     it('returns an empty fragment when the selector matches no element', () => {
@@ -133,12 +133,12 @@ describe('createWebPageDOM', () => {
     it('removes content using a range selector object', () => {
       const freshDocument = createWebPageDOM(sampleHTML, location);
       const rangeSelector = {
-        startAfter: '.intro',
-        endBefore: '.outro',
+        startAfter: '.introduction',
+        endBefore: '.conclusion',
       };
 
       freshDocument.remove(rangeSelector);
-      const bodyParagraph = freshDocument.querySelector('.body');
+      const bodyParagraph = freshDocument.querySelector('.central');
 
       expect(bodyParagraph).to.be.null;
     });
@@ -147,32 +147,31 @@ describe('createWebPageDOM', () => {
   describe('#selectRange', () => {
     it('creates a range using startAfter and endBefore', () => {
       const rangeSelector = {
-        startAfter: '.intro',
-        endBefore: '.outro',
+        startAfter: '.introduction',
+        endBefore: '.conclusion',
       };
       const range = document.selectRange(rangeSelector);
       const fragment = range.cloneContents();
       const paragraph = fragment.querySelector('p');
 
-      expect(paragraph.textContent).to.equal('Body paragraph');
+      expect(paragraph.textContent).to.equal('Central paragraph');
     });
 
     it('creates a range using startBefore and endAfter', () => {
       const rangeSelector = {
-        startBefore: '.body',
-        endAfter: '.body',
+        startBefore: '.central',
+        endAfter: '.central',
       };
       const range = document.selectRange(rangeSelector);
       const fragment = range.cloneContents();
       const paragraph = fragment.querySelector('p');
 
-      expect(paragraph.textContent).to.equal('Body paragraph');
+      expect(paragraph.textContent).to.equal('Central paragraph');
     });
     it('throws an error when the start selector has no match', () => {
-
       const rangeSelector = {
         startAfter: '.nonexistent',
-        endBefore: '.outro',
+        endBefore: '.conclusion',
       };
 
       expect(() => document.selectRange(rangeSelector)).to.throw('The "start" selector has no match in document');
@@ -180,7 +179,7 @@ describe('createWebPageDOM', () => {
 
     it('throws an error when the end selector has no match', () => {
       const rangeSelector = {
-        startAfter: '.intro',
+        startAfter: '.introduction',
         endBefore: '.nonexistent',
       };
 
@@ -190,7 +189,7 @@ describe('createWebPageDOM', () => {
     it('includes the selector in the error message when the start selector fails', () => {
       const rangeSelector = {
         startAfter: '.missing',
-        endBefore: '.outro',
+        endBefore: '.conclusion',
       };
 
       expect(() => document.selectRange(rangeSelector)).to.throw(JSON.stringify(rangeSelector));
@@ -198,7 +197,7 @@ describe('createWebPageDOM', () => {
 
     it('includes the selector in the error message when the end selector fails', () => {
       const rangeSelector = {
-        startAfter: '.intro',
+        startAfter: '.introduction',
         endBefore: '.missing',
       };
 
