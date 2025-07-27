@@ -172,14 +172,10 @@ describe('Filter', () => {
   });
 
   describe('#removeUnwantedElements', () => {
-    let script;
-    let style;
-
     before(async () => {
-      script = webPageDOM.createElement('script');
-      style = webPageDOM.createElement('style');
-      webPageDOM.body.appendChild(script);
-      webPageDOM.body.appendChild(style);
+      webPageDOM.body.appendChild(webPageDOM.createElement('script'));
+      webPageDOM.body.appendChild(webPageDOM.createElement('style'));
+
       await filter(webPageDOM, sourceDocument);
     });
 
@@ -193,18 +189,17 @@ describe('Filter', () => {
   });
 
   describe('#updateProtectedLinks', () => {
-    let link;
-
     before(async () => {
-      link = webPageDOM.createElement('a');
+      const link = webPageDOM.createElement('a');
       link.href = 'https://example.com/email-protection';
       link.className = 'email-protection';
       link.innerHTML = 'Click here';
       webPageDOM.body.appendChild(link);
+
       await filter(webPageDOM, sourceDocument);
     });
 
-    it('updates link href', async () => {
+    it('updates link destination', async () => {
       expect(webPageDOM.querySelector('a.email-protection').href).to.equal('https://example.com/email-protection');
     });
 
