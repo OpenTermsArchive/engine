@@ -5,10 +5,9 @@ import { removeQueryParams } from './exposedFilters.js';
 
 describe('exposedFilters', () => {
   let webPageDOM;
-  const baseURL = 'https://example.com';
 
   before(() => {
-    webPageDOM = createWebPageDOM('<!DOCTYPE html><html><body></body></html>', baseURL);
+    webPageDOM = createWebPageDOM('<!DOCTYPE html><html><body></body></html>', 'https://example.com');
   });
 
   describe('#removeQueryParams', () => {
