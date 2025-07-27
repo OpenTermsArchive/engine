@@ -68,7 +68,7 @@ describe('exposedFilters', () => {
         webPageDOM.body.appendChild(link);
       });
 
-      it('leaves URL unchanged when no parameters to remove', () => {
+      it('leaves the URL unchanged', () => {
         removeQueryParams(webPageDOM, []);
 
         expect(link.href).to.equal('https://example.com/page?utm_source=test&keep=value');
