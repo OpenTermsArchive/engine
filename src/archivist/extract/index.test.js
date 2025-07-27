@@ -116,7 +116,7 @@ describe('Extract', () => {
   describe('#extract', () => {
     context('from HTML content', () => {
       describe('Filter', () => {
-        it('applies filters to convert relative URLs to absolute', async () => {
+        it('converts relative URLs to absolute', async () => {
           const result = await extract(new SourceDocument({
             content: rawHTML,
             location: virtualLocation,
@@ -127,7 +127,7 @@ describe('Extract', () => {
           expect(result).to.include('http://absolute.url/link');
         });
 
-        it('applies filters to remove unwanted elements', async () => {
+        it('discards non-textual elements', async () => {
           const result = await extract(new SourceDocument({
             content: rawHTMLWithCommonChangingItems,
             location: virtualLocation,
@@ -138,7 +138,7 @@ describe('Extract', () => {
           expect(result).to.not.include('console.log');
         });
 
-        it('applies filters to update protected links', async () => {
+        it('cleans up protected links', async () => {
           const result = await extract(new SourceDocument({
             content: rawHTMLWithCommonChangingItems,
             location: virtualLocation,
@@ -151,7 +151,7 @@ describe('Extract', () => {
         });
 
         context('with a synchronous filter', () => {
-          it('extracts content from the given HTML also with given additional filter', async () => {
+          it('applies all filters', async () => {
             const result = await extract(new SourceDocument({
               content: rawHTML,
               location: virtualLocation,
@@ -164,7 +164,7 @@ describe('Extract', () => {
         });
 
         context('with an asynchronous filter', () => {
-          it('extracts content from the given HTML also with given additional filter', async () => {
+          it('applies all filters', async () => {
             const result = await extract(new SourceDocument({
               content: rawHTML,
               location: virtualLocation,
