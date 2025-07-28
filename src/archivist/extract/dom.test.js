@@ -199,7 +199,6 @@ describe('createWebPageDOM', () => {
       expect(() => document.selectRange(rangeSelector)).to.throw(JSON.stringify(rangeSelector));
     });
 
-
     it('throws a clear error when the endAfter selector has no match', () => {
       const rangeSelector = {
         startAfter: '.introduction',

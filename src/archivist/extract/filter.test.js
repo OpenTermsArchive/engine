@@ -191,6 +191,7 @@ describe('Filter', () => {
   describe('#updateProtectedLinks', () => {
     before(async () => {
       const link = webPageDOM.createElement('a');
+
       link.href = 'https://example.com/email-protection';
       link.className = 'email-protection';
       link.innerHTML = 'Click here';

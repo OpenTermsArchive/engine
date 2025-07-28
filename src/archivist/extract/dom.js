@@ -1,10 +1,10 @@
 import jsdom from 'jsdom';
 
 export default function createWebPageDOM(content, location) {
-  const document = new jsdom.JSDOM(content, {
+  const { document } = new jsdom.JSDOM(content, {
     url: location,
     virtualConsole: new jsdom.VirtualConsole(),
-  }).window.document;
+  }).window;
 
   return Object.assign(document, {
     select(contentSelectors) {
