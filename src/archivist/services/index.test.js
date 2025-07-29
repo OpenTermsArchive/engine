@@ -107,12 +107,12 @@ describe('Services', () => {
       });
     });
 
-    context('with empty directory', () => {
+    context('with an empty directory', () => {
       beforeEach(() => {
         readdir.resolves([]);
       });
 
-      it('returns empty array', async () => {
+      it('returns an empty array', async () => {
         const serviceIds = await getDeclaredServicesIds();
 
         expect(serviceIds).to.deep.equal([]);
@@ -178,27 +178,27 @@ describe('Services', () => {
         readFile.resolves(JSON.stringify(validDeclaration));
       });
 
-      it('returns parsed service declaration', async () => {
+      it('returns the parsed service declaration', async () => {
         const result = await loadServiceDeclaration(serviceId);
 
         expect(result).to.deep.equal(validDeclaration);
       });
 
-      it('reads from correct file path', async () => {
+      it('reads from the correct file path', async () => {
         await loadServiceDeclaration(serviceId);
 
         expect(readFile).to.have.been.calledWith(sinon.match(filePath => filePath.endsWith(`${path.sep}serviceA.json`)));
       });
     });
 
-    context('when file contains invalid JSON', () => {
+    context('when the declaration contains invalid JSON', () => {
       const serviceId = 'invalidJson';
 
       beforeEach(() => {
         readFile.resolves('{ invalid json content');
       });
 
-      it('throws descriptive error message', async () => {
+      it('throws with a descriptive error message', async () => {
         try {
           await loadServiceDeclaration(serviceId);
           expect.fail('Expected function to throw an error');
@@ -231,7 +231,7 @@ describe('Services', () => {
         access.rejects(error);
       });
 
-      it('returns empty object', async () => {
+      it('returns an empty object', async () => {
         const result = await loadServiceFilters(serviceId);
 
         expect(result).to.deep.equal({});
@@ -244,7 +244,7 @@ describe('Services', () => {
       });
     });
 
-    context('with real service that has filters file', () => {
+    context('with a service that has a filters file', () => {
       let result;
 
       before(async () => {

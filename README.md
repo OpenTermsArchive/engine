@@ -4,6 +4,12 @@ This codebase is a Node.js module enabling downloading, archiving and publishing
 
 For documentation, visit [docs.opentermsarchive.org](https://docs.opentermsarchive.org/)
 
+## Testing
+
+Use `npm test` to run all tests.
+
+Use `npm run test:only <file.test.js>... [--watch]` to run specific test files. The `--watch` option enables running those tests each time a file changes.
+
 - - -
 
 ## Contribute

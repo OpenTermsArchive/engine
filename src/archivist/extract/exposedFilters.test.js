@@ -5,10 +5,9 @@ import { removeQueryParams } from './exposedFilters.js';
 
 describe('exposedFilters', () => {
   let webPageDOM;
-  const baseURL = 'https://example.com';
 
   before(() => {
-    webPageDOM = createWebPageDOM('<!DOCTYPE html><html><body></body></html>', baseURL);
+    webPageDOM = createWebPageDOM('<!DOCTYPE html><html><body></body></html>', 'https://example.com');
   });
 
   describe('#removeQueryParams', () => {
@@ -19,10 +18,11 @@ describe('exposedFilters', () => {
         link = webPageDOM.createElement('a');
         link.href = 'https://example.com/page?utm_source=test&keep=value';
         webPageDOM.body.appendChild(link);
-        removeQueryParams(webPageDOM, ['utm_source']);
       });
 
-      it('removes specified query parameters', () => {
+      it('removes the specified query parameters', () => {
+        removeQueryParams(webPageDOM, ['utm_source']);
+
         expect(link.href).to.equal('https://example.com/page?keep=value');
       });
     });
@@ -34,10 +34,11 @@ describe('exposedFilters', () => {
         img = webPageDOM.createElement('img');
         img.src = 'https://example.com/image.jpg?width=100&keep=value';
         webPageDOM.body.appendChild(img);
-        removeQueryParams(webPageDOM, ['width']);
       });
 
-      it('removes specified query parameters', () => {
+      it('removes the specified query parameters', () => {
+        removeQueryParams(webPageDOM, ['width']);
+
         expect(img.src).to.equal('https://example.com/image.jpg?keep=value');
       });
     });
@@ -49,10 +50,11 @@ describe('exposedFilters', () => {
         link = webPageDOM.createElement('a');
         link.href = 'https://example.com/page?utm_source=test&keep=value';
         webPageDOM.body.appendChild(link);
-        removeQueryParams(webPageDOM, 'utm_source');
       });
 
-      it('removes single query parameter passed as string', () => {
+      it('removes a single query parameter passed as string', () => {
+        removeQueryParams(webPageDOM, 'utm_source');
+
         expect(link.href).to.equal('https://example.com/page?keep=value');
       });
     });
@@ -64,10 +66,11 @@ describe('exposedFilters', () => {
         link = webPageDOM.createElement('a');
         link.href = 'https://example.com/page?utm_source=test&keep=value';
         webPageDOM.body.appendChild(link);
-        removeQueryParams(webPageDOM, []);
       });
 
-      it('leaves URL unchanged when no parameters to remove', () => {
+      it('leaves the URL unchanged', () => {
+        removeQueryParams(webPageDOM, []);
+
         expect(link.href).to.equal('https://example.com/page?utm_source=test&keep=value');
       });
     });
@@ -79,10 +82,11 @@ describe('exposedFilters', () => {
         link = webPageDOM.createElement('a');
         link.href = 'invalid://url';
         webPageDOM.body.appendChild(link);
-        removeQueryParams(webPageDOM, ['utm_source']);
       });
 
       it('ignores elements with invalid URLs', () => {
+        removeQueryParams(webPageDOM, ['utm_source']);
+
         expect(link.href).to.equal('invalid://url');
       });
     });
@@ -94,10 +98,11 @@ describe('exposedFilters', () => {
         link = webPageDOM.createElement('a');
         link.href = 'https://example.com/page?utm_source=test&utm_medium=email&keep=value&remove=me';
         webPageDOM.body.appendChild(link);
-        removeQueryParams(webPageDOM, [ 'utm_source', 'utm_medium', 'remove' ]);
       });
 
       it('removes all specified query parameters', () => {
+        removeQueryParams(webPageDOM, [ 'utm_source', 'utm_medium', 'remove' ]);
+
         expect(link.href).to.equal('https://example.com/page?keep=value');
       });
     });

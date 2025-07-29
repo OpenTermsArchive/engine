@@ -19,9 +19,9 @@ describe('createWebPageDOM', () => {
         </header>
         <main>
           <article id="content">
-            <p class="intro">Introduction paragraph</p>
-            <p class="body">Body paragraph</p>
-            <p class="outro">Conclusion paragraph</p>
+            <p class="introduction">Introduction paragraph</p>
+            <p class="central">Central paragraph</p>
+            <p class="conclusion">Conclusion paragraph</p>
           </article>
           <aside class="sidebar">
             <div class="widget">Widget content</div>
@@ -48,29 +48,29 @@ describe('createWebPageDOM', () => {
     expect(document.location.href).to.equal(location);
   });
 
-  it('provides access to standard DOM methods', () => {
+  it('provides access to the DOM API', () => {
     const title = document.querySelector('title');
 
     expect(title.textContent).to.equal('Test Document');
   });
 
   describe('#select', () => {
-    it('selects elements using CSS selector', () => {
-      const fragment = document.select('p.intro');
+    it('returns elements using CSS selectors', () => {
+      const fragment = document.select('p.introduction');
       const paragraph = fragment.querySelector('p');
 
       expect(paragraph.textContent).to.equal('Introduction paragraph');
     });
 
-    it('selects multiple elements using CSS selector', () => {
+    it('returns multiple elements using CSS selectors', () => {
       const fragment = document.select('p');
       const paragraphs = fragment.querySelectorAll('p');
 
       expect(paragraphs.length).to.equal(4);
     });
 
-    it('selects elements using array of CSS selectors', () => {
-      const fragment = document.select([ 'h1', '.intro' ]);
+    it('returns elements using an array of CSS selectors', () => {
+      const fragment = document.select([ 'h1', '.introduction' ]);
       const heading = fragment.querySelector('h1');
       const paragraph = fragment.querySelector('p');
 
@@ -78,18 +78,18 @@ describe('createWebPageDOM', () => {
       expect(paragraph.textContent).to.equal('Introduction paragraph');
     });
 
-    it('selects content using range selector object', () => {
+    it('returns content using a range selector object', () => {
       const rangeSelector = {
-        startAfter: '.intro',
-        endBefore: '.outro',
+        startAfter: '.introduction',
+        endBefore: '.conclusion',
       };
       const fragment = document.select(rangeSelector);
       const paragraph = fragment.querySelector('p');
 
-      expect(paragraph.textContent).to.equal('Body paragraph');
+      expect(paragraph.textContent).to.equal('Central paragraph');
     });
 
-    it('returns empty fragment when selector matches no elements', () => {
+    it('returns an empty fragment when the selector matches no element', () => {
       const fragment = document.select('.nonexistent');
 
       expect(fragment.childNodes.length).to.equal(0);
@@ -103,14 +103,14 @@ describe('createWebPageDOM', () => {
       testDocument = createWebPageDOM(sampleHTML, location);
     });
 
-    it('removes elements using CSS selector', () => {
+    it('removes elements using CSS selectors', () => {
       testDocument.remove('.sidebar');
       const sidebar = testDocument.querySelector('.sidebar');
 
       expect(sidebar).to.be.null;
     });
 
-    it('removes multiple elements using CSS selector', () => {
+    it('removes multiple elements using CSS selectors', () => {
       const freshDocument = createWebPageDOM(sampleHTML, location);
 
       freshDocument.remove('p');
@@ -119,7 +119,7 @@ describe('createWebPageDOM', () => {
       expect(paragraphs.length).to.equal(0);
     });
 
-    it('removes elements using array of CSS selectors', () => {
+    it('removes elements using an array of CSS selectors', () => {
       const freshDocument = createWebPageDOM(sampleHTML, location);
 
       freshDocument.remove([ 'nav', '.widget' ]);
@@ -130,78 +130,82 @@ describe('createWebPageDOM', () => {
       expect(widget).to.be.null;
     });
 
-    it('removes content using range selector object', () => {
+    it('removes content using a range selector object', () => {
       const freshDocument = createWebPageDOM(sampleHTML, location);
       const rangeSelector = {
-        startAfter: '.intro',
-        endBefore: '.outro',
+        startAfter: '.introduction',
+        endBefore: '.conclusion',
       };
 
       freshDocument.remove(rangeSelector);
-      const bodyParagraph = freshDocument.querySelector('.body');
+      const bodyParagraph = freshDocument.querySelector('.central');
 
       expect(bodyParagraph).to.be.null;
     });
   });
 
   describe('#selectRange', () => {
-    it('creates range using startAfter and endBefore', () => {
+    it('creates a range using startAfter and endBefore', () => {
       const rangeSelector = {
-        startAfter: '.intro',
-        endBefore: '.outro',
+        startAfter: '.introduction',
+        endBefore: '.conclusion',
       };
       const range = document.selectRange(rangeSelector);
       const fragment = range.cloneContents();
       const paragraph = fragment.querySelector('p');
 
-      expect(paragraph.textContent).to.equal('Body paragraph');
+      expect(paragraph.textContent).to.equal('Central paragraph');
     });
 
-    it('creates range using startBefore and endAfter', () => {
+    it('creates a range using startBefore and endAfter', () => {
       const rangeSelector = {
-        startBefore: '.body',
-        endAfter: '.body',
+        startBefore: '.central',
+        endAfter: '.central',
       };
       const range = document.selectRange(rangeSelector);
       const fragment = range.cloneContents();
       const paragraph = fragment.querySelector('p');
 
-      expect(paragraph.textContent).to.equal('Body paragraph');
+      expect(paragraph.textContent).to.equal('Central paragraph');
     });
 
-    it('throws error when start selector has no match', () => {
+    it('throws a clear error when the startBefore selector has no match', () => {
       const rangeSelector = {
-        startAfter: '.nonexistent',
-        endBefore: '.outro',
+        startBefore: '.nonexistent',
+        endBefore: '.conclusion',
       };
 
-      expect(() => document.selectRange(rangeSelector)).to.throw('The "start" selector has no match in document');
-    });
-
-    it('throws error when end selector has no match', () => {
-      const rangeSelector = {
-        startAfter: '.intro',
-        endBefore: '.nonexistent',
-      };
-
-      expect(() => document.selectRange(rangeSelector)).to.throw('The "end" selector has no match in document');
-    });
-
-    it('includes range selector in error message when start selector fails', () => {
-      const rangeSelector = {
-        startAfter: '.missing',
-        endBefore: '.outro',
-      };
-
+      expect(() => document.selectRange(rangeSelector)).to.throw('"start" selector has no match');
       expect(() => document.selectRange(rangeSelector)).to.throw(JSON.stringify(rangeSelector));
     });
 
-    it('includes range selector in error message when end selector fails', () => {
+    it('throws a clear error when the startAfter selector has no match', () => {
       const rangeSelector = {
-        startAfter: '.intro',
-        endBefore: '.missing',
+        startAfter: '.nonexistent',
+        endBefore: '.conclusion',
       };
 
+      expect(() => document.selectRange(rangeSelector)).to.throw('"start" selector has no match');
+      expect(() => document.selectRange(rangeSelector)).to.throw(JSON.stringify(rangeSelector));
+    });
+
+    it('throws a clear error when the endBefore selector has no match', () => {
+      const rangeSelector = {
+        startAfter: '.introduction',
+        endBefore: '.nonexistent',
+      };
+
+      expect(() => document.selectRange(rangeSelector)).to.throw('"end" selector has no match');
+      expect(() => document.selectRange(rangeSelector)).to.throw(JSON.stringify(rangeSelector));
+    });
+
+    it('throws a clear error when the endAfter selector has no match', () => {
+      const rangeSelector = {
+        startAfter: '.introduction',
+        endAfter: '.nonexistent',
+      };
+
+      expect(() => document.selectRange(rangeSelector)).to.throw('"end" selector has no match');
       expect(() => document.selectRange(rangeSelector)).to.throw(JSON.stringify(rangeSelector));
     });
   });

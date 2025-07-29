@@ -8,12 +8,12 @@ const delay = ms => new Promise(resolve => { setTimeout(resolve, ms); });
 describe('Filter', () => {
   let webPageDOM;
   let sourceDocument;
-  const baseURL = 'https://example.com';
+  const BASE_URL = 'https://example.com';
 
   before(() => {
-    webPageDOM = createWebPageDOM('<!DOCTYPE html><html><body></body></html>', baseURL);
+    webPageDOM = createWebPageDOM('<!DOCTYPE html><html><body></body></html>', BASE_URL);
     sourceDocument = {
-      location: baseURL,
+      location: BASE_URL,
       contentSelectors: [],
       insignificantContentSelectors: [],
       filters: [],
@@ -138,7 +138,7 @@ describe('Filter', () => {
         });
 
         it('provides location', () => {
-          expect(receivedContext.fetch).to.equal(sourceDocument.location);
+          expect(receivedContext.fetch).to.equal(BASE_URL);
         });
 
         it('provides filters list', () => {
@@ -172,43 +172,39 @@ describe('Filter', () => {
   });
 
   describe('#removeUnwantedElements', () => {
-    let script;
-    let style;
-
     before(async () => {
-      script = webPageDOM.createElement('script');
-      style = webPageDOM.createElement('style');
-      webPageDOM.body.appendChild(script);
-      webPageDOM.body.appendChild(style);
+      webPageDOM.body.appendChild(webPageDOM.createElement('script'));
+      webPageDOM.body.appendChild(webPageDOM.createElement('style'));
+
       await filter(webPageDOM, sourceDocument);
     });
 
-    it('removes script elements', async () => {
+    it('removes script elements', () => {
       expect(webPageDOM.querySelector('script')).to.be.null;
     });
 
-    it('removes style elements', async () => {
+    it('removes style elements', () => {
       expect(webPageDOM.querySelector('style')).to.be.null;
     });
   });
 
   describe('#updateProtectedLinks', () => {
-    let link;
-
     before(async () => {
-      link = webPageDOM.createElement('a');
+      const link = webPageDOM.createElement('a');
+
       link.href = 'https://example.com/email-protection';
       link.className = 'email-protection';
       link.innerHTML = 'Click here';
       webPageDOM.body.appendChild(link);
+
       await filter(webPageDOM, sourceDocument);
     });
 
-    it('updates link href', async () => {
+    it('updates link destination', () => {
       expect(webPageDOM.querySelector('a.email-protection').href).to.equal('https://example.com/email-protection');
     });
 
-    it('updates link content', async () => {
+    it('updates link content', () => {
       expect(webPageDOM.querySelector('a.email-protection').innerHTML).to.equal('[email&nbsp;protected]');
     });
   });
