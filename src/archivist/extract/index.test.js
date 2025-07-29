@@ -3,21 +3,19 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 
 import chai from 'chai';
-import jsdom from 'jsdom';
 import mime from 'mime';
 
 import SourceDocument from '../services/sourceDocument.js';
 
 import { ExtractDocumentError } from './errors.js';
 
-import extract, { convertRelativeURLsToAbsolute } from './index.js';
+import extract from './index.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const fs = fsApi.promises;
-const { JSDOM } = jsdom;
 const { expect } = chai;
 
-const virtualLocation = 'https://exemple.com/main';
+const virtualLocation = 'https://example.com/main';
 const rawHTML = `
 <!DOCTYPE html>
 <html>
@@ -39,7 +37,7 @@ const rawHTML = `
 const expectedExtracted = `Title
 =====
 
-[link 1](https://exemple.com/relative/link)
+[link 1](https://example.com/relative/link)
 
 [link 2](#anchor)
 
@@ -63,10 +61,11 @@ const rawHTMLWithCommonChangingItems = `
     <style>body { background: blue }</style>
     <script>console.log("test")</script>
     <h1>Title</h1>
-    <p><a id="link1" href="/relative/link">link 1</a></p>
+    <p><a id="link1" href="/relative/link?utm_source=test&id=123">link 1</a></p>
     <p><a id="link2" href="#anchor">link 2</a></p>
-    <p><a id="link3" href="http://absolute.url/link">link 3</a></p>
+    <p><a id="link3" href="http://absolute.url/link?keep=me">link 3</a></p>
     <p><a id="link4" href="">link 4</a></p>
+    <p><img src="https://example.com/image.jpg?width=100&quality=80" alt="test"/></p>
     <a href="/cdn-cgi/l/email-protection#3b4c52555f484f495e5a56154b49524d5a584215484f5a4f5e565e554f7b4c52555f484f495e5a5615585456">[email&#160;protected]</a>
     <p><a href="/cdn-cgi/l/email-protection#2d4e4243594c4e596d4e4459545e4e424259034858">conta<span>[email&#160;protected]</span></a></p>
   </body>
@@ -76,17 +75,19 @@ const rawHTMLWithCommonChangingItems = `
 const expectedExtractedWithCommonChangingItems = `Title
 =====
 
-[link 1](https://exemple.com/relative/link)
+[link 1](https://example.com/relative/link?utm_source=test&id=123)
 
 [link 2](#anchor)
 
-[link 3](http://absolute.url/link)
+[link 3](http://absolute.url/link?keep=me)
 
 link 4
 
-[\\[email protected\\]](https://exemple.com/cdn-cgi/l/email-protection)
+![test](https://example.com/image.jpg?width=100&quality=80)
 
-[\\[email protected\\]](https://exemple.com/cdn-cgi/l/email-protection)`;
+[\\[email protected\\]](https://example.com/cdn-cgi/l/email-protection)
+
+[\\[email protected\\]](https://example.com/cdn-cgi/l/email-protection)`;
 /* eslint-enable no-irregular-whitespace */
 
 const additionalFilter = {
@@ -112,31 +113,70 @@ const additionalFilter = {
 };
 
 describe('Extract', () => {
-  describe('#convertRelativeURLsToAbsolute', () => {
-    let subject;
-
-    before(() => {
-      const { document: webPageDOM } = new JSDOM(rawHTML).window;
-
-      convertRelativeURLsToAbsolute(webPageDOM, virtualLocation);
-      subject = Array.from(webPageDOM.querySelectorAll('a[href]')).map(el => el.href);
-    });
-
-    it('converts relative urls', () => {
-      expect(subject).to.include('https://exemple.com/relative/link');
-    });
-
-    it('leaves absolute urls untouched', () => {
-      expect(subject).to.include('http://absolute.url/link');
-    });
-
-    it('leaves invalid urls untouched', () => {
-      expect(subject).to.include('http://[INVALID_URL=http://www.example.org/');
-    });
-  });
-
   describe('#extract', () => {
     context('from HTML content', () => {
+      describe('Filter', () => {
+        it('converts relative URLs to absolute', async () => {
+          const result = await extract(new SourceDocument({
+            content: rawHTML,
+            location: virtualLocation,
+            contentSelectors: 'body',
+          }));
+
+          expect(result).to.include('https://example.com/relative/link');
+          expect(result).to.include('http://absolute.url/link');
+        });
+
+        it('discards non-textual elements', async () => {
+          const result = await extract(new SourceDocument({
+            content: rawHTMLWithCommonChangingItems,
+            location: virtualLocation,
+            contentSelectors: 'body',
+          }));
+
+          expect(result).to.not.include('background: red');
+          expect(result).to.not.include('console.log');
+        });
+
+        it('cleans up protected links', async () => {
+          const result = await extract(new SourceDocument({
+            content: rawHTMLWithCommonChangingItems,
+            location: virtualLocation,
+            contentSelectors: 'body',
+          }));
+
+          expect(result).to.include('email protected');
+          expect(result).to.not.include('3b4c52555f484f495e5a56154b49524d5a584215484f5a4f5e565e554f7b4c52555f484f495e5a5615585456');
+          expect(result).to.not.include('2d4e4243594c4e596d4e4459545e4e424259034858');
+        });
+
+        context('with a synchronous filter', () => {
+          it('applies all filters', async () => {
+            const result = await extract(new SourceDocument({
+              content: rawHTML,
+              location: virtualLocation,
+              contentSelectors: 'body',
+              filters: [additionalFilter.removeLinks],
+            }));
+
+            expect(result).to.equal(expectedExtractedWithAdditional);
+          });
+        });
+
+        context('with an asynchronous filter', () => {
+          it('applies all filters', async () => {
+            const result = await extract(new SourceDocument({
+              content: rawHTML,
+              location: virtualLocation,
+              contentSelectors: 'body',
+              filters: [additionalFilter.removeLinksAsync],
+            }));
+
+            expect(result).to.equal(expectedExtractedWithAdditional);
+          });
+        });
+      });
+
       describe('Select', () => {
         context('with string selector', () => {
           it('extracts content from the given HTML with common changing items', async () => {
@@ -221,7 +261,7 @@ describe('Extract', () => {
                 contentSelectors: [ 'h1', 'h1 ~ p' ],
               }));
 
-              expect(result).to.equal('Title\n=====\n\n[link 1](https://exemple.com/relative/link)\n\n[link 2](#anchor)\n\n[link 3](http://absolute.url/link)\n\n[link 5](http://[INVALID_URL=http://www.example.org/)');
+              expect(result).to.equal('Title\n=====\n\n[link 1](https://example.com/relative/link)\n\n[link 2](#anchor)\n\n[link 3](http://absolute.url/link)\n\n[link 5](http://[INVALID_URL=http://www.example.org/)');
             });
           });
         });
@@ -238,7 +278,7 @@ describe('Extract', () => {
                 },
               }));
 
-              expect(result).to.equal('[link 1](https://exemple.com/relative/link)');
+              expect(result).to.equal('[link 1](https://example.com/relative/link)');
             });
           });
           context('with startBefore and endAfter', () => {
@@ -359,7 +399,7 @@ describe('Extract', () => {
               insignificantContentSelectors: 'h1',
             }));
 
-            expect(result).to.equal('[link 1](https://exemple.com/relative/link)\n\n[link 2](#anchor)\n\n[link 3](http://absolute.url/link)\n\n[link 5](http://[INVALID_URL=http://www.example.org/)');
+            expect(result).to.equal('[link 1](https://example.com/relative/link)\n\n[link 2](#anchor)\n\n[link 3](http://absolute.url/link)\n\n[link 5](http://[INVALID_URL=http://www.example.org/)');
           });
         });
 
@@ -372,7 +412,7 @@ describe('Extract', () => {
               insignificantContentSelectors: [ 'h1', '#link3', '#link5' ],
             }));
 
-            expect(result).to.equal('[link 1](https://exemple.com/relative/link)\n\n[link 2](#anchor)');
+            expect(result).to.equal('[link 1](https://example.com/relative/link)\n\n[link 2](#anchor)');
           });
         });
 
@@ -435,7 +475,7 @@ describe('Extract', () => {
               ],
             }));
 
-            expect(result).to.equal('[link 1](https://exemple.com/relative/link)\n\n[link 2](#anchor)');
+            expect(result).to.equal('[link 1](https://example.com/relative/link)\n\n[link 2](#anchor)');
           });
         });
 
@@ -454,7 +494,7 @@ describe('Extract', () => {
               ],
             }));
 
-            expect(result).to.equal('[link 1](https://exemple.com/relative/link)\n\n[link 2](#anchor)');
+            expect(result).to.equal('[link 1](https://example.com/relative/link)\n\n[link 2](#anchor)');
           });
 
           context('where one selector is dependent on another', () => {
@@ -474,34 +514,6 @@ describe('Extract', () => {
 
               expect(result).to.equal('[link 2](#anchor)\n\n[link 3](http://absolute.url/link)\n\n[link 5](http://[INVALID_URL=http://www.example.org/)');
             });
-          });
-        });
-      });
-
-      describe('Filter', () => {
-        context('with a synchronous filter', () => {
-          it('extracts content from the given HTML also with given additional filter', async () => {
-            const result = await extract(new SourceDocument({
-              content: rawHTML,
-              location: virtualLocation,
-              contentSelectors: 'body',
-              filters: [additionalFilter.removeLinks],
-            }));
-
-            expect(result).to.equal(expectedExtractedWithAdditional);
-          });
-        });
-
-        context('with an asynchronous filter', () => {
-          it('extracts content from the given HTML also with given additional filter', async () => {
-            const result = await extract(new SourceDocument({
-              content: rawHTML,
-              location: virtualLocation,
-              contentSelectors: 'body',
-              filters: [additionalFilter.removeLinksAsync],
-            }));
-
-            expect(result).to.equal(expectedExtractedWithAdditional);
           });
         });
       });

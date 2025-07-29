@@ -45,6 +45,7 @@
     "start:api": "node bin/ota.js serve",
     "start:scheduler": "npm start -- --schedule",
     "test": "cross-env NODE_ENV=test mocha --recursive \"./src/**/*.test.js\" \"./scripts/**/*.test.js\" --exit",
+    "test:only": "cross-env NODE_ENV=test mocha --recursive",
     "posttest": "npm run lint",
     "test:debug": "npm run test -- --inspect-brk --exit"
   },
@@ -122,6 +123,6 @@
     "@opentermsarchive/terms-types": "^2.0.0"
   },
   "engines": {
-    "node": ">=16.0.0"
+    "node": ">=16.0.0 < 23.0.0"
   }
 }
