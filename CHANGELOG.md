@@ -10,7 +10,7 @@ All changes that impact users of this module are documented in this file, in the
 
 ### Added
 
-- Add support for parameterized filters in service declarations using object syntax; to pass parameters to curstom filters (with following signature: `customFilter(document, params, documentDeclaration)`), use the following syntax:
+- Add support for parameters in filters; see more in the [filters documentation](https://docs.opentermsarchive.org/terms/how-to/apply-filters/)
 
   ```json
   "filter": [
@@ -23,7 +23,7 @@ All changes that impact users of this module are documented in this file, in the
   ]
   ```
 
-- Add `removeQueryParams` built-in filter to remove specified query parameters from URLs in links and images; to use it in service declarations, add the following to your `filter` array:
+- Add `removeQueryParams` built-in filter to remove query parameters from links and images; see more in the [built-in filters documentation](https://docs.opentermsarchive.org/terms/reference/built-in-filters/)
   
   ```json
   "filter": [
