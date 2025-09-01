@@ -3,8 +3,8 @@ export const LINKS_TO_CONVERT_SELECTOR = 'a[href]:not([href^="#"]):not([href=""]
 export default async function filter(webPageDOM, sourceDocument) {
   await applyCustomFilters(webPageDOM, sourceDocument);
   convertRelativeURLsToAbsolute(webPageDOM, sourceDocument.location);
-  removeUnwantedElements(webPageDOM);
-  updateProtectedLinks(webPageDOM);
+  discardNonTextualElements(webPageDOM);
+  cleanEmailProtectedLinks(webPageDOM);
 
   return webPageDOM;
 }
@@ -36,24 +36,24 @@ function convertRelativeURLsToAbsolute(webPageDOM, baseURL) {
   });
 }
 
-function removeUnwantedElements(webPageDOM) {
+function discardNonTextualElements(webPageDOM) {
   webPageDOM.querySelectorAll('script, style').forEach(node => node.remove());
 }
 
-function updateProtectedLinks(webPageDOM) {
+function cleanEmailProtectedLinks(webPageDOM) {
   webPageDOM.querySelectorAll('a[href*="/email-protection"]').forEach(node => {
-    const newProtectedLink = webPageDOM.createElement('a');
+    const replacement = webPageDOM.createElement('a');
     const [href] = node.href.split('#');
 
     Array.from(node.attributes).forEach(attr => {
       if (attr.name === 'href') {
-        newProtectedLink.setAttribute('href', href);
+        replacement.setAttribute('href', href);
       } else {
-        newProtectedLink.setAttribute(attr.name, attr.value);
+        replacement.setAttribute(attr.name, attr.value);
       }
     });
 
-    newProtectedLink.innerHTML = '[email&nbsp;protected]';
-    node.parentNode.replaceChild(newProtectedLink, node);
+    replacement.innerHTML = '[email&nbsp;protected]';
+    node.parentNode.replaceChild(replacement, node);
   });
 }
