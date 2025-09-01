@@ -107,6 +107,22 @@ describe('exposedFilters', () => {
       });
     });
 
+    describe('with duplicate parameters', () => {
+      let link;
+
+      before(() => {
+        link = webPageDOM.createElement('a');
+        link.href = 'https://example.com/test?utm_source=to_remove_1&keep=true&utm_source=to_remove_2';
+        webPageDOM.body.appendChild(link);
+      });
+
+      it('removes all instances of duplicate query parameters', () => {
+        removeQueryParams(webPageDOM, ['utm_source']);
+
+        expect(link.href).to.equal('https://example.com/test?keep=true');
+      });
+    });
+
     describe('textual content preservation', () => {
       let codeElement;
       let paragraphElement;
