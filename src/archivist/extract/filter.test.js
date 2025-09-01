@@ -29,51 +29,46 @@ describe('Filter', () => {
     });
 
     describe('with custom filters', () => {
-      let customElement;
-      let contentFilter;
-      let appendFilter;
-      let failingFilter;
-      let contextFilter;
-      let asyncFilter;
       let receivedContext;
 
+      const contentFilter = (dom, { select }) => {
+        const element = dom.querySelector(select[0]);
+
+        if (element) {
+          element.innerHTML = 'Filtered content';
+        }
+      };
+
+      const appendFilter = (dom, { select }) => {
+        const element = dom.querySelector(select[0]);
+
+        if (element) {
+          element.innerHTML += ' + Appended content';
+        }
+      };
+
+      const failingFilter = () => {
+        throw new Error('Filter failed');
+      };
+
+      const contextSpyFilter = (dom, context) => {
+        receivedContext = context;
+      };
+
+      const asyncFilter = async (dom, { select }) => {
+        const element = dom.querySelector(select[0]);
+
+        if (element) {
+          await delay(100);
+          element.innerHTML = 'Async content';
+        }
+      };
+
       before(() => {
-        customElement = webPageDOM.createElement('div');
-        customElement.className = 'custom-content';
-        webPageDOM.body.appendChild(customElement);
+        const div = webPageDOM.createElement('div');
 
-        contentFilter = function contentFilter(dom, { select }) {
-          const element = dom.querySelector(select[0]);
-
-          if (element) {
-            element.innerHTML = 'Filtered content';
-          }
-        };
-
-        appendFilter = function appendFilter(dom, { select }) {
-          const element = dom.querySelector(select[0]);
-
-          if (element) {
-            element.innerHTML += ' + Appended content';
-          }
-        };
-
-        failingFilter = function failingFilter() {
-          throw new Error('Filter failed');
-        };
-
-        contextFilter = function contextFilter(dom, context) {
-          receivedContext = context;
-        };
-
-        asyncFilter = async function asyncFilter(dom, { select }) {
-          const element = dom.querySelector(select[0]);
-
-          if (element) {
-            await delay(100);
-            element.innerHTML = 'Async content';
-          }
-        };
+        div.className = 'custom-content';
+        webPageDOM.body.appendChild(div);
 
         sourceDocument.contentSelectors = ['.custom-content'];
       });
@@ -108,9 +103,9 @@ describe('Filter', () => {
         await expect(filter(webPageDOM, sourceDocument)).to.be.rejectedWith('The filter function "failingFilter" failed: Error: Filter failed');
       });
 
-      context('filter context', () => {
+      describe('filter parameters', () => {
         before(async () => {
-          sourceDocument.filters = [contextFilter];
+          sourceDocument.filters = [contextSpyFilter];
           sourceDocument.contentSelectors = ['.custom-content'];
           sourceDocument.insignificantContentSelectors = ['.insignificant'];
 
@@ -130,7 +125,7 @@ describe('Filter', () => {
         });
 
         it('provides filters list', () => {
-          expect(receivedContext.filter).to.deep.equal(['contextFilter']);
+          expect(receivedContext.filter).to.deep.equal(['contextSpyFilter']);
         });
       });
     });
