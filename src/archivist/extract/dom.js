@@ -9,18 +9,28 @@ export default function createWebPageDOM(content, location) {
   return Object.assign(document, {
     select(contentSelectors) {
       const result = document.createDocumentFragment();
+      let hasContent = false;
 
       [].concat(contentSelectors).forEach(selector => {
         if (typeof selector === 'object') {
           const rangeSelection = this.selectRange(selector);
+          const clonedContent = rangeSelection.cloneContents();
 
-          result.appendChild(rangeSelection.cloneContents());
+          if (clonedContent.hasChildNodes()) {
+            result.appendChild(clonedContent);
+            hasContent = true;
+          }
         } else {
-          document.querySelectorAll(selector).forEach(element => result.appendChild(element.cloneNode(true)));
+          const elements = document.querySelectorAll(selector);
+
+          if (elements.length > 0) {
+            elements.forEach(element => result.appendChild(element.cloneNode(true)));
+            hasContent = true;
+          }
         }
       });
 
-      return result;
+      return hasContent ? result : null;
     },
 
     remove(insignificantContentSelectors) {

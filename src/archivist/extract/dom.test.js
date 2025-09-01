@@ -89,10 +89,10 @@ describe('createWebPageDOM', () => {
       expect(paragraph.textContent).to.equal('Central paragraph');
     });
 
-    it('returns an empty fragment when the selector matches no element', () => {
-      const fragment = document.select('.nonexistent');
+    it('returns null when the selector matches no element', () => {
+      const result = document.select('.nonexistent');
 
-      expect(fragment.childNodes.length).to.equal(0);
+      expect(result).to.be.null;
     });
   });
 
