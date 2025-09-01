@@ -20,6 +20,10 @@ describe('exposedFilters', () => {
         webPageDOM.body.appendChild(link);
       });
 
+      after(() => {
+        link.remove();
+      });
+
       it('removes the specified query parameters', () => {
         removeQueryParams(webPageDOM, ['utm_source']);
 
@@ -34,6 +38,10 @@ describe('exposedFilters', () => {
         img = webPageDOM.createElement('img');
         img.src = 'https://example.com/image.jpg?width=100&keep=value';
         webPageDOM.body.appendChild(img);
+      });
+
+      after(() => {
+        img.remove();
       });
 
       it('removes the specified query parameters', () => {
@@ -52,6 +60,10 @@ describe('exposedFilters', () => {
         webPageDOM.body.appendChild(link);
       });
 
+      after(() => {
+        link.remove();
+      });
+
       it('removes a single query parameter passed as string', () => {
         removeQueryParams(webPageDOM, 'utm_source');
 
@@ -66,6 +78,10 @@ describe('exposedFilters', () => {
         link = webPageDOM.createElement('a');
         link.href = 'https://example.com/page?utm_source=test&keep=value';
         webPageDOM.body.appendChild(link);
+      });
+
+      after(() => {
+        link.remove();
       });
 
       it('leaves the URL unchanged', () => {
@@ -84,6 +100,10 @@ describe('exposedFilters', () => {
         webPageDOM.body.appendChild(link);
       });
 
+      after(() => {
+        link.remove();
+      });
+
       it('ignores elements with invalid URLs', () => {
         removeQueryParams(webPageDOM, ['utm_source']);
 
@@ -100,6 +120,10 @@ describe('exposedFilters', () => {
         webPageDOM.body.appendChild(link);
       });
 
+      after(() => {
+        link.remove();
+      });
+
       it('removes all specified query parameters', () => {
         removeQueryParams(webPageDOM, [ 'utm_source', 'utm_medium', 'remove' ]);
 
@@ -114,6 +138,10 @@ describe('exposedFilters', () => {
         link = webPageDOM.createElement('a');
         link.href = 'https://example.com/test?utm_source=to_remove_1&keep=true&utm_source=to_remove_2';
         webPageDOM.body.appendChild(link);
+      });
+
+      after(() => {
+        link.remove();
       });
 
       it('removes all instances of duplicate query parameters', () => {
@@ -144,6 +172,12 @@ const trackingUrl = 'https://tracker.com/pixel?utm_source=app&user_id=123';
 fetch(trackingUrl);
         `;
         webPageDOM.body.appendChild(preElement);
+      });
+
+      after(() => {
+        codeElement.remove();
+        paragraphElement.remove();
+        preElement.remove();
       });
 
       it('preserves code element URLs with tracking parameters', () => {
