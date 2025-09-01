@@ -7,7 +7,7 @@ describe('exposedFilters', () => {
   let webPageDOM;
 
   before(() => {
-    webPageDOM = createWebPageDOM('<!DOCTYPE html><html><body></body></html>', 'https://example.com');
+    webPageDOM = createWebPageDOM('<!DOCTYPE html><html><body></body></html>');
   });
 
   describe('#removeQueryParams', () => {
@@ -80,14 +80,14 @@ describe('exposedFilters', () => {
 
       before(() => {
         link = webPageDOM.createElement('a');
-        link.href = 'invalid://url';
+        link.href = 'ht^tp://example.com?utm_source=test';
         webPageDOM.body.appendChild(link);
       });
 
       it('ignores elements with invalid URLs', () => {
         removeQueryParams(webPageDOM, ['utm_source']);
 
-        expect(link.href).to.equal('invalid://url');
+        expect(link.href).to.equal('ht^tp://example.com?utm_source=test');
       });
     });
 
