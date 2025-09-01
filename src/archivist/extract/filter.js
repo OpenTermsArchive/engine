@@ -6,8 +6,6 @@ export default async function filter(webPageDOM, sourceDocument) {
   removeUnwantedElements(webPageDOM);
   updateProtectedLinks(webPageDOM);
 
-  webPageDOM.remove(sourceDocument.insignificantContentSelectors);
-
   return webPageDOM;
 }
 

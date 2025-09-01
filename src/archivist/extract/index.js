@@ -29,11 +29,12 @@ export default async function extract(sourceDocument) {
 }
 
 export async function extractFromHTML(sourceDocument) {
-  const { location, content, contentSelectors } = sourceDocument;
+  const { location, content, contentSelectors, insignificantContentSelectors } = sourceDocument;
 
   const webPageDOM = createWebPageDOM(content, location);
   const filteredDOM = await filter(webPageDOM, sourceDocument);
-  const selectedDOM = filteredDOM.select(contentSelectors);
+  const cleanedDOM = filteredDOM.remove(insignificantContentSelectors);
+  const selectedDOM = cleanedDOM.select(contentSelectors);
 
   if (!selectedDOM.children.length) {
     throw new Error(`The provided selector "${contentSelectors}" has no match in the web page at '${location}'`);
