@@ -106,5 +106,53 @@ describe('exposedFilters', () => {
         expect(link.href).to.equal('https://example.com/page?keep=value');
       });
     });
+
+    describe('textual content preservation', () => {
+      let codeElement;
+      let paragraphElement;
+      let preElement;
+
+      before(() => {
+        codeElement = webPageDOM.createElement('code');
+        codeElement.textContent = 'https://example.com/track?utm_source=newsletter&utm_campaign=winter';
+        webPageDOM.body.appendChild(codeElement);
+
+        paragraphElement = webPageDOM.createElement('p');
+        paragraphElement.textContent = 'When users click on links with utm_source=email or utm_medium=social, we track their behavior using https://analytics.example.com?utm_source=website&session_id=abc123.';
+        webPageDOM.body.appendChild(paragraphElement);
+
+        preElement = webPageDOM.createElement('pre');
+        preElement.textContent = `
+// Example tracking implementation
+const trackingUrl = 'https://tracker.com/pixel?utm_source=app&user_id=123';
+fetch(trackingUrl);
+        `;
+        webPageDOM.body.appendChild(preElement);
+      });
+
+      it('preserves code element URLs with tracking parameters', () => {
+        const originalCodeContent = codeElement.textContent;
+
+        removeQueryParams(webPageDOM, [ 'utm_source', 'utm_campaign', 'utm_medium', 'session_id', 'user_id' ]);
+
+        expect(codeElement.textContent).to.equal(originalCodeContent);
+      });
+
+      it('preserves paragraph element URLs with tracking parameters', () => {
+        const originalParagraphContent = paragraphElement.textContent;
+
+        removeQueryParams(webPageDOM, [ 'utm_source', 'utm_campaign', 'utm_medium', 'session_id', 'user_id' ]);
+
+        expect(paragraphElement.textContent).to.equal(originalParagraphContent);
+      });
+
+      it('preserves preformatted element URLs with tracking parameters', () => {
+        const originalPreContent = preElement.textContent;
+
+        removeQueryParams(webPageDOM, [ 'utm_source', 'utm_campaign', 'utm_medium', 'session_id', 'user_id' ]);
+
+        expect(preElement.textContent).to.equal(originalPreContent);
+      });
+    });
   });
 });
