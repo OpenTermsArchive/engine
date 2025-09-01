@@ -36,7 +36,7 @@ export async function extractFromHTML(sourceDocument) {
   const cleanedDOM = filteredDOM.remove(insignificantContentSelectors);
   const selectedDOM = cleanedDOM.select(contentSelectors);
 
-  if (!selectedDOM.children.length) {
+  if (!selectedDOM?.children.length) {
     throw new Error(`The provided selector "${contentSelectors}" has no match in the web page at '${location}'. This could be due to elements being removed before content selection if "remove" and "select" selectors conflict.`);
   }
 
