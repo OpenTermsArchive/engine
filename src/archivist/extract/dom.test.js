@@ -99,7 +99,7 @@ describe('createWebPageDOM', () => {
   describe('#remove', () => {
     let testDocument;
 
-    before(() => {
+    beforeEach(() => {
       testDocument = createWebPageDOM(sampleHTML, location);
     });
 
@@ -111,34 +111,29 @@ describe('createWebPageDOM', () => {
     });
 
     it('removes multiple elements using CSS selectors', () => {
-      const freshDocument = createWebPageDOM(sampleHTML, location);
-
-      freshDocument.remove('p');
-      const paragraphs = freshDocument.querySelectorAll('p');
+      testDocument.remove('p');
+      const paragraphs = testDocument.querySelectorAll('p');
 
       expect(paragraphs.length).to.equal(0);
     });
 
     it('removes elements using an array of CSS selectors', () => {
-      const freshDocument = createWebPageDOM(sampleHTML, location);
-
-      freshDocument.remove([ 'nav', '.widget' ]);
-      const nav = freshDocument.querySelector('nav');
-      const widget = freshDocument.querySelector('.widget');
+      testDocument.remove([ 'nav', '.widget' ]);
+      const nav = testDocument.querySelector('nav');
+      const widget = testDocument.querySelector('.widget');
 
       expect(nav).to.be.null;
       expect(widget).to.be.null;
     });
 
     it('removes content using a range selector object', () => {
-      const freshDocument = createWebPageDOM(sampleHTML, location);
       const rangeSelector = {
         startAfter: '.introduction',
         endBefore: '.conclusion',
       };
 
-      freshDocument.remove(rangeSelector);
-      const bodyParagraph = freshDocument.querySelector('.central');
+      testDocument.remove(rangeSelector);
+      const bodyParagraph = testDocument.querySelector('.central');
 
       expect(bodyParagraph).to.be.null;
     });
