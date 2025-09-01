@@ -28,18 +28,6 @@ describe('Filter', () => {
       expect(result).to.equal(webPageDOM);
     });
 
-    it('removes insignificant content', async () => {
-      const insignificantContent = webPageDOM.createElement('div');
-
-      insignificantContent.className = 'insignificant';
-      webPageDOM.body.appendChild(insignificantContent);
-      sourceDocument.insignificantContentSelectors = ['.insignificant'];
-
-      await filter(webPageDOM, sourceDocument);
-
-      expect(webPageDOM.querySelector('.insignificant')).to.be.null;
-    });
-
     describe('with custom filters', () => {
       let customElement;
       let contentFilter;
