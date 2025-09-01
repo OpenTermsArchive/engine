@@ -7,6 +7,7 @@ import { expect } from 'chai';
 import config from 'config';
 import jsonSourceMap from 'json-source-map';
 
+import * as exposedFilters from '../../../src/archivist/extract/exposedFilters.js';
 import extract from '../../../src/archivist/extract/index.js';
 import fetch, { launchHeadlessBrowser, stopHeadlessBrowser } from '../../../src/archivist/fetcher/index.js';
 import * as services from '../../../src/archivist/services/index.js';
@@ -75,6 +76,24 @@ export default async options => {
             assertValid(serviceHistorySchema, declarationHistory);
           });
         }
+
+        it('filters do not use reserved names', async () => {
+          const filtersFilePath = path.join(declarationsPath, `${serviceId}.filters.js`);
+
+          if (!fsApi.existsSync(filtersFilePath)) {
+            return; // Skip if no filters file exists
+          }
+
+          const serviceFilters = await services.loadServiceFilters(serviceId);
+          const reservedFilterNames = Object.keys(exposedFilters);
+          const serviceFilterNames = Object.keys(serviceFilters);
+
+          const conflictingNames = serviceFilterNames.filter(name => reservedFilterNames.includes(name));
+
+          if (conflictingNames.length) {
+            throw new Error(`Service filter file "${serviceId}.filters.js" declares filters with engine reserved names: "${conflictingNames.join('", "')}".`);
+          }
+        });
 
         if (!schemaOnly && service) {
           service.getTermsTypes()
