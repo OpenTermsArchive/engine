@@ -37,7 +37,7 @@ export async function extractFromHTML(sourceDocument) {
   const selectedDOM = cleanedDOM.select(contentSelectors);
 
   if (!selectedDOM.children.length) {
-    throw new Error(`The provided selector "${contentSelectors}" has no match in the web page at '${location}'`);
+    throw new Error(`The provided selector "${contentSelectors}" has no match in the web page at '${location}'. This could be due to elements being removed before content selection if "remove" and "select" selectors conflict.`);
   }
 
   const markdownContent = transformFromHTML(selectedDOM);
