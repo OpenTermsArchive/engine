@@ -87,27 +87,51 @@ export async function loadServiceFilters(serviceId) {
   return {};
 }
 
+function parseFilterItem(filterItem) {
+  if (typeof filterItem === 'string') {
+    return { filterName: filterItem, filterParams: undefined };
+  }
+
+  if (typeof filterItem === 'object' && filterItem !== null) {
+    const [ filterNameEntry, filterParamsEntry ] = Object.entries(filterItem)[0];
+
+    return { filterName: filterNameEntry, filterParams: filterParamsEntry };
+  }
+
+  return { filterName: undefined, filterParams: undefined };
+}
+
+function createWrappedFilter(baseFunction, filterName, filterParams) {
+  if (!baseFunction) {
+    return;
+  }
+
+  if (filterParams) {
+    const wrappedFilter = (webPageDOM, context) => baseFunction(webPageDOM, filterParams, context);
+
+    Object.defineProperty(wrappedFilter, 'name', { value: filterName });
+
+    return wrappedFilter;
+  }
+
+  return baseFunction;
+}
+
 export function getServiceFilters(serviceFilters, filterNames) {
   if (!filterNames) {
-    return undefined;
+    return;
   }
 
   const filters = filterNames.reduce((filters, filterItem) => {
-    let filterFunction;
+    const { filterName, filterParams } = parseFilterItem(filterItem);
 
-    if (typeof filterItem === 'string') {
-      filterFunction = exposedFilters[filterItem] || serviceFilters[filterItem];
-    } else if (typeof filterItem === 'object' && filterItem !== null) {
-      const [ filterName, params ] = Object.entries(filterItem)[0];
-      const baseFunction = exposedFilters[filterName] || serviceFilters[filterName];
-
-      if (baseFunction) {
-        const wrappedFilter = (webPageDOM, context) => baseFunction(webPageDOM, params, context);
-
-        Object.defineProperty(wrappedFilter, 'name', { value: filterName });
-        filterFunction = wrappedFilter;
-      }
+    if (!filterName) {
+      return filters;
     }
+
+    const baseFunction = exposedFilters[filterName] || serviceFilters[filterName];
+    const filterFunction = createWrappedFilter(baseFunction, filterName, filterParams);
+
     if (filterFunction) {
       filters.push(filterFunction);
     }
@@ -151,6 +175,7 @@ async function addTermsHistory(service, serviceId, termsType, declarationEntries
 async function createTermsForDate(service, serviceId, termsType, date, declarationEntries, filters, latestValidTerms) {
   const declaration = declarationEntries.find(entry => new Date(date) <= new Date(entry.validUntil)) || latestValidTerms;
   const actualFilters = resolveFiltersForDate(date, declaration.filter, filters);
+
   const sourceDocuments = await createHistorySourceDocuments(serviceId, declaration, actualFilters);
 
   service.addTerms(new Terms({
@@ -162,12 +187,19 @@ async function createTermsForDate(service, serviceId, termsType, date, declarati
 }
 
 function resolveFiltersForDate(date, filterNames, filters) {
-  return filterNames?.map(filterName => {
+  return filterNames?.map(filterItem => {
+    const { filterName, filterParams } = parseFilterItem(filterItem);
+
+    if (!filterName) {
+      return;
+    }
+
     const filterHistory = filters[filterName];
     const historicalFilter = filterHistory?.find(entry => new Date(date) <= new Date(entry.validUntil));
     const currentFilter = filterHistory?.find(entry => !entry.validUntil);
+    const filter = (historicalFilter || currentFilter)?.filter;
 
-    return (historicalFilter || currentFilter)?.filter;
+    return createWrappedFilter(filter, filterName, filterParams);
   });
 }
 
@@ -199,7 +231,11 @@ async function createHistorySourceDocuments(serviceId, termsDeclaration, actualF
 
 function extractHistoryDates({ filters, filterNames, termsTypeDeclarationEntries }) {
   const filterDates = Object.entries(filters)
-    .filter(([filterName]) => filterNames.includes(filterName))
+    .filter(([filterName]) => filterNames.some(filterItem => {
+      const { filterName: itemName } = parseFilterItem(filterItem);
+
+      return itemName === filterName;
+    }))
     .flatMap(([ , filterEntries ]) => filterEntries.map(({ validUntil }) => validUntil))
     .filter(Boolean);
 

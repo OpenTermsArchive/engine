@@ -27,3 +27,18 @@ export const removePrintButton = [
     filter: () => 'third-removePrintButton',
   },
 ];
+
+export const removeButtonWithText = [
+  {
+    validUntil: '2020-09-29T21:30:21.000Z',
+    filter: text => `second-removeButtonWithText-${text}`,
+  },
+  {
+    validUntil: '2020-07-22T11:30:21.000Z',
+    filter: text => `first-removeButtonWithText-${text}`,
+  },
+  {
+    validUntil: '2020-10-20T12:30:21.000Z',
+    filter: text => `third-removeButtonWithText-${text}`,
+  },
+];
