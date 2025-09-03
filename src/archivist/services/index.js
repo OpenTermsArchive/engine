@@ -318,7 +318,11 @@ async function fileExists(filePath) {
     await fs.access(filePath);
 
     return true;
-  } catch {
-    return false;
+  } catch (error) {
+    if (error.code === 'ENOENT') {
+      return false;
+    }
+
+    throw error;
   }
 }
