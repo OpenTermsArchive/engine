@@ -117,12 +117,12 @@ function createWrappedFilter(baseFunction, filterName, filterParams) {
   return baseFunction;
 }
 
-export function getServiceFilters(serviceFilters, filterNames) {
-  if (!filterNames) {
+export function getServiceFilters(serviceFilters, declaredFilters) {
+  if (!declaredFilters) {
     return;
   }
 
-  const filters = filterNames.reduce((filters, filterItem) => {
+  const filters = declaredFilters.reduce((filters, filterItem) => {
     const { filterName, filterParams } = parseFilterItem(filterItem);
 
     if (!filterName) {
@@ -165,8 +165,8 @@ async function addHistoryToService(service) {
 }
 
 async function addTermsHistory(service, serviceId, termsType, declarationEntries, filters) {
-  const filterNames = [...new Set(declarationEntries.flatMap(d => d.filter))].filter(Boolean);
-  const historyDates = extractHistoryDates({ termsTypeDeclarationEntries: declarationEntries, filters, filterNames });
+  const declaredFilters = [...new Set(declarationEntries.flatMap(declarationEntrie => declarationEntrie.filter))].filter(Boolean);
+  const historyDates = extractHistoryDates({ termsTypeDeclarationEntries: declarationEntries, filters, declaredFilters });
   const latestValidTerms = declarationEntries.find(entry => !entry.validUntil);
 
   await Promise.all(historyDates.map(date => createTermsForDate(service, serviceId, termsType, date, declarationEntries, filters, latestValidTerms)));
@@ -186,8 +186,8 @@ async function createTermsForDate(service, serviceId, termsType, date, declarati
   }));
 }
 
-function resolveFiltersForDate(date, filterNames, filters) {
-  return filterNames?.map(filterItem => {
+function resolveFiltersForDate(date, declaredFilters, filters) {
+  return declaredFilters?.map(filterItem => {
     const { filterName, filterParams } = parseFilterItem(filterItem);
 
     if (!filterName) {
@@ -229,9 +229,9 @@ async function createHistorySourceDocuments(serviceId, termsDeclaration, actualF
   }));
 }
 
-function extractHistoryDates({ filters, filterNames, termsTypeDeclarationEntries }) {
+function extractHistoryDates({ filters, declaredFilters, termsTypeDeclarationEntries }) {
   const filterDates = Object.entries(filters)
-    .filter(([filterName]) => filterNames.some(filterItem => {
+    .filter(([filterName]) => declaredFilters.some(filterItem => {
       const { filterName: itemName } = parseFilterItem(filterItem);
 
       return itemName === filterName;
