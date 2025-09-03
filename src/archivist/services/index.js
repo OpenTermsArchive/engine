@@ -45,9 +45,10 @@ export async function createServiceFromDeclaration(serviceId) {
 
 export async function loadServiceDeclaration(serviceId) {
   const filePath = path.join(declarationsPath, `${serviceId}${JSON_EXT}`);
+  const rawServiceDeclaration = await fs.readFile(filePath);
 
   try {
-    return JSON.parse(await fs.readFile(filePath));
+    return JSON.parse(rawServiceDeclaration);
   } catch (error) {
     throw new Error(`The "${serviceId}" service declaration is malformed and cannot be parsed in ${filePath}`);
   }
