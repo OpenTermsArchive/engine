@@ -234,7 +234,7 @@ describe('Services', () => {
       it('returns an empty object', async () => {
         const result = await loadServiceFilters(serviceId);
 
-        expect(result).to.deep.equal({});
+        expect(result).to.be.empty;
       });
 
       it('checks for file existence', async () => {
@@ -299,7 +299,7 @@ describe('Services', () => {
       expect(result[0](null, 'context')).to.equal('foo');
     });
 
-    context('parameters passed to filters', () => {
+    describe('parameters passed to filters', () => {
       let serviceLoadedFilters;
       let passedDOM;
       let passedContext;
@@ -342,8 +342,8 @@ describe('Services', () => {
 
   describe('#createSourceDocuments', () => {
     const realFilterNames = Object.keys(exposedFilters);
+    const SERVICE_ID = 'service_with_filters_history';
     let result;
-    const serviceId = 'service_with_filters_history';
 
     context('when terms declaration has only one source document', () => {
       const termsDeclaration = {
@@ -358,7 +358,7 @@ describe('Services', () => {
       };
 
       before(async () => {
-        result = await createSourceDocuments(serviceId, termsDeclaration);
+        result = await createSourceDocuments(SERVICE_ID, termsDeclaration);
       });
 
       it('creates a single SourceDocument', () => {
@@ -411,7 +411,7 @@ describe('Services', () => {
       };
 
       before(async () => {
-        result = await createSourceDocuments(serviceId, termsDeclaration);
+        result = await createSourceDocuments(SERVICE_ID, termsDeclaration);
       });
 
       it('creates multiple SourceDocuments', () => {
