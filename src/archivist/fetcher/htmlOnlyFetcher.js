@@ -4,6 +4,8 @@ import HttpProxyAgent from 'http-proxy-agent';
 import HttpsProxyAgent from 'https-proxy-agent';
 import nodeFetch, { AbortError } from 'node-fetch';
 
+import { resolveProxyConfiguration } from './proxyUtils.js';
+
 export default async function fetch(url, config) {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), config.navigationTimeout);
@@ -14,31 +16,12 @@ export default async function fetch(url, config) {
     headers: { 'Accept-Language': config.language },
   };
 
-  // Handle http_proxy/https_proxy environment variables precedence
-  let http_proxy = null;
-  let https_proxy = null;
+  const { httpProxy, httpsProxy } = resolveProxyConfiguration();
 
-  if (process.env.http_proxy) {
-    http_proxy = process.env.http_proxy;
-  }
-  else if (process.env.HTTP_PROXY) {
-    http_proxy = process.env.HTTP_PROXY;
-  }
-
-  if (process.env.https_proxy) {
-    https_proxy = process.env.https_proxy;
-  }
-  else if (process.env.HTTPS_PROXY) {
-    https_proxy = process.env.HTTPS_PROXY;
-  }
-  else if (http_proxy) {
-    https_proxy = http_proxy;
-  }
-
-  if (url.startsWith('https:') && https_proxy) {
-    nodeFetchOptions.agent = new HttpsProxyAgent(https_proxy);
-  } else if (url.startsWith('http:') && http_proxy) {
-    nodeFetchOptions.agent = new HttpProxyAgent(http_proxy);
+  if (url.startsWith('https:') && httpsProxy) {
+    nodeFetchOptions.agent = new HttpsProxyAgent(httpsProxy);
+  } else if (url.startsWith('http:') && httpProxy) {
+    nodeFetchOptions.agent = new HttpProxyAgent(httpProxy);
   }
 
   let response;
