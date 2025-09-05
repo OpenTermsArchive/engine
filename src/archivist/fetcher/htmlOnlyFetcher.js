@@ -14,10 +14,31 @@ export default async function fetch(url, config) {
     headers: { 'Accept-Language': config.language },
   };
 
-  if (url.startsWith('https:') && process.env.HTTPS_PROXY) {
-    nodeFetchOptions.agent = new HttpsProxyAgent(process.env.HTTPS_PROXY);
-  } else if (url.startsWith('http:') && process.env.HTTP_PROXY) {
-    nodeFetchOptions.agent = new HttpProxyAgent(process.env.HTTP_PROXY);
+  // Handle http_proxy/https_proxy environment variables precedence
+  let http_proxy = null;
+  let https_proxy = null;
+
+  if (process.env.http_proxy) {
+    http_proxy = process.env.http_proxy;
+  }
+  else if (process.env.HTTP_PROXY) {
+    http_proxy = process.env.HTTP_PROXY;
+  }
+
+  if (process.env.https_proxy) {
+    https_proxy = process.env.https_proxy;
+  }
+  else if (process.env.HTTPS_PROXY) {
+    https_proxy = process.env.HTTPS_PROXY;
+  }
+  else if (http_proxy) {
+    https_proxy = http_proxy;
+  }
+
+  if (url.startsWith('https:') && https_proxy) {
+    nodeFetchOptions.agent = new HttpsProxyAgent(https_proxy);
+  } else if (url.startsWith('http:') && http_proxy) {
+    nodeFetchOptions.agent = new HttpProxyAgent(http_proxy);
   }
 
   let response;
