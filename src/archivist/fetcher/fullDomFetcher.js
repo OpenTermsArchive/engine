@@ -4,6 +4,7 @@ import stealthPlugin from 'puppeteer-extra-plugin-stealth';
 puppeteer.use(stealthPlugin());
 
 let browser;
+let proxyCredentials = {};
 
 export default async function fetch(url, cssSelectors, config) {
   let page;
@@ -24,6 +25,10 @@ export default async function fetch(url, cssSelectors, config) {
     const client = await page.target().createCDPSession();
 
     await client.send('Network.clearBrowserCookies'); // Clear cookies to ensure clean state between fetches and prevent session persistence across different URLs
+
+    if (proxyCredentials.username && proxyCredentials.password) {
+      await page.authenticate(proxyCredentials);
+    }
 
     response = await page.goto(url, { waitUntil: 'load' }); // Using `load` instead of `networkidle0` as it's more reliable and faster. The 'load' event fires when the page and all its resources (stylesheets, scripts, images) have finished loading. `networkidle0` can be problematic as it waits for 500ms of network inactivity, which may never occur on dynamic pages and then triggers a navigation timeout.
 
@@ -88,18 +93,46 @@ export async function launchHeadlessBrowser() {
 
   const options = {
     args: [],
-    headless: true,
+    headless: !process.env.FETCHER_NO_HEADLESS,
   };
+
+  // Handle http_proxy/https_proxy environment variables precedence
+  let http_proxy = null;
+  let https_proxy = null;
+
   if (process.env.http_proxy) {
-    options.args = [].concat(options.args, `--proxy-server=${process.env.http_proxy}`);
+    http_proxy = process.env.http_proxy;
   }
-  
+  else if (process.env.HTTP_PROXY) {
+    http_proxy = process.env.HTTP_PROXY;
+  }
+
+  if (process.env.https_proxy) {
+    https_proxy = process.env.https_proxy;
+  }
+  else if (process.env.HTTPS_PROXY) {
+    https_proxy = process.env.HTTPS_PROXY;
+  }
+  else if (http_proxy) {
+    https_proxy = http_proxy;
+  }
+
+  // Set proxy in Puppeteer and eventually store credentials
+  if (http_proxy) {
+    const httpProxyUrl = new URL(http_proxy);
+    const httpsProxyUrl = new URL(https_proxy);
+    proxyCredentials.username = httpProxyUrl.username;
+    proxyCredentials.password = httpProxyUrl.password;
+
+    if (httpProxyUrl.username != httpsProxyUrl.username || httpProxyUrl.password != httpsProxyUrl.password) {
+      throw new Error('Unsupported proxies specified, http and https proxy should have the same credentials.');
+    }
+
+    options.args = [].concat(options.args, `--proxy-server=http=${httpProxyUrl.host};https=${httpsProxyUrl.host}`);
+  }
+
   if (process.env.FETCHER_NO_SANDBOX) {
     options.args = [].concat(options.args, [ '--no-sandbox', '--disable-setuid-sandbox' ]);
-  }
-  
-  if (process.env.FETCHER_NO_HEADLESS) {
-    options.headless = false;
   }
 
   browser = await puppeteer.launch(options);
