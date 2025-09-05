@@ -93,9 +93,11 @@ export async function launchHeadlessBrowser() {
   if (process.env.http_proxy) {
     options.args = [].concat(options.args, `--proxy-server=${process.env.http_proxy}`);
   }
+  
   if (process.env.FETCHER_NO_SANDBOX) {
     options.args = [].concat(options.args, [ '--no-sandbox', '--disable-setuid-sandbox' ]);
   }
+  
   if (process.env.FETCHER_NO_HEADLESS) {
     options.headless = false;
   }
