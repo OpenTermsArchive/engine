@@ -2,8 +2,6 @@
 
 All changes that impact users of this module are documented in this file, in the [Common Changelog](https://common-changelog.org) format with some additional specifications defined in the CONTRIBUTING file. This codebase adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-
-
 ## Unreleased [minor]
 
 > Development of this release was supported by the [French Ministry for Foreign Affairs](https://www.diplomatie.gouv.fr/fr/politique-etrangere-de-la-france/diplomatie-numerique/) through its ministerial [State Startups incubator](https://beta.gouv.fr/startups/open-terms-archive.html) under the aegis of the Ambassador for Digital Affairs.
@@ -11,27 +9,7 @@ All changes that impact users of this module are documented in this file, in the
 ### Added
 
 - Add support for parameters in filters; see more in the [filters documentation](https://docs.opentermsarchive.org/terms/how-to/apply-filters/)
-
-  ```json
-  "filter": [
-    {
-      "customFilter": "parameter"
-    },
-    {
-      "customFilter2": ["parameter1", "parameter2"]
-    }
-  ]
-  ```
-
 - Add `removeQueryParams` built-in filter to remove query parameters from links and images; see more in the [built-in filters documentation](https://docs.opentermsarchive.org/terms/reference/built-in-filters/)
-  
-  ```json
-  "filter": [
-    {
-      "removeQueryParams": ["paramToRemove1", "paramToRemove2"]
-    }
-  ]
-  ```
 
 ## 7.0.0 - 2025-07-21
 
