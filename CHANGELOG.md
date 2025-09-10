@@ -8,7 +8,7 @@ All changes that impact users of this module are documented in this file, in the
 
 ### Added
 
-- Add a horizontal rule to delimit source documents when concatenating them to improve readability
+- Improve readability of multi-document terms
 
 ## 7.0.0 - 2025-07-21
 
