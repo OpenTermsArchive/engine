@@ -8,7 +8,8 @@ All changes that impact users of this module are documented in this file, in the
 
 ### Added
 
-- Improve readability of multi-document terms
+- Add support for parameters in filters; see more in the [filters documentation](https://docs.opentermsarchive.org/terms/how-to/apply-filters/)
+- Add `removeQueryParams` built-in filter to remove query parameters from links and images; see more in the [built-in filters documentation](https://docs.opentermsarchive.org/terms/reference/built-in-filters/)
 
 ## 7.1.0 - 2025-09-10
 
@@ -18,8 +19,7 @@ _Full changeset and discussions: [#1188](https://github.com/OpenTermsArchive/eng
 
 ### Added
 
-- Add support for parameters in filters; see more in the [filters documentation](https://docs.opentermsarchive.org/terms/how-to/apply-filters/)
-- Add `removeQueryParams` built-in filter to remove query parameters from links and images; see more in the [built-in filters documentation](https://docs.opentermsarchive.org/terms/reference/built-in-filters/)
+- Improve readability of multi-document terms
 
 ## 7.0.0 - 2025-07-21
 
