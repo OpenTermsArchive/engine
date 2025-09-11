@@ -5,3 +5,7 @@ export function removeShareButton() {
 export function removePrintButton() {
   return 'last-removePrintButton';
 }
+
+export function removeButtonWithText(text) {
+  return `last-removeButtonWithText-${text}`;
+}

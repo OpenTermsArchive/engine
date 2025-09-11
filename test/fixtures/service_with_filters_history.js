@@ -14,6 +14,9 @@ const filters = [
   function removePrintButton() {
     return 'last-removePrintButton';
   },
+  function removeButtonWithText(text) {
+    return `last-removeButtonWithText-${text}`;
+  },
 ];
 
 [
@@ -45,6 +48,9 @@ const filters = [
           function removePrintButton() {
             return 'first-removePrintButton';
           },
+          function removeButtonWithText(text) {
+            return `first-removeButtonWithText-${text}`;
+          },
         ],
       }),
     ],
@@ -64,6 +70,9 @@ const filters = [
           },
           function removePrintButton() {
             return 'second-removePrintButton';
+          },
+          function removeButtonWithText(text) {
+            return `second-removeButtonWithText-${text}`;
           },
         ],
       }),
@@ -85,6 +94,9 @@ const filters = [
           function removePrintButton() {
             return 'second-removePrintButton';
           },
+          function removeButtonWithText(text) {
+            return `second-removeButtonWithText-${text}`;
+          },
         ],
       }),
     ],
@@ -104,6 +116,9 @@ const filters = [
           },
           function removePrintButton() {
             return 'third-removePrintButton';
+          },
+          function removeButtonWithText(text) {
+            return `third-removeButtonWithText-${text}`;
           },
         ],
       }),
@@ -125,6 +140,9 @@ const filters = [
           function removePrintButton() {
             return 'third-removePrintButton';
           },
+          function removeButtonWithText(text) {
+            return `third-removeButtonWithText-${text}`;
+          },
         ],
       }),
     ],
@@ -144,6 +162,9 @@ const filters = [
           },
           function removePrintButton() {
             return 'last-removePrintButton';
+          },
+          function removeButtonWithText(text) {
+            return `last-removeButtonWithText-${text}`;
           },
         ],
       }),

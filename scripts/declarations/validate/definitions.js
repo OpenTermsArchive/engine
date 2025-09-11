@@ -29,9 +29,20 @@ const definitions = {
   filters: {
     type: 'array',
     items: {
-      type: 'string',
-      pattern: '^.+$',
-      description: 'Filter function name',
+      oneOf: [
+        {
+          type: 'string',
+          pattern: '^.+$',
+          description: 'Filter function name',
+        },
+        {
+          type: 'object',
+          description: 'Filter function with parameters. The key is the filter function name, the value is the parameters.',
+          additionalProperties: false,
+          minProperties: 1,
+          maxProperties: 1,
+        },
+      ],
     },
   },
   validUntil: {

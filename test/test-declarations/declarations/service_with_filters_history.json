@@ -6,7 +6,10 @@
       "select": "main",
       "filter": [
         "removeShareButton",
-        "removePrintButton"
+        "removePrintButton",
+        {
+          "removeButtonWithText": "button-text"
+        }
       ]
     }
   }
