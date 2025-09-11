@@ -107,7 +107,7 @@ describe('exposedFilters', () => {
       it('ignores elements with invalid URLs', () => {
         removeQueryParams(webPageDOM, ['utm_source']);
 
-        expect(link.href).to.equal('ht^tp://example.com?utm_source=test');
+        expect(link.href).to.equal('ht^THIS_IS_WRONG^tp://example.com?utm_source=test');
       });
     });
 
