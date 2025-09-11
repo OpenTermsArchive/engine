@@ -96,7 +96,7 @@ describe('exposedFilters', () => {
 
       before(() => {
         link = webPageDOM.createElement('a');
-        link.href = 'ht^tp://example.com?utm_source=test';
+        link.href = 'ht^THIS_IS_WRONG^tp://example.com?utm_source=test';
         webPageDOM.body.appendChild(link);
       });
 

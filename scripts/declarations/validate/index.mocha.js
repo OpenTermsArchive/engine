@@ -91,7 +91,7 @@ export default async options => {
           const conflictingNames = serviceFilterNames.filter(name => reservedFilterNames.includes(name));
 
           if (conflictingNames.length) {
-            throw new Error(`Service filter file "${serviceId}.filters.js" declares filters with engine reserved names: "${conflictingNames.join('", "')}".`);
+            throw new Error(`Service filter file "${serviceId}.filters.js" declares filters with names used by built-in filters: "${conflictingNames.join('", "')}". Rename these filters to avoid a collision.`);
           }
         });
 
