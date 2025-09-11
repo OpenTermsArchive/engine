@@ -37,7 +37,7 @@ const definitions = {
         },
         {
           type: 'object',
-          patternProperties: { '^.+$': { description: 'Filter function parameters - can be string, array, object, etc.' } },
+          description: 'Filter function with parameters. The key is the filter function name, the value is the parameters.',
           additionalProperties: false,
           minProperties: 1,
           maxProperties: 1,
