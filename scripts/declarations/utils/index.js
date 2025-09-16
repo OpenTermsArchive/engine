@@ -9,7 +9,7 @@ export default class DeclarationUtils {
   }
 
   static getServiceIdFromFilePath(filePath) {
-    return path.parse(filePath.replace(/\.history|\.filters/, '')).name;
+    return path.parse(filePath.replace(/\.history|\.filters/g, '')).name;
   }
 
   async getJSONFromFile(ref, filePath) {
@@ -47,7 +47,7 @@ export default class DeclarationUtils {
         return; // Assuming history modifications imply corresponding changes in the service declaration and that the analysis of which terms types of this service have changed will be done when analysing the related declaration, no further action is required here
       }
 
-      if (modifiedFilePath.endsWith('.filters.js')) {
+      if (modifiedFilePath.endsWith('.filters.js') || modifiedFilePath.endsWith('.filters.history.js')) {
         const declaration = await this.getJSONFromFile(this.defaultBranch, `declarations/${serviceId}.json`);
 
         servicesTermsTypes[serviceId] = Object.keys(declaration.terms); // Considering how rarely filters are used, simply return all term types that could potentially be impacted to spare implementing a function change check
