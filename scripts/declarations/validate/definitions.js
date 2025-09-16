@@ -38,7 +38,7 @@ const definitions = {
         {
           type: 'object',
           description: 'Filter function with parameters. The key is the filter function name, the value is the parameters.',
-          additionalProperties: false,
+          additionalProperties: true,
           minProperties: 1,
           maxProperties: 1,
         },
