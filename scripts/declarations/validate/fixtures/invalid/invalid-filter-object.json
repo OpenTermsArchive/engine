@@ -1,0 +1,17 @@
+{
+  "name": "Service with invalid filter object",
+  "terms": {
+    "Privacy Policy": {
+      "fetch": "https://example.com/privacy",
+      "select": "div.content",
+      "filter": [
+        {
+          "filterName": {
+            "param": "value"
+          },
+          "unexpectedAdditionalProperty": "value"
+        }
+      ]
+    }
+  }
+}

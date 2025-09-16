@@ -1,0 +1,22 @@
+{
+  "name": "Service with filters",
+  "terms": {
+    "Privacy Policy": {
+      "fetch": "https://example.com/privacy",
+      "select": "div.content",
+      "filter": [
+        "removeLinks",
+        {
+          "customFilter": {
+            "param": "value"
+          }
+        },
+        {
+          "anotherFilter": {
+            "setting": true
+          }
+        }
+      ]
+    }
+  }
+}

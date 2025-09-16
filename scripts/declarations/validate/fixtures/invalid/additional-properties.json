@@ -1,0 +1,10 @@
+{
+  "name": "Service with additional properties",
+  "terms": {
+    "Privacy Policy": {
+      "fetch": "https://example.com/privacy",
+      "select": "div.content"
+    }
+  },
+  "unexpectedProperty": "value"
+}

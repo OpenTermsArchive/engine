@@ -1,0 +1,8 @@
+{
+  "name": "Service with non-PDF URL for PDF document",
+  "terms": {
+    "Privacy Policy": {
+      "fetch": "https://example.com/privacy.html"
+    }
+  }
+}

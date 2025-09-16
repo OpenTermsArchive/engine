@@ -1,0 +1,8 @@
+{
+  "name": "Service with PDF terms",
+  "terms": {
+    "Privacy Policy": {
+      "fetch": "https://example.com/privacy.pdf"
+    }
+  }
+}
