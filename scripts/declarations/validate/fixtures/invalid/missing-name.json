@@ -1,0 +1,8 @@
+{
+  "terms": {
+    "Privacy Policy": {
+      "fetch": "https://example.com/privacy",
+      "select": "div.content"
+    }
+  }
+}

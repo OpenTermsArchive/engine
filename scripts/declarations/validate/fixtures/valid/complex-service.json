@@ -1,0 +1,30 @@
+{
+  "name": "Complex service",
+  "terms": {
+    "Privacy Policy": {
+      "fetch": "https://example.com/privacy",
+      "select": [
+        "div.content",
+        ".privacy-section"
+      ],
+      "filter": [
+        "removeLinks",
+        {
+          "customTransform": {
+            "options": {
+              "cleanup": true
+            }
+          }
+        }
+      ],
+      "remove": [
+        ".ads",
+        ".tracking"
+      ],
+      "executeClientScripts": true
+    },
+    "Terms of Service": {
+      "fetch": "https://example.com/terms.pdf"
+    }
+  }
+}

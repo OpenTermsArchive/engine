@@ -1,0 +1,24 @@
+{
+  "name": "Multiple source documents service",
+  "terms": {
+    "Privacy Policy": {
+      "combine": [
+        {
+          "fetch": "https://example.com/privacy1",
+          "select": "div.content",
+          "filter": [
+            "removeLinks"
+          ]
+        },
+        {
+          "fetch": "https://example.com/privacy2",
+          "select": ".privacy-section"
+        }
+      ],
+      "select": "body",
+      "filter": [
+        "trimWhitespace"
+      ]
+    }
+  }
+}

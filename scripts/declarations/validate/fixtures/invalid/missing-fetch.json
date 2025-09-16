@@ -1,0 +1,8 @@
+{
+  "name": "Service without fetch",
+  "terms": {
+    "Privacy Policy": {
+      "select": "div.content"
+    }
+  }
+}

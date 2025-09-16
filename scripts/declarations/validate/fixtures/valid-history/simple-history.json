@@ -1,0 +1,9 @@
+{
+  "Privacy Policy": [
+    {
+      "fetch": "https://example.com/privacy",
+      "select": "div.content",
+      "validUntil": "2023-12-31T23:59:59Z"
+    }
+  ]
+}

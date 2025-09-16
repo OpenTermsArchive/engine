@@ -1,0 +1,9 @@
+{
+  "name": "Service with invalid URL",
+  "terms": {
+    "Privacy Policy": {
+      "fetch": "not-a-valid-url",
+      "select": "div.content"
+    }
+  }
+}

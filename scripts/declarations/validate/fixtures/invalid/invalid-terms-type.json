@@ -1,0 +1,9 @@
+{
+  "name": "Service with invalid terms type",
+  "terms": {
+    "Invalid Terms Type": {
+      "fetch": "https://example.com/privacy",
+      "select": "div.content"
+    }
+  }
+}

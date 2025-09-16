@@ -1,0 +1,19 @@
+{
+  "name": "Service with range selectors",
+  "terms": {
+    "Privacy Policy": {
+      "fetch": "https://example.com/privacy",
+      "select": [
+        "div.content",
+        {
+          "startBefore": "h1",
+          "endAfter": "footer"
+        },
+        {
+          "startAfter": "h2",
+          "endBefore": ".end-marker"
+        }
+      ]
+    }
+  }
+}
