@@ -19,87 +19,66 @@ describe('Schema validation', () => {
     addFormats(validator);
   });
 
-  describe('Service schema', () => {
-    describe('with valid declarations', () => {
-      const validDir = path.join(fixturesDir, 'valid');
-      const files = fs.readdirSync(validDir);
-      const validFiles = files.filter(file => file.endsWith('.json'));
+  const loadFixture = filePath => {
+    const content = fs.readFileSync(filePath, 'utf8');
 
-      validFiles.forEach(file => {
-        it(`validates ${file}`, () => {
-          const filePath = path.join(validDir, file);
-          const content = fs.readFileSync(filePath, 'utf8');
-          const declaration = JSON.parse(content);
+    return JSON.parse(content);
+  };
 
-          const valid = validator.validate(serviceSchema, declaration);
+  const getJsonFiles = dir => {
+    const files = fs.readdirSync(dir);
 
-          if (!valid) {
-            console.error(`Validation errors for ${file}:`, validator.errors);
-          }
+    return files.filter(file => file.endsWith('.json'));
+  };
 
-          expect(valid, `${file} should be valid`).to.be.true;
-        });
+  const validateDeclaration = (schema, declaration, file, shouldBeValid) => {
+    const valid = validator.validate(schema, declaration);
+
+    if (!valid && shouldBeValid) {
+      console.error(`Validation errors for ${file}:`, validator.errors);
+    }
+
+    return valid;
+  };
+
+  const createValidationTests = (schema, directory, shouldBeValid) => {
+    const files = getJsonFiles(directory);
+    const action = shouldBeValid ? 'validates' : 'rejects';
+
+    files.forEach(file => {
+      it(`${action} ${file}`, () => {
+        const filePath = path.join(directory, file);
+        const declaration = loadFixture(filePath);
+        const valid = validateDeclaration(schema, declaration, file, shouldBeValid);
+
+        expect(valid, `${file} should be ${shouldBeValid ? 'valid' : 'invalid'}`).to.equal(shouldBeValid);
       });
+    });
+  };
+
+  describe('Service schema', () => {
+    const validDir = path.join(fixturesDir, 'valid');
+    const invalidDir = path.join(fixturesDir, 'invalid');
+
+    describe('with valid declarations', () => {
+      createValidationTests(serviceSchema, validDir, true);
     });
 
     describe('with invalid declarations', () => {
-      const invalidDir = path.join(fixturesDir, 'invalid');
-      const files = fs.readdirSync(invalidDir);
-      const invalidFiles = files.filter(file => file.endsWith('.json'));
-
-      invalidFiles.forEach(file => {
-        it(`rejects ${file}`, () => {
-          const filePath = path.join(invalidDir, file);
-          const content = fs.readFileSync(filePath, 'utf8');
-          const declaration = JSON.parse(content);
-
-          const valid = validator.validate(serviceSchema, declaration);
-
-          expect(valid, `${file} should be invalid`).to.be.false;
-        });
-      });
+      createValidationTests(serviceSchema, invalidDir, false);
     });
   });
 
   describe('Service history schema', () => {
+    const validHistoryDir = path.join(fixturesDir, 'valid-history');
+    const invalidHistoryDir = path.join(fixturesDir, 'invalid-history');
+
     describe('with valid history declarations', () => {
-      const validHistoryDir = path.join(fixturesDir, 'valid-history');
-      const files = fs.readdirSync(validHistoryDir);
-      const validHistoryFiles = files.filter(file => file.endsWith('.json'));
-
-      validHistoryFiles.forEach(file => {
-        it(`validates ${file}`, () => {
-          const filePath = path.join(validHistoryDir, file);
-          const content = fs.readFileSync(filePath, 'utf8');
-          const declaration = JSON.parse(content);
-
-          const valid = validator.validate(serviceHistorySchema, declaration);
-
-          if (!valid) {
-            console.error(`Validation errors for ${file}:`, validator.errors);
-          }
-
-          expect(valid, `${file} should be valid`).to.be.true;
-        });
-      });
+      createValidationTests(serviceHistorySchema, validHistoryDir, true);
     });
 
     describe('with invalid history declarations', () => {
-      const invalidHistoryDir = path.join(fixturesDir, 'invalid-history');
-      const files = fs.readdirSync(invalidHistoryDir);
-      const invalidHistoryFiles = files.filter(file => file.endsWith('.json'));
-
-      invalidHistoryFiles.forEach(file => {
-        it(`rejects ${file}`, () => {
-          const filePath = path.join(invalidHistoryDir, file);
-          const content = fs.readFileSync(filePath, 'utf8');
-          const declaration = JSON.parse(content);
-
-          const valid = validator.validate(serviceHistorySchema, declaration);
-
-          expect(valid, `${file} should be invalid`).to.be.false;
-        });
-      });
+      createValidationTests(serviceHistorySchema, invalidHistoryDir, false);
     });
   });
 });
