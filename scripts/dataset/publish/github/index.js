@@ -3,7 +3,7 @@ import path from 'path';
 import url from 'url';
 
 import config from 'config';
-import { Octokit } from 'octokit';
+import { Octokit } from 'octokit'; // eslint-disable-line import/no-unresolved
 
 import * as readme from '../../assets/README.template.js';
 
