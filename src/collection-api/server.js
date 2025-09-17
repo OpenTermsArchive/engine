@@ -1,7 +1,6 @@
 import config from 'config';
 import express from 'express';
 
-import 'express-async-errors';
 import logger from './logger.js';
 import errorsMiddleware from './middlewares/errors.js';
 import loggerMiddleware from './middlewares/logger.js';
