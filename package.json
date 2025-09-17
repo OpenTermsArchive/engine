@@ -45,9 +45,9 @@
     "start:api": "node bin/ota.js serve",
     "start:scheduler": "npm start -- --schedule",
     "test": "cross-env NODE_ENV=test mocha --recursive \"./src/**/*.test.js\" \"./scripts/**/*.test.js\" --exit",
-    "test:only": "cross-env NODE_ENV=test mocha --recursive",
     "posttest": "npm run lint",
-    "test:debug": "npm run test -- --inspect-brk --exit"
+    "test:debug": "npm run test -- --inspect-brk --exit",
+    "test:only": "cross-env NODE_ENV=test mocha --recursive"
   },
   "dependencies": {
     "@accordproject/concerto-cto": "^3.24.0",
