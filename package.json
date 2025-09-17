@@ -41,7 +41,7 @@
     "lint": "eslint src test scripts bin",
     "lint:fix": "npm run lint -- --fix",
     "metadata:validate": "node bin/ota.js validate metadata",
-    "start": "node -r dotenv/config --max-http-header-size=32768 bin/ota.js track",
+    "start": "DOTENV_CONFIG_QUIET=true node -r dotenv/config --max-http-header-size=32768 bin/ota.js track",
     "start:api": "node bin/ota.js serve",
     "start:scheduler": "npm start -- --schedule",
     "test": "cross-env NODE_ENV=test mocha --recursive \"./src/**/*.test.js\" \"./scripts/**/*.test.js\" --exit",
