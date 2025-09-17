@@ -5,7 +5,7 @@ import dotenv from 'dotenv';
 import winston from 'winston';
 import 'winston-mail';
 
-dotenv.config();
+dotenv.config({ quiet: true });
 
 const { combine, timestamp, printf, colorize } = winston.format;
 

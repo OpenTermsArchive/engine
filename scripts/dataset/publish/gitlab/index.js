@@ -10,7 +10,7 @@ import GitLab from '../../../../src/reporter/gitlab/index.js';
 import * as readme from '../../assets/README.template.js';
 import logger from '../../logger/index.js';
 
-dotenv.config();
+dotenv.config({ quiet: true });
 
 export default async function publish({
   archivePath,
