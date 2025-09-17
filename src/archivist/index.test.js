@@ -2,7 +2,7 @@ import fsApi from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-import chai from 'chai';
+import { expect, use } from 'chai';
 import config from 'config';
 import nock from 'nock';
 import sinon from 'sinon';
@@ -16,8 +16,7 @@ import Archivist, { EVENTS } from './index.js';
 
 const fs = fsApi.promises;
 
-chai.use(sinonChai);
-const { expect } = chai;
+use(sinonChai);
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 

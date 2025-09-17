@@ -1,8 +1,6 @@
-import chai from 'chai';
+import { expect } from 'chai';
 
 import SourceDocument from './sourceDocument.js';
-
-const { expect } = chai;
 
 describe('SourceDocument', () => {
   const URL = 'https://www.service.example/terms';

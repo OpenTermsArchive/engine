@@ -1,8 +1,6 @@
-import chai from 'chai';
+import { expect } from 'chai';
 
 import Version from './version.js';
-
-const { expect } = chai;
 
 describe('Version', () => {
   let subject;

@@ -1,8 +1,6 @@
-import chai from 'chai';
+import { expect } from 'chai';
 
 import Snapshot from './snapshot.js';
-
-const { expect } = chai;
 
 describe('Snapshot', () => {
   let subject;

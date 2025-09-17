@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-import chai from 'chai';
+import { expect } from 'chai';
 import config from 'config';
 import mime from 'mime';
 
@@ -13,8 +13,6 @@ import { TERMS_TYPE_AND_DOCUMENT_ID_SEPARATOR, SNAPSHOT_ID_MARKER, COMMIT_MESSAG
 import Git from './git.js';
 
 import GitRepository from './index.js';
-
-const { expect } = chai;
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
