@@ -79,7 +79,11 @@ export default class MongoRepository extends RepositoryInterface {
   }
 
   async findById(recordId) {
-    const mongoDocument = await this.collection.findOne({ _id: new ObjectId(recordId) });
+    if (!ObjectId.isValid(recordId)) {
+      return null;
+    }
+
+    const mongoDocument = await this.collection.findOne({ _id: ObjectId.createFromHexString(recordId) });
 
     return this.#toDomain(mongoDocument);
   }
@@ -108,7 +112,7 @@ export default class MongoRepository extends RepositoryInterface {
   }
 
   async loadRecordContent(record) {
-    const { content } = await this.collection.findOne({ _id: new ObjectId(record.id) }, { projection: { content: 1 } });
+    const { content } = await this.collection.findOne({ _id: ObjectId.createFromHexString(record.id) }, { projection: { content: 1 } });
 
     record.content = content instanceof Binary ? content.buffer : content;
   }
