@@ -1,6 +1,6 @@
 import 'dotenv/config';
 import config from 'config';
-import { Octokit } from 'octokit';
+import { Octokit } from 'octokit'; // eslint-disable-line import/no-unresolved
 
 async function removeDuplicateIssues() {
   const repository = config.get('@opentermsarchive/engine.reporter.githubIssues.repositories.declarations');
