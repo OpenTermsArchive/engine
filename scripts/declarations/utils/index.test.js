@@ -39,6 +39,24 @@ const removeLatestCommit = async () => {
 };
 
 describe('DeclarationUtils', () => {
+  describe('#getServiceIdFromFilePath', () => {
+    it('extracts service ID from regular file path', () => {
+      expect(DeclarationUtils.getServiceIdFromFilePath('declarations/ServiceA.json')).to.equal('ServiceA');
+    });
+
+    it('extracts service ID from history file path', () => {
+      expect(DeclarationUtils.getServiceIdFromFilePath('declarations/ServiceA.history.json')).to.equal('ServiceA');
+    });
+
+    it('extracts service ID from filters file path', () => {
+      expect(DeclarationUtils.getServiceIdFromFilePath('declarations/ServiceA.filters.js')).to.equal('ServiceA');
+    });
+
+    it('extracts service ID from filters history file path', () => {
+      expect(DeclarationUtils.getServiceIdFromFilePath('declarations/ServiceA.filters.history.js')).to.equal('ServiceA');
+    });
+  });
+
   describe('#getModifiedServicesAndTermsTypes', () => {
     before(async () => {
       await loadFixtures();
@@ -134,6 +152,50 @@ describe('DeclarationUtils', () => {
             ServiceA: [ 'Imprint', 'Privacy Policy', 'Terms of Service' ],
             ServiceB: ['Terms of Service'],
           },
+        });
+      });
+    });
+
+    context('when filters file is modified', () => {
+      before(async () => {
+        await fs.writeFile(path.resolve(SUBJECT_PATH, './declarations/ServiceA.filters.js'), 'module.exports = {};');
+        await declarationUtils.git.add('./declarations/ServiceA.filters.js');
+        await declarationUtils.git.commit('Add filters file', './declarations/ServiceA.filters.js');
+      });
+      after(removeLatestCommit);
+
+      it('returns all terms types from the service declaration', async () => {
+        const result = await declarationUtils.getModifiedServicesAndTermsTypes();
+
+        expect(result.services).to.include('ServiceA');
+        expect(result.servicesTermsTypes.ServiceA).to.have.members([ 'Privacy Policy', 'Terms of Service' ]);
+      });
+    });
+
+    context('when filters history file is modified', () => {
+      before(async () => {
+        await fs.writeFile(path.resolve(SUBJECT_PATH, './declarations/ServiceA.filters.history.js'), 'module.exports = {};');
+        await declarationUtils.git.add('./declarations/ServiceA.filters.history.js');
+        await declarationUtils.git.commit('Add filters history file', './declarations/ServiceA.filters.history.js');
+      });
+      after(removeLatestCommit);
+
+      it('returns all terms types from the service declaration', async () => {
+        const result = await declarationUtils.getModifiedServicesAndTermsTypes();
+
+        expect(result.services).to.include('ServiceA');
+        expect(result.servicesTermsTypes.ServiceA).to.have.members([ 'Privacy Policy', 'Terms of Service' ]);
+      });
+    });
+
+    context('when history file is modified without declaration changes', () => {
+      before(() => commitChanges(COMMIT_PATHS.serviceAHistory, FIXTURES.serviceATermsUpdatedHistory.content));
+      after(removeLatestCommit);
+
+      it('returns no services and no terms types', async () => {
+        expect(await declarationUtils.getModifiedServicesAndTermsTypes()).to.deep.equal({
+          services: [],
+          servicesTermsTypes: {},
         });
       });
     });
