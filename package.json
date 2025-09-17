@@ -74,7 +74,7 @@
     "eslint-plugin-import": "^2.32.0",
     "eslint-plugin-jsdoc": "^58.1.1",
     "eslint-plugin-json-format": "^2.0.1",
-    "eslint-plugin-no-only-tests": "^3.1.0",
+    "eslint-plugin-no-only-tests": "^3.3.0",
     "express": "^5.1.0",
     "fetch-charset-detection": "^1.0.1",
     "form-data": "^4.0.4",
@@ -109,10 +109,10 @@
     "nock": "^14.0.10",
     "node-stream-zip": "^1.15.0",
     "prettier": "^2.2.1",
-    "semver": "^7.6.0",
+    "semver": "^7.7.2",
     "sinon": "^21.0.0",
     "sinon-chai": "^4.0.1",
-    "supertest": "^6.3.3"
+    "supertest": "^7.1.4"
   },
   "peerDependencies": {
     "@opentermsarchive/terms-types": "^2.0.0"
