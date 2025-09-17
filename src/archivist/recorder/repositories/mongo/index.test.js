@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-import chai from 'chai';
+import { expect } from 'chai';
 import config from 'config';
 import mime from 'mime';
 import { MongoClient } from 'mongodb';
@@ -12,7 +12,6 @@ import Version from '../../version.js';
 
 import MongoRepository from './index.js';
 
-const { expect } = chai;
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const { connectionURI } = config.get('@opentermsarchive/engine.recorder.snapshots.storage.mongo');

@@ -2,7 +2,7 @@ import fsApi from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-import chai from 'chai';
+import { expect } from 'chai';
 import mime from 'mime';
 
 import SourceDocument from '../services/sourceDocument.js';
@@ -13,7 +13,6 @@ import extract from './index.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const fs = fsApi.promises;
-const { expect } = chai;
 
 const virtualLocation = 'https://example.com/main';
 const rawHTML = `
