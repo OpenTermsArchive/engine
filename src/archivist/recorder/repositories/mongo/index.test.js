@@ -5,7 +5,7 @@ import { fileURLToPath } from 'url';
 import { expect } from 'chai';
 import config from 'config';
 import mime from 'mime';
-import { MongoClient } from 'mongodb';
+import { MongoClient, ObjectId } from 'mongodb';
 
 import Snapshot from '../../snapshot.js';
 import Version from '../../version.js';
@@ -443,7 +443,9 @@ describe('MongoRepository', () => {
 
       context('when requested record does not exist', () => {
         it('returns null', async () => {
-          expect(await subject.findById('inexistantID')).to.equal(null);
+          const nonExistentId = new ObjectId().toString();
+
+          expect(await subject.findById(nonExistentId)).to.equal(null);
         });
       });
     });
@@ -1118,7 +1120,9 @@ describe('MongoRepository', () => {
 
       context('when requested record does not exist', () => {
         it('returns null', async () => {
-          expect(await subject.findById('inexistantID')).to.equal(null);
+          const nonExistentId = new ObjectId().toString();
+
+          expect(await subject.findById(nonExistentId)).to.equal(null);
         });
       });
     });
