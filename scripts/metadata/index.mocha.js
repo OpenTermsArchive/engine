@@ -4,7 +4,7 @@ import path from 'path';
 import Ajv from 'ajv';
 import addFormats from 'ajv-formats';
 import config from 'config';
-import Croner from 'croner';
+import { Cron } from 'croner';
 import yaml from 'js-yaml';
 
 import specsRouter from '../../src/collection-api/routes/docs.js';
@@ -15,7 +15,7 @@ describe('Metadata file validation', () => {
     'iso3166-2': code => /^[A-Z]{2}(-[A-Z0-9]{1,3})?$/.test(code),
     'cron-expression': cronExpression => {
       try {
-        Croner(cronExpression); // eslint-disable-line new-cap
+        new Cron(cronExpression); // eslint-disable-line no-new
 
         return true;
       } catch {

@@ -63,7 +63,7 @@
     "chai-as-promised": "^8.0.2",
     "commander": "^9.4.1",
     "config": "^4.1.1",
-    "croner": "^8.0.2",
+    "croner": "^9.1.0",
     "cronstrue": "^2.50.0",
     "cross-env": "^7.0.3",
     "datauri": "^4.1.0",
