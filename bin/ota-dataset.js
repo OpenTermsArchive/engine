@@ -3,7 +3,7 @@ import './env.js';
 
 import { program } from 'commander';
 import config from 'config';
-import cron from 'croner';
+import { Cron } from 'croner';
 import cronstrue from 'cronstrue';
 
 import { release } from '../scripts/dataset/index.js';
@@ -34,5 +34,5 @@ if (!schedule) {
   logger.info('The scheduler is running…');
   logger.info(`Dataset will be published ${humanReadableSchedule.toLowerCase()} in the timezone of this machine`);
 
-  cron(config.get('@opentermsarchive/engine.dataset.publishingSchedule'), () => release(options));
+  new Cron(config.get('@opentermsarchive/engine.dataset.publishingSchedule'), () => release(options)); // eslint-disable-line no-new
 }
