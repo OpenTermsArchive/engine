@@ -2,17 +2,16 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-import chai from 'chai';
+import { expect } from 'chai';
 import config from 'config';
 import mime from 'mime';
-import { MongoClient } from 'mongodb';
+import { MongoClient, ObjectId } from 'mongodb';
 
 import Snapshot from '../../snapshot.js';
 import Version from '../../version.js';
 
 import MongoRepository from './index.js';
 
-const { expect } = chai;
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const { connectionURI } = config.get('@opentermsarchive/engine.recorder.snapshots.storage.mongo');
@@ -52,6 +51,10 @@ describe('MongoRepository', () => {
       const db = client.db(config.get('@opentermsarchive/engine.recorder.versions.storage.mongo.database'));
 
       collection = db.collection(config.get('@opentermsarchive/engine.recorder.versions.storage.mongo.collection'));
+    });
+
+    after(async () => {
+      await client.close();
     });
 
     describe('#save', () => {
@@ -444,7 +447,9 @@ describe('MongoRepository', () => {
 
       context('when requested record does not exist', () => {
         it('returns null', async () => {
-          expect(await subject.findById('inexistantID')).to.equal(null);
+          const nonExistentId = new ObjectId().toString();
+
+          expect(await subject.findById(nonExistentId)).to.equal(null);
         });
       });
     });
@@ -840,6 +845,10 @@ describe('MongoRepository', () => {
       collection = db.collection(config.get('@opentermsarchive/engine.recorder.snapshots.storage.mongo.collection'));
     });
 
+    after(async () => {
+      await client.close();
+    });
+
     describe('#save', () => {
       let record;
       let mongoDocument;
@@ -1119,7 +1128,9 @@ describe('MongoRepository', () => {
 
       context('when requested record does not exist', () => {
         it('returns null', async () => {
-          expect(await subject.findById('inexistantID')).to.equal(null);
+          const nonExistentId = new ObjectId().toString();
+
+          expect(await subject.findById(nonExistentId)).to.equal(null);
         });
       });
     });

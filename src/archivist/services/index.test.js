@@ -1,7 +1,7 @@
 import fs from 'fs/promises';
 import path from 'path';
 
-import chai from 'chai';
+import { expect, use } from 'chai';
 import sinon from 'sinon';
 import sinonChai from 'sinon-chai';
 
@@ -14,8 +14,7 @@ import Terms from './terms.js';
 
 import { getDeclaredServicesIds, loadServiceDeclaration, loadServiceFilters, getServiceFilters, createSourceDocuments, createServiceFromDeclaration, load, loadWithHistory } from './index.js';
 
-chai.use(sinonChai);
-const { expect } = chai;
+use(sinonChai);
 
 describe('Services', () => {
   describe('#getDeclaredServicesIds', () => {
