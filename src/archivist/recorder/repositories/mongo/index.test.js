@@ -53,6 +53,10 @@ describe('MongoRepository', () => {
       collection = db.collection(config.get('@opentermsarchive/engine.recorder.versions.storage.mongo.collection'));
     });
 
+    after(async () => {
+      await client.close();
+    });
+
     describe('#save', () => {
       let record;
       let mongoDocument;
@@ -839,6 +843,10 @@ describe('MongoRepository', () => {
       const db = client.db(config.get('@opentermsarchive/engine.recorder.snapshots.storage.mongo.database'));
 
       collection = db.collection(config.get('@opentermsarchive/engine.recorder.snapshots.storage.mongo.collection'));
+    });
+
+    after(async () => {
+      await client.close();
     });
 
     describe('#save', () => {
