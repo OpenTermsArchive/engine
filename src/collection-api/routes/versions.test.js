@@ -1,4 +1,4 @@
-import chai from 'chai';
+import { expect } from 'chai';
 import config from 'config';
 import supertest from 'supertest';
 
@@ -9,7 +9,6 @@ import app from '../server.js';
 
 const basePath = config.get('@opentermsarchive/engine.collection-api.basePath');
 
-const { expect } = chai;
 const request = supertest(app);
 
 describe('Versions API', () => {

@@ -2,7 +2,7 @@ import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-import chai from 'chai';
+import { expect, use } from 'chai';
 import config from 'config';
 import dircompare from 'dir-compare';
 import mime from 'mime';
@@ -14,8 +14,6 @@ import Version from '../../../src/archivist/recorder/version.js';
 import generateArchive from './index.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-
-const { expect } = chai;
 
 const FIRST_SERVICE_PROVIDER_ID = 'ServiceA';
 const SECOND_SERVICE_PROVIDER_ID = 'ServiceB';
@@ -113,7 +111,7 @@ describe('Export', () => {
   });
 });
 
-chai.use(chai => {
+use(chai => {
   const { Assertion } = chai;
 
   Assertion.addMethod('sameContentAs', function (expectedContentPath) {

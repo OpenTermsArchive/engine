@@ -1,11 +1,16 @@
 import ciceroMark from '@accordproject/markdown-cicero';
 import mardownPdf from '@accordproject/markdown-pdf';
-import TurndownService from '@opentermsarchive/turndown';
 import turndownPluginGithubFlavouredMarkdown from 'joplin-turndown-plugin-gfm';
+import TurndownService from 'turndown';
 
 const turndownService = new TurndownService();
 
 turndownService.use(turndownPluginGithubFlavouredMarkdown.gfm);
+
+turndownService.addRule('fix-anchors-containing-block-elements', {
+  ...turndownService.options.rules.inlineLink,
+  replacement: (content, node) => turndownService.options.rules.inlineLink.replacement(content.trim(), node),
+});
 
 const { PdfTransformer } = mardownPdf;
 const { CiceroMarkTransformer } = ciceroMark;

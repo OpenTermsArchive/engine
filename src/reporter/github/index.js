@@ -1,6 +1,6 @@
 import { createRequire } from 'module';
 
-import { Octokit } from 'octokit';
+import { Octokit } from 'octokit'; // eslint-disable-line import/no-unresolved
 
 import logger from '../../logger/index.js';
 import { LABELS, MANAGED_BY_OTA_MARKER, DEPRECATED_MANAGED_BY_OTA_MARKER } from '../labels.js';

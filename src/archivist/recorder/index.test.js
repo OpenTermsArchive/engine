@@ -1,12 +1,10 @@
-import chai from 'chai';
+import { expect } from 'chai';
 import config from 'config';
 
 import Snapshot from './snapshot.js';
 import Version from './version.js';
 
 import Recorder from './index.js';
-
-const { expect } = chai;
 
 const MIME_TYPE = 'text/html';
 const FETCH_DATE = new Date('2000-01-01T12:00:00.000Z');

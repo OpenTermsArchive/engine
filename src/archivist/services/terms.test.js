@@ -1,9 +1,7 @@
-import chai from 'chai';
+import { expect } from 'chai';
 
 import SourceDocument from './sourceDocument.js';
 import Terms from './terms.js';
-
-const { expect } = chai;
 
 describe('Terms', () => {
   const service = { name: 'Service' };

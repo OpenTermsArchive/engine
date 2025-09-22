@@ -1,7 +1,7 @@
 import { createRequire } from 'module';
 
 import config from 'config';
-import cron from 'croner';
+import { Cron } from 'croner';
 import cronstrue from 'cronstrue';
 
 import { getCollection } from './archivist/collection/index.js';
@@ -83,7 +83,7 @@ export default async function track({ services, types, extractOnly, schedule }) 
   logger.info('The scheduler is running…');
   logger.info(`Terms will be tracked ${humanReadableSchedule.toLowerCase()} in the timezone of this machine`);
 
-  cron(
+  new Cron( // eslint-disable-line no-new
     trackingSchedule,
     { protect: job => logger.warn(`Tracking scheduled at ${new Date().toISOString()} were blocked by an unfinished tracking started at ${job.currentRun().toISOString()}`) },
     () => archivist.track({ services, types }),

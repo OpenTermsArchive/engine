@@ -3,7 +3,7 @@ import http from 'http';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-import chai from 'chai';
+import { expect, use } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import iconv from 'iconv-lite';
 
@@ -11,10 +11,9 @@ import fetch, { launchHeadlessBrowser, stopHeadlessBrowser, FetchDocumentError, 
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-const { expect } = chai;
 const SERVER_PORT = 8976;
 
-chai.use(chaiAsPromised);
+use(chaiAsPromised);
 
 const termsHTML = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>First provider TOS</title></head><body><h1>Terms of service</h1><p>Dapibus quis diam sagittis</p></body></html>';
 const termsWithOtherCharsetHTML = '<!DOCTYPE html><html><head><meta http-equiv="Content-Type" content="text/html; charset=windows-1251"><title>TOS на първия доставчик</title></head><body><h1>Условия за ползване</h1><p>Dapibus quis diam sagittis</p></body></html>';

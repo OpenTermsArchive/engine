@@ -1,14 +1,13 @@
 import http from 'http';
 
-import chai from 'chai';
+import { expect, use } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 
 import fetch, { launchHeadlessBrowser, stopHeadlessBrowser } from './fullDomFetcher.js';
 
-const { expect } = chai;
 const SERVER_PORT = 8977;
 
-chai.use(chaiAsPromised);
+use(chaiAsPromised);
 
 const dynamicHTML = '<!DOCTYPE html><html><head><title>Dynamic Page</title><script>setTimeout(() => { document.body.innerHTML += "<div class=\'dynamic\'>Loaded</div>"; }, 100);</script></head><body></body></html>';
 const delayedContentHTML = '<!DOCTYPE html><html><head><title>Delayed Content</title><script>setTimeout(() => { document.querySelector(".content").textContent = "Final content"; }, 100);</script></head><body><div class="content"></div></body></html>';
