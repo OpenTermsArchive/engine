@@ -1,25 +1,28 @@
 export function removeQueryParams(webPageDOM, paramsToRemove = []) {
-  if (typeof paramsToRemove === 'string') {
-    paramsToRemove = [paramsToRemove];
-  }
+  const normalizedParams = Array.isArray(paramsToRemove) ? paramsToRemove : [paramsToRemove];
 
-  if (!paramsToRemove.length) {
+  if (!normalizedParams.length) {
     return;
   }
 
-  const elements = [
-    ...webPageDOM.querySelectorAll('a[href]'),
-    ...webPageDOM.querySelectorAll('img[src]'),
-  ];
+  const elements = webPageDOM.querySelectorAll('a[href], img[src]');
 
-  elements.forEach(element => {
+  for (const element of elements) {
     try {
-      const url = new URL(element.href || element.src);
+      const urlString = element.href || element.src;
+      const url = new URL(urlString);
 
-      paramsToRemove.forEach(param => url.searchParams.delete(param));
-      element[element.tagName === 'A' ? 'href' : 'src'] = url.toString();
-    } catch (error) {
-      // ignore if the element has not a valid URL
+      const hasTargetParams = normalizedParams.some(param => url.searchParams.has(param));
+
+      if (hasTargetParams) {
+        normalizedParams.forEach(param => url.searchParams.delete(param));
+
+        const attributeName = element.tagName === 'A' ? 'href' : 'src';
+
+        element[attributeName] = url.toString();
+      }
+    } catch {
+      // Silently ignore invalid URLs
     }
-  });
+  }
 }
