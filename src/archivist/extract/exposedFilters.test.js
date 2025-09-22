@@ -157,6 +157,60 @@ describe('exposedFilters', () => {
       });
     });
 
+    describe('with URLs without target parameters', () => {
+      let absoluteLink;
+      let relativeLink;
+      let anchorLink;
+      let img;
+      const originalAbsoluteHref = 'https://example.com/page?keep=value&preserve=me';
+      const originalRelativeHref = './relative/path?existing=param';
+      const originalAnchorHref = '#section1';
+      const originalImgSrc = 'https://example.com/image.jpg?width=100&height=200';
+
+      before(() => {
+        absoluteLink = webPageDOM.createElement('a');
+        absoluteLink.setAttribute('href', originalAbsoluteHref);
+        webPageDOM.body.appendChild(absoluteLink);
+
+        relativeLink = webPageDOM.createElement('a');
+        relativeLink.setAttribute('href', originalRelativeHref);
+        webPageDOM.body.appendChild(relativeLink);
+
+        anchorLink = webPageDOM.createElement('a');
+        anchorLink.setAttribute('href', originalAnchorHref);
+        webPageDOM.body.appendChild(anchorLink);
+
+        img = webPageDOM.createElement('img');
+        img.setAttribute('src', originalImgSrc);
+        webPageDOM.body.appendChild(img);
+
+        removeQueryParams(webPageDOM, [ 'utm_source', 'utm_medium', 'session_id' ]);
+      });
+
+      after(() => {
+        absoluteLink.remove();
+        relativeLink.remove();
+        anchorLink.remove();
+        img.remove();
+      });
+
+      it('leaves absolute link URLs untouched', () => {
+        expect(absoluteLink.getAttribute('href')).to.equal(originalAbsoluteHref);
+      });
+
+      it('leaves relative link URLs untouched', () => {
+        expect(relativeLink.getAttribute('href')).to.equal(originalRelativeHref);
+      });
+
+      it('leaves anchor link URLs untouched', () => {
+        expect(anchorLink.getAttribute('href')).to.equal(originalAnchorHref);
+      });
+
+      it('leaves image source URLs untouched', () => {
+        expect(img.getAttribute('src')).to.equal(originalImgSrc);
+      });
+    });
+
     describe('textual content preservation', () => {
       let codeElement;
       let paragraphElement;
