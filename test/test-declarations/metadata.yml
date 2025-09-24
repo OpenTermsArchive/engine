@@ -12,22 +12,20 @@ languages:
   - en
 jurisdictions:
   - EU
+trackingPeriods:
+  - startDate: '2025-07-17'
+    schedule: 30 */12 * * *
+    serverLocation: Strasbourg, FR
 governance:
-  hosts: 
-    - name: Localhost
-  administrators:
-    - name: Open Terms Archive
-      url: https://opentermsarchive.org/
-      logo: https://opentermsarchive.org/images/logo/logo-open-terms-archive-black.png
-  curators: 
-    - name: Open Terms Archive
-      url: https://opentermsarchive.org/
-      logo: https://opentermsarchive.org/images/logo/logo-open-terms-archive-black.png
-  maintainers:
-    - name: Open Terms Archive
-      url: https://opentermsarchive.org/
-      logo: https://opentermsarchive.org/images/logo/logo-open-terms-archive-black.png
-  sponsors:
-    - name: Open Terms Archive
-      url: https://opentermsarchive.org/
-      logo: https://opentermsarchive.org/images/logo/logo-open-terms-archive-black.png
+  Open Terms Archive:
+    url: https://opentermsarchive.org
+    logo: https://opentermsarchive.org/images/logo/logo-open-terms-archive-black.png
+    roles:
+      - host
+      - sysadmin
+      - curator
+      - maintainer
+      - contributor
+      - analyst
+      - diffuser
+      - sponsor
