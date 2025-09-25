@@ -155,10 +155,10 @@ const { version: PACKAGE_VERSION } = require('../../../package.json');
  *               roles:
  *                 type: array
  *                 description: Roles of the entity within the governance, see [collection governance](https://docs.opentermsarchive.org/collections/reference/governance/)
- *                 example: [host, administrator]
+ *                 example: [host, sysadmin]
  *                 items:
  *                   type: string
- *                   enum: [host, administrator, curator, maintainer, sponsor]
+ *                   enum: [host, sysadmin, curator, maintainer, contributor, analyst, diffuser, sponsor]
  *         i18n:
  *           type: object
  *           description: Internationalization of any of the Metadata properties (except i18n itself) for different language codes

@@ -2,6 +2,14 @@
 
 All changes that impact users of this module are documented in this file, in the [Common Changelog](https://common-changelog.org) format with some additional specifications defined in the CONTRIBUTING file. This codebase adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased [major]
+
+> Development of this release was supported by the [French Ministry for Foreign Affairs](https://www.diplomatie.gouv.fr/fr/politique-etrangere-de-la-france/diplomatie-numerique/) through its ministerial [State Startups incubator](https://beta.gouv.fr/startups/open-terms-archive.html) under the aegis of the Ambassador for Digital Affairs.
+
+### Changed
+
+- **Breaking:** Update collection governance roles by adding `contributor`, `analyst` and `diffuser` and replacing `administrator` with `sysadmin`; update roles in your [metadata file](https://docs.opentermsarchive.org/collections/metadata/) at the root of your collection folder
+
 ## 8.0.0 - 2025-09-22
 
 _Full changeset and discussions: [#1193](https://github.com/OpenTermsArchive/engine/pull/1193)._
