@@ -158,8 +158,7 @@ export default class Archivist extends events.EventEmitter {
 
   async trackTermsChanges({ terms, extractOnly = false }) {
     if (!extractOnly) {
-      await this.fetchSourceDocuments(terms);
-      await this.recordSnapshots(terms);
+      await this.fetchAndRecordSnapshots(terms);
     }
 
     await this.loadSourceDocumentsFromSnapshots(terms);
@@ -170,39 +169,43 @@ export default class Archivist extends events.EventEmitter {
     }
 
     await this.recordVersion(terms, extractOnly);
-
-    terms.sourceDocuments.forEach(sourceDocument => {
-      sourceDocument.content = null; // Reduce memory usage by clearing no longer needed large content strings
-      sourceDocument.mimeType = null; // …and associated MIME type
-      sourceDocument.snapshotId = null; // …and associated snapshot ID for consistency
-    });
   }
 
-  async fetchSourceDocuments(terms) {
+  async fetchAndRecordSnapshots(terms) {
     terms.fetchDate = new Date();
-
     const fetchDocumentErrors = [];
 
     for (const sourceDocument of terms.sourceDocuments) {
-      const { location: url, executeClientScripts, cssSelectors } = sourceDocument;
+      const error = await this.fetchSourceDocument(sourceDocument);
 
-      try {
-        const { mimeType, content, fetcher } = await this.fetch({ url, executeClientScripts, cssSelectors });
-
-        sourceDocument.content = content;
-        sourceDocument.mimeType = mimeType;
-        sourceDocument.fetcher = fetcher;
-      } catch (error) {
-        if (!(error instanceof FetchDocumentError)) {
-          throw error;
-        }
-
+      if (error) {
         fetchDocumentErrors.push(error);
+      } else {
+        await this.recordSnapshot(terms, sourceDocument);
+        sourceDocument.clearContent(); // Clear content to reduce memory usage
       }
     }
 
     if (fetchDocumentErrors.length) {
       throw new InaccessibleContentError(fetchDocumentErrors);
+    }
+  }
+
+  async fetchSourceDocument(sourceDocument) {
+    const { location: url, executeClientScripts, cssSelectors } = sourceDocument;
+
+    try {
+      const { mimeType, content, fetcher } = await this.fetch({ url, executeClientScripts, cssSelectors });
+
+      sourceDocument.content = content;
+      sourceDocument.mimeType = mimeType;
+      sourceDocument.fetcher = fetcher;
+    } catch (error) {
+      if (!(error instanceof FetchDocumentError)) {
+        throw error;
+      }
+
+      return error;
     }
   }
 
@@ -269,35 +272,33 @@ export default class Archivist extends events.EventEmitter {
     return record;
   }
 
-  recordSnapshots(terms) {
-    return Promise.all(terms.sourceDocuments.map(async sourceDocument => {
-      const record = new Snapshot({
-        serviceId: terms.service.id,
-        termsType: terms.type,
-        documentId: terms.hasMultipleSourceDocuments && sourceDocument.id,
-        fetchDate: terms.fetchDate,
-        content: sourceDocument.content,
-        mimeType: sourceDocument.mimeType,
-        metadata: {
-          'x-engine-version': PACKAGE_VERSION,
-          'x-fetcher': sourceDocument.fetcher,
-          'x-source-document-location': sourceDocument.location,
-        },
-      });
+  async recordSnapshot(terms, sourceDocument) {
+    const record = new Snapshot({
+      serviceId: terms.service.id,
+      termsType: terms.type,
+      documentId: terms.hasMultipleSourceDocuments && sourceDocument.id,
+      fetchDate: terms.fetchDate,
+      content: sourceDocument.content,
+      mimeType: sourceDocument.mimeType,
+      metadata: {
+        'x-engine-version': PACKAGE_VERSION,
+        'x-fetcher': sourceDocument.fetcher,
+        'x-source-document-location': sourceDocument.location,
+      },
+    });
 
-      await this.recorder.record(record);
+    await this.recorder.record(record);
 
-      if (!record.id) {
-        this.emit('snapshotNotChanged', record);
-
-        return record;
-      }
-
-      sourceDocument.snapshotId = record.id;
-
-      this.emit(record.isFirstRecord ? 'firstSnapshotRecorded' : 'snapshotRecorded', record);
+    if (!record.id) {
+      this.emit('snapshotNotChanged', record);
 
       return record;
-    }));
+    }
+
+    sourceDocument.snapshotId = record.id;
+
+    this.emit(record.isFirstRecord ? 'firstSnapshotRecorded' : 'snapshotRecorded', record);
+
+    return record;
   }
 }

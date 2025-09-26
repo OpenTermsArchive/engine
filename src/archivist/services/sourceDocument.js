@@ -35,6 +35,12 @@ export default class SourceDocument {
     return result.filter(selector => selector);
   }
 
+  clearContent() {
+    this.content = null; // Reduce memory usage by clearing no longer needed large content strings
+    this.mimeType = null; // …and associated MIME type
+    this.snapshotId = null; // …and associated snapshot ID for consistency
+  }
+
   static extractCssSelectorsFromProperty(property) {
     if (Array.isArray(property)) {
       return []
