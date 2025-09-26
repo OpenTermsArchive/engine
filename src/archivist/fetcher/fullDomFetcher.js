@@ -7,6 +7,7 @@ let browser;
 
 export default async function fetch(url, cssSelectors, config) {
   let page;
+  let client;
   let response;
   const selectors = [].concat(cssSelectors);
 
@@ -21,7 +22,7 @@ export default async function fetch(url, cssSelectors, config) {
     await page.setExtraHTTPHeaders({ 'Accept-Language': config.language });
 
     await page.setCacheEnabled(false); // Disable cache to ensure fresh content on each fetch and prevent stale data from previous requests
-    const client = await page.target().createCDPSession();
+    client = await page.target().createCDPSession();
 
     await client.send('Network.clearBrowserCookies'); // Clear cookies to ensure clean state between fetches and prevent session persistence across different URLs
 
@@ -69,8 +70,15 @@ export default async function fetch(url, cssSelectors, config) {
     }
     throw new Error(error.message);
   } finally {
+    // Clean up CDP session first to prevent memory leaks. CDP sessions maintain persistent
+    // connections to Chrome's debugging interface and must be explicitly detached to avoid
+    // keeping references to browser internals that prevent proper garbage collection
+    if (client) {
+      await client.detach().catch(); // Ignore CDP session cleanup errors
+    }
+
     if (page) {
-      await page.close();
+      await page.close().catch(); // Ignore page close errors
     }
   }
 }
@@ -102,6 +110,38 @@ export async function stopHeadlessBrowser() {
     return;
   }
 
-  await browser.close();
-  browser = null;
+  try {
+    // Close all pages first to ensure clean shutdown. Each page holds significant resources
+    // that must be explicitly released: DOM trees, JavaScript contexts, network connections,
+    // and CDP sessions. Closing pages before browser shutdown prevents race conditions where
+    // the browser terminates while pages are still active, which can lead to memory leaks
+    // and orphaned processes. This defensive approach ensures all page-level resources are
+    // properly cleaned up before browser-level termination.
+    const pages = await browser.pages();
+
+    await Promise.all(pages.map(page => {
+      if (!page.isClosed()) {
+        return page.close().catch(); // Ignore errors when closing individual pages
+      }
+
+      return Promise.resolve(); // Return resolved promise for already closed pages
+    }));
+
+    await browser.close();
+  } catch (error) {
+    console.warn('Error during browser cleanup, attempting force kill:', error);
+
+    // Force kill browser process if normal close fails
+    try {
+      const browserProcess = browser.process();
+
+      if (browserProcess && !browserProcess.killed) {
+        browserProcess.kill('SIGKILL');
+      }
+    } catch (killError) {
+      console.warn('Failed to force kill browser process:', killError);
+    }
+  } finally {
+    browser = null;
+  }
 }
