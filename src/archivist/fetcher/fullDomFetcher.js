@@ -94,7 +94,12 @@ export async function launchHeadlessBrowser() {
     return browser;
   }
 
-  browser = await puppeteer.launch({ headless: true });
+  browser = await puppeteer.launch({
+    headless: true,
+    args: [
+      '--single-process', // Force single process mode to prevent multiple main browsers
+    ],
+  });
 
   return browser;
 }
