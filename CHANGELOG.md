@@ -9,6 +9,7 @@ All changes that impact users of this module are documented in this file, in the
 ### Changed
 
 - Improve memory management when tracking terms with multiple source documents
+- All available snapshots are now stored in multi-documents terms, even if some are unavailable. 
 
 ## 9.0.0 - 2025-09-25
 
