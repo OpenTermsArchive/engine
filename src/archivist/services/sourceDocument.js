@@ -35,6 +35,11 @@ export default class SourceDocument {
     return result.filter(selector => selector);
   }
 
+  clearContent() {
+    this.content = null;
+    this.mimeType = null;
+  }
+
   static extractCssSelectorsFromProperty(property) {
     if (Array.isArray(property)) {
       return []

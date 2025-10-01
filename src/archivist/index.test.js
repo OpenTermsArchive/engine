@@ -276,8 +276,8 @@ describe('Archivist', function () {
         service: { id: 'test-service' },
         type: 'test-type',
         sourceDocuments: [
-          { location: 'https://example.com/doc1' },
-          { location: 'https://example.com/doc2' },
+          { location: 'https://example.com/doc1', content: 'test', mimeType: 'text/html' },
+          { location: 'https://example.com/doc2', content: 'test', mimeType: 'text/html' },
         ],
       };
     });
@@ -446,7 +446,7 @@ describe('Archivist', function () {
       });
     });
 
-    describe('#recordSnapshots', () => {
+    describe('#recordSnapshot', () => {
       let terms;
       let snapshot;
 
@@ -462,7 +462,7 @@ describe('Archivist', function () {
 
       context('when it is the first record', () => {
         before(async () => {
-          [snapshot] = await app.recordSnapshots(terms);
+          snapshot = await app.recordSnapshot(terms, terms.sourceDocuments[0]);
         });
 
         after(() => {
@@ -483,12 +483,12 @@ describe('Archivist', function () {
           let changedSnapshot;
 
           before(async () => {
-            await app.recordSnapshots(terms);
+            await app.recordSnapshot(terms, terms.sourceDocuments[0]);
             resetSpiesHistory();
             terms.sourceDocuments.forEach(sourceDocument => {
               sourceDocument.content = serviceBSnapshotExpectedContent;
             });
-            [changedSnapshot] = await app.recordSnapshots(terms);
+            changedSnapshot = await app.recordSnapshot(terms, terms.sourceDocuments[0]);
           });
 
           after(() => {
@@ -508,9 +508,9 @@ describe('Archivist', function () {
           let snapshot;
 
           before(async () => {
-            await app.recordSnapshots(terms);
+            await app.recordSnapshot(terms, terms.sourceDocuments[0]);
             resetSpiesHistory();
-            [snapshot] = await app.recordSnapshots(terms);
+            snapshot = await app.recordSnapshot(terms, terms.sourceDocuments[0]);
           });
 
           after(() => {
@@ -544,7 +544,7 @@ describe('Archivist', function () {
 
       context('when it is the first record', () => {
         before(async () => {
-          version = await app.recordVersion(terms);
+          version = await app.recordVersion(terms, 'content');
         });
 
         after(() => {
@@ -565,12 +565,12 @@ describe('Archivist', function () {
           let changedVersion;
 
           before(async () => {
-            await app.recordVersion(terms);
+            await app.recordVersion(terms, 'content');
             resetSpiesHistory();
             terms.sourceDocuments.forEach(sourceDocument => {
               sourceDocument.content = serviceBSnapshotExpectedContent;
             });
-            changedVersion = await app.recordVersion(terms);
+            changedVersion = await app.recordVersion(terms, 'content updated');
           });
 
           after(() => {
@@ -590,9 +590,9 @@ describe('Archivist', function () {
           let version;
 
           before(async () => {
-            await app.recordVersion(terms);
+            await app.recordVersion(terms, 'content');
             resetSpiesHistory();
-            version = await app.recordVersion(terms);
+            version = await app.recordVersion(terms, 'content');
           });
 
           after(() => {
