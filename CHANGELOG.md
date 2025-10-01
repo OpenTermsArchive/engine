@@ -2,14 +2,16 @@
 
 All changes that impact users of this module are documented in this file, in the [Common Changelog](https://common-changelog.org) format with some additional specifications defined in the CONTRIBUTING file. This codebase adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased [minor]
+## 9.1.0 - 2025-10-01
+
+_Full changeset and discussions: [#1197](https://github.com/OpenTermsArchive/engine/pull/1197)._
 
 > Development of this release was supported by the [French Ministry for Foreign Affairs](https://www.diplomatie.gouv.fr/fr/politique-etrangere-de-la-france/diplomatie-numerique/) through its ministerial [State Startups incubator](https://beta.gouv.fr/startups/open-terms-archive.html) under the aegis of the Ambassador for Digital Affairs.
 
 ### Changed
 
 - Improve memory management when tracking terms with multiple source documents
-- All available snapshots are now stored in multi-documents terms, even if some are unavailable. 
+- All available snapshots are now stored in multi-documents terms, even if some are unavailable.
 
 ## 9.0.0 - 2025-09-25
 
