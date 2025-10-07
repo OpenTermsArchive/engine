@@ -8,7 +8,7 @@ All changes that impact users of this module are documented in this file, in the
 
 ### Fixed
 
-- Fix PDF content extraction when source document MIME type includes charset parameter
+- Increase robustness of PDF content type detection
 
 ## 9.1.0 - 2025-10-01
 
