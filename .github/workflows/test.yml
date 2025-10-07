@@ -24,7 +24,7 @@ jobs:
       - uses: ankane/setup-mongodb@v1
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24
       - run: npm ci
       - name: Run tests (Linux)
         if: ${{ runner.os == 'Linux' }}
@@ -54,7 +54,7 @@ jobs:
           path: ./demo-declarations
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24
       - run: cd ./demo-declarations && npm install
       - run: npm ci
       - run: ./node_modules/.bin/cross-env NODE_ENV=ci npm run declarations:lint
@@ -81,7 +81,7 @@ jobs:
           path: ./demo-declarations
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24
       - run: cd ./demo-declarations && npm install
       - run: npm ci
       - run: ./node_modules/.bin/cross-env NODE_ENV=ci npm run metadata:validate
