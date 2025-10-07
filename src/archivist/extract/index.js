@@ -18,7 +18,7 @@ export { ExtractDocumentError } from './errors.js';
  */
 export default async function extract(sourceDocument) {
   try {
-    if (sourceDocument.mimeType == mime.getType('pdf')) {
+    if (mime.getExtension(sourceDocument.mimeType) == 'pdf') {
       return await extractFromPDF(sourceDocument);
     }
 
