@@ -534,6 +534,10 @@ describe('Extract', () => {
         expect(await extract({ content: pdfContent, mimeType: mime.getType('pdf') })).to.equal(expectedExtractedContent);
       });
 
+      it('extracts content from PDF when MIME type includes charset parameter', async () => {
+        expect(await extract({ content: pdfContent, mimeType: 'application/pdf; charset=utf-8' })).to.equal(expectedExtractedContent);
+      });
+
       context('when PDF contains no text', () => {
         it('throws an ExtractDocumentError error', async () => {
           await expect(extract({ content: await fs.readFile(path.resolve(__dirname, '../../../test/fixtures/termsWithoutText.pdf')), mimeType: mime.getType('pdf') })).to.be.rejectedWith(ExtractDocumentError, /contains no text/);
