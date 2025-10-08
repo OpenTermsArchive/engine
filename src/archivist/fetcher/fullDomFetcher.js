@@ -107,11 +107,12 @@ export async function launchHeadlessBrowser() {
 
     proxyCredentials = extractProxyCredentials(httpProxy, httpsProxy);
 
-    options.args = [].concat(options.args, `--proxy-server=http=${httpProxyUrl.host};https=${httpsProxyUrl.host}`);
+    options.args.push(`--proxy-server=http=${httpProxyUrl.host};https=${httpsProxyUrl.host}`);
   }
 
   if (process.env.FETCHER_NO_SANDBOX) {
-    options.args = [].concat(options.args, [ '--no-sandbox', '--disable-setuid-sandbox' ]);
+    options.args.push('--no-sandbox');
+    options.args.push('--disable-setuid-sandbox');
   }
 
   browser = await puppeteer.launch(options);

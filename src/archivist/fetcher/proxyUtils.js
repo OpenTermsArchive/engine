@@ -1,22 +1,11 @@
 export function resolveProxyConfiguration() {
-  let httpProxy = null;
-  let httpsProxy = null;
+  const httpProxy = process.env.http_proxy || process.env.HTTP_PROXY;
+  const httpsProxy = process.env.https_proxy || process.env.HTTPS_PROXY || httpProxy;
 
-  if (process.env.http_proxy) {
-    httpProxy = process.env.http_proxy;
-  } else if (process.env.HTTP_PROXY) {
-    httpProxy = process.env.HTTP_PROXY;
-  }
-
-  if (process.env.https_proxy) {
-    httpsProxy = process.env.https_proxy;
-  } else if (process.env.HTTPS_PROXY) {
-    httpsProxy = process.env.HTTPS_PROXY;
-  } else if (httpProxy) {
-    httpsProxy = httpProxy;
-  }
-
-  return { httpProxy, httpsProxy };
+  return {
+    httpProxy,
+    httpsProxy
+  };
 }
 
 export function extractProxyCredentials(httpProxy, httpsProxy) {
