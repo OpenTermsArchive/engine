@@ -4,7 +4,7 @@ export function resolveProxyConfiguration() {
 
   return {
     httpProxy,
-    httpsProxy
+    httpsProxy,
   };
 }
 
