@@ -2,12 +2,15 @@
 
 All changes that impact users of this module are documented in this file, in the [Common Changelog](https://common-changelog.org) format with some additional specifications defined in the CONTRIBUTING file. This codebase adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased
+## Unreleased [minor]
 
-### Changed
+> Development of this feature was contributed by the [European Commission](https://commission.europa.eu/) for its [VLOP/VLOSE instance](https://code.europa.eu/dsa/terms-and-conditions-database/vlops-and-vloses/).
 
-- Add extra options for fetchers, including support for (authentifying) proxies and switchin on/off headless mode and
-    sandboxing.
+### Added
+
+- Add proxy support for fetching documents behind firewalls or restricted networks; configure using `HTTP_PROXY` and `HTTPS_PROXY` (or `http_proxy` and `https_proxy`) environment variables
+- Add debugging options to disable headless mode for visual troubleshooting during development; set `FETCHER_NO_HEADLESS=1` to show browser window
+- Add sandbox control for improved compatibility with Docker and containerized environments; set `FETCHER_NO_SANDBOX=1` when running in containers
 
 ## 9.1.0 - 2025-10-01
 
