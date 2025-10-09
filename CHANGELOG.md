@@ -4,7 +4,7 @@ All changes that impact users of this module are documented in this file, in the
 
 ## Unreleased [minor]
 
-> Development of this feature was contributed by the [European Commission](https://commission.europa.eu/) for its [VLOP/VLOSE instance](https://code.europa.eu/dsa/terms-and-conditions-database/vlops-and-vloses/).
+> Development of this release was supported by the [European Commission](https://commission.europa.eu/) for its [VLOPs/VLOSEs instance](https://code.europa.eu/dsa/terms-and-conditions-database/vlops-and-vloses/).
 
 ### Added
 
