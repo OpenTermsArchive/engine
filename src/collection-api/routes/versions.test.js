@@ -11,7 +11,7 @@ const basePath = config.get('@opentermsarchive/engine.collection-api.basePath');
 
 const request = supertest(app);
 
-describe('Versions API', () => {
+describe.only('Versions API', () => {
   let versionsRepository;
   const FETCH_DATE = new Date('2023-01-01T12:00:00Z');
   const VERSION_COMMON_ATTRIBUTES = {
@@ -80,27 +80,35 @@ describe('Versions API', () => {
         expect(response.type).to.equal('application/json');
       });
 
+      it('returns response with metadata structure', () => {
+        expect(response.body).to.have.all.keys('data', 'count');
+      });
+
       it('returns all versions for the service and terms type', () => {
-        expect(response.body).to.be.an('array').with.lengthOf(3);
+        expect(response.body.data).to.be.an('array').with.lengthOf(3);
+      });
+
+      it('returns correct count', () => {
+        expect(response.body.count).to.equal(3);
       });
 
       it('returns versions with id and fetchDate only', () => {
-        response.body.forEach(version => {
+        response.body.data.forEach(version => {
           expect(version).to.have.all.keys('id', 'fetchDate');
           expect(version).to.not.have.property('content');
         });
       });
 
       it('returns versions in chronological order', () => {
-        expect(response.body[0].id).to.equal(version1.id);
-        expect(response.body[1].id).to.equal(version2.id);
-        expect(response.body[2].id).to.equal(version3.id);
+        expect(response.body.data[0].id).to.equal(version1.id);
+        expect(response.body.data[1].id).to.equal(version2.id);
+        expect(response.body.data[2].id).to.equal(version3.id);
       });
 
       it('returns versions with correct fetchDates', () => {
-        expect(response.body[0].fetchDate).to.equal(toISODateWithoutMilliseconds(version1.fetchDate));
-        expect(response.body[1].fetchDate).to.equal(toISODateWithoutMilliseconds(version2.fetchDate));
-        expect(response.body[2].fetchDate).to.equal(toISODateWithoutMilliseconds(version3.fetchDate));
+        expect(response.body.data[0].fetchDate).to.equal(toISODateWithoutMilliseconds(version1.fetchDate));
+        expect(response.body.data[1].fetchDate).to.equal(toISODateWithoutMilliseconds(version2.fetchDate));
+        expect(response.body.data[2].fetchDate).to.equal(toISODateWithoutMilliseconds(version3.fetchDate));
       });
     });
 

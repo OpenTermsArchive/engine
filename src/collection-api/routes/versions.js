@@ -55,21 +55,28 @@ const versionsRepository = await RepositoryFactory.create(config.get('@openterms
  *         required: true
  *     responses:
  *       200:
- *         description: An array of JSON objects containing version metadata (without content).
+ *         description: A JSON object containing the list of versions and metadata.
  *         content:
  *           application/json:
  *             schema:
- *               type: array
- *               items:
- *                 type: object
- *                 properties:
- *                   id:
- *                     type: string
- *                     description: The ID of the version.
- *                   fetchDate:
- *                     type: string
- *                     format: date-time
- *                     description: The ISO 8601 datetime string when the version was recorded.
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   type: array
+ *                   description: The list of versions.
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: string
+ *                         description: The ID of the version.
+ *                       fetchDate:
+ *                         type: string
+ *                         format: date-time
+ *                         description: The ISO 8601 datetime string when the version was recorded.
+ *                 count:
+ *                   type: integer
+ *                   description: The total number of versions found.
  *       404:
  *         description: No versions found for the specified combination of service ID and terms type.
  *         content:
@@ -94,7 +101,10 @@ router.get('/versions/:serviceId/:termsType', async (req, res) => {
     return res.status(404).json({ error: `No versions found for service "${serviceId}" and terms type "${termsType}"` });
   }
 
-  return res.status(200).json(versionsList);
+  return res.status(200).json({
+    data: versionsList,
+    count: versionsList.length,
+  });
 });
 
 /**
