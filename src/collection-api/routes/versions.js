@@ -196,6 +196,9 @@ router.get('/version/:versionId', async (req, res) => {
 /**
  * @private
  * @swagger
+/**
+ * @private
+ * @swagger
  * /version/{serviceId}/{termsType}/{date}:
  *   get:
  *     summary: Get a specific version of some terms at a given date.
@@ -264,10 +267,23 @@ router.get('/version/:serviceId/:termsType/:date', async (req, res) => {
     return res.status(404).json({ error: `No version found for date ${date}` });
   }
 
+  const [ firstVersion, prevVersion, nextVersion, lastVersion ] = await Promise.all([
+    versionsRepository.findFirst(version.serviceId, version.termsType),
+    versionsRepository.findPrevious(version.id),
+    versionsRepository.findNext(version.id),
+    versionsRepository.findLatest(version.serviceId, version.termsType),
+  ]);
+
   return res.status(200).json({
     id: version.id,
     fetchDate: toISODateWithoutMilliseconds(version.fetchDate),
     content: version.content,
+    links: {
+      first: firstVersion?.id || null,
+      prev: prevVersion?.id || null,
+      next: nextVersion?.id || null,
+      last: lastVersion?.id || null,
+    },
   });
 });
 
