@@ -122,17 +122,17 @@ export default class GitRepository extends RepositoryInterface {
     }
 
     const pathPattern = DataMapper.generateFilePath(version.serviceId, version.termsType);
-    const currentTime = version.fetchDate.getTime();
 
-    const commits = await this.git.listCommits([ `--since=${version.fetchDate.toISOString()}`, '--', pathPattern ]); // --since is inclusive
+    // Use --ancestry-path to follow the direct lineage from versionId to HEAD
+    // This gets commits that are both descendants of versionId and ancestors of HEAD
+    const [commit] = await this.git.listCommits([
+      '--ancestry-path',
+      `${versionId}..HEAD`,
+      '--',
+      pathPattern,
+    ]);
 
-    const nextCommits = commits.filter(commit => new Date(commit.date).getTime() > currentTime); // Filter out commits not strictly after the current date
-
-    if (nextCommits.length === 0) {
-      return null;
-    }
-
-    return this.#toDomain(nextCommits[0], { deferContentLoading: true }); // First element is the one immediately after the current date (listCommits returns oldest first)
+    return this.#toDomain(commit, { deferContentLoading: true });
   }
 
   async count() {
