@@ -93,6 +93,11 @@ export default class MongoRepository extends RepositoryInterface {
       .map(mongoDocument => this.#toDomain(mongoDocument, { deferContentLoading: true })));
   }
 
+  async findByServiceAndTermsType(serviceId, termsType) {
+    return Promise.all((await this.collection.find({ serviceId, termsType }).project({ content: 0 }).sort({ fetchDate: 1 }).toArray())
+      .map(mongoDocument => this.#toDomain(mongoDocument, { deferContentLoading: true })));
+  }
+
   count() {
     return this.collection.countDocuments();
   }
