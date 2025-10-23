@@ -287,34 +287,43 @@ describe('Versions API', () => {
 
   describe('GET /version/:serviceId/:termsType/:date', () => {
     let expectedResult;
+    let firstVersion;
+    let middleVersion;
+    let lastVersion;
 
     before(async () => {
+      await versionsRepository.removeAll();
+
       const ONE_HOUR = 60 * 60 * 1000;
 
-      await versionsRepository.save(new Version({
+      firstVersion = await versionsRepository.save(new Version({
         ...VERSION_COMMON_ATTRIBUTES,
         content: 'initial content',
         fetchDate: new Date(new Date(FETCH_DATE).getTime() - ONE_HOUR),
       }));
 
-      const version = new Version({
+      middleVersion = await versionsRepository.save(new Version({
         ...VERSION_COMMON_ATTRIBUTES,
         content: 'updated content',
         fetchDate: FETCH_DATE,
-      });
+      }));
 
-      await versionsRepository.save(version);
-
-      await versionsRepository.save(new Version({
+      lastVersion = await versionsRepository.save(new Version({
         ...VERSION_COMMON_ATTRIBUTES,
         content: 'latest content',
         fetchDate: new Date(new Date(FETCH_DATE).getTime() + ONE_HOUR),
       }));
 
       expectedResult = {
-        id: version.id,
-        fetchDate: toISODateWithoutMilliseconds(version.fetchDate),
-        content: version.content,
+        id: middleVersion.id,
+        fetchDate: toISODateWithoutMilliseconds(middleVersion.fetchDate),
+        content: middleVersion.content,
+        links: {
+          first: firstVersion.id,
+          prev: firstVersion.id,
+          next: lastVersion.id,
+          last: lastVersion.id,
+        },
       };
     });
 
