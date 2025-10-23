@@ -634,6 +634,83 @@ describe('MongoRepository', () => {
       });
     });
 
+    describe('#findByServiceAndTermsType', () => {
+      const expectedIds = [];
+      let records;
+
+      before(async () => {
+        const { id: id1 } = await subject.save(new Version({
+          serviceId: SERVICE_PROVIDER_ID,
+          termsType: TERMS_TYPE,
+          content: CONTENT,
+          fetchDate: FETCH_DATE,
+          snapshotIds: [SNAPSHOT_ID],
+        }));
+
+        expectedIds.push(id1);
+
+        const { id: id2 } = await subject.save(new Version({
+          serviceId: SERVICE_PROVIDER_ID,
+          termsType: TERMS_TYPE,
+          content: `${CONTENT} - updated`,
+          fetchDate: FETCH_DATE_LATER,
+          snapshotIds: [SNAPSHOT_ID],
+        }));
+
+        expectedIds.push(id2);
+
+        await subject.save(new Version({
+          serviceId: 'other_service',
+          termsType: 'Privacy Policy',
+          content: `${CONTENT} - other`,
+          fetchDate: FETCH_DATE,
+          snapshotIds: [SNAPSHOT_ID],
+        }));
+
+        (records = await subject.findByServiceAndTermsType(SERVICE_PROVIDER_ID, TERMS_TYPE));
+      });
+
+      after(() => subject.removeAll());
+
+      it('returns only matching records', () => {
+        expect(records.length).to.equal(2);
+      });
+
+      it('returns Version objects', () => {
+        for (const record of records) {
+          expect(record).to.be.an.instanceof(Version);
+        }
+      });
+
+      it('returns records with matching service ID', () => {
+        for (const record of records) {
+          expect(record.serviceId).to.equal(SERVICE_PROVIDER_ID);
+        }
+      });
+
+      it('returns records with matching terms type', () => {
+        for (const record of records) {
+          expect(record.termsType).to.equal(TERMS_TYPE);
+        }
+      });
+
+      it('returns records in ascending order', () => {
+        expect(records.map(record => record.fetchDate)).to.deep.equal([ FETCH_DATE, FETCH_DATE_LATER ]);
+      });
+
+      it('returns records with correct IDs', () => {
+        expect(records.map(record => record.id)).to.have.members(expectedIds);
+      });
+
+      context('when no matching records exist', () => {
+        it('returns an empty array', async () => {
+          const result = await subject.findByServiceAndTermsType('non_existent_service', 'Non Existent Terms');
+
+          expect(result).to.be.an('array').that.is.empty;
+        });
+      });
+    });
+
     describe('#count', () => {
       let count;
 
