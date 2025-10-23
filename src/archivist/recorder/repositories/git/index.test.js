@@ -663,6 +663,197 @@ describe('GitRepository', () => {
       });
     });
 
+    describe('#findFirst', () => {
+      let firstVersion;
+      let result;
+
+      before(async function () {
+        this.timeout(5000);
+
+        firstVersion = await subject.save(new Version({
+          serviceId: SERVICE_PROVIDER_ID,
+          termsType: TERMS_TYPE,
+          content: 'first content',
+          fetchDate: FETCH_DATE_EARLIER,
+          snapshotIds: [SNAPSHOT_ID],
+        }));
+
+        await subject.save(new Version({
+          serviceId: SERVICE_PROVIDER_ID,
+          termsType: TERMS_TYPE,
+          content: 'middle content',
+          fetchDate: FETCH_DATE,
+          snapshotIds: [SNAPSHOT_ID],
+        }));
+
+        await subject.save(new Version({
+          serviceId: SERVICE_PROVIDER_ID,
+          termsType: TERMS_TYPE,
+          content: 'last content',
+          fetchDate: FETCH_DATE_LATER,
+          snapshotIds: [SNAPSHOT_ID],
+        }));
+
+        result = await subject.findFirst(SERVICE_PROVIDER_ID, TERMS_TYPE);
+      });
+
+      after(() => subject.removeAll());
+
+      it('returns a Version object', () => {
+        expect(result).to.be.an.instanceof(Version);
+      });
+
+      it('returns the oldest version', () => {
+        expect(result.id).to.equal(firstVersion.id);
+      });
+
+      it('returns the correct fetch date', () => {
+        expect(result.fetchDate).to.deep.equal(firstVersion.fetchDate);
+      });
+
+      context('when no versions exist', () => {
+        it('returns null', async () => {
+          expect(await subject.findFirst('non_existent_service', 'Non Existent Terms')).to.be.null;
+        });
+      });
+    });
+
+    describe('#findPrevious', () => {
+      let firstVersion;
+      let middleVersion;
+      let lastVersion;
+
+      before(async function () {
+        this.timeout(5000);
+
+        firstVersion = await subject.save(new Version({
+          serviceId: SERVICE_PROVIDER_ID,
+          termsType: TERMS_TYPE,
+          content: 'first content',
+          fetchDate: FETCH_DATE_EARLIER,
+          snapshotIds: [SNAPSHOT_ID],
+        }));
+
+        middleVersion = await subject.save(new Version({
+          serviceId: SERVICE_PROVIDER_ID,
+          termsType: TERMS_TYPE,
+          content: 'middle content',
+          fetchDate: FETCH_DATE,
+          snapshotIds: [SNAPSHOT_ID],
+        }));
+
+        lastVersion = await subject.save(new Version({
+          serviceId: SERVICE_PROVIDER_ID,
+          termsType: TERMS_TYPE,
+          content: 'last content',
+          fetchDate: FETCH_DATE_LATER,
+          snapshotIds: [SNAPSHOT_ID],
+        }));
+      });
+
+      after(() => subject.removeAll());
+
+      context('when requesting previous of middle version', () => {
+        it('returns the version before it', async () => {
+          const result = await subject.findPrevious(middleVersion.id);
+
+          expect(result).to.be.an.instanceof(Version);
+          expect(result.id).to.equal(firstVersion.id);
+        });
+      });
+
+      context('when requesting previous of last version', () => {
+        it('returns the version before it', async () => {
+          const result = await subject.findPrevious(lastVersion.id);
+
+          expect(result).to.be.an.instanceof(Version);
+          expect(result.id).to.equal(middleVersion.id);
+        });
+      });
+
+      context('when requesting previous of first version', () => {
+        it('returns null', async () => {
+          const result = await subject.findPrevious(firstVersion.id);
+
+          expect(result).to.be.null;
+        });
+      });
+
+      context('when the version does not exist', () => {
+        it('returns null', async () => {
+          expect(await subject.findPrevious('non_existent_version_id')).to.be.null;
+        });
+      });
+    });
+
+    describe('#findNext', () => {
+      let firstVersion;
+      let middleVersion;
+      let lastVersion;
+
+      before(async function () {
+        this.timeout(5000);
+
+        firstVersion = await subject.save(new Version({
+          serviceId: SERVICE_PROVIDER_ID,
+          termsType: TERMS_TYPE,
+          content: 'first content',
+          fetchDate: FETCH_DATE_EARLIER,
+          snapshotIds: [SNAPSHOT_ID],
+        }));
+
+        middleVersion = await subject.save(new Version({
+          serviceId: SERVICE_PROVIDER_ID,
+          termsType: TERMS_TYPE,
+          content: 'middle content',
+          fetchDate: FETCH_DATE,
+          snapshotIds: [SNAPSHOT_ID],
+        }));
+
+        lastVersion = await subject.save(new Version({
+          serviceId: SERVICE_PROVIDER_ID,
+          termsType: TERMS_TYPE,
+          content: 'last content',
+          fetchDate: FETCH_DATE_LATER,
+          snapshotIds: [SNAPSHOT_ID],
+        }));
+      });
+
+      after(() => subject.removeAll());
+
+      context('when requesting next of first version', () => {
+        it('returns the version after it', async () => {
+          const result = await subject.findNext(firstVersion.id);
+
+          expect(result).to.be.an.instanceof(Version);
+          expect(result.id).to.equal(middleVersion.id);
+        });
+      });
+
+      context('when requesting next of middle version', () => {
+        it('returns the version after it', async () => {
+          const result = await subject.findNext(middleVersion.id);
+
+          expect(result).to.be.an.instanceof(Version);
+          expect(result.id).to.equal(lastVersion.id);
+        });
+      });
+
+      context('when requesting next of last version', () => {
+        it('returns null', async () => {
+          const result = await subject.findNext(lastVersion.id);
+
+          expect(result).to.be.null;
+        });
+      });
+
+      context('when the version does not exist', () => {
+        it('returns null', async () => {
+          expect(await subject.findNext('non_existent_version_id')).to.be.null;
+        });
+      });
+    });
+
     describe('#findLatest', () => {
       context('when there are records for the given service', () => {
         let lastSnapshotId;
