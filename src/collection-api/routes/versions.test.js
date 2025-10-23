@@ -11,7 +11,7 @@ const basePath = config.get('@opentermsarchive/engine.collection-api.basePath');
 
 const request = supertest(app);
 
-describe.only('Versions API', () => {
+describe('Versions API', () => {
   let versionsRepository;
   const FETCH_DATE = new Date('2023-01-01T12:00:00Z');
   const VERSION_COMMON_ATTRIBUTES = {
@@ -132,31 +132,41 @@ describe.only('Versions API', () => {
   });
 
   describe('GET /version/:versionId', () => {
-    let versionId;
-    let expectedResult;
+    const ONE_HOUR = 60 * 60 * 1000;
+    let firstVersion;
+    let middleVersion;
+    let lastVersion;
 
     before(async () => {
-      const version = new Version({
+      await versionsRepository.removeAll();
+
+      firstVersion = new Version({
         ...VERSION_COMMON_ATTRIBUTES,
-        content: 'test content',
+        content: 'first content',
+        fetchDate: new Date(FETCH_DATE.getTime() - ONE_HOUR),
+      });
+      await versionsRepository.save(firstVersion);
+
+      middleVersion = new Version({
+        ...VERSION_COMMON_ATTRIBUTES,
+        content: 'middle content',
         fetchDate: FETCH_DATE,
       });
+      await versionsRepository.save(middleVersion);
 
-      await versionsRepository.save(version);
-
-      versionId = version.id;
-      expectedResult = {
-        id: version.id,
-        fetchDate: toISODateWithoutMilliseconds(version.fetchDate),
-        content: version.content,
-      };
+      lastVersion = new Version({
+        ...VERSION_COMMON_ATTRIBUTES,
+        content: 'last content',
+        fetchDate: new Date(FETCH_DATE.getTime() + ONE_HOUR),
+      });
+      await versionsRepository.save(lastVersion);
     });
 
     let response;
 
-    context('when a version is found', () => {
+    context('when requesting the first version', () => {
       before(async () => {
-        response = await request.get(`${basePath}/v1/version/${versionId}`);
+        response = await request.get(`${basePath}/v1/version/${firstVersion.id}`);
       });
 
       it('responds with 200 status code', () => {
@@ -167,8 +177,92 @@ describe.only('Versions API', () => {
         expect(response.type).to.equal('application/json');
       });
 
-      it('returns the expected version', () => {
-        expect(response.body).to.deep.equal(expectedResult);
+      it('returns the version content and metadata', () => {
+        expect(response.body.id).to.equal(firstVersion.id);
+        expect(response.body.fetchDate).to.equal(toISODateWithoutMilliseconds(firstVersion.fetchDate));
+        expect(response.body.content).to.equal(firstVersion.content);
+      });
+
+      it('returns links object', () => {
+        expect(response.body.links).to.be.an('object');
+      });
+
+      it('returns first link pointing to itself', () => {
+        expect(response.body.links.first).to.equal(firstVersion.id);
+      });
+
+      it('returns null for prev', () => {
+        expect(response.body.links.prev).to.be.null;
+      });
+
+      it('returns next link', () => {
+        expect(response.body.links.next).to.equal(middleVersion.id);
+      });
+
+      it('returns last link', () => {
+        expect(response.body.links.last).to.equal(lastVersion.id);
+      });
+    });
+
+    context('when requesting a middle version', () => {
+      before(async () => {
+        response = await request.get(`${basePath}/v1/version/${middleVersion.id}`);
+      });
+
+      it('responds with 200 status code', () => {
+        expect(response.status).to.equal(200);
+      });
+
+      it('returns the version content and metadata', () => {
+        expect(response.body.id).to.equal(middleVersion.id);
+        expect(response.body.content).to.equal(middleVersion.content);
+      });
+
+      it('returns first link', () => {
+        expect(response.body.links.first).to.equal(firstVersion.id);
+      });
+
+      it('returns prev link', () => {
+        expect(response.body.links.prev).to.equal(firstVersion.id);
+      });
+
+      it('returns next link', () => {
+        expect(response.body.links.next).to.equal(lastVersion.id);
+      });
+
+      it('returns last link', () => {
+        expect(response.body.links.last).to.equal(lastVersion.id);
+      });
+    });
+
+    context('when requesting the last version', () => {
+      before(async () => {
+        response = await request.get(`${basePath}/v1/version/${lastVersion.id}`);
+      });
+
+      it('responds with 200 status code', () => {
+        expect(response.status).to.equal(200);
+      });
+
+      it('returns the version content and metadata', () => {
+        expect(response.body.id).to.equal(lastVersion.id);
+        expect(response.body.content).to.equal(lastVersion.content);
+      });
+
+      it('returns first link', () => {
+        expect(response.body.links.first).to.equal(firstVersion.id);
+      });
+
+      it('returns prev link', () => {
+        expect(response.body.links.prev).to.equal(middleVersion.id);
+      });
+
+      it('returns null for next', () => {
+        expect(response.body.links.next).to.be.null;
+      });
+
+      it('returns last link pointing to itself', () => {
+        expect(response.body.links.last).to.equal(lastVersion.id);
       });
     });
 

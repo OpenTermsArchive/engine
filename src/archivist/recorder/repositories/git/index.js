@@ -98,6 +98,43 @@ export default class GitRepository extends RepositoryInterface {
     return Promise.all((await this.#getCommits(pathPattern)).map(commit => this.#toDomain(commit, { deferContentLoading: true })));
   }
 
+  async findFirst(serviceId, termsType) {
+    const allVersions = await this.findByServiceAndTermsType(serviceId, termsType);
+
+    return allVersions.length > 0 ? allVersions[0] : null;
+  }
+
+  async findPrevious(versionId) {
+    const version = await this.findById(versionId);
+
+    if (!version) {
+      return null;
+    }
+
+    return this.findByDate(version.serviceId, version.termsType, new Date(version.fetchDate.getTime() - 1));
+  }
+
+  async findNext(versionId) {
+    const version = await this.findById(versionId);
+
+    if (!version) {
+      return null;
+    }
+
+    const pathPattern = DataMapper.generateFilePath(version.serviceId, version.termsType);
+    const currentTime = version.fetchDate.getTime();
+
+    const commits = await this.git.listCommits([ `--since=${version.fetchDate.toISOString()}`, '--', pathPattern ]); // --since is inclusive
+
+    const nextCommits = commits.filter(commit => new Date(commit.date).getTime() > currentTime); // Filter out commits not strictly after the current date
+
+    if (nextCommits.length === 0) {
+      return null;
+    }
+
+    return this.#toDomain(nextCommits[0], { deferContentLoading: true }); // First element is the one immediately after the current date (listCommits returns oldest first)
+  }
+
   async count() {
     return (await this.git.log(Object.values(DataMapper.COMMIT_MESSAGE_PREFIXES).map(prefix => `--grep=${prefix}`))).length;
   }

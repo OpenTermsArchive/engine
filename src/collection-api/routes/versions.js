@@ -125,11 +125,34 @@ router.get('/versions/:serviceId/:termsType', async (req, res) => {
  *         required: true
  *     responses:
  *       200:
- *         description: A JSON object containing the version content and metadata.
+ *         description: A JSON object containing the version content, metadata, and navigation links.
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/Version'
+ *               allOf:
+ *                 - $ref: '#/components/schemas/Version'
+ *                 - type: object
+ *                   properties:
+ *                     links:
+ *                       type: object
+ *                       description: Navigation links to related versions.
+ *                       properties:
+ *                         first:
+ *                           type: string
+ *                           description: The ID of the first version for this service and terms type.
+ *                           nullable: true
+ *                         prev:
+ *                           type: string
+ *                           description: The ID of the previous version, or null if this is the first.
+ *                           nullable: true
+ *                         next:
+ *                           type: string
+ *                           description: The ID of the next version, or null if this is the last.
+ *                           nullable: true
+ *                         last:
+ *                           type: string
+ *                           description: The ID of the last version for this service and terms type.
+ *                           nullable: true
  *       404:
  *         description: No version found with the specified ID.
  *         content:
@@ -150,10 +173,23 @@ router.get('/version/:versionId', async (req, res) => {
     return res.status(404).json({ error: `No version found with ID "${versionId}"` });
   }
 
+  const [ firstVersion, prevVersion, nextVersion, lastVersion ] = await Promise.all([
+    versionsRepository.findFirst(version.serviceId, version.termsType),
+    versionsRepository.findPrevious(versionId),
+    versionsRepository.findNext(versionId),
+    versionsRepository.findLatest(version.serviceId, version.termsType),
+  ]);
+
   return res.status(200).json({
     id: version.id,
     fetchDate: toISODateWithoutMilliseconds(version.fetchDate),
     content: version.content,
+    links: {
+      first: firstVersion?.id || null,
+      prev: prevVersion?.id || null,
+      next: nextVersion?.id || null,
+      last: lastVersion?.id || null,
+    },
   });
 });
 

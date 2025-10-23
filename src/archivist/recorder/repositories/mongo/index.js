@@ -98,6 +98,36 @@ export default class MongoRepository extends RepositoryInterface {
       .map(mongoDocument => this.#toDomain(mongoDocument, { deferContentLoading: true })));
   }
 
+  async findFirst(serviceId, termsType) {
+    const [mongoDocument] = await this.collection.find({ serviceId, termsType }).limit(1).sort({ fetchDate: 1 }).toArray();
+
+    return this.#toDomain(mongoDocument, { deferContentLoading: true });
+  }
+
+  async findPrevious(versionId) {
+    const version = await this.findById(versionId);
+
+    if (!version) {
+      return null;
+    }
+
+    const [mongoDocument] = await this.collection.find({ serviceId: version.serviceId, termsType: version.termsType, fetchDate: { $lt: new Date(version.fetchDate) } }).limit(1).sort({ fetchDate: -1 }).toArray();
+
+    return this.#toDomain(mongoDocument, { deferContentLoading: true });
+  }
+
+  async findNext(versionId) {
+    const version = await this.findById(versionId);
+
+    if (!version) {
+      return null;
+    }
+
+    const [mongoDocument] = await this.collection.find({ serviceId: version.serviceId, termsType: version.termsType, fetchDate: { $gt: new Date(version.fetchDate) } }).limit(1).sort({ fetchDate: 1 }).toArray();
+
+    return this.#toDomain(mongoDocument, { deferContentLoading: true });
+  }
+
   count() {
     return this.collection.countDocuments();
   }

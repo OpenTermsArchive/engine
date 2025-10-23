@@ -92,6 +92,34 @@ class RepositoryInterface {
   }
 
   /**
+   * Find the first (oldest) record for a specific service and terms type
+   * @param   {string}          serviceId - Service ID of record to find
+   * @param   {string}          termsType - Terms type of record to find
+   * @returns {Promise<Record>}           Promise that will be resolved with the found record or null if none match
+   */
+  async findFirst(serviceId, termsType) {
+    throw new Error(`#findFirst method is not implemented in ${this.constructor.name}`);
+  }
+
+  /**
+   * Find the previous record (the one before the given version)
+   * @param   {string}          versionId - Version ID to find the previous record for
+   * @returns {Promise<Record>}           Promise that will be resolved with the found record or null if none match
+   */
+  async findPrevious(versionId) {
+    throw new Error(`#findPrevious method is not implemented in ${this.constructor.name}`);
+  }
+
+  /**
+   * Find the next record (the one after the given version)
+   * @param   {string}          versionId - Version ID to find the next record for
+   * @returns {Promise<Record>}           Promise that will be resolved with the found record or null if none match
+   */
+  async findNext(versionId) {
+    throw new Error(`#findNext method is not implemented in ${this.constructor.name}`);
+  }
+
+  /**
    * Count the total number of records in the repository
    * For performance reasons, use this method rather than counting the number of entries returned by #findAll if you only need the size of a repository
    * @returns {Promise<number>} Promise that will be resolved with the total number of records
