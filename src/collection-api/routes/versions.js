@@ -84,19 +84,17 @@ const versionsRepository = await RepositoryFactory.create(config.get('@openterms
 router.get('/versions/:serviceId/:termsType', async (req, res) => {
   const { serviceId, termsType } = req.params;
 
-  const allVersions = await versionsRepository.findAll();
-  const filteredVersions = allVersions
-    .filter(version => version.serviceId === serviceId && version.termsType === termsType)
-    .map(version => ({
-      id: version.id,
-      fetchDate: toISODateWithoutMilliseconds(version.fetchDate),
-    }));
+  const versions = await versionsRepository.findByServiceAndTermsType(serviceId, termsType);
+  const versionsList = versions.map(version => ({
+    id: version.id,
+    fetchDate: toISODateWithoutMilliseconds(version.fetchDate),
+  }));
 
-  if (filteredVersions.length === 0) {
+  if (versionsList.length === 0) {
     return res.status(404).json({ error: `No versions found for service "${serviceId}" and terms type "${termsType}"` });
   }
 
-  return res.status(200).json(filteredVersions);
+  return res.status(200).json(versionsList);
 });
 
 /**
