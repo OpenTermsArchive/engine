@@ -80,6 +80,18 @@ class RepositoryInterface {
   }
 
   /**
+   * Find all records for a specific service and terms type
+   * For performance reasons, the content of the records will not be loaded by default. Use #loadRecordContent to load the content of individual records
+   * @see RepositoryInterface#loadRecordContent
+   * @param   {string}                 serviceId - Service ID of records to find
+   * @param   {string}                 termsType - Terms type of records to find
+   * @returns {Promise<Array<Record>>}           Promise that will be resolved with an array of matching records
+   */
+  async findByServiceAndTermsType(serviceId, termsType) {
+    throw new Error(`#findByServiceAndTermsType method is not implemented in ${this.constructor.name}`);
+  }
+
+  /**
    * Count the total number of records in the repository
    * For performance reasons, use this method rather than counting the number of entries returned by #findAll if you only need the size of a repository
    * @returns {Promise<number>} Promise that will be resolved with the total number of records
