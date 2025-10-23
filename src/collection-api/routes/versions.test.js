@@ -285,6 +285,96 @@ describe('Versions API', () => {
     });
   });
 
+  describe('GET /version/:serviceId/:termsType/latest', () => {
+    let firstVersion;
+    let middleVersion;
+    let lastVersion;
+
+    before(async () => {
+      await versionsRepository.removeAll();
+
+      const ONE_HOUR = 60 * 60 * 1000;
+
+      firstVersion = await versionsRepository.save(new Version({
+        ...VERSION_COMMON_ATTRIBUTES,
+        content: 'first content',
+        fetchDate: new Date(FETCH_DATE.getTime() - ONE_HOUR),
+      }));
+
+      middleVersion = await versionsRepository.save(new Version({
+        ...VERSION_COMMON_ATTRIBUTES,
+        content: 'middle content',
+        fetchDate: FETCH_DATE,
+      }));
+
+      lastVersion = await versionsRepository.save(new Version({
+        ...VERSION_COMMON_ATTRIBUTES,
+        content: 'last content',
+        fetchDate: new Date(FETCH_DATE.getTime() + ONE_HOUR),
+      }));
+    });
+
+    let response;
+
+    context('when versions exist', () => {
+      before(async () => {
+        response = await request.get(`${basePath}/v1/version/service-1/Terms%20of%20Service/latest`);
+      });
+
+      it('responds with 200 status code', () => {
+        expect(response.status).to.equal(200);
+      });
+
+      it('responds with Content-Type application/json', () => {
+        expect(response.type).to.equal('application/json');
+      });
+
+      it('returns the latest version', () => {
+        expect(response.body.id).to.equal(lastVersion.id);
+        expect(response.body.content).to.equal(lastVersion.content);
+        expect(response.body.fetchDate).to.equal(toISODateWithoutMilliseconds(lastVersion.fetchDate));
+      });
+
+      it('returns links object', () => {
+        expect(response.body.links).to.be.an('object');
+      });
+
+      it('returns first link', () => {
+        expect(response.body.links.first).to.equal(firstVersion.id);
+      });
+
+      it('returns prev link', () => {
+        expect(response.body.links.prev).to.equal(middleVersion.id);
+      });
+
+      it('returns null for next', () => {
+        expect(response.body.links.next).to.be.null;
+      });
+
+      it('returns last link pointing to itself', () => {
+        expect(response.body.links.last).to.equal(lastVersion.id);
+      });
+    });
+
+    context('when no versions exist', () => {
+      before(async () => {
+        response = await request.get(`${basePath}/v1/version/non-existent-service/Non%20Existent%20Terms/latest`);
+      });
+
+      it('responds with 404 status code', () => {
+        expect(response.status).to.equal(404);
+      });
+
+      it('responds with Content-Type application/json', () => {
+        expect(response.type).to.equal('application/json');
+      });
+
+      it('returns an error message', () => {
+        expect(response.body.error).to.contain('No version found').and.to.contain('non-existent-service');
+      });
+    });
+  });
+
   describe('GET /version/:serviceId/:termsType/:date', () => {
     let expectedResult;
     let firstVersion;
