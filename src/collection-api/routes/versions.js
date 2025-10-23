@@ -196,6 +196,72 @@ router.get('/version/:versionId', async (req, res) => {
 /**
  * @private
  * @swagger
+ * /version/{serviceId}/{termsType}/latest:
+ *   get:
+ *     summary: Get the latest version of some terms for a service.
+ *     tags: [Versions]
+ *     produces:
+ *       - application/json
+ *     parameters:
+ *       - in: path
+ *         name: serviceId
+ *         description: The ID of the service whose version will be returned.
+ *         schema:
+ *           type: string
+ *         required: true
+ *       - in: path
+ *         name: termsType
+ *         description: The type of terms whose version will be returned.
+ *         schema:
+ *           type: string
+ *         required: true
+ *     responses:
+ *       200:
+ *         description: A JSON object containing the version content and metadata.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Version'
+ *       404:
+ *         description: No version found for the specified combination of service ID and terms type.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   description: Error message indicating that no version is found.
+ */
+router.get('/version/:serviceId/:termsType/latest', async (req, res) => {
+  const { serviceId, termsType } = req.params;
+
+  const version = await versionsRepository.findLatest(serviceId, termsType);
+
+  if (!version) {
+    return res.status(404).json({ error: `No version found for service "${serviceId}" and terms type "${termsType}"` });
+  }
+
+  const [ firstVersion, prevVersion, nextVersion, lastVersion ] = await Promise.all([
+    versionsRepository.findFirst(version.serviceId, version.termsType),
+    versionsRepository.findPrevious(version.id),
+    versionsRepository.findNext(version.id),
+    versionsRepository.findLatest(version.serviceId, version.termsType),
+  ]);
+
+  return res.status(200).json({
+    id: version.id,
+    fetchDate: toISODateWithoutMilliseconds(version.fetchDate),
+    content: version.content,
+    links: {
+      first: firstVersion?.id || null,
+      prev: prevVersion?.id || null,
+      next: nextVersion?.id || null,
+      last: lastVersion?.id || null,
+    },
+  });
+});
+
 /**
  * @private
  * @swagger
