@@ -131,6 +131,66 @@ describe.only('Versions API', () => {
     });
   });
 
+  describe('GET /version/:versionId', () => {
+    let versionId;
+    let expectedResult;
+
+    before(async () => {
+      const version = new Version({
+        ...VERSION_COMMON_ATTRIBUTES,
+        content: 'test content',
+        fetchDate: FETCH_DATE,
+      });
+
+      await versionsRepository.save(version);
+
+      versionId = version.id;
+      expectedResult = {
+        id: version.id,
+        fetchDate: toISODateWithoutMilliseconds(version.fetchDate),
+        content: version.content,
+      };
+    });
+
+    let response;
+
+    context('when a version is found', () => {
+      before(async () => {
+        response = await request.get(`${basePath}/v1/version/${versionId}`);
+      });
+
+      it('responds with 200 status code', () => {
+        expect(response.status).to.equal(200);
+      });
+
+      it('responds with Content-Type application/json', () => {
+        expect(response.type).to.equal('application/json');
+      });
+
+      it('returns the expected version', () => {
+        expect(response.body).to.deep.equal(expectedResult);
+      });
+    });
+
+    context('when the version does not exist', () => {
+      before(async () => {
+        response = await request.get(`${basePath}/v1/version/non-existent-id`);
+      });
+
+      it('responds with 404 status code', () => {
+        expect(response.status).to.equal(404);
+      });
+
+      it('responds with Content-Type application/json', () => {
+        expect(response.type).to.equal('application/json');
+      });
+
+      it('returns an error message', () => {
+        expect(response.body.error).to.contain('No version found').and.to.contain('non-existent-id');
+      });
+    });
+  });
+
   describe('GET /version/:serviceId/:termsType/:date', () => {
     let expectedResult;
 

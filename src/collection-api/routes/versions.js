@@ -110,6 +110,56 @@ router.get('/versions/:serviceId/:termsType', async (req, res) => {
 /**
  * @private
  * @swagger
+ * /version/{versionId}:
+ *   get:
+ *     summary: Get a specific version by its ID.
+ *     tags: [Versions]
+ *     produces:
+ *       - application/json
+ *     parameters:
+ *       - in: path
+ *         name: versionId
+ *         description: The ID of the version to retrieve.
+ *         schema:
+ *           type: string
+ *         required: true
+ *     responses:
+ *       200:
+ *         description: A JSON object containing the version content and metadata.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Version'
+ *       404:
+ *         description: No version found with the specified ID.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   description: Error message indicating that no version is found.
+ */
+router.get('/version/:versionId', async (req, res) => {
+  const { versionId } = req.params;
+
+  const version = await versionsRepository.findById(versionId);
+
+  if (!version) {
+    return res.status(404).json({ error: `No version found with ID "${versionId}"` });
+  }
+
+  return res.status(200).json({
+    id: version.id,
+    fetchDate: toISODateWithoutMilliseconds(version.fetchDate),
+    content: version.content,
+  });
+});
+
+/**
+ * @private
+ * @swagger
  * /version/{serviceId}/{termsType}/{date}:
  *   get:
  *     summary: Get a specific version of some terms at a given date.
