@@ -13,6 +13,9 @@ jobs:
           - ubuntu-22.04
           - windows-latest
           - macos-latest
+        node_version:
+          - 20
+          - 24
       fail-fast: false # run tests on other operating systems even if one fails
 
     runs-on: ${{ matrix.operating_system }}
@@ -24,7 +27,7 @@ jobs:
       - uses: ankane/setup-mongodb@v1
       - uses: actions/setup-node@v4
         with:
-          node-version: 24
+          node-version: ${{ matrix.node_version }}
       - run: npm ci
       - name: Run tests (Linux)
         if: ${{ runner.os == 'Linux' }}
@@ -40,6 +43,9 @@ jobs:
           - ubuntu-22.04 # Using Ubuntu 22.04 due to AppArmor restrictions in newer versions (23.10+) that interfere with Puppeteer's sandbox functionality. See https://pptr.dev/troubleshooting#issues-with-apparmor-on-ubuntu
           - windows-latest
           - macos-latest
+        node_version:
+          - 20
+          - 24
       fail-fast: false # run tests on other operating systems even if one fails
 
     runs-on: ${{ matrix.operating_system }}
@@ -54,7 +60,7 @@ jobs:
           path: ./demo-declarations
       - uses: actions/setup-node@v4
         with:
-          node-version: 24
+          node-version: ${{ matrix.node_version }}
       - run: cd ./demo-declarations && npm install
       - run: npm ci
       - run: ./node_modules/.bin/cross-env NODE_ENV=ci npm run declarations:lint
@@ -67,6 +73,9 @@ jobs:
           - ubuntu-22.04
           - windows-latest
           - macos-latest
+        node_version:
+          - 20
+          - 24
       fail-fast: false
 
     runs-on: ${{ matrix.operating_system }}
@@ -81,7 +90,7 @@ jobs:
           path: ./demo-declarations
       - uses: actions/setup-node@v4
         with:
-          node-version: 24
+          node-version: ${{ matrix.node_version }}
       - run: cd ./demo-declarations && npm install
       - run: npm ci
       - run: ./node_modules/.bin/cross-env NODE_ENV=ci npm run metadata:validate
