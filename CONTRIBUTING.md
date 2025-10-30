@@ -8,6 +8,7 @@ First of all, thanks for taking the time to contribute! 🎉👍
   - [Commit messages](#commit-messages)
   - [Changelog](#changelog)
 - [Development](#development)
+  - [Configuration and environment variables](#configuration-and-environment-variables)
   - [Documentation](#documentation)
 - [Naming](#naming)
   - [Instances and repositories](#instances-and-repositories)
@@ -90,6 +91,40 @@ _Modifications made in this changeset do not add, remove or alter any behavior, 
 This content will be automatically deleted by the CI after merging.
 
 ## Development
+
+### Configuration and environment variables
+
+The choice between environment variables and configuration files should be made based on the nature of the data and how it will be used.
+
+**Use environment variables for:**
+
+- Secrets: API keys, passwords, tokens, or any sensitive data that should not be committed to version control. Examples:
+  - `OTA_ENGINE_GITHUB_TOKEN`: GitHub API token for creating issues and managing repositories
+  - `OTA_ENGINE_SMTP_PASSWORD`: Password for SMTP server authentication
+- Debugging flags: Toggles for development features. Examples:
+  - `OTA_ENGINE_FETCHER_NO_HEADLESS`: Disables headless mode in Puppeteer to show the browser window during fetching
+- Unix standards: System-level settings following Unix conventions. Examples:
+  - `HTTP_PROXY`, `HTTPS_PROXY`, `http_proxy`, `https_proxy`: Proxy server configuration for HTTP/HTTPS requests
+- Runtime overrides: Container-specific or deployment-specific settings that vary between environments. Examples:
+  - `OTA_ENGINE_FETCHER_NO_SANDBOX`: Disables Chrome sandbox (required in some Docker environments)
+
+**Use configuration files for:**
+
+- Engine behavior: Core functionality settings that define how the application operates. Examples:
+  - `trackingSchedule`: Cron expression defining when to track terms (e.g., `"30 */12 * * *"` for every 12 hours)
+  - `fetcher.language`: Language code for Accept-Language header in HTTP requests
+- Service settings: External service endpoints and integration parameters. Examples:
+  - `versionsRepositoryURL`: URL of the GitHub repository storing document versions
+  - `logger.smtp.host`: SMTP server hostname for sending error notifications
+- Static infrastructure: Deployment-independent paths and identifiers. Examples:
+  - `recorder.versions.storage.git.path`: File system path where Git repository for versions is stored
+  - `recorder.versions.storage.git.author`: Git commit author name and email for automated commits
+
+When uncertain whether to use an environment variable or a configuration file, consider:
+
+- Does it contain sensitive information? → Environment variable
+- Should it be version-controlled and reviewed? → Configuration file
+- Is it a stable setting that defines application behavior? → Configuration file
 
 ### Documentation
 
