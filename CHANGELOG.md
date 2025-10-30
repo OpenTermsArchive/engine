@@ -9,8 +9,8 @@ All changes that impact users of this module are documented in this file, in the
 ### Added
 
 - Add proxy support for fetching documents behind firewalls or restricted networks; configure using `HTTP_PROXY` and `HTTPS_PROXY` (or `http_proxy` and `https_proxy`) environment variables
-- Add debugging options to disable headless mode for visual troubleshooting during development; set `FETCHER_NO_HEADLESS=1` to show browser window
-- Add sandbox control for improved compatibility with Docker and containerized environments; set `FETCHER_NO_SANDBOX=1` when running in containers
+- Add debugging options to disable headless mode for visual troubleshooting during development; set `OTA_ENGINE_FETCHER_NO_HEADLESS=1` to show browser window
+- Add sandbox control for improved compatibility with Docker and containerized environments; set `OTA_ENGINE_FETCHER_NO_SANDBOX=1` when running in containers
 
 ## 9.1.1 - 2025-10-07
 

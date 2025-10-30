@@ -94,7 +94,7 @@ export async function launchHeadlessBrowser() {
 
   const options = {
     args: [],
-    headless: !process.env.FETCHER_NO_HEADLESS,
+    headless: !process.env.OTA_ENGINE_FETCHER_NO_HEADLESS,
   };
 
   const { httpProxy, httpsProxy } = resolveProxyConfiguration();
@@ -110,7 +110,7 @@ export async function launchHeadlessBrowser() {
     options.args.push(`--proxy-server=http=${httpProxyUrl.host};https=${httpsProxyUrl.host}`);
   }
 
-  if (process.env.FETCHER_NO_SANDBOX) {
+  if (process.env.OTA_ENGINE_FETCHER_NO_SANDBOX) {
     options.args.push('--no-sandbox');
     options.args.push('--disable-setuid-sandbox');
   }
