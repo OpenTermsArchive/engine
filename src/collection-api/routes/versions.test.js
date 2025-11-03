@@ -92,10 +92,17 @@ describe('Versions API', () => {
         expect(response.body.count).to.equal(3);
       });
 
-      it('returns versions with id and fetchDate only', () => {
+      it('returns versions with id, serviceId, termsType and fetchDate', () => {
         response.body.data.forEach(version => {
-          expect(version).to.have.all.keys('id', 'fetchDate');
+          expect(version).to.have.all.keys('id', 'serviceId', 'termsType', 'fetchDate');
           expect(version).to.not.have.property('content');
+        });
+      });
+
+      it('returns versions with correct serviceId and termsType', () => {
+        response.body.data.forEach(version => {
+          expect(version.serviceId).to.equal('service-1');
+          expect(version.termsType).to.equal('Terms of Service');
         });
       });
 
@@ -179,6 +186,8 @@ describe('Versions API', () => {
 
       it('returns the version content and metadata', () => {
         expect(response.body.id).to.equal(firstVersion.id);
+        expect(response.body.serviceId).to.equal(firstVersion.serviceId);
+        expect(response.body.termsType).to.equal(firstVersion.termsType);
         expect(response.body.fetchDate).to.equal(toISODateWithoutMilliseconds(firstVersion.fetchDate));
         expect(response.body.content).to.equal(firstVersion.content);
       });
@@ -215,6 +224,8 @@ describe('Versions API', () => {
 
       it('returns the version content and metadata', () => {
         expect(response.body.id).to.equal(middleVersion.id);
+        expect(response.body.serviceId).to.equal(middleVersion.serviceId);
+        expect(response.body.termsType).to.equal(middleVersion.termsType);
         expect(response.body.content).to.equal(middleVersion.content);
       });
 
@@ -246,6 +257,8 @@ describe('Versions API', () => {
 
       it('returns the version content and metadata', () => {
         expect(response.body.id).to.equal(lastVersion.id);
+        expect(response.body.serviceId).to.equal(lastVersion.serviceId);
+        expect(response.body.termsType).to.equal(lastVersion.termsType);
         expect(response.body.content).to.equal(lastVersion.content);
       });
 
@@ -331,6 +344,8 @@ describe('Versions API', () => {
 
       it('returns the latest version', () => {
         expect(response.body.id).to.equal(lastVersion.id);
+        expect(response.body.serviceId).to.equal(lastVersion.serviceId);
+        expect(response.body.termsType).to.equal(lastVersion.termsType);
         expect(response.body.content).to.equal(lastVersion.content);
         expect(response.body.fetchDate).to.equal(toISODateWithoutMilliseconds(lastVersion.fetchDate));
       });
@@ -406,6 +421,8 @@ describe('Versions API', () => {
 
       expectedResult = {
         id: middleVersion.id,
+        serviceId: middleVersion.serviceId,
+        termsType: middleVersion.termsType,
         fetchDate: toISODateWithoutMilliseconds(middleVersion.fetchDate),
         content: middleVersion.content,
         links: {
