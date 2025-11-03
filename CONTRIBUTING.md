@@ -100,13 +100,13 @@ The choice between environment variables and configuration files should be made 
 
 - Secrets: API keys, passwords, tokens, or any sensitive data that should not be committed to version control. Examples:
   - `OTA_ENGINE_GITHUB_TOKEN`: GitHub API token for creating issues and managing repositories
-  - `OTA_ENGINE_SMTP_PASSWORD`: Password for SMTP server authentication
-- Debugging flags: Toggles for development features. Examples:
-  - `OTA_ENGINE_FETCHER_NO_HEADLESS`: Disables headless mode in Puppeteer to show the browser window during fetching
-- Unix standards: System-level settings following Unix conventions. Examples:
-  - `HTTP_PROXY`, `HTTPS_PROXY`, `http_proxy`, `https_proxy`: Proxy server configuration for HTTP/HTTPS requests
-- Runtime overrides: Container-specific or deployment-specific settings that vary between environments. Examples:
-  - `OTA_ENGINE_FETCHER_NO_SANDBOX`: Disables Chrome sandbox (required in some Docker environments)
+  - `OTA_ENGINE_SMTP_PASSWORD`: password for SMTP server authentication
+- Debugging flags: toggles for development features. Examples:
+  - `OTA_ENGINE_FETCHER_NO_HEADLESS`: disables headless mode in Puppeteer to show the browser window during fetching
+- Unix standards: system-level settings following Unix conventions. Examples:
+  - `HTTP_PROXY`, `HTTPS_PROXY`, `http_proxy`, `https_proxy`: proxy server configuration for HTTP/HTTPS requests
+- Runtime overrides: container-specific or deployment-specific settings that vary between environments. Examples:
+  - `OTA_ENGINE_FETCHER_NO_SANDBOX`: disables Chrome sandbox (required in some Docker environments)
 
 **Use configuration files for:**
 
