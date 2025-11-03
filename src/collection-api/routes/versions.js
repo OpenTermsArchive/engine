@@ -16,13 +16,19 @@ import { toISODateWithoutMilliseconds } from '../../archivist/utils/date.js';
  *       type: object
  *       description: Version content and metadata
  *       properties:
+ *         id:
+ *           type: string
+ *           description: The ID of the version.
+ *         serviceId:
+ *           type: string
+ *           description: The ID of the service.
+ *         termsType:
+ *           type: string
+ *           description: The type of terms.
  *         fetchDate:
  *           type: string
  *           format: date-time
  *           description: The ISO 8601 datetime string when the version was recorded.
- *         id:
- *           type: string
- *           description: The ID of the version.
  *         content:
  *           type: string
  *           description: The JSON-escaped Markdown content of the version
@@ -69,6 +75,8 @@ router.get('/versions', async (req, res) => {
   const versions = await versionsRepository.findAll();
   const versionsList = versions.map(version => ({
     id: version.id,
+    serviceId: version.serviceId,
+    termsType: version.termsType,
     fetchDate: toISODateWithoutMilliseconds(version.fetchDate),
   }));
 
@@ -117,6 +125,12 @@ router.get('/versions', async (req, res) => {
  *                       id:
  *                         type: string
  *                         description: The ID of the version.
+ *                       serviceId:
+ *                         type: string
+ *                         description: The ID of the service.
+ *                       termsType:
+ *                         type: string
+ *                         description: The type of terms.
  *                       fetchDate:
  *                         type: string
  *                         format: date-time
@@ -141,6 +155,8 @@ router.get('/versions/:serviceId/:termsType', async (req, res) => {
   const versions = await versionsRepository.findByServiceAndTermsType(serviceId, termsType);
   const versionsList = versions.map(version => ({
     id: version.id,
+    serviceId: version.serviceId,
+    termsType: version.termsType,
     fetchDate: toISODateWithoutMilliseconds(version.fetchDate),
   }));
 
@@ -229,6 +245,8 @@ router.get('/version/:versionId', async (req, res) => {
 
   return res.status(200).json({
     id: version.id,
+    serviceId: version.serviceId,
+    termsType: version.termsType,
     fetchDate: toISODateWithoutMilliseconds(version.fetchDate),
     content: version.content,
     links: {
@@ -298,6 +316,8 @@ router.get('/version/:serviceId/:termsType/latest', async (req, res) => {
 
   return res.status(200).json({
     id: version.id,
+    serviceId: version.serviceId,
+    termsType: version.termsType,
     fetchDate: toISODateWithoutMilliseconds(version.fetchDate),
     content: version.content,
     links: {
@@ -389,6 +409,8 @@ router.get('/version/:serviceId/:termsType/:date', async (req, res) => {
 
   return res.status(200).json({
     id: version.id,
+    serviceId: version.serviceId,
+    termsType: version.termsType,
     fetchDate: toISODateWithoutMilliseconds(version.fetchDate),
     content: version.content,
     links: {
