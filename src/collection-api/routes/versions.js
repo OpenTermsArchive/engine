@@ -34,6 +34,53 @@ const versionsRepository = await RepositoryFactory.create(config.get('@openterms
 /**
  * @private
  * @swagger
+ * /versions:
+ *   get:
+ *     summary: Get all versions.
+ *     tags: [Versions]
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: A JSON object containing the list of all versions and metadata.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   type: array
+ *                   description: The list of all versions.
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: string
+ *                         description: The ID of the version.
+ *                       fetchDate:
+ *                         type: string
+ *                         format: date-time
+ *                         description: The ISO 8601 datetime string when the version was recorded.
+ *                 count:
+ *                   type: integer
+ *                   description: The total number of versions found.
+ */
+router.get('/versions', async (req, res) => {
+  const versions = await versionsRepository.findAll();
+  const versionsList = versions.map(version => ({
+    id: version.id,
+    fetchDate: toISODateWithoutMilliseconds(version.fetchDate),
+  }));
+
+  return res.status(200).json({
+    data: versionsList,
+    count: versionsList.length,
+  });
+});
+
+/**
+ * @private
+ * @swagger
  * /versions/{serviceId}/{termsType}:
  *   get:
  *     summary: Get all versions of some terms for a specific service.
