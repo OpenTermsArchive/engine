@@ -89,19 +89,19 @@ export default class GitRepository extends RepositoryInterface {
   }
 
   async findAll() {
-    return Promise.all((await this.#getCommits()).map(commit => this.#toDomain(commit, { deferContentLoading: true })));
+    return Promise.all((await this.#getCommits()).reverse().map(commit => this.#toDomain(commit, { deferContentLoading: true })));
   }
 
   async findByServiceAndTermsType(serviceId, termsType) {
     const pathPattern = DataMapper.generateFilePath(serviceId, termsType);
 
-    return Promise.all((await this.#getCommits(pathPattern)).map(commit => this.#toDomain(commit, { deferContentLoading: true })));
+    return Promise.all((await this.#getCommits(pathPattern)).reverse().map(commit => this.#toDomain(commit, { deferContentLoading: true })));
   }
 
   async findFirst(serviceId, termsType) {
     const allVersions = await this.findByServiceAndTermsType(serviceId, termsType);
 
-    return allVersions.length > 0 ? allVersions[0] : null;
+    return allVersions.length > 0 ? allVersions[allVersions.length - 1] : null;
   }
 
   async findPrevious(versionId) {

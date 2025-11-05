@@ -106,16 +106,16 @@ describe('Versions API', () => {
         });
       });
 
-      it('returns versions in chronological order', () => {
-        expect(response.body.data[0].id).to.equal(version1.id);
+      it('returns versions in reverse chronological order', () => {
+        expect(response.body.data[0].id).to.equal(version3.id);
         expect(response.body.data[1].id).to.equal(version2.id);
-        expect(response.body.data[2].id).to.equal(version3.id);
+        expect(response.body.data[2].id).to.equal(version1.id);
       });
 
       it('returns versions with correct fetchDates', () => {
-        expect(response.body.data[0].fetchDate).to.equal(toISODateWithoutMilliseconds(version1.fetchDate));
+        expect(response.body.data[0].fetchDate).to.equal(toISODateWithoutMilliseconds(version3.fetchDate));
         expect(response.body.data[1].fetchDate).to.equal(toISODateWithoutMilliseconds(version2.fetchDate));
-        expect(response.body.data[2].fetchDate).to.equal(toISODateWithoutMilliseconds(version3.fetchDate));
+        expect(response.body.data[2].fetchDate).to.equal(toISODateWithoutMilliseconds(version1.fetchDate));
       });
     });
 
