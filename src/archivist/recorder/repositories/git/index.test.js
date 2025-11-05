@@ -661,6 +661,37 @@ describe('GitRepository', () => {
       it('returns the proper count', () => {
         expect(count).to.equal(3);
       });
+
+      context('with serviceId and termsType filters', () => {
+        it('returns count for specific service and terms type', async () => {
+          const filteredCount = await subject.count(SERVICE_PROVIDER_ID, TERMS_TYPE);
+
+          expect(filteredCount).to.equal(3);
+        });
+
+        it('returns zero for non-existent service', async () => {
+          const filteredCount = await subject.count('non-existent-service', TERMS_TYPE);
+
+          expect(filteredCount).to.equal(0);
+        });
+      });
+
+      context('with only serviceId filter', () => {
+        it('returns count for all terms types of a service', async () => {
+          // Add a version with different terms type
+          await subject.save(new Version({
+            serviceId: SERVICE_PROVIDER_ID,
+            termsType: 'Different Terms',
+            content: CONTENT,
+            fetchDate: FETCH_DATE,
+            snapshotIds: [SNAPSHOT_ID],
+          }));
+
+          const filteredCount = await subject.count(SERVICE_PROVIDER_ID);
+
+          expect(filteredCount).to.equal(4); // 3 from TERMS_TYPE + 1 from 'Different Terms'
+        });
+      });
     });
 
     describe('#findFirst', () => {

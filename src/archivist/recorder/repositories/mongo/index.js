@@ -148,8 +148,18 @@ export default class MongoRepository extends RepositoryInterface {
     return this.#toDomain(mongoDocument, { deferContentLoading: true });
   }
 
-  count() {
-    return this.collection.countDocuments();
+  count(serviceId, termsType) {
+    const filter = {};
+
+    if (serviceId) {
+      filter.serviceId = serviceId;
+    }
+
+    if (termsType) {
+      filter.termsType = termsType;
+    }
+
+    return this.collection.countDocuments(filter);
   }
 
   async* iterate() {

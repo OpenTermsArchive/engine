@@ -128,9 +128,11 @@ class RepositoryInterface {
   /**
    * Count the total number of records in the repository
    * For performance reasons, use this method rather than counting the number of entries returned by #findAll if you only need the size of a repository
-   * @returns {Promise<number>} Promise that will be resolved with the total number of records
+   * @param   {string}          [serviceId] - Optional service ID to filter records
+   * @param   {string}          [termsType] - Optional terms type to filter records (requires serviceId)
+   * @returns {Promise<number>}             Promise that will be resolved with the total number of records
    */
-  async count() {
+  async count(serviceId, termsType) {
     throw new Error(`#count method is not implemented in ${this.constructor.name}`);
   }
 
