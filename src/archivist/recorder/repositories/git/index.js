@@ -136,8 +136,25 @@ export default class GitRepository extends RepositoryInterface {
     return this.#toDomain(commit, { deferContentLoading: true });
   }
 
-  async count() {
-    return (await this.git.log(Object.values(DataMapper.COMMIT_MESSAGE_PREFIXES).map(prefix => `--grep=${prefix}`))).length;
+  async count(serviceId, termsType) {
+    const grepOptions = Object.values(DataMapper.COMMIT_MESSAGE_PREFIXES).map(prefix => `--grep=${prefix}`);
+    const pathOptions = [];
+
+    if (serviceId && termsType) {
+      const pathPattern = DataMapper.generateFilePath(serviceId, termsType);
+
+      pathOptions.push('--', pathPattern);
+    } else if (serviceId) {
+      // Count all records for a service (all terms types)
+      const pathPattern = DataMapper.generateFilePath(serviceId);
+
+      pathOptions.push('--', pathPattern);
+    } else {
+      // Count all records (exclude root directory files)
+      pathOptions.push('--', '*/*');
+    }
+
+    return (await this.git.log([ ...grepOptions, ...pathOptions ])).length;
   }
 
   async* iterate() {
@@ -176,7 +193,6 @@ export default class GitRepository extends RepositoryInterface {
   }
 
   async #getCommits(pathFilter, { sortOrder = 'asc', limit, offset } = {}) {
-    // Build git options: filter by commit message prefixes and exclude root directory commits
     const grepOptions = Object.values(DataMapper.COMMIT_MESSAGE_PREFIXES).flatMap(prefix => [ '--grep', prefix ]);
     const pathOptions = pathFilter
       ? [ '--', pathFilter ]

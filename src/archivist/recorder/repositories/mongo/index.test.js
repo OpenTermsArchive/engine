@@ -712,39 +712,115 @@ describe('MongoRepository', () => {
     });
 
     describe('#count', () => {
-      let count;
+      context('without filters', () => {
+        let count;
 
-      before(async () => {
-        await subject.save(new Version({
-          serviceId: SERVICE_PROVIDER_ID,
-          termsType: TERMS_TYPE,
-          content: CONTENT,
-          fetchDate: FETCH_DATE,
-          snapshotIds: [SNAPSHOT_ID],
-        }));
-        await subject.save(new Version({
-          serviceId: SERVICE_PROVIDER_ID,
-          termsType: TERMS_TYPE,
-          content: `${CONTENT} - updated`,
-          fetchDate: FETCH_DATE_LATER,
-          snapshotIds: [SNAPSHOT_ID],
-        }));
-        await subject.save(new Version({
-          serviceId: SERVICE_PROVIDER_ID,
-          termsType: TERMS_TYPE,
-          content: `${CONTENT} - updated 2`,
-          isTechnicalUpgrade: true,
-          fetchDate: FETCH_DATE_EARLIER,
-          snapshotIds: [SNAPSHOT_ID],
-        }));
+        before(async () => {
+          await subject.save(new Version({
+            serviceId: SERVICE_PROVIDER_ID,
+            termsType: TERMS_TYPE,
+            content: CONTENT,
+            fetchDate: FETCH_DATE,
+            snapshotIds: [SNAPSHOT_ID],
+          }));
+          await subject.save(new Version({
+            serviceId: SERVICE_PROVIDER_ID,
+            termsType: TERMS_TYPE,
+            content: `${CONTENT} - updated`,
+            fetchDate: FETCH_DATE_LATER,
+            snapshotIds: [SNAPSHOT_ID],
+          }));
+          await subject.save(new Version({
+            serviceId: SERVICE_PROVIDER_ID,
+            termsType: TERMS_TYPE,
+            content: `${CONTENT} - updated 2`,
+            isExtractOnly: true,
+            fetchDate: FETCH_DATE_EARLIER,
+            snapshotIds: [SNAPSHOT_ID],
+          }));
 
-        (count = await subject.count());
+          (count = await subject.count());
+        });
+
+        after(() => subject.removeAll());
+
+        it('returns the proper count', () => {
+          expect(count).to.equal(3);
+        });
       });
 
-      after(() => subject.removeAll());
+      context('with serviceId and termsType filters', () => {
+        before(async () => {
+          await subject.save(new Version({
+            serviceId: SERVICE_PROVIDER_ID,
+            termsType: TERMS_TYPE,
+            content: CONTENT,
+            fetchDate: FETCH_DATE,
+            snapshotIds: [SNAPSHOT_ID],
+          }));
+          await subject.save(new Version({
+            serviceId: SERVICE_PROVIDER_ID,
+            termsType: TERMS_TYPE,
+            content: `${CONTENT} - updated`,
+            fetchDate: FETCH_DATE_LATER,
+            snapshotIds: [SNAPSHOT_ID],
+          }));
+          await subject.save(new Version({
+            serviceId: 'other_service',
+            termsType: 'Privacy Policy',
+            content: 'Other content',
+            fetchDate: FETCH_DATE,
+            snapshotIds: [SNAPSHOT_ID],
+          }));
+        });
 
-      it('returns the proper count', () => {
-        expect(count).to.equal(3);
+        after(() => subject.removeAll());
+
+        it('returns count for specific service and terms type', async () => {
+          const filteredCount = await subject.count(SERVICE_PROVIDER_ID, TERMS_TYPE);
+
+          expect(filteredCount).to.equal(2);
+        });
+
+        it('returns zero for non-existent service', async () => {
+          const filteredCount = await subject.count('non-existent-service', TERMS_TYPE);
+
+          expect(filteredCount).to.equal(0);
+        });
+      });
+
+      context('with only serviceId filter', () => {
+        before(async () => {
+          await subject.save(new Version({
+            serviceId: SERVICE_PROVIDER_ID,
+            termsType: TERMS_TYPE,
+            content: CONTENT,
+            fetchDate: FETCH_DATE,
+            snapshotIds: [SNAPSHOT_ID],
+          }));
+          await subject.save(new Version({
+            serviceId: SERVICE_PROVIDER_ID,
+            termsType: 'Different Terms',
+            content: 'Different content',
+            fetchDate: FETCH_DATE_LATER,
+            snapshotIds: [SNAPSHOT_ID],
+          }));
+          await subject.save(new Version({
+            serviceId: 'other_service',
+            termsType: 'Privacy Policy',
+            content: 'Other content',
+            fetchDate: FETCH_DATE,
+            snapshotIds: [SNAPSHOT_ID],
+          }));
+        });
+
+        after(() => subject.removeAll());
+
+        it('returns count for all terms types of a service', async () => {
+          const filteredCount = await subject.count(SERVICE_PROVIDER_ID);
+
+          expect(filteredCount).to.equal(2);
+        });
       });
     });
 

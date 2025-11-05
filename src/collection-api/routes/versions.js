@@ -132,9 +132,8 @@ router.get('/versions', async (req, res) => {
     return res.status(400).json({ error: 'Invalid offset parameter. Must be a non-negative integer.' });
   }
 
-  // Get total count (without pagination)
-  const allVersions = await versionsRepository.findAll();
-  const totalCount = allVersions.length;
+  // Get total count using efficient count method
+  const totalCount = await versionsRepository.count();
 
   // Get paginated versions using repository-level pagination
   const paginatedVersions = await versionsRepository.findAll({ limit, offset });
@@ -280,14 +279,12 @@ router.get('/versions/:serviceId/:termsType', async (req, res) => {
     return res.status(400).json({ error: 'Invalid offset parameter. Must be a non-negative integer.' });
   }
 
-  // Get total count (without pagination)
-  const allVersions = await versionsRepository.findByServiceAndTermsType(serviceId, termsType);
+  // Get total count using efficient count method
+  const totalCount = await versionsRepository.count(serviceId, termsType);
 
-  if (allVersions.length === 0) {
+  if (totalCount === 0) {
     return res.status(404).json({ error: `No versions found for service "${serviceId}" and terms type "${termsType}"` });
   }
-
-  const totalCount = allVersions.length;
 
   // Get paginated versions using repository-level pagination
   const paginatedVersions = await versionsRepository.findByServiceAndTermsType(serviceId, termsType, { limit, offset });
