@@ -81,7 +81,7 @@ describe('Versions API', () => {
       });
 
       it('returns response with metadata structure', () => {
-        expect(response.body).to.have.all.keys('data', 'count');
+        expect(response.body).to.have.all.keys('data', 'count', 'limit', 'offset');
       });
 
       it('returns all versions for the service and terms type', () => {
@@ -116,6 +116,155 @@ describe('Versions API', () => {
         expect(response.body.data[0].fetchDate).to.equal(toISODateWithoutMilliseconds(version3.fetchDate));
         expect(response.body.data[1].fetchDate).to.equal(toISODateWithoutMilliseconds(version2.fetchDate));
         expect(response.body.data[2].fetchDate).to.equal(toISODateWithoutMilliseconds(version1.fetchDate));
+      });
+    });
+
+    context('with pagination', () => {
+      context('with default limit (no query parameters)', () => {
+        before(async () => {
+          response = await request.get(`${basePath}/v1/versions/service-1/Terms%20of%20Service`);
+        });
+
+        it('responds with 200 status code', () => {
+          expect(response.status).to.equal(200);
+        });
+
+        it('returns all versions when total is less than default limit', () => {
+          expect(response.body.data).to.be.an('array').with.lengthOf(3);
+        });
+
+        it('includes default pagination metadata', () => {
+          expect(response.body).to.have.property('limit', 100);
+          expect(response.body).to.have.property('offset', 0);
+        });
+      });
+
+      context('with limit parameter', () => {
+        before(async () => {
+          response = await request.get(`${basePath}/v1/versions/service-1/Terms%20of%20Service?limit=2`);
+        });
+
+        it('responds with 200 status code', () => {
+          expect(response.status).to.equal(200);
+        });
+
+        it('returns limited number of versions', () => {
+          expect(response.body.data).to.be.an('array').with.lengthOf(2);
+        });
+
+        it('returns correct total count', () => {
+          expect(response.body.count).to.equal(3);
+        });
+
+        it('includes pagination metadata', () => {
+          expect(response.body).to.have.property('limit', 2);
+          expect(response.body).to.have.property('offset', 0);
+        });
+
+        it('returns first two versions in reverse chronological order', () => {
+          expect(response.body.data[0].id).to.equal(version3.id);
+          expect(response.body.data[1].id).to.equal(version2.id);
+        });
+      });
+
+      context('with limit and offset parameters', () => {
+        before(async () => {
+          response = await request.get(`${basePath}/v1/versions/service-1/Terms%20of%20Service?limit=1&offset=1`);
+        });
+
+        it('responds with 200 status code', () => {
+          expect(response.status).to.equal(200);
+        });
+
+        it('returns limited number of versions starting from offset', () => {
+          expect(response.body.data).to.be.an('array').with.lengthOf(1);
+        });
+
+        it('returns correct total count', () => {
+          expect(response.body.count).to.equal(3);
+        });
+
+        it('includes pagination metadata', () => {
+          expect(response.body).to.have.property('limit', 1);
+          expect(response.body).to.have.property('offset', 1);
+        });
+
+        it('returns second version', () => {
+          expect(response.body.data[0].id).to.equal(version2.id);
+        });
+      });
+
+      context('with only offset parameter', () => {
+        before(async () => {
+          response = await request.get(`${basePath}/v1/versions/service-1/Terms%20of%20Service?offset=1`);
+        });
+
+        it('responds with 200 status code', () => {
+          expect(response.status).to.equal(200);
+        });
+
+        it('returns all versions starting from offset', () => {
+          expect(response.body.data).to.be.an('array').with.lengthOf(2);
+        });
+
+        it('returns correct total count', () => {
+          expect(response.body.count).to.equal(3);
+        });
+
+        it('includes offset in metadata', () => {
+          expect(response.body).to.have.property('offset', 1);
+        });
+
+        it('returns last two versions', () => {
+          expect(response.body.data[0].id).to.equal(version2.id);
+          expect(response.body.data[1].id).to.equal(version1.id);
+        });
+      });
+
+      context('with invalid limit parameter (too small)', () => {
+        before(async () => {
+          response = await request.get(`${basePath}/v1/versions/service-1/Terms%20of%20Service?limit=0`);
+        });
+
+        it('responds with 400 status code', () => {
+          expect(response.status).to.equal(400);
+        });
+
+        it('returns error message', () => {
+          expect(response.body).to.have.property('error');
+          expect(response.body.error).to.include('Invalid limit parameter');
+        });
+      });
+
+      context('with invalid limit parameter (exceeds maximum)', () => {
+        before(async () => {
+          response = await request.get(`${basePath}/v1/versions/service-1/Terms%20of%20Service?limit=501`);
+        });
+
+        it('responds with 400 status code', () => {
+          expect(response.status).to.equal(400);
+        });
+
+        it('returns error message', () => {
+          expect(response.body).to.have.property('error');
+          expect(response.body.error).to.include('Invalid limit parameter');
+          expect(response.body.error).to.include('500');
+        });
+      });
+
+      context('with invalid offset parameter', () => {
+        before(async () => {
+          response = await request.get(`${basePath}/v1/versions/service-1/Terms%20of%20Service?offset=-1`);
+        });
+
+        it('responds with 400 status code', () => {
+          expect(response.status).to.equal(400);
+        });
+
+        it('returns error message', () => {
+          expect(response.body).to.have.property('error');
+          expect(response.body.error).to.include('Invalid offset parameter');
+        });
       });
     });
 
