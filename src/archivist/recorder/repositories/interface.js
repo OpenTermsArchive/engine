@@ -72,22 +72,28 @@ class RepositoryInterface {
   /**
    * Find all records
    * For performance reasons, the content of the records will not be loaded by default. Use #loadRecordContent to load the content of individual records
-   * @see RepositoryInterface#loadRecordContent
-   * @returns {Promise<Array<Record>>} Promise that will be resolved with an array of all records
+   * @see    RepositoryInterface#loadRecordContent
+   * @param   {object}                 [options]        - Pagination options
+   * @param   {number}                 [options.limit]  - Maximum number of records to return
+   * @param   {number}                 [options.offset] - Number of records to skip
+   * @returns {Promise<Array<Record>>}                  Promise that will be resolved with an array of all records
    */
-  async findAll() {
+  async findAll(options = {}) {
     throw new Error(`#findAll method is not implemented in ${this.constructor.name}`);
   }
 
   /**
    * Find all records for a specific service and terms type
    * For performance reasons, the content of the records will not be loaded by default. Use #loadRecordContent to load the content of individual records
-   * @see RepositoryInterface#loadRecordContent
-   * @param   {string}                 serviceId - Service ID of records to find
-   * @param   {string}                 termsType - Terms type of records to find
-   * @returns {Promise<Array<Record>>}           Promise that will be resolved with an array of matching records
+   * @see    RepositoryInterface#loadRecordContent
+   * @param   {string}                 serviceId        - Service ID of records to find
+   * @param   {string}                 termsType        - Terms type of records to find
+   * @param   {object}                 [options]        - Pagination options
+   * @param   {number}                 [options.limit]  - Maximum number of records to return
+   * @param   {number}                 [options.offset] - Number of records to skip
+   * @returns {Promise<Array<Record>>}                  Promise that will be resolved with an array of matching records
    */
-  async findByServiceAndTermsType(serviceId, termsType) {
+  async findByServiceAndTermsType(serviceId, termsType, options = {}) {
     throw new Error(`#findByServiceAndTermsType method is not implemented in ${this.constructor.name}`);
   }
 

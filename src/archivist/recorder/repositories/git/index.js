@@ -88,14 +88,14 @@ export default class GitRepository extends RepositoryInterface {
     return this.#toDomain(commit);
   }
 
-  async findAll() {
-    return Promise.all((await this.#getCommits(undefined, { sortOrder: 'desc' })).map(commit => this.#toDomain(commit, { deferContentLoading: true })));
+  async findAll({ limit, offset } = {}) {
+    return Promise.all((await this.#getCommits(undefined, { sortOrder: 'desc', limit, offset })).map(commit => this.#toDomain(commit, { deferContentLoading: true })));
   }
 
-  async findByServiceAndTermsType(serviceId, termsType) {
+  async findByServiceAndTermsType(serviceId, termsType, { limit, offset } = {}) {
     const pathPattern = DataMapper.generateFilePath(serviceId, termsType);
 
-    return Promise.all((await this.#getCommits(pathPattern, { sortOrder: 'desc' })).map(commit => this.#toDomain(commit, { deferContentLoading: true })));
+    return Promise.all((await this.#getCommits(pathPattern, { sortOrder: 'desc', limit, offset })).map(commit => this.#toDomain(commit, { deferContentLoading: true })));
   }
 
   async findFirst(serviceId, termsType) {
@@ -175,7 +175,7 @@ export default class GitRepository extends RepositoryInterface {
     record.content = pdfBuffer;
   }
 
-  async #getCommits(pathFilter, { sortOrder = 'asc' } = {}) {
+  async #getCommits(pathFilter, { sortOrder = 'asc', limit, offset } = {}) {
     // Build git options: filter by commit message prefixes and exclude root directory commits
     const grepOptions = Object.values(DataMapper.COMMIT_MESSAGE_PREFIXES).flatMap(prefix => [ '--grep', prefix ]);
     const pathOptions = pathFilter
@@ -184,7 +184,20 @@ export default class GitRepository extends RepositoryInterface {
 
     const options = [ ...grepOptions, ...pathOptions ];
 
-    const commits = await this.git.listCommits(options, { reverse: false }); // Get commits without git's --reverse for better performance, filtered at git level
+    // Use git-level pagination when available
+    // Note: --skip and --max-count work in topological order, not chronological order
+    // This means pagination may not be strictly chronological, but it's acceptable for performance
+    const paginationOptions = {};
+
+    if (offset !== undefined) {
+      paginationOptions.skip = offset;
+    }
+
+    if (limit !== undefined) {
+      paginationOptions.maxCount = limit;
+    }
+
+    const commits = await this.git.listCommits(options, { reverse: false, ...paginationOptions }); // Get commits without git's --reverse for better performance, filtered at git level
 
     // Sort by date in JavaScript for accuracy - git's date ordering may not be reliable with backdated commits
     commits.sort((commitA, commitB) => {
