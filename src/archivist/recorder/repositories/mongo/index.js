@@ -88,13 +88,33 @@ export default class MongoRepository extends RepositoryInterface {
     return this.#toDomain(mongoDocument);
   }
 
-  async findAll() {
-    return Promise.all((await this.collection.find().project({ content: 0 }).sort({ fetchDate: -1 }).toArray())
+  async findAll({ limit, offset } = {}) {
+    let query = this.collection.find().project({ content: 0 }).sort({ fetchDate: -1 });
+
+    if (offset !== undefined) {
+      query = query.skip(offset);
+    }
+
+    if (limit !== undefined) {
+      query = query.limit(limit);
+    }
+
+    return Promise.all((await query.toArray())
       .map(mongoDocument => this.#toDomain(mongoDocument, { deferContentLoading: true })));
   }
 
-  async findByServiceAndTermsType(serviceId, termsType) {
-    return Promise.all((await this.collection.find({ serviceId, termsType }).project({ content: 0 }).sort({ fetchDate: -1 }).toArray())
+  async findByServiceAndTermsType(serviceId, termsType, { limit, offset } = {}) {
+    let query = this.collection.find({ serviceId, termsType }).project({ content: 0 }).sort({ fetchDate: -1 });
+
+    if (offset !== undefined) {
+      query = query.skip(offset);
+    }
+
+    if (limit !== undefined) {
+      query = query.limit(limit);
+    }
+
+    return Promise.all((await query.toArray())
       .map(mongoDocument => this.#toDomain(mongoDocument, { deferContentLoading: true })));
   }
 
