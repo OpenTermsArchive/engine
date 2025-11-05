@@ -618,8 +618,8 @@ describe('MongoRepository', () => {
         }
       });
 
-      it('returns records in ascending order', () => {
-        expect(records.map(record => record.fetchDate)).to.deep.equal([ FETCH_DATE_EARLIER, FETCH_DATE, FETCH_DATE_LATER ]);
+      it('returns records in descending order', () => {
+        expect(records.map(record => record.fetchDate)).to.deep.equal([ FETCH_DATE_LATER, FETCH_DATE, FETCH_DATE_EARLIER ]);
       });
     });
 
@@ -683,8 +683,8 @@ describe('MongoRepository', () => {
         }
       });
 
-      it('returns records in ascending order', () => {
-        expect(records.map(record => record.fetchDate)).to.deep.equal([ FETCH_DATE, FETCH_DATE_LATER ]);
+      it('returns records in descending order', () => {
+        expect(records.map(record => record.fetchDate)).to.deep.equal([ FETCH_DATE_LATER, FETCH_DATE ]);
       });
 
       it('returns records with correct IDs', () => {
@@ -1448,8 +1448,8 @@ describe('MongoRepository', () => {
         }
       });
 
-      it('returns records in ascending order', () => {
-        expect(records.map(record => record.fetchDate)).to.deep.equal([ FETCH_DATE_EARLIER, FETCH_DATE, FETCH_DATE_LATER ]);
+      it('returns records in descending order', () => {
+        expect(records.map(record => record.fetchDate)).to.deep.equal([ FETCH_DATE_LATER, FETCH_DATE, FETCH_DATE_EARLIER ]);
       });
     });
 
