@@ -49,7 +49,13 @@ const versionsRepository = await RepositoryFactory.create(config.get('@openterms
  *     parameters:
  *       - in: query
  *         name: limit
- *         description: The maximum number of versions to return.
+ *         description: |
+ *           The maximum number of versions to return.
+ *
+ *           **Note for Git storage**: Pagination uses Git's `--skip` and `--max-count` options,
+ *           which work in topological order rather than strictly chronological order.
+ *           This means paginated results may not be in perfect chronological sequence,
+ *           but this is an acceptable performance trade-off.
  *         schema:
  *           type: integer
  *           minimum: 1
@@ -58,7 +64,11 @@ const versionsRepository = await RepositoryFactory.create(config.get('@openterms
  *         required: false
  *       - in: query
  *         name: offset
- *         description: The number of versions to skip before returning results.
+ *         description: |
+ *           The number of versions to skip before returning results.
+ *
+ *           **Note for Git storage**: Pagination uses Git's `--skip` and `--max-count` options,
+ *           which work in topological order rather than strictly chronological order.
  *         schema:
  *           type: integer
  *           minimum: 0
@@ -122,11 +132,12 @@ router.get('/versions', async (req, res) => {
     return res.status(400).json({ error: 'Invalid offset parameter. Must be a non-negative integer.' });
   }
 
+  // Get total count (without pagination)
   const allVersions = await versionsRepository.findAll();
   const totalCount = allVersions.length;
 
-  // Apply pagination
-  const paginatedVersions = allVersions.slice(offset, offset + limit);
+  // Get paginated versions using repository-level pagination
+  const paginatedVersions = await versionsRepository.findAll({ limit, offset });
 
   const versionsList = paginatedVersions.map(version => ({
     id: version.id,
@@ -169,7 +180,13 @@ router.get('/versions', async (req, res) => {
  *         required: true
  *       - in: query
  *         name: limit
- *         description: The maximum number of versions to return.
+ *         description: |
+ *           The maximum number of versions to return.
+ *
+ *           **Note for Git storage**: Pagination uses Git's `--skip` and `--max-count` options,
+ *           which work in topological order rather than strictly chronological order.
+ *           This means paginated results may not be in perfect chronological sequence,
+ *           but this is an acceptable performance trade-off.
  *         schema:
  *           type: integer
  *           minimum: 1
@@ -178,7 +195,11 @@ router.get('/versions', async (req, res) => {
  *         required: false
  *       - in: query
  *         name: offset
- *         description: The number of versions to skip before returning results.
+ *         description: |
+ *           The number of versions to skip before returning results.
+ *
+ *           **Note for Git storage**: Pagination uses Git's `--skip` and `--max-count` options,
+ *           which work in topological order rather than strictly chronological order.
  *         schema:
  *           type: integer
  *           minimum: 0
@@ -259,6 +280,7 @@ router.get('/versions/:serviceId/:termsType', async (req, res) => {
     return res.status(400).json({ error: 'Invalid offset parameter. Must be a non-negative integer.' });
   }
 
+  // Get total count (without pagination)
   const allVersions = await versionsRepository.findByServiceAndTermsType(serviceId, termsType);
 
   if (allVersions.length === 0) {
@@ -267,8 +289,8 @@ router.get('/versions/:serviceId/:termsType', async (req, res) => {
 
   const totalCount = allVersions.length;
 
-  // Apply pagination
-  const paginatedVersions = allVersions.slice(offset, offset + limit);
+  // Get paginated versions using repository-level pagination
+  const paginatedVersions = await versionsRepository.findByServiceAndTermsType(serviceId, termsType, { limit, offset });
 
   const versionsList = paginatedVersions.map(version => ({
     id: version.id,
