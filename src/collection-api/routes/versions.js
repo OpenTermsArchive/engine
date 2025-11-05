@@ -46,6 +46,24 @@ const versionsRepository = await RepositoryFactory.create(config.get('@openterms
  *     tags: [Versions]
  *     produces:
  *       - application/json
+ *     parameters:
+ *       - in: query
+ *         name: limit
+ *         description: The maximum number of versions to return.
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *           maximum: 500
+ *           default: 100
+ *         required: false
+ *       - in: query
+ *         name: offset
+ *         description: The number of versions to skip before returning results.
+ *         schema:
+ *           type: integer
+ *           minimum: 0
+ *           default: 0
+ *         required: false
  *     responses:
  *       200:
  *         description: A JSON object containing the list of all versions and metadata.
@@ -70,20 +88,61 @@ const versionsRepository = await RepositoryFactory.create(config.get('@openterms
  *                 count:
  *                   type: integer
  *                   description: The total number of versions found.
+ *                 limit:
+ *                   type: integer
+ *                   description: The maximum number of versions returned in this response.
+ *                 offset:
+ *                   type: integer
+ *                   description: The number of versions skipped before returning results.
+ *       400:
+ *         description: Invalid pagination parameters.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   description: Error message indicating invalid parameters.
  */
 router.get('/versions', async (req, res) => {
-  const versions = await versionsRepository.findAll();
-  const versionsList = versions.map(version => ({
+  const limit = req.query.limit ? parseInt(req.query.limit, 10) : 100;
+  const offset = req.query.offset ? parseInt(req.query.offset, 10) : 0;
+
+  // Validate pagination parameters
+  if (Number.isNaN(limit) || limit < 1) {
+    return res.status(400).json({ error: 'Invalid limit parameter. Must be a positive integer.' });
+  }
+
+  if (limit > 500) {
+    return res.status(400).json({ error: 'Invalid limit parameter. Must not exceed 500.' });
+  }
+
+  if (Number.isNaN(offset) || offset < 0) {
+    return res.status(400).json({ error: 'Invalid offset parameter. Must be a non-negative integer.' });
+  }
+
+  const allVersions = await versionsRepository.findAll();
+  const totalCount = allVersions.length;
+
+  // Apply pagination
+  const paginatedVersions = allVersions.slice(offset, offset + limit);
+
+  const versionsList = paginatedVersions.map(version => ({
     id: version.id,
     serviceId: version.serviceId,
     termsType: version.termsType,
     fetchDate: toISODateWithoutMilliseconds(version.fetchDate),
   }));
 
-  return res.status(200).json({
+  const response = {
     data: versionsList,
-    count: versionsList.length,
-  });
+    count: totalCount,
+    limit,
+    offset,
+  };
+
+  return res.status(200).json(response);
 });
 
 /**
@@ -108,6 +167,23 @@ router.get('/versions', async (req, res) => {
  *         schema:
  *           type: string
  *         required: true
+ *       - in: query
+ *         name: limit
+ *         description: The maximum number of versions to return.
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *           maximum: 500
+ *           default: 100
+ *         required: false
+ *       - in: query
+ *         name: offset
+ *         description: The number of versions to skip before returning results.
+ *         schema:
+ *           type: integer
+ *           minimum: 0
+ *           default: 0
+ *         required: false
  *     responses:
  *       200:
  *         description: A JSON object containing the list of versions and metadata.
@@ -138,6 +214,22 @@ router.get('/versions', async (req, res) => {
  *                 count:
  *                   type: integer
  *                   description: The total number of versions found.
+ *                 limit:
+ *                   type: integer
+ *                   description: The maximum number of versions returned in this response.
+ *                 offset:
+ *                   type: integer
+ *                   description: The number of versions skipped before returning results.
+ *       400:
+ *         description: Invalid pagination parameters.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   description: Error message indicating invalid parameters.
  *       404:
  *         description: No versions found for the specified combination of service ID and terms type.
  *         content:
@@ -151,23 +243,48 @@ router.get('/versions', async (req, res) => {
  */
 router.get('/versions/:serviceId/:termsType', async (req, res) => {
   const { serviceId, termsType } = req.params;
+  const limit = req.query.limit ? parseInt(req.query.limit, 10) : 100;
+  const offset = req.query.offset ? parseInt(req.query.offset, 10) : 0;
 
-  const versions = await versionsRepository.findByServiceAndTermsType(serviceId, termsType);
-  const versionsList = versions.map(version => ({
+  // Validate pagination parameters
+  if (Number.isNaN(limit) || limit < 1) {
+    return res.status(400).json({ error: 'Invalid limit parameter. Must be a positive integer.' });
+  }
+
+  if (limit > 500) {
+    return res.status(400).json({ error: 'Invalid limit parameter. Must not exceed 500.' });
+  }
+
+  if (Number.isNaN(offset) || offset < 0) {
+    return res.status(400).json({ error: 'Invalid offset parameter. Must be a non-negative integer.' });
+  }
+
+  const allVersions = await versionsRepository.findByServiceAndTermsType(serviceId, termsType);
+
+  if (allVersions.length === 0) {
+    return res.status(404).json({ error: `No versions found for service "${serviceId}" and terms type "${termsType}"` });
+  }
+
+  const totalCount = allVersions.length;
+
+  // Apply pagination
+  const paginatedVersions = allVersions.slice(offset, offset + limit);
+
+  const versionsList = paginatedVersions.map(version => ({
     id: version.id,
     serviceId: version.serviceId,
     termsType: version.termsType,
     fetchDate: toISODateWithoutMilliseconds(version.fetchDate),
   }));
 
-  if (versionsList.length === 0) {
-    return res.status(404).json({ error: `No versions found for service "${serviceId}" and terms type "${termsType}"` });
-  }
-
-  return res.status(200).json({
+  const response = {
     data: versionsList,
-    count: versionsList.length,
-  });
+    count: totalCount,
+    limit,
+    offset,
+  };
+
+  return res.status(200).json(response);
 });
 
 /**
