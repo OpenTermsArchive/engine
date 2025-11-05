@@ -2,6 +2,16 @@
 
 All changes that impact users of this module are documented in this file, in the [Common Changelog](https://common-changelog.org) format with some additional specifications defined in the CONTRIBUTING file. This codebase adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased [minor]
+
+> Development of this release was supported by the [European Commission](https://commission.europa.eu/) for its [VLOPs/VLOSEs instance](https://code.europa.eu/dsa/terms-and-conditions-database/vlops-and-vloses/).
+
+### Added
+
+- Add proxy support for fetching documents behind firewalls or restricted networks; configure using `HTTP_PROXY` and `HTTPS_PROXY` (or `http_proxy` and `https_proxy`) environment variables
+- Add debugging options to disable headless mode for visual troubleshooting during development; set `OTA_ENGINE_FETCHER_NO_HEADLESS=1` to show browser window
+- Add sandbox control for improved compatibility with Docker and containerized environments; set `OTA_ENGINE_FETCHER_NO_SANDBOX=1` when running in containers
+
 ## 9.1.2 - 2025-10-30
 
 _Full changeset and discussions: [#1199](https://github.com/OpenTermsArchive/engine/pull/1199)._

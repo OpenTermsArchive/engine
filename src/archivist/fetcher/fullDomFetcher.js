@@ -1,6 +1,8 @@
 import puppeteer from 'puppeteer-extra';
 import stealthPlugin from 'puppeteer-extra-plugin-stealth';
 
+import { resolveProxyConfiguration, extractProxyCredentials } from './proxyUtils.js';
+
 puppeteer.use(stealthPlugin());
 
 let browser;
@@ -24,6 +26,10 @@ export default async function fetch(url, cssSelectors, config) {
     const client = await page.target().createCDPSession();
 
     await client.send('Network.clearBrowserCookies'); // Clear cookies to ensure clean state between fetches and prevent session persistence across different URLs
+
+    if (browser.proxyCredentials?.username && browser.proxyCredentials?.password) {
+      await page.authenticate(browser.proxyCredentials);
+    }
 
     response = await page.goto(url, { waitUntil: 'load' }); // Using `load` instead of `networkidle0` as it's more reliable and faster. The 'load' event fires when the page and all its resources (stylesheets, scripts, images) have finished loading. `networkidle0` can be problematic as it waits for 500ms of network inactivity, which may never occur on dynamic pages and then triggers a navigation timeout.
 
@@ -86,7 +92,34 @@ export async function launchHeadlessBrowser() {
     return browser;
   }
 
-  browser = await puppeteer.launch({ headless: true });
+  const options = {
+    args: [],
+    headless: !process.env.OTA_ENGINE_FETCHER_NO_HEADLESS,
+  };
+
+  const { httpProxy, httpsProxy } = resolveProxyConfiguration();
+
+  let proxyCredentials = null;
+
+  if (httpProxy) {
+    const httpProxyUrl = new URL(httpProxy);
+    const httpsProxyUrl = new URL(httpsProxy);
+
+    proxyCredentials = extractProxyCredentials(httpProxy, httpsProxy);
+
+    options.args.push(`--proxy-server=http=${httpProxyUrl.host};https=${httpsProxyUrl.host}`);
+  }
+
+  if (process.env.OTA_ENGINE_FETCHER_NO_SANDBOX) {
+    options.args.push('--no-sandbox');
+    options.args.push('--disable-setuid-sandbox');
+  }
+
+  browser = await puppeteer.launch(options);
+
+  if (proxyCredentials) {
+    browser.proxyCredentials = proxyCredentials;
+  }
 
   return browser;
 }
