@@ -118,6 +118,21 @@ export default class MongoRepository extends RepositoryInterface {
       .map(mongoDocument => this.#toDomain(mongoDocument, { deferContentLoading: true })));
   }
 
+  async findByService(serviceId, { limit, offset } = {}) {
+    let query = this.collection.find({ serviceId }).project({ content: 0 }).sort({ fetchDate: -1 });
+
+    if (offset !== undefined) {
+      query = query.skip(offset);
+    }
+
+    if (limit !== undefined) {
+      query = query.limit(limit);
+    }
+
+    return Promise.all((await query.toArray())
+      .map(mongoDocument => this.#toDomain(mongoDocument, { deferContentLoading: true })));
+  }
+
   async findFirst(serviceId, termsType) {
     const [mongoDocument] = await this.collection.find({ serviceId, termsType }).limit(1).sort({ fetchDate: 1 }).toArray();
 

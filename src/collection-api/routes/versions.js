@@ -119,7 +119,6 @@ router.get('/versions', async (req, res) => {
   const limit = req.query.limit ? parseInt(req.query.limit, 10) : 100;
   const offset = req.query.offset ? parseInt(req.query.offset, 10) : 0;
 
-  // Validate pagination parameters
   if (Number.isNaN(limit) || limit < 1) {
     return res.status(400).json({ error: 'Invalid limit parameter. Must be a positive integer.' });
   }
@@ -132,11 +131,149 @@ router.get('/versions', async (req, res) => {
     return res.status(400).json({ error: 'Invalid offset parameter. Must be a non-negative integer.' });
   }
 
-  // Get total count using efficient count method
-  const totalCount = await versionsRepository.count();
-
-  // Get paginated versions using repository-level pagination
   const paginatedVersions = await versionsRepository.findAll({ limit, offset });
+
+  const versionsList = paginatedVersions.map(version => ({
+    id: version.id,
+    serviceId: version.serviceId,
+    termsType: version.termsType,
+    fetchDate: toISODateWithoutMilliseconds(version.fetchDate),
+  }));
+
+  const response = {
+    data: versionsList,
+    count: await versionsRepository.count(),
+    limit,
+    offset,
+  };
+
+  return res.status(200).json(response);
+});
+
+/**
+ * @private
+ * @swagger
+ * /versions/{serviceId}:
+ *   get:
+ *     summary: Get all versions for a specific service.
+ *     tags: [Versions]
+ *     produces:
+ *       - application/json
+ *     parameters:
+ *       - in: path
+ *         name: serviceId
+ *         description: The ID of the service whose versions will be returned.
+ *         schema:
+ *           type: string
+ *         required: true
+ *       - in: query
+ *         name: limit
+ *         description: |
+ *           The maximum number of versions to return.
+ *
+ *           **Note for Git storage**: Pagination uses Git's `--skip` and `--max-count` options,
+ *           which work in topological order rather than strictly chronological order.
+ *           This means paginated results may not be in perfect chronological sequence,
+ *           but this is an acceptable performance trade-off.
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *           maximum: 500
+ *           default: 100
+ *         required: false
+ *       - in: query
+ *         name: offset
+ *         description: |
+ *           The number of versions to skip before returning results.
+ *
+ *           **Note for Git storage**: Pagination uses Git's `--skip` and `--max-count` options,
+ *           which work in topological order rather than strictly chronological order.
+ *         schema:
+ *           type: integer
+ *           minimum: 0
+ *           default: 0
+ *         required: false
+ *     responses:
+ *       200:
+ *         description: A JSON object containing the list of versions and metadata.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   type: array
+ *                   description: The list of versions.
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: string
+ *                         description: The ID of the version.
+ *                       serviceId:
+ *                         type: string
+ *                         description: The ID of the service.
+ *                       termsType:
+ *                         type: string
+ *                         description: The type of terms.
+ *                       fetchDate:
+ *                         type: string
+ *                         format: date-time
+ *                         description: The ISO 8601 datetime string when the version was recorded.
+ *                 count:
+ *                   type: integer
+ *                   description: The total number of versions found.
+ *                 limit:
+ *                   type: integer
+ *                   description: The maximum number of versions returned in this response.
+ *                 offset:
+ *                   type: integer
+ *                   description: The number of versions skipped before returning results.
+ *       400:
+ *         description: Invalid pagination parameters.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   description: Error message indicating invalid parameters.
+ *       404:
+ *         description: No versions found for the specified service ID.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   description: Error message indicating that no versions are found.
+ */
+router.get('/versions/:serviceId', async (req, res) => {
+  const { serviceId } = req.params;
+  const limit = req.query.limit ? parseInt(req.query.limit, 10) : 100;
+  const offset = req.query.offset ? parseInt(req.query.offset, 10) : 0;
+
+  if (Number.isNaN(limit) || limit < 1) {
+    return res.status(400).json({ error: 'Invalid limit parameter. Must be a positive integer.' });
+  }
+
+  if (limit > 500) {
+    return res.status(400).json({ error: 'Invalid limit parameter. Must not exceed 500.' });
+  }
+
+  if (Number.isNaN(offset) || offset < 0) {
+    return res.status(400).json({ error: 'Invalid offset parameter. Must be a non-negative integer.' });
+  }
+
+  const totalCount = await versionsRepository.count(serviceId);
+
+  if (totalCount === 0) {
+    return res.status(404).json({ error: `No versions found for service "${serviceId}"` });
+  }
+
+  const paginatedVersions = await versionsRepository.findByService(serviceId, { limit, offset });
 
   const versionsList = paginatedVersions.map(version => ({
     id: version.id,
@@ -266,7 +403,6 @@ router.get('/versions/:serviceId/:termsType', async (req, res) => {
   const limit = req.query.limit ? parseInt(req.query.limit, 10) : 100;
   const offset = req.query.offset ? parseInt(req.query.offset, 10) : 0;
 
-  // Validate pagination parameters
   if (Number.isNaN(limit) || limit < 1) {
     return res.status(400).json({ error: 'Invalid limit parameter. Must be a positive integer.' });
   }
@@ -279,14 +415,14 @@ router.get('/versions/:serviceId/:termsType', async (req, res) => {
     return res.status(400).json({ error: 'Invalid offset parameter. Must be a non-negative integer.' });
   }
 
-  // Get total count using efficient count method
-  const totalCount = await versionsRepository.count(serviceId, termsType);
+  const allVersions = await versionsRepository.findByServiceAndTermsType(serviceId, termsType);
 
-  if (totalCount === 0) {
+  if (allVersions.length === 0) {
     return res.status(404).json({ error: `No versions found for service "${serviceId}" and terms type "${termsType}"` });
   }
 
-  // Get paginated versions using repository-level pagination
+  const totalCount = allVersions.length;
+
   const paginatedVersions = await versionsRepository.findByServiceAndTermsType(serviceId, termsType, { limit, offset });
 
   const versionsList = paginatedVersions.map(version => ({
