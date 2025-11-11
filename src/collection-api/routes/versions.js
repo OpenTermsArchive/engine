@@ -11,6 +11,36 @@ import { toISODateWithoutMilliseconds } from '../../archivist/utils/date.js';
  *   name: Versions
  *   description: Versions API
  * components:
+ *   parameters:
+ *     LimitParam:
+ *       in: query
+ *       name: limit
+ *       description: |
+ *         The maximum number of versions to return.
+ *
+ *         **Note for Git storage**: Pagination uses Git's `--skip` and `--max-count` options,
+ *         which work in topological order rather than strictly chronological order.
+ *         This means paginated results may not be in perfect chronological sequence,
+ *         but this is an acceptable performance trade-off.
+ *       schema:
+ *         type: integer
+ *         minimum: 1
+ *         maximum: 500
+ *         default: 100
+ *       required: false
+ *     OffsetParam:
+ *       in: query
+ *       name: offset
+ *       description: |
+ *         The number of versions to skip before returning results.
+ *
+ *         **Note for Git storage**: Pagination uses Git's `--skip` and `--max-count` options,
+ *         which work in topological order rather than strictly chronological order.
+ *       schema:
+ *         type: integer
+ *         minimum: 0
+ *         default: 0
+ *       required: false
  *   schemas:
  *     Version:
  *       type: object
@@ -32,6 +62,83 @@ import { toISODateWithoutMilliseconds } from '../../archivist/utils/date.js';
  *         content:
  *           type: string
  *           description: The JSON-escaped Markdown content of the version
+ *     VersionListItem:
+ *       type: object
+ *       properties:
+ *         id:
+ *           type: string
+ *           description: The ID of the version.
+ *         serviceId:
+ *           type: string
+ *           description: The ID of the service.
+ *         termsType:
+ *           type: string
+ *           description: The type of terms.
+ *         fetchDate:
+ *           type: string
+ *           format: date-time
+ *           description: The ISO 8601 datetime string when the version was recorded.
+ *     PaginatedVersionsResponse:
+ *       type: object
+ *       properties:
+ *         data:
+ *           type: array
+ *           description: The list of versions.
+ *           items:
+ *             $ref: '#/components/schemas/VersionListItem'
+ *         count:
+ *           type: integer
+ *           description: The total number of versions found.
+ *         limit:
+ *           type: integer
+ *           description: The maximum number of versions returned in this response.
+ *         offset:
+ *           type: integer
+ *           description: The number of versions skipped before returning results.
+ *     VersionWithLinks:
+ *       allOf:
+ *         - $ref: '#/components/schemas/Version'
+ *         - type: object
+ *           properties:
+ *             links:
+ *               type: object
+ *               description: Navigation links to related versions.
+ *               properties:
+ *                 first:
+ *                   type: string
+ *                   description: The ID of the first version for this service and terms type.
+ *                   nullable: true
+ *                 prev:
+ *                   type: string
+ *                   description: The ID of the previous version, or null if this is the first.
+ *                   nullable: true
+ *                 next:
+ *                   type: string
+ *                   description: The ID of the next version, or null if this is the last.
+ *                   nullable: true
+ *                 last:
+ *                   type: string
+ *                   description: The ID of the last version for this service and terms type.
+ *                   nullable: true
+ *     ErrorResponse:
+ *       type: object
+ *       properties:
+ *         error:
+ *           type: string
+ *           description: Error message.
+ *   responses:
+ *     BadRequestError:
+ *       description: Invalid pagination parameters.
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/ErrorResponse'
+ *     NotFoundError:
+ *       description: Resource not found.
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/ErrorResponse'
  */
 const router = express.Router();
 
@@ -95,73 +202,17 @@ function mapVersionToDetailResponse(version, links) {
  *     produces:
  *       - application/json
  *     parameters:
- *       - in: query
- *         name: limit
- *         description: |
- *           The maximum number of versions to return.
- *
- *           **Note for Git storage**: Pagination uses Git's `--skip` and `--max-count` options,
- *           which work in topological order rather than strictly chronological order.
- *           This means paginated results may not be in perfect chronological sequence,
- *           but this is an acceptable performance trade-off.
- *         schema:
- *           type: integer
- *           minimum: 1
- *           maximum: 500
- *           default: 100
- *         required: false
- *       - in: query
- *         name: offset
- *         description: |
- *           The number of versions to skip before returning results.
- *
- *           **Note for Git storage**: Pagination uses Git's `--skip` and `--max-count` options,
- *           which work in topological order rather than strictly chronological order.
- *         schema:
- *           type: integer
- *           minimum: 0
- *           default: 0
- *         required: false
+ *       - $ref: '#/components/parameters/LimitParam'
+ *       - $ref: '#/components/parameters/OffsetParam'
  *     responses:
  *       200:
  *         description: A JSON object containing the list of all versions and metadata.
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 data:
- *                   type: array
- *                   description: The list of all versions.
- *                   items:
- *                     type: object
- *                     properties:
- *                       id:
- *                         type: string
- *                         description: The ID of the version.
- *                       fetchDate:
- *                         type: string
- *                         format: date-time
- *                         description: The ISO 8601 datetime string when the version was recorded.
- *                 count:
- *                   type: integer
- *                   description: The total number of versions found.
- *                 limit:
- *                   type: integer
- *                   description: The maximum number of versions returned in this response.
- *                 offset:
- *                   type: integer
- *                   description: The number of versions skipped before returning results.
+ *               $ref: '#/components/schemas/PaginatedVersionsResponse'
  *       400:
- *         description: Invalid pagination parameters.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 error:
- *                   type: string
- *                   description: Error message indicating invalid parameters.
+ *         $ref: '#/components/responses/BadRequestError'
  */
 router.get('/versions', async (req, res) => {
   const { limit, offset } = parsePaginationParams(req.query);
@@ -201,89 +252,19 @@ router.get('/versions', async (req, res) => {
  *         schema:
  *           type: string
  *         required: true
- *       - in: query
- *         name: limit
- *         description: |
- *           The maximum number of versions to return.
- *
- *           **Note for Git storage**: Pagination uses Git's `--skip` and `--max-count` options,
- *           which work in topological order rather than strictly chronological order.
- *           This means paginated results may not be in perfect chronological sequence,
- *           but this is an acceptable performance trade-off.
- *         schema:
- *           type: integer
- *           minimum: 1
- *           maximum: 500
- *           default: 100
- *         required: false
- *       - in: query
- *         name: offset
- *         description: |
- *           The number of versions to skip before returning results.
- *
- *           **Note for Git storage**: Pagination uses Git's `--skip` and `--max-count` options,
- *           which work in topological order rather than strictly chronological order.
- *         schema:
- *           type: integer
- *           minimum: 0
- *           default: 0
- *         required: false
+ *       - $ref: '#/components/parameters/LimitParam'
+ *       - $ref: '#/components/parameters/OffsetParam'
  *     responses:
  *       200:
  *         description: A JSON object containing the list of versions and metadata.
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 data:
- *                   type: array
- *                   description: The list of versions.
- *                   items:
- *                     type: object
- *                     properties:
- *                       id:
- *                         type: string
- *                         description: The ID of the version.
- *                       serviceId:
- *                         type: string
- *                         description: The ID of the service.
- *                       termsType:
- *                         type: string
- *                         description: The type of terms.
- *                       fetchDate:
- *                         type: string
- *                         format: date-time
- *                         description: The ISO 8601 datetime string when the version was recorded.
- *                 count:
- *                   type: integer
- *                   description: The total number of versions found.
- *                 limit:
- *                   type: integer
- *                   description: The maximum number of versions returned in this response.
- *                 offset:
- *                   type: integer
- *                   description: The number of versions skipped before returning results.
+ *               $ref: '#/components/schemas/PaginatedVersionsResponse'
  *       400:
- *         description: Invalid pagination parameters.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 error:
- *                   type: string
- *                   description: Error message indicating invalid parameters.
+ *         $ref: '#/components/responses/BadRequestError'
  *       404:
- *         description: No versions found for the specified service ID.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 error:
- *                   type: string
- *                   description: Error message indicating that no versions are found.
+ *         $ref: '#/components/responses/NotFoundError'
  */
 router.get('/versions/:serviceId', async (req, res) => {
   const { serviceId } = req.params;
@@ -336,89 +317,19 @@ router.get('/versions/:serviceId', async (req, res) => {
  *         schema:
  *           type: string
  *         required: true
- *       - in: query
- *         name: limit
- *         description: |
- *           The maximum number of versions to return.
- *
- *           **Note for Git storage**: Pagination uses Git's `--skip` and `--max-count` options,
- *           which work in topological order rather than strictly chronological order.
- *           This means paginated results may not be in perfect chronological sequence,
- *           but this is an acceptable performance trade-off.
- *         schema:
- *           type: integer
- *           minimum: 1
- *           maximum: 500
- *           default: 100
- *         required: false
- *       - in: query
- *         name: offset
- *         description: |
- *           The number of versions to skip before returning results.
- *
- *           **Note for Git storage**: Pagination uses Git's `--skip` and `--max-count` options,
- *           which work in topological order rather than strictly chronological order.
- *         schema:
- *           type: integer
- *           minimum: 0
- *           default: 0
- *         required: false
+ *       - $ref: '#/components/parameters/LimitParam'
+ *       - $ref: '#/components/parameters/OffsetParam'
  *     responses:
  *       200:
  *         description: A JSON object containing the list of versions and metadata.
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 data:
- *                   type: array
- *                   description: The list of versions.
- *                   items:
- *                     type: object
- *                     properties:
- *                       id:
- *                         type: string
- *                         description: The ID of the version.
- *                       serviceId:
- *                         type: string
- *                         description: The ID of the service.
- *                       termsType:
- *                         type: string
- *                         description: The type of terms.
- *                       fetchDate:
- *                         type: string
- *                         format: date-time
- *                         description: The ISO 8601 datetime string when the version was recorded.
- *                 count:
- *                   type: integer
- *                   description: The total number of versions found.
- *                 limit:
- *                   type: integer
- *                   description: The maximum number of versions returned in this response.
- *                 offset:
- *                   type: integer
- *                   description: The number of versions skipped before returning results.
+ *               $ref: '#/components/schemas/PaginatedVersionsResponse'
  *       400:
- *         description: Invalid pagination parameters.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 error:
- *                   type: string
- *                   description: Error message indicating invalid parameters.
+ *         $ref: '#/components/responses/BadRequestError'
  *       404:
- *         description: No versions found for the specified combination of service ID and terms type.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 error:
- *                   type: string
- *                   description: Error message indicating that no versions are found.
+ *         $ref: '#/components/responses/NotFoundError'
  */
 router.get('/versions/:serviceId/:termsType', async (req, res) => {
   const { serviceId, termsType } = req.params;
@@ -471,40 +382,9 @@ router.get('/versions/:serviceId/:termsType', async (req, res) => {
  *         content:
  *           application/json:
  *             schema:
- *               allOf:
- *                 - $ref: '#/components/schemas/Version'
- *                 - type: object
- *                   properties:
- *                     links:
- *                       type: object
- *                       description: Navigation links to related versions.
- *                       properties:
- *                         first:
- *                           type: string
- *                           description: The ID of the first version for this service and terms type.
- *                           nullable: true
- *                         prev:
- *                           type: string
- *                           description: The ID of the previous version, or null if this is the first.
- *                           nullable: true
- *                         next:
- *                           type: string
- *                           description: The ID of the next version, or null if this is the last.
- *                           nullable: true
- *                         last:
- *                           type: string
- *                           description: The ID of the last version for this service and terms type.
- *                           nullable: true
+ *               $ref: '#/components/schemas/VersionWithLinks'
  *       404:
- *         description: No version found with the specified ID.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 error:
- *                   type: string
- *                   description: Error message indicating that no version is found.
+ *         $ref: '#/components/responses/NotFoundError'
  */
 router.get('/version/:versionId', async (req, res) => {
   const { versionId } = req.params;
@@ -549,21 +429,13 @@ router.get('/version/:versionId', async (req, res) => {
  *         required: true
  *     responses:
  *       200:
- *         description: A JSON object containing the version content and metadata.
+ *         description: A JSON object containing the version content, metadata, and navigation links.
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/Version'
+ *               $ref: '#/components/schemas/VersionWithLinks'
  *       404:
- *         description: No version found for the specified combination of service ID and terms type.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 error:
- *                   type: string
- *                   description: Error message indicating that no version is found.
+ *         $ref: '#/components/responses/NotFoundError'
  */
 router.get('/version/:serviceId/:termsType/latest', async (req, res) => {
   const { serviceId, termsType } = req.params;
@@ -615,31 +487,19 @@ router.get('/version/:serviceId/:termsType/latest', async (req, res) => {
  *         required: true
  *     responses:
  *       200:
- *         description: A JSON object containing the version content and metadata.
+ *         description: A JSON object containing the version content, metadata, and navigation links.
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/Version'
+ *               $ref: '#/components/schemas/VersionWithLinks'
  *       404:
- *         description: No version found for the specified combination of service ID, terms type and date.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 error:
- *                   type: string
- *                   description: Error message indicating that no version is found.
+ *         $ref: '#/components/responses/NotFoundError'
  *       416:
  *         description: The requested date is in the future.
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 error:
- *                   type: string
- *                   description: Error message indicating that the requested date is in the future.
+ *               $ref: '#/components/schemas/ErrorResponse'
  */
 router.get('/version/:serviceId/:termsType/:date', async (req, res) => {
   const { serviceId, termsType, date } = req.params;
