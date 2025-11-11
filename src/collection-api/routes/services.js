@@ -9,6 +9,24 @@ import express from 'express';
  *   description: Services API
  * components:
  *   schemas:
+ *     ServiceListItem:
+ *       type: object
+ *       properties:
+ *         id:
+ *           type: string
+ *           description: The ID of the service.
+ *         name:
+ *           type: string
+ *           description: The name of the service.
+ *         terms:
+ *           type: array
+ *           description: The declared terms types for this service.
+ *           items:
+ *             type: object
+ *             properties:
+ *               type:
+ *                 type: string
+ *                 description: The type of terms.
  *     Service:
  *       type: object
  *       description: Definition of a service and the agreements its provider sets forth. While the information is the same, the format differs from the JSON declaration files that are designed for readability by contributors.
@@ -51,6 +69,19 @@ import express from 'express';
  *                       description: The names of filters to apply to the content.
  *                       items:
  *                         type: string
+ *     ErrorResponse:
+ *       type: object
+ *       properties:
+ *         error:
+ *           type: string
+ *           description: Error message.
+ *   responses:
+ *     NotFoundError:
+ *       description: Resource not found.
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/ErrorResponse'
  */
 export default function servicesRouter(services) {
   const router = express.Router();
@@ -71,23 +102,7 @@ export default function servicesRouter(services) {
    *             schema:
    *               type: array
    *               items:
-   *                 type: object
-   *                 properties:
-   *                   id:
-   *                     type: string
-   *                     description: The ID of the service.
-   *                   name:
-   *                     type: string
-   *                     description: The name of the service.
-   *                   terms:
-   *                     type: array
-   *                     description: The declared terms types for this service.
-   *                     items:
-   *                       type: object
-   *                       properties:
-   *                         type:
-   *                           type: string
-   *                           description: The type of terms.
+   *                 $ref: '#/components/schemas/ServiceListItem'
    */
   router.get('/services', (req, res) => {
     res.status(200).json(Object.values(services).map(service => ({
@@ -127,16 +142,14 @@ export default function servicesRouter(services) {
    *             schema:
    *               $ref: '#/components/schemas/Service'
    *       404:
-   *         description: No service matching the provided ID is found.
+   *         $ref: '#/components/responses/NotFoundError'
    */
   router.get('/service/:serviceId', (req, res) => {
     const matchedServiceID = Object.keys(services).find(key => key.toLowerCase() === req.params.serviceId?.toLowerCase());
     const service = services[matchedServiceID];
 
     if (!service) {
-      res.status(404).send('Service not found');
-
-      return;
+      return res.status(404).json({ error: 'Service not found' });
     }
 
     res.status(200).json({
