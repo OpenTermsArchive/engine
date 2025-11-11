@@ -89,24 +89,24 @@ export default class GitRepository extends RepositoryInterface {
   }
 
   async findAll({ limit, offset } = {}) {
-    return Promise.all((await this.#getCommits(undefined, { sortOrder: 'desc', limit, offset })).map(commit => this.#toDomain(commit, { deferContentLoading: true })));
+    return Promise.all((await this.#getCommits({ limit, offset })).map(commit => this.#toDomain(commit, { deferContentLoading: true })));
   }
 
   async findByServiceAndTermsType(serviceId, termsType, { limit, offset } = {}) {
     const pathPattern = DataMapper.generateFilePath(serviceId, termsType);
 
-    return Promise.all((await this.#getCommits(pathPattern, { sortOrder: 'desc', limit, offset })).map(commit => this.#toDomain(commit, { deferContentLoading: true })));
+    return Promise.all((await this.#getCommits({ pathFilter: pathPattern, limit, offset })).map(commit => this.#toDomain(commit, { deferContentLoading: true })));
   }
 
   async findByService(serviceId, { limit, offset } = {}) {
     const pathPattern = DataMapper.generateFilePath(serviceId);
 
-    return Promise.all((await this.#getCommits(pathPattern, { sortOrder: 'desc', limit, offset })).map(commit => this.#toDomain(commit, { deferContentLoading: true })));
+    return Promise.all((await this.#getCommits({ pathFilter: pathPattern, limit, offset })).map(commit => this.#toDomain(commit, { deferContentLoading: true })));
   }
 
   async findFirst(serviceId, termsType) {
     const pathPattern = DataMapper.generateFilePath(serviceId, termsType);
-    const commits = await this.#getCommits(pathPattern, { sortOrder: 'asc' });
+    const commits = await this.#getCommits({ pathFilter: pathPattern, reverse: true });
 
     return commits.length > 0 ? this.#toDomain(commits[0], { deferContentLoading: true }) : null;
   }
@@ -164,7 +164,7 @@ export default class GitRepository extends RepositoryInterface {
   }
 
   async* iterate() {
-    const commits = await this.#getCommits(undefined, { sortOrder: 'asc' });
+    const commits = await this.#getCommits({ reverse: true });
 
     for (const commit of commits) {
       yield this.#toDomain(commit);
@@ -198,7 +198,7 @@ export default class GitRepository extends RepositoryInterface {
     record.content = pdfBuffer;
   }
 
-  async #getCommits(pathFilter, { sortOrder = 'asc', limit, offset } = {}) {
+  async #getCommits({ pathFilter, reverse = false, limit, offset } = {}) {
     const grepOptions = Object.values(DataMapper.COMMIT_MESSAGE_PREFIXES).flatMap(prefix => [ '--grep', prefix ]);
     const pathOptions = pathFilter
       ? [ '--', pathFilter ]
@@ -222,11 +222,12 @@ export default class GitRepository extends RepositoryInterface {
     const commits = await this.git.listCommits(options, { reverse: false, ...paginationOptions }); // Get commits without git's --reverse for better performance, filtered at git level
 
     // Sort by date in JavaScript for accuracy - git's date ordering may not be reliable with backdated commits
+    // Default order is descending (newest to oldest), reverse gives ascending (oldest to newest)
     commits.sort((commitA, commitB) => {
       const dateA = new Date(commitA.date);
       const dateB = new Date(commitB.date);
 
-      return sortOrder === 'asc' ? dateA - dateB : dateB - dateA;
+      return reverse ? dateA - dateB : dateB - dateA;
     });
 
     return commits;
