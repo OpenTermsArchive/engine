@@ -60,6 +60,31 @@ function validatePaginationParams(limit, offset) {
   return null;
 }
 
+function mapVersionToListItem(version) {
+  return {
+    id: version.id,
+    serviceId: version.serviceId,
+    termsType: version.termsType,
+    fetchDate: toISODateWithoutMilliseconds(version.fetchDate),
+  };
+}
+
+function mapVersionToDetailResponse(version, links) {
+  return {
+    id: version.id,
+    serviceId: version.serviceId,
+    termsType: version.termsType,
+    fetchDate: toISODateWithoutMilliseconds(version.fetchDate),
+    content: version.content,
+    links: {
+      first: links.first?.id || null,
+      prev: links.prev?.id || null,
+      next: links.next?.id || null,
+      last: links.last?.id || null,
+    },
+  };
+}
+
 /**
  * @private
  * @swagger
@@ -148,12 +173,7 @@ router.get('/versions', async (req, res) => {
 
   const paginatedVersions = await versionsRepository.findAll({ limit, offset });
 
-  const versionsList = paginatedVersions.map(version => ({
-    id: version.id,
-    serviceId: version.serviceId,
-    termsType: version.termsType,
-    fetchDate: toISODateWithoutMilliseconds(version.fetchDate),
-  }));
+  const versionsList = paginatedVersions.map(mapVersionToListItem);
 
   const response = {
     data: versionsList,
@@ -282,12 +302,7 @@ router.get('/versions/:serviceId', async (req, res) => {
 
   const paginatedVersions = await versionsRepository.findByService(serviceId, { limit, offset });
 
-  const versionsList = paginatedVersions.map(version => ({
-    id: version.id,
-    serviceId: version.serviceId,
-    termsType: version.termsType,
-    fetchDate: toISODateWithoutMilliseconds(version.fetchDate),
-  }));
+  const versionsList = paginatedVersions.map(mapVersionToListItem);
 
   const response = {
     data: versionsList,
@@ -414,22 +429,15 @@ router.get('/versions/:serviceId/:termsType', async (req, res) => {
     return res.status(400).json(validationError);
   }
 
-  const allVersions = await versionsRepository.findByServiceAndTermsType(serviceId, termsType);
+  const totalCount = await versionsRepository.count(serviceId, termsType);
 
-  if (allVersions.length === 0) {
+  if (totalCount === 0) {
     return res.status(404).json({ error: `No versions found for service "${serviceId}" and terms type "${termsType}"` });
   }
 
-  const totalCount = allVersions.length;
-
   const paginatedVersions = await versionsRepository.findByServiceAndTermsType(serviceId, termsType, { limit, offset });
 
-  const versionsList = paginatedVersions.map(version => ({
-    id: version.id,
-    serviceId: version.serviceId,
-    termsType: version.termsType,
-    fetchDate: toISODateWithoutMilliseconds(version.fetchDate),
-  }));
+  const versionsList = paginatedVersions.map(mapVersionToListItem);
 
   const response = {
     data: versionsList,
@@ -507,26 +515,14 @@ router.get('/version/:versionId', async (req, res) => {
     return res.status(404).json({ error: `No version found with ID "${versionId}"` });
   }
 
-  const [ firstVersion, prevVersion, nextVersion, lastVersion ] = await Promise.all([
+  const [ first, prev, next, last ] = await Promise.all([
     versionsRepository.findFirst(version.serviceId, version.termsType),
     versionsRepository.findPrevious(versionId),
     versionsRepository.findNext(versionId),
     versionsRepository.findLatest(version.serviceId, version.termsType),
   ]);
 
-  return res.status(200).json({
-    id: version.id,
-    serviceId: version.serviceId,
-    termsType: version.termsType,
-    fetchDate: toISODateWithoutMilliseconds(version.fetchDate),
-    content: version.content,
-    links: {
-      first: firstVersion?.id || null,
-      prev: prevVersion?.id || null,
-      next: nextVersion?.id || null,
-      last: lastVersion?.id || null,
-    },
-  });
+  return res.status(200).json(mapVersionToDetailResponse(version, { first, prev, next, last }));
 });
 
 /**
@@ -578,26 +574,14 @@ router.get('/version/:serviceId/:termsType/latest', async (req, res) => {
     return res.status(404).json({ error: `No version found for service "${serviceId}" and terms type "${termsType}"` });
   }
 
-  const [ firstVersion, prevVersion, nextVersion, lastVersion ] = await Promise.all([
+  const [ first, prev, next, last ] = await Promise.all([
     versionsRepository.findFirst(version.serviceId, version.termsType),
     versionsRepository.findPrevious(version.id),
     versionsRepository.findNext(version.id),
     versionsRepository.findLatest(version.serviceId, version.termsType),
   ]);
 
-  return res.status(200).json({
-    id: version.id,
-    serviceId: version.serviceId,
-    termsType: version.termsType,
-    fetchDate: toISODateWithoutMilliseconds(version.fetchDate),
-    content: version.content,
-    links: {
-      first: firstVersion?.id || null,
-      prev: prevVersion?.id || null,
-      next: nextVersion?.id || null,
-      last: lastVersion?.id || null,
-    },
-  });
+  return res.status(200).json(mapVersionToDetailResponse(version, { first, prev, next, last }));
 });
 
 /**
@@ -668,29 +652,17 @@ router.get('/version/:serviceId/:termsType/:date', async (req, res) => {
   const version = await versionsRepository.findByDate(serviceId, termsType, requestedDate);
 
   if (!version) {
-    return res.status(404).json({ error: `No version found for date ${date}` });
+    return res.status(404).json({ error: `No version found for service "${serviceId}" and terms type "${termsType}" at date ${date}` });
   }
 
-  const [ firstVersion, prevVersion, nextVersion, lastVersion ] = await Promise.all([
+  const [ first, prev, next, last ] = await Promise.all([
     versionsRepository.findFirst(version.serviceId, version.termsType),
     versionsRepository.findPrevious(version.id),
     versionsRepository.findNext(version.id),
     versionsRepository.findLatest(version.serviceId, version.termsType),
   ]);
 
-  return res.status(200).json({
-    id: version.id,
-    serviceId: version.serviceId,
-    termsType: version.termsType,
-    fetchDate: toISODateWithoutMilliseconds(version.fetchDate),
-    content: version.content,
-    links: {
-      first: firstVersion?.id || null,
-      prev: prevVersion?.id || null,
-      next: nextVersion?.id || null,
-      last: lastVersion?.id || null,
-    },
-  });
+  return res.status(200).json(mapVersionToDetailResponse(version, { first, prev, next, last }));
 });
 
 export default router;
