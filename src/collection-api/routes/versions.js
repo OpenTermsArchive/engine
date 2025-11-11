@@ -37,6 +37,29 @@ const router = express.Router();
 
 const versionsRepository = await RepositoryFactory.create(config.get('@opentermsarchive/engine.recorder.versions.storage')).initialize();
 
+function parsePaginationParams(query) {
+  const limit = query.limit ? parseInt(query.limit, 10) : 100;
+  const offset = query.offset ? parseInt(query.offset, 10) : 0;
+
+  return { limit, offset };
+}
+
+function validatePaginationParams(limit, offset) {
+  if (Number.isNaN(limit) || limit < 1) {
+    return { error: 'Invalid limit parameter. Must be a positive integer.' };
+  }
+
+  if (limit > 500) {
+    return { error: 'Invalid limit parameter. Must not exceed 500.' };
+  }
+
+  if (Number.isNaN(offset) || offset < 0) {
+    return { error: 'Invalid offset parameter. Must be a non-negative integer.' };
+  }
+
+  return null;
+}
+
 /**
  * @private
  * @swagger
@@ -116,19 +139,11 @@ const versionsRepository = await RepositoryFactory.create(config.get('@openterms
  *                   description: Error message indicating invalid parameters.
  */
 router.get('/versions', async (req, res) => {
-  const limit = req.query.limit ? parseInt(req.query.limit, 10) : 100;
-  const offset = req.query.offset ? parseInt(req.query.offset, 10) : 0;
+  const { limit, offset } = parsePaginationParams(req.query);
+  const validationError = validatePaginationParams(limit, offset);
 
-  if (Number.isNaN(limit) || limit < 1) {
-    return res.status(400).json({ error: 'Invalid limit parameter. Must be a positive integer.' });
-  }
-
-  if (limit > 500) {
-    return res.status(400).json({ error: 'Invalid limit parameter. Must not exceed 500.' });
-  }
-
-  if (Number.isNaN(offset) || offset < 0) {
-    return res.status(400).json({ error: 'Invalid offset parameter. Must be a non-negative integer.' });
+  if (validationError) {
+    return res.status(400).json(validationError);
   }
 
   const paginatedVersions = await versionsRepository.findAll({ limit, offset });
@@ -252,19 +267,11 @@ router.get('/versions', async (req, res) => {
  */
 router.get('/versions/:serviceId', async (req, res) => {
   const { serviceId } = req.params;
-  const limit = req.query.limit ? parseInt(req.query.limit, 10) : 100;
-  const offset = req.query.offset ? parseInt(req.query.offset, 10) : 0;
+  const { limit, offset } = parsePaginationParams(req.query);
+  const validationError = validatePaginationParams(limit, offset);
 
-  if (Number.isNaN(limit) || limit < 1) {
-    return res.status(400).json({ error: 'Invalid limit parameter. Must be a positive integer.' });
-  }
-
-  if (limit > 500) {
-    return res.status(400).json({ error: 'Invalid limit parameter. Must not exceed 500.' });
-  }
-
-  if (Number.isNaN(offset) || offset < 0) {
-    return res.status(400).json({ error: 'Invalid offset parameter. Must be a non-negative integer.' });
+  if (validationError) {
+    return res.status(400).json(validationError);
   }
 
   const totalCount = await versionsRepository.count(serviceId);
@@ -400,19 +407,11 @@ router.get('/versions/:serviceId', async (req, res) => {
  */
 router.get('/versions/:serviceId/:termsType', async (req, res) => {
   const { serviceId, termsType } = req.params;
-  const limit = req.query.limit ? parseInt(req.query.limit, 10) : 100;
-  const offset = req.query.offset ? parseInt(req.query.offset, 10) : 0;
+  const { limit, offset } = parsePaginationParams(req.query);
+  const validationError = validatePaginationParams(limit, offset);
 
-  if (Number.isNaN(limit) || limit < 1) {
-    return res.status(400).json({ error: 'Invalid limit parameter. Must be a positive integer.' });
-  }
-
-  if (limit > 500) {
-    return res.status(400).json({ error: 'Invalid limit parameter. Must not exceed 500.' });
-  }
-
-  if (Number.isNaN(offset) || offset < 0) {
-    return res.status(400).json({ error: 'Invalid offset parameter. Must be a non-negative integer.' });
+  if (validationError) {
+    return res.status(400).json(validationError);
   }
 
   const allVersions = await versionsRepository.findByServiceAndTermsType(serviceId, termsType);
