@@ -24,13 +24,18 @@ export async function release({ shouldPublish, shouldRemoveLocalCopy, fileName }
 
   logger.info('Start publishing dataset…');
 
-  const releaseUrl = await publishRelease({
+  const results = await publishRelease({
     archivePath,
     releaseDate,
     stats,
   });
 
-  logger.info(`Dataset published to ${releaseUrl}`);
+  if (results.length > 0) {
+    logger.info('Dataset published to following platforms:');
+    results.forEach(result => {
+      logger.info(`  - ${result.platform}: ${result.url}`);
+    });
+  }
 
   if (!shouldRemoveLocalCopy) {
     return;
