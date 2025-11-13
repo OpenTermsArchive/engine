@@ -13,7 +13,19 @@ logger.format = combine(
 
     const timestampPrefix = config.get('@opentermsarchive/engine.logger.timestampPrefix') ? `${timestamp} ` : '';
 
-    return `${timestampPrefix}${level.padEnd(15)} ${prefix.padEnd(50)} ${message}`;
+    const levelStr = level.padEnd(15);
+    let coloredLevel = levelStr;
+    let coloredMessage = message;
+
+    if (level.includes('warn')) {
+      coloredLevel = `\x1b[33m${levelStr}\x1b[0m`;
+      coloredMessage = `\x1b[33m${message}\x1b[0m`;
+    } else if (level.includes('error')) {
+      coloredLevel = `\x1b[31m${levelStr}\x1b[0m`;
+      coloredMessage = `\x1b[31m${message}\x1b[0m`;
+    }
+
+    return `${timestampPrefix} ${coloredLevel} ${prefix.padEnd(50)} ${coloredMessage}`;
   }),
 );
 
