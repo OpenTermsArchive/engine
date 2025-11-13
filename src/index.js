@@ -40,8 +40,11 @@ export default async function track({ services, types, extractOnly, schedule }) 
     });
   }
 
-  // The result of the extraction step that generates the version from the snapshots may depend on changes to the engine or its dependencies.
-  // The process thus starts by only performing the extraction process so that any version following such changes can be labelled (to avoid sending notifications, for example)
+  // Technical upgrade pass: apply changes from engine, dependency, or declaration upgrades.
+  // This regenerates versions from existing snapshots with updated extraction logic.
+  // For terms with combined source documents, if a new document was added to the declaration,
+  // it will be fetched and combined with existing snapshots to regenerate the complete version.
+  // All versions from this pass are labeled as technical upgrades to avoid false notifications about content changes.
   await archivist.track({ services, types, extractOnly: true });
 
   if (extractOnly) {

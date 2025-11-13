@@ -159,6 +159,10 @@ export default class Archivist extends events.EventEmitter {
   async trackTermsChanges({ terms, extractOnly = false }) {
     if (!extractOnly) {
       await this.fetchAndRecordSnapshots(terms);
+    } else {
+      // In extractOnly mode (technical upgrade pass), fetch and record snapshots only for new source documents
+      // that don't have existing snapshots yet (e.g., when a declaration is updated to add a new source document)
+      await this.fetchAndRecordMissingSnapshots(terms);
     }
 
     const contents = await this.extractContentsFromSnapshots(terms);
@@ -175,6 +179,50 @@ export default class Archivist extends events.EventEmitter {
     const fetchDocumentErrors = [];
 
     for (const sourceDocument of terms.sourceDocuments) {
+      const error = await this.fetchSourceDocument(sourceDocument);
+
+      if (error) {
+        fetchDocumentErrors.push(error);
+      } else {
+        await this.recordSnapshot(terms, sourceDocument);
+        sourceDocument.clearContent(); // Reduce memory usage by clearing no longer needed large content strings
+      }
+    }
+
+    if (fetchDocumentErrors.length) {
+      throw new InaccessibleContentError(fetchDocumentErrors);
+    }
+  }
+
+  async fetchAndRecordMissingSnapshots(terms) {
+    if (!terms.hasMultipleSourceDocuments) { // If the terms has only one source document, there is nothing to do
+      return;
+    }
+
+    const existingVersion = await this.recorder.versionsRepository.findLatest(terms.service.id, terms.type);
+
+    if (!existingVersion) { // If the terms already has a version recorded, skip this step as the next version will be tagged as "First record…" anyway
+      return;
+    }
+
+    const missingSourceDocuments = [];
+
+    for (const sourceDocument of terms.sourceDocuments) {
+      const snapshot = await this.recorder.getLatestSnapshot(terms, sourceDocument.id);
+
+      if (!snapshot) {
+        missingSourceDocuments.push(sourceDocument);
+      }
+    }
+
+    if (missingSourceDocuments.length) {
+      return;
+    }
+
+    terms.fetchDate = new Date();
+    const fetchDocumentErrors = [];
+
+    for (const sourceDocument of missingSourceDocuments) {
       const error = await this.fetchSourceDocument(sourceDocument);
 
       if (error) {
