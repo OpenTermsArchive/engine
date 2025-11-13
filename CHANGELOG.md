@@ -2,13 +2,18 @@
 
 All changes that impact users of this module are documented in this file, in the [Common Changelog](https://common-changelog.org) format with some additional specifications defined in the CONTRIBUTING file. This codebase adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## 10.0.0 - 2025-11-20
-
-_Full changeset and discussions: [#1207](https://github.com/OpenTermsArchive/engine/pull/1207)._
+## Unreleased [minor]
 
 > Development of this release was supported by the [French Ministry for Foreign Affairs](https://www.diplomatie.gouv.fr/fr/politique-etrangere-de-la-france/diplomatie-numerique/) through its ministerial [State Startups incubator](https://beta.gouv.fr/startups/open-terms-archive.html) under the aegis of the Ambassador for Digital Affairs.
 
 ### Added
+
+- Add support for publishing datasets to data.gouv.fr; configure `dataset.datagouv.datasetId` in configuration file and set `OTA_ENGINE_DATAGOUV_API_KEY` environment variable
+- Add ability to publish datasets to multiple platforms simultaneously; datasets can now be published to GitHub (or GitLab) and data.gouv.fr in parallel
+
+## 10.0.0 - 2025-11-20
+
+_Full changeset and discussions: [#1207](https://github.com/OpenTermsArchive/engine/pull/1207)._
 
 - Add `ota apply-technical-upgrades` CLI command to apply technical upgrades independently
 
