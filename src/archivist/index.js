@@ -213,7 +213,7 @@ export default class Archivist extends events.EventEmitter {
       }
     }
 
-    if (missingSourceDocuments.length) {
+    if (!missingSourceDocuments.length) {
       return;
     }
 
