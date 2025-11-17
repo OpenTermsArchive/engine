@@ -13,7 +13,7 @@ import Reporter from './reporter/index.js';
 const require = createRequire(import.meta.url);
 const { version: PACKAGE_VERSION } = require('../package.json');
 
-export default async function track({ services, types, schedule }) {
+async function initialize(services) {
   const archivist = new Archivist({
     recorderConfig: config.get('@opentermsarchive/engine.recorder'),
     fetcherConfig: config.get('@opentermsarchive/engine.fetcher'),
@@ -40,11 +40,17 @@ export default async function track({ services, types, schedule }) {
     });
   }
 
+  return { archivist, services };
+}
+
+export default async function track({ services, types, schedule }) {
+  const { archivist, services: filteredServices } = await initialize(services);
+
   // Technical upgrade pass: apply changes from engine, dependency, or declaration upgrades.
   // This regenerates versions from existing snapshots with updated extraction logic.
   // For terms with combined source documents, if a new document was added to the declaration, it will be fetched and combined with existing snapshots to regenerate the complete version.
   // All versions from this pass are labeled as technical upgrades to avoid false notifications about content changes.
-  await archivist.applyTechnicalUpgrades({ services, types });
+  await archivist.applyTechnicalUpgrades({ services: filteredServices, types });
 
   if (process.env.OTA_ENGINE_SENDINBLUE_API_KEY) {
     try {
@@ -70,7 +76,7 @@ export default async function track({ services, types, schedule }) {
   }
 
   if (!schedule) {
-    await archivist.track({ services, types });
+    await archivist.track({ services: filteredServices, types });
 
     return;
   }
@@ -84,36 +90,12 @@ export default async function track({ services, types, schedule }) {
   new Cron( // eslint-disable-line no-new
     trackingSchedule,
     { protect: job => logger.warn(`Tracking scheduled at ${new Date().toISOString()} were blocked by an unfinished tracking started at ${job.currentRun().toISOString()}`) },
-    () => archivist.track({ services, types }),
+    () => archivist.track({ services: filteredServices, types }),
   );
 }
 
 export async function applyTechnicalUpgrades({ services, types }) {
-  const archivist = new Archivist({
-    recorderConfig: config.get('@opentermsarchive/engine.recorder'),
-    fetcherConfig: config.get('@opentermsarchive/engine.fetcher'),
-  });
+  const { archivist, services: filteredServices } = await initialize(services);
 
-  archivist.attach(logger);
-
-  await archivist.initialize();
-
-  const collection = await getCollection();
-  const collectionName = collection?.name ? ` with ${collection.name} collection` : '';
-
-  logger.info(`Start engine v${PACKAGE_VERSION}${collectionName}\n`);
-
-  if (services?.length) {
-    services = services.filter(serviceId => {
-      const isServiceDeclared = archivist.services[serviceId];
-
-      if (!isServiceDeclared) {
-        logger.warn(`Parameter "${serviceId}" was interpreted as a service ID to update, but no matching declaration was found; it will be ignored`);
-      }
-
-      return isServiceDeclared;
-    });
-  }
-
-  await archivist.applyTechnicalUpgrades({ services, types });
+  await archivist.applyTechnicalUpgrades({ services: filteredServices, types });
 }

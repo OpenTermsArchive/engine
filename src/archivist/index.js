@@ -129,41 +129,31 @@ export default class Archivist extends events.EventEmitter {
   }
 
   async track({ services: servicesIds = this.servicesIds, types: termsTypes = [] } = {}) {
-    const numberOfTerms = Service.getNumberOfTerms(this.services, servicesIds, termsTypes);
-
-    this.emit('trackingStarted', servicesIds.length, numberOfTerms, false);
-
-    await Promise.all([ launchHeadlessBrowser(), this.recorder.initialize() ]);
-
-    this.trackingQueue.concurrency = MAX_PARALLEL_TRACKING;
-
-    servicesIds.forEach(serviceId => {
-      this.services[serviceId].getTermsTypes().forEach(termsType => {
-        if (termsTypes.length && !termsTypes.includes(termsType)) {
-          return;
-        }
-
-        this.trackingQueue.push({ terms: this.services[serviceId].getTerms({ type: termsType }), technicalUpgradeOnly: false });
-      });
+    await this.processTerms({
+      servicesIds,
+      termsTypes,
+      technicalUpgradeOnly: false,
+      concurrency: MAX_PARALLEL_TRACKING,
     });
-
-    if (this.trackingQueue.length()) {
-      await this.trackingQueue.drain();
-    }
-
-    await Promise.all([ stopHeadlessBrowser(), this.recorder.finalize() ]);
-
-    this.emit('trackingCompleted', servicesIds.length, numberOfTerms, false);
   }
 
   async applyTechnicalUpgrades({ services: servicesIds = this.servicesIds, types: termsTypes = [] } = {}) {
+    await this.processTerms({
+      servicesIds,
+      termsTypes,
+      technicalUpgradeOnly: true,
+      concurrency: MAX_PARALLEL_TECHNICAL_UPGRADES,
+    });
+  }
+
+  async processTerms({ servicesIds, termsTypes, technicalUpgradeOnly, concurrency }) {
     const numberOfTerms = Service.getNumberOfTerms(this.services, servicesIds, termsTypes);
 
-    this.emit('trackingStarted', servicesIds.length, numberOfTerms, true);
+    this.emit('trackingStarted', servicesIds.length, numberOfTerms, technicalUpgradeOnly);
 
     await Promise.all([ launchHeadlessBrowser(), this.recorder.initialize() ]);
 
-    this.trackingQueue.concurrency = MAX_PARALLEL_TECHNICAL_UPGRADES;
+    this.trackingQueue.concurrency = concurrency;
 
     servicesIds.forEach(serviceId => {
       this.services[serviceId].getTermsTypes().forEach(termsType => {
@@ -171,7 +161,7 @@ export default class Archivist extends events.EventEmitter {
           return;
         }
 
-        this.trackingQueue.push({ terms: this.services[serviceId].getTerms({ type: termsType }), technicalUpgradeOnly: true });
+        this.trackingQueue.push({ terms: this.services[serviceId].getTerms({ type: termsType }), technicalUpgradeOnly });
       });
     });
 
@@ -181,7 +171,7 @@ export default class Archivist extends events.EventEmitter {
 
     await Promise.all([ stopHeadlessBrowser(), this.recorder.finalize() ]);
 
-    this.emit('trackingCompleted', servicesIds.length, numberOfTerms, true);
+    this.emit('trackingCompleted', servicesIds.length, numberOfTerms, technicalUpgradeOnly);
   }
 
   async trackTermsChanges({ terms, technicalUpgradeOnly = false }) {
