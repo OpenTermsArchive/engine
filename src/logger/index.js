@@ -195,9 +195,9 @@ logger.onVersionNotChanged = ({ serviceId, termsType }) => {
   logger.info({ message: 'No changes after filtering, did not record version', serviceId, termsType });
 };
 
-logger.onTrackingStarted = (numberOfServices, numberOfTerms, extractOnly) => {
-  if (extractOnly) {
-    logger.info(`Examining ${numberOfTerms} terms from ${numberOfServices} services for extraction…`);
+logger.onTrackingStarted = (numberOfServices, numberOfTerms, technicalUpgradeOnly) => {
+  if (technicalUpgradeOnly) {
+    logger.info(`Applying technical upgrades to ${numberOfTerms} terms from ${numberOfServices} services…`);
   } else {
     logger.info(`Tracking changes of ${numberOfTerms} terms from ${numberOfServices} services…`);
   }
@@ -206,11 +206,11 @@ logger.onTrackingStarted = (numberOfServices, numberOfTerms, extractOnly) => {
   trackingStartTime = Date.now();
 };
 
-logger.onTrackingCompleted = (numberOfServices, numberOfTerms, extractOnly) => {
+logger.onTrackingCompleted = (numberOfServices, numberOfTerms, technicalUpgradeOnly) => {
   const duration = formatDuration(Date.now() - trackingStartTime);
 
-  if (extractOnly) {
-    logger.info(`Examined ${numberOfTerms} terms from ${numberOfServices} services for extraction in ${duration}`);
+  if (technicalUpgradeOnly) {
+    logger.info(`Applied technical upgrades to ${numberOfTerms} terms from ${numberOfServices} services in ${duration}`);
     logger.info(`Recorded ${recordedVersionsCount} new versions\n`);
   } else {
     logger.info(`Tracked changes of ${numberOfTerms} terms from ${numberOfServices} services in ${duration}`);

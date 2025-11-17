@@ -220,7 +220,7 @@ describe('MongoRepository', () => {
         });
       });
 
-      context('when it is an extracted only version', () => {
+      context('when it is an technical upgrade version', () => {
         const EXTRACTED_ONLY_CONTENT = `${CONTENT} extracted only`;
 
         before(async () => {
@@ -230,7 +230,7 @@ describe('MongoRepository', () => {
             content: CONTENT,
             fetchDate: FETCH_DATE_EARLIER,
             snapshotIds: [SNAPSHOT_ID],
-          })); // An extracted only version cannot be the first record
+          })); // An technical upgrade version cannot be the first record
 
           numberOfRecordsBefore = await collection.countDocuments({
             serviceId: SERVICE_PROVIDER_ID,
@@ -243,7 +243,7 @@ describe('MongoRepository', () => {
             content: EXTRACTED_ONLY_CONTENT,
             fetchDate: FETCH_DATE,
             snapshotIds: [SNAPSHOT_ID],
-            isExtractOnly: true,
+            isTechnicalUpgrade: true,
           })));
 
           numberOfRecordsAfter = await collection.countDocuments({
@@ -267,8 +267,8 @@ describe('MongoRepository', () => {
           expect(mongoDocument._id.toString()).to.equal(record.id);
         });
 
-        it('stores information that it is an extracted only version', () => {
-          expect(mongoDocument.isExtractOnly).to.be.true;
+        it('stores information that it is an technical upgrade version', () => {
+          expect(mongoDocument.isTechnicalUpgrade).to.be.true;
         });
       });
 
@@ -596,7 +596,7 @@ describe('MongoRepository', () => {
           serviceId: SERVICE_PROVIDER_ID,
           termsType: TERMS_TYPE,
           content: `${CONTENT} - updated 2`,
-          isExtractOnly: true,
+          isTechnicalUpgrade: true,
           fetchDate: FETCH_DATE_EARLIER,
           snapshotIds: [SNAPSHOT_ID],
         }));
@@ -645,7 +645,7 @@ describe('MongoRepository', () => {
           serviceId: SERVICE_PROVIDER_ID,
           termsType: TERMS_TYPE,
           content: `${CONTENT} - updated 2`,
-          isExtractOnly: true,
+          isTechnicalUpgrade: true,
           fetchDate: FETCH_DATE_EARLIER,
           snapshotIds: [SNAPSHOT_ID],
         }));
@@ -810,7 +810,7 @@ describe('MongoRepository', () => {
           serviceId: SERVICE_PROVIDER_ID,
           termsType: TERMS_TYPE,
           content: `${CONTENT} - updated 2`,
-          isExtractOnly: true,
+          isTechnicalUpgrade: true,
           fetchDate: FETCH_DATE_EARLIER,
           snapshotIds: [SNAPSHOT_ID],
         }));
@@ -1164,7 +1164,7 @@ describe('MongoRepository', () => {
           serviceId: SERVICE_PROVIDER_ID,
           termsType: TERMS_TYPE,
           content: `${CONTENT} - updated 2`,
-          isExtractOnly: true,
+          isTechnicalUpgrade: true,
           fetchDate: FETCH_DATE_EARLIER,
           mimeType: HTML_MIME_TYPE,
         }));
@@ -1213,7 +1213,7 @@ describe('MongoRepository', () => {
           serviceId: SERVICE_PROVIDER_ID,
           termsType: TERMS_TYPE,
           content: `${CONTENT} - updated 2`,
-          isExtractOnly: true,
+          isTechnicalUpgrade: true,
           fetchDate: FETCH_DATE_EARLIER,
           mimeType: HTML_MIME_TYPE,
         }));
@@ -1421,7 +1421,7 @@ describe('MongoRepository', () => {
           serviceId: SERVICE_PROVIDER_ID,
           termsType: TERMS_TYPE,
           content: `${CONTENT} - updated 2`,
-          isExtractOnly: true,
+          isTechnicalUpgrade: true,
           fetchDate: FETCH_DATE_EARLIER,
           mimeType: HTML_MIME_TYPE,
         }));

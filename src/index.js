@@ -13,7 +13,7 @@ import Reporter from './reporter/index.js';
 const require = createRequire(import.meta.url);
 const { version: PACKAGE_VERSION } = require('../package.json');
 
-export default async function track({ services, types, extractOnly, schedule }) {
+export default async function track({ services, types, technicalUpgradeOnly, schedule }) {
   const archivist = new Archivist({
     recorderConfig: config.get('@opentermsarchive/engine.recorder'),
     fetcherConfig: config.get('@opentermsarchive/engine.fetcher'),
@@ -45,9 +45,9 @@ export default async function track({ services, types, extractOnly, schedule }) 
   // For terms with combined source documents, if a new document was added to the declaration,
   // it will be fetched and combined with existing snapshots to regenerate the complete version.
   // All versions from this pass are labeled as technical upgrades to avoid false notifications about content changes.
-  await archivist.track({ services, types, extractOnly: true });
+  await archivist.track({ services, types, technicalUpgradeOnly: true });
 
-  if (extractOnly) {
+  if (technicalUpgradeOnly) {
     return;
   }
 

@@ -128,14 +128,14 @@ export default class Archivist extends events.EventEmitter {
     });
   }
 
-  async track({ services: servicesIds = this.servicesIds, types: termsTypes = [], extractOnly = false } = {}) {
+  async track({ services: servicesIds = this.servicesIds, types: termsTypes = [], technicalUpgradeOnly = false } = {}) {
     const numberOfTerms = Service.getNumberOfTerms(this.services, servicesIds, termsTypes);
 
-    this.emit('trackingStarted', servicesIds.length, numberOfTerms, extractOnly);
+    this.emit('trackingStarted', servicesIds.length, numberOfTerms, technicalUpgradeOnly);
 
     await Promise.all([ launchHeadlessBrowser(), this.recorder.initialize() ]);
 
-    this.trackingQueue.concurrency = extractOnly ? MAX_PARALLEL_EXTRACTING : MAX_PARALLEL_TRACKING;
+    this.trackingQueue.concurrency = technicalUpgradeOnly ? MAX_PARALLEL_EXTRACTING : MAX_PARALLEL_TRACKING;
 
     servicesIds.forEach(serviceId => {
       this.services[serviceId].getTermsTypes().forEach(termsType => {
@@ -143,7 +143,7 @@ export default class Archivist extends events.EventEmitter {
           return;
         }
 
-        this.trackingQueue.push({ terms: this.services[serviceId].getTerms({ type: termsType }), extractOnly });
+        this.trackingQueue.push({ terms: this.services[serviceId].getTerms({ type: termsType }), technicalUpgradeOnly });
       });
     });
 
@@ -153,14 +153,14 @@ export default class Archivist extends events.EventEmitter {
 
     await Promise.all([ stopHeadlessBrowser(), this.recorder.finalize() ]);
 
-    this.emit('trackingCompleted', servicesIds.length, numberOfTerms, extractOnly);
+    this.emit('trackingCompleted', servicesIds.length, numberOfTerms, technicalUpgradeOnly);
   }
 
-  async trackTermsChanges({ terms, extractOnly = false }) {
-    if (!extractOnly) {
+  async trackTermsChanges({ terms, technicalUpgradeOnly = false }) {
+    if (!technicalUpgradeOnly) {
       await this.fetchAndRecordSnapshots(terms);
     } else {
-      // In extractOnly mode (technical upgrade pass), fetch and record snapshots only for new source documents
+      // In technical upgrade mode, fetch and record snapshots only for new source documents
       // that don't have existing snapshots yet (e.g., when a declaration is updated to add a new source document)
       await this.fetchAndRecordMissingSnapshots(terms);
     }
@@ -171,7 +171,7 @@ export default class Archivist extends events.EventEmitter {
       return;
     }
 
-    await this.recordVersion(terms, contents.join(Version.SOURCE_DOCUMENTS_SEPARATOR), extractOnly);
+    await this.recordVersion(terms, contents.join(Version.SOURCE_DOCUMENTS_SEPARATOR), technicalUpgradeOnly);
   }
 
   async fetchAndRecordSnapshots(terms) {
@@ -297,14 +297,14 @@ export default class Archivist extends events.EventEmitter {
     return contents;
   }
 
-  async recordVersion(terms, content, extractOnly) {
+  async recordVersion(terms, content, technicalUpgradeOnly) {
     const record = new Version({
       content,
       snapshotIds: terms.sourceDocuments.map(sourceDocuments => sourceDocuments.snapshotId),
       serviceId: terms.service.id,
       termsType: terms.type,
       fetchDate: terms.fetchDate,
-      isExtractOnly: extractOnly,
+      isTechnicalUpgrade: technicalUpgradeOnly,
       metadata: { 'x-engine-version': PACKAGE_VERSION },
     });
 

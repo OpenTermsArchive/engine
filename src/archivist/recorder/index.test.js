@@ -258,8 +258,8 @@ describe('Recorder', () => {
               expect(await record.content).to.equal(UPDATED_CONTENT);
             });
 
-            it('records in the version that it is not an extracted only version', () => {
-              expect(record.isExtractOnly).to.equal(false);
+            it('records in the version that it is not a technical upgrade version', () => {
+              expect(record.isTechnicalUpgrade).to.equal(false);
             });
 
             it('returns the record id', () => {
@@ -315,7 +315,7 @@ describe('Recorder', () => {
                   content: CONTENT,
                   snapshotIds: [SNAPSHOT_ID],
                   fetchDate: FETCH_DATE,
-                  isExtractOnly: true,
+                  isTechnicalUpgrade: true,
                 })));
 
                 record = await recorder.versionsRepository.findLatest(SERVICE_ID, TYPE);
@@ -354,7 +354,7 @@ describe('Recorder', () => {
                   content: UPDATED_CONTENT,
                   snapshotIds: [SNAPSHOT_ID],
                   fetchDate: FETCH_DATE_LATER,
-                  isExtractOnly: true,
+                  isTechnicalUpgrade: true,
                 })));
 
                 record = await recorder.versionsRepository.findLatest(SERVICE_ID, TYPE);
@@ -366,8 +366,8 @@ describe('Recorder', () => {
                 expect(await record.content).to.equal(UPDATED_CONTENT);
               });
 
-              it('records in the version that it is an extracted only version', () => {
-                expect(record.isExtractOnly).to.equal(true);
+              it('records in the version that it is an technical upgrade version', () => {
+                expect(record.isTechnicalUpgrade).to.equal(true);
               });
 
               it('returns the record id', () => {
@@ -395,7 +395,7 @@ describe('Recorder', () => {
                   content: CONTENT,
                   snapshotIds: [SNAPSHOT_ID],
                   fetchDate: FETCH_DATE_LATER,
-                  isExtractOnly: true,
+                  isTechnicalUpgrade: true,
                 })));
 
                 record = await recorder.versionsRepository.findLatest(SERVICE_ID, TYPE);
