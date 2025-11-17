@@ -17,7 +17,7 @@ if (config.get('@opentermsarchive/engine.logger.sendMailOnError')) {
     from: config.get('@opentermsarchive/engine.logger.sendMailOnError.from'),
     host: config.get('@opentermsarchive/engine.logger.smtp.host'),
     username: config.get('@opentermsarchive/engine.logger.smtp.username'),
-    password: process.env.SMTP_PASSWORD,
+    password: process.env.OTA_ENGINE_SMTP_PASSWORD,
     ssl: true,
     timeout: 30 * 1000,
     formatter: args => args[Object.getOwnPropertySymbols(args)[1]], // Returns the full error message, the same visible in the console. It is referenced in the argument object with a Symbol of which we do not have the reference but we know it is the second one.
