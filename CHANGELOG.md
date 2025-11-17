@@ -14,7 +14,10 @@ All changes that impact users of this module are documented in this file, in the
 ### Changed
 
 - **Breaking:** Remove `--extract-only` option from `ota track` command; use the new `ota apply-technical-upgrades` command instead
-- Enhance technical upgrade pass to fetch missing snapshots for newly added source documents in combined terms declarations
+
+### Fixed
+
+- Fix incorrect versioning that occurred when adding new source documents to combined terms declarations
 
 ## 9.2.3 - 2025-11-19
 
