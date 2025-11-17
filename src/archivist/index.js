@@ -160,9 +160,7 @@ export default class Archivist extends events.EventEmitter {
     if (!technicalUpgradeOnly) {
       await this.fetchAndRecordSnapshots(terms);
     } else {
-      // In technical upgrade mode, fetch and record snapshots only for new source documents
-      // that don't have existing snapshots yet (e.g., when a declaration is updated to add a new source document)
-      await this.fetchAndRecordMissingSnapshots(terms);
+      await this.fetchAndRecordNewSourceDocuments(terms); // In technical upgrade mode, fetch and record snapshots only for new source documents that don't have existing snapshots yet (e.g., when a declaration is updated to add a new source document)
     }
 
     const contents = await this.extractContentsFromSnapshots(terms);
@@ -194,14 +192,14 @@ export default class Archivist extends events.EventEmitter {
     }
   }
 
-  async fetchAndRecordMissingSnapshots(terms) {
+  async fetchAndRecordNewSourceDocuments(terms) {
     if (!terms.hasMultipleSourceDocuments) { // If the terms has only one source document, there is nothing to do
       return;
     }
 
     const existingVersion = await this.recorder.versionsRepository.findLatest(terms.service.id, terms.type);
 
-    if (!existingVersion) { // If the terms already has a version recorded, skip this step as the next version will be tagged as "First record…" anyway
+    if (!existingVersion) { // If the terms does not have a version recorded, skip this step as the next version will be tagged as "First record…" anyway
       return;
     }
 

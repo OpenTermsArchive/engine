@@ -42,8 +42,7 @@ export default async function track({ services, types, technicalUpgradeOnly, sch
 
   // Technical upgrade pass: apply changes from engine, dependency, or declaration upgrades.
   // This regenerates versions from existing snapshots with updated extraction logic.
-  // For terms with combined source documents, if a new document was added to the declaration,
-  // it will be fetched and combined with existing snapshots to regenerate the complete version.
+  // For terms with combined source documents, if a new document was added to the declaration, it will be fetched and combined with existing snapshots to regenerate the complete version.
   // All versions from this pass are labeled as technical upgrades to avoid false notifications about content changes.
   await archivist.track({ services, types, technicalUpgradeOnly: true });
 
