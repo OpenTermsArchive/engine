@@ -20,7 +20,7 @@ const { version: PACKAGE_VERSION } = require('../../package.json');
 // - too many requests on the same endpoint yield 403
 // - sometimes when creating a commit no SHA are returned for unknown reasons
 const MAX_PARALLEL_TRACKING = 1;
-const MAX_PARALLEL_EXTRACTING = 10;
+const MAX_PARALLEL_TECHNICAL_UPGRADES = 10;
 
 export const EVENTS = [
   'snapshotRecorded',
@@ -128,14 +128,14 @@ export default class Archivist extends events.EventEmitter {
     });
   }
 
-  async track({ services: servicesIds = this.servicesIds, types: termsTypes = [], technicalUpgradeOnly = false } = {}) {
+  async track({ services: servicesIds = this.servicesIds, types: termsTypes = [] } = {}) {
     const numberOfTerms = Service.getNumberOfTerms(this.services, servicesIds, termsTypes);
 
-    this.emit('trackingStarted', servicesIds.length, numberOfTerms, technicalUpgradeOnly);
+    this.emit('trackingStarted', servicesIds.length, numberOfTerms, false);
 
     await Promise.all([ launchHeadlessBrowser(), this.recorder.initialize() ]);
 
-    this.trackingQueue.concurrency = technicalUpgradeOnly ? MAX_PARALLEL_EXTRACTING : MAX_PARALLEL_TRACKING;
+    this.trackingQueue.concurrency = MAX_PARALLEL_TRACKING;
 
     servicesIds.forEach(serviceId => {
       this.services[serviceId].getTermsTypes().forEach(termsType => {
@@ -143,7 +143,7 @@ export default class Archivist extends events.EventEmitter {
           return;
         }
 
-        this.trackingQueue.push({ terms: this.services[serviceId].getTerms({ type: termsType }), technicalUpgradeOnly });
+        this.trackingQueue.push({ terms: this.services[serviceId].getTerms({ type: termsType }), technicalUpgradeOnly: false });
       });
     });
 
@@ -153,7 +153,35 @@ export default class Archivist extends events.EventEmitter {
 
     await Promise.all([ stopHeadlessBrowser(), this.recorder.finalize() ]);
 
-    this.emit('trackingCompleted', servicesIds.length, numberOfTerms, technicalUpgradeOnly);
+    this.emit('trackingCompleted', servicesIds.length, numberOfTerms, false);
+  }
+
+  async applyTechnicalUpgrades({ services: servicesIds = this.servicesIds, types: termsTypes = [] } = {}) {
+    const numberOfTerms = Service.getNumberOfTerms(this.services, servicesIds, termsTypes);
+
+    this.emit('trackingStarted', servicesIds.length, numberOfTerms, true);
+
+    await Promise.all([ launchHeadlessBrowser(), this.recorder.initialize() ]);
+
+    this.trackingQueue.concurrency = MAX_PARALLEL_TECHNICAL_UPGRADES;
+
+    servicesIds.forEach(serviceId => {
+      this.services[serviceId].getTermsTypes().forEach(termsType => {
+        if (termsTypes.length && !termsTypes.includes(termsType)) {
+          return;
+        }
+
+        this.trackingQueue.push({ terms: this.services[serviceId].getTerms({ type: termsType }), technicalUpgradeOnly: true });
+      });
+    });
+
+    if (this.trackingQueue.length()) {
+      await this.trackingQueue.drain();
+    }
+
+    await Promise.all([ stopHeadlessBrowser(), this.recorder.finalize() ]);
+
+    this.emit('trackingCompleted', servicesIds.length, numberOfTerms, true);
   }
 
   async trackTermsChanges({ terms, technicalUpgradeOnly = false }) {

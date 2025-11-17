@@ -167,7 +167,7 @@ describe('Archivist', function () {
 
             app.services[SERVICE_A_ID].getTerms({ type: SERVICE_A_TYPE }).sourceDocuments[0].contentSelectors = 'h1';
 
-            await app.track({ services: [ 'service·A', 'Service B!' ], technicalUpgradeOnly: true });
+            await app.applyTechnicalUpgrades({ services: [ 'service·A', 'Service B!' ] });
 
             const [reExtractedVersionCommit] = await gitVersion.log({ file: SERVICE_A_EXPECTED_VERSION_FILE_PATH });
 
@@ -229,7 +229,7 @@ describe('Archivist', function () {
               }
               versionNotChangedSpy(record);
             });
-            await app.track({ services, technicalUpgradeOnly: true });
+            await app.applyTechnicalUpgrades({ services });
           });
 
           after(resetGitRepositories);

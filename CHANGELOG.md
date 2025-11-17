@@ -6,10 +6,14 @@ All changes that impact users of this module are documented in this file, in the
 
 > Development of this release was supported by the [French Ministry for Foreign Affairs](https://www.diplomatie.gouv.fr/fr/politique-etrangere-de-la-france/diplomatie-numerique/) through its ministerial [State Startups incubator](https://beta.gouv.fr/startups/open-terms-archive.html) under the aegis of the Ambassador for Digital Affairs.
 
+### Added
+
+- Add `applyTechnicalUpgrades()` function as a standalone method to apply technical upgrades without regular tracking
+- Add `ota apply-technical-upgrades` CLI command to apply technical upgrades independently
+
 ### Changed
 
-- **Breaking:** Rename `extractOnly` parameter to `technicalUpgradeOnly` in `track()` function to clarify that only the technical upgrade pass will run; ifyou are using the `track()` function directly with the `extractOnly` parameter, rename it to `technicalUpgradeOnly`
-- **Breaking:** Rename CLI flag from `--extract-only` to `--technical-upgrade-only` for consistency and clarity; if you are using the CLI with the `--extract-only` flag, rename it to `--technical-upgrade-only`
+- **Breaking:** Remove `--extract-only` option from `ota track` command; use the new `ota apply-technical-upgrades` command instead
 - Enhance technical upgrade pass to fetch missing snapshots for newly added source documents in combined terms declarations
 
 ## 9.2.3 - 2025-11-19
