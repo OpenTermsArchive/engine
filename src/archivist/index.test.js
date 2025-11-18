@@ -53,6 +53,31 @@ describe('Archivist', function () {
 
   const services = [ 'service·A', 'Service B!' ];
 
+  function setupNockForServices({ serviceA = true, serviceB = true } = {}) {
+    nock.cleanAll();
+    if (serviceA) {
+      nock('https://www.servicea.example')
+        .get('/tos')
+        .reply(200, serviceASnapshotExpectedContent, { 'Content-Type': 'text/html' });
+    }
+    if (serviceB) {
+      nock('https://www.serviceb.example')
+        .get('/privacy')
+        .reply(200, serviceBSnapshotExpectedContent, { 'Content-Type': 'application/pdf' });
+    }
+  }
+
+  async function createAndInitializeArchivist() {
+    const archivist = new Archivist({
+      recorderConfig: config.get('@opentermsarchive/engine.recorder'),
+      fetcherConfig: config.get('@opentermsarchive/engine.fetcher'),
+    });
+
+    await archivist.initialize();
+
+    return archivist;
+  }
+
   before(async () => {
     gitVersion = new Git({
       path: VERSIONS_PATH,
@@ -71,13 +96,8 @@ describe('Archivist', function () {
 
   describe('#track', () => {
     before(async () => {
-      nock('https://www.servicea.example').get('/tos').reply(200, serviceASnapshotExpectedContent, { 'Content-Type': 'text/html' });
-      nock('https://www.serviceb.example').get('/privacy').reply(200, serviceBSnapshotExpectedContent, { 'Content-Type': 'application/pdf' });
-      app = new Archivist({
-        recorderConfig: config.get('@opentermsarchive/engine.recorder'),
-        fetcherConfig: config.get('@opentermsarchive/engine.fetcher'),
-      });
-      await app.initialize();
+      setupNockForServices();
+      app = await createAndInitializeArchivist();
     });
 
     context('when everything works fine', () => {
@@ -113,8 +133,7 @@ describe('Archivist', function () {
     context('when there is an operational error with service A', () => {
       before(async () => {
         // as there is no more HTTP request mocks for service A, it should throw an `ENOTFOUND` error which is considered as an expected error in our workflow
-        nock.cleanAll();
-        nock('https://www.serviceb.example').get('/privacy').reply(200, serviceBSnapshotExpectedContent, { 'Content-Type': 'application/pdf' });
+        setupNockForServices({ serviceA: false, serviceB: true });
         await app.track({ services });
       });
 
@@ -152,14 +171,8 @@ describe('Archivist', function () {
         let serviceBCommits;
 
         before(async () => {
-          nock('https://www.servicea.example').get('/tos').reply(200, serviceASnapshotExpectedContent, { 'Content-Type': 'text/html' });
-          nock('https://www.serviceb.example').get('/privacy').reply(200, serviceBSnapshotExpectedContent, { 'Content-Type': 'application/pdf' });
-          app = new Archivist({
-            recorderConfig: config.get('@opentermsarchive/engine.recorder'),
-            fetcherConfig: config.get('@opentermsarchive/engine.fetcher'),
-          });
-
-          await app.initialize();
+          setupNockForServices();
+          app = await createAndInitializeArchivist();
           await app.track({ services });
 
           ({ id: originalSnapshotId } = await app.recorder.snapshotsRepository.findLatest(SERVICE_A_ID, SERVICE_A_TYPE));
@@ -212,14 +225,8 @@ describe('Archivist', function () {
         let versionB;
 
         before(async () => {
-          nock('https://www.servicea.example').get('/tos').reply(200, serviceASnapshotExpectedContent, { 'Content-Type': 'text/html' });
-          nock('https://www.serviceb.example').get('/privacy').reply(200, serviceBSnapshotExpectedContent, { 'Content-Type': 'application/pdf' });
-          app = new Archivist({
-            recorderConfig: config.get('@opentermsarchive/engine.recorder'),
-            fetcherConfig: config.get('@opentermsarchive/engine.fetcher'),
-          });
-
-          await app.initialize();
+          setupNockForServices();
+          app = await createAndInitializeArchivist();
           await app.track({ services });
           app.services[SERVICE_A_ID].getTerms({ type: SERVICE_A_TYPE }).sourceDocuments[0].contentSelectors = 'inexistant-selector';
           inaccessibleContentSpy = sinon.spy();
@@ -279,11 +286,7 @@ describe('Archivist', function () {
               .get('/community-standards/new-policy/')
               .reply(200, MOCK_CONTENT_4, { 'Content-Type': 'text/html' });
 
-            app = new Archivist({
-              recorderConfig: config.get('@opentermsarchive/engine.recorder'),
-              fetcherConfig: config.get('@opentermsarchive/engine.fetcher'),
-            });
-            await app.initialize();
+            app = await createAndInitializeArchivist();
 
             let terms = app.services[SERVICE_ID].getTerms({ type: TERMS_TYPE });
 
@@ -362,11 +365,7 @@ describe('Archivist', function () {
               .get('/community-standards/violence-incitement/')
               .reply(200, MOCK_CONTENT_3, { 'Content-Type': 'text/html' });
 
-            app = new Archivist({
-              recorderConfig: config.get('@opentermsarchive/engine.recorder'),
-              fetcherConfig: config.get('@opentermsarchive/engine.fetcher'),
-            });
-            await app.initialize();
+            app = await createAndInitializeArchivist();
 
             // Disable executeClientScripts for testing since nock doesn't work with headless browser
             let terms = app.services[SERVICE_ID].getTerms({ type: TERMS_TYPE });
@@ -438,11 +437,7 @@ describe('Archivist', function () {
               .get('/community-standards/violence-incitement/')
               .reply(200, MOCK_CONTENT_3, { 'Content-Type': 'text/html' });
 
-            app = new Archivist({
-              recorderConfig: config.get('@opentermsarchive/engine.recorder'),
-              fetcherConfig: config.get('@opentermsarchive/engine.fetcher'),
-            });
-            await app.initialize();
+            app = await createAndInitializeArchivist();
 
             // Disable executeClientScripts for testing since nock doesn't work with headless browser
             let terms = app.services[SERVICE_ID].getTerms({ type: TERMS_TYPE });
@@ -502,11 +497,7 @@ describe('Archivist', function () {
               .get('/community-standards/new-policy/')
               .reply(200, MOCK_CONTENT_4, { 'Content-Type': 'text/html' });
 
-            app = new Archivist({
-              recorderConfig: config.get('@opentermsarchive/engine.recorder'),
-              fetcherConfig: config.get('@opentermsarchive/engine.fetcher'),
-            });
-            await app.initialize();
+            app = await createAndInitializeArchivist();
 
             // Modify declaration before any tracking
             const terms = app.services[SERVICE_ID].getTerms({ type: TERMS_TYPE });
@@ -552,11 +543,7 @@ describe('Archivist', function () {
     const retryableError = new FetchDocumentError(FetchDocumentError.LIKELY_TRANSIENT_ERRORS[0]);
 
     before(async () => {
-      app = new Archivist({
-        recorderConfig: config.get('@opentermsarchive/engine.recorder'),
-        fetcherConfig: config.get('@opentermsarchive/engine.fetcher'),
-      });
-      await app.initialize();
+      app = await createAndInitializeArchivist();
     });
 
     beforeEach(() => {
@@ -641,11 +628,7 @@ describe('Archivist', function () {
 
     describe('#attach', () => {
       before(async () => {
-        app = new Archivist({
-          recorderConfig: config.get('@opentermsarchive/engine.recorder'),
-          fetcherConfig: config.get('@opentermsarchive/engine.fetcher'),
-        });
-        await app.initialize();
+        app = await createAndInitializeArchivist();
 
         EVENTS.forEach(event => {
           const handlerName = `on${event[0].toUpperCase()}${event.substring(1)}`;
@@ -674,14 +657,9 @@ describe('Archivist', function () {
       let plugin;
 
       before(async () => {
-        nock.cleanAll();
-        nock('https://www.servicea.example').get('/tos').reply(200, serviceASnapshotExpectedContent, { 'Content-Type': 'text/html' });
+        setupNockForServices({ serviceA: true, serviceB: false });
 
-        app = new Archivist({
-          recorderConfig: config.get('@opentermsarchive/engine.recorder'),
-          fetcherConfig: config.get('@opentermsarchive/engine.fetcher'),
-        });
-        await app.initialize();
+        app = await createAndInitializeArchivist();
 
         plugin = { onFirstVersionRecorded: () => { throw new Error('Plugin error'); } };
 
@@ -728,11 +706,7 @@ describe('Archivist', function () {
     }
 
     before(async () => {
-      app = new Archivist({
-        recorderConfig: config.get('@opentermsarchive/engine.recorder'),
-        fetcherConfig: config.get('@opentermsarchive/engine.fetcher'),
-      });
-      await app.initialize();
+      app = await createAndInitializeArchivist();
 
       EVENTS.forEach(event => {
         const handlerName = `on${event[0].toUpperCase()}${event.substr(1)}`;
