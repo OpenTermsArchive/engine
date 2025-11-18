@@ -253,46 +253,59 @@ describe('Archivist', function () {
       });
 
       describe('with combined source documents', () => {
-        const SERVICE_ID = 'service_with_multiple_source_documents_terms';
-        const TERMS_TYPE = 'Community Guidelines';
-        const MOCK_CONTENT_1 = '<html><body id="main"><h1>Community Standards</h1><p>Community Standards content</p></body></html>';
-        const MOCK_CONTENT_2 = '<html><body><p>Hate speech content</p><div id="footer">Footer</div></body></html>';
-        const MOCK_CONTENT_3 = '<html><body><p>Violence incitement content</p><button class="share">Share</button><button class="print">Print</button></body></html>';
-        const MOCK_CONTENT_4 = '<html><body><p>New additional policy</p></body></html>';
+        const MULTI_SOURCE_DOCS = {
+          SERVICE_ID: 'service_with_multiple_source_documents_terms',
+          TERMS_TYPE: 'Community Guidelines',
+          BASE_URL: 'https://www.service-with-multiple-source-documents-terms.example',
+          CONTENT: {
+            COMMUNITY_STANDARDS: '<html><body id="main"><h1>Community Standards</h1><p>Community Standards content</p></body></html>',
+            HATE_SPEECH: '<html><body><p>Hate speech content</p><div id="footer">Footer</div></body></html>',
+            VIOLENCE_INCITEMENT: '<html><body><p>Violence incitement content</p><button class="share">Share</button><button class="print">Print</button></body></html>',
+            NEW_POLICY: '<html><body><p>New additional policy</p></body></html>',
+          },
+          PATHS: {
+            COMMUNITY_STANDARDS: '/community-standards',
+            HATE_SPEECH: '/community-standards/hate-speech/',
+            VIOLENCE_INCITEMENT: '/community-standards/violence-incitement/',
+            NEW_POLICY: '/community-standards/new-policy/',
+          },
+          EXPECTED_TEXTS: {
+            COMMUNITY_STANDARDS: 'Community Standards',
+            HATE_SPEECH: 'Hate speech content',
+            VIOLENCE_INCITEMENT: 'Violence incitement content',
+            NEW_POLICY: 'New additional policy',
+          },
+        };
+
+        const { SERVICE_ID, TERMS_TYPE } = MULTI_SOURCE_DOCS;
+
+        function setupNockForMultiSourceDocs(pathKeys) {
+          pathKeys.forEach(pathKey => {
+            nock(MULTI_SOURCE_DOCS.BASE_URL)
+              .persist()
+              .get(MULTI_SOURCE_DOCS.PATHS[pathKey])
+              .reply(200, MULTI_SOURCE_DOCS.CONTENT[pathKey], { 'Content-Type': 'text/html' });
+          });
+        }
+
+        function disableClientScriptsForTerms(terms) {
+          terms.sourceDocuments.forEach(doc => {
+            doc.executeClientScripts = false;
+          });
+        }
 
         context('when a source document is added to existing combined terms', () => {
           let initialVersion;
           let upgradeVersion;
 
           before(async () => {
-            // Mock all source documents
-            nock('https://www.service-with-multiple-source-documents-terms.example')
-              .persist()
-              .get('/community-standards')
-              .reply(200, MOCK_CONTENT_1, { 'Content-Type': 'text/html' });
-
-            nock('https://www.service-with-multiple-source-documents-terms.example')
-              .persist()
-              .get('/community-standards/hate-speech/')
-              .reply(200, MOCK_CONTENT_2, { 'Content-Type': 'text/html' });
-
-            nock('https://www.service-with-multiple-source-documents-terms.example')
-              .persist()
-              .get('/community-standards/violence-incitement/')
-              .reply(200, MOCK_CONTENT_3, { 'Content-Type': 'text/html' });
-
-            nock('https://www.service-with-multiple-source-documents-terms.example')
-              .persist()
-              .get('/community-standards/new-policy/')
-              .reply(200, MOCK_CONTENT_4, { 'Content-Type': 'text/html' });
+            setupNockForMultiSourceDocs([ 'COMMUNITY_STANDARDS', 'HATE_SPEECH', 'VIOLENCE_INCITEMENT', 'NEW_POLICY' ]);
 
             app = await createAndInitializeArchivist();
 
             let terms = app.services[SERVICE_ID].getTerms({ type: TERMS_TYPE });
 
-            terms.sourceDocuments.forEach(doc => {
-              doc.executeClientScripts = false; // Disable executeClientScripts for testing since nock doesn't work with headless browser
-            });
+            disableClientScriptsForTerms(terms);
 
             // First, track the terms normally to create initial version
             await app.track({ services: [SERVICE_ID], types: [TERMS_TYPE] });
@@ -303,7 +316,7 @@ describe('Archivist', function () {
 
             terms.sourceDocuments.push(new SourceDocument({
               id: 'new-policy',
-              location: 'https://www.service-with-multiple-source-documents-terms.example/community-standards/new-policy/',
+              location: `${MULTI_SOURCE_DOCS.BASE_URL}${MULTI_SOURCE_DOCS.PATHS.NEW_POLICY}`,
               contentSelectors: 'body',
               executeClientScripts: false,
               filters: [],
@@ -330,16 +343,16 @@ describe('Archivist', function () {
           it('fetches and includes the new source document in the version', async () => {
             const versionContent = await upgradeVersion.content;
 
-            expect(versionContent).to.include('New additional policy');
+            expect(versionContent).to.include(MULTI_SOURCE_DOCS.EXPECTED_TEXTS.NEW_POLICY);
           });
 
           it('includes all source documents in version', async () => {
             const versionContent = await upgradeVersion.content;
 
-            expect(versionContent).to.include('Community Standards');
-            expect(versionContent).to.include('Hate speech content');
-            expect(versionContent).to.include('Violence incitement content');
-            expect(versionContent).to.include('New additional policy');
+            expect(versionContent).to.include(MULTI_SOURCE_DOCS.EXPECTED_TEXTS.COMMUNITY_STANDARDS);
+            expect(versionContent).to.include(MULTI_SOURCE_DOCS.EXPECTED_TEXTS.HATE_SPEECH);
+            expect(versionContent).to.include(MULTI_SOURCE_DOCS.EXPECTED_TEXTS.VIOLENCE_INCITEMENT);
+            expect(versionContent).to.include(MULTI_SOURCE_DOCS.EXPECTED_TEXTS.NEW_POLICY);
           });
         });
 
@@ -349,37 +362,20 @@ describe('Archivist', function () {
           let newLocationScope;
 
           before(async () => {
-            // Mock all source documents
-            nock('https://www.service-with-multiple-source-documents-terms.example')
-              .persist()
-              .get('/community-standards')
-              .reply(200, MOCK_CONTENT_1, { 'Content-Type': 'text/html' });
-
-            nock('https://www.service-with-multiple-source-documents-terms.example')
-              .persist()
-              .get('/community-standards/hate-speech/')
-              .reply(200, MOCK_CONTENT_2, { 'Content-Type': 'text/html' });
-
-            nock('https://www.service-with-multiple-source-documents-terms.example')
-              .persist()
-              .get('/community-standards/violence-incitement/')
-              .reply(200, MOCK_CONTENT_3, { 'Content-Type': 'text/html' });
+            setupNockForMultiSourceDocs([ 'COMMUNITY_STANDARDS', 'HATE_SPEECH', 'VIOLENCE_INCITEMENT' ]);
 
             app = await createAndInitializeArchivist();
 
-            // Disable executeClientScripts for testing since nock doesn't work with headless browser
             let terms = app.services[SERVICE_ID].getTerms({ type: TERMS_TYPE });
 
-            terms.sourceDocuments.forEach(doc => {
-              doc.executeClientScripts = false;
-            });
+            disableClientScriptsForTerms(terms);
 
             // First, track the terms normally
             await app.track({ services: [SERVICE_ID], types: [TERMS_TYPE] });
             initialVersion = await app.recorder.versionsRepository.findLatest(SERVICE_ID, TERMS_TYPE);
 
             // Mock new location (but it won't be fetched during technical upgrade)
-            newLocationScope = nock('https://www.service-with-multiple-source-documents-terms.example')
+            newLocationScope = nock(MULTI_SOURCE_DOCS.BASE_URL)
               .persist()
               .get('/community-standards/hate-speech-updated/')
               .reply(200, '<html><body><p>Updated hate speech policy</p></body></html>', { 'Content-Type': 'text/html' });
@@ -387,7 +383,7 @@ describe('Archivist', function () {
             // Modify the declaration to change location
             terms = app.services[SERVICE_ID].getTerms({ type: TERMS_TYPE });
 
-            terms.sourceDocuments[1].location = 'https://www.service-with-multiple-source-documents-terms.example/community-standards/hate-speech-updated/';
+            terms.sourceDocuments[1].location = `${MULTI_SOURCE_DOCS.BASE_URL}/community-standards/hate-speech-updated/`;
 
             // Apply technical upgrades
             await app.applyTechnicalUpgrades({ services: [SERVICE_ID], types: [TERMS_TYPE] });
@@ -421,30 +417,13 @@ describe('Archivist', function () {
           let upgradeVersionContent;
 
           before(async () => {
-            // Mock all source documents
-            nock('https://www.service-with-multiple-source-documents-terms.example')
-              .persist()
-              .get('/community-standards')
-              .reply(200, MOCK_CONTENT_1, { 'Content-Type': 'text/html' });
-
-            nock('https://www.service-with-multiple-source-documents-terms.example')
-              .persist()
-              .get('/community-standards/hate-speech/')
-              .reply(200, MOCK_CONTENT_2, { 'Content-Type': 'text/html' });
-
-            nock('https://www.service-with-multiple-source-documents-terms.example')
-              .persist()
-              .get('/community-standards/violence-incitement/')
-              .reply(200, MOCK_CONTENT_3, { 'Content-Type': 'text/html' });
+            setupNockForMultiSourceDocs([ 'COMMUNITY_STANDARDS', 'HATE_SPEECH', 'VIOLENCE_INCITEMENT' ]);
 
             app = await createAndInitializeArchivist();
 
-            // Disable executeClientScripts for testing since nock doesn't work with headless browser
             let terms = app.services[SERVICE_ID].getTerms({ type: TERMS_TYPE });
 
-            terms.sourceDocuments.forEach(doc => {
-              doc.executeClientScripts = false;
-            });
+            disableClientScriptsForTerms(terms);
 
             // First, track the terms normally
             await app.track({ services: [SERVICE_ID], types: [TERMS_TYPE] });
@@ -478,10 +457,10 @@ describe('Archivist', function () {
 
           it('extracts content with the new selector from existing snapshot', () => {
             // With new selector 'h1', should only extract the heading
-            expect(upgradeVersionContent).to.include('Community Standards');
+            expect(upgradeVersionContent).to.include(MULTI_SOURCE_DOCS.EXPECTED_TEXTS.COMMUNITY_STANDARDS);
             // The rest should be from other source documents
-            expect(upgradeVersionContent).to.include('Hate speech content');
-            expect(upgradeVersionContent).to.include('Violence incitement content');
+            expect(upgradeVersionContent).to.include(MULTI_SOURCE_DOCS.EXPECTED_TEXTS.HATE_SPEECH);
+            expect(upgradeVersionContent).to.include(MULTI_SOURCE_DOCS.EXPECTED_TEXTS.VIOLENCE_INCITEMENT);
           });
 
           it('regenerates version with updated extraction logic', () => {
@@ -493,9 +472,9 @@ describe('Archivist', function () {
           let newSourceScope;
 
           before(async () => {
-            newSourceScope = nock('https://www.service-with-multiple-source-documents-terms.example')
-              .get('/community-standards/new-policy/')
-              .reply(200, MOCK_CONTENT_4, { 'Content-Type': 'text/html' });
+            newSourceScope = nock(MULTI_SOURCE_DOCS.BASE_URL)
+              .get(MULTI_SOURCE_DOCS.PATHS.NEW_POLICY)
+              .reply(200, MULTI_SOURCE_DOCS.CONTENT.NEW_POLICY, { 'Content-Type': 'text/html' });
 
             app = await createAndInitializeArchivist();
 
@@ -504,7 +483,7 @@ describe('Archivist', function () {
 
             terms.sourceDocuments.push({
               id: 'new-policy',
-              location: 'https://www.service-with-multiple-source-documents-terms.example/community-standards/new-policy/',
+              location: `${MULTI_SOURCE_DOCS.BASE_URL}${MULTI_SOURCE_DOCS.PATHS.NEW_POLICY}`,
               contentSelectors: 'body',
               executeClientScripts: false,
               filters: [],
