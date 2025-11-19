@@ -8,7 +8,6 @@ All changes that impact users of this module are documented in this file, in the
 
 ### Added
 
-- Add `applyTechnicalUpgrades()` function as a standalone method to apply technical upgrades without regular tracking
 - Add `ota apply-technical-upgrades` CLI command to apply technical upgrades independently
 
 ### Changed
