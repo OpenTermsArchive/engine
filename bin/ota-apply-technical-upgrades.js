@@ -12,7 +12,7 @@ const { applyTechnicalUpgrades } = await import(pathToFileURL(path.resolve(__dir
 
 program
   .name('ota apply-technical-upgrades')
-  .description('Apply technical upgrades: regenerate versions from existing snapshots with updated declarations/engine, and fetch missing snapshots for newly added source documents')
+  .description('Apply technical upgrades by generating new versions from the latest snapshots using updated declarations, engine logic, or dependencies, and by retrieving any missing snapshots for newly added source documents')
   .option('-s, --services [serviceId...]', 'service IDs to apply technical upgrades to')
   .option('-t, --types [termsType...]', 'terms types to apply technical upgrades to');
 
