@@ -12,8 +12,11 @@ export default class Recorder {
     return Promise.all([ this.versionsRepository.initialize(), this.snapshotsRepository.initialize() ]);
   }
 
-  finalize() {
-    return Promise.all([ this.versionsRepository.finalize(), this.snapshotsRepository.finalize() ]);
+  async finalize() {
+    // Close repositories sequentially to avoid race conditions when both repositories  use the same MongoDB connection (same server/database).
+    // Parallel closing can cause "Operation interrupted because client was closed" errors, especially on Windows.
+    await this.versionsRepository.finalize();
+    await this.snapshotsRepository.finalize();
   }
 
   getLatestSnapshot(terms, sourceDocumentId) {
