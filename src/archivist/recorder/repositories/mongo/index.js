@@ -135,7 +135,7 @@ export default class MongoRepository extends RepositoryInterface {
 
   async #toPersistence(record) {
     if (record.content === undefined || record.content === null) {
-      await this.repository.loadRecordContent(record);
+      await this.loadRecordContent(record);
     }
 
     return DataMapper.toPersistence(record);

@@ -1,7 +1,7 @@
 import AbortController from 'abort-controller';
 import convertBody from 'fetch-charset-detection'; // eslint-disable-line import/no-unresolved
-import HttpProxyAgent from 'http-proxy-agent';
-import HttpsProxyAgent from 'https-proxy-agent';
+import { HttpProxyAgent } from 'http-proxy-agent';
+import { HttpsProxyAgent } from 'https-proxy-agent';
 import nodeFetch, { AbortError } from 'node-fetch';
 
 import { resolveProxyConfiguration } from './proxyUtils.js';
