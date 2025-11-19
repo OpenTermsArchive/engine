@@ -2,16 +2,13 @@
 
 All changes that impact users of this module are documented in this file, in the [Common Changelog](https://common-changelog.org) format with some additional specifications defined in the CONTRIBUTING file. This codebase adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased
-
-_Full changeset and discussions: [#1206](https://github.com/OpenTermsArchive/engine/pull/1206)._
+## Unreleased [patch]
 
 > Development of this release was supported by the [European Commission](https://commission.europa.eu/) for its [VLOPs/VLOSEs instance](https://code.europa.eu/dsa/terms-and-conditions-database/vlops-and-vloses/).
 
 ### Fixed
 
-- Fixed improper import of `http-proxy-agent` / `https-proxy-agent` in the `htmlOnlyFetch`.
-
+- Fix tracking when proxy configuration is provided
 
 ## 9.2.0 - 2025-11-05
 
