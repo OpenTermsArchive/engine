@@ -16,6 +16,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const { connectionURI } = config.get('@opentermsarchive/engine.recorder.snapshots.storage.mongo');
 const client = new MongoClient(connectionURI);
+const isWindows = process.platform === 'win32';
 
 const SERVICE_PROVIDER_ID = 'test_service';
 const TERMS_TYPE = 'Terms of Service';
@@ -41,6 +42,16 @@ const METADATA = {
 let collection;
 
 describe('MongoRepository', () => {
+  before(function () {
+    if (isWindows) {
+      console.log('MongoDB tests are unstable on Windows due to race condition in connection cleanup.');
+      console.log('Lacking a production use case for Mongo on Windows, we skip tests. Please reach out if you have a use case.');
+      // On Windows, when multiple repositories connect to the same MongoDB server and are closed in parallel or even sequentially, unhandled "Operation interrupted because client was closed" errors occur after all tests pass.
+      // The issue does not occur on Linux or macOS, so it appears to be a platform-specific difference in how the MongoDB driver handles connection pool cleanup during client.close().
+      this.skip();
+    }
+  });
+
   let subject;
 
   context('Version', () => {

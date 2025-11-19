@@ -6,6 +6,8 @@ import Version from './version.js';
 
 import Recorder from './index.js';
 
+const isWindows = process.platform === 'win32';
+
 const MIME_TYPE = 'text/html';
 const FETCH_DATE = new Date('2000-01-01T12:00:00.000Z');
 const FETCH_DATE_LATER = new Date('2000-01-02T12:00:00.000Z');
@@ -18,7 +20,14 @@ describe('Recorder', () => {
     describe(repositoryType, () => {
       let recorder;
 
-      before(async () => {
+      before(async function () {
+        if (repositoryType == 'mongo' && isWindows) {
+          console.log('MongoDB tests are unstable on Windows due to race condition in connection cleanup.');
+          console.log('Lacking a production use case for Mongo on Windows, we skip tests. Please reach out if you have a use case.');
+          // On Windows, when multiple repositories connect to the same MongoDB server and are closed in parallel or even sequentially, unhandled "Operation interrupted because client was closed" errors occur after all tests pass.
+          // The issue does not occur on Linux or macOS, so it appears to be a platform-specific difference in how the MongoDB driver handles connection pool cleanup during client.close().
+          this.skip();
+        }
         const options = config.util.cloneDeep(config.get('@opentermsarchive/engine.recorder'));
 
         options.versions.storage.type = repositoryType;
@@ -28,7 +37,7 @@ describe('Recorder', () => {
         await recorder.initialize();
       });
 
-      after(() => recorder.finalize());
+      after(() => recorder?.finalize());
 
       context('Snapshot', () => {
         describe('#record', () => {
