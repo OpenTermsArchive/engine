@@ -16,12 +16,12 @@ export default async function publishRelease({ archivePath, releaseDate, stats }
     platforms.push({ name: 'GitLab', publish: () => publishGitLab({ archivePath, releaseDate, stats }) });
   }
 
-  if (process.env.OTA_ENGINE_DATAGOUV_API_KEY && config.get('@opentermsarchive/engine.dataset.datagouv.datasetId')) {
+  if (process.env.OTA_ENGINE_DATAGOUV_API_KEY && (config.has('@opentermsarchive/engine.dataset.datagouv.datasetId') || config.has('@opentermsarchive/engine.dataset.datagouv.organizationIdOrSlug'))) {
     platforms.push({ name: 'data.gouv.fr', publish: () => publishDataGouv({ archivePath, releaseDate, stats }) });
   }
 
   if (!platforms.length) {
-    throw new Error('No publishing platform configured. Please configure at least one of: GitHub (OTA_ENGINE_GITHUB_TOKEN), GitLab (OTA_ENGINE_GITLAB_TOKEN), or data.gouv.fr (OTA_ENGINE_DATAGOUV_API_KEY + datasetId in config).');
+    throw new Error('No publishing platform configured. Please configure at least one of: GitHub (OTA_ENGINE_GITHUB_TOKEN), GitLab (OTA_ENGINE_GITLAB_TOKEN), or data.gouv.fr (OTA_ENGINE_DATAGOUV_API_KEY + datasetId or organizationIdOrSlug in config).');
   }
 
   const results = await Promise.allSettled(platforms.map(async platform => {
