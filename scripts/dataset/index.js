@@ -9,7 +9,7 @@ import publishRelease from './publish/index.js';
 
 export async function release({ shouldPublish, shouldRemoveLocalCopy, fileName }) {
   const releaseDate = new Date();
-  const archiveName = fileName || `dataset-${config.get('@opentermsarchive/engine.dataset.title')}-${releaseDate.toISOString().replace(/T.*/, '')}`;
+  const archiveName = fileName || `${config.get('@opentermsarchive/engine.dataset.title').toLowerCase().replace(/[^a-zA-Z0-9.\-_]/g, '-')}-${releaseDate.toISOString().replace(/T.*/, '')}`;
   const archivePath = `${path.basename(archiveName, '.zip')}.zip`; // allow to pass filename or filename.zip as the archive name and have filename.zip as the result name
 
   logger.info('Start exporting dataset…');
@@ -24,13 +24,18 @@ export async function release({ shouldPublish, shouldRemoveLocalCopy, fileName }
 
   logger.info('Start publishing dataset…');
 
-  const releaseUrl = await publishRelease({
+  const results = await publishRelease({
     archivePath,
     releaseDate,
     stats,
   });
 
-  logger.info(`Dataset published to ${releaseUrl}`);
+  if (results.length > 0) {
+    logger.info('Dataset published to following platforms:');
+    results.forEach(result => {
+      logger.info(`  - ${result.platform}: ${result.url}`);
+    });
+  }
 
   if (!shouldRemoveLocalCopy) {
     return;

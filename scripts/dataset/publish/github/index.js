@@ -1,18 +1,22 @@
 import fsApi from 'fs';
 import path from 'path';
-import url from 'url';
 
 import config from 'config';
 import { Octokit } from 'octokit'; // eslint-disable-line import/no-unresolved
 
 import * as readme from '../../assets/README.template.js';
+import { createModuleLogger } from '../../logger/index.js';
+
+const logger = createModuleLogger('github');
 
 export default async function publish({ archivePath, releaseDate, stats }) {
   const octokit = new Octokit({ auth: process.env.OTA_ENGINE_GITHUB_TOKEN });
 
-  const [ owner, repo ] = url.parse(config.get('@opentermsarchive/engine.dataset.versionsRepositoryURL')).pathname.split('/').filter(component => component);
+  const [ owner, repo ] = new URL(config.get('@opentermsarchive/engine.dataset.versionsRepositoryURL')).pathname.split('/').filter(component => component);
 
   const tagName = `${path.basename(archivePath, path.extname(archivePath))}`; // use archive filename as Git tag
+
+  logger.info(`Creating release for ${owner}/${repo}…`);
 
   const { data: { upload_url: uploadUrl, html_url: releaseUrl } } = await octokit.rest.repos.createRelease({
     owner,
@@ -21,6 +25,9 @@ export default async function publish({ archivePath, releaseDate, stats }) {
     name: readme.title({ releaseDate }),
     body: readme.body(stats),
   });
+
+  logger.info(`Release created successfully with tag: ${tagName}`);
+  logger.info('Uploading release asset…');
 
   await octokit.rest.repos.uploadReleaseAsset({
     data: fsApi.readFileSync(archivePath),
@@ -31,6 +38,8 @@ export default async function publish({ archivePath, releaseDate, stats }) {
     name: path.basename(archivePath),
     url: uploadUrl,
   });
+
+  logger.info(`Release asset uploaded successfully: ${path.basename(archivePath)}`);
 
   return releaseUrl;
 }
