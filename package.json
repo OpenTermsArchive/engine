@@ -1,6 +1,6 @@
 {
   "name": "@opentermsarchive/engine",
-  "version": "9.2.3",
+  "version": "10.0.0",
   "description": "Tracks and makes visible changes to the terms of online services",
   "homepage": "https://opentermsarchive.org",
   "bugs": {
