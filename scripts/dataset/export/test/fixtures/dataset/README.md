@@ -1,4 +1,4 @@
-# Open Terms Archive — sandbox — January 1, 2022 dataset
+# Open Terms Archive — sandbox — January 1, 2022
 
 This dataset consolidates the contractual documents of 2 service providers, in all their versions that were accessible online between January 1, 2021 and January 6, 2022.
 
