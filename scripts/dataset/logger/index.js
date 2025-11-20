@@ -8,10 +8,12 @@ const { combine, timestamp, printf, colorize } = winston.format;
 logger.format = combine(
   colorize(),
   timestamp({ format: 'YYYY-MM-DDTHH:mm:ssZ' }),
-  printf(({ level, message, counter, hash, timestamp }) => {
-    const prefix = counter && hash ? `${counter.toString().padEnd(6)} ${hash.padEnd(40)}` : '';
+  printf(({ level, message, counter, hash, timestamp, module }) => {
+    let prefix = counter && hash ? `${counter.toString().padEnd(6)} ${hash.padEnd(40)}` : '';
 
     const timestampPrefix = config.get('@opentermsarchive/engine.logger.timestampPrefix') ? `${timestamp} ` : '';
+
+    prefix = module ? `${module} ${prefix}` : prefix;
 
     const levelStr = level.padEnd(15);
     let coloredLevel = levelStr;
@@ -28,5 +30,13 @@ logger.format = combine(
     return `${timestampPrefix} ${coloredLevel} ${prefix.padEnd(50)} ${coloredMessage}`;
   }),
 );
+
+export function createModuleLogger(moduleName) {
+  return {
+    info: message => logger.info(message, { module: moduleName }),
+    warn: message => logger.warn(message, { module: moduleName }),
+    error: message => logger.error(message, { module: moduleName }),
+  };
+}
 
 export default logger;

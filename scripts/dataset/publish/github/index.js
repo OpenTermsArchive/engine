@@ -6,6 +6,9 @@ import config from 'config';
 import { Octokit } from 'octokit'; // eslint-disable-line import/no-unresolved
 
 import * as readme from '../../assets/README.template.js';
+import { createModuleLogger } from '../../logger/index.js';
+
+const logger = createModuleLogger('github');
 
 export default async function publish({ archivePath, releaseDate, stats }) {
   const octokit = new Octokit({ auth: process.env.OTA_ENGINE_GITHUB_TOKEN });
