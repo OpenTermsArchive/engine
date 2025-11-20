@@ -19,7 +19,7 @@ app.use(errorsMiddleware);
 
 const port = config.get('@opentermsarchive/engine.collection-api.port');
 
-app.listen(port);
+app.listen(port, '127.0.0.1');
 
 if (process.env.NODE_ENV !== 'test') {
   logger.info(`Start Open Terms Archive API on http://localhost:${port}${BASE_PATH}`);
