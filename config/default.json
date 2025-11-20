@@ -56,7 +56,7 @@
       }
     },
     "dataset": {
-      "title": "sandbox",
+      "title": "Sandbox collection dataset",
       "versionsRepositoryURL": "https://github.com/OpenTermsArchive/sandbox-declarations",
       "publishingSchedule": "30 8 * * MON"
     }
