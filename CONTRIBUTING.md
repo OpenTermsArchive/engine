@@ -165,10 +165,9 @@ For command-line examples and documentation, we follow the [docopt usage pattern
 
 In order to improve the understandability of commands, we document all CLI options and examples with the long version of the options.
 
-
 ```diff
-- ota track -s $service_id -r
-+ ota track --services <service_id> --extract-only
+- ota track -s <service_id> -t <terms_type>
++ ota track --services <service_id> --types <terms_type>
 ```
 
 ## Naming

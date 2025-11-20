@@ -25,7 +25,7 @@ const filters = [
       new SourceDocument({
         location: 'https://www.service-with-multiple-source-documents-terms.example/community-standards',
         contentSelectors: '#main',
-        insignificantContentSelectors: 'body',
+        insignificantContentSelectors: 'footer',
         filters: undefined,
         executeClientScripts: true,
       }),
@@ -39,7 +39,7 @@ const filters = [
       new SourceDocument({
         location: 'https://www.service-with-multiple-source-documents-terms.example/community-standards/violence-incitement/',
         contentSelectors: 'body',
-        insignificantContentSelectors: 'body',
+        insignificantContentSelectors: 'footer',
         filters,
         executeClientScripts: true,
       }),

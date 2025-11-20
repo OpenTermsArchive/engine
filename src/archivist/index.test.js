@@ -11,6 +11,7 @@ import sinonChai from 'sinon-chai';
 import { InaccessibleContentError } from './errors.js';
 import { FetchDocumentError } from './fetcher/index.js';
 import Git from './recorder/repositories/git/git.js';
+import SourceDocument from './services/sourceDocument.js';
 
 import Archivist, { EVENTS } from './index.js';
 
@@ -52,6 +53,31 @@ describe('Archivist', function () {
 
   const services = [ 'service·A', 'Service B!' ];
 
+  function setupNockForServices({ serviceA = true, serviceB = true } = {}) {
+    nock.cleanAll();
+    if (serviceA) {
+      nock('https://www.servicea.example')
+        .get('/tos')
+        .reply(200, serviceASnapshotExpectedContent, { 'Content-Type': 'text/html' });
+    }
+    if (serviceB) {
+      nock('https://www.serviceb.example')
+        .get('/privacy')
+        .reply(200, serviceBSnapshotExpectedContent, { 'Content-Type': 'application/pdf' });
+    }
+  }
+
+  async function createAndInitializeArchivist() {
+    const archivist = new Archivist({
+      recorderConfig: config.get('@opentermsarchive/engine.recorder'),
+      fetcherConfig: config.get('@opentermsarchive/engine.fetcher'),
+    });
+
+    await archivist.initialize();
+
+    return archivist;
+  }
+
   before(async () => {
     gitVersion = new Git({
       path: VERSIONS_PATH,
@@ -70,13 +96,8 @@ describe('Archivist', function () {
 
   describe('#track', () => {
     before(async () => {
-      nock('https://www.servicea.example').get('/tos').reply(200, serviceASnapshotExpectedContent, { 'Content-Type': 'text/html' });
-      nock('https://www.serviceb.example').get('/privacy').reply(200, serviceBSnapshotExpectedContent, { 'Content-Type': 'application/pdf' });
-      app = new Archivist({
-        recorderConfig: config.get('@opentermsarchive/engine.recorder'),
-        fetcherConfig: config.get('@opentermsarchive/engine.fetcher'),
-      });
-      await app.initialize();
+      setupNockForServices();
+      app = await createAndInitializeArchivist();
     });
 
     context('when everything works fine', () => {
@@ -112,8 +133,7 @@ describe('Archivist', function () {
     context('when there is an operational error with service A', () => {
       before(async () => {
         // as there is no more HTTP request mocks for service A, it should throw an `ENOTFOUND` error which is considered as an expected error in our workflow
-        nock.cleanAll();
-        nock('https://www.serviceb.example').get('/privacy').reply(200, serviceBSnapshotExpectedContent, { 'Content-Type': 'application/pdf' });
+        setupNockForServices({ serviceA: false, serviceB: true });
         await app.track({ services });
       });
 
@@ -139,107 +159,353 @@ describe('Archivist', function () {
         expect(resultingTerms).to.equal(serviceBVersionExpectedContent);
       });
     });
+  });
 
-    context('extracting only', () => {
-      context('when a service’s filter declaration changes', () => {
-        context('when everything works fine', () => {
-          let originalSnapshotId;
-          let firstVersionId;
-          let reExtractedVersionId;
-          let reExtractedVersionMessageBody;
-          let serviceBCommits;
+  describe('#applyTechnicalUpgrades', () => {
+    context('when a service’s filter declaration changes', () => {
+      context('when everything works fine', () => {
+        let originalSnapshotId;
+        let firstVersionId;
+        let reExtractedVersionId;
+        let reExtractedVersionMessageBody;
+        let serviceBCommits;
+
+        before(async () => {
+          setupNockForServices();
+          app = await createAndInitializeArchivist();
+          await app.track({ services });
+
+          ({ id: originalSnapshotId } = await app.recorder.snapshotsRepository.findLatest(SERVICE_A_ID, SERVICE_A_TYPE));
+          ({ id: firstVersionId } = await app.recorder.versionsRepository.findLatest(SERVICE_A_ID, SERVICE_A_TYPE));
+
+          serviceBCommits = await gitVersion.log({ file: SERVICE_B_EXPECTED_VERSION_FILE_PATH });
+
+          app.services[SERVICE_A_ID].getTerms({ type: SERVICE_A_TYPE }).sourceDocuments[0].contentSelectors = 'h1';
+
+          await app.applyTechnicalUpgrades({ services: [ 'service·A', 'Service B!' ] });
+
+          const [reExtractedVersionCommit] = await gitVersion.log({ file: SERVICE_A_EXPECTED_VERSION_FILE_PATH });
+
+          reExtractedVersionId = reExtractedVersionCommit.hash;
+          reExtractedVersionMessageBody = reExtractedVersionCommit.body;
+        });
+
+        after(resetGitRepositories);
+
+        it('updates the version of the changed service', async () => {
+          const serviceAContent = await fs.readFile(path.resolve(__dirname, SERVICE_A_EXPECTED_VERSION_FILE_PATH), { encoding: 'utf8' });
+
+          expect(serviceAContent).to.equal('Terms of service with UTF-8 \'çhãràčtęrs"\n========================================');
+        });
+
+        it('generates a new version id', () => {
+          expect(reExtractedVersionId).to.not.equal(firstVersionId);
+        });
+
+        it('mentions the snapshot id in the changelog', () => {
+          expect(reExtractedVersionMessageBody).to.include(originalSnapshotId);
+        });
+
+        it('does not change other services', async () => {
+          const serviceBVersion = await fs.readFile(path.resolve(__dirname, SERVICE_B_EXPECTED_VERSION_FILE_PATH), { encoding: 'utf8' });
+
+          expect(serviceBVersion).to.equal(serviceBVersionExpectedContent);
+        });
+
+        it('does not generate a new id for other services', async () => {
+          const serviceBCommitsAfterExtraction = await gitVersion.log({ file: SERVICE_B_EXPECTED_VERSION_FILE_PATH });
+
+          expect(serviceBCommitsAfterExtraction.map(commit => commit.hash)).to.deep.equal(serviceBCommits.map(commit => commit.hash));
+        });
+      });
+
+      context('when there is an operational error with service A', () => {
+        let inaccessibleContentSpy;
+        let versionNotChangedSpy;
+        let versionB;
+
+        before(async () => {
+          setupNockForServices();
+          app = await createAndInitializeArchivist();
+          await app.track({ services });
+          app.services[SERVICE_A_ID].getTerms({ type: SERVICE_A_TYPE }).sourceDocuments[0].contentSelectors = 'inexistant-selector';
+          inaccessibleContentSpy = sinon.spy();
+          versionNotChangedSpy = sinon.spy();
+          app.on('inaccessibleContent', inaccessibleContentSpy);
+          app.on('versionNotChanged', record => {
+            if (record.serviceId == 'Service B!') {
+              versionB = record;
+            }
+            versionNotChangedSpy(record);
+          });
+          await app.applyTechnicalUpgrades({ services });
+        });
+
+        after(resetGitRepositories);
+
+        it('emits an inaccessibleContent event', () => {
+          expect(inaccessibleContentSpy).to.have.been.called;
+        });
+
+        it('still extracts the terms of other services', () => {
+          expect(versionNotChangedSpy).to.have.been.calledWith(versionB);
+        });
+      });
+
+      describe('with combined source documents', () => {
+        const MULTI_SOURCE_DOCS = {
+          SERVICE_ID: 'service_with_multiple_source_documents_terms',
+          TERMS_TYPE: 'Community Guidelines',
+          BASE_URL: 'https://www.service-with-multiple-source-documents-terms.example',
+          CONTENT: {
+            COMMUNITY_STANDARDS: '<html><body id="main"><h1>Community Standards</h1><p>Community Standards content</p></body></html>',
+            HATE_SPEECH: '<html><body><p>Hate speech content</p><div id="footer">Footer</div></body></html>',
+            VIOLENCE_INCITEMENT: '<html><body><p>Violence incitement content</p><button class="share">Share</button><button class="print">Print</button></body></html>',
+            NEW_POLICY: '<html><body><p>New additional policy</p></body></html>',
+          },
+          PATHS: {
+            COMMUNITY_STANDARDS: '/community-standards',
+            HATE_SPEECH: '/community-standards/hate-speech/',
+            VIOLENCE_INCITEMENT: '/community-standards/violence-incitement/',
+            NEW_POLICY: '/community-standards/new-policy/',
+          },
+          EXPECTED_TEXTS: {
+            COMMUNITY_STANDARDS: 'Community Standards',
+            HATE_SPEECH: 'Hate speech content',
+            VIOLENCE_INCITEMENT: 'Violence incitement content',
+            NEW_POLICY: 'New additional policy',
+          },
+        };
+
+        const { SERVICE_ID, TERMS_TYPE } = MULTI_SOURCE_DOCS;
+
+        function setupNockForMultiSourceDocs(pathKeys) {
+          pathKeys.forEach(pathKey => {
+            nock(MULTI_SOURCE_DOCS.BASE_URL)
+              .persist()
+              .get(MULTI_SOURCE_DOCS.PATHS[pathKey])
+              .reply(200, MULTI_SOURCE_DOCS.CONTENT[pathKey], { 'Content-Type': 'text/html' });
+          });
+        }
+
+        function disableClientScriptsForTerms(terms) {
+          terms.sourceDocuments.forEach(doc => {
+            doc.executeClientScripts = false;
+          });
+        }
+
+        context('when a source document is added to existing combined terms', () => {
+          let initialVersion;
+          let upgradeVersion;
 
           before(async () => {
-            nock('https://www.servicea.example').get('/tos').reply(200, serviceASnapshotExpectedContent, { 'Content-Type': 'text/html' });
-            nock('https://www.serviceb.example').get('/privacy').reply(200, serviceBSnapshotExpectedContent, { 'Content-Type': 'application/pdf' });
-            app = new Archivist({
-              recorderConfig: config.get('@opentermsarchive/engine.recorder'),
-              fetcherConfig: config.get('@opentermsarchive/engine.fetcher'),
-            });
+            setupNockForMultiSourceDocs([ 'COMMUNITY_STANDARDS', 'HATE_SPEECH', 'VIOLENCE_INCITEMENT', 'NEW_POLICY' ]);
 
-            await app.initialize();
-            await app.track({ services });
+            app = await createAndInitializeArchivist();
 
-            ({ id: originalSnapshotId } = await app.recorder.snapshotsRepository.findLatest(SERVICE_A_ID, SERVICE_A_TYPE));
-            ({ id: firstVersionId } = await app.recorder.versionsRepository.findLatest(SERVICE_A_ID, SERVICE_A_TYPE));
+            let terms = app.services[SERVICE_ID].getTerms({ type: TERMS_TYPE });
 
-            serviceBCommits = await gitVersion.log({ file: SERVICE_B_EXPECTED_VERSION_FILE_PATH });
+            disableClientScriptsForTerms(terms);
 
-            app.services[SERVICE_A_ID].getTerms({ type: SERVICE_A_TYPE }).sourceDocuments[0].contentSelectors = 'h1';
+            // First, track the terms normally to create initial version
+            await app.track({ services: [SERVICE_ID], types: [TERMS_TYPE] });
+            initialVersion = await app.recorder.versionsRepository.findLatest(SERVICE_ID, TERMS_TYPE);
 
-            await app.track({ services: [ 'service·A', 'Service B!' ], extractOnly: true });
+            // Modify the declaration to add a new source document
+            terms = app.services[SERVICE_ID].getTerms({ type: TERMS_TYPE });
 
-            const [reExtractedVersionCommit] = await gitVersion.log({ file: SERVICE_A_EXPECTED_VERSION_FILE_PATH });
+            terms.sourceDocuments.push(new SourceDocument({
+              id: 'new-policy',
+              location: `${MULTI_SOURCE_DOCS.BASE_URL}${MULTI_SOURCE_DOCS.PATHS.NEW_POLICY}`,
+              contentSelectors: 'body',
+              executeClientScripts: false,
+              filters: [],
+            }));
 
-            reExtractedVersionId = reExtractedVersionCommit.hash;
-            reExtractedVersionMessageBody = reExtractedVersionCommit.body;
+            // Apply technical upgrades
+            await app.applyTechnicalUpgrades({ services: [SERVICE_ID], types: [TERMS_TYPE] });
+            upgradeVersion = await app.recorder.versionsRepository.findLatest(SERVICE_ID, TERMS_TYPE);
           });
 
-          after(resetGitRepositories);
-
-          it('updates the version of the changed service', async () => {
-            const serviceAContent = await fs.readFile(path.resolve(__dirname, SERVICE_A_EXPECTED_VERSION_FILE_PATH), { encoding: 'utf8' });
-
-            expect(serviceAContent).to.equal('Terms of service with UTF-8 \'çhãràčtęrs"\n========================================');
+          after(async () => {
+            await resetGitRepositories();
+            nock.cleanAll();
           });
 
-          it('generates a new version id', () => {
-            expect(reExtractedVersionId).to.not.equal(firstVersionId);
+          it('creates a new version', () => {
+            expect(upgradeVersion.id).to.not.equal(initialVersion.id);
           });
 
-          it('mentions the snapshot id in the changelog', () => {
-            expect(reExtractedVersionMessageBody).to.include(originalSnapshotId);
+          it('marks the new version as technical upgrade', () => {
+            expect(upgradeVersion.isTechnicalUpgrade).to.be.true;
           });
 
-          it('does not change other services', async () => {
-            const serviceBVersion = await fs.readFile(path.resolve(__dirname, SERVICE_B_EXPECTED_VERSION_FILE_PATH), { encoding: 'utf8' });
+          it('fetches and includes the new source document in the version', async () => {
+            const versionContent = await upgradeVersion.content;
 
-            expect(serviceBVersion).to.equal(serviceBVersionExpectedContent);
+            expect(versionContent).to.include(MULTI_SOURCE_DOCS.EXPECTED_TEXTS.NEW_POLICY);
           });
 
-          it('does not generate a new id for other services', async () => {
-            const serviceBCommitsAfterExtraction = await gitVersion.log({ file: SERVICE_B_EXPECTED_VERSION_FILE_PATH });
+          it('includes all source documents in version', async () => {
+            const versionContent = await upgradeVersion.content;
 
-            expect(serviceBCommitsAfterExtraction.map(commit => commit.hash)).to.deep.equal(serviceBCommits.map(commit => commit.hash));
+            expect(versionContent).to.include(MULTI_SOURCE_DOCS.EXPECTED_TEXTS.COMMUNITY_STANDARDS);
+            expect(versionContent).to.include(MULTI_SOURCE_DOCS.EXPECTED_TEXTS.HATE_SPEECH);
+            expect(versionContent).to.include(MULTI_SOURCE_DOCS.EXPECTED_TEXTS.VIOLENCE_INCITEMENT);
+            expect(versionContent).to.include(MULTI_SOURCE_DOCS.EXPECTED_TEXTS.NEW_POLICY);
           });
         });
 
-        context('when there is an operational error with service A', () => {
-          let inaccessibleContentSpy;
-          let versionNotChangedSpy;
-          let versionB;
+        context('when a source document location is modified in combined terms', () => {
+          let initialVersion;
+          let latestVersion;
+          let newLocationScope;
 
           before(async () => {
-            nock('https://www.servicea.example').get('/tos').reply(200, serviceASnapshotExpectedContent, { 'Content-Type': 'text/html' });
-            nock('https://www.serviceb.example').get('/privacy').reply(200, serviceBSnapshotExpectedContent, { 'Content-Type': 'application/pdf' });
-            app = new Archivist({
-              recorderConfig: config.get('@opentermsarchive/engine.recorder'),
-              fetcherConfig: config.get('@opentermsarchive/engine.fetcher'),
-            });
+            setupNockForMultiSourceDocs([ 'COMMUNITY_STANDARDS', 'HATE_SPEECH', 'VIOLENCE_INCITEMENT' ]);
 
-            await app.initialize();
-            await app.track({ services });
-            app.services[SERVICE_A_ID].getTerms({ type: SERVICE_A_TYPE }).sourceDocuments[0].contentSelectors = 'inexistant-selector';
-            inaccessibleContentSpy = sinon.spy();
-            versionNotChangedSpy = sinon.spy();
-            app.on('inaccessibleContent', inaccessibleContentSpy);
-            app.on('versionNotChanged', record => {
-              if (record.serviceId == 'Service B!') {
-                versionB = record;
-              }
-              versionNotChangedSpy(record);
-            });
-            await app.track({ services, extractOnly: true });
+            app = await createAndInitializeArchivist();
+
+            let terms = app.services[SERVICE_ID].getTerms({ type: TERMS_TYPE });
+
+            disableClientScriptsForTerms(terms);
+
+            // First, track the terms normally
+            await app.track({ services: [SERVICE_ID], types: [TERMS_TYPE] });
+            initialVersion = await app.recorder.versionsRepository.findLatest(SERVICE_ID, TERMS_TYPE);
+
+            // Mock new location (but it won't be fetched during technical upgrade)
+            newLocationScope = nock(MULTI_SOURCE_DOCS.BASE_URL)
+              .persist()
+              .get('/community-standards/hate-speech-updated/')
+              .reply(200, '<html><body><p>Updated hate speech policy</p></body></html>', { 'Content-Type': 'text/html' });
+
+            // Modify the declaration to change location
+            terms = app.services[SERVICE_ID].getTerms({ type: TERMS_TYPE });
+
+            terms.sourceDocuments[1].location = `${MULTI_SOURCE_DOCS.BASE_URL}/community-standards/hate-speech-updated/`;
+
+            // Apply technical upgrades
+            await app.applyTechnicalUpgrades({ services: [SERVICE_ID], types: [TERMS_TYPE] });
+            latestVersion = await app.recorder.versionsRepository.findLatest(SERVICE_ID, TERMS_TYPE);
           });
 
-          after(resetGitRepositories);
-
-          it('emits an inaccessibleContent event', () => {
-            expect(inaccessibleContentSpy).to.have.been.called;
+          after(async () => {
+            await resetGitRepositories();
+            nock.cleanAll();
           });
 
-          it('still extracts the terms of other services', () => {
-            expect(versionNotChangedSpy).to.have.been.calledWith(versionB);
+          it('does not create a new version', () => {
+            expect(latestVersion.id).to.equal(initialVersion.id);
+          });
+
+          it('does not fetch from new location', () => {
+            expect(newLocationScope.isDone()).to.be.false;
+          });
+
+          it('does not include content from the new location', async () => {
+            const versionContent = await latestVersion.content;
+
+            expect(versionContent).to.not.include('Updated hate speech policy');
+          });
+        });
+
+        context('when a source document selector is modified in combined terms', () => {
+          let initialVersion;
+          let latestVersion;
+          let initialVersionContent;
+          let upgradeVersionContent;
+
+          before(async () => {
+            setupNockForMultiSourceDocs([ 'COMMUNITY_STANDARDS', 'HATE_SPEECH', 'VIOLENCE_INCITEMENT' ]);
+
+            app = await createAndInitializeArchivist();
+
+            let terms = app.services[SERVICE_ID].getTerms({ type: TERMS_TYPE });
+
+            disableClientScriptsForTerms(terms);
+
+            // First, track the terms normally
+            await app.track({ services: [SERVICE_ID], types: [TERMS_TYPE] });
+            initialVersion = await app.recorder.versionsRepository.findLatest(SERVICE_ID, TERMS_TYPE);
+            initialVersionContent = await initialVersion.content;
+
+            // Modify the declaration to change selector
+            terms = app.services[SERVICE_ID].getTerms({ type: TERMS_TYPE });
+
+            // Change from 'body' to 'h1' for the first source document
+            terms.sourceDocuments[0].contentSelectors = 'h1';
+
+            // Apply technical upgrades
+            await app.applyTechnicalUpgrades({ services: [SERVICE_ID], types: [TERMS_TYPE] });
+            latestVersion = await app.recorder.versionsRepository.findLatest(SERVICE_ID, TERMS_TYPE);
+            upgradeVersionContent = await latestVersion.content;
+          });
+
+          after(async () => {
+            await resetGitRepositories();
+            nock.cleanAll();
+          });
+
+          it('creates a new version', () => {
+            expect(latestVersion.id).to.not.equal(initialVersion.id);
+          });
+
+          it('marks the new version as technical upgrade', () => {
+            expect(latestVersion.isTechnicalUpgrade).to.be.true;
+          });
+
+          it('extracts content with the new selector from existing snapshot', () => {
+            // With new selector 'h1', should only extract the heading
+            expect(upgradeVersionContent).to.include(MULTI_SOURCE_DOCS.EXPECTED_TEXTS.COMMUNITY_STANDARDS);
+            // The rest should be from other source documents
+            expect(upgradeVersionContent).to.include(MULTI_SOURCE_DOCS.EXPECTED_TEXTS.HATE_SPEECH);
+            expect(upgradeVersionContent).to.include(MULTI_SOURCE_DOCS.EXPECTED_TEXTS.VIOLENCE_INCITEMENT);
+          });
+
+          it('regenerates version with updated extraction logic', () => {
+            expect(upgradeVersionContent).to.not.equal(initialVersionContent);
+          });
+        });
+
+        context('when adding source document but no version exists yet', () => {
+          let newSourceScope;
+
+          before(async () => {
+            newSourceScope = nock(MULTI_SOURCE_DOCS.BASE_URL)
+              .get(MULTI_SOURCE_DOCS.PATHS.NEW_POLICY)
+              .reply(200, MULTI_SOURCE_DOCS.CONTENT.NEW_POLICY, { 'Content-Type': 'text/html' });
+
+            app = await createAndInitializeArchivist();
+
+            // Modify declaration before any tracking
+            const terms = app.services[SERVICE_ID].getTerms({ type: TERMS_TYPE });
+
+            terms.sourceDocuments.push({
+              id: 'new-policy',
+              location: `${MULTI_SOURCE_DOCS.BASE_URL}${MULTI_SOURCE_DOCS.PATHS.NEW_POLICY}`,
+              contentSelectors: 'body',
+              executeClientScripts: false,
+              filters: [],
+            });
+
+            // Apply technical upgrades (should skip because no version exists)
+            await app.applyTechnicalUpgrades({ services: [SERVICE_ID], types: [TERMS_TYPE] });
+          });
+
+          after(async () => {
+            await resetGitRepositories();
+            nock.cleanAll();
+          });
+
+          it('does not create a version when none existed before', async () => {
+            const version = await app.recorder.versionsRepository.findLatest(SERVICE_ID, TERMS_TYPE);
+
+            expect(version).to.be.null;
+          });
+
+          it('does not fetch the new source document', () => {
+            expect(newSourceScope.isDone()).to.be.false;
           });
         });
       });
@@ -256,11 +522,7 @@ describe('Archivist', function () {
     const retryableError = new FetchDocumentError(FetchDocumentError.LIKELY_TRANSIENT_ERRORS[0]);
 
     before(async () => {
-      app = new Archivist({
-        recorderConfig: config.get('@opentermsarchive/engine.recorder'),
-        fetcherConfig: config.get('@opentermsarchive/engine.fetcher'),
-      });
-      await app.initialize();
+      app = await createAndInitializeArchivist();
     });
 
     beforeEach(() => {
@@ -345,11 +607,7 @@ describe('Archivist', function () {
 
     describe('#attach', () => {
       before(async () => {
-        app = new Archivist({
-          recorderConfig: config.get('@opentermsarchive/engine.recorder'),
-          fetcherConfig: config.get('@opentermsarchive/engine.fetcher'),
-        });
-        await app.initialize();
+        app = await createAndInitializeArchivist();
 
         EVENTS.forEach(event => {
           const handlerName = `on${event[0].toUpperCase()}${event.substring(1)}`;
@@ -378,14 +636,9 @@ describe('Archivist', function () {
       let plugin;
 
       before(async () => {
-        nock.cleanAll();
-        nock('https://www.servicea.example').get('/tos').reply(200, serviceASnapshotExpectedContent, { 'Content-Type': 'text/html' });
+        setupNockForServices({ serviceA: true, serviceB: false });
 
-        app = new Archivist({
-          recorderConfig: config.get('@opentermsarchive/engine.recorder'),
-          fetcherConfig: config.get('@opentermsarchive/engine.fetcher'),
-        });
-        await app.initialize();
+        app = await createAndInitializeArchivist();
 
         plugin = { onFirstVersionRecorded: () => { throw new Error('Plugin error'); } };
 
@@ -432,11 +685,7 @@ describe('Archivist', function () {
     }
 
     before(async () => {
-      app = new Archivist({
-        recorderConfig: config.get('@opentermsarchive/engine.recorder'),
-        fetcherConfig: config.get('@opentermsarchive/engine.fetcher'),
-      });
-      await app.initialize();
+      app = await createAndInitializeArchivist();
 
       EVENTS.forEach(event => {
         const handlerName = `on${event[0].toUpperCase()}${event.substr(1)}`;

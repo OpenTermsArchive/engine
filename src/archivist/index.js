@@ -20,7 +20,7 @@ const { version: PACKAGE_VERSION } = require('../../package.json');
 // - too many requests on the same endpoint yield 403
 // - sometimes when creating a commit no SHA are returned for unknown reasons
 const MAX_PARALLEL_TRACKING = 1;
-const MAX_PARALLEL_EXTRACTING = 10;
+const MAX_PARALLEL_TECHNICAL_UPGRADES = 10;
 
 export const EVENTS = [
   'snapshotRecorded',
@@ -128,14 +128,32 @@ export default class Archivist extends events.EventEmitter {
     });
   }
 
-  async track({ services: servicesIds = this.servicesIds, types: termsTypes = [], extractOnly = false } = {}) {
+  async track({ services: servicesIds = this.servicesIds, types: termsTypes = [] } = {}) {
+    await this.processTerms({
+      servicesIds,
+      termsTypes,
+      technicalUpgradeOnly: false,
+      concurrency: MAX_PARALLEL_TRACKING,
+    });
+  }
+
+  async applyTechnicalUpgrades({ services: servicesIds = this.servicesIds, types: termsTypes = [] } = {}) {
+    await this.processTerms({
+      servicesIds,
+      termsTypes,
+      technicalUpgradeOnly: true,
+      concurrency: MAX_PARALLEL_TECHNICAL_UPGRADES,
+    });
+  }
+
+  async processTerms({ servicesIds, termsTypes, technicalUpgradeOnly, concurrency }) {
     const numberOfTerms = Service.getNumberOfTerms(this.services, servicesIds, termsTypes);
 
-    this.emit('trackingStarted', servicesIds.length, numberOfTerms, extractOnly);
+    this.emit('trackingStarted', servicesIds.length, numberOfTerms, technicalUpgradeOnly);
 
     await Promise.all([ launchHeadlessBrowser(), this.recorder.initialize() ]);
 
-    this.trackingQueue.concurrency = extractOnly ? MAX_PARALLEL_EXTRACTING : MAX_PARALLEL_TRACKING;
+    this.trackingQueue.concurrency = concurrency;
 
     servicesIds.forEach(serviceId => {
       this.services[serviceId].getTermsTypes().forEach(termsType => {
@@ -143,7 +161,7 @@ export default class Archivist extends events.EventEmitter {
           return;
         }
 
-        this.trackingQueue.push({ terms: this.services[serviceId].getTerms({ type: termsType }), extractOnly });
+        this.trackingQueue.push({ terms: this.services[serviceId].getTerms({ type: termsType }), technicalUpgradeOnly });
       });
     });
 
@@ -153,12 +171,14 @@ export default class Archivist extends events.EventEmitter {
 
     await Promise.all([ stopHeadlessBrowser(), this.recorder.finalize() ]);
 
-    this.emit('trackingCompleted', servicesIds.length, numberOfTerms, extractOnly);
+    this.emit('trackingCompleted', servicesIds.length, numberOfTerms, technicalUpgradeOnly);
   }
 
-  async trackTermsChanges({ terms, extractOnly = false }) {
-    if (!extractOnly) {
+  async trackTermsChanges({ terms, technicalUpgradeOnly = false }) {
+    if (!technicalUpgradeOnly) {
       await this.fetchAndRecordSnapshots(terms);
+    } else {
+      await this.fetchAndRecordNewSourceDocuments(terms); // In technical upgrade mode, fetch and record snapshots only for new source documents that don't have existing snapshots yet (e.g., when a declaration is updated to add a new source document)
     }
 
     const contents = await this.extractContentsFromSnapshots(terms);
@@ -167,7 +187,7 @@ export default class Archivist extends events.EventEmitter {
       return;
     }
 
-    await this.recordVersion(terms, contents.join(Version.SOURCE_DOCUMENTS_SEPARATOR), extractOnly);
+    await this.recordVersion(terms, contents.join(Version.SOURCE_DOCUMENTS_SEPARATOR), technicalUpgradeOnly);
   }
 
   async fetchAndRecordSnapshots(terms) {
@@ -175,6 +195,50 @@ export default class Archivist extends events.EventEmitter {
     const fetchDocumentErrors = [];
 
     for (const sourceDocument of terms.sourceDocuments) {
+      const error = await this.fetchSourceDocument(sourceDocument);
+
+      if (error) {
+        fetchDocumentErrors.push(error);
+      } else {
+        await this.recordSnapshot(terms, sourceDocument);
+        sourceDocument.clearContent(); // Reduce memory usage by clearing no longer needed large content strings
+      }
+    }
+
+    if (fetchDocumentErrors.length) {
+      throw new InaccessibleContentError(fetchDocumentErrors);
+    }
+  }
+
+  async fetchAndRecordNewSourceDocuments(terms) {
+    if (!terms.hasMultipleSourceDocuments) { // If the terms has only one source document, there is nothing to do
+      return;
+    }
+
+    const existingVersion = await this.recorder.versionsRepository.findLatest(terms.service.id, terms.type);
+
+    if (!existingVersion) { // If the terms does not have a version recorded, skip this step as the next version will be tagged as "First record…" anyway
+      return;
+    }
+
+    const missingSourceDocuments = [];
+
+    for (const sourceDocument of terms.sourceDocuments) {
+      const snapshot = await this.recorder.getLatestSnapshot(terms, sourceDocument.id);
+
+      if (!snapshot) {
+        missingSourceDocuments.push(sourceDocument);
+      }
+    }
+
+    if (!missingSourceDocuments.length) {
+      return;
+    }
+
+    terms.fetchDate = new Date();
+    const fetchDocumentErrors = [];
+
+    for (const sourceDocument of missingSourceDocuments) {
       const error = await this.fetchSourceDocument(sourceDocument);
 
       if (error) {
@@ -249,14 +313,14 @@ export default class Archivist extends events.EventEmitter {
     return contents;
   }
 
-  async recordVersion(terms, content, extractOnly) {
+  async recordVersion(terms, content, technicalUpgradeOnly) {
     const record = new Version({
       content,
       snapshotIds: terms.sourceDocuments.map(sourceDocuments => sourceDocuments.snapshotId),
       serviceId: terms.service.id,
       termsType: terms.type,
       fetchDate: terms.fetchDate,
-      isExtractOnly: extractOnly,
+      isTechnicalUpgrade: technicalUpgradeOnly,
       metadata: { 'x-engine-version': PACKAGE_VERSION },
     });
 

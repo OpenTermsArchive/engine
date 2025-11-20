@@ -208,7 +208,7 @@ describe('GitRepository', () => {
         });
       });
 
-      context('when it is an extracted only version', () => {
+      context('when it is an technical upgrade version', () => {
         const EXTRACTED_ONLY_CONTENT = `${CONTENT} extracted only`;
 
         before(async () => {
@@ -217,7 +217,7 @@ describe('GitRepository', () => {
             termsType: TERMS_TYPE,
             content: CONTENT,
             fetchDate: FETCH_DATE_EARLIER,
-          })); // An extracted only version cannot be the first record
+          })); // An technical upgrade version cannot be the first record
 
           numberOfRecordsBefore = (await git.log()).length;
 
@@ -226,7 +226,7 @@ describe('GitRepository', () => {
             termsType: TERMS_TYPE,
             content: EXTRACTED_ONLY_CONTENT,
             fetchDate: FETCH_DATE,
-            isExtractOnly: true,
+            isTechnicalUpgrade: true,
             snapshotIds: [SNAPSHOT_ID],
           })));
 
@@ -245,8 +245,8 @@ describe('GitRepository', () => {
           expect(commit.hash).to.include(id);
         });
 
-        it('stores information that it is an extracted only version', () => {
-          expect(commit.message).to.include(COMMIT_MESSAGE_PREFIXES.extractOnly);
+        it('stores information that it is an technical upgrade version', () => {
+          expect(commit.message).to.include(COMMIT_MESSAGE_PREFIXES.technicalUpgrade);
         });
       });
 
@@ -518,7 +518,7 @@ describe('GitRepository', () => {
           serviceId: SERVICE_PROVIDER_ID,
           termsType: TERMS_TYPE,
           content: `${CONTENT} - updated 2`,
-          isExtractOnly: true,
+          isTechnicalUpgrade: true,
           fetchDate: FETCH_DATE_EARLIER,
           snapshotIds: [SNAPSHOT_ID],
         }));
@@ -569,7 +569,7 @@ describe('GitRepository', () => {
           serviceId: SERVICE_PROVIDER_ID,
           termsType: TERMS_TYPE,
           content: `${CONTENT} - updated 2`,
-          isExtractOnly: true,
+          isTechnicalUpgrade: true,
           fetchDate: FETCH_DATE_EARLIER,
           snapshotIds: [SNAPSHOT_ID],
         }));
@@ -678,7 +678,7 @@ describe('GitRepository', () => {
           serviceId: SERVICE_PROVIDER_ID,
           termsType: TERMS_TYPE,
           content: `${CONTENT} - updated 2`,
-          isExtractOnly: true,
+          isTechnicalUpgrade: true,
           fetchDate: FETCH_DATE_EARLIER,
           snapshotIds: [SNAPSHOT_ID],
           mimeType: HTML_MIME_TYPE,
@@ -1079,7 +1079,7 @@ describe('GitRepository', () => {
           serviceId: SERVICE_PROVIDER_ID,
           termsType: TERMS_TYPE,
           content: `${CONTENT} - updated 2`,
-          isExtractOnly: true,
+          isTechnicalUpgrade: true,
           fetchDate: FETCH_DATE_EARLIER,
           mimeType: HTML_MIME_TYPE,
         }));
@@ -1130,7 +1130,7 @@ describe('GitRepository', () => {
           serviceId: SERVICE_PROVIDER_ID,
           termsType: TERMS_TYPE,
           content: `${CONTENT} - updated 2`,
-          isExtractOnly: true,
+          isTechnicalUpgrade: true,
           fetchDate: FETCH_DATE_EARLIER,
           mimeType: HTML_MIME_TYPE,
         }));
@@ -1269,7 +1269,7 @@ describe('GitRepository', () => {
           serviceId: SERVICE_PROVIDER_ID,
           termsType: TERMS_TYPE,
           content: `${CONTENT} - updated 2`,
-          isExtractOnly: true,
+          isTechnicalUpgrade: true,
           fetchDate: FETCH_DATE_EARLIER,
           mimeType: HTML_MIME_TYPE,
         }));
@@ -1398,24 +1398,24 @@ describe('GitRepository', () => {
     after(() => subject.removeAll());
 
     describe('Records attributes', () => {
-      describe('#isExtractOnly', () => {
+      describe('#isTechnicalUpgrade', () => {
         context('records with deprecated message', () => {
           it('returns the proper value', async () => {
-            expect((await subject.findById(commits.deprecatedRefilter.id)).isExtractOnly).to.be.true;
+            expect((await subject.findById(commits.deprecatedRefilter.id)).isTechnicalUpgrade).to.be.true;
           });
 
           it('returns the proper value', async () => {
-            expect((await subject.findById(commits.deprecatedFirstRecord.id)).isExtractOnly).to.be.false;
+            expect((await subject.findById(commits.deprecatedFirstRecord.id)).isTechnicalUpgrade).to.be.false;
           });
         });
 
         context('record with current message', () => {
           it('returns the proper value', async () => {
-            expect((await subject.findById(commits.currentExtractOnly.id)).isExtractOnly).to.be.true;
+            expect((await subject.findById(commits.currentExtractOnly.id)).isTechnicalUpgrade).to.be.true;
           });
 
           it('returns the proper value', async () => {
-            expect((await subject.findById(commits.currentFirstRecord.id)).isExtractOnly).to.be.false;
+            expect((await subject.findById(commits.currentFirstRecord.id)).isTechnicalUpgrade).to.be.false;
           });
         });
       });

@@ -7,7 +7,7 @@ import Version from '../../version.js';
 
 export const COMMIT_MESSAGE_PREFIXES = {
   startTracking: 'First record of',
-  extractOnly: 'Apply technical or declaration upgrade on',
+  technicalUpgrade: 'Apply technical or declaration upgrade on',
   update: 'Record new changes of',
   deprecated_startTracking: 'Start tracking',
   deprecated_refilter: 'Refilter',
@@ -22,9 +22,9 @@ const MULTIPLE_SOURCE_DOCUMENTS_PREFIX = 'This version was recorded after extrac
 export const COMMIT_MESSAGE_PREFIXES_REGEXP = new RegExp(`^(${Object.values(COMMIT_MESSAGE_PREFIXES).join('|')})`);
 
 export function toPersistence(record, snapshotIdentiferTemplate) {
-  const { serviceId, termsType, documentId, isExtractOnly, snapshotIds = [], mimeType, isFirstRecord, metadata } = record;
+  const { serviceId, termsType, documentId, isTechnicalUpgrade, snapshotIds = [], mimeType, isFirstRecord, metadata } = record;
 
-  let prefix = isExtractOnly ? COMMIT_MESSAGE_PREFIXES.extractOnly : COMMIT_MESSAGE_PREFIXES.update;
+  let prefix = isTechnicalUpgrade ? COMMIT_MESSAGE_PREFIXES.technicalUpgrade : COMMIT_MESSAGE_PREFIXES.update;
 
   prefix = isFirstRecord ? COMMIT_MESSAGE_PREFIXES.startTracking : prefix;
 
@@ -75,7 +75,7 @@ export function toDomain(commit) {
   const mimeTypeValue = mime.getType(relativeFilePath);
 
   if (mimeTypeValue == mime.getType('markdown')) {
-    attributes.isExtractOnly = message.startsWith(COMMIT_MESSAGE_PREFIXES.extractOnly) || message.startsWith(COMMIT_MESSAGE_PREFIXES.deprecated_refilter);
+    attributes.isTechnicalUpgrade = message.startsWith(COMMIT_MESSAGE_PREFIXES.technicalUpgrade) || message.startsWith(COMMIT_MESSAGE_PREFIXES.deprecated_refilter);
     attributes.snapshotIds = snapshotIdsMatch;
 
     return new Version(attributes);

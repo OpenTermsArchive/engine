@@ -21,7 +21,7 @@
         }
       ],
       "select": "body",
-      "remove": "body",
+      "remove": "footer",
       "executeClientScripts": true
     }
   }
