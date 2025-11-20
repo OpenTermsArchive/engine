@@ -14,7 +14,7 @@ export function title({ releaseDate }) {
 
   const title = config.get('@opentermsarchive/engine.dataset.title');
 
-  return `${title} — ${releaseDate} dataset`;
+  return `${title} — ${releaseDate}`;
 }
 
 export function body({ servicesCount, firstVersionDate, lastVersionDate }) {
