@@ -17,6 +17,8 @@ export default async function publish({ archivePath, releaseDate, stats }) {
 
   const tagName = `${path.basename(archivePath, path.extname(archivePath))}`; // use archive filename as Git tag
 
+  logger.info(`Creating release for ${owner}/${repo}…`);
+
   const { data: { upload_url: uploadUrl, html_url: releaseUrl } } = await octokit.rest.repos.createRelease({
     owner,
     repo,
@@ -24,6 +26,9 @@ export default async function publish({ archivePath, releaseDate, stats }) {
     name: readme.title({ releaseDate }),
     body: readme.body(stats),
   });
+
+  logger.info(`Release created successfully with tag: ${tagName}`);
+  logger.info('Uploading release asset…');
 
   await octokit.rest.repos.uploadReleaseAsset({
     data: fsApi.readFileSync(archivePath),
@@ -34,6 +39,8 @@ export default async function publish({ archivePath, releaseDate, stats }) {
     name: path.basename(archivePath),
     url: uploadUrl,
   });
+
+  logger.info(`Release asset uploaded successfully: ${path.basename(archivePath)}`);
 
   return releaseUrl;
 }
