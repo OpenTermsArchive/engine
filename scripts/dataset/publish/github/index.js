@@ -1,6 +1,5 @@
 import fsApi from 'fs';
 import path from 'path';
-import url from 'url';
 
 import config from 'config';
 import { Octokit } from 'octokit'; // eslint-disable-line import/no-unresolved
@@ -13,7 +12,7 @@ const logger = createModuleLogger('github');
 export default async function publish({ archivePath, releaseDate, stats }) {
   const octokit = new Octokit({ auth: process.env.OTA_ENGINE_GITHUB_TOKEN });
 
-  const [ owner, repo ] = url.parse(config.get('@opentermsarchive/engine.dataset.versionsRepositoryURL')).pathname.split('/').filter(component => component);
+  const [ owner, repo ] = new URL(config.get('@opentermsarchive/engine.dataset.versionsRepositoryURL')).pathname.split('/').filter(component => component);
 
   const tagName = `${path.basename(archivePath, path.extname(archivePath))}`; // use archive filename as Git tag
 
