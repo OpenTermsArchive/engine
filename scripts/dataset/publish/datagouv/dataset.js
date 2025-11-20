@@ -5,7 +5,9 @@ import FormData from 'form-data';
 import nodeFetch from 'node-fetch';
 
 import * as readme from '../../assets/README.template.js';
-import logger from '../../logger/index.js';
+import { createModuleLogger } from '../../logger/index.js';
+
+const logger = createModuleLogger('datagouv');
 
 const DATASET_LICENSE = 'odc-odbl';
 const DEFAULT_RESOURCE_DESCRIPTION = 'See README.md inside the archive for dataset structure and usage information.';

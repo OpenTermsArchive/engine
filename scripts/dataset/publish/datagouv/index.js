@@ -1,8 +1,9 @@
 import config from 'config';
 
-import logger from '../../logger/index.js';
+import { createModuleLogger } from '../../logger/index.js';
 
 import { updateDatasetMetadata, uploadResource, updateResourceMetadata, getDatasetUrl } from './dataset.js';
+const logger = createModuleLogger('datagouv');
 
 const PRODUCTION_API_BASE_URL = 'https://www.data.gouv.fr/api/1';
 const DEMO_API_BASE_URL = 'https://demo.data.gouv.fr/api/1';
