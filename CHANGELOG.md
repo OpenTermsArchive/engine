@@ -8,7 +8,7 @@ All changes that impact users of this module are documented in this file, in the
 
 ### Added
 
-- Add support for publishing datasets to data.gouv.fr; configure `dataset.datagouv.datasetId` in configuration file and set `OTA_ENGINE_DATAGOUV_API_KEY` environment variable
+- Add support for publishing datasets to data.gouv.fr; configure `dataset.datagouv.datasetId` or `dataset.datagouv.organizationIdOrSlug` in configuration file and set `OTA_ENGINE_DATAGOUV_API_KEY` environment variable
 - Add ability to publish datasets to multiple platforms simultaneously; datasets can now be published to GitHub (or GitLab) and data.gouv.fr in parallel
 
 ## 10.0.1 - 2025-11-24
