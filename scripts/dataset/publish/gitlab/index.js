@@ -8,7 +8,9 @@ import nodeFetch from 'node-fetch';
 
 import GitLab from '../../../../src/reporter/gitlab/index.js';
 import * as readme from '../../assets/README.template.js';
-import logger from '../../logger/index.js';
+import { createModuleLogger } from '../../logger/index.js';
+
+const logger = createModuleLogger('gitlab');
 
 dotenv.config({ quiet: true });
 
