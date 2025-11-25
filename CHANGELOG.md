@@ -2,6 +2,14 @@
 
 All changes that impact users of this module are documented in this file, in the [Common Changelog](https://common-changelog.org) format with some additional specifications defined in the CONTRIBUTING file. This codebase adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased [patch]
+
+> Development of this release was supported by the [European Commission](https://commission.europa.eu/) for its [VLOPs/VLOSEs instance](https://code.europa.eu/dsa/terms-and-conditions-database/vlops-and-vloses/).
+
+### Fixed
+
+- Support proxies in GitLab issues reporting
+
 ## 10.1.0 - 2025-11-24
 
 _Full changeset and discussions: [#1202](https://github.com/OpenTermsArchive/engine/pull/1202)._
