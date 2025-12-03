@@ -43,6 +43,30 @@ export default async function fetch(url, cssSelectors, config) {
       throw new Error(`Received HTTP code ${statusCode} when trying to fetch '${url}'`);
     }
 
+    const contentType = response.headers()['content-type'];
+
+    // PDF handling (fallback)
+    if (contentType && contentType.includes('application/pdf')) {
+      console.log("Detected PDF:", url);
+
+      const pdfArray = await page.evaluate(async () => {
+        const res = await fetch(window.location.href);
+        const blob = await res.blob();
+        const arrayBuffer = await blob.arrayBuffer();
+        return Array.from(new Uint8Array(arrayBuffer)); // <-- ensures plain array
+      });
+
+      const pdfBuffer = Buffer.from(pdfArray);
+
+      console.log('PDF size:', pdfBuffer.length);
+      console.log('First bytes:', pdfBuffer.slice(0, 10).toString());
+
+      return {
+        mimeType: 'application/pdf',
+        content: pdfBuffer,
+      };
+    }
+
     const waitForSelectorsPromises = selectors.filter(Boolean).map(selector =>
       page.waitForFunction(
         cssSelector => {
