@@ -25,6 +25,8 @@
   "files": [
     "bin",
     "config",
+    "!config/development.json",
+    "!config/local.json",
     "scripts",
     "src",
     ".eslintrc.yaml"
