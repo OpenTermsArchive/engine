@@ -57,6 +57,12 @@ jobs:
           branch: main
           unprotect_reviews: true
 
+      - name: Update npm
+        run: npm install -g npm@latest
+
+      - name: Publish to NPM public repository
+        run: npm publish
+
       - name: Push changes to repository
         run: git push origin && git push --tags
 
@@ -66,12 +72,6 @@ jobs:
           tag_name: v${{ steps.release-changelog.outputs.version }}
           body: ${{ steps.release-changelog.outputs.content }}
           token: ${{ secrets.RELEASE_BOT_GITHUB_TOKEN }}
-
-      - name: Update npm
-        run: npm install -g npm@latest
-      
-      - name: Publish to NPM public repository
-        run: npm publish
 
       - name: Trigger documentation deploy
         uses: peter-evans/repository-dispatch@v2
