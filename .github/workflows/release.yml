@@ -61,7 +61,7 @@ jobs:
         run: npm install -g npm@latest
 
       - name: Publish to NPM public repository
-        run: npm publish
+        run: npm publish --provenance
 
       - name: Push changes to repository
         run: git push origin && git push --tags
