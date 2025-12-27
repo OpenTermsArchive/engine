@@ -8,6 +8,7 @@ puppeteer.use(stealthPlugin());
 let browser;
 
 export default async function fetch(url, cssSelectors, config) {
+  let context;
   let page;
   let response;
   const selectors = [].concat(cssSelectors);
@@ -17,15 +18,11 @@ export default async function fetch(url, cssSelectors, config) {
   }
 
   try {
-    page = await browser.newPage();
+    context = await browser.createBrowserContext(); // Create an isolated browser context to ensure complete isolation between fetches (cookies, localStorage, sessionStorage, IndexedDB, cache)
+    page = await context.newPage();
 
     await page.setDefaultNavigationTimeout(config.navigationTimeout);
     await page.setExtraHTTPHeaders({ 'Accept-Language': config.language });
-
-    await page.setCacheEnabled(false); // Disable cache to ensure fresh content on each fetch and prevent stale data from previous requests
-    const client = await page.target().createCDPSession();
-
-    await client.send('Network.clearBrowserCookies'); // Clear cookies to ensure clean state between fetches and prevent session persistence across different URLs
 
     if (browser.proxyCredentials?.username && browser.proxyCredentials?.password) {
       await page.authenticate(browser.proxyCredentials);
@@ -77,6 +74,9 @@ export default async function fetch(url, cssSelectors, config) {
   } finally {
     if (page) {
       await page.close();
+    }
+    if (context) {
+      await context.close(); // Close the isolated context to free resources and ensure complete cleanup
     }
   }
 }
