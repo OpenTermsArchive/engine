@@ -21,6 +21,7 @@ export default async function fetch(url, cssSelectors, config) {
     context = await browser.createBrowserContext(); // Create an isolated browser context to ensure complete isolation between fetches (cookies, localStorage, sessionStorage, IndexedDB, cache)
     page = await context.newPage();
 
+    await page.setViewport({ width: 1920, height: 1080 }); // Set a realistic viewport size to avoid detection based on default Puppeteer dimensions (800x600)
     await page.setDefaultNavigationTimeout(config.navigationTimeout);
     await page.setExtraHTTPHeaders({ 'Accept-Language': config.language });
 
