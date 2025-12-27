@@ -15,6 +15,7 @@ First of all, thanks for taking the time to contribute! 🎉👍
   - [Namespaces](#namespaces)
 - [Practices](#practices)
   - [Errors handling](#errors-handling)
+  - [Bot detection evasion](#bot-detection-evasion)
 - [List a new contributor](#list-a-new-contributor-in-the-open-terms-archive-website)
 - - -
 
@@ -225,6 +226,25 @@ In contrast, we consider errors from the `recorder` module as fatal, and we cras
 **The best way to handle programmer errors is to crash immediately.** Indeed, it is not recommended to attempt to recover from programmer errors — that is, allow the current operation to fail, but keep handling requests. Consider that a programmer error is a case that you didn’t think about when you wrote the original code. How can you be sure that the problem won’t affect the program itself and the data integrity?
 
 This section is highly inspired, and in part extracted, from [this error handling guide](https://console.joyent.com/node-js/production/design/errors).
+
+### Bot detection evasion
+
+The fetching system uses a two-tier strategy with automatic fallback:
+
+1. **HTML-Only fetcher**: Lightweight HTTP client based on `node-fetch` with no bot detection evasion mechanisms
+2. **Full DOM fetcher**: Headless browser based on `puppeteer-extra` with stealth plugin
+
+By default, the system first attempts an HTML-Only fetch. If bot blocking is detected (HTTP 403, 406, 502, or ECONNRESET), it automatically falls back to Full DOM. This behavior can be forced via `executeClientScripts: true` in the service declaration.
+
+The HTML-Only fetcher **intentionally has no evasion mechanisms**. Since fallback to Full DOM is automatic and fallback cases are rare, investing in evasion techniques for the HTML-Only fetcher is not necessary.
+
+The Full DOM fetcher uses:
+
+- **Stealth plugin** (`puppeteer-extra-plugin-stealth`) with default configuration to mask browser automation markers
+- **Realistic viewport** of 1920x1080 pixels
+- **Isolated browser context** for each request, ensuring complete isolation (cookies, storage, cache)
+
+This design **prioritizes determinism** (same URL → same content) over simulating a persistent user session. This choice is essential for the archiving use case, the content retrieved must be consistent and reproducible, regardless of previous fetch operations.
 
 ## List a new contributor in the Open Terms Archive website
 
