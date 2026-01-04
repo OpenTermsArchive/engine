@@ -30,7 +30,6 @@ logger.format = combine(
     return `${timestampPrefix} ${coloredLevel} ${prefix.padEnd(50)} ${coloredMessage}`;
   }),
 );
-
 export function createModuleLogger(moduleName) {
   return {
     info: message => logger.info(message, { module: moduleName }),
@@ -38,5 +37,4 @@ export function createModuleLogger(moduleName) {
     error: message => logger.error(message, { module: moduleName }),
   };
 }
-
 export default logger;

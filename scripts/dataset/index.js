@@ -29,19 +29,16 @@ export async function release({ shouldPublish, shouldRemoveLocalCopy, fileName }
     releaseDate,
     stats,
   });
-
   if (results.length > 0) {
     logger.info('Dataset published to following platforms:');
     results.forEach(result => {
       logger.info(`  - ${result.platform}: ${result.url}`);
     });
   }
-
   if (!shouldRemoveLocalCopy) {
     return;
   }
 
   fs.unlinkSync(archivePath);
-
   logger.info(`Removed local copy ${archivePath}`);
 }
