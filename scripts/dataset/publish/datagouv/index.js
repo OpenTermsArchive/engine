@@ -41,11 +41,19 @@ function loadConfiguration() {
   const organizationIdOrSlug = config.has('@opentermsarchive/engine.dataset.datagouv.organizationIdOrSlug') && config.get('@opentermsarchive/engine.dataset.datagouv.organizationIdOrSlug');
 
   if (!datasetId && !organizationIdOrSlug) {
-    throw new Error('Either datasetId or organizationIdOrSlug is required in config at @opentermsarchive/engine.dataset.datagouv');
+    throw new Error('Either "datasetId" or "organizationIdOrSlug" is required in config at @opentermsarchive/engine.dataset.datagouv');
   }
 
   const datasetTitle = config.get('@opentermsarchive/engine.dataset.title');
+  if (!datasetTitle) {
+    throw new Error('"title" is required in config at @opentermsarchive/engine.dataset');
+  }
+
   const frequency = config.has('@opentermsarchive/engine.dataset.datagouv.frequency') && config.get('@opentermsarchive/engine.dataset.datagouv.frequency');
+  if (!frequency){
+    throw new Error('"frequency" is required in config at @opentermsarchive/engine.dataset.datagouv');
+  }
+
   const useDemo = config.has('@opentermsarchive/engine.dataset.datagouv.useDemo') && config.get('@opentermsarchive/engine.dataset.datagouv.useDemo');
   const apiBaseUrl = useDemo ? DEMO_API_BASE_URL : PRODUCTION_API_BASE_URL;
 
