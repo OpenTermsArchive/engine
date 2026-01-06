@@ -45,12 +45,14 @@ function loadConfiguration() {
   }
 
   const datasetTitle = config.get('@opentermsarchive/engine.dataset.title');
+
   if (!datasetTitle) {
     throw new Error('"title" is required in config at @opentermsarchive/engine.dataset');
   }
 
   const frequency = config.has('@opentermsarchive/engine.dataset.datagouv.frequency') && config.get('@opentermsarchive/engine.dataset.datagouv.frequency');
-  if (!frequency){
+
+  if (!frequency) {
     throw new Error('"frequency" is required in config at @opentermsarchive/engine.dataset.datagouv');
   }
 

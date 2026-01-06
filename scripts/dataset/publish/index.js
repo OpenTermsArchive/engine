@@ -1,5 +1,3 @@
-import config from 'config';
-
 import logger from '../logger/index.js';
 
 import publishDataGouv from './datagouv/index.js';
