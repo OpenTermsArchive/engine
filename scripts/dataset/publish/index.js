@@ -1,5 +1,3 @@
-import config from 'config';
-
 import logger from '../logger/index.js';
 
 import publishDataGouv from './datagouv/index.js';
@@ -16,7 +14,7 @@ export default async function publishRelease({ archivePath, releaseDate, stats }
     platforms.push({ name: 'GitLab', publish: () => publishGitLab({ archivePath, releaseDate, stats }) });
   }
 
-  if (process.env.OTA_ENGINE_DATAGOUV_API_KEY && (config.has('@opentermsarchive/engine.dataset.datagouv.datasetId') || config.has('@opentermsarchive/engine.dataset.datagouv.organizationIdOrSlug'))) {
+  if (process.env.OTA_ENGINE_DATAGOUV_API_KEY) {
     platforms.push({ name: 'data.gouv.fr', publish: () => publishDataGouv({ archivePath, releaseDate, stats }) });
   }
 
