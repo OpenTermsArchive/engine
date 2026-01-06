@@ -8,7 +8,7 @@ All changes that impact users of this module are documented in this file, in the
 
 ### Fixed
 
-- Validate presence of required configuration for dataset publication to Data.gouv
+- Validate presence of required configuration for dataset publication to data.gouv.fr
 
 ## 10.1.2 - 2025-12-09
 
