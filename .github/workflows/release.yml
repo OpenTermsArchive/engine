@@ -55,7 +55,7 @@ jobs:
       #     unprotect_reviews: true
 
       - name: Publish to NPM public repository
-        run: npm publish --provenance --dry-run
+        run: npm publish --provenance
 
       # - name: Push changes to repository
       #   run: git push origin && git push --tags
