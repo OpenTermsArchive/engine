@@ -57,9 +57,6 @@ jobs:
           branch: main
           unprotect_reviews: true
 
-      - name: Update npm
-        run: npm install -g npm@latest
-
       - name: Publish to NPM public repository
         run: npm publish --provenance
 
