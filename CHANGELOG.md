@@ -2,6 +2,15 @@
 
 All changes that impact users of this module are documented in this file, in the [Common Changelog](https://common-changelog.org) format with some additional specifications defined in the CONTRIBUTING file. This codebase adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased [minor]
+
+> Development of this release was made on a volunteer basis by [@Ndpnt](http://github.com/ndpnt).
+
+### Changed
+
+- Set realistic viewport size for full DOM fetcher to avoid detection based on default Puppeteer dimensions
+- Improve isolation between fetches by using isolated browser contexts
+
 ## 10.2.0 - 2026-01-08
 
 _Full changeset and discussions: [#1219](https://github.com/OpenTermsArchive/engine/pull/1219)._
