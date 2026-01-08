@@ -50,24 +50,20 @@ jobs:
           git commit -m "Release v${{ steps.release-changelog.outputs.version }}"
           git tag v${{ steps.release-changelog.outputs.version }}
 
-      - name: Run status checks for release commit on temporary branch # Use temporary branch to enable pushing commits to this branch protected by required status checks 
-        uses: CasperWA/push-protected@v2
-        with:
-          token: ${{ secrets.RELEASE_BOT_GITHUB_TOKEN }}
-          branch: main
-          unprotect_reviews: true
-
       - name: Update npm
         run: npm install -g npm@latest
 
+      # Publish to NPM first, before pushing to repository
+      # If this fails, no changes are pushed to the repository, ensuring consistency
       - name: Publish to NPM public repository
         run: npm publish --provenance
 
+      # Only push to repository after successful NPM publish
       - name: Push changes to repository
         run: git push origin && git push --tags
 
       - name: Create GitHub release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           tag_name: v${{ steps.release-changelog.outputs.version }}
           body: ${{ steps.release-changelog.outputs.content }}
