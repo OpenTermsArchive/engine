@@ -23,6 +23,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
+          ref: main
           token: ${{ secrets.RELEASE_BOT_GITHUB_TOKEN }}
 
       - uses: actions/setup-node@v4
@@ -57,7 +58,7 @@ jobs:
 
       # Only push to repository after successful NPM publish
       - name: Push changes to repository
-        run: git push origin && git push --tags
+        run: git push origin main && git push --tags
 
       - name: Create GitHub release
         uses: softprops/action-gh-release@v2
@@ -81,6 +82,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
+          ref: main
           token: ${{ secrets.RELEASE_BOT_GITHUB_TOKEN }}
 
       - name: Configure Git author
@@ -94,4 +96,4 @@ jobs:
       - name: Save changelog
         run: |
           git commit -m "Clean changelog" CHANGELOG.md
-          git push origin
+          git push origin main
