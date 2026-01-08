@@ -1,10 +1,7 @@
 name: Release
 
 on:
-  pull_request_target:
-    branches:
-      - test-release
-    types: [ closed ]
+  push:
 
 permissions:
   id-token: write  # Required for OIDC. See https://docs.npmjs.com/trusted-publishers#step-2-configure-your-cicd-workflow
