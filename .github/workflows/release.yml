@@ -50,9 +50,6 @@ jobs:
           git commit -m "Release v${{ steps.release-changelog.outputs.version }}"
           git tag v${{ steps.release-changelog.outputs.version }}
 
-      - name: Update npm
-        run: npm install -g npm@latest
-
       # Publish to NPM first, before pushing to repository
       # If this fails, no changes are pushed to the repository, ensuring consistency
       - name: Publish to NPM public repository
