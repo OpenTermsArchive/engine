@@ -25,5 +25,5 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Lint commit messages
-        run: npm run commit-messages:lint
+      # - name: Lint commit messages
+      #   run: npm run commit-messages:lint

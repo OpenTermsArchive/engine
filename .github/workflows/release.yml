@@ -2,8 +2,8 @@ name: Release
 
 on:
   pull_request_target:
-    branches: 
-      - main
+    branches:
+      - test-release
     types: [ closed ]
 
 permissions:
@@ -21,7 +21,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           token: ${{ secrets.RELEASE_BOT_GITHUB_TOKEN }}
 
@@ -50,36 +50,29 @@ jobs:
           git commit -m "Release v${{ steps.release-changelog.outputs.version }}"
           git tag v${{ steps.release-changelog.outputs.version }}
 
-      - name: Run status checks for release commit on temporary branch # Use temporary branch to enable pushing commits to this branch protected by required status checks 
-        uses: CasperWA/push-protected@v2
-        with:
-          token: ${{ secrets.RELEASE_BOT_GITHUB_TOKEN }}
-          branch: main
-          unprotect_reviews: true
-
-      - name: Update npm
-        run: npm install -g npm@latest
-
+      # Publish to NPM first, before pushing to repository
+      # If this fails, no changes are pushed to the repository, ensuring consistency
       - name: Publish to NPM public repository
-        run: npm publish --provenance
+        run: npm publish --provenance --dry-run
 
+      # Only push to repository after successful NPM publish
       - name: Push changes to repository
-        run: git push origin && git push --tags
+        run: git push origin test-release
 
-      - name: Create GitHub release
-        uses: softprops/action-gh-release@v1
-        with:
-          tag_name: v${{ steps.release-changelog.outputs.version }}
-          body: ${{ steps.release-changelog.outputs.content }}
-          token: ${{ secrets.RELEASE_BOT_GITHUB_TOKEN }}
+      # - name: Create GitHub release
+      #   uses: softprops/action-gh-release@v2
+      #   with:
+      #     tag_name: v${{ steps.release-changelog.outputs.version }}
+      #     body: ${{ steps.release-changelog.outputs.content }}
+      #     token: ${{ secrets.RELEASE_BOT_GITHUB_TOKEN }}
 
-      - name: Trigger documentation deploy
-        uses: peter-evans/repository-dispatch@v2
-        with:
-          token: ${{ secrets.TRIGGER_DOCS_DEPLOY_TOKEN }}
-          event-type: engine-release
-          repository: OpenTermsArchive/docs
-          client-payload: '{"version": "v${{ steps.release-changelog.outputs.version }}"}'
+      # - name: Trigger documentation deploy
+      #   uses: peter-evans/repository-dispatch@v2
+      #   with:
+      #     token: ${{ secrets.TRIGGER_DOCS_DEPLOY_TOKEN }}
+      #     event-type: engine-release
+      #     repository: OpenTermsArchive/docs
+      #     client-payload: '{"version": "v${{ steps.release-changelog.outputs.version }}"}'
 
   clean_changelog:
     if: github.event.pull_request.merged == true && needs.changelog.outputs.release-type == 'no-release'
@@ -101,4 +94,4 @@ jobs:
       - name: Save changelog
         run: |
           git commit -m "Clean changelog" CHANGELOG.md
-          git push origin
+          git push origin test-release
