@@ -20,6 +20,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
+          ref: test-release
           token: ${{ secrets.RELEASE_BOT_GITHUB_TOKEN }}
 
       - uses: actions/setup-node@v4
@@ -78,6 +79,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
+          ref: test-release
           token: ${{ secrets.RELEASE_BOT_GITHUB_TOKEN }}
 
       - name: Configure Git author
