@@ -10,6 +10,7 @@ export default async function fetch(url, cssSelectors, config) {
 
   let context;
   let page;
+  let client;
   let response;
   const selectors = [].concat(cssSelectors);
 
@@ -24,6 +25,14 @@ export default async function fetch(url, cssSelectors, config) {
     await page.setViewport({ width: 1920, height: 1080 }); // Set a realistic viewport size to avoid detection based on default Puppeteer dimensions (800x600)
     await page.setDefaultNavigationTimeout(config.navigationTimeout);
     await page.setExtraHTTPHeaders({ 'Accept-Language': config.language });
+
+    // Use CDP to ensure the browser language is set correctly (most reliable method, see https://zirkelc.dev/posts/puppeteer-language-experiment)
+    client = await page.createCDPSession();
+
+    await client.send('Network.setUserAgentOverride', {
+      userAgent: await browser.userAgent(),
+      acceptLanguage: config.language,
+    });
 
     if (browser.proxyCredentials?.username && browser.proxyCredentials?.password) {
       await page.authenticate(browser.proxyCredentials);
@@ -73,6 +82,9 @@ export default async function fetch(url, cssSelectors, config) {
     }
     throw new Error(error.message);
   } finally {
+    if (client) {
+      await client.detach();
+    }
     if (page) {
       await page.close();
     }
