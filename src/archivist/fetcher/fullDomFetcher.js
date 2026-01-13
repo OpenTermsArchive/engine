@@ -3,11 +3,11 @@ import stealthPlugin from 'puppeteer-extra-plugin-stealth';
 
 import { resolveProxyConfiguration, extractProxyCredentials } from './proxyUtils.js';
 
-puppeteer.use(stealthPlugin());
-
 let browser;
 
 export default async function fetch(url, cssSelectors, config) {
+  puppeteer.use(stealthPlugin({ locale: config.language }));
+
   let context;
   let page;
   let response;
