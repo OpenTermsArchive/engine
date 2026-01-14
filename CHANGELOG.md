@@ -2,6 +2,14 @@
 
 All changes that impact users of this module are documented in this file, in the [Common Changelog](https://common-changelog.org) format with some additional specifications defined in the CONTRIBUTING file. This codebase adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased [patch]
+
+> Development of this release was supported by [Reset Tech](https://www.reset.tech).
+
+### Fixed
+
+- Fix error messages when the start and end selectors of range selectors match elements on the page but the selected range or extracted content is empty
+
 ## 10.3.1 - 2026-01-13
 
 > Development of this release was supported by [Reset Tech](https://www.reset.tech).

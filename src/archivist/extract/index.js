@@ -35,15 +35,16 @@ export async function extractFromHTML(sourceDocument) {
   const filteredDOM = await filter(webPageDOM, sourceDocument);
   const cleanedDOM = filteredDOM.remove(insignificantContentSelectors);
   const selectedDOM = cleanedDOM.select(contentSelectors);
+  const contentSelectorsDisplay = typeof contentSelectors === 'object' ? JSON.stringify(contentSelectors) : contentSelectors;
 
   if (!selectedDOM?.children.length) {
-    throw new Error(`The provided selector "${contentSelectors}" has no match in the web page at '${location}'. This could be due to elements being removed before content selection if "remove" and "select" selectors match the same content.`);
+    throw new Error(`The provided selector "${contentSelectorsDisplay}" has no match in the web page at '${location}'. This could be due to elements being removed before content selection if "remove" and "select" selectors match the same content.`);
   }
 
   const markdownContent = transformFromHTML(selectedDOM);
 
   if (!markdownContent) {
-    throw new Error(`The provided selector "${contentSelectors}" matches an empty content in the web page at '${location}'`);
+    throw new Error(`The provided selector "${contentSelectorsDisplay}" matches an empty content in the web page at '${location}'`);
   }
 
   return markdownContent;
