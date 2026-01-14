@@ -99,8 +99,7 @@ jobs:
           git commit -m "Release v${{ steps.release-changelog.outputs.version }}"
           git tag v${{ steps.release-changelog.outputs.version }}
 
-      # Publish to NPM first, before pushing to repository
-      # If this fails, no changes are pushed to the repository, ensuring consistency
+      # Publish to NPM first, before pushing to repository. If this fails, no changes are pushed to the repository, ensuring consistency
       - name: Publish to NPM public repository
         run: npm publish --provenance
 
