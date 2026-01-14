@@ -57,12 +57,15 @@ jobs:
           fi
 
   changelog:
+    needs: release-decision
+    if: ${{ needs.release-decision.outputs.should-release == 'true' }}
     uses: "./.github/workflows/changelog.yml"
   test:
+    needs: changelog
+    if: ${{ needs.changelog.outputs.release-type != 'no-release' }}
     uses: "OpenTermsArchive/engine/.github/workflows/test.yml@main"
   release:
-    needs: [ release-decision, changelog, test ]
-    if: ${{ needs.release-decision.outputs.should-release && needs.changelog.outputs.release-type != 'no-release' }}
+    needs: test
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -121,8 +124,8 @@ jobs:
           client-payload: '{"version": "v${{ steps.release-changelog.outputs.version }}"}'
 
   clean_changelog:
-    needs: [ release-decision, changelog ]
-    if: ${{ !needs.release-decision.outputs.should-release && needs.changelog.outputs.release-type == 'no-release' }}
+    needs: changelog
+    if: ${{ needs.changelog.outputs.release-type == 'no-release' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
