@@ -5,6 +5,10 @@ on:
     branches:
       - main
 
+concurrency:
+  group: release
+  cancel-in-progress: false
+
 permissions:
   id-token: write  # Required for OIDC. See https://docs.npmjs.com/trusted-publishers#step-2-configure-your-cicd-workflow
   contents: read
