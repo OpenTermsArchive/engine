@@ -10,13 +10,39 @@ permissions:
   contents: read
 
 jobs:
+  release-decision:
+    runs-on: ubuntu-latest
+    outputs:
+      should-release: ${{ steps.decision.outputs.should-release }}
+    steps:
+      - name: Decide release
+        id: decision
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          COMMITTER_EMAIL: ${{ github.event.head_commit.committer.email }}
+        shell: bash
+        run: |
+          # Skip if commit is from release bot (avoid infinite loop)
+          if [[ "$COMMITTER_EMAIL" == 'release-bot@opentermsarchive.org' ]]; then
+            echo "should-release=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          # Check if commit comes from a PR merged to main
+          gh pr list \
+            --repo "${{ github.repository }}" \
+            --search "${{ github.sha }} is:merged base:main" \
+            --state merged \
+            --json number \
+            --jq '"should-release=\(length > 0)"' >> "$GITHUB_OUTPUT"
+
   changelog:
     uses: "./.github/workflows/changelog.yml"
   test:
     uses: "OpenTermsArchive/engine/.github/workflows/test.yml@main"
   release:
-    needs: [ changelog, test ]
-    if: needs.changelog.outputs.release-type != 'no-release'
+    needs: [ release-decision, changelog, test ]
+    if: ${{ needs.release-decision.outputs.should-release && needs.changelog.outputs.release-type != 'no-release' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -75,8 +101,8 @@ jobs:
           client-payload: '{"version": "v${{ steps.release-changelog.outputs.version }}"}'
 
   clean_changelog:
-    if: needs.changelog.outputs.release-type == 'no-release'
-    needs: [ changelog ]
+    needs: [ release-decision, changelog ]
+    if: ${{ !needs.release-decision.outputs.should-release && needs.changelog.outputs.release-type == 'no-release' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
