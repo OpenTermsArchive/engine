@@ -24,21 +24,37 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           COMMITTER_EMAIL: ${{ github.event.head_commit.committer.email }}
+          COMMITTER_NAME: ${{ github.event.head_commit.committer.name }}
+          COMMIT_SHA: ${{ github.sha }}
         shell: bash
         run: |
+          echo "Commit: $COMMIT_SHA"
+          echo "Committer: $COMMITTER_NAME <$COMMITTER_EMAIL>"
+
           # Skip if commit is from release bot (avoid infinite loop)
           if [[ "$COMMITTER_EMAIL" == 'release-bot@opentermsarchive.org' ]]; then
+            echo "→ Skipping: commit is from release bot"
             echo "should-release=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
           # Check if commit comes from a PR merged to main
-          gh pr list \
+          PR_JSON=$(gh pr list \
             --repo "${{ github.repository }}" \
-            --search "${{ github.sha }} is:merged base:main" \
+            --search "$COMMIT_SHA is:merged base:main" \
             --state merged \
-            --json number \
-            --jq '"should-release=\(length > 0)"' >> "$GITHUB_OUTPUT"
+            --json number,title,url)
+
+          PR_COUNT=$(echo "$PR_JSON" | jq 'length')
+
+          if [[ "$PR_COUNT" -gt 0 ]]; then
+            echo "$PR_JSON" | jq -r '.[] | "→ Found PR #\(.number): \(.title)"'
+            echo "→ Release will proceed"
+            echo "should-release=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "→ No merged PR found for this commit"
+            echo "should-release=false" >> "$GITHUB_OUTPUT"
+          fi
 
   changelog:
     uses: "./.github/workflows/changelog.yml"
