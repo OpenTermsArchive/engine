@@ -8,11 +8,11 @@ export default async function publishRelease({ archivePath, releaseDate, stats }
   const platforms = [];
 
   // If both GitHub and GitLab tokens are defined, GitHub takes precedence
-  if (process.env.OTA_ENGINE_GITHUB_TOKEN) {
-    platforms.push({ name: 'GitHub', publish: () => publishGitHub({ archivePath, releaseDate, stats }) });
-  } else if (process.env.OTA_ENGINE_GITLAB_TOKEN) {
-    platforms.push({ name: 'GitLab', publish: () => publishGitLab({ archivePath, releaseDate, stats }) });
-  }
+  // if (process.env.OTA_ENGINE_GITHUB_TOKEN) {
+  //   platforms.push({ name: 'GitHub', publish: () => publishGitHub({ archivePath, releaseDate, stats }) });
+  // } else if (process.env.OTA_ENGINE_GITLAB_TOKEN) {
+  //   platforms.push({ name: 'GitLab', publish: () => publishGitLab({ archivePath, releaseDate, stats }) });
+  // }
 
   if (process.env.OTA_ENGINE_DATAGOUV_API_KEY) {
     platforms.push({ name: 'data.gouv.fr', publish: () => publishDataGouv({ archivePath, releaseDate, stats }) });
