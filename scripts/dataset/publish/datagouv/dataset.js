@@ -150,13 +150,17 @@ export async function updateDatasetMetadata({ apiBaseUrl, headers, datasetId, ti
 export async function uploadResource({ apiBaseUrl, headers, datasetId, archivePath }) {
   logger.info('Uploading dataset archive…');
 
-  const { formData, fileName } = createFormDataForFile(archivePath);
+  const { formData, fileName, fileSize } = createFormDataForFile(archivePath);
+
+  logger.info(`Starting upload of ${(fileSize / 1024 / 1024).toFixed(2)} MB…`);
 
   const uploadResponse = await nodeFetch(routes.datasetUpload(apiBaseUrl, datasetId), {
     method: 'POST',
     headers: { ...formData.getHeaders(), ...headers },
     body: formData,
   });
+
+  logger.info(`Upload completed, server responded with status: ${uploadResponse.status}`);
 
   if (!uploadResponse.ok) {
     const errorText = await uploadResponse.text();
@@ -174,13 +178,17 @@ export async function uploadResource({ apiBaseUrl, headers, datasetId, archivePa
 export async function replaceResourceFile({ apiBaseUrl, headers, datasetId, resourceId, archivePath }) {
   logger.info(`Replacing file for existing resource ID: ${resourceId}…`);
 
-  const { formData, fileName } = createFormDataForFile(archivePath);
+  const { formData, fileName, fileSize } = createFormDataForFile(archivePath);
+
+  logger.info(`Starting upload of ${(fileSize / 1024 / 1024).toFixed(2)} MB…`);
 
   const uploadResponse = await nodeFetch(routes.resourceUpload(apiBaseUrl, datasetId, resourceId), {
     method: 'POST',
     headers: { ...formData.getHeaders(), ...headers },
     body: formData,
   });
+
+  logger.info(`Upload completed, server responded with status: ${uploadResponse.status}`);
 
   if (!uploadResponse.ok) {
     const errorText = await uploadResponse.text();
@@ -230,5 +238,5 @@ function createFormDataForFile(archivePath) {
     knownLength: fileStats.size,
   });
 
-  return { formData, fileName };
+  return { formData, fileName, fileSize: fileStats.size };
 }
