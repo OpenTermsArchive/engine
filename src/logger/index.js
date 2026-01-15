@@ -2,10 +2,10 @@ import os from 'os';
 
 import config from 'config';
 import winston from 'winston';
-import 'winston-mail';
 
 import { getCollection } from '../archivist/collection/index.js';
 
+import MailTransportWithRetry from './mail-transport-with-retry.js';
 import { formatDuration } from './utils.js';
 
 const { combine, timestamp, printf, colorize } = winston.format;
@@ -60,7 +60,7 @@ if (config.get('@opentermsarchive/engine.logger.sendMailOnError')) {
       username: config.get('@opentermsarchive/engine.logger.smtp.username'),
       password: process.env.OTA_ENGINE_SMTP_PASSWORD,
       ssl: true,
-      timeout: 30 * 1000,
+      timeout: 60 * 1000,
       html: false,
       formatter({ message, level }) {
         const isError = level.includes('error');
@@ -141,14 +141,14 @@ if (config.get('@opentermsarchive/engine.logger.sendMailOnError')) {
       },
     };
 
-    transports.push(new winston.transports.Mail({
+    transports.push(new MailTransportWithRetry({
       ...mailerOptions,
       level: 'error',
       subject: `Server error on ${collection.id} collection`,
     }));
 
     if (config.get('@opentermsarchive/engine.logger.sendMailOnError.sendWarnings')) {
-      transports.push(new winston.transports.Mail({
+      transports.push(new MailTransportWithRetry({
         ...mailerOptions,
         level: 'warn',
         subject: `Inaccessible content on ${collection.id} collection`,
