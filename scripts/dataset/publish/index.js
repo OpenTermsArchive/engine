@@ -22,26 +22,29 @@ export default async function publishRelease({ archivePath, releaseDate, stats }
     throw new Error('No publishing platform configured. Please configure at least one of: GitHub (OTA_ENGINE_GITHUB_TOKEN), GitLab (OTA_ENGINE_GITLAB_TOKEN), or data.gouv.fr (OTA_ENGINE_DATAGOUV_API_KEY + datasetId or organizationIdOrSlug in config).');
   }
 
-  const results = await Promise.allSettled(platforms.map(async platform => {
-    const url = await platform.publish();
+  const succeeded = [];
+  const failed = [];
 
-    return { platform: platform.name, url };
-  }));
+  // Execute publications sequentially to avoid memory issues with large file uploads
+  for (const platform of platforms) {
+    try {
+      const url = await platform.publish();
 
-  const succeeded = results.filter(result => result.status === 'fulfilled');
-  const failed = results.filter(result => result.status === 'rejected');
+      succeeded.push({ platform: platform.name, url });
+    } catch (error) {
+      failed.push({ platform: platform.name, error });
+    }
+  }
 
   if (failed.length) {
     let errorMessage = !succeeded.length ? 'All platforms failed to publish:' : 'Some platforms failed to publish:';
 
-    failed.forEach(rejectedResult => {
-      const index = results.indexOf(rejectedResult);
-
-      errorMessage += `\n  - ${platforms[index].name}: ${rejectedResult.reason.message}`;
+    failed.forEach(({ platform, error }) => {
+      errorMessage += `\n  - ${platform}: ${error.message}`;
     });
 
     logger.error(errorMessage);
   }
 
-  return succeeded.map(result => result.value);
+  return succeeded;
 }
