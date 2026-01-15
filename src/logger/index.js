@@ -57,9 +57,10 @@ if (config.get('@opentermsarchive/engine.logger.sendMailOnError')) {
       to: config.get('@opentermsarchive/engine.logger.sendMailOnError.to'),
       from: config.get('@opentermsarchive/engine.logger.sendMailOnError.from'),
       host: config.get('@opentermsarchive/engine.logger.smtp.host'),
+      port: config.get('@opentermsarchive/engine.logger.smtp.port'),
       username: config.get('@opentermsarchive/engine.logger.smtp.username'),
       password: process.env.OTA_ENGINE_SMTP_PASSWORD,
-      ssl: true,
+      tls: true,
       timeout: 60 * 1000,
       html: false,
       formatter({ message, level }) {
