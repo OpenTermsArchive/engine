@@ -30,7 +30,7 @@ export default async function publish({ archivePath, releaseDate, stats }) {
   logger.info('Uploading release asset…');
 
   await octokit.rest.repos.uploadReleaseAsset({
-    data: fsApi.readFileSync(archivePath),
+    data: fsApi.createReadStream(archivePath),
     headers: {
       'content-type': 'application/zip',
       'content-length': fsApi.statSync(archivePath).size,

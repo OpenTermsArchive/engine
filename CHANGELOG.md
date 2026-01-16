@@ -2,6 +2,14 @@
 
 All changes that impact users of this module are documented in this file, in the [Common Changelog](https://common-changelog.org) format with some additional specifications defined in the CONTRIBUTING file. This codebase adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased [patch]
+
+> Development of this release was supported by [Reset Tech](https://www.reset.tech).
+
+### Fixed
+
+- Fix dataset publishing failure for large files by executing uploads sequentially instead of in parallel
+
 ## 10.3.2 - 2026-01-14
 
 > Development of this release was supported by [Reset Tech](https://www.reset.tech).
