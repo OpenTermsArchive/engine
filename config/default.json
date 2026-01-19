@@ -43,7 +43,8 @@
     },
     "logger": {
       "smtp": {
-        "host": "smtp-relay.sendinblue.com",
+        "host": "smtp-relay.brevo.com",
+        "port": 587,
         "username": "admin@opentermsarchive.org"
       },
       "sendMailOnError": false,

@@ -2,6 +2,14 @@
 
 All changes that impact users of this module are documented in this file, in the [Common Changelog](https://common-changelog.org) format with some additional specifications defined in the CONTRIBUTING file. This codebase adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased [minor]
+
+> Development of this release was supported by [Reset Tech](https://www.reset.tech).
+
+### Changed
+
+- Make SMTP port configurable and switch from implicit SSL to STARTTLS, enabling use of alternative ports (like 2525) on servers where standard SMTP ports are blocked
+
 ## 10.3.3 - 2026-01-16
 
 > Development of this release was supported by [Reset Tech](https://www.reset.tech).
