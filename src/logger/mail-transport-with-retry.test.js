@@ -97,7 +97,7 @@ describe('MailTransportWithRetry', () => {
       });
     });
 
-    context('when email fails all retry attempts', () => {
+    context('when email fails after all retry attempts', () => {
       it('emits error event after all retries are exhausted', async () => {
         const errorHandler = sinon.spy();
 
