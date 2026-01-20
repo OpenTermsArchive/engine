@@ -174,7 +174,8 @@ async function configurePage(page, client, config) {
 
 function setupPdfInterception(client) {
   const pdf = { content: null, status: null };
-  const { promise: handled, resolve: onHandled } = Promise.withResolvers();
+  let onHandled;
+  const handled = new Promise(resolve => { onHandled = resolve; });
 
   client.send('Fetch.enable', { patterns: [{ urlPattern: '*', requestStage: 'Response' }] }); // Intercept all responses before Chrome processes them, allowing to capture PDF content before it's handled by the PDF viewer
 
