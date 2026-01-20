@@ -8,37 +8,64 @@ let browser;
 export default async function fetch(url, cssSelectors, config) {
   puppeteer.use(stealthPlugin({ locale: config.language }));
 
-  let context;
-  let page;
-  let client;
-  let response;
-  const selectors = [].concat(cssSelectors);
-
   if (!browser) {
     throw new Error('The headless browser should be controlled manually with "launchHeadlessBrowser" and "stopHeadlessBrowser".');
   }
 
+  let context;
+  let page;
+  let client;
+
   try {
     context = await browser.createBrowserContext(); // Create an isolated browser context to ensure complete isolation between fetches (cookies, localStorage, sessionStorage, IndexedDB, cache)
     page = await context.newPage();
-
-    await page.setViewport({ width: 1920, height: 1080 }); // Set a realistic viewport size to avoid detection based on default Puppeteer dimensions (800x600)
-    await page.setDefaultNavigationTimeout(config.navigationTimeout);
-    await page.setExtraHTTPHeaders({ 'Accept-Language': config.language });
-
-    // Use CDP to ensure the browser language is set correctly (most reliable method, see https://zirkelc.dev/posts/puppeteer-language-experiment)
     client = await page.createCDPSession();
 
-    await client.send('Network.setUserAgentOverride', {
-      userAgent: await browser.userAgent(),
-      acceptLanguage: config.language,
-    });
+    await configurePage(page, client, config);
 
-    if (browser.proxyCredentials?.username && browser.proxyCredentials?.password) {
-      await page.authenticate(browser.proxyCredentials);
+    const selectors = [].concat(cssSelectors).filter(Boolean);
+
+    let pdf = {};
+    let handled = null;
+
+    if (!selectors.length) { // CSS selectors are specified only for HTML content and omitted when fetching a PDF
+      ({ pdf, handled } = setupPdfInterception(client));
     }
 
-    response = await page.goto(url, { waitUntil: 'load' }); // Using `load` instead of `networkidle0` as it's more reliable and faster. The 'load' event fires when the page and all its resources (stylesheets, scripts, images) have finished loading. `networkidle0` can be problematic as it waits for 500ms of network inactivity, which may never occur on dynamic pages and then triggers a navigation timeout.
+    let response;
+    let navigationAborted = false;
+
+    try {
+      response = await page.goto(url, { waitUntil: 'load' }); // Using `load` instead of `networkidle0` as it's more reliable and faster. The 'load' event fires when the page and all its resources (stylesheets, scripts, images) have finished loading. `networkidle0` can be problematic as it waits for 500ms of network inactivity, which may never occur on dynamic pages and then triggers a navigation timeout.
+    } catch (error) {
+      if (error.message.includes('net::ERR_ABORTED')) {
+        // Chrome may sometimes abort navigation for files such as PDFs.
+        // Do not throw for now; wait for the PDF interception handler to finish processing the response.
+        navigationAborted = true;
+      } else {
+        throw error;
+      }
+    }
+
+    // PDF interception handling
+    if (handled) {
+      await handled; // Wait for the interception callback to finish processing the response
+
+      if (pdf.content) {
+        return {
+          mimeType: 'application/pdf',
+          content: pdf.content,
+        };
+      }
+
+      if (pdf.status) { // Status captured by CDP interception
+        throw new Error(`Received HTTP code ${pdf.status} when trying to fetch '${url}'`);
+      }
+    }
+
+    if (navigationAborted) {
+      throw new Error(`Navigation aborted when trying to fetch '${url}'`);
+    }
 
     if (!response) {
       throw new Error(`Response is empty when trying to fetch '${url}'`);
@@ -46,31 +73,11 @@ export default async function fetch(url, cssSelectors, config) {
 
     const statusCode = response.status();
 
-    if (statusCode < 200 || (statusCode >= 300 && statusCode !== 304)) {
+    if (!isValidHttpStatus(statusCode)) {
       throw new Error(`Received HTTP code ${statusCode} when trying to fetch '${url}'`);
     }
 
-    const waitForSelectorsPromises = selectors.filter(Boolean).map(selector =>
-      page.waitForFunction(
-        cssSelector => {
-          const element = document.querySelector(cssSelector); // eslint-disable-line no-undef
-
-          return element?.textContent.trim().length; // Ensures element exists and contains non-empty text, as an empty element may indicate content is still loading
-        },
-        { timeout: config.waitForElementsTimeout },
-        selector,
-      ));
-
-    // We expect all elements to be present on the page…
-    await Promise.all(waitForSelectorsPromises).catch(error => {
-      if (error.name == 'TimeoutError') {
-        // however, if they are not, this is not considered as an error since selectors may be out of date
-        // and the whole content of the page should still be returned.
-        return;
-      }
-
-      throw error;
-    });
+    await waitForSelectors(page, selectors, config.waitForElementsTimeout);
 
     return {
       mimeType: 'text/html',
@@ -80,17 +87,10 @@ export default async function fetch(url, cssSelectors, config) {
     if (error.name === 'TimeoutError') {
       throw new Error(`Timed out after ${config.navigationTimeout / 1000} seconds when trying to fetch '${url}'`);
     }
+
     throw new Error(error.message);
   } finally {
-    if (client) {
-      await client.detach();
-    }
-    if (page) {
-      await page.close();
-    }
-    if (context) {
-      await context.close(); // Close the isolated context to free resources and ensure complete cleanup
-    }
+    await cleanupPage(client, page, context);
   }
 }
 
@@ -150,4 +150,104 @@ export async function stopHeadlessBrowser() {
 
   await browser.close();
   browser = null;
+}
+
+function isValidHttpStatus(status) {
+  return (status >= 200 && status < 300) || status === 304;
+}
+
+async function configurePage(page, client, config) {
+  await page.setViewport({ width: 1920, height: 1080 }); // Realistic viewport to avoid detection based on default Puppeteer dimensions (800x600)
+  await page.setDefaultNavigationTimeout(config.navigationTimeout);
+  await page.setExtraHTTPHeaders({ 'Accept-Language': config.language });
+
+  // Use CDP to ensure browser language is set correctly (see https://zirkelc.dev/posts/puppeteer-language-experiment)
+  await client.send('Network.setUserAgentOverride', {
+    userAgent: await browser.userAgent(),
+    acceptLanguage: config.language,
+  });
+
+  if (browser.proxyCredentials?.username && browser.proxyCredentials?.password) {
+    await page.authenticate(browser.proxyCredentials);
+  }
+}
+
+function setupPdfInterception(client) {
+  const pdf = { content: null, status: null };
+  let onHandled;
+  const handled = new Promise(resolve => { onHandled = resolve; });
+
+  client.send('Fetch.enable', { patterns: [{ urlPattern: '*', requestStage: 'Response' }] }); // Intercept all responses before Chrome processes them, allowing to capture PDF content before it's handled by the PDF viewer
+
+  client.on('Fetch.requestPaused', async ({ requestId, resourceType, responseHeaders, responseStatusCode }) => {
+    try {
+      const contentType = responseHeaders?.find(header => header.name.toLowerCase() === 'content-type')?.value;
+
+      if (!contentType?.includes('application/pdf')) {
+        return;
+      }
+
+      pdf.status = responseStatusCode;
+
+      if (!isValidHttpStatus(responseStatusCode)) {
+        return;
+      }
+
+      try {
+        const { body, base64Encoded } = await client.send('Fetch.getResponseBody', { requestId });
+
+        pdf.content = Buffer.from(body, base64Encoded ? 'base64' : 'utf8');
+      } catch {
+        // Response body may be unavailable due to network error or connection interruption
+      }
+    } finally {
+      try {
+        await client.send('Fetch.continueResponse', { requestId });
+      } catch {
+        // Client may have been closed by cleanupPage() in fetch() while this async callback was still running
+      }
+
+      if (resourceType === 'Document') { // Signal that the main navigation request has been processed
+        onHandled();
+      }
+    }
+  });
+
+  return { pdf, handled };
+}
+
+async function waitForSelectors(page, selectors, timeout) {
+  const waitForSelectorsPromises = selectors.filter(Boolean).map(selector =>
+    page.waitForFunction(
+      cssSelector => {
+        const element = document.querySelector(cssSelector); // eslint-disable-line no-undef
+
+        return element?.textContent.trim().length; // Ensures element exists and has non-empty text
+      },
+      { timeout },
+      selector,
+    ));
+
+  // We expect all elements to be present on the page…
+  await Promise.all(waitForSelectorsPromises).catch(error => {
+    if (error.name == 'TimeoutError') {
+      // however, if they are not, this is not considered as an error since selectors may be out of date
+      // and the whole content of the page should still be returned.
+      return;
+    }
+
+    throw error;
+  });
+}
+
+async function cleanupPage(client, page, context) {
+  if (client) {
+    await client.detach().catch(() => {});
+  }
+  if (page) {
+    await page.close().catch(() => {});
+  }
+  if (context) {
+    await context.close().catch(() => {}); // Close the isolated context to free resources and ensure complete cleanup
+  }
 }
