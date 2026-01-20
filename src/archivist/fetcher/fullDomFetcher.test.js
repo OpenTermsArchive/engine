@@ -1,9 +1,14 @@
+import fs from 'fs';
 import http from 'http';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
 import { expect, use } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 
 import fetch, { launchHeadlessBrowser, stopHeadlessBrowser } from './fullDomFetcher.js';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const SERVER_PORT = 8977;
 
@@ -16,6 +21,7 @@ describe('Full DOM Fetcher', function () {
   this.timeout(60000);
 
   let temporaryServer;
+  let expectedPDFContent;
 
   before(async () => {
     await launchHeadlessBrowser();
@@ -26,6 +32,10 @@ describe('Full DOM Fetcher', function () {
       }
       if (request.url === '/delayed-content') {
         response.writeHead(200, { 'Content-Type': 'text/html' }).write(delayedContentHTML);
+      }
+      if (request.url === '/terms.pdf') {
+        expectedPDFContent = fs.readFileSync(path.resolve(__dirname, '../../../test/fixtures/terms.pdf'));
+        response.writeHead(200, { 'Content-Type': 'application/pdf' }).write(expectedPDFContent);
       }
 
       return response.end();
@@ -83,6 +93,28 @@ describe('Full DOM Fetcher', function () {
         const timeout = 10;
 
         await expect(fetch(url, ['.content'], { ...config, navigationTimeout: timeout })).to.be.rejectedWith(`Timed out after ${timeout / 1000} seconds when trying to fetch '${url}'`);
+      });
+    });
+
+    context('when URL targets a PDF file', () => {
+      let content;
+      let mimeType;
+      const pdfUrl = `http://127.0.0.1:${SERVER_PORT}/terms.pdf`;
+
+      before(async () => {
+        ({ content, mimeType } = await fetch(pdfUrl, [], config));
+      });
+
+      it('returns a buffer for PDF content', () => {
+        expect(content).to.be.an.instanceOf(Buffer);
+      });
+
+      it('returns the correct MIME type', () => {
+        expect(mimeType).to.equal('application/pdf');
+      });
+
+      it('returns the PDF file content', () => {
+        expect(content.equals(expectedPDFContent)).to.be.true;
       });
     });
   });
