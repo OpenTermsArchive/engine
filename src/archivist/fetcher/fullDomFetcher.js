@@ -38,27 +38,32 @@ export default async function fetch(url, cssSelectors, config) {
     try {
       response = await page.goto(url, { waitUntil: 'load' }); // Using `load` instead of `networkidle0` as it's more reliable and faster. The 'load' event fires when the page and all its resources (stylesheets, scripts, images) have finished loading. `networkidle0` can be problematic as it waits for 500ms of network inactivity, which may never occur on dynamic pages and then triggers a navigation timeout.
     } catch (error) {
-      if (!error.message.includes('net::ERR_ABORTED')) {
+      if (error.message.includes('net::ERR_ABORTED')) {
+        // Chrome may sometimes abort navigation for files such as PDFs.
+        // Do not throw for now; wait for the PDF interception handler to finish processing the response.
+        navigationAborted = true;
+      } else {
         throw error;
-      }
-
-      navigationAborted = true; // Chrome sometimes aborts navigation for PDFs
-
-      if (handled) { // Wait for PDF interception to complete (null if interception is not enabled)
-        await handled;
       }
     }
 
-    // Return PDF if intercepted (aborted navigation or loaded in Chrome's PDF viewer)
-    if (pdf.content) {
-      return { mimeType: 'application/pdf', content: pdf.content };
+    // PDF interception handling
+    if (handled) {
+      await handled; // Wait for the interception callback to finish processing the response
+
+      if (pdf.content) {
+        return {
+          mimeType: 'application/pdf',
+          content: pdf.content,
+        };
+      }
+
+      if (pdf.status) { // Status captured by CDP interception
+        throw new Error(`Received HTTP code ${pdf.status} when trying to fetch '${url}'`);
+      }
     }
 
     if (navigationAborted) {
-      if (pdf.status) {
-        throw new Error(`Received HTTP code ${pdf.status} when trying to fetch '${url}'`);
-      }
-
       throw new Error(`Navigation aborted when trying to fetch '${url}'`);
     }
 
