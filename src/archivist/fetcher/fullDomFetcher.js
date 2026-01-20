@@ -8,9 +8,6 @@ let browser;
 export default async function fetch(url, cssSelectors, config) {
   puppeteer.use(stealthPlugin({ locale: config.language }));
 
-  let context;
-  let page;
-  let client;
   let response;
   const selectors = [].concat(cssSelectors);
 
@@ -18,24 +15,20 @@ export default async function fetch(url, cssSelectors, config) {
     throw new Error('The headless browser should be controlled manually with "launchHeadlessBrowser" and "stopHeadlessBrowser".');
   }
 
+  let context;
+  let page;
+  let client;
+
   try {
     context = await browser.createBrowserContext(); // Create an isolated browser context to ensure complete isolation between fetches (cookies, localStorage, sessionStorage, IndexedDB, cache)
     page = await context.newPage();
-
-    await page.setViewport({ width: 1920, height: 1080 }); // Set a realistic viewport size to avoid detection based on default Puppeteer dimensions (800x600)
-    await page.setDefaultNavigationTimeout(config.navigationTimeout);
-    await page.setExtraHTTPHeaders({ 'Accept-Language': config.language });
-
-    // Use CDP to ensure the browser language is set correctly (most reliable method, see https://zirkelc.dev/posts/puppeteer-language-experiment)
     client = await page.createCDPSession();
 
-    await client.send('Network.setUserAgentOverride', {
-      userAgent: await browser.userAgent(),
-      acceptLanguage: config.language,
-    });
+    await configurePage(page, client, config);
 
-    if (browser.proxyCredentials?.username && browser.proxyCredentials?.password) {
-      await page.authenticate(browser.proxyCredentials);
+
+
+
     }
 
     response = await page.goto(url, { waitUntil: 'load' }); // Using `load` instead of `networkidle0` as it's more reliable and faster. The 'load' event fires when the page and all its resources (stylesheets, scripts, images) have finished loading. `networkidle0` can be problematic as it waits for 500ms of network inactivity, which may never occur on dynamic pages and then triggers a navigation timeout.
@@ -46,31 +39,11 @@ export default async function fetch(url, cssSelectors, config) {
 
     const statusCode = response.status();
 
-    if (statusCode < 200 || (statusCode >= 300 && statusCode !== 304)) {
+    if (!isValidHttpStatus(statusCode)) {
       throw new Error(`Received HTTP code ${statusCode} when trying to fetch '${url}'`);
     }
 
-    const waitForSelectorsPromises = selectors.filter(Boolean).map(selector =>
-      page.waitForFunction(
-        cssSelector => {
-          const element = document.querySelector(cssSelector); // eslint-disable-line no-undef
-
-          return element?.textContent.trim().length; // Ensures element exists and contains non-empty text, as an empty element may indicate content is still loading
-        },
-        { timeout: config.waitForElementsTimeout },
-        selector,
-      ));
-
-    // We expect all elements to be present on the page…
-    await Promise.all(waitForSelectorsPromises).catch(error => {
-      if (error.name == 'TimeoutError') {
-        // however, if they are not, this is not considered as an error since selectors may be out of date
-        // and the whole content of the page should still be returned.
-        return;
-      }
-
-      throw error;
-    });
+    await waitForSelectors(page, selectors, config.waitForElementsTimeout);
 
     return {
       mimeType: 'text/html',
@@ -82,15 +55,7 @@ export default async function fetch(url, cssSelectors, config) {
     }
     throw new Error(error.message);
   } finally {
-    if (client) {
-      await client.detach();
-    }
-    if (page) {
-      await page.close();
-    }
-    if (context) {
-      await context.close(); // Close the isolated context to free resources and ensure complete cleanup
-    }
+    await cleanupPage(client, page, context);
   }
 }
 
@@ -150,4 +115,60 @@ export async function stopHeadlessBrowser() {
 
   await browser.close();
   browser = null;
+}
+
+function isValidHttpStatus(status) {
+  return (status >= 200 && status < 300) || status === 304;
+}
+
+async function configurePage(page, client, config) {
+  await page.setViewport({ width: 1920, height: 1080 }); // Realistic viewport to avoid detection based on default Puppeteer dimensions (800x600)
+  await page.setDefaultNavigationTimeout(config.navigationTimeout);
+  await page.setExtraHTTPHeaders({ 'Accept-Language': config.language });
+
+  // Use CDP to ensure browser language is set correctly (see https://zirkelc.dev/posts/puppeteer-language-experiment)
+  await client.send('Network.setUserAgentOverride', {
+    userAgent: await browser.userAgent(),
+    acceptLanguage: config.language,
+  });
+
+  if (browser.proxyCredentials?.username && browser.proxyCredentials?.password) {
+    await page.authenticate(browser.proxyCredentials);
+  }
+}
+
+async function waitForSelectors(page, selectors, timeout) {
+  const waitForSelectorsPromises = selectors.filter(Boolean).map(selector =>
+    page.waitForFunction(
+      cssSelector => {
+        const element = document.querySelector(cssSelector); // eslint-disable-line no-undef
+
+        return element?.textContent.trim().length; // Ensures element exists and has non-empty text
+      },
+      { timeout },
+      selector,
+    ));
+
+  // We expect all elements to be present on the page…
+  await Promise.all(waitForSelectorsPromises).catch(error => {
+    if (error.name == 'TimeoutError') {
+      // however, if they are not, this is not considered as an error since selectors may be out of date
+      // and the whole content of the page should still be returned.
+      return;
+    }
+
+    throw error;
+  });
+}
+
+async function cleanupPage(client, page, context) {
+  if (client) {
+    await client.detach().catch(() => {});
+  }
+  if (page) {
+    await page.close().catch(() => {});
+  }
+  if (context) {
+    await context.close().catch(() => {}); // Close the isolated context to free resources and ensure complete cleanup
+  }
 }
