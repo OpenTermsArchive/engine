@@ -8,9 +8,6 @@ let browser;
 export default async function fetch(url, cssSelectors, config) {
   puppeteer.use(stealthPlugin({ locale: config.language }));
 
-  let response;
-  const selectors = [].concat(cssSelectors);
-
   if (!browser) {
     throw new Error('The headless browser should be controlled manually with "launchHeadlessBrowser" and "stopHeadlessBrowser".');
   }
@@ -26,12 +23,44 @@ export default async function fetch(url, cssSelectors, config) {
 
     await configurePage(page, client, config);
 
+    const selectors = [].concat(cssSelectors).filter(Boolean);
 
+    let pdf = {};
+    let handled = null;
 
-
+    if (!selectors.length) { // CSS selectors are specified only for HTML content and omitted when fetching a PDF
+      ({ pdf, handled } = setupPdfInterception(client));
     }
 
-    response = await page.goto(url, { waitUntil: 'load' }); // Using `load` instead of `networkidle0` as it's more reliable and faster. The 'load' event fires when the page and all its resources (stylesheets, scripts, images) have finished loading. `networkidle0` can be problematic as it waits for 500ms of network inactivity, which may never occur on dynamic pages and then triggers a navigation timeout.
+    let response;
+    let navigationAborted = false;
+
+    try {
+      response = await page.goto(url, { waitUntil: 'load' }); // Using `load` instead of `networkidle0` as it's more reliable and faster. The 'load' event fires when the page and all its resources (stylesheets, scripts, images) have finished loading. `networkidle0` can be problematic as it waits for 500ms of network inactivity, which may never occur on dynamic pages and then triggers a navigation timeout.
+    } catch (error) {
+      if (!error.message.includes('net::ERR_ABORTED')) {
+        throw error;
+      }
+
+      navigationAborted = true; // Chrome sometimes aborts navigation for PDFs
+
+      if (handled) { // Wait for PDF interception to complete (null if interception is not enabled)
+        await handled;
+      }
+    }
+
+    // Return PDF if intercepted (aborted navigation or loaded in Chrome's PDF viewer)
+    if (pdf.content) {
+      return { mimeType: 'application/pdf', content: pdf.content };
+    }
+
+    if (navigationAborted) {
+      if (pdf.status) {
+        throw new Error(`Received HTTP code ${pdf.status} when trying to fetch '${url}'`);
+      }
+
+      throw new Error(`Navigation aborted when trying to fetch '${url}'`);
+    }
 
     if (!response) {
       throw new Error(`Response is empty when trying to fetch '${url}'`);
@@ -53,6 +82,7 @@ export default async function fetch(url, cssSelectors, config) {
     if (error.name === 'TimeoutError') {
       throw new Error(`Timed out after ${config.navigationTimeout / 1000} seconds when trying to fetch '${url}'`);
     }
+
     throw new Error(error.message);
   } finally {
     await cleanupPage(client, page, context);
@@ -135,6 +165,49 @@ async function configurePage(page, client, config) {
   if (browser.proxyCredentials?.username && browser.proxyCredentials?.password) {
     await page.authenticate(browser.proxyCredentials);
   }
+}
+
+function setupPdfInterception(client) {
+  const pdf = { content: null, status: null };
+  const { promise: handled, resolve: onHandled } = Promise.withResolvers();
+
+  client.send('Fetch.enable', { patterns: [{ urlPattern: '*', requestStage: 'Response' }] }); // Intercept all responses before Chrome processes them, allowing to capture PDF content before it's handled by the PDF viewer
+
+  client.on('Fetch.requestPaused', async ({ requestId, resourceType, responseHeaders, responseStatusCode }) => {
+    try {
+      const contentType = responseHeaders?.find(header => header.name.toLowerCase() === 'content-type')?.value;
+
+      if (!contentType?.includes('application/pdf')) {
+        return;
+      }
+
+      pdf.status = responseStatusCode;
+
+      if (!isValidHttpStatus(responseStatusCode)) {
+        return;
+      }
+
+      try {
+        const { body, base64Encoded } = await client.send('Fetch.getResponseBody', { requestId });
+
+        pdf.content = Buffer.from(body, base64Encoded ? 'base64' : 'utf8');
+      } catch {
+        // Response body may be unavailable due to network error or connection interruption
+      }
+    } finally {
+      try {
+        await client.send('Fetch.continueResponse', { requestId });
+      } catch {
+        // Client may have been closed by cleanupPage() in fetch() while this async callback was still running
+      }
+
+      if (resourceType === 'Document') { // Signal that the main navigation request has been processed
+        onHandled();
+      }
+    }
+  });
+
+  return { pdf, handled };
 }
 
 async function waitForSelectors(page, selectors, timeout) {
