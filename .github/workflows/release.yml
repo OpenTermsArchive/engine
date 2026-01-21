@@ -15,132 +15,39 @@ permissions:
 
 jobs:
   release-decision:
-    runs-on: ubuntu-latest
-    outputs:
-      should-release: ${{ steps.decision.outputs.should-release }}
-    steps:
-      - name: Decide release
-        id: decision
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          COMMITTER_EMAIL: ${{ github.event.head_commit.committer.email }}
-          COMMITTER_NAME: ${{ github.event.head_commit.committer.name }}
-          COMMIT_SHA: ${{ github.sha }}
-        shell: bash
-        run: |
-          echo "Commit: $COMMIT_SHA"
-          echo "Committer: $COMMITTER_NAME <$COMMITTER_EMAIL>"
-
-          # Skip if commit is from release bot (avoid infinite loop)
-          if [[ "$COMMITTER_EMAIL" == 'release-bot@opentermsarchive.org' ]]; then
-            echo "→ Skipping: commit is from release bot"
-            echo "should-release=false" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-
-          # Check if commit comes from a PR merged to main
-          PR_JSON=$(gh pr list \
-            --repo "${{ github.repository }}" \
-            --search "$COMMIT_SHA is:merged base:main" \
-            --state merged \
-            --json number,title,url)
-
-          PR_COUNT=$(echo "$PR_JSON" | jq 'length')
-
-          if [[ "$PR_COUNT" -gt 0 ]]; then
-            echo "$PR_JSON" | jq -r '.[] | "→ Found PR #\(.number): \(.title)"'
-            echo "→ Release will proceed"
-            echo "should-release=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "→ No merged PR found for this commit"
-            echo "should-release=false" >> "$GITHUB_OUTPUT"
-          fi
+    uses: OpenTermsArchive/shared-workflows/.github/workflows/release-decision.yml@4565230eda2a36c5270784cd73452743dc0a69ed # v0.2.0
 
   changelog:
     needs: release-decision
     if: ${{ needs.release-decision.outputs.should-release == 'true' }}
-    uses: "./.github/workflows/changelog.yml"
+    uses: OpenTermsArchive/shared-workflows/.github/workflows/changelog.yml@4565230eda2a36c5270784cd73452743dc0a69ed # v0.2.0
+
   test:
     needs: changelog
     if: ${{ needs.changelog.outputs.release-type != 'no-release' }}
-    uses: "OpenTermsArchive/engine/.github/workflows/test.yml@main"
+    uses: OpenTermsArchive/engine/.github/workflows/test.yml@main
+
   release:
-    needs: test
+    needs: [changelog, test]
+    if: ${{ needs.changelog.outputs.release-type != 'no-release' }}
+    uses: OpenTermsArchive/shared-workflows/.github/workflows/release.yml@4565230eda2a36c5270784cd73452743dc0a69ed # v0.2.0
+    secrets: inherit
+
+  clean-changelog:
+    needs: changelog
+    if: ${{ needs.changelog.outputs.release-type == 'no-release' }}
+    uses: OpenTermsArchive/shared-workflows/.github/workflows/clean-changelog.yml@4565230eda2a36c5270784cd73452743dc0a69ed # v0.2.0
+    secrets: inherit
+
+  trigger-docs:
+    needs: release
+    if: ${{ needs.release.outputs.released == 'true' }}
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          ref: main
-          token: ${{ secrets.RELEASE_BOT_GITHUB_TOKEN }}
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '24'
-          registry-url: 'https://registry.npmjs.org'
-
-      - name: Configure Git author
-        run: |
-          git config --global user.name "Open Terms Archive Release Bot"
-          git config --global user.email "release-bot@opentermsarchive.org"
-
-      - name: Update changelog for release
-        id: release-changelog
-        uses: OpenTermsArchive/changelog-action/release@v0.2.0
-
-      - name: Bump package version
-        run: npm --no-git-tag-version version ${{ steps.release-changelog.outputs.version }}
-
-      - name: Commit CHANGELOG.md and package.json changes and create tag
-        run: |
-          git add "package.json"
-          git add "package-lock.json"
-          git add "CHANGELOG.md"
-          git commit -m "Release v${{ steps.release-changelog.outputs.version }}"
-          git tag v${{ steps.release-changelog.outputs.version }}
-
-      # Publish to NPM first, before pushing to repository. If this fails, no changes are pushed to the repository, ensuring consistency
-      - name: Publish to NPM public repository
-        run: npm publish --provenance
-
-      # Only push to repository after successful NPM publish
-      - name: Push changes to repository
-        run: git push origin main && git push --tags
-
-      - name: Create GitHub release
-        uses: softprops/action-gh-release@a06a81a03ee405af7f2048a818ed3f03bbf83c7b # v2
-        with:
-          tag_name: v${{ steps.release-changelog.outputs.version }}
-          body: ${{ steps.release-changelog.outputs.content }}
-          token: ${{ secrets.RELEASE_BOT_GITHUB_TOKEN }}
-
       - name: Trigger documentation deploy
         uses: peter-evans/repository-dispatch@bf47d102fdb849e755b0b0023ea3e81a44b6f570 # v2
         with:
           token: ${{ secrets.TRIGGER_DOCS_DEPLOY_TOKEN }}
           event-type: engine-release
           repository: OpenTermsArchive/docs
-          client-payload: '{"version": "v${{ steps.release-changelog.outputs.version }}"}'
-
-  clean_changelog:
-    needs: changelog
-    if: ${{ needs.changelog.outputs.release-type == 'no-release' }}
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: main
-          token: ${{ secrets.RELEASE_BOT_GITHUB_TOKEN }}
-
-      - name: Configure Git author
-        run: |
-          git config --global user.name "Open Terms Archive Release Bot"
-          git config --global user.email "release-bot@opentermsarchive.org"
-
-      - name: Update changelog for release
-        uses: OpenTermsArchive/changelog-action/release@v0.2.0
-
-      - name: Save changelog
-        run: |
-          git commit -m "Clean changelog" CHANGELOG.md
-          git push origin main
+          client-payload: '{"version": "v${{ needs.release.outputs.version }}"}'

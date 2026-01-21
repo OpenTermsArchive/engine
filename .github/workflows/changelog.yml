@@ -3,20 +3,7 @@ name: Changelog
 on:
   pull_request:
   workflow_dispatch:
-  workflow_call:
-    outputs:
-      release-type:
-        description: The release type extracted from changelog
-        value: ${{ jobs.validate.outputs.release-type }}
 
 jobs:
   validate:
-    runs-on: [ ubuntu-latest ]
-    outputs:
-      release-type: ${{ steps.validate-changelog.outputs.release-type }}
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Validate changelog
-        id: validate-changelog
-        uses: OpenTermsArchive/changelog-action/validate@v0.2.0
+    uses: OpenTermsArchive/shared-workflows/.github/workflows/changelog.yml@4565230eda2a36c5270784cd73452743dc0a69ed # v0.2.0

@@ -1,29 +1,8 @@
 name: Lint commit messages
 
-on: 
+on:
   pull_request:
-
-permissions:
-  contents: read
-  pull-requests: read
 
 jobs:
   commitlint:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout "main" branch
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          ref: ${{ github.event.pull_request.base.ref }}
-
-      - name: Checkout the current pull request branch
-        run: |
-          git fetch --no-tags origin +refs/pull/${{ github.event.pull_request.number }}/head:${{ github.event.pull_request.head.ref }}
-          git checkout ${{ github.event.pull_request.head.ref }}
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Lint commit messages
-        run: npm run commit-messages:lint
+    uses: OpenTermsArchive/shared-workflows/.github/workflows/commit.yml@4565230eda2a36c5270784cd73452743dc0a69ed # v0.2.0
