@@ -198,6 +198,10 @@ export default class GitRepository extends RepositoryInterface {
     record.content = pdfBuffer;
   }
 
+  getDiffStats(recordId) {
+    return this.git.getDiffStats(recordId);
+  }
+
   async #getCommits({ pathFilter, reverse = false, limit, offset } = {}) {
     const grepOptions = Object.values(DataMapper.COMMIT_MESSAGE_PREFIXES).flatMap(prefix => [ '--grep', prefix ]);
     const pathOptions = pathFilter

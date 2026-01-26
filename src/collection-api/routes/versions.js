@@ -78,6 +78,19 @@ import { toISODateWithoutMilliseconds } from '../../archivist/utils/date.js';
  *           type: string
  *           format: date-time
  *           description: The ISO 8601 datetime string when the version was recorded.
+ *     VersionListItemWithStats:
+ *       allOf:
+ *         - $ref: '#/components/schemas/VersionListItem'
+ *         - type: object
+ *           properties:
+ *             additions:
+ *               type: integer
+ *               nullable: true
+ *               description: The number of lines added in this version, or null if not available.
+ *             deletions:
+ *               type: integer
+ *               nullable: true
+ *               description: The number of lines deleted in this version, or null if not available.
  *     PaginatedVersionsResponse:
  *       type: object
  *       properties:
@@ -95,11 +108,36 @@ import { toISODateWithoutMilliseconds } from '../../archivist/utils/date.js';
  *         offset:
  *           type: integer
  *           description: The number of versions skipped before returning results.
+ *     PaginatedVersionsWithStatsResponse:
+ *       type: object
+ *       properties:
+ *         data:
+ *           type: array
+ *           description: The list of versions with diff statistics.
+ *           items:
+ *             $ref: '#/components/schemas/VersionListItemWithStats'
+ *         count:
+ *           type: integer
+ *           description: The total number of versions found.
+ *         limit:
+ *           type: integer
+ *           description: The maximum number of versions returned in this response.
+ *         offset:
+ *           type: integer
+ *           description: The number of versions skipped before returning results.
  *     VersionWithLinks:
  *       allOf:
  *         - $ref: '#/components/schemas/Version'
  *         - type: object
  *           properties:
+ *             additions:
+ *               type: integer
+ *               nullable: true
+ *               description: The number of lines added in this version, or null if not available.
+ *             deletions:
+ *               type: integer
+ *               nullable: true
+ *               description: The number of lines deleted in this version, or null if not available.
  *             links:
  *               type: object
  *               description: Navigation links to related versions.
@@ -173,6 +211,7 @@ function mapVersionToListItem(version) {
     serviceId: version.serviceId,
     termsType: version.termsType,
     fetchDate: toISODateWithoutMilliseconds(version.fetchDate),
+    isTechnicalUpgrade: version.isTechnicalUpgrade,
   };
 }
 
@@ -183,6 +222,7 @@ function mapVersionToDetailResponse(version, links) {
     termsType: version.termsType,
     fetchDate: toISODateWithoutMilliseconds(version.fetchDate),
     content: version.content,
+    isTechnicalUpgrade: version.isTechnicalUpgrade,
     links: {
       first: links.first?.id || null,
       prev: links.prev?.id || null,
@@ -321,11 +361,11 @@ router.get('/versions/:serviceId', async (req, res) => {
  *       - $ref: '#/components/parameters/OffsetParam'
  *     responses:
  *       200:
- *         description: A JSON object containing the list of versions and metadata.
+ *         description: A JSON object containing the list of versions with diff statistics and metadata.
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/PaginatedVersionsResponse'
+ *               $ref: '#/components/schemas/PaginatedVersionsWithStatsResponse'
  *       400:
  *         $ref: '#/components/responses/BadRequestError'
  *       404:
@@ -348,7 +388,14 @@ router.get('/versions/:serviceId/:termsType', async (req, res) => {
 
   const paginatedVersions = await versionsRepository.findByServiceAndTermsType(serviceId, termsType, { limit, offset });
 
-  const versionsList = paginatedVersions.map(mapVersionToListItem);
+  const versionsList = await Promise.all(paginatedVersions.map(async version => {
+    const stats = await versionsRepository.getDiffStats(version.id);
+
+    return {
+      ...mapVersionToListItem(version),
+      ...stats,
+    };
+  }));
 
   const response = {
     data: versionsList,
@@ -395,14 +442,18 @@ router.get('/version/:versionId', async (req, res) => {
     return res.status(404).json({ error: `No version found with ID "${versionId}"` });
   }
 
-  const [ first, prev, next, last ] = await Promise.all([
+  const [ first, prev, next, last, stats ] = await Promise.all([
     versionsRepository.findFirst(version.serviceId, version.termsType),
     versionsRepository.findPrevious(versionId),
     versionsRepository.findNext(versionId),
     versionsRepository.findLatest(version.serviceId, version.termsType),
+    versionsRepository.getDiffStats(versionId),
   ]);
 
-  return res.status(200).json(mapVersionToDetailResponse(version, { first, prev, next, last }));
+  return res.status(200).json({
+    ...mapVersionToDetailResponse(version, { first, prev, next, last }),
+    ...stats,
+  });
 });
 
 /**

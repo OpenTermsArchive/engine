@@ -154,4 +154,23 @@ export default class Git {
   async updateCommitGraph() {
     await this.git.raw([ 'commit-graph', 'write', '--reachable', '--changed-paths', '--append' ]);
   }
+
+  async getDiffStats(commitHash) {
+    const output = await this.git.raw([ 'show', '--numstat', '--format=', commitHash ]);
+
+    let additions = 0;
+    let deletions = 0;
+
+    for (const line of output.trim().split('\n')) {
+      if (!line) continue;
+
+      const [added, deleted] = line.split('\t');
+
+      // Binary files show '-' for additions/deletions
+      if (added !== '-') additions += parseInt(added, 10);
+      if (deleted !== '-') deletions += parseInt(deleted, 10);
+    }
+
+    return { additions, deletions };
+  }
 }
