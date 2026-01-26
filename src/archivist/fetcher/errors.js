@@ -10,6 +10,7 @@ export class FetchDocumentError extends Error {
     'EAI_AGAIN', // DNS lookup temporary failure - DNS server is temporarily unavailable or overloaded
     'ETIMEDOUT', // Connection timeout - network latency or server load issues
     'ERR_NAME_NOT_RESOLVED', // DNS lookup temporary failure - DNS server is temporarily unavailable or overloaded
+    'Timed out after', // Navigation timeout - page took too long to load, might be temporary server overload
     'HTTP code 500', // Internal Server Error - server encountered an error while processing the request
     'HTTP code 503', // Service Unavailable - server is temporarily overloaded or down for maintenance
     'HTTP code 504', // Gateway Timeout - upstream server took too long to respond, might be temporary
