@@ -59,6 +59,9 @@ import { toISODateWithoutMilliseconds } from '../../archivist/utils/date.js';
  *           type: string
  *           format: date-time
  *           description: The ISO 8601 datetime string when the version was recorded.
+ *         isFirstRecord:
+ *           type: boolean
+ *           description: Whether this version is the first one recorded for this service and terms type.
  *         content:
  *           type: string
  *           description: The JSON-escaped Markdown content of the version
@@ -78,6 +81,9 @@ import { toISODateWithoutMilliseconds } from '../../archivist/utils/date.js';
  *           type: string
  *           format: date-time
  *           description: The ISO 8601 datetime string when the version was recorded.
+ *         isFirstRecord:
+ *           type: boolean
+ *           description: Whether this version is the first one recorded for this service and terms type.
  *     VersionListItemWithStats:
  *       allOf:
  *         - $ref: '#/components/schemas/VersionListItem'
@@ -211,6 +217,7 @@ function mapVersionToListItem(version) {
     serviceId: version.serviceId,
     termsType: version.termsType,
     fetchDate: toISODateWithoutMilliseconds(version.fetchDate),
+    isFirstRecord: version.isFirstRecord,
     isTechnicalUpgrade: version.isTechnicalUpgrade,
   };
 }
@@ -222,6 +229,7 @@ function mapVersionToDetailResponse(version, links) {
     termsType: version.termsType,
     fetchDate: toISODateWithoutMilliseconds(version.fetchDate),
     content: version.content,
+    isFirstRecord: version.isFirstRecord,
     isTechnicalUpgrade: version.isTechnicalUpgrade,
     links: {
       first: links.first?.id || null,
