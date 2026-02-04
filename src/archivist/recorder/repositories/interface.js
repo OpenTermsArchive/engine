@@ -179,8 +179,8 @@ class RepositoryInterface {
 
   /**
    * Get diff statistics for a specific record
-   * @param   {string}                              recordId - Record ID to get diff stats for
-   * @returns {Promise<{additions: number, deletions: number}>} Promise that will be resolved with the diff statistics
+   * @param   {string}                                          recordId - Record ID to get diff stats for
+   * @returns {Promise<{additions: number, deletions: number}>}          Promise that will be resolved with the diff statistics
    */
   async getDiffStats(recordId) {
     throw new Error(`#getDiffStats method is not implemented in ${this.constructor.name}`);

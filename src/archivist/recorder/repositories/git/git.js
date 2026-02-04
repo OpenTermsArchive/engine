@@ -162,9 +162,11 @@ export default class Git {
     let deletions = 0;
 
     for (const line of output.trim().split('\n')) {
-      if (!line) continue;
+      if (!line) {
+        continue;
+      }
 
-      const [added, deleted] = line.split('\t');
+      const [ added, deleted ] = line.split('\t');
 
       // Binary files show '-' for additions/deletions
       if (added !== '-') additions += parseInt(added, 10);
