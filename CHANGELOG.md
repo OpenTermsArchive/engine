@@ -2,6 +2,14 @@
 
 All changes that impact users of this module are documented in this file, in the [Common Changelog](https://common-changelog.org) format with some additional specifications defined in the CONTRIBUTING file. This codebase adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased [patch]
+
+> Development of this release was supported by [Reset Tech](https://www.reset.tech).
+
+### Fixed
+
+- Fix declaration validation when a new service is added along with a filters file
+
 ## 10.6.0 - 2026-01-26
 
 > Development of this release was supported by [Reset Tech](https://www.reset.tech).
