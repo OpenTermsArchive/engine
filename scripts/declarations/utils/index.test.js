@@ -190,15 +190,12 @@ describe('DeclarationUtils', () => {
 
     context('when a new declaration has been added along with a filters file', () => {
       before(async () => {
-        await commitChanges(COMMIT_PATHS.serviceB, FIXTURES.serviceB.content);
+        await fs.writeFile(path.resolve(SUBJECT_PATH, COMMIT_PATHS.serviceB), JSON.stringify(FIXTURES.serviceB.content, null, 2));
         await fs.writeFile(path.resolve(SUBJECT_PATH, './declarations/ServiceB.filters.js'), 'module.exports = {};');
-        await declarationUtils.git.add('./declarations/ServiceB.filters.js');
-        await declarationUtils.git.commit('Add filters file for new service', './declarations/ServiceB.filters.js');
+        await declarationUtils.git.add([ COMMIT_PATHS.serviceB, './declarations/ServiceB.filters.js' ]);
+        await declarationUtils.git.commit('Add declaration with filters for new service');
       });
-      after(async () => {
-        await removeLatestCommit();
-        await removeLatestCommit();
-      });
+      after(removeLatestCommit);
 
       it('returns the added service ID along with all its terms types', async () => {
         expect(await declarationUtils.getModifiedServicesAndTermsTypes()).to.deep.equal({
