@@ -188,6 +188,26 @@ describe('DeclarationUtils', () => {
       });
     });
 
+    context('when a new declaration has been added along with a filters file', () => {
+      before(async () => {
+        await commitChanges(COMMIT_PATHS.serviceB, FIXTURES.serviceB.content);
+        await fs.writeFile(path.resolve(SUBJECT_PATH, './declarations/ServiceB.filters.js'), 'module.exports = {};');
+        await declarationUtils.git.add('./declarations/ServiceB.filters.js');
+        await declarationUtils.git.commit('Add filters file for new service', './declarations/ServiceB.filters.js');
+      });
+      after(async () => {
+        await removeLatestCommit();
+        await removeLatestCommit();
+      });
+
+      it('returns the added service ID along with all its terms types', async () => {
+        expect(await declarationUtils.getModifiedServicesAndTermsTypes()).to.deep.equal({
+          services: ['ServiceB'],
+          servicesTermsTypes: { ServiceB: ['Terms of Service'] },
+        });
+      });
+    });
+
     context('when history file is modified without declaration changes', () => {
       before(() => commitChanges(COMMIT_PATHS.serviceAHistory, FIXTURES.serviceATermsUpdatedHistory.content));
       after(removeLatestCommit);
