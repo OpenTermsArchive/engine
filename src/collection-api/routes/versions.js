@@ -144,6 +144,12 @@ import { toISODateWithoutMilliseconds } from '../../archivist/utils/date.js';
  *               type: integer
  *               nullable: true
  *               description: The number of lines deleted in this version, or null if not available.
+ *             fetchUrls:
+ *               type: array
+ *               description: The URLs of the source documents that were fetched to produce this version.
+ *               items:
+ *                 type: string
+ *                 format: uri
  *             links:
  *               type: object
  *               description: Navigation links to related versions.
@@ -187,6 +193,7 @@ import { toISODateWithoutMilliseconds } from '../../archivist/utils/date.js';
 const router = express.Router();
 
 const versionsRepository = await RepositoryFactory.create(config.get('@opentermsarchive/engine.recorder.versions.storage')).initialize();
+const snapshotsRepository = await RepositoryFactory.create(config.get('@opentermsarchive/engine.recorder.snapshots.storage')).initialize();
 
 function parsePaginationParams(query) {
   const limit = query.limit ? parseInt(query.limit, 10) : 100;
@@ -222,7 +229,17 @@ function mapVersionToListItem(version) {
   };
 }
 
-function mapVersionToDetailResponse(version, links) {
+async function getFetchUrls(snapshotIds) {
+  if (!snapshotIds?.length) return [];
+  const snapshots = await Promise.all(snapshotIds.map(id => snapshotsRepository.findMetadataById(id)));
+
+  return snapshots
+    .filter(Boolean)
+    .map(snapshot => snapshot.metadata?.['x-source-document-location'])
+    .filter(Boolean);
+}
+
+function mapVersionToDetailResponse(version, links, fetchUrls) {
   return {
     id: version.id,
     serviceId: version.serviceId,
@@ -231,6 +248,7 @@ function mapVersionToDetailResponse(version, links) {
     content: version.content,
     isFirstRecord: version.isFirstRecord,
     isTechnicalUpgrade: version.isTechnicalUpgrade,
+    fetchUrls,
     links: {
       first: links.first?.id || null,
       prev: links.prev?.id || null,
@@ -450,16 +468,17 @@ router.get('/version/:versionId', async (req, res) => {
     return res.status(404).json({ error: `No version found with ID "${versionId}"` });
   }
 
-  const [ first, prev, next, last, stats ] = await Promise.all([
+  const [ first, prev, next, last, stats, fetchUrls ] = await Promise.all([
     versionsRepository.findFirst(version.serviceId, version.termsType),
     versionsRepository.findPrevious(versionId),
     versionsRepository.findNext(versionId),
     versionsRepository.findLatest(version.serviceId, version.termsType),
     versionsRepository.getDiffStats(versionId),
+    getFetchUrls(version.snapshotIds),
   ]);
 
   return res.status(200).json({
-    ...mapVersionToDetailResponse(version, { first, prev, next, last }),
+    ...mapVersionToDetailResponse(version, { first, prev, next, last }, fetchUrls),
     ...stats,
   });
 });
@@ -505,14 +524,15 @@ router.get('/version/:serviceId/:termsType/latest', async (req, res) => {
     return res.status(404).json({ error: `No version found for service "${serviceId}" and terms type "${termsType}"` });
   }
 
-  const [ first, prev, next, last ] = await Promise.all([
+  const [ first, prev, next, last, fetchUrls ] = await Promise.all([
     versionsRepository.findFirst(version.serviceId, version.termsType),
     versionsRepository.findPrevious(version.id),
     versionsRepository.findNext(version.id),
     versionsRepository.findLatest(version.serviceId, version.termsType),
+    getFetchUrls(version.snapshotIds),
   ]);
 
-  return res.status(200).json(mapVersionToDetailResponse(version, { first, prev, next, last }));
+  return res.status(200).json(mapVersionToDetailResponse(version, { first, prev, next, last }, fetchUrls));
 });
 
 /**
@@ -574,14 +594,15 @@ router.get('/version/:serviceId/:termsType/:date', async (req, res) => {
     return res.status(404).json({ error: `No version found for service "${serviceId}" and terms type "${termsType}" at date ${date}` });
   }
 
-  const [ first, prev, next, last ] = await Promise.all([
+  const [ first, prev, next, last, fetchUrls ] = await Promise.all([
     versionsRepository.findFirst(version.serviceId, version.termsType),
     versionsRepository.findPrevious(version.id),
     versionsRepository.findNext(version.id),
     versionsRepository.findLatest(version.serviceId, version.termsType),
+    getFetchUrls(version.snapshotIds),
   ]);
 
-  return res.status(200).json(mapVersionToDetailResponse(version, { first, prev, next, last }));
+  return res.status(200).json(mapVersionToDetailResponse(version, { first, prev, next, last }, fetchUrls));
 });
 
 export default router;

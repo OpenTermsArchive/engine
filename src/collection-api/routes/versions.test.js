@@ -341,6 +341,10 @@ describe('Versions API', () => {
         expect(response.body.content).to.equal(firstVersion.content);
       });
 
+      it('returns fetchUrls as an empty array when no matching snapshots exist', () => {
+        expect(response.body.fetchUrls).to.deep.equal([]);
+      });
+
       it('returns links object', () => {
         expect(response.body.links).to.be.an('object');
       });
@@ -499,6 +503,10 @@ describe('Versions API', () => {
         expect(response.body.fetchDate).to.equal(toISODateWithoutMilliseconds(lastVersion.fetchDate));
       });
 
+      it('returns fetchUrls as an empty array when no matching snapshots exist', () => {
+        expect(response.body.fetchUrls).to.deep.equal([]);
+      });
+
       it('returns links object', () => {
         expect(response.body.links).to.be.an('object');
       });
@@ -576,6 +584,7 @@ describe('Versions API', () => {
         content: middleVersion.content,
         isFirstRecord: false,
         isTechnicalUpgrade: false,
+        fetchUrls: [],
         links: {
           first: firstVersion.id,
           prev: firstVersion.id,
