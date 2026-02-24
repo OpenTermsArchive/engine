@@ -92,9 +92,9 @@ describe('Versions API', () => {
         expect(response.body.count).to.equal(3);
       });
 
-      it('returns versions with id, serviceId, termsType and fetchDate', () => {
+      it('returns versions with id, serviceId, termsType, fetchDate, isFirstRecord, isTechnicalUpgrade, additions and deletions', () => {
         response.body.data.forEach(version => {
-          expect(version).to.have.all.keys('id', 'serviceId', 'termsType', 'fetchDate');
+          expect(version).to.have.all.keys('id', 'serviceId', 'termsType', 'fetchDate', 'isFirstRecord', 'isTechnicalUpgrade', 'additions', 'deletions');
           expect(version).to.not.have.property('content');
         });
       });
@@ -574,6 +574,8 @@ describe('Versions API', () => {
         termsType: middleVersion.termsType,
         fetchDate: toISODateWithoutMilliseconds(middleVersion.fetchDate),
         content: middleVersion.content,
+        isFirstRecord: false,
+        isTechnicalUpgrade: false,
         links: {
           first: firstVersion.id,
           prev: firstVersion.id,
