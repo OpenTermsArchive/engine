@@ -88,6 +88,12 @@ export default class GitRepository extends RepositoryInterface {
     return this.#toDomain(commit);
   }
 
+  async findMetadataById(recordId) {
+    const commit = await this.git.getCommit([recordId]);
+
+    return this.#toDomain(commit, { deferContentLoading: true });
+  }
+
   async findAll({ limit, offset } = {}) {
     return Promise.all((await this.#getCommits({ limit, offset })).map(commit => this.#toDomain(commit, { deferContentLoading: true })));
   }

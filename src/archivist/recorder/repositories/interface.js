@@ -70,6 +70,15 @@ class RepositoryInterface {
   }
 
   /**
+   * Find the metadata of the record that matches the given record ID, without loading its content
+   * @param   {string}          recordId - Record ID of the record to find
+   * @returns {Promise<Record>}          Promise that will be resolved with the found record (without content) or null if none match the given ID
+   */
+  async findMetadataById(recordId) {
+    throw new Error(`#findMetadataById method is not implemented in ${this.constructor.name}`);
+  }
+
+  /**
    * Find all records
    * For performance reasons, the content of the records will not be loaded by default. Use #loadRecordContent to load the content of individual records
    * @see    RepositoryInterface#loadRecordContent
