@@ -524,15 +524,19 @@ router.get('/version/:serviceId/:termsType/latest', async (req, res) => {
     return res.status(404).json({ error: `No version found for service "${serviceId}" and terms type "${termsType}"` });
   }
 
-  const [ first, prev, next, last, fetchUrls ] = await Promise.all([
+  const [ first, prev, next, last, stats, fetchUrls ] = await Promise.all([
     versionsRepository.findFirst(version.serviceId, version.termsType),
     versionsRepository.findPrevious(version.id),
     versionsRepository.findNext(version.id),
     versionsRepository.findLatest(version.serviceId, version.termsType),
+    versionsRepository.getDiffStats(version.id),
     getFetchUrls(version.snapshotIds),
   ]);
 
-  return res.status(200).json(mapVersionToDetailResponse(version, { first, prev, next, last }, fetchUrls));
+  return res.status(200).json({
+    ...mapVersionToDetailResponse(version, { first, prev, next, last }, fetchUrls),
+    ...stats,
+  });
 });
 
 /**
@@ -594,15 +598,19 @@ router.get('/version/:serviceId/:termsType/:date', async (req, res) => {
     return res.status(404).json({ error: `No version found for service "${serviceId}" and terms type "${termsType}" at date ${date}` });
   }
 
-  const [ first, prev, next, last, fetchUrls ] = await Promise.all([
+  const [ first, prev, next, last, stats, fetchUrls ] = await Promise.all([
     versionsRepository.findFirst(version.serviceId, version.termsType),
     versionsRepository.findPrevious(version.id),
     versionsRepository.findNext(version.id),
     versionsRepository.findLatest(version.serviceId, version.termsType),
+    versionsRepository.getDiffStats(version.id),
     getFetchUrls(version.snapshotIds),
   ]);
 
-  return res.status(200).json(mapVersionToDetailResponse(version, { first, prev, next, last }, fetchUrls));
+  return res.status(200).json({
+    ...mapVersionToDetailResponse(version, { first, prev, next, last }, fetchUrls),
+    ...stats,
+  });
 });
 
 export default router;
