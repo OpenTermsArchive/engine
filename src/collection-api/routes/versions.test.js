@@ -99,6 +99,15 @@ describe('Versions API', () => {
         });
       });
 
+      it('returns correct additions and deletions values for each version', () => {
+        expect(response.body.data[0].additions).to.equal(1);
+        expect(response.body.data[0].deletions).to.equal(1);
+        expect(response.body.data[1].additions).to.equal(1);
+        expect(response.body.data[1].deletions).to.equal(1);
+        expect(response.body.data[2].additions).to.equal(1);
+        expect(response.body.data[2].deletions).to.equal(0);
+      });
+
       it('returns versions with correct serviceId and termsType', () => {
         response.body.data.forEach(version => {
           expect(version.serviceId).to.equal('service-1');
@@ -364,6 +373,11 @@ describe('Versions API', () => {
       it('returns last link', () => {
         expect(response.body.links.last).to.equal(lastVersion.id);
       });
+
+      it('returns additions and deletions', () => {
+        expect(response.body).to.have.property('additions', 1);
+        expect(response.body).to.have.property('deletions', 0);
+      });
     });
 
     context('when requesting a middle version', () => {
@@ -397,6 +411,11 @@ describe('Versions API', () => {
       it('returns last link', () => {
         expect(response.body.links.last).to.equal(lastVersion.id);
       });
+
+      it('returns additions and deletions', () => {
+        expect(response.body).to.have.property('additions', 1);
+        expect(response.body).to.have.property('deletions', 1);
+      });
     });
 
     context('when requesting the last version', () => {
@@ -429,6 +448,11 @@ describe('Versions API', () => {
 
       it('returns last link pointing to itself', () => {
         expect(response.body.links.last).to.equal(lastVersion.id);
+      });
+
+      it('returns additions and deletions', () => {
+        expect(response.body).to.have.property('additions', 1);
+        expect(response.body).to.have.property('deletions', 1);
       });
     });
 
@@ -526,6 +550,11 @@ describe('Versions API', () => {
       it('returns last link pointing to itself', () => {
         expect(response.body.links.last).to.equal(lastVersion.id);
       });
+
+      it('returns additions and deletions', () => {
+        expect(response.body).to.have.property('additions', 1);
+        expect(response.body).to.have.property('deletions', 1);
+      });
     });
 
     context('when no versions exist', () => {
@@ -584,6 +613,8 @@ describe('Versions API', () => {
         content: middleVersion.content,
         isFirstRecord: false,
         isTechnicalUpgrade: false,
+        additions: 1,
+        deletions: 1,
         fetchUrls: [],
         links: {
           first: firstVersion.id,
