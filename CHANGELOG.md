@@ -9,7 +9,7 @@ All changes that impact users of this module are documented in this file, in the
 ### Removed
 
 - Remove Notifier module
-- **Breaking:** Remove all default SMTP values (`host`, `port`, `username`) from logger configuration; operators enabling `sendMailOnError` must now explicitly set all three in `@opentermsarchive/engine.logger.smtp`
+- **Breaking:** Remove all default SMTP values (`host`, `port`, `username`) from logger configuration; operators enabling `sendMailOnError` must now explicitly set all three in [`@opentermsarchive/engine.logger.smtp`](https://docs.opentermsarchive.org/collections/reference/configuration/#logger)
 
 ## 10.6.1 - 2026-02-05
 
