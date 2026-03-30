@@ -50,12 +50,6 @@
       "sendMailOnError": false,
       "timestampPrefix": true
     },
-    "notifier": {
-      "sendInBlue": {
-        "updatesListId": 850,
-        "updateTemplateId": 7
-      }
-    },
     "dataset": {
       "publishingSchedule": "30 8 * * MON"
     }
