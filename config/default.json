@@ -42,11 +42,6 @@
       "language": "en"
     },
     "logger": {
-      "smtp": {
-        "host": "smtp-relay.brevo.com",
-        "port": 587,
-        "username": "admin@opentermsarchive.org"
-      },
       "sendMailOnError": false,
       "timestampPrefix": true
     },
