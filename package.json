@@ -95,7 +95,6 @@
     "puppeteer": "^24.22.0",
     "puppeteer-extra": "^3.3.6",
     "puppeteer-extra-plugin-stealth": "^2.11.2",
-    "sib-api-v3-sdk": "^8.5.0",
     "simple-git": "^3.28.0",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1",

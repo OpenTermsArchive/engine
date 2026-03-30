@@ -42,19 +42,8 @@
       "language": "en"
     },
     "logger": {
-      "smtp": {
-        "host": "smtp-relay.brevo.com",
-        "port": 587,
-        "username": "admin@opentermsarchive.org"
-      },
       "sendMailOnError": false,
       "timestampPrefix": true
-    },
-    "notifier": {
-      "sendInBlue": {
-        "updatesListId": 850,
-        "updateTemplateId": 7
-      }
     },
     "dataset": {
       "publishingSchedule": "30 8 * * MON"

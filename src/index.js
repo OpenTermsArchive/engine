@@ -7,7 +7,6 @@ import cronstrue from 'cronstrue';
 import { getCollection } from './archivist/collection/index.js';
 import Archivist from './archivist/index.js';
 import logger from './logger/index.js';
-import Notifier from './notifier/index.js';
 import Reporter from './reporter/index.js';
 
 const require = createRequire(import.meta.url);
@@ -51,16 +50,6 @@ export default async function track({ services, types, schedule }) {
   // For terms with combined source documents, if a new document was added to the declaration, it will be fetched and combined with existing snapshots to regenerate the complete version.
   // All versions from this pass are labeled as technical upgrades to avoid false notifications about content changes.
   await archivist.applyTechnicalUpgrades({ services: filteredServices, types });
-
-  if (process.env.OTA_ENGINE_SENDINBLUE_API_KEY) {
-    try {
-      archivist.attach(new Notifier(archivist.services));
-    } catch (error) {
-      logger.error('Cannot instantiate the Notifier module; it will be ignored:', error);
-    }
-  } else {
-    logger.warn('Environment variable "OTA_ENGINE_SENDINBLUE_API_KEY" was not found; the Notifier module will be ignored');
-  }
 
   if (process.env.OTA_ENGINE_GITHUB_TOKEN || process.env.OTA_ENGINE_GITLAB_TOKEN) {
     try {
