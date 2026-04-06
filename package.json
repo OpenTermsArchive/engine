@@ -116,5 +116,10 @@
   },
   "engines": {
     "node": ">=20 <=24"
+  },
+  "overrides": {
+    "jsdom": {
+      "lru-cache": "11.2.7"
+    }
   }
 }
