@@ -84,7 +84,7 @@
     "iconv-lite": "^0.7.0",
     "joplin-turndown-plugin-gfm": "^1.0.12",
     "js-yaml": "^4.1.0",
-    "jsdom": "^27.0.0",
+    "jsdom": "^29.0.1",
     "json-source-map": "^0.6.1",
     "mime": "^4.1.0",
     "mocha": "^11.7.2",
@@ -116,5 +116,10 @@
   },
   "engines": {
     "node": ">=20 <=24"
+  },
+  "overrides": {
+    "jsdom": {
+      "lru-cache": "11.2.7"
+    }
   }
 }
