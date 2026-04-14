@@ -170,6 +170,17 @@ describe('SourceDocument', () => {
       expect(new SourceDocument({ location: 'https://example.com/terms%20of%20service' }).id).to.equal('terms of service');
     });
 
+    it('removes known file extension from URL pathname', () => {
+      expect(new SourceDocument({ location: 'https://example.com/en.html' }).id).to.equal('en');
+    });
+
+    it('removes only the last file extension', () => {
+      expect(new SourceDocument({ location: 'https://example.com/terms.backup.html' }).id).to.equal('terms.backup');
+    });
+
+    it('keeps unknown extension in URL pathname', () => {
+      expect(new SourceDocument({ location: 'https://example.com/terms.of.service' }).id).to.equal('terms.of.service');
+    });
     it('decodes URL-encoded characters before replacing illegal ones', () => {
       expect(new SourceDocument({ location: 'https://example.com/terms%3Aof%3Aservice' }).id).to.equal('terms_of_service');
     });
