@@ -1,3 +1,7 @@
+import path from 'path';
+
+import mime from 'mime';
+
 export default class SourceDocument {
   /**
    * Represents a source document containing web content and metadata for extraction.
@@ -21,7 +25,7 @@ export default class SourceDocument {
     this.filters = filters;
     this.content = content;
     this.mimeType = mimeType;
-    this.id = new URL(location).pathname.split('/').filter(Boolean).join('-');
+    this.id = SourceDocument.generateId(location);
   }
 
   get cssSelectors() {
@@ -58,6 +62,20 @@ export default class SourceDocument {
     }
 
     return [selector];
+  }
+
+  static generateId(location) {
+    const ILLEGAL_CHARACTERS = /[\\:"<>|*?]/g; // Characters forbidden in filenames for cross-platform compatibility; see https://github.com/actions/toolkit/blob/main/packages/artifact/src/internal/upload/path-and-artifact-name-validation.ts
+
+    const pathname = decodeURIComponent(new URL(location).pathname);
+    const extension = path.extname(pathname);
+    const pathnameWithoutExtension = mime.getType(extension) ? pathname.slice(0, -extension.length) : pathname; // Remove file extension when it corresponds to a known MIME type, as the extension is not part of the document's identity but a web server implementation detail
+
+    return pathnameWithoutExtension
+      .split('/')
+      .filter(Boolean)
+      .join('-')
+      .replace(ILLEGAL_CHARACTERS, '_');
   }
 
   toPersistence() {

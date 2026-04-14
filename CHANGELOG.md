@@ -2,6 +2,15 @@
 
 All changes that impact users of this module are documented in this file, in the [Common Changelog](https://common-changelog.org) format with some additional specifications defined in the CONTRIBUTING file. This codebase adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased [patch]
+
+> Development of this release was supported by [Reset Tech](https://www.reset.tech).
+
+### Fixed
+
+- Fix snapshot storage failure when source document URLs contain characters forbidden in filenames
+- Fix duplicate file extension in snapshot filenames when source document URLs end with an extension
+
 ## 11.0.1 - 2026-04-06
 
 > Development of this release was supported by [Reset Tech](https://www.reset.tech).
