@@ -21,7 +21,7 @@ export default class SourceDocument {
     this.filters = filters;
     this.content = content;
     this.mimeType = mimeType;
-    this.id = new URL(location).pathname.split('/').filter(Boolean).join('-');
+    this.id = SourceDocument.generateId(location);
   }
 
   get cssSelectors() {
@@ -58,6 +58,16 @@ export default class SourceDocument {
     }
 
     return [selector];
+  }
+
+  static generateId(location) {
+    const ILLEGAL_CHARACTERS = /[\\:"<>|*?]/g; // Characters forbidden in filenames for cross-platform compatibility; see https://github.com/actions/toolkit/blob/main/packages/artifact/src/internal/upload/path-and-artifact-name-validation.ts
+
+    return decodeURIComponent(new URL(location).pathname)
+      .split('/')
+      .filter(Boolean)
+      .join('-')
+      .replace(ILLEGAL_CHARACTERS, '_');
   }
 
   toPersistence() {
