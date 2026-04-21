@@ -92,6 +92,26 @@ export default class GitRepository extends RepositoryInterface {
     return Promise.all((await this.#getCommits()).map(commit => this.#toDomain(commit, { deferContentLoading: true })));
   }
 
+  async findRecent(limit, { serviceId, termsType } = {}) {
+    const commits = (await this.#getCommits()).reverse();
+    const records = [];
+
+    for (const commit of commits) {
+      if (records.length >= limit) break;
+
+      const record = await this.#toDomain(commit, { deferContentLoading: true });
+
+      if (!record) continue;
+
+      if (serviceId !== undefined && record.serviceId !== serviceId) continue;
+      if (termsType !== undefined && record.termsType !== termsType) continue;
+
+      records.push(record);
+    }
+
+    return records;
+  }
+
   async count() {
     return (await this.git.log(Object.values(DataMapper.COMMIT_MESSAGE_PREFIXES).map(prefix => `--grep=${prefix}`))).length;
   }

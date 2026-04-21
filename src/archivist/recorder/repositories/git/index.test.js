@@ -584,6 +584,148 @@ describe('GitRepository', () => {
       });
     });
 
+    describe('#findRecent', () => {
+      const OTHER_SERVICE = 'other_service';
+      const OTHER_TERMS = 'Privacy Policy';
+
+      before(async function () {
+        this.timeout(5000);
+
+        await subject.save(new Version({
+          serviceId: SERVICE_PROVIDER_ID,
+          termsType: TERMS_TYPE,
+          content: CONTENT,
+          fetchDate: FETCH_DATE_EARLIER,
+          snapshotIds: [SNAPSHOT_ID],
+        }));
+        await subject.save(new Version({
+          serviceId: SERVICE_PROVIDER_ID,
+          termsType: TERMS_TYPE,
+          content: `${CONTENT} - updated`,
+          fetchDate: FETCH_DATE,
+          snapshotIds: [SNAPSHOT_ID],
+        }));
+        await subject.save(new Version({
+          serviceId: SERVICE_PROVIDER_ID,
+          termsType: OTHER_TERMS,
+          content: CONTENT,
+          fetchDate: FETCH_DATE_LATER,
+          snapshotIds: [SNAPSHOT_ID],
+        }));
+        await subject.save(new Version({
+          serviceId: OTHER_SERVICE,
+          termsType: TERMS_TYPE,
+          content: CONTENT,
+          fetchDate: FETCH_DATE_LATER,
+          snapshotIds: [SNAPSHOT_ID],
+        }));
+      });
+
+      after(() => subject.removeAll());
+
+      context('without filters', () => {
+        let records;
+
+        before(async () => {
+          records = await subject.findRecent(10);
+        });
+
+        it('returns records in descending chronological order', () => {
+          const dates = records.map(record => record.fetchDate.getTime());
+
+          expect(dates).to.deep.equal([...dates].sort((a, b) => b - a));
+        });
+
+        it('returns all matching records', () => {
+          expect(records).to.have.length(4);
+        });
+
+        it('does not load content eagerly', () => {
+          for (const record of records) {
+            expect(() => record.content).to.throw('Content not defined');
+          }
+        });
+
+        it('exposes the metadata needed for feed entries', () => {
+          const [record] = records;
+
+          expect(record.id).to.be.a('string');
+          expect(record.serviceId).to.be.a('string');
+          expect(record.termsType).to.be.a('string');
+          expect(record.fetchDate).to.be.an.instanceof(Date);
+          expect(record.isFirstRecord).to.be.a('boolean');
+          expect(record.isTechnicalUpgrade).to.be.a('boolean');
+        });
+      });
+
+      context('when limit is smaller than the number of matching records', () => {
+        let records;
+
+        before(async () => {
+          records = await subject.findRecent(2);
+        });
+
+        it('returns at most limit records', () => {
+          expect(records).to.have.length(2);
+        });
+
+        it('returns the most recent records', () => {
+          for (const record of records) {
+            expect(record.fetchDate.getTime()).to.be.at.least(FETCH_DATE.getTime());
+          }
+        });
+      });
+
+      context('when a serviceId filter is given', () => {
+        let records;
+
+        before(async () => {
+          records = await subject.findRecent(10, { serviceId: SERVICE_PROVIDER_ID });
+        });
+
+        it('returns only records for that service', () => {
+          for (const record of records) {
+            expect(record.serviceId).to.equal(SERVICE_PROVIDER_ID);
+          }
+        });
+
+        it('returns all records that match', () => {
+          expect(records).to.have.length(3);
+        });
+      });
+
+      context('when both serviceId and termsType filters are given', () => {
+        let records;
+
+        before(async () => {
+          records = await subject.findRecent(10, { serviceId: SERVICE_PROVIDER_ID, termsType: TERMS_TYPE });
+        });
+
+        it('returns only records for that service and terms type', () => {
+          for (const record of records) {
+            expect(record.serviceId).to.equal(SERVICE_PROVIDER_ID);
+            expect(record.termsType).to.equal(TERMS_TYPE);
+          }
+        });
+
+        it('returns all records that match', () => {
+          expect(records).to.have.length(2);
+        });
+      });
+
+      context('when filters match no record', () => {
+        let records;
+
+        before(async () => {
+          records = await subject.findRecent(10, { serviceId: 'unknown' });
+        });
+
+        it('returns an empty array', () => {
+          expect(records).to.deep.equal([]);
+        });
+      });
+    });
+
     describe('#findLatest', () => {
       context('when there are records for the given service', () => {
         let lastSnapshotId;

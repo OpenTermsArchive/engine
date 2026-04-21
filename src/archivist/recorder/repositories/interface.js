@@ -80,6 +80,20 @@ class RepositoryInterface {
   }
 
   /**
+   * Find the most recent records in the repository, optionally filtered by service ID and terms type
+   * For performance reasons, the content of the records will not be loaded. Use #loadRecordContent to load the content of individual records
+   * @see RepositoryInterface#loadRecordContent
+   * @param   {number}                 limit                - Maximum number of records to return
+   * @param   {object}                 [filters]            - Optional filters
+   * @param   {string}                 [filters.serviceId]  - Restrict results to this service ID
+   * @param   {string}                 [filters.termsType]  - Restrict results to this terms type
+   * @returns {Promise<Array<Record>>}                      Promise that will be resolved with an array of records in descending chronological order
+   */
+  async findRecent(limit, filters) {
+    throw new Error(`#findRecent method is not implemented in ${this.constructor.name}`);
+  }
+
+  /**
    * Count the total number of records in the repository
    * For performance reasons, use this method rather than counting the number of entries returned by #findAll if you only need the size of a repository
    * @returns {Promise<number>} Promise that will be resolved with the total number of records
