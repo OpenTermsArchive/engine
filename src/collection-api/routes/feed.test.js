@@ -228,4 +228,120 @@ describe('Feed API', () => {
       });
     });
   });
+
+  describe('GET /feed/:serviceId', () => {
+    const SERVICE = 'service_without_history';
+    const OTHER_SERVICE = 'service_with_history';
+    const TERMS = 'Terms of Service';
+
+    let repository;
+
+    before(async function () {
+      this.timeout(5000);
+      repository = RepositoryFactory.create(storageConfig);
+      await repository.initialize();
+
+      await repository.save(new Version({
+        serviceId: SERVICE,
+        termsType: TERMS,
+        content: 'c1',
+        fetchDate: new Date('2024-01-01T00:00:00Z'),
+        snapshotIds: ['s1'],
+      }));
+      await repository.save(new Version({
+        serviceId: SERVICE,
+        termsType: TERMS,
+        content: 'c2',
+        fetchDate: new Date('2024-02-01T00:00:00Z'),
+        snapshotIds: ['s2'],
+      }));
+      await repository.save(new Version({
+        serviceId: OTHER_SERVICE,
+        termsType: TERMS,
+        content: 'c3',
+        fetchDate: new Date('2024-03-01T00:00:00Z'),
+        snapshotIds: ['s3'],
+      }));
+    });
+
+    after(() => repository.removeAll());
+
+    context('when the service exists and has versions', () => {
+      let response;
+
+      before(async () => {
+        response = await request.get(`${basePath}/v1/feed/${encodeURIComponent(SERVICE)}`);
+      });
+
+      it('responds with 200', () => {
+        expect(response.status).to.equal(200);
+      });
+
+      it('responds with Content-Type application/atom+xml', () => {
+        expect(response.headers['content-type']).to.match(/^application\/atom\+xml/);
+      });
+
+      it('includes only entries for that service', () => {
+        const serviceTerms = [...response.text.matchAll(/scheme="tag:opentermsarchive.org,2026:scheme:service"[^/]*term="([^"]+)"/g)]
+          .concat([...response.text.matchAll(/term="([^"]+)"[^/]*scheme="tag:opentermsarchive.org,2026:scheme:service"/g)])
+          .map(match => match[1]);
+
+        expect(serviceTerms).to.not.be.empty;
+
+        for (const term of serviceTerms) {
+          expect(term).to.equal(SERVICE);
+        }
+      });
+
+      it('has a feed id including the service id', () => {
+        expect(extractTag(response.text, 'id')).to.equal(`tag:opentermsarchive.org,2026:feed:test:${SERVICE}`);
+      });
+
+      it('has a self link pointing to the service-scoped feed endpoint', () => {
+        const href = response.text.match(/<link[^>]*rel="self"[^>]*href="([^"]+)"/)[1];
+
+        expect(href).to.match(new RegExp(`/feed/${SERVICE}$`));
+      });
+    });
+
+    context('when the service exists but has no versions', () => {
+      let response;
+
+      before(async () => {
+        response = await request.get(`${basePath}/v1/feed/${encodeURIComponent('service_with_filters_history')}`);
+      });
+
+      it('responds with 200', () => {
+        expect(response.status).to.equal(200);
+      });
+
+      it('returns an empty feed (no entries)', () => {
+        expect(response.text).to.not.include('<entry>');
+      });
+    });
+
+    context('when the service does not exist', () => {
+      let response;
+
+      before(async () => {
+        response = await request.get(`${basePath}/v1/feed/DoesNotExist`);
+      });
+
+      it('responds with 404', () => {
+        expect(response.status).to.equal(404);
+      });
+    });
+
+    context('when the serviceId uses different casing', () => {
+      let response;
+
+      before(async () => {
+        response = await request.get(`${basePath}/v1/feed/${encodeURIComponent(SERVICE.toUpperCase())}`);
+      });
+
+      it('still resolves to the service (case-insensitive)', () => {
+        expect(response.status).to.equal(200);
+      });
+    });
+  });
 });

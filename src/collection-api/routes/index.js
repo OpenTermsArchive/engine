@@ -38,7 +38,7 @@ export default async function apiRouter(basePath) {
   router.use(await metadataRouter(collection, services));
   router.use(servicesRouter(services));
   router.use(versionsRouter);
-  router.use(feedRouter());
+  router.use(feedRouter(services));
 
   return router;
 }

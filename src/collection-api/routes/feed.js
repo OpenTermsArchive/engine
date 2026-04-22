@@ -6,6 +6,7 @@ import { COMMIT_MESSAGE_PREFIXES } from '../../archivist/recorder/repositories/g
 import { toISODateWithoutMilliseconds } from '../../archivist/utils/date.js';
 
 import versionsRepository, { storageConfig } from './versionsRepository.js';
+import { findServiceCaseInsensitive } from './utils.js';
 
 const TAG_AUTHORITY = 'opentermsarchive.org,2026';
 const FEED_AUTHOR_NAME = 'OTA-Bot';
@@ -108,13 +109,14 @@ function render(document) {
 }
 
 /**
- * @returns {express.Router} The router instance
+ * @param   {object}         services The services to be exposed by the API
+ * @returns {express.Router}          The router instance
  * @swagger
  * tags:
  *   name: Feeds
  *   description: Atom feeds of version changes
  */
-export default function feedRouter() {
+export default function feedRouter(services) {
   const router = express.Router();
 
   /**
@@ -143,6 +145,49 @@ export default function feedRouter() {
     const document = buildFeedDocument({ collection, selfHref, feedId, versions, baseUrl });
 
     sendAtom(res, render(document));
+  });
+
+  /**
+   * @swagger
+   * /feed/{serviceId}:
+   *   get:
+   *     summary: Atom feed of the latest version changes scoped to a single service.
+   *     tags: [Feeds]
+   *     produces:
+   *       - application/atom+xml
+   *     parameters:
+   *       - in: path
+   *         name: serviceId
+   *         description: The ID of the service. Case-insensitive.
+   *         schema:
+   *           type: string
+   *         required: true
+   *     responses:
+   *       200:
+   *         description: An Atom 1.0 feed listing the latest version records for the given service, newest first.
+   *         content:
+   *           application/atom+xml:
+   *             schema:
+   *               type: string
+   *       404:
+   *         description: No service matching the provided ID is found.
+   */
+  router.get('/feed/:serviceId', async (req, res) => {
+    const service = findServiceCaseInsensitive(services, req.params.serviceId);
+
+    if (!service) {
+      return res.status(404).send('Service not found');
+    }
+
+    const collection = await getCollection();
+    const baseUrl = buildAbsoluteBaseUrl(req);
+    const selfHref = `${baseUrl}/feed/${encodeURIComponent(service.id)}`;
+    const feedId = `tag:${TAG_AUTHORITY}:feed:${collection.metadata?.id}:${service.id}`;
+
+    const versions = await versionsRepository.findRecent(DEFAULT_LIMIT, { serviceId: service.id });
+    const document = buildFeedDocument({ collection, selfHref, feedId, versions, baseUrl });
+
+    return sendAtom(res, render(document));
   });
 
   return router;
