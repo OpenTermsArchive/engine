@@ -344,4 +344,143 @@ describe('Feed API', () => {
       });
     });
   });
+
+  describe('XML escaping and URL encoding', () => {
+    const SERVICE = 'Service B!';
+    const TERMS = 'Privacy Policy';
+    const FETCH_DATE = new Date('2024-05-15T10:00:00Z');
+
+    let response;
+    let repository;
+
+    before(async function () {
+      this.timeout(5000);
+      repository = RepositoryFactory.create(storageConfig);
+      await repository.initialize();
+
+      await repository.save(new Version({
+        serviceId: SERVICE,
+        termsType: TERMS,
+        content: 'content with & and <tags>',
+        fetchDate: FETCH_DATE,
+        snapshotIds: ['s_escape'],
+      }));
+
+      response = await request.get(`${basePath}/v1/feed/${encodeURIComponent(SERVICE)}/${encodeURIComponent(TERMS)}`);
+    });
+
+    after(() => repository.removeAll());
+
+    it('responds with 200', () => {
+      expect(response.status).to.equal(200);
+    });
+
+    it('URL-encodes spaces and special characters in the self link href', () => {
+      const href = response.text.match(/<link[^>]*rel="self"[^>]*href="([^"]+)"/)[1];
+
+      expect(href).to.include('Service%20B!');
+      expect(href).to.include('Privacy%20Policy');
+      expect(href).to.not.include('Service B!');
+    });
+
+    it('URL-encodes spaces and special characters in entry alternate links', () => {
+      const href = response.text.match(/<link[^>]*rel="alternate"[^>]*href="([^"]+)"/)[1];
+
+      expect(href).to.include('Service%20B!');
+      expect(href).to.include('Privacy%20Policy');
+    });
+  });
+
+  describe('GET /feed/:serviceId/:termsType', () => {
+    const SERVICE = 'service_without_history';
+    const TERMS = 'Terms of Service';
+    const UNKNOWN_TERMS = 'Imprint';
+
+    let repository;
+
+    before(async function () {
+      this.timeout(5000);
+      repository = RepositoryFactory.create(storageConfig);
+      await repository.initialize();
+
+      await repository.save(new Version({
+        serviceId: SERVICE,
+        termsType: TERMS,
+        content: 'first',
+        fetchDate: new Date('2024-01-01T00:00:00Z'),
+        snapshotIds: ['s1'],
+      }));
+      await repository.save(new Version({
+        serviceId: SERVICE,
+        termsType: TERMS,
+        content: 'updated',
+        fetchDate: new Date('2024-02-01T00:00:00Z'),
+        snapshotIds: ['s2'],
+      }));
+    });
+
+    after(() => repository.removeAll());
+
+    context('when the service and terms type match', () => {
+      let response;
+
+      before(async () => {
+        response = await request.get(`${basePath}/v1/feed/${encodeURIComponent(SERVICE)}/${encodeURIComponent(TERMS)}`);
+      });
+
+      it('responds with 200', () => {
+        expect(response.status).to.equal(200);
+      });
+
+      it('includes entries for the combination', () => {
+        const entries = response.text.match(/<entry>/g) || [];
+
+        expect(entries.length).to.be.at.least(1);
+      });
+
+      it('entries only have the expected terms type', () => {
+        const termsTypeTerms = [...response.text.matchAll(/<category[^/]*scheme="tag:opentermsarchive.org,2026:scheme:terms-type"[^/]*term="([^"]+)"/g)]
+          .concat([...response.text.matchAll(/<category[^/]*term="([^"]+)"[^/]*scheme="tag:opentermsarchive.org,2026:scheme:terms-type"/g)])
+          .map(match => match[1]);
+
+        for (const term of termsTypeTerms) {
+          expect(term).to.equal(TERMS);
+        }
+      });
+
+      it('has a feed id that includes both service and terms type', () => {
+        expect(extractTag(response.text, 'id')).to.equal(`tag:opentermsarchive.org,2026:feed:test:${SERVICE}:${TERMS}`);
+      });
+
+      it('has a self link pointing to the combination endpoint', () => {
+        const href = response.text.match(/<link[^>]*rel="self"[^>]*href="([^"]+)"/)[1];
+
+        expect(href).to.match(new RegExp(`/feed/${SERVICE}/${encodeURIComponent(TERMS)}$`));
+      });
+    });
+
+    context('when the service exists but does not declare the terms type', () => {
+      let response;
+
+      before(async () => {
+        response = await request.get(`${basePath}/v1/feed/${encodeURIComponent(SERVICE)}/${encodeURIComponent(UNKNOWN_TERMS)}`);
+      });
+
+      it('responds with 404', () => {
+        expect(response.status).to.equal(404);
+      });
+    });
+
+    context('when the service does not exist', () => {
+      let response;
+
+      before(async () => {
+        response = await request.get(`${basePath}/v1/feed/DoesNotExist/${encodeURIComponent(TERMS)}`);
+      });
+
+      it('responds with 404', () => {
+        expect(response.status).to.equal(404);
+      });
+    });
+  });
 });

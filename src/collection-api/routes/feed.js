@@ -190,5 +190,60 @@ export default function feedRouter(services) {
     return sendAtom(res, render(document));
   });
 
+  /**
+   * @swagger
+   * /feed/{serviceId}/{termsType}:
+   *   get:
+   *     summary: Atom feed of the latest version changes scoped to a service and terms type.
+   *     tags: [Feeds]
+   *     produces:
+   *       - application/atom+xml
+   *     parameters:
+   *       - in: path
+   *         name: serviceId
+   *         description: The ID of the service. Case-insensitive.
+   *         schema:
+   *           type: string
+   *         required: true
+   *       - in: path
+   *         name: termsType
+   *         description: The terms type declared by the service (e.g. "Terms of Service", "Privacy Policy").
+   *         schema:
+   *           type: string
+   *         required: true
+   *     responses:
+   *       200:
+   *         description: An Atom 1.0 feed listing the latest version records for the given service and terms type, newest first.
+   *         content:
+   *           application/atom+xml:
+   *             schema:
+   *               type: string
+   *       404:
+   *         description: Either the service ID does not match any service or the terms type is not declared by that service.
+   */
+  router.get('/feed/:serviceId/:termsType', async (req, res) => {
+    const service = findServiceCaseInsensitive(services, req.params.serviceId);
+
+    if (!service) {
+      return res.status(404).send('Service not found');
+    }
+
+    const { termsType } = req.params;
+
+    if (!service.getTermsTypes().includes(termsType)) {
+      return res.status(404).send('Terms type not found for this service');
+    }
+
+    const collection = await getCollection();
+    const baseUrl = buildAbsoluteBaseUrl(req);
+    const selfHref = `${baseUrl}/feed/${encodeURIComponent(service.id)}/${encodeURIComponent(termsType)}`;
+    const feedId = `tag:${TAG_AUTHORITY}:feed:${collection.metadata?.id}:${service.id}:${termsType}`;
+
+    const versions = await versionsRepository.findRecent(DEFAULT_LIMIT, { serviceId: service.id, termsType });
+    const document = buildFeedDocument({ collection, selfHref, feedId, versions, baseUrl });
+
+    return sendAtom(res, render(document));
+  });
+
   return router;
 }
