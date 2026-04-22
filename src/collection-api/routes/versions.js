@@ -3,6 +3,7 @@ import express from 'express';
 import { toISODateWithoutMilliseconds } from '../../archivist/utils/date.js';
 
 import versionsRepository from './versionsRepository.js';
+import { findServiceCaseInsensitive } from './utils.js';
 
 /**
  * @private
@@ -27,9 +28,10 @@ import versionsRepository from './versionsRepository.js';
  *           type: string
  *           description: The JSON-escaped Markdown content of the version
  */
-const router = express.Router();
+export default function versionsRouter(services) {
+  const router = express.Router();
 
-/**
+  /**
  * @private
  * @swagger
  * /version/{serviceId}/{termsType}/{date}:
@@ -86,25 +88,32 @@ const router = express.Router();
  *                   type: string
  *                   description: Error message indicating that the requested date is in the future.
  */
-router.get('/version/:serviceId/:termsType/:date', async (req, res) => {
-  const { serviceId, termsType, date } = req.params;
-  const requestedDate = new Date(date);
+  router.get('/version/:serviceId/:termsType/:date', async (req, res) => {
+    const { termsType, date } = req.params;
+    const requestedDate = new Date(date);
 
-  if (requestedDate > new Date()) {
-    return res.status(416).json({ error: 'Requested version is in the future' });
-  }
+    if (requestedDate > new Date()) {
+      return res.status(416).json({ error: 'Requested version is in the future' });
+    }
 
-  const version = await versionsRepository.findByDate(serviceId, termsType, requestedDate);
+    const service = findServiceCaseInsensitive(services, req.params.serviceId);
 
-  if (!version) {
-    return res.status(404).json({ error: `No version found for date ${date}` });
-  }
+    if (!service) {
+      return res.status(404).json({ error: 'Service not found' });
+    }
 
-  return res.status(200).json({
-    id: version.id,
-    fetchDate: toISODateWithoutMilliseconds(version.fetchDate),
-    content: version.content,
+    const version = await versionsRepository.findByDate(service.id, termsType, requestedDate);
+
+    if (!version) {
+      return res.status(404).json({ error: `No version found for date ${date}` });
+    }
+
+    return res.status(200).json({
+      id: version.id,
+      fetchDate: toISODateWithoutMilliseconds(version.fetchDate),
+      content: version.content,
+    });
   });
-});
 
-export default router;
+  return router;
+}
