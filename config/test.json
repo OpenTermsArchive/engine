@@ -47,7 +47,10 @@
     },
     "collection-api": {
       "port": 3000,
-      "basePath": "/collection-api"
+      "basePath": "/collection-api",
+      "feed": {
+        "limit": 3
+      }
     }
   }
 }

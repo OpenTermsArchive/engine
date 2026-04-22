@@ -132,6 +132,13 @@ describe('Feed API', () => {
 
     after(() => repository.removeAll());
 
+    it('lists one entry per saved version up to the configured limit', () => {
+      const limit = config.get('@opentermsarchive/engine.collection-api.feed.limit');
+      const entries = response.text.match(/<entry>/g) || [];
+
+      expect(entries).to.have.length(Math.min(4, limit));
+    });
+
     it('orders entries newest-first', () => {
       const updates = [...response.text.matchAll(/<entry>[\s\S]*?<updated>([^<]+)<\/updated>[\s\S]*?<\/entry>/g)].map(match => match[1]);
 
@@ -225,6 +232,15 @@ describe('Feed API', () => {
 
         expect(entry).to.not.be.undefined;
         expect(entry).to.match(/term="Technical upgrade"/);
+      });
+    });
+
+    describe('configurable limit', () => {
+      it('returns at most the configured number of entries', () => {
+        const limit = config.get('@opentermsarchive/engine.collection-api.feed.limit');
+        const entries = response.text.match(/<entry>/g) || [];
+
+        expect(entries.length).to.be.at.most(limit);
       });
     });
   });

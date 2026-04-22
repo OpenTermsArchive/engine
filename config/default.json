@@ -47,6 +47,11 @@
     },
     "dataset": {
       "publishingSchedule": "30 8 * * MON"
+    },
+    "collection-api": {
+      "feed": {
+        "limit": 100
+      }
     }
   }
 }

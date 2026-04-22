@@ -1,3 +1,4 @@
+import config from 'config';
 import express from 'express';
 import { js2xml } from 'xml-js';
 
@@ -11,6 +12,14 @@ import { findServiceCaseInsensitive } from './utils.js';
 const TAG_AUTHORITY = 'opentermsarchive.org,2026';
 const FEED_AUTHOR_NAME = 'OTA-Bot';
 const DEFAULT_LIMIT = 100;
+
+function getFeedLimit() {
+  if (config.has('@opentermsarchive/engine.collection-api.feed.limit')) {
+    return config.get('@opentermsarchive/engine.collection-api.feed.limit');
+  }
+
+  return DEFAULT_LIMIT;
+}
 
 const RECORD_TYPES = {
   firstRecord: 'First record',
@@ -129,7 +138,7 @@ export default function feedRouter(services) {
    *       - application/atom+xml
    *     responses:
    *       200:
-   *         description: An Atom 1.0 feed listing the latest version records, newest first.
+   *         description: An Atom 1.0 feed listing the latest version records, newest first. The maximum number of entries is server-configured.
    *         content:
    *           application/atom+xml:
    *             schema:
@@ -141,7 +150,7 @@ export default function feedRouter(services) {
     const selfHref = `${baseUrl}/feed`;
     const feedId = `tag:${TAG_AUTHORITY}:feed:${collection.metadata?.id}`;
 
-    const versions = await versionsRepository.findRecent(DEFAULT_LIMIT);
+    const versions = await versionsRepository.findRecent(getFeedLimit());
     const document = buildFeedDocument({ collection, selfHref, feedId, versions, baseUrl });
 
     sendAtom(res, render(document));
@@ -184,7 +193,7 @@ export default function feedRouter(services) {
     const selfHref = `${baseUrl}/feed/${encodeURIComponent(service.id)}`;
     const feedId = `tag:${TAG_AUTHORITY}:feed:${collection.metadata?.id}:${service.id}`;
 
-    const versions = await versionsRepository.findRecent(DEFAULT_LIMIT, { serviceId: service.id });
+    const versions = await versionsRepository.findRecent(getFeedLimit(), { serviceId: service.id });
     const document = buildFeedDocument({ collection, selfHref, feedId, versions, baseUrl });
 
     return sendAtom(res, render(document));
@@ -239,7 +248,7 @@ export default function feedRouter(services) {
     const selfHref = `${baseUrl}/feed/${encodeURIComponent(service.id)}/${encodeURIComponent(termsType)}`;
     const feedId = `tag:${TAG_AUTHORITY}:feed:${collection.metadata?.id}:${service.id}:${termsType}`;
 
-    const versions = await versionsRepository.findRecent(DEFAULT_LIMIT, { serviceId: service.id, termsType });
+    const versions = await versionsRepository.findRecent(getFeedLimit(), { serviceId: service.id, termsType });
     const document = buildFeedDocument({ collection, selfHref, feedId, versions, baseUrl });
 
     return sendAtom(res, render(document));
