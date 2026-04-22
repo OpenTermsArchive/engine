@@ -66,13 +66,18 @@ function buildEntryId(collection, version) {
 }
 
 function buildEntry(collection, baseUrl, version) {
+  const apiLink = buildVersionLink(baseUrl, version);
+  const githubCommitLink = collection.metadata?.versions && `${collection.metadata.versions}/commit/${version.id}`;
+
+  const links = [{ _attributes: { rel: 'alternate', type: 'text/html', href: githubCommitLink || apiLink } }];
+
+  if (githubCommitLink) {
+    links.push({ _attributes: { rel: 'related', type: 'text/html', href: apiLink } });
+  }
+
   return {
     id: { _text: buildEntryId(collection, version) },
-    link: { _attributes: {
-      rel: 'alternate',
-      type: 'text/html',
-      href: buildVersionLink(baseUrl, version),
-    } },
+    link: links,
     title: { _text: buildEntryTitle(version) },
     updated: { _text: version.fetchDate.toISOString() },
     category: [

@@ -159,8 +159,15 @@ describe('Feed API', () => {
         expect(firstEntry).to.include(`<id>${expected}</id>`);
       });
 
-      it('has an alternate link to the version API endpoint', () => {
+      it('has an alternate link to the GitHub commit', async () => {
+        const collection = await getCollection();
         const href = firstEntry.match(/<link[^>]*rel="alternate"[^>]*href="([^"]+)"/)[1];
+
+        expect(href).to.equal(`${collection.metadata.versions}/commit/${savedVersions.technicalUpgradeRecord.id}`);
+      });
+
+      it('has a related link to the version API endpoint', () => {
+        const href = firstEntry.match(/<link[^>]*rel="related"[^>]*href="([^"]+)"/)[1];
         const expectedPathFragment = `/version/${encodeURIComponent('service-2')}/${encodeURIComponent('Privacy Policy')}/${encodeURIComponent(toISODateWithoutMilliseconds(FETCH_DATE_UPGRADE))}`;
 
         expect(href).to.include(expectedPathFragment);
@@ -399,8 +406,8 @@ describe('Feed API', () => {
       expect(href).to.not.include('Service B!');
     });
 
-    it('URL-encodes spaces and special characters in entry alternate links', () => {
-      const href = response.text.match(/<link[^>]*rel="alternate"[^>]*href="([^"]+)"/)[1];
+    it('URL-encodes spaces and special characters in entry related links', () => {
+      const href = response.text.match(/<link[^>]*rel="related"[^>]*href="([^"]+)"/)[1];
 
       expect(href).to.include('Service%20B!');
       expect(href).to.include('Privacy%20Policy');
