@@ -1,8 +1,8 @@
-import config from 'config';
 import express from 'express';
 
-import RepositoryFactory from '../../archivist/recorder/repositories/factory.js';
 import { toISODateWithoutMilliseconds } from '../../archivist/utils/date.js';
+
+import versionsRepository from './versionsRepository.js';
 
 /**
  * @private
@@ -28,8 +28,6 @@ import { toISODateWithoutMilliseconds } from '../../archivist/utils/date.js';
  *           description: The JSON-escaped Markdown content of the version
  */
 const router = express.Router();
-
-const versionsRepository = await RepositoryFactory.create(config.get('@opentermsarchive/engine.recorder.versions.storage')).initialize();
 
 /**
  * @private
