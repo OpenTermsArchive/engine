@@ -97,14 +97,14 @@ export default class GitRepository extends RepositoryInterface {
     const records = [];
 
     for (const commit of commits) {
-      if (records.length >= limit) break;
+      if (records.length >= limit) { break; }
 
       const record = await this.#toDomain(commit, { deferContentLoading: true });
 
-      if (!record) continue;
+      if (!record) { continue; }
 
-      if (serviceId !== undefined && record.serviceId !== serviceId) continue;
-      if (termsType !== undefined && record.termsType !== termsType) continue;
+      if (serviceId !== undefined && record.serviceId !== serviceId) { continue; }
+      if (termsType !== undefined && record.termsType !== termsType) { continue; }
 
       records.push(record);
     }

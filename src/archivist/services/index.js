@@ -281,7 +281,7 @@ function getHistoryFilePaths(serviceId) {
 }
 
 async function loadServiceHistory(historyFilePath) {
-  if (!(await fileExists(historyFilePath))) return {};
+  if (!(await fileExists(historyFilePath))) { return {}; }
 
   try {
     return JSON.parse(await fs.readFile(historyFilePath));

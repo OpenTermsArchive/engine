@@ -6,8 +6,8 @@ import { getCollection } from '../../archivist/collection/index.js';
 import { COMMIT_MESSAGE_PREFIXES } from '../../archivist/recorder/repositories/git/dataMapper.js';
 import { toISODateWithoutMilliseconds } from '../../archivist/utils/date.js';
 
-import versionsRepository, { storageConfig } from './versionsRepository.js';
 import { findServiceCaseInsensitive } from './utils.js';
+import versionsRepository, { storageConfig } from './versionsRepository.js';
 
 const TAG_AUTHORITY = 'opentermsarchive.org,2026';
 const FEED_AUTHOR_NAME = 'OTA-Bot';
@@ -38,8 +38,8 @@ function buildAbsoluteBaseUrl(req) {
 }
 
 function classifyRecordType(version) {
-  if (version.isFirstRecord) return RECORD_TYPES.firstRecord;
-  if (version.isTechnicalUpgrade) return RECORD_TYPES.technicalUpgrade;
+  if (version.isFirstRecord) { return RECORD_TYPES.firstRecord; }
+  if (version.isTechnicalUpgrade) { return RECORD_TYPES.technicalUpgrade; }
 
   return RECORD_TYPES.change;
 }
@@ -47,8 +47,7 @@ function classifyRecordType(version) {
 function buildEntryTitle(version) {
   let prefix = COMMIT_MESSAGE_PREFIXES.update;
 
-  if (version.isFirstRecord) prefix = COMMIT_MESSAGE_PREFIXES.startTracking;
-  else if (version.isTechnicalUpgrade) prefix = COMMIT_MESSAGE_PREFIXES.technicalUpgrade;
+  if (version.isFirstRecord) { prefix = COMMIT_MESSAGE_PREFIXES.startTracking; } else if (version.isTechnicalUpgrade) { prefix = COMMIT_MESSAGE_PREFIXES.technicalUpgrade; }
 
   return `${prefix} ${version.serviceId} ${version.termsType}`;
 }

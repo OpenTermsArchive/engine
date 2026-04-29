@@ -2,10 +2,12 @@ import express from 'express';
 
 import { toISODateWithoutMilliseconds } from '../../archivist/utils/date.js';
 
-import versionsRepository from './versionsRepository.js';
 import { findServiceCaseInsensitive } from './utils.js';
+import versionsRepository from './versionsRepository.js';
 
 /**
+ * @param   {object}         services The services to be exposed by the API
+ * @returns {express.Router}          The router instance
  * @private
  * @swagger
  * tags:
@@ -32,62 +34,62 @@ export default function versionsRouter(services) {
   const router = express.Router();
 
   /**
- * @private
- * @swagger
- * /version/{serviceId}/{termsType}/{date}:
- *   get:
- *     summary: Get a specific version of some terms at a given date.
- *     tags: [Versions]
- *     produces:
- *       - application/json
- *     parameters:
- *       - in: path
- *         name: serviceId
- *         description: The ID of the service whose version will be returned.
- *         schema:
- *           type: string
- *         required: true
- *       - in: path
- *         name: termsType
- *         description: The type of terms whose version will be returned.
- *         schema:
- *           type: string
- *         required: true
- *       - in: path
- *         name: date
- *         description: The date and time for which the version is requested, in ISO 8601 format.
- *         schema:
- *           type: string
- *           format: date-time
- *         required: true
- *     responses:
- *       200:
- *         description: A JSON object containing the version content and metadata.
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Version'
- *       404:
- *         description: No version found for the specified combination of service ID, terms type and date.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 error:
- *                   type: string
- *                   description: Error message indicating that no version is found.
- *       416:
- *         description: The requested date is in the future.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 error:
- *                   type: string
- *                   description: Error message indicating that the requested date is in the future.
- */
+   * @private
+   * @swagger
+   * /version/{serviceId}/{termsType}/{date}:
+   *   get:
+   *     summary: Get a specific version of some terms at a given date.
+   *     tags: [Versions]
+   *     produces:
+   *       - application/json
+   *     parameters:
+   *       - in: path
+   *         name: serviceId
+   *         description: The ID of the service whose version will be returned.
+   *         schema:
+   *           type: string
+   *         required: true
+   *       - in: path
+   *         name: termsType
+   *         description: The type of terms whose version will be returned.
+   *         schema:
+   *           type: string
+   *         required: true
+   *       - in: path
+   *         name: date
+   *         description: The date and time for which the version is requested, in ISO 8601 format.
+   *         schema:
+   *           type: string
+   *           format: date-time
+   *         required: true
+   *     responses:
+   *       200:
+   *         description: A JSON object containing the version content and metadata.
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/Version'
+   *       404:
+   *         description: No version found for the specified combination of service ID, terms type and date.
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 error:
+   *                   type: string
+   *                   description: Error message indicating that no version is found.
+   *       416:
+   *         description: The requested date is in the future.
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 error:
+   *                   type: string
+   *                   description: Error message indicating that the requested date is in the future.
+   */
   router.get('/version/:serviceId/:termsType/:date', async (req, res) => {
     const { termsType, date } = req.params;
     const requestedDate = new Date(date);

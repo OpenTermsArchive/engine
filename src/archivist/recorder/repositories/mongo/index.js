@@ -96,8 +96,8 @@ export default class MongoRepository extends RepositoryInterface {
   async findRecent(limit, { serviceId, termsType } = {}) {
     const query = {};
 
-    if (serviceId !== undefined) query.serviceId = serviceId;
-    if (termsType !== undefined) query.termsType = termsType;
+    if (serviceId !== undefined) { query.serviceId = serviceId; }
+    if (termsType !== undefined) { query.termsType = termsType; }
 
     const mongoDocuments = await this.collection
       .find(query)

@@ -149,7 +149,7 @@ describe('Feed API', () => {
       let firstEntry;
 
       before(() => {
-        firstEntry = response.text.match(/<entry>[\s\S]*?<\/entry>/)[0];
+        [firstEntry] = response.text.match(/<entry>[\s\S]*?<\/entry>/);
       });
 
       it('has an id tag URI including storage type and record id', () => {
