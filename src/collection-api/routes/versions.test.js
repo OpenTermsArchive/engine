@@ -96,31 +96,6 @@ describe('Versions API', () => {
       });
     });
 
-    context('when the serviceId uses different casing', () => {
-      before(async () => {
-        response = await request.get(`${basePath}/v1/version/SERVICE·A/Terms%20of%20Service/${encodeURIComponent(toISODateWithoutMilliseconds(FETCH_DATE))}`);
-      });
-
-      it('still resolves to the service (case-insensitive)', () => {
-        expect(response.status).to.equal(200);
-        expect(response.body).to.deep.equal(expectedResult);
-      });
-    });
-
-    context('when the service does not exist', () => {
-      before(async () => {
-        response = await request.get(`${basePath}/v1/version/DoesNotExist/Terms%20of%20Service/${encodeURIComponent(toISODateWithoutMilliseconds(FETCH_DATE))}`);
-      });
-
-      it('responds with 404 status code', () => {
-        expect(response.status).to.equal(404);
-      });
-
-      it('returns an error message', () => {
-        expect(response.body.error).to.equal('Service not found');
-      });
-    });
-
     context('when the requested date is in the future', () => {
       before(async () => {
         const dateInTheFuture = new Date(Date.now() + 60000); // 1 minute in the future

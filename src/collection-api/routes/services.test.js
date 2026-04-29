@@ -56,7 +56,6 @@ describe('Services API', () => {
   describe('GET /service/:serviceId', () => {
     let response;
     const SERVICE_ID = 'Service B!';
-    const CASE_INSENSITIVE_SERVICE_ID = 'service b!';
 
     before(async () => {
       response = await request(app).get(`${basePath}/v1/service/${encodeURI(SERVICE_ID)}`);
@@ -106,49 +105,13 @@ describe('Services API', () => {
       });
     });
 
-    context('with a case-insensitive service ID parameter', () => {
+    context('when the service ID casing does not match', () => {
       before(async () => {
-        response = await request(app).get(`${basePath}/v1/service/${encodeURI(CASE_INSENSITIVE_SERVICE_ID)}`);
+        response = await request(app).get(`${basePath}/v1/service/${encodeURI(SERVICE_ID.toLowerCase())}`);
       });
 
-      it('responds with 200 status code', () => {
-        expect(response.status).to.equal(200);
-      });
-
-      it('returns a service object with id', () => {
-        expect(response.body).to.have.property('id');
-      });
-
-      it('returns the proper service object', () => {
-        expect(response.body.id).to.equal(SERVICE_ID);
-      });
-
-      it('returns a service object with name', () => {
-        expect(response.body).to.have.property('name');
-      });
-
-      it('returns a service object with an array of terms', () => {
-        expect(response.body).to.have.property('terms').that.is.an('array');
-      });
-
-      it('each terms should have a type property', () => {
-        response.body.terms.forEach(terms => {
-          expect(terms).to.have.property('type');
-        });
-      });
-
-      it('each terms should have an array of source documents', () => {
-        response.body.terms.forEach(terms => {
-          expect(terms).to.have.property('sourceDocuments').that.is.an('array');
-        });
-      });
-
-      it('each source document should have a location', () => {
-        response.body.terms.forEach(terms => {
-          terms.sourceDocuments.forEach(sourceDocument => {
-            expect(sourceDocument).to.have.property('location');
-          });
-        });
+      it('responds with 404 status code', () => {
+        expect(response.status).to.equal(404);
       });
     });
 

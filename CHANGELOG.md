@@ -2,7 +2,7 @@
 
 All changes that impact users of this module are documented in this file, in the [Common Changelog](https://common-changelog.org) format with some additional specifications defined in the CONTRIBUTING file. This codebase adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased [minor]
+## Unreleased [major]
 
 > Development of this release was supported by [Reset Tech](https://www.reset.tech).
 
@@ -15,7 +15,7 @@ All changes that impact users of this module are documented in this file, in the
 
 ### Changed
 
-- Resolve `serviceId` path parameter case-insensitively on the `GET /version/:serviceId/:termsType/:date` endpoint, consistent with other endpoints
+- **Breaking:** Resolve `serviceId` path parameter case-sensitively on the `GET /service/:serviceId` endpoint, in line with the documented service ID format; clients relying on case-insensitive matching must now use the exact ID casing
 
 ## 11.0.2 - 2026-04-14
 

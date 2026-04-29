@@ -6,8 +6,6 @@ import { getCollection } from '../../archivist/collection/index.js';
 import { COMMIT_MESSAGE_PREFIXES } from '../../archivist/recorder/repositories/git/dataMapper.js';
 import { toISODateWithoutMilliseconds } from '../../archivist/utils/date.js';
 
-import { findServiceCaseInsensitive } from './utils.js';
-
 const TAG_AUTHORITY = 'opentermsarchive.org,2026';
 const FEED_AUTHOR_NAME = 'OTA-Bot';
 const DEFAULT_LIMIT = 100;
@@ -172,7 +170,7 @@ export default function feedRouter(services, versionsRepository, storageType) {
    *     parameters:
    *       - in: path
    *         name: serviceId
-   *         description: The ID of the service. Case-insensitive.
+   *         description: The ID of the service.
    *         schema:
    *           type: string
    *         required: true
@@ -187,7 +185,7 @@ export default function feedRouter(services, versionsRepository, storageType) {
    *         description: No service matching the provided ID is found.
    */
   router.get('/feed/:serviceId', async (req, res) => {
-    const service = findServiceCaseInsensitive(services, req.params.serviceId);
+    const service = Object.hasOwn(services, req.params.serviceId) ? services[req.params.serviceId] : null;
 
     if (!service) {
       return res.status(404).send('Service not found');
@@ -215,7 +213,7 @@ export default function feedRouter(services, versionsRepository, storageType) {
    *     parameters:
    *       - in: path
    *         name: serviceId
-   *         description: The ID of the service. Case-insensitive.
+   *         description: The ID of the service.
    *         schema:
    *           type: string
    *         required: true
@@ -236,7 +234,7 @@ export default function feedRouter(services, versionsRepository, storageType) {
    *         description: Either the service ID does not match any service or the terms type is not declared by that service.
    */
   router.get('/feed/:serviceId/:termsType', async (req, res) => {
-    const service = findServiceCaseInsensitive(services, req.params.serviceId);
+    const service = Object.hasOwn(services, req.params.serviceId) ? services[req.params.serviceId] : null;
 
     if (!service) {
       return res.status(404).send('Service not found');

@@ -355,15 +355,15 @@ describe('Feed API', () => {
       });
     });
 
-    context('when the serviceId uses different casing', () => {
+    context('when the serviceId casing does not match', () => {
       let response;
 
       before(async () => {
         response = await request.get(`${basePath}/v1/feed/${encodeURIComponent(SERVICE.toUpperCase())}`);
       });
 
-      it('still resolves to the service (case-insensitive)', () => {
-        expect(response.status).to.equal(200);
+      it('responds with 404', () => {
+        expect(response.status).to.equal(404);
       });
     });
   });

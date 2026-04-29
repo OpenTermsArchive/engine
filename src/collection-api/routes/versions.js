@@ -2,10 +2,7 @@ import express from 'express';
 
 import { toISODateWithoutMilliseconds } from '../../archivist/utils/date.js';
 
-import { findServiceCaseInsensitive } from './utils.js';
-
 /**
- * @param   {object}         services           The services to be exposed by the API
  * @param   {object}         versionsRepository The versions repository instance
  * @returns {express.Router}                    The router instance
  * @private
@@ -30,7 +27,7 @@ import { findServiceCaseInsensitive } from './utils.js';
  *           type: string
  *           description: The JSON-escaped Markdown content of the version
  */
-export default function versionsRouter(services, versionsRepository) {
+export default function versionsRouter(versionsRepository) {
   const router = express.Router();
 
   /**
@@ -91,20 +88,14 @@ export default function versionsRouter(services, versionsRepository) {
    *                   description: Error message indicating that the requested date is in the future.
    */
   router.get('/version/:serviceId/:termsType/:date', async (req, res) => {
-    const { termsType, date } = req.params;
+    const { serviceId, termsType, date } = req.params;
     const requestedDate = new Date(date);
 
     if (requestedDate > new Date()) {
       return res.status(416).json({ error: 'Requested version is in the future' });
     }
 
-    const service = findServiceCaseInsensitive(services, req.params.serviceId);
-
-    if (!service) {
-      return res.status(404).json({ error: 'Service not found' });
-    }
-
-    const version = await versionsRepository.findByDate(service.id, termsType, requestedDate);
+    const version = await versionsRepository.findByDate(serviceId, termsType, requestedDate);
 
     if (!version) {
       return res.status(404).json({ error: `No version found for date ${date}` });
