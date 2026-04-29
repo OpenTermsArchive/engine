@@ -5,6 +5,7 @@ import { getCollection } from '../../archivist/collection/index.js';
 import * as Services from '../../archivist/services/index.js';
 
 import docsRouter from './docs.js';
+import feedRouter from './feed.js';
 import metadataRouter from './metadata.js';
 import servicesRouter from './services.js';
 import versionsRouter from './versions.js';
@@ -36,7 +37,8 @@ export default async function apiRouter(basePath) {
 
   router.use(await metadataRouter(collection, services));
   router.use(servicesRouter(services));
-  router.use(versionsRouter);
+  router.use(versionsRouter(services));
+  router.use(feedRouter(services));
 
   return router;
 }

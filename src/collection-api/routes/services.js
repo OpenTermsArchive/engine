@@ -1,5 +1,7 @@
 import express from 'express';
 
+import { findServiceCaseInsensitive } from './utils.js';
+
 /**
  * @param   {object}         services The services to be exposed by the API
  * @returns {express.Router}          The router instance
@@ -130,8 +132,7 @@ export default function servicesRouter(services) {
    *         description: No service matching the provided ID is found.
    */
   router.get('/service/:serviceId', (req, res) => {
-    const matchedServiceID = Object.keys(services).find(key => key.toLowerCase() === req.params.serviceId?.toLowerCase());
-    const service = services[matchedServiceID];
+    const service = findServiceCaseInsensitive(services, req.params.serviceId);
 
     if (!service) {
       res.status(404).send('Service not found');

@@ -100,7 +100,8 @@
     "swagger-ui-express": "^5.0.1",
     "turndown": "^7.2.1",
     "winston": "^3.17.0",
-    "winston-mail": "^2.0.0"
+    "winston-mail": "^2.0.0",
+    "xml-js": "^1.6.11"
   },
   "devDependencies": {
     "@commitlint/cli": "^19.8.1",

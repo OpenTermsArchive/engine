@@ -93,6 +93,22 @@ export default class MongoRepository extends RepositoryInterface {
       .map(mongoDocument => this.#toDomain(mongoDocument, { deferContentLoading: true })));
   }
 
+  async findRecent(limit, { serviceId, termsType } = {}) {
+    const query = {};
+
+    if (serviceId !== undefined) { query.serviceId = serviceId; }
+    if (termsType !== undefined) { query.termsType = termsType; }
+
+    const mongoDocuments = await this.collection
+      .find(query)
+      .project({ content: 0 })
+      .sort({ fetchDate: -1 })
+      .limit(limit)
+      .toArray();
+
+    return Promise.all(mongoDocuments.map(mongoDocument => this.#toDomain(mongoDocument, { deferContentLoading: true })));
+  }
+
   count() {
     return this.collection.countDocuments();
   }

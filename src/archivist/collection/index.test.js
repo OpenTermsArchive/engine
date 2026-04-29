@@ -18,7 +18,7 @@ describe('Collection', () => {
     try {
       metadataBackup = await fs.readFile(metadataPath, 'utf8');
     } catch (error) {
-      if (error.code !== 'ENOENT') throw error;
+      if (error.code !== 'ENOENT') { throw error; }
     }
   });
 

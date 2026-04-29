@@ -17,7 +17,7 @@ describe('Versions API', () => {
     let versionsRepository;
     const FETCH_DATE = new Date('2023-01-01T12:00:00Z');
     const VERSION_COMMON_ATTRIBUTES = {
-      serviceId: 'service-1',
+      serviceId: 'service·A',
       termsType: 'Terms of Service',
       snapshotId: ['snapshot_id'],
     };
@@ -62,7 +62,7 @@ describe('Versions API', () => {
 
     context('when a version is found', () => {
       before(async () => {
-        response = await request.get(`${basePath}/v1/version/service-1/Terms%20of%20Service/${encodeURIComponent(toISODateWithoutMilliseconds(FETCH_DATE))}`);
+        response = await request.get(`${basePath}/v1/version/service·A/Terms%20of%20Service/${encodeURIComponent(toISODateWithoutMilliseconds(FETCH_DATE))}`);
       });
 
       it('responds with 200 status code', () => {
@@ -80,7 +80,7 @@ describe('Versions API', () => {
 
     context('when the requested date is anterior to the first available version', () => {
       before(async () => {
-        response = await request.get(`${basePath}/v1/version/service-1/Terms%20of%20Service/2000-01-01T12:00:00Z`);
+        response = await request.get(`${basePath}/v1/version/service·A/Terms%20of%20Service/2000-01-01T12:00:00Z`);
       });
 
       it('responds with 404 status code', () => {
@@ -96,11 +96,36 @@ describe('Versions API', () => {
       });
     });
 
+    context('when the serviceId uses different casing', () => {
+      before(async () => {
+        response = await request.get(`${basePath}/v1/version/SERVICE·A/Terms%20of%20Service/${encodeURIComponent(toISODateWithoutMilliseconds(FETCH_DATE))}`);
+      });
+
+      it('still resolves to the service (case-insensitive)', () => {
+        expect(response.status).to.equal(200);
+        expect(response.body).to.deep.equal(expectedResult);
+      });
+    });
+
+    context('when the service does not exist', () => {
+      before(async () => {
+        response = await request.get(`${basePath}/v1/version/DoesNotExist/Terms%20of%20Service/${encodeURIComponent(toISODateWithoutMilliseconds(FETCH_DATE))}`);
+      });
+
+      it('responds with 404 status code', () => {
+        expect(response.status).to.equal(404);
+      });
+
+      it('returns an error message', () => {
+        expect(response.body.error).to.equal('Service not found');
+      });
+    });
+
     context('when the requested date is in the future', () => {
       before(async () => {
         const dateInTheFuture = new Date(Date.now() + 60000); // 1 minute in the future
 
-        response = await request.get(`${basePath}/v1/version/service-1/Terms%20of%20Service/${encodeURIComponent(toISODateWithoutMilliseconds(dateInTheFuture))}`);
+        response = await request.get(`${basePath}/v1/version/service·A/Terms%20of%20Service/${encodeURIComponent(toISODateWithoutMilliseconds(dateInTheFuture))}`);
       });
 
       it('responds with 416 status code', () => {
