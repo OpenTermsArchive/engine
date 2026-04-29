@@ -68,8 +68,12 @@ export default class Git {
     return this.git.push();
   }
 
-  listCommits(options = []) {
-    return this.log([ '--reverse', '--no-merges', '--name-only', ...options ]); // Returns all commits in chronological order (`--reverse`), excluding merge commits (`--no-merges`), with modified files names (`--name-only`)
+  listCommits(options = [], { reverse = true, skip, maxCount } = {}) {
+    const reverseOption = reverse ? ['--reverse'] : [];
+    const skipOption = skip !== undefined ? [`--skip=${skip}`] : [];
+    const maxCountOption = maxCount !== undefined ? [`--max-count=${maxCount}`] : [];
+
+    return this.log([ ...reverseOption, '--author-date-order', '--no-merges', '--name-only', ...skipOption, ...maxCountOption, ...options ]); // Returns commits in chronological order with `--reverse` (oldest first) or reverse chronological without it (newest first), sorted by author date (`--author-date-order`), excluding merge commits (`--no-merges`), with modified files names (`--name-only`), with optional pagination (`--skip`, `--max-count`)
   }
 
   async getCommit(options) {

@@ -88,29 +88,63 @@ export default class MongoRepository extends RepositoryInterface {
     return this.#toDomain(mongoDocument);
   }
 
-  async findAll() {
-    return Promise.all((await this.collection.find().project({ content: 0 }).sort({ fetchDate: 1 }).toArray())
+  async findAll({ limit, offset } = {}) {
+    let query = this.collection.find().project({ content: 0 }).sort({ fetchDate: -1 });
+
+    if (offset !== undefined) {
+      query = query.skip(offset);
+    }
+
+    if (limit !== undefined) {
+      query = query.limit(limit);
+    }
+
+    return Promise.all((await query.toArray())
       .map(mongoDocument => this.#toDomain(mongoDocument, { deferContentLoading: true })));
   }
 
-  async findRecent(limit, { serviceId, termsType } = {}) {
-    const query = {};
+  async findByServiceAndTermsType(serviceId, termsType, { limit, offset } = {}) {
+    let query = this.collection.find({ serviceId, termsType }).project({ content: 0 }).sort({ fetchDate: -1 });
 
-    if (serviceId !== undefined) { query.serviceId = serviceId; }
-    if (termsType !== undefined) { query.termsType = termsType; }
+    if (offset !== undefined) {
+      query = query.skip(offset);
+    }
 
-    const mongoDocuments = await this.collection
-      .find(query)
-      .project({ content: 0 })
-      .sort({ fetchDate: -1 })
-      .limit(limit)
-      .toArray();
+    if (limit !== undefined) {
+      query = query.limit(limit);
+    }
 
-    return Promise.all(mongoDocuments.map(mongoDocument => this.#toDomain(mongoDocument, { deferContentLoading: true })));
+    return Promise.all((await query.toArray())
+      .map(mongoDocument => this.#toDomain(mongoDocument, { deferContentLoading: true })));
   }
 
-  count() {
-    return this.collection.countDocuments();
+  async findByService(serviceId, { limit, offset } = {}) {
+    let query = this.collection.find({ serviceId }).project({ content: 0 }).sort({ fetchDate: -1 });
+
+    if (offset !== undefined) {
+      query = query.skip(offset);
+    }
+
+    if (limit !== undefined) {
+      query = query.limit(limit);
+    }
+
+    return Promise.all((await query.toArray())
+      .map(mongoDocument => this.#toDomain(mongoDocument, { deferContentLoading: true })));
+  }
+
+  count(serviceId, termsType) {
+    const filter = {};
+
+    if (serviceId) {
+      filter.serviceId = serviceId;
+    }
+
+    if (termsType) {
+      filter.termsType = termsType;
+    }
+
+    return this.collection.countDocuments(filter);
   }
 
   async* iterate() {

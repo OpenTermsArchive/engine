@@ -153,7 +153,7 @@ export default function feedRouter(services, versionsRepository, storageType) {
     const selfHref = `${baseUrl}/feed`;
     const feedId = `tag:${TAG_AUTHORITY}:feed:${collection.metadata?.id}`;
 
-    const versions = await versionsRepository.findRecent(getFeedLimit());
+    const versions = await versionsRepository.findAll({ limit: getFeedLimit() });
     const document = buildFeedDocument({ collection, storageType, selfHref, feedId, versions, baseUrl });
 
     sendAtom(res, render(document));
@@ -196,7 +196,7 @@ export default function feedRouter(services, versionsRepository, storageType) {
     const selfHref = `${baseUrl}/feed/${encodeURIComponent(service.id)}`;
     const feedId = `tag:${TAG_AUTHORITY}:feed:${collection.metadata?.id}:${service.id}`;
 
-    const versions = await versionsRepository.findRecent(getFeedLimit(), { serviceId: service.id });
+    const versions = await versionsRepository.findByService(service.id, { limit: getFeedLimit() });
     const document = buildFeedDocument({ collection, storageType, selfHref, feedId, versions, baseUrl });
 
     return sendAtom(res, render(document));
@@ -251,7 +251,7 @@ export default function feedRouter(services, versionsRepository, storageType) {
     const selfHref = `${baseUrl}/feed/${encodeURIComponent(service.id)}/${encodeURIComponent(termsType)}`;
     const feedId = `tag:${TAG_AUTHORITY}:feed:${collection.metadata?.id}:${service.id}:${termsType}`;
 
-    const versions = await versionsRepository.findRecent(getFeedLimit(), { serviceId: service.id, termsType });
+    const versions = await versionsRepository.findByServiceAndTermsType(service.id, termsType, { limit: getFeedLimit() });
     const document = buildFeedDocument({ collection, storageType, selfHref, feedId, versions, baseUrl });
 
     return sendAtom(res, render(document));
