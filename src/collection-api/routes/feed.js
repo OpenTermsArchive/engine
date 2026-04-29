@@ -7,7 +7,6 @@ import { COMMIT_MESSAGE_PREFIXES } from '../../archivist/recorder/repositories/g
 import { toISODateWithoutMilliseconds } from '../../archivist/utils/date.js';
 
 import { findServiceCaseInsensitive } from './utils.js';
-import versionsRepository, { storageConfig } from './versionsRepository.js';
 
 const TAG_AUTHORITY = 'opentermsarchive.org,2026';
 const FEED_AUTHOR_NAME = 'OTA-Bot';
@@ -60,11 +59,11 @@ function buildVersionLink(baseUrl, version) {
   return `${baseUrl}/version/${encodedService}/${encodedTermsType}/${encodedDate}`;
 }
 
-function buildEntryId(collection, version) {
-  return `tag:${TAG_AUTHORITY}:version:${collection.metadata?.id}:${storageConfig.type}:${version.id}`;
+function buildEntryId(collection, storageType, version) {
+  return `tag:${TAG_AUTHORITY}:version:${collection.metadata?.id}:${storageType}:${version.id}`;
 }
 
-function buildEntry(collection, baseUrl, version) {
+function buildEntry(collection, storageType, baseUrl, version) {
   const apiLink = buildVersionLink(baseUrl, version);
   const githubCommitLink = collection.metadata?.versions && `${collection.metadata.versions}/commit/${version.id}`;
 
@@ -75,7 +74,7 @@ function buildEntry(collection, baseUrl, version) {
   }
 
   return {
-    id: { _text: buildEntryId(collection, version) },
+    id: { _text: buildEntryId(collection, storageType, version) },
     link: links,
     title: { _text: buildEntryTitle(version) },
     updated: { _text: version.fetchDate.toISOString() },
@@ -87,7 +86,7 @@ function buildEntry(collection, baseUrl, version) {
   };
 }
 
-function buildFeedDocument({ collection, selfHref, feedId, versions, baseUrl }) {
+function buildFeedDocument({ collection, storageType, selfHref, feedId, versions, baseUrl }) {
   const latestFetchDate = versions.length > 0 ? versions[0].fetchDate : new Date();
 
   const feed = {
@@ -104,7 +103,7 @@ function buildFeedDocument({ collection, selfHref, feedId, versions, baseUrl }) 
     feed.logo = { _text: collection.metadata.logo };
   }
 
-  feed.entry = versions.map(version => buildEntry(collection, baseUrl, version));
+  feed.entry = versions.map(version => buildEntry(collection, storageType, baseUrl, version));
 
   return {
     _declaration: { _attributes: { version: '1.0', encoding: 'utf-8' } },
@@ -122,14 +121,16 @@ function render(document) {
 }
 
 /**
- * @param   {object}         services The services to be exposed by the API
- * @returns {express.Router}          The router instance
+ * @param   {object}         services           The services to be exposed by the API
+ * @param   {object}         versionsRepository The versions repository instance
+ * @param   {string}         storageType        The storage type identifier of the versions repository
+ * @returns {express.Router}                    The router instance
  * @swagger
  * tags:
  *   name: Feeds
  *   description: Atom feeds of version changes
  */
-export default function feedRouter(services) {
+export default function feedRouter(services, versionsRepository, storageType) {
   const router = express.Router();
 
   /**
@@ -155,7 +156,7 @@ export default function feedRouter(services) {
     const feedId = `tag:${TAG_AUTHORITY}:feed:${collection.metadata?.id}`;
 
     const versions = await versionsRepository.findRecent(getFeedLimit());
-    const document = buildFeedDocument({ collection, selfHref, feedId, versions, baseUrl });
+    const document = buildFeedDocument({ collection, storageType, selfHref, feedId, versions, baseUrl });
 
     sendAtom(res, render(document));
   });
@@ -198,7 +199,7 @@ export default function feedRouter(services) {
     const feedId = `tag:${TAG_AUTHORITY}:feed:${collection.metadata?.id}:${service.id}`;
 
     const versions = await versionsRepository.findRecent(getFeedLimit(), { serviceId: service.id });
-    const document = buildFeedDocument({ collection, selfHref, feedId, versions, baseUrl });
+    const document = buildFeedDocument({ collection, storageType, selfHref, feedId, versions, baseUrl });
 
     return sendAtom(res, render(document));
   });
@@ -253,7 +254,7 @@ export default function feedRouter(services) {
     const feedId = `tag:${TAG_AUTHORITY}:feed:${collection.metadata?.id}:${service.id}:${termsType}`;
 
     const versions = await versionsRepository.findRecent(getFeedLimit(), { serviceId: service.id, termsType });
-    const document = buildFeedDocument({ collection, selfHref, feedId, versions, baseUrl });
+    const document = buildFeedDocument({ collection, storageType, selfHref, feedId, versions, baseUrl });
 
     return sendAtom(res, render(document));
   });

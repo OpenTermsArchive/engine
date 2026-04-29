@@ -3,11 +3,11 @@ import express from 'express';
 import { toISODateWithoutMilliseconds } from '../../archivist/utils/date.js';
 
 import { findServiceCaseInsensitive } from './utils.js';
-import versionsRepository from './versionsRepository.js';
 
 /**
- * @param   {object}         services The services to be exposed by the API
- * @returns {express.Router}          The router instance
+ * @param   {object}         services           The services to be exposed by the API
+ * @param   {object}         versionsRepository The versions repository instance
+ * @returns {express.Router}                    The router instance
  * @private
  * @swagger
  * tags:
@@ -30,7 +30,7 @@ import versionsRepository from './versionsRepository.js';
  *           type: string
  *           description: The JSON-escaped Markdown content of the version
  */
-export default function versionsRouter(services) {
+export default function versionsRouter(services, versionsRepository) {
   const router = express.Router();
 
   /**
