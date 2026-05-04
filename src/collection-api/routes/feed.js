@@ -35,16 +35,29 @@ function buildAbsoluteBaseUrl(req) {
 }
 
 function classifyRecordType(version) {
-  if (version.isFirstRecord) { return RECORD_TYPES.firstRecord; }
-  if (version.isTechnicalUpgrade) { return RECORD_TYPES.technicalUpgrade; }
-
-  return RECORD_TYPES.change;
+  switch (true) {
+  case version.isFirstRecord:
+    return RECORD_TYPES.firstRecord;
+  case version.isTechnicalUpgrade:
+    return RECORD_TYPES.technicalUpgrade;
+  default:
+    return RECORD_TYPES.change;
+  }
 }
 
 function buildEntryTitle(version) {
-  let prefix = COMMIT_MESSAGE_PREFIXES.update;
+  let prefix;
 
-  if (version.isFirstRecord) { prefix = COMMIT_MESSAGE_PREFIXES.startTracking; } else if (version.isTechnicalUpgrade) { prefix = COMMIT_MESSAGE_PREFIXES.technicalUpgrade; }
+  switch (true) {
+  case version.isFirstRecord:
+    prefix = COMMIT_MESSAGE_PREFIXES.startTracking;
+    break;
+  case version.isTechnicalUpgrade:
+    prefix = COMMIT_MESSAGE_PREFIXES.technicalUpgrade;
+    break;
+  default:
+    prefix = COMMIT_MESSAGE_PREFIXES.update;
+  }
 
   return `${prefix} ${version.serviceId} ${version.termsType}`;
 }
