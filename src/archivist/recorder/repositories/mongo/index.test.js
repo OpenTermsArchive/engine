@@ -629,45 +629,198 @@ describe('MongoRepository', () => {
         }
       });
 
-      it('returns records in ascending order', () => {
-        expect(records.map(record => record.fetchDate)).to.deep.equal([ FETCH_DATE_EARLIER, FETCH_DATE, FETCH_DATE_LATER ]);
+      it('returns records in descending order', () => {
+        expect(records.map(record => record.fetchDate)).to.deep.equal([ FETCH_DATE_LATER, FETCH_DATE, FETCH_DATE_EARLIER ]);
       });
     });
 
-    describe('#count', () => {
-      let count;
+    describe('#findByServiceAndTermsType', () => {
+      const expectedIds = [];
+      let records;
 
       before(async () => {
-        await subject.save(new Version({
+        const { id: id1 } = await subject.save(new Version({
           serviceId: SERVICE_PROVIDER_ID,
           termsType: TERMS_TYPE,
           content: CONTENT,
           fetchDate: FETCH_DATE,
           snapshotIds: [SNAPSHOT_ID],
         }));
-        await subject.save(new Version({
+
+        expectedIds.push(id1);
+
+        const { id: id2 } = await subject.save(new Version({
           serviceId: SERVICE_PROVIDER_ID,
           termsType: TERMS_TYPE,
           content: `${CONTENT} - updated`,
           fetchDate: FETCH_DATE_LATER,
           snapshotIds: [SNAPSHOT_ID],
         }));
+
+        expectedIds.push(id2);
+
         await subject.save(new Version({
-          serviceId: SERVICE_PROVIDER_ID,
-          termsType: TERMS_TYPE,
-          content: `${CONTENT} - updated 2`,
-          isTechnicalUpgrade: true,
-          fetchDate: FETCH_DATE_EARLIER,
+          serviceId: 'other_service',
+          termsType: 'Privacy Policy',
+          content: `${CONTENT} - other`,
+          fetchDate: FETCH_DATE,
           snapshotIds: [SNAPSHOT_ID],
         }));
 
-        (count = await subject.count());
+        (records = await subject.findByServiceAndTermsType(SERVICE_PROVIDER_ID, TERMS_TYPE));
       });
 
       after(() => subject.removeAll());
 
-      it('returns the proper count', () => {
-        expect(count).to.equal(3);
+      it('returns only matching records', () => {
+        expect(records.length).to.equal(2);
+      });
+
+      it('returns Version objects', () => {
+        for (const record of records) {
+          expect(record).to.be.an.instanceof(Version);
+        }
+      });
+
+      it('returns records with matching service ID', () => {
+        for (const record of records) {
+          expect(record.serviceId).to.equal(SERVICE_PROVIDER_ID);
+        }
+      });
+
+      it('returns records with matching terms type', () => {
+        for (const record of records) {
+          expect(record.termsType).to.equal(TERMS_TYPE);
+        }
+      });
+
+      it('returns records in descending order', () => {
+        expect(records.map(record => record.fetchDate)).to.deep.equal([ FETCH_DATE_LATER, FETCH_DATE ]);
+      });
+
+      it('returns records with correct IDs', () => {
+        expect(records.map(record => record.id)).to.have.members(expectedIds);
+      });
+
+      context('when no matching records exist', () => {
+        it('returns an empty array', async () => {
+          const result = await subject.findByServiceAndTermsType('non_existent_service', 'Non Existent Terms');
+
+          expect(result).to.be.an('array').that.is.empty;
+        });
+      });
+    });
+
+    describe('#count', () => {
+      context('without filters', () => {
+        let count;
+
+        before(async () => {
+          await subject.save(new Version({
+            serviceId: SERVICE_PROVIDER_ID,
+            termsType: TERMS_TYPE,
+            content: CONTENT,
+            fetchDate: FETCH_DATE,
+            snapshotIds: [SNAPSHOT_ID],
+          }));
+          await subject.save(new Version({
+            serviceId: SERVICE_PROVIDER_ID,
+            termsType: TERMS_TYPE,
+            content: `${CONTENT} - updated`,
+            fetchDate: FETCH_DATE_LATER,
+            snapshotIds: [SNAPSHOT_ID],
+          }));
+          await subject.save(new Version({
+            serviceId: SERVICE_PROVIDER_ID,
+            termsType: TERMS_TYPE,
+            content: `${CONTENT} - updated 2`,
+            isTechnicalUpgrade: true,
+            fetchDate: FETCH_DATE_EARLIER,
+            snapshotIds: [SNAPSHOT_ID],
+          }));
+
+          (count = await subject.count());
+        });
+
+        after(() => subject.removeAll());
+
+        it('returns the proper count', () => {
+          expect(count).to.equal(3);
+        });
+      });
+
+      context('with serviceId and termsType filters', () => {
+        before(async () => {
+          await subject.save(new Version({
+            serviceId: SERVICE_PROVIDER_ID,
+            termsType: TERMS_TYPE,
+            content: CONTENT,
+            fetchDate: FETCH_DATE,
+            snapshotIds: [SNAPSHOT_ID],
+          }));
+          await subject.save(new Version({
+            serviceId: SERVICE_PROVIDER_ID,
+            termsType: TERMS_TYPE,
+            content: `${CONTENT} - updated`,
+            fetchDate: FETCH_DATE_LATER,
+            snapshotIds: [SNAPSHOT_ID],
+          }));
+          await subject.save(new Version({
+            serviceId: 'other_service',
+            termsType: 'Privacy Policy',
+            content: 'Other content',
+            fetchDate: FETCH_DATE,
+            snapshotIds: [SNAPSHOT_ID],
+          }));
+        });
+
+        after(() => subject.removeAll());
+
+        it('returns count for specific service and terms type', async () => {
+          const filteredCount = await subject.count(SERVICE_PROVIDER_ID, TERMS_TYPE);
+
+          expect(filteredCount).to.equal(2);
+        });
+
+        it('returns zero for non-existent service', async () => {
+          const filteredCount = await subject.count('non-existent-service', TERMS_TYPE);
+
+          expect(filteredCount).to.equal(0);
+        });
+      });
+
+      context('with only serviceId filter', () => {
+        before(async () => {
+          await subject.save(new Version({
+            serviceId: SERVICE_PROVIDER_ID,
+            termsType: TERMS_TYPE,
+            content: CONTENT,
+            fetchDate: FETCH_DATE,
+            snapshotIds: [SNAPSHOT_ID],
+          }));
+          await subject.save(new Version({
+            serviceId: SERVICE_PROVIDER_ID,
+            termsType: 'Different Terms',
+            content: 'Different content',
+            fetchDate: FETCH_DATE_LATER,
+            snapshotIds: [SNAPSHOT_ID],
+          }));
+          await subject.save(new Version({
+            serviceId: 'other_service',
+            termsType: 'Privacy Policy',
+            content: 'Other content',
+            fetchDate: FETCH_DATE,
+            snapshotIds: [SNAPSHOT_ID],
+          }));
+        });
+
+        after(() => subject.removeAll());
+
+        it('returns count for all terms types of a service', async () => {
+          const filteredCount = await subject.count(SERVICE_PROVIDER_ID);
+
+          expect(filteredCount).to.equal(2);
+        });
       });
     });
 
@@ -1197,8 +1350,8 @@ describe('MongoRepository', () => {
         }
       });
 
-      it('returns records in ascending order', () => {
-        expect(records.map(record => record.fetchDate)).to.deep.equal([ FETCH_DATE_EARLIER, FETCH_DATE, FETCH_DATE_LATER ]);
+      it('returns records in descending order', () => {
+        expect(records.map(record => record.fetchDate)).to.deep.equal([ FETCH_DATE_LATER, FETCH_DATE, FETCH_DATE_EARLIER ]);
       });
     });
 

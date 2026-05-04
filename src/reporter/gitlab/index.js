@@ -358,7 +358,7 @@ export default class GitLab {
     try {
       let apiUrl = `${this.apiBaseURL}/projects/${this.projectId}/issues?search=${encodeURIComponent(title)}&state=${searchParams.state}&per_page=100`;
 
-      if (searchParams.state == 'all') apiUrl = `${this.apiBaseURL}/projects/${this.projectId}/issues?search=${encodeURIComponent(title)}&per_page=100`;
+      if (searchParams.state == 'all') { apiUrl = `${this.apiBaseURL}/projects/${this.projectId}/issues?search=${encodeURIComponent(title)}&per_page=100`; }
 
       const options = GitLab.baseOptionsHttpReq();
 

@@ -1,10 +1,13 @@
+import config from 'config';
 import express from 'express';
 import helmet from 'helmet';
 
 import { getCollection } from '../../archivist/collection/index.js';
+import RepositoryFactory from '../../archivist/recorder/repositories/factory.js';
 import * as Services from '../../archivist/services/index.js';
 
 import docsRouter from './docs.js';
+import feedRouter from './feed.js';
 import metadataRouter from './metadata.js';
 import servicesRouter from './services.js';
 import versionsRouter from './versions.js';
@@ -33,10 +36,14 @@ export default async function apiRouter(basePath) {
 
   const services = await Services.load();
   const collection = await getCollection();
+  const versionsStorageConfig = config.get('@opentermsarchive/engine.recorder.versions.storage');
+  const versionsRepository = await RepositoryFactory.create(versionsStorageConfig).initialize();
+  const feedConfig = config.get('@opentermsarchive/engine.collection-api.feed');
 
   router.use(await metadataRouter(collection, services));
   router.use(servicesRouter(services));
-  router.use(versionsRouter);
+  router.use(versionsRouter(versionsRepository));
+  router.use(feedRouter(services, versionsRepository, versionsStorageConfig.type, feedConfig.limit, feedConfig.versionUrlTemplate));
 
   return router;
 }

@@ -39,7 +39,7 @@ async function removeDuplicateIssues() {
   }
 
   for (const [ title, duplicateIssues ] of issuesByTitle) {
-    if (duplicateIssues.length === 1) continue;
+    if (duplicateIssues.length === 1) { continue; }
 
     const originalIssue = duplicateIssues.reduce((oldest, current) => (new Date(current.created_at) < new Date(oldest.created_at) ? current : oldest));
 

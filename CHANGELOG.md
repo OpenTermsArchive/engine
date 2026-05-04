@@ -2,6 +2,21 @@
 
 All changes that impact users of this module are documented in this file, in the [Common Changelog](https://common-changelog.org) format with some additional specifications defined in the CONTRIBUTING file. This codebase adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased [major]
+
+> Development of this release was supported by [Reset Tech](https://www.reset.tech).
+
+### Added
+
+- Add `GET /feed` endpoint on the Collection API exposing an Atom feed of the latest version changes across the whole collection
+- Add `GET /feed/:serviceId` endpoint on the Collection API exposing an Atom feed scoped to a single service
+- Add `GET /feed/:serviceId/:termsType` endpoint on the Collection API exposing an Atom feed scoped to a single service and terms type
+- Add [`@opentermsarchive/engine.collection-api.feed.limit`](https://docs.opentermsarchive.org/collections/reference/configuration/) configuration option controlling the maximum number of entries returned by feed endpoints (default: `100`)
+
+### Changed
+
+- **Breaking:** Resolve `serviceId` path parameter case-sensitively on the `GET /service/:serviceId` endpoint, in line with the documented service ID format; clients relying on case-insensitive matching must now use the exact ID casing
+
 ## 11.0.2 - 2026-04-14
 
 > Development of this release was supported by [Reset Tech](https://www.reset.tech).
