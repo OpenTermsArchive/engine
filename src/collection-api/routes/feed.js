@@ -59,9 +59,18 @@ function buildFeedId(tagAuthority, collection, ...suffix) {
   return [ `tag:${tagAuthority}:feed`, collection.metadata?.id, ...suffix ].join(':');
 }
 
+function buildSchemes(tagAuthority) {
+  return {
+    service: `tag:${tagAuthority}:scheme:service`,
+    termsType: `tag:${tagAuthority}:scheme:terms-type`,
+    recordType: `tag:${tagAuthority}:scheme:record-type`,
+  };
+}
+
 function buildEntry(tagAuthority, storageType, baseUrl, collection, version) {
   const apiLink = buildVersionLink(baseUrl, version);
   const githubCommitLink = collection.metadata?.versions && `${collection.metadata.versions}/commit/${version.id}`;
+  const schemes = buildSchemes(tagAuthority);
 
   const links = [{ _attributes: { rel: 'alternate', type: 'text/html', href: githubCommitLink || apiLink } }];
 
@@ -75,9 +84,9 @@ function buildEntry(tagAuthority, storageType, baseUrl, collection, version) {
     title: { _text: buildEntryTitle(version) },
     updated: { _text: version.fetchDate.toISOString() },
     category: [
-      { _attributes: { term: version.serviceId, scheme: `tag:${tagAuthority}:scheme:service` } },
-      { _attributes: { term: version.termsType, scheme: `tag:${tagAuthority}:scheme:terms-type` } },
-      { _attributes: { term: classifyRecordType(version), scheme: `tag:${tagAuthority}:scheme:record-type` } },
+      { _attributes: { term: version.serviceId, scheme: schemes.service } },
+      { _attributes: { term: version.termsType, scheme: schemes.termsType } },
+      { _attributes: { term: classifyRecordType(version), scheme: schemes.recordType } },
     ],
   };
 }
