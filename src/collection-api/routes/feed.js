@@ -55,6 +55,10 @@ function buildEntryId(tagAuthority, storageType, collection, version) {
   return `tag:${tagAuthority}:version:${collection.metadata?.id}:${storageType}:${version.id}`;
 }
 
+function buildFeedId(tagAuthority, collection, ...suffix) {
+  return [ `tag:${tagAuthority}:feed`, collection.metadata?.id, ...suffix ].join(':');
+}
+
 function buildEntry(tagAuthority, storageType, baseUrl, collection, version) {
   const apiLink = buildVersionLink(baseUrl, version);
   const githubCommitLink = collection.metadata?.versions && `${collection.metadata.versions}/commit/${version.id}`;
@@ -146,7 +150,7 @@ export default function feedRouter(services, versionsRepository, storageType, fe
     const collection = await getCollection();
     const baseUrl = buildAbsoluteBaseUrl(req);
     const selfHref = `${baseUrl}/feed`;
-    const feedId = `tag:${tagAuthority}:feed:${collection.metadata?.id}`;
+    const feedId = buildFeedId(tagAuthority, collection);
 
     const versions = await versionsRepository.findAll({ limit: feedLimit });
 
@@ -188,7 +192,7 @@ export default function feedRouter(services, versionsRepository, storageType, fe
     const collection = await getCollection();
     const baseUrl = buildAbsoluteBaseUrl(req);
     const selfHref = `${baseUrl}/feed/${encodeURIComponent(service.id)}`;
-    const feedId = `tag:${tagAuthority}:feed:${collection.metadata?.id}:${service.id}`;
+    const feedId = buildFeedId(tagAuthority, collection, service.id);
 
     const versions = await versionsRepository.findByService(service.id, { limit: feedLimit });
 
@@ -242,7 +246,7 @@ export default function feedRouter(services, versionsRepository, storageType, fe
     const collection = await getCollection();
     const baseUrl = buildAbsoluteBaseUrl(req);
     const selfHref = `${baseUrl}/feed/${encodeURIComponent(service.id)}/${encodeURIComponent(termsType)}`;
-    const feedId = `tag:${tagAuthority}:feed:${collection.metadata?.id}:${service.id}:${termsType}`;
+    const feedId = buildFeedId(tagAuthority, collection, service.id, termsType);
 
     const versions = await versionsRepository.findByServiceAndTermsType(service.id, termsType, { limit: feedLimit });
 
