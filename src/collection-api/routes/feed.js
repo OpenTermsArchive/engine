@@ -1,4 +1,3 @@
-import config from 'config';
 import express from 'express';
 import { js2xml } from 'xml-js';
 
@@ -6,28 +5,10 @@ import { getCollection } from '../../archivist/collection/index.js';
 import { COMMIT_MESSAGE_PREFIXES } from '../../archivist/recorder/repositories/git/dataMapper.js';
 import { toISODateWithoutMilliseconds } from '../../archivist/utils/date.js';
 
-const TAG_AUTHORITY = 'opentermsarchive.org,2026';
-const FEED_AUTHOR_NAME = 'OTA-Bot';
-const DEFAULT_LIMIT = 100;
-
-function getFeedLimit() {
-  if (config.has('@opentermsarchive/engine.collection-api.feed.limit')) {
-    return config.get('@opentermsarchive/engine.collection-api.feed.limit');
-  }
-
-  return DEFAULT_LIMIT;
-}
-
 const RECORD_TYPES = {
   firstRecord: 'First record',
   technicalUpgrade: 'Technical upgrade',
   change: 'Change',
-};
-
-const SCHEMES = {
-  service: `tag:${TAG_AUTHORITY}:scheme:service`,
-  termsType: `tag:${TAG_AUTHORITY}:scheme:terms-type`,
-  recordType: `tag:${TAG_AUTHORITY}:scheme:record-type`,
 };
 
 function buildAbsoluteBaseUrl(req) {
@@ -70,11 +51,11 @@ function buildVersionLink(baseUrl, version) {
   return `${baseUrl}/version/${encodedService}/${encodedTermsType}/${encodedDate}`;
 }
 
-function buildEntryId(collection, storageType, version) {
-  return `tag:${TAG_AUTHORITY}:version:${collection.metadata?.id}:${storageType}:${version.id}`;
+function buildEntryId(tagAuthority, storageType, collection, version) {
+  return `tag:${tagAuthority}:version:${collection.metadata?.id}:${storageType}:${version.id}`;
 }
 
-function buildEntry(collection, storageType, baseUrl, version) {
+function buildEntry(tagAuthority, storageType, baseUrl, collection, version) {
   const apiLink = buildVersionLink(baseUrl, version);
   const githubCommitLink = collection.metadata?.versions && `${collection.metadata.versions}/commit/${version.id}`;
 
@@ -85,19 +66,19 @@ function buildEntry(collection, storageType, baseUrl, version) {
   }
 
   return {
-    id: { _text: buildEntryId(collection, storageType, version) },
+    id: { _text: buildEntryId(tagAuthority, storageType, collection, version) },
     link: links,
     title: { _text: buildEntryTitle(version) },
     updated: { _text: version.fetchDate.toISOString() },
     category: [
-      { _attributes: { term: version.serviceId, scheme: SCHEMES.service } },
-      { _attributes: { term: version.termsType, scheme: SCHEMES.termsType } },
-      { _attributes: { term: classifyRecordType(version), scheme: SCHEMES.recordType } },
+      { _attributes: { term: version.serviceId, scheme: `tag:${tagAuthority}:scheme:service` } },
+      { _attributes: { term: version.termsType, scheme: `tag:${tagAuthority}:scheme:terms-type` } },
+      { _attributes: { term: classifyRecordType(version), scheme: `tag:${tagAuthority}:scheme:record-type` } },
     ],
   };
 }
 
-function buildFeedDocument({ collection, storageType, selfHref, feedId, versions, baseUrl }) {
+function buildFeedDocument({ tagAuthority, storageType, feedAuthorName, collection, selfHref, feedId, versions, baseUrl }) {
   const latestFetchDate = versions.length > 0 ? versions[0].fetchDate : new Date();
 
   const feed = {
@@ -107,14 +88,14 @@ function buildFeedDocument({ collection, storageType, selfHref, feedId, versions
     id: { _text: feedId },
     updated: { _text: latestFetchDate.toISOString() },
     link: { _attributes: { rel: 'self', href: selfHref } },
-    author: { name: { _text: FEED_AUTHOR_NAME } },
+    author: { name: { _text: feedAuthorName } },
   };
 
   if (collection.metadata?.logo) {
     feed.logo = { _text: collection.metadata.logo };
   }
 
-  feed.entry = versions.map(version => buildEntry(collection, storageType, baseUrl, version));
+  feed.entry = versions.map(version => buildEntry(tagAuthority, storageType, baseUrl, collection, version));
 
   return {
     _declaration: { _attributes: { version: '1.0', encoding: 'utf-8' } },
@@ -133,13 +114,16 @@ function sendFeed(res, opts) {
  * @param   {object}         services           The services to be exposed by the API
  * @param   {object}         versionsRepository The versions repository instance
  * @param   {string}         storageType        The storage type identifier of the versions repository
+ * @param   {number}         feedLimit          Maximum number of entries returned by feed endpoints
+ * @param   {string}         feedAuthorName     Name used for the Atom feed-level author element
+ * @param   {string}         tagAuthority       Tag URI authority used to mint feed and entry IDs (RFC 4151)
  * @returns {express.Router}                    The router instance
  * @swagger
  * tags:
  *   name: Feeds
  *   description: Atom feeds of version changes
  */
-export default function feedRouter(services, versionsRepository, storageType) {
+export default function feedRouter(services, versionsRepository, storageType, feedLimit, feedAuthorName, tagAuthority) {
   const router = express.Router();
 
   /**
@@ -162,11 +146,11 @@ export default function feedRouter(services, versionsRepository, storageType) {
     const collection = await getCollection();
     const baseUrl = buildAbsoluteBaseUrl(req);
     const selfHref = `${baseUrl}/feed`;
-    const feedId = `tag:${TAG_AUTHORITY}:feed:${collection.metadata?.id}`;
+    const feedId = `tag:${tagAuthority}:feed:${collection.metadata?.id}`;
 
-    const versions = await versionsRepository.findAll({ limit: getFeedLimit() });
+    const versions = await versionsRepository.findAll({ limit: feedLimit });
 
-    sendFeed(res, { collection, storageType, selfHref, feedId, versions, baseUrl });
+    sendFeed(res, { tagAuthority, storageType, feedAuthorName, collection, selfHref, feedId, versions, baseUrl });
   });
 
   /**
@@ -204,11 +188,11 @@ export default function feedRouter(services, versionsRepository, storageType) {
     const collection = await getCollection();
     const baseUrl = buildAbsoluteBaseUrl(req);
     const selfHref = `${baseUrl}/feed/${encodeURIComponent(service.id)}`;
-    const feedId = `tag:${TAG_AUTHORITY}:feed:${collection.metadata?.id}:${service.id}`;
+    const feedId = `tag:${tagAuthority}:feed:${collection.metadata?.id}:${service.id}`;
 
-    const versions = await versionsRepository.findByService(service.id, { limit: getFeedLimit() });
+    const versions = await versionsRepository.findByService(service.id, { limit: feedLimit });
 
-    return sendFeed(res, { collection, storageType, selfHref, feedId, versions, baseUrl });
+    return sendFeed(res, { tagAuthority, storageType, feedAuthorName, collection, selfHref, feedId, versions, baseUrl });
   });
 
   /**
@@ -258,11 +242,11 @@ export default function feedRouter(services, versionsRepository, storageType) {
     const collection = await getCollection();
     const baseUrl = buildAbsoluteBaseUrl(req);
     const selfHref = `${baseUrl}/feed/${encodeURIComponent(service.id)}/${encodeURIComponent(termsType)}`;
-    const feedId = `tag:${TAG_AUTHORITY}:feed:${collection.metadata?.id}:${service.id}:${termsType}`;
+    const feedId = `tag:${tagAuthority}:feed:${collection.metadata?.id}:${service.id}:${termsType}`;
 
-    const versions = await versionsRepository.findByServiceAndTermsType(service.id, termsType, { limit: getFeedLimit() });
+    const versions = await versionsRepository.findByServiceAndTermsType(service.id, termsType, { limit: feedLimit });
 
-    return sendFeed(res, { collection, storageType, selfHref, feedId, versions, baseUrl });
+    return sendFeed(res, { tagAuthority, storageType, feedAuthorName, collection, selfHref, feedId, versions, baseUrl });
   });
 
   return router;

@@ -38,11 +38,12 @@ export default async function apiRouter(basePath) {
   const collection = await getCollection();
   const versionsStorageConfig = config.get('@opentermsarchive/engine.recorder.versions.storage');
   const versionsRepository = await RepositoryFactory.create(versionsStorageConfig).initialize();
+  const feedConfig = config.get('@opentermsarchive/engine.collection-api.feed');
 
   router.use(await metadataRouter(collection, services));
   router.use(servicesRouter(services));
   router.use(versionsRouter(versionsRepository));
-  router.use(feedRouter(services, versionsRepository, versionsStorageConfig.type));
+  router.use(feedRouter(services, versionsRepository, versionsStorageConfig.type, feedConfig.limit, feedConfig.author.name, feedConfig.tagAuthority));
 
   return router;
 }

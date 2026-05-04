@@ -50,7 +50,11 @@
     },
     "collection-api": {
       "feed": {
-        "limit": 100
+        "limit": 100,
+        "author": {
+          "name": "Open Terms Archive Collection API"
+        },
+        "tagAuthority": "opentermsarchive.org,2026"
       }
     }
   }
