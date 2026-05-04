@@ -1,12 +1,16 @@
 import { expect } from 'chai';
 import config from 'config';
+import express from 'express';
 import supertest from 'supertest';
 
 import { getCollection } from '../../archivist/collection/index.js';
 import RepositoryFactory from '../../archivist/recorder/repositories/factory.js';
+import * as Services from '../../archivist/services/index.js';
 import Version from '../../archivist/recorder/version.js';
 import { toISODateWithoutMilliseconds } from '../../archivist/utils/date.js';
 import app from '../server.js';
+
+import feedRouter from './feed.js';
 
 const basePath = config.get('@opentermsarchive/engine.collection-api.basePath');
 const request = supertest(app);
@@ -159,18 +163,17 @@ describe('Feed API', () => {
         expect(firstEntry).to.include(`<id>${expected}</id>`);
       });
 
-      it('has an alternate link to the GitHub commit', async () => {
-        const collection = await getCollection();
+      it('has an alternate link to the API version endpoint', () => {
         const href = firstEntry.match(/<link[^>]*rel="alternate"[^>]*href="([^"]+)"/)[1];
-
-        expect(href).to.equal(`${collection.metadata.versions}/commit/${savedVersions.technicalUpgradeRecord.id}`);
-      });
-
-      it('has a related link to the version API endpoint', () => {
-        const href = firstEntry.match(/<link[^>]*rel="related"[^>]*href="([^"]+)"/)[1];
         const expectedPathFragment = `/version/${encodeURIComponent('service-2')}/${encodeURIComponent('Privacy Policy')}/${encodeURIComponent(toISODateWithoutMilliseconds(FETCH_DATE_UPGRADE))}`;
 
         expect(href).to.include(expectedPathFragment);
+      });
+
+      it('has exactly one link per entry', () => {
+        const links = firstEntry.match(/<link\b[^>]*\/>/g) || [];
+
+        expect(links).to.have.length(1);
       });
 
       it('has a type="text/html" on the alternate link', () => {
@@ -406,8 +409,9 @@ describe('Feed API', () => {
       expect(href).to.not.include('Service B!');
     });
 
-    it('URL-encodes spaces and special characters in entry related links', () => {
-      const href = response.text.match(/<link[^>]*rel="related"[^>]*href="([^"]+)"/)[1];
+    it('URL-encodes spaces and special characters in entry alternate links', () => {
+      const entry = response.text.match(/<entry>[\s\S]*?<\/entry>/)[0];
+      const href = entry.match(/<link[^>]*rel="alternate"[^>]*href="([^"]+)"/)[1];
 
       expect(href).to.include('Service%20B!');
       expect(href).to.include('Privacy%20Policy');
@@ -504,6 +508,61 @@ describe('Feed API', () => {
       it('responds with 404', () => {
         expect(response.status).to.equal(404);
       });
+    });
+  });
+
+  describe('entry links with versionUrlTemplate configured', () => {
+    const TEMPLATE = 'https://example.test/v/%VERSION_ID';
+
+    let response;
+    let repository;
+    let savedVersion;
+
+    before(async function () {
+      this.timeout(5000);
+      repository = RepositoryFactory.create(storageConfig);
+      await repository.initialize();
+
+      savedVersion = await repository.save(new Version({
+        serviceId: 'service-1',
+        termsType: 'Terms of Service',
+        content: 'content',
+        fetchDate: new Date('2024-01-01T00:00:00Z'),
+        snapshotIds: ['s1'],
+      }));
+
+      const services = await Services.load();
+      const templatedApp = express();
+
+      templatedApp.use(feedRouter(services, repository, storageConfig.type, 10, TEMPLATE));
+
+      response = await supertest(templatedApp).get('/feed');
+    });
+
+    after(() => repository.removeAll());
+
+    it('interpolates %VERSION_ID into the alternate link', () => {
+      const href = response.text.match(/<entry>[\s\S]*?<link[^>]*rel="alternate"[^>]*href="([^"]+)"/)[1];
+
+      expect(href).to.equal(`https://example.test/v/${savedVersion.id}`);
+    });
+
+    it('does not point to the API for entry links', () => {
+      const entries = response.text.match(/<entry>[\s\S]*?<\/entry>/g) || [];
+
+      for (const entry of entries) {
+        expect(entry).to.not.match(/<link[^>]*href="[^"]*\/version\//);
+      }
+    });
+
+    it('still emits exactly one link per entry', () => {
+      const entries = response.text.match(/<entry>[\s\S]*?<\/entry>/g) || [];
+
+      for (const entry of entries) {
+        const links = entry.match(/<link\b[^>]*\/>/g) || [];
+
+        expect(links).to.have.length(1);
+      }
     });
   });
 });

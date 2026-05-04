@@ -70,20 +70,13 @@ function buildSchemes() {
   };
 }
 
-function buildEntry(storageType, baseUrl, collection, version) {
-  const apiLink = buildVersionLink(baseUrl, version);
-  const githubCommitLink = collection.metadata?.versions && `${collection.metadata.versions}/commit/${version.id}`;
+function buildEntry(storageType, versionUrlTemplate, baseUrl, collection, version) {
+  const href = versionUrlTemplate?.replace('%VERSION_ID', version.id) ?? buildVersionLink(baseUrl, version);
   const schemes = buildSchemes();
-
-  const links = [{ _attributes: { rel: 'alternate', type: 'text/html', href: githubCommitLink || apiLink } }];
-
-  if (githubCommitLink) {
-    links.push({ _attributes: { rel: 'related', type: 'text/html', href: apiLink } });
-  }
 
   return {
     id: { _text: buildEntryId(storageType, collection, version) },
-    link: links,
+    link: { _attributes: { rel: 'alternate', type: 'text/html', href } },
     title: { _text: buildEntryTitle(version) },
     updated: { _text: version.fetchDate.toISOString() },
     category: [
@@ -94,7 +87,7 @@ function buildEntry(storageType, baseUrl, collection, version) {
   };
 }
 
-function buildFeedDocument({ storageType, collection, selfHref, feedId, versions, baseUrl }) {
+function buildFeedDocument({ storageType, versionUrlTemplate, collection, selfHref, feedId, versions, baseUrl }) {
   const latestFetchDate = versions.length > 0 ? versions[0].fetchDate : new Date();
 
   const feed = {
@@ -111,7 +104,7 @@ function buildFeedDocument({ storageType, collection, selfHref, feedId, versions
     feed.logo = { _text: collection.metadata.logo };
   }
 
-  feed.entry = versions.map(version => buildEntry(storageType, baseUrl, collection, version));
+  feed.entry = versions.map(version => buildEntry(storageType, versionUrlTemplate, baseUrl, collection, version));
 
   return {
     _declaration: { _attributes: { version: '1.0', encoding: 'utf-8' } },
@@ -127,17 +120,18 @@ function sendFeed(res, opts) {
 }
 
 /**
- * @param   {object}         services           The services to be exposed by the API
- * @param   {object}         versionsRepository The versions repository instance
- * @param   {string}         storageType        The storage type identifier of the versions repository
- * @param   {number}         feedLimit          Maximum number of entries returned by feed endpoints
- * @returns {express.Router}                    The router instance
+ * @param   {object}         services             The services to be exposed by the API
+ * @param   {object}         versionsRepository   The versions repository instance
+ * @param   {string}         storageType          The storage type identifier of the versions repository
+ * @param   {number}         feedLimit            Maximum number of entries returned by feed endpoints
+ * @param   {string}         [versionUrlTemplate] Optional URL template with %VERSION_ID placeholder; when set, replaces the API link as each entry's alternate href
+ * @returns {express.Router}                      The router instance
  * @swagger
  * tags:
  *   name: Feeds
  *   description: Atom feeds of version changes
  */
-export default function feedRouter(services, versionsRepository, storageType, feedLimit) {
+export default function feedRouter(services, versionsRepository, storageType, feedLimit, versionUrlTemplate) {
   const router = express.Router();
 
   /**
@@ -164,7 +158,7 @@ export default function feedRouter(services, versionsRepository, storageType, fe
 
     const versions = await versionsRepository.findAll({ limit: feedLimit });
 
-    sendFeed(res, { storageType, collection, selfHref, feedId, versions, baseUrl });
+    sendFeed(res, { storageType, versionUrlTemplate, collection, selfHref, feedId, versions, baseUrl });
   });
 
   /**
@@ -206,7 +200,7 @@ export default function feedRouter(services, versionsRepository, storageType, fe
 
     const versions = await versionsRepository.findByService(service.id, { limit: feedLimit });
 
-    return sendFeed(res, { storageType, collection, selfHref, feedId, versions, baseUrl });
+    return sendFeed(res, { storageType, versionUrlTemplate, collection, selfHref, feedId, versions, baseUrl });
   });
 
   /**
@@ -260,7 +254,7 @@ export default function feedRouter(services, versionsRepository, storageType, fe
 
     const versions = await versionsRepository.findByServiceAndTermsType(service.id, termsType, { limit: feedLimit });
 
-    return sendFeed(res, { storageType, collection, selfHref, feedId, versions, baseUrl });
+    return sendFeed(res, { storageType, versionUrlTemplate, collection, selfHref, feedId, versions, baseUrl });
   });
 
   return router;
