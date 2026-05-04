@@ -122,13 +122,11 @@ function buildFeedDocument({ collection, storageType, selfHref, feedId, versions
   };
 }
 
-function sendAtom(res, xml) {
-  res.set('Content-Type', 'application/atom+xml; charset=utf-8');
-  res.status(200).send(xml);
-}
+function sendFeed(res, opts) {
+  const document = buildFeedDocument(opts);
 
-function render(document) {
-  return js2xml(document, { compact: true, spaces: 2 });
+  res.set('Content-Type', 'application/atom+xml; charset=utf-8');
+  res.status(200).send(js2xml(document, { compact: true, spaces: 2 }));
 }
 
 /**
@@ -167,9 +165,8 @@ export default function feedRouter(services, versionsRepository, storageType) {
     const feedId = `tag:${TAG_AUTHORITY}:feed:${collection.metadata?.id}`;
 
     const versions = await versionsRepository.findAll({ limit: getFeedLimit() });
-    const document = buildFeedDocument({ collection, storageType, selfHref, feedId, versions, baseUrl });
 
-    sendAtom(res, render(document));
+    sendFeed(res, { collection, storageType, selfHref, feedId, versions, baseUrl });
   });
 
   /**
@@ -210,9 +207,8 @@ export default function feedRouter(services, versionsRepository, storageType) {
     const feedId = `tag:${TAG_AUTHORITY}:feed:${collection.metadata?.id}:${service.id}`;
 
     const versions = await versionsRepository.findByService(service.id, { limit: getFeedLimit() });
-    const document = buildFeedDocument({ collection, storageType, selfHref, feedId, versions, baseUrl });
 
-    return sendAtom(res, render(document));
+    return sendFeed(res, { collection, storageType, selfHref, feedId, versions, baseUrl });
   });
 
   /**
@@ -265,9 +261,8 @@ export default function feedRouter(services, versionsRepository, storageType) {
     const feedId = `tag:${TAG_AUTHORITY}:feed:${collection.metadata?.id}:${service.id}:${termsType}`;
 
     const versions = await versionsRepository.findByServiceAndTermsType(service.id, termsType, { limit: getFeedLimit() });
-    const document = buildFeedDocument({ collection, storageType, selfHref, feedId, versions, baseUrl });
 
-    return sendAtom(res, render(document));
+    return sendFeed(res, { collection, storageType, selfHref, feedId, versions, baseUrl });
   });
 
   return router;
