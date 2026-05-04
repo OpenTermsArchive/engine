@@ -69,10 +69,8 @@ describe('Feed API', () => {
         expect(selfHrefMatch[1]).to.match(new RegExp(`${basePath}/v1/feed$`));
       });
 
-      it('has an author matching the configured feed author name', () => {
-        const expectedName = config.get('@opentermsarchive/engine.collection-api.feed.author.name');
-
-        expect(response.text).to.match(new RegExp(`<author>[\\s\\S]*<name>${expectedName}</name>[\\s\\S]*</author>`));
+      it('has an author matching the feed author name', () => {
+        expect(response.text).to.match(/<author>[\s\S]*<name>Open Terms Archive engine<\/name>[\s\S]*<\/author>/);
       });
 
       it('has a logo matching the collection logo', () => {
