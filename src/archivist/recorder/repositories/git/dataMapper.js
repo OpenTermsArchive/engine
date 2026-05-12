@@ -2,13 +2,14 @@ import path from 'path';
 
 import mime from 'mime';
 
+import { TITLE_PREFIXES } from '../../record.js';
 import Snapshot from '../../snapshot.js';
 import Version from '../../version.js';
 
 export const COMMIT_MESSAGE_PREFIXES = {
-  startTracking: 'First record of',
-  technicalUpgrade: 'Apply technical or declaration upgrade on',
-  update: 'Record new changes of',
+  startTracking: TITLE_PREFIXES.firstRecord,
+  technicalUpgrade: TITLE_PREFIXES.technicalUpgrade,
+  update: TITLE_PREFIXES.update,
   deprecated_startTracking: 'Start tracking',
   deprecated_refilter: 'Refilter',
   deprecated_update: 'Update',
@@ -30,13 +31,9 @@ const MULTIPLE_SOURCE_DOCUMENTS_PREFIX = 'This version was recorded after extrac
 export const COMMIT_MESSAGE_PREFIXES_REGEXP = new RegExp(`^(${Object.values(COMMIT_MESSAGE_PREFIXES).join('|')})`);
 
 export function toPersistence(record, snapshotIdentiferTemplate) {
-  const { serviceId, termsType, documentId, isTechnicalUpgrade, snapshotIds = [], mimeType, isFirstRecord, metadata } = record;
+  const { serviceId, termsType, documentId, snapshotIds = [], mimeType, metadata } = record;
 
-  let prefix = isTechnicalUpgrade ? COMMIT_MESSAGE_PREFIXES.technicalUpgrade : COMMIT_MESSAGE_PREFIXES.update;
-
-  prefix = isFirstRecord ? COMMIT_MESSAGE_PREFIXES.startTracking : prefix;
-
-  const subject = `${prefix} ${serviceId} ${termsType}`;
+  const subject = record.displayTitle;
   const documentIdMessage = `${documentId ? `Document ID ${documentId}\n\n` : ''}`;
   let snapshotIdsMessage;
 
