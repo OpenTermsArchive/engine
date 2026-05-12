@@ -7,7 +7,6 @@ import { toISODateWithoutMilliseconds } from '../../archivist/utils/date.js';
 
 const RECORD_TYPES = {
   firstRecord: 'First record',
-  technicalUpgrade: 'Technical upgrade',
   change: 'Change',
 };
 
@@ -19,29 +18,11 @@ function buildAbsoluteBaseUrl(req) {
 }
 
 function classifyRecordType(version) {
-  switch (true) {
-  case version.isFirstRecord:
-    return RECORD_TYPES.firstRecord;
-  case version.isTechnicalUpgrade:
-    return RECORD_TYPES.technicalUpgrade;
-  default:
-    return RECORD_TYPES.change;
-  }
+  return version.isFirstRecord ? RECORD_TYPES.firstRecord : RECORD_TYPES.change;
 }
 
 function buildEntryTitle(version) {
-  let prefix;
-
-  switch (true) {
-  case version.isFirstRecord:
-    prefix = COMMIT_MESSAGE_PREFIXES.startTracking;
-    break;
-  case version.isTechnicalUpgrade:
-    prefix = COMMIT_MESSAGE_PREFIXES.technicalUpgrade;
-    break;
-  default:
-    prefix = COMMIT_MESSAGE_PREFIXES.update;
-  }
+  const prefix = version.isFirstRecord ? COMMIT_MESSAGE_PREFIXES.startTracking : COMMIT_MESSAGE_PREFIXES.update;
 
   return `${prefix} ${version.serviceId} ${version.termsType}`;
 }
@@ -156,7 +137,7 @@ export default function feedRouter(services, versionsRepository, storageType, fe
     const selfHref = `${baseUrl}/feed`;
     const feedId = buildFeedId(collection);
 
-    const versions = await versionsRepository.findAll({ limit: feedLimit });
+    const versions = await versionsRepository.findAll({ limit: feedLimit, includeTechnicalUpgrades: false });
 
     sendFeed(res, { storageType, versionUrlTemplate, collection, selfHref, feedId, versions, baseUrl });
   });
@@ -198,7 +179,7 @@ export default function feedRouter(services, versionsRepository, storageType, fe
     const selfHref = `${baseUrl}/feed/${encodeURIComponent(service.id)}`;
     const feedId = buildFeedId(collection, service.id);
 
-    const versions = await versionsRepository.findByService(service.id, { limit: feedLimit });
+    const versions = await versionsRepository.findByService(service.id, { limit: feedLimit, includeTechnicalUpgrades: false });
 
     return sendFeed(res, { storageType, versionUrlTemplate, collection, selfHref, feedId, versions, baseUrl });
   });
@@ -252,7 +233,7 @@ export default function feedRouter(services, versionsRepository, storageType, fe
     const selfHref = `${baseUrl}/feed/${encodeURIComponent(service.id)}/${encodeURIComponent(termsType)}`;
     const feedId = buildFeedId(collection, service.id, termsType);
 
-    const versions = await versionsRepository.findByServiceAndTermsType(service.id, termsType, { limit: feedLimit });
+    const versions = await versionsRepository.findByServiceAndTermsType(service.id, termsType, { limit: feedLimit, includeTechnicalUpgrades: false });
 
     return sendFeed(res, { storageType, versionUrlTemplate, collection, selfHref, feedId, versions, baseUrl });
   });

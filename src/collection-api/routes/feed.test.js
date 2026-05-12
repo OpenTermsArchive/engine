@@ -136,11 +136,11 @@ describe('Feed API', () => {
 
     after(() => repository.removeAll());
 
-    it('lists one entry per saved version up to the configured limit', () => {
+    it('lists one entry per real-change version up to the configured limit', () => {
       const limit = config.get('@opentermsarchive/engine.collection-api.feed.limit');
       const entries = response.text.match(/<entry>/g) || [];
 
-      expect(entries).to.have.length(Math.min(4, limit));
+      expect(entries).to.have.length(Math.min(3, limit));
     });
 
     it('orders entries newest-first', () => {
@@ -158,14 +158,14 @@ describe('Feed API', () => {
 
       it('has an id tag URI including storage type and record id', () => {
         const collectionId = 'test';
-        const expected = `tag:opentermsarchive.org,2026:version:${collectionId}:${storageConfig.type}:${savedVersions.technicalUpgradeRecord.id}`;
+        const expected = `tag:opentermsarchive.org,2026:version:${collectionId}:${storageConfig.type}:${savedVersions.upgradeRecord.id}`;
 
         expect(firstEntry).to.include(`<id>${expected}</id>`);
       });
 
       it('has an alternate link to the API version endpoint', () => {
         const href = firstEntry.match(/<link[^>]*rel="alternate"[^>]*href="([^"]+)"/)[1];
-        const expectedPathFragment = `/version/${encodeURIComponent('service-2')}/${encodeURIComponent('Privacy Policy')}/${encodeURIComponent(toISODateWithoutMilliseconds(FETCH_DATE_UPGRADE))}`;
+        const expectedPathFragment = `/version/${encodeURIComponent('service-2')}/${encodeURIComponent('Privacy Policy')}/${encodeURIComponent(toISODateWithoutMilliseconds(savedVersions.upgradeRecord.fetchDate))}`;
 
         expect(href).to.include(expectedPathFragment);
       });
@@ -183,7 +183,7 @@ describe('Feed API', () => {
       it('has a title reconstructed from commit prefix + serviceId + termsType', () => {
         const title = firstEntry.match(/<title[^>]*>([\s\S]*?)<\/title>/)[1];
 
-        expect(title).to.include('Apply technical or declaration upgrade on');
+        expect(title).to.include('First record of');
         expect(title).to.include('service-2');
         expect(title).to.include('Privacy Policy');
       });
@@ -191,7 +191,7 @@ describe('Feed API', () => {
       it('has an updated element matching the fetch date', () => {
         const updated = firstEntry.match(/<updated>([^<]+)<\/updated>/)[1];
 
-        expect(new Date(updated).toISOString()).to.equal(FETCH_DATE_UPGRADE.toISOString());
+        expect(new Date(updated).toISOString()).to.equal(savedVersions.upgradeRecord.fetchDate.toISOString());
       });
 
       it('has three categories with the expected schemes', () => {
@@ -212,7 +212,7 @@ describe('Feed API', () => {
 
         expect(terms).to.include('service-2');
         expect(terms).to.include('Privacy Policy');
-        expect(terms).to.include('Technical upgrade');
+        expect(terms).to.include('First record');
       });
     });
 
@@ -237,11 +237,10 @@ describe('Feed API', () => {
         expect(entry).to.match(/term="Change"/);
       });
 
-      it('classifies a technical upgrade as "Technical upgrade"', () => {
+      it('excludes technical upgrade records from the feed', () => {
         const entry = findEntryById(response.text, savedVersions.technicalUpgradeRecord.id);
 
-        expect(entry).to.not.be.undefined;
-        expect(entry).to.match(/term="Technical upgrade"/);
+        expect(entry).to.be.undefined;
       });
     });
 
