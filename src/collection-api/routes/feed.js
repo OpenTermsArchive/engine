@@ -46,10 +46,11 @@ function buildFeedId(collection, ...suffix) {
 
 function buildEntry(storageType, versionUrlTemplate, baseUrl, collection, version) {
   const href = versionUrlTemplate?.replace('%VERSION_ID', version.id) ?? buildVersionLink(baseUrl, version);
+  const type = versionUrlTemplate ? 'text/html' : 'application/json'; // The default link points to the JSON Version API; operators who configure a versionUrlTemplate typically target a human-readable page (e.g. a GitHub commit), which is HTML.
 
   return {
     id: { _text: buildEntryId(storageType, collection, version) },
-    link: { _attributes: { rel: 'alternate', type: 'text/html', href } },
+    link: { _attributes: { rel: 'alternate', type, href } },
     title: { _text: version.displayTitle },
     updated: { _text: version.fetchDate.toISOString() },
     category: [
@@ -68,7 +69,7 @@ function buildFeedDocument({ storageType, versionUrlTemplate, collection, selfHr
     title: { _text: collection.metadata.name },
     id: { _text: feedId },
     updated: { _text: latestFetchDate.toISOString() },
-    link: { _attributes: { rel: 'self', href: selfHref } },
+    link: { _attributes: { rel: 'self', type: 'application/atom+xml', href: selfHref } },
     author: { name: { _text: FEED_AUTHOR_NAME } },
   };
 

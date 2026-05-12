@@ -73,6 +73,10 @@ describe('Feed API', () => {
         expect(selfHrefMatch[1]).to.match(new RegExp(`${basePath}/v1/feed$`));
       });
 
+      it('advertises an application/atom+xml type on the self link', () => {
+        expect(response.text).to.match(/<link[^>]*rel="self"[^>]*type="application\/atom\+xml"/);
+      });
+
       it('has an author matching the feed author name', () => {
         expect(response.text).to.match(/<author>[\s\S]*<name>Open Terms Archive engine<\/name>[\s\S]*<\/author>/);
       });
@@ -176,8 +180,8 @@ describe('Feed API', () => {
         expect(links).to.have.length(1);
       });
 
-      it('has a type="text/html" on the alternate link', () => {
-        expect(firstEntry).to.match(/<link[^>]*rel="alternate"[^>]*type="text\/html"/);
+      it('has a type matching the default Version API JSON response on the alternate link', () => {
+        expect(firstEntry).to.match(/<link[^>]*rel="alternate"[^>]*type="application\/json"/);
       });
 
       it('has a title reconstructed from commit prefix + serviceId + termsType', () => {
@@ -544,6 +548,12 @@ describe('Feed API', () => {
       const href = response.text.match(/<entry>[\s\S]*?<link[^>]*rel="alternate"[^>]*href="([^"]+)"/)[1];
 
       expect(href).to.equal(`https://example.test/v/${savedVersion.id}`);
+    });
+
+    it('advertises a text/html type on the alternate link', () => {
+      const entry = response.text.match(/<entry>[\s\S]*?<\/entry>/)[0];
+
+      expect(entry).to.match(/<link[^>]*rel="alternate"[^>]*type="text\/html"/);
     });
 
     it('does not point to the API for entry links', () => {
