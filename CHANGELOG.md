@@ -12,6 +12,7 @@ All changes that impact users of this module are documented in this file, in the
 - Add `GET /feed/:serviceId` endpoint on the Collection API exposing an Atom feed scoped to a single service
 - Add `GET /feed/:serviceId/:termsType` endpoint on the Collection API exposing an Atom feed scoped to a single service and terms type
 - Add [`@opentermsarchive/engine.collection-api.feed.limit`](https://docs.opentermsarchive.org/collections/reference/configuration/) configuration option controlling the maximum number of entries returned by feed endpoints (default: `100`)
+- Add [`@opentermsarchive/engine.collection-api.feed.versionUrlTemplate`](https://docs.opentermsarchive.org/collections/reference/configuration/) configuration option to customize the `alternate` link of feed entries with a URL template (e.g. `https://github.com/openTermsArchive/demo-versions/commit/%VERSION_ID`); useful to point feed readers to a human-readable page instead of the default version API endpoint
 
 ### Changed
 
