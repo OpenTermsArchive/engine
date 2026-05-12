@@ -88,20 +88,20 @@ export default class GitRepository extends RepositoryInterface {
     return this.#toDomain(commit);
   }
 
-  async findAll({ limit, offset } = {}) {
-    return Promise.all((await this.#getCommits({ limit, offset })).map(commit => this.#toDomain(commit, { deferContentLoading: true })));
+  async findAll({ limit, offset, includeTechnicalUpgrades = true } = {}) {
+    return Promise.all((await this.#getCommits({ limit, offset, includeTechnicalUpgrades })).map(commit => this.#toDomain(commit, { deferContentLoading: true })));
   }
 
-  async findByService(serviceId, { limit, offset } = {}) {
+  async findByService(serviceId, { limit, offset, includeTechnicalUpgrades = true } = {}) {
     const pathPattern = DataMapper.generateFilePath(serviceId);
 
-    return Promise.all((await this.#getCommits({ pathFilter: pathPattern, limit, offset })).map(commit => this.#toDomain(commit, { deferContentLoading: true })));
+    return Promise.all((await this.#getCommits({ pathFilter: pathPattern, limit, offset, includeTechnicalUpgrades })).map(commit => this.#toDomain(commit, { deferContentLoading: true })));
   }
 
-  async findByServiceAndTermsType(serviceId, termsType, { limit, offset } = {}) {
+  async findByServiceAndTermsType(serviceId, termsType, { limit, offset, includeTechnicalUpgrades = true } = {}) {
     const pathPattern = DataMapper.generateFilePath(serviceId, termsType);
 
-    return Promise.all((await this.#getCommits({ pathFilter: pathPattern, limit, offset })).map(commit => this.#toDomain(commit, { deferContentLoading: true })));
+    return Promise.all((await this.#getCommits({ pathFilter: pathPattern, limit, offset, includeTechnicalUpgrades })).map(commit => this.#toDomain(commit, { deferContentLoading: true })));
   }
 
   async count(serviceId, termsType) {
@@ -160,8 +160,11 @@ export default class GitRepository extends RepositoryInterface {
     record.content = pdfBuffer;
   }
 
-  async #getCommits({ pathFilter, reverse = false, limit, offset } = {}) {
-    const grepOptions = Object.values(DataMapper.COMMIT_MESSAGE_PREFIXES).flatMap(prefix => [ '--grep', prefix ]);
+  async #getCommits({ pathFilter, reverse = false, limit, offset, includeTechnicalUpgrades = true } = {}) {
+    const prefixes = includeTechnicalUpgrades
+      ? DataMapper.COMMIT_MESSAGE_PREFIXES
+      : DataMapper.REAL_CHANGE_COMMIT_MESSAGE_PREFIXES;
+    const grepOptions = Object.values(prefixes).flatMap(prefix => [ '--grep', prefix ]);
     const pathOptions = pathFilter
       ? [ '--', pathFilter ]
       : [ '--', '*/*' ]; // Exclude root directory files by only matching files in subdirectories

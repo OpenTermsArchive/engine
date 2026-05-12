@@ -14,6 +14,14 @@ export const COMMIT_MESSAGE_PREFIXES = {
   deprecated_update: 'Update',
 };
 
+// Subset of COMMIT_MESSAGE_PREFIXES that exclude technical upgrades (re-renders of existing snapshots with updated extraction rules) and only represent content changes detected at the service source
+export const REAL_CHANGE_COMMIT_MESSAGE_PREFIXES = {
+  startTracking: COMMIT_MESSAGE_PREFIXES.startTracking,
+  update: COMMIT_MESSAGE_PREFIXES.update,
+  deprecated_startTracking: COMMIT_MESSAGE_PREFIXES.deprecated_startTracking,
+  deprecated_update: COMMIT_MESSAGE_PREFIXES.deprecated_update,
+};
+
 export const TERMS_TYPE_AND_DOCUMENT_ID_SEPARATOR = ' #';
 export const SNAPSHOT_ID_MARKER = '%SNAPSHOT_ID';
 const SINGLE_SOURCE_DOCUMENT_PREFIX = 'This version was recorded after extracting from snapshot';
