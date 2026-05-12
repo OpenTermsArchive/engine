@@ -12,6 +12,12 @@ const RECORD_TYPES = {
 const TAG_AUTHORITY = 'opentermsarchive.org,2026'; // Tag URI authority (RFC 4151). The year fixes the scheme inception and must never change: it would invalidate every previously emitted feed and entry ID.
 const FEED_AUTHOR_NAME = 'Open Terms Archive engine';
 
+const SCHEMES = Object.freeze({
+  service: `tag:${TAG_AUTHORITY}:scheme:service`,
+  termsType: `tag:${TAG_AUTHORITY}:scheme:terms-type`,
+  recordType: `tag:${TAG_AUTHORITY}:scheme:record-type`,
+});
+
 function buildAbsoluteBaseUrl(req) {
   const host = req.get('X-Forwarded-Host') ?? req.get('host'); // Behind a trusted reverse proxy, the public host comes from X-Forwarded-Host. req.get('host') only sees the internal Host header, so we read the forwarded value explicitly and fall back to the direct host for non-proxied setups (dev, tests).
 
@@ -38,17 +44,8 @@ function buildFeedId(collection, ...suffix) {
   return [ `tag:${TAG_AUTHORITY}:feed`, collection.metadata?.id, ...suffix ].join(':');
 }
 
-function buildSchemes() {
-  return {
-    service: `tag:${TAG_AUTHORITY}:scheme:service`,
-    termsType: `tag:${TAG_AUTHORITY}:scheme:terms-type`,
-    recordType: `tag:${TAG_AUTHORITY}:scheme:record-type`,
-  };
-}
-
 function buildEntry(storageType, versionUrlTemplate, baseUrl, collection, version) {
   const href = versionUrlTemplate?.replace('%VERSION_ID', version.id) ?? buildVersionLink(baseUrl, version);
-  const schemes = buildSchemes();
 
   return {
     id: { _text: buildEntryId(storageType, collection, version) },
@@ -56,9 +53,9 @@ function buildEntry(storageType, versionUrlTemplate, baseUrl, collection, versio
     title: { _text: version.displayTitle },
     updated: { _text: version.fetchDate.toISOString() },
     category: [
-      { _attributes: { term: version.serviceId, scheme: schemes.service } },
-      { _attributes: { term: version.termsType, scheme: schemes.termsType } },
-      { _attributes: { term: classifyRecordType(version), scheme: schemes.recordType } },
+      { _attributes: { term: version.serviceId, scheme: SCHEMES.service } },
+      { _attributes: { term: version.termsType, scheme: SCHEMES.termsType } },
+      { _attributes: { term: classifyRecordType(version), scheme: SCHEMES.recordType } },
     ],
   };
 }
