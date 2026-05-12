@@ -44,6 +44,10 @@ export default async function apiRouter(basePath) {
     throw new Error('Collection metadata "id" is required to expose feed endpoints, as it is used to build the tag URIs that uniquely identify the feed and its entries. Add an "id" field to the collection metadata file.');
   }
 
+  if (!collection.metadata?.name) {
+    throw new Error('Collection metadata "name" is required to expose feed endpoints, as it is used as the Atom feed title which the Atom 1.0 specification requires to be non-empty. Add a "name" field to the collection metadata file.');
+  }
+
   router.use(await metadataRouter(collection, services));
   router.use(servicesRouter(services));
   router.use(versionsRouter(versionsRepository));

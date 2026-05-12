@@ -65,7 +65,7 @@ function buildFeedDocument({ storageType, versionUrlTemplate, collection, selfHr
 
   const feed = {
     _attributes: { xmlns: 'http://www.w3.org/2005/Atom' },
-    title: { _text: collection.metadata?.name || '' },
+    title: { _text: collection.metadata.name },
     subtitle: { _text: collection.metadata?.tagline || '' },
     id: { _text: feedId },
     updated: { _text: latestFetchDate.toISOString() },
