@@ -96,7 +96,7 @@ describe('Feed API', () => {
       this.timeout(5000);
       repository = RepositoryFactory.create(storageConfig);
       await repository.initialize();
-
+      await repository.removeAll();
       const firstRecord = await repository.save(new Version({
         serviceId: 'service-1',
         termsType: 'Terms of Service',
@@ -265,7 +265,7 @@ describe('Feed API', () => {
       this.timeout(5000);
       repository = RepositoryFactory.create(storageConfig);
       await repository.initialize();
-
+      await repository.removeAll();
       await repository.save(new Version({
         serviceId: SERVICE,
         termsType: TERMS,
@@ -382,7 +382,7 @@ describe('Feed API', () => {
       this.timeout(5000);
       repository = RepositoryFactory.create(storageConfig);
       await repository.initialize();
-
+      await repository.removeAll();
       await repository.save(new Version({
         serviceId: SERVICE,
         termsType: TERMS,
@@ -428,7 +428,7 @@ describe('Feed API', () => {
       this.timeout(5000);
       repository = RepositoryFactory.create(storageConfig);
       await repository.initialize();
-
+      await repository.removeAll();
       await repository.save(new Version({
         serviceId: SERVICE,
         termsType: TERMS,
@@ -521,7 +521,7 @@ describe('Feed API', () => {
       this.timeout(5000);
       repository = RepositoryFactory.create(storageConfig);
       await repository.initialize();
-
+      await repository.removeAll();
       savedVersion = await repository.save(new Version({
         serviceId: 'service-1',
         termsType: 'Terms of Service',
