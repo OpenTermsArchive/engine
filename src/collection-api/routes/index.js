@@ -40,6 +40,10 @@ export default async function apiRouter(basePath) {
   const versionsRepository = await RepositoryFactory.create(versionsStorageConfig).initialize();
   const feedConfig = config.get('@opentermsarchive/engine.collection-api.feed');
 
+  if (!collection.metadata?.id) {
+    throw new Error('Collection metadata "id" is required to expose feed endpoints, as it is used to build the tag URIs that uniquely identify the feed and its entries. Add an "id" field to the collection metadata file.');
+  }
+
   router.use(await metadataRouter(collection, services));
   router.use(servicesRouter(services));
   router.use(versionsRouter(versionsRepository));
