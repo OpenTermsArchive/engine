@@ -10,7 +10,7 @@ const RECORD_TYPES = {
   change: 'Change',
 };
 
-const TAG_AUTHORITY = 'opentermsarchive.org,2026';
+const TAG_AUTHORITY = 'opentermsarchive.org,2026'; // Tag URI authority (RFC 4151). The year fixes the scheme inception and must never change: it would invalidate every previously emitted feed and entry ID.
 const FEED_AUTHOR_NAME = 'Open Terms Archive engine';
 
 function buildAbsoluteBaseUrl(req) {
