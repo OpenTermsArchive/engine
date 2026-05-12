@@ -5,8 +5,8 @@ import supertest from 'supertest';
 
 import { getCollection } from '../../archivist/collection/index.js';
 import RepositoryFactory from '../../archivist/recorder/repositories/factory.js';
-import * as Services from '../../archivist/services/index.js';
 import Version from '../../archivist/recorder/version.js';
+import * as Services from '../../archivist/services/index.js';
 import { toISODateWithoutMilliseconds } from '../../archivist/utils/date.js';
 import app from '../server.js';
 
