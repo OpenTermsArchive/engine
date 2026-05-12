@@ -347,6 +347,10 @@ describe('Feed API', () => {
       it('returns an empty feed (no entries)', () => {
         expect(response.text).to.not.include('<entry>');
       });
+
+      it('uses a stable updated date so conditional GET keeps working', () => {
+        expect(extractTag(response.text, 'updated')).to.equal(new Date(0).toISOString());
+      });
     });
 
     context('when the service does not exist', () => {

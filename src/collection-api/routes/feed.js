@@ -62,7 +62,7 @@ function buildEntry(storageType, versionUrlTemplate, baseUrl, collection, versio
 }
 
 function buildFeedDocument({ storageType, versionUrlTemplate, collection, selfHref, feedId, versions, baseUrl }) {
-  const latestFetchDate = versions.length > 0 ? versions[0].fetchDate : new Date();
+  const latestFetchDate = versions.length > 0 ? versions[0].fetchDate : new Date(0); // Atom 1.0 requires a feed-level <updated>. When no entry exists yet, fall back to the Unix epoch so the value is stable across requests, emitting `new Date()` would defeat conditional GET caching for empty feeds.
 
   const feed = {
     _attributes: { xmlns: 'http://www.w3.org/2005/Atom' },
