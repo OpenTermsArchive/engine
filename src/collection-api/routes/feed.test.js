@@ -564,4 +564,46 @@ describe('Feed API', () => {
       }
     });
   });
+
+  describe('behind a reverse proxy', () => {
+    let response;
+    let repository;
+
+    before(async function () {
+      this.timeout(5000);
+      repository = RepositoryFactory.create(storageConfig);
+      await repository.initialize();
+      await repository.removeAll();
+      await repository.save(new Version({
+        serviceId: 'service-1',
+        termsType: 'Terms of Service',
+        content: 'content',
+        fetchDate: new Date('2024-01-01T00:00:00Z'),
+        snapshotIds: ['s1'],
+      }));
+
+      response = await request
+        .get(`${basePath}/v1/feed`)
+        .set('X-Forwarded-Proto', 'https')
+        .set('X-Forwarded-Host', 'api.example.com');
+    });
+
+    after(() => repository.removeAll());
+
+    it('uses the forwarded protocol and host in the self link', () => {
+      const href = response.text.match(/<link[^>]*rel="self"[^>]*href="([^"]+)"/)[1];
+
+      expect(href).to.match(/^https:\/\/api\.example\.com\//);
+    });
+
+    it('uses the forwarded protocol and host in entry alternate links', () => {
+      const entry = response.text.match(/<entry>[\s\S]*?<\/entry>/);
+
+      expect(entry).to.not.be.null;
+
+      const href = entry[0].match(/<link[^>]*rel="alternate"[^>]*href="([^"]+)"/)[1];
+
+      expect(href).to.match(/^https:\/\/api\.example\.com\//);
+    });
+  });
 });
