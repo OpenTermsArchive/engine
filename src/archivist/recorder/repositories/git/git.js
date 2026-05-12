@@ -73,7 +73,15 @@ export default class Git {
     const skipOption = skip !== undefined ? [`--skip=${skip}`] : [];
     const maxCountOption = maxCount !== undefined ? [`--max-count=${maxCount}`] : [];
 
-    return this.log([ ...reverseOption, '--author-date-order', '--no-merges', '--name-only', ...skipOption, ...maxCountOption, ...options ]); // Returns commits in chronological order with `--reverse` (oldest first) or reverse chronological without it (newest first), sorted by author date (`--author-date-order`), excluding merge commits (`--no-merges`), with modified files names (`--name-only`), with optional pagination (`--skip`, `--max-count`)
+    return this.log([
+      ...reverseOption, // When `reverse` is true, lists commits oldest-first; otherwise the default newest-first applies
+      '--author-date-order', // Best-effort author-date ordering: with --max-count, git applies the cap topologically, so the page can miss strictly-newer commits that #getCommits' JS resort cannot recover
+      '--no-merges', // Exclude merge commits — records are stored as regular commits, never as merges
+      '--name-only', // Append the modified file names below each commit, used by `toDomain` to extract the record's file path
+      ...skipOption, // Optional `--skip=N`: drop the first N matching commits (pagination offset)
+      ...maxCountOption, // Optional `--max-count=N`: cap the result to N commits (pagination limit)
+      ...options, // Caller-supplied options: typically grep filters on commit messages and a path filter (`-- pathspec`)
+    ]);
   }
 
   async getCommit(options) {
