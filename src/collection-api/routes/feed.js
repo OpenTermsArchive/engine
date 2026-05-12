@@ -61,9 +61,11 @@ function buildEntry(storageType, versionUrlTemplate, baseUrl, collection, versio
   };
 }
 
-function buildFeedDocument({ storageType, versionUrlTemplate, collection, selfHref, feedId, versions, baseUrl }) {
-  const latestFetchDate = versions.length > 0 ? versions[0].fetchDate : new Date(0); // Atom 1.0 requires a feed-level <updated>. When no entry exists yet, fall back to the Unix epoch so the value is stable across requests, emitting `new Date()` would defeat conditional GET caching for empty feeds.
+function computeLatestFetchDate(versions) {
+  return versions.length > 0 ? versions[0].fetchDate : new Date(0); // Atom 1.0 requires a feed-level <updated>. When no entry exists yet, fall back to the Unix epoch so the value is stable across requests, emitting `new Date()` would defeat conditional GET caching for empty feeds.
+}
 
+function buildFeedDocument({ storageType, versionUrlTemplate, collection, selfHref, feedId, versions, baseUrl, latestFetchDate }) {
   const feed = {
     _attributes: { xmlns: 'http://www.w3.org/2005/Atom' },
     title: { _text: collection.metadata.name },
@@ -89,11 +91,19 @@ function buildFeedDocument({ storageType, versionUrlTemplate, collection, selfHr
   };
 }
 
-function sendFeed(res, opts) {
-  const document = buildFeedDocument(opts);
+function sendFeed(req, res, opts) {
+  const latestFetchDate = computeLatestFetchDate(opts.versions);
+
+  res.set('Last-Modified', latestFetchDate.toUTCString()); // Setting Last-Modified before checking req.fresh enables Express to compare it with If-Modified-Since and return 304 when nothing changed since the reader's last fetch; the headline optimisation for Atom feeds, which are typically polled every few minutes.
+
+  if (req.fresh) {
+    return res.status(304).end();
+  }
 
   res.set('Content-Type', 'application/atom+xml; charset=utf-8');
-  res.status(200).send(js2xml(document, { compact: true, spaces: 2 }));
+  const document = buildFeedDocument({ ...opts, latestFetchDate });
+
+  return res.status(200).send(js2xml(document, { compact: true, spaces: 2 }));
 }
 
 /**
@@ -135,7 +145,7 @@ export default function feedRouter(services, versionsRepository, storageType, fe
 
     const versions = await versionsRepository.findAll({ limit: feedLimit, includeTechnicalUpgrades: false });
 
-    sendFeed(res, { storageType, versionUrlTemplate, collection, selfHref, feedId, versions, baseUrl });
+    sendFeed(req, res, { storageType, versionUrlTemplate, collection, selfHref, feedId, versions, baseUrl });
   });
 
   /**
@@ -177,7 +187,7 @@ export default function feedRouter(services, versionsRepository, storageType, fe
 
     const versions = await versionsRepository.findByService(service.id, { limit: feedLimit, includeTechnicalUpgrades: false });
 
-    return sendFeed(res, { storageType, versionUrlTemplate, collection, selfHref, feedId, versions, baseUrl });
+    return sendFeed(req, res, { storageType, versionUrlTemplate, collection, selfHref, feedId, versions, baseUrl });
   });
 
   /**
@@ -231,7 +241,7 @@ export default function feedRouter(services, versionsRepository, storageType, fe
 
     const versions = await versionsRepository.findByServiceAndTermsType(service.id, termsType, { limit: feedLimit, includeTechnicalUpgrades: false });
 
-    return sendFeed(res, { storageType, versionUrlTemplate, collection, selfHref, feedId, versions, baseUrl });
+    return sendFeed(req, res, { storageType, versionUrlTemplate, collection, selfHref, feedId, versions, baseUrl });
   });
 
   return router;

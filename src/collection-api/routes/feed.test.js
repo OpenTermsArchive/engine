@@ -579,6 +579,53 @@ describe('Feed API', () => {
     });
   });
 
+  describe('conditional GET via Last-Modified', () => {
+    const FETCH_DATE = new Date('2024-05-15T10:00:00Z');
+
+    let repository;
+
+    before(async function () {
+      this.timeout(5000);
+      repository = RepositoryFactory.create(storageConfig);
+      await repository.initialize();
+      await repository.removeAll();
+      await repository.save(new Version({
+        serviceId: 'service-1',
+        termsType: 'Terms of Service',
+        content: 'content',
+        fetchDate: FETCH_DATE,
+        snapshotIds: ['s1'],
+      }));
+    });
+
+    after(() => repository.removeAll());
+
+    it('exposes a Last-Modified header matching the latest entry fetch date', async () => {
+      const response = await request.get(`${basePath}/v1/feed`);
+
+      expect(response.headers['last-modified']).to.equal(FETCH_DATE.toUTCString());
+    });
+
+    it('returns 304 with no body when If-Modified-Since is at or after the latest entry', async () => {
+      const response = await request
+        .get(`${basePath}/v1/feed`)
+        .set('If-Modified-Since', FETCH_DATE.toUTCString());
+
+      expect(response.status).to.equal(304);
+      expect(response.text).to.be.empty;
+    });
+
+    it('returns 200 with body when If-Modified-Since is before the latest entry', async () => {
+      const earlier = new Date(FETCH_DATE.getTime() - 24 * 60 * 60 * 1000);
+      const response = await request
+        .get(`${basePath}/v1/feed`)
+        .set('If-Modified-Since', earlier.toUTCString());
+
+      expect(response.status).to.equal(200);
+      expect(response.text).to.include('<feed');
+    });
+  });
+
   describe('behind a reverse proxy', () => {
     let response;
     let repository;
