@@ -66,12 +66,15 @@ function buildFeedDocument({ storageType, versionUrlTemplate, collection, selfHr
   const feed = {
     _attributes: { xmlns: 'http://www.w3.org/2005/Atom' },
     title: { _text: collection.metadata.name },
-    subtitle: { _text: collection.metadata?.tagline || '' },
     id: { _text: feedId },
     updated: { _text: latestFetchDate.toISOString() },
     link: { _attributes: { rel: 'self', href: selfHref } },
     author: { name: { _text: FEED_AUTHOR_NAME } },
   };
+
+  if (collection.metadata?.tagline) {
+    feed.subtitle = { _text: collection.metadata.tagline };
+  }
 
   if (collection.metadata?.logo) {
     feed.logo = { _text: collection.metadata.logo };
