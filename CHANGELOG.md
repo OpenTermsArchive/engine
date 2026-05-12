@@ -4,7 +4,7 @@ All changes that impact users of this module are documented in this file, in the
 
 ## Unreleased [major]
 
-> Development of this release was supported by [Reset Tech](https://www.reset.tech).
+> Development of this release was supported by the [NGI0 Commons Fund](https://nlnet.nl/project/Modular-OTA/), a fund established by [NLnet](https://nlnet.nl/) with financial support from the European Commission's [Next Generation Internet](https://www.ngi.eu) programme, under the aegis of DG CNECT under grant agreement N°101069594.
 
 ### Added
 
