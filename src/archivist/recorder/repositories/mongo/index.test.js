@@ -632,6 +632,28 @@ describe('MongoRepository', () => {
       it('returns records in descending order', () => {
         expect(records.map(record => record.fetchDate)).to.deep.equal([ FETCH_DATE_LATER, FETCH_DATE, FETCH_DATE_EARLIER ]);
       });
+
+      context('with includeTechnicalUpgrades: false', () => {
+        let filteredRecords;
+
+        before(async () => {
+          filteredRecords = await subject.findAll({ includeTechnicalUpgrades: false });
+        });
+
+        it('excludes technical upgrade records', () => {
+          expect(filteredRecords.length).to.equal(2);
+        });
+
+        it('only returns records that represent actual content changes', () => {
+          for (const record of filteredRecords) {
+            expect(record.isTechnicalUpgrade).to.not.be.true;
+          }
+        });
+
+        it('returns the expected records in descending order', () => {
+          expect(filteredRecords.map(record => record.fetchDate)).to.deep.equal([ FETCH_DATE_LATER, FETCH_DATE ]);
+        });
+      });
     });
 
     describe('#findByServiceAndTermsType', () => {
@@ -707,6 +729,34 @@ describe('MongoRepository', () => {
           const result = await subject.findByServiceAndTermsType('non_existent_service', 'Non Existent Terms');
 
           expect(result).to.be.an('array').that.is.empty;
+        });
+      });
+
+      context('with includeTechnicalUpgrades: false', () => {
+        let filteredRecords;
+        let technicalUpgradeId;
+
+        before(async () => {
+          ({ id: technicalUpgradeId } = await subject.save(new Version({
+            serviceId: SERVICE_PROVIDER_ID,
+            termsType: TERMS_TYPE,
+            content: `${CONTENT} - technical upgrade`,
+            fetchDate: FETCH_DATE_EARLIER,
+            snapshotIds: [SNAPSHOT_ID],
+            isTechnicalUpgrade: true,
+          })));
+
+          filteredRecords = await subject.findByServiceAndTermsType(SERVICE_PROVIDER_ID, TERMS_TYPE, { includeTechnicalUpgrades: false });
+        });
+
+        it('excludes technical upgrade records', () => {
+          expect(filteredRecords.map(record => record.id)).to.not.include(technicalUpgradeId);
+        });
+
+        it('only returns records that represent actual content changes', () => {
+          for (const record of filteredRecords) {
+            expect(record.isTechnicalUpgrade).to.not.be.true;
+          }
         });
       });
     });

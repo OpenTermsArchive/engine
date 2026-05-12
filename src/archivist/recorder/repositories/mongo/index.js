@@ -88,8 +88,9 @@ export default class MongoRepository extends RepositoryInterface {
     return this.#toDomain(mongoDocument);
   }
 
-  async findAll({ limit, offset } = {}) {
-    let query = this.collection.find().project({ content: 0 }).sort({ fetchDate: -1 });
+  async findAll({ limit, offset, includeTechnicalUpgrades = true } = {}) {
+    const filter = includeTechnicalUpgrades ? {} : { isTechnicalUpgrade: { $ne: true } };
+    let query = this.collection.find(filter).project({ content: 0 }).sort({ fetchDate: -1 });
 
     if (offset !== undefined) {
       query = query.skip(offset);
@@ -103,8 +104,14 @@ export default class MongoRepository extends RepositoryInterface {
       .map(mongoDocument => this.#toDomain(mongoDocument, { deferContentLoading: true })));
   }
 
-  async findByServiceAndTermsType(serviceId, termsType, { limit, offset } = {}) {
-    let query = this.collection.find({ serviceId, termsType }).project({ content: 0 }).sort({ fetchDate: -1 });
+  async findByServiceAndTermsType(serviceId, termsType, { limit, offset, includeTechnicalUpgrades = true } = {}) {
+    const filter = { serviceId, termsType };
+
+    if (!includeTechnicalUpgrades) {
+      filter.isTechnicalUpgrade = { $ne: true };
+    }
+
+    let query = this.collection.find(filter).project({ content: 0 }).sort({ fetchDate: -1 });
 
     if (offset !== undefined) {
       query = query.skip(offset);
@@ -118,8 +125,14 @@ export default class MongoRepository extends RepositoryInterface {
       .map(mongoDocument => this.#toDomain(mongoDocument, { deferContentLoading: true })));
   }
 
-  async findByService(serviceId, { limit, offset } = {}) {
-    let query = this.collection.find({ serviceId }).project({ content: 0 }).sort({ fetchDate: -1 });
+  async findByService(serviceId, { limit, offset, includeTechnicalUpgrades = true } = {}) {
+    const filter = { serviceId };
+
+    if (!includeTechnicalUpgrades) {
+      filter.isTechnicalUpgrade = { $ne: true };
+    }
+
+    let query = this.collection.find(filter).project({ content: 0 }).sort({ fetchDate: -1 });
 
     if (offset !== undefined) {
       query = query.skip(offset);
