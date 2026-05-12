@@ -2,7 +2,6 @@ import express from 'express';
 import { js2xml } from 'xml-js';
 
 import { getCollection } from '../../archivist/collection/index.js';
-import { COMMIT_MESSAGE_PREFIXES } from '../../archivist/recorder/repositories/git/dataMapper.js';
 import { toISODateWithoutMilliseconds } from '../../archivist/utils/date.js';
 
 const RECORD_TYPES = {
@@ -19,12 +18,6 @@ function buildAbsoluteBaseUrl(req) {
 
 function classifyRecordType(version) {
   return version.isFirstRecord ? RECORD_TYPES.firstRecord : RECORD_TYPES.change;
-}
-
-function buildEntryTitle(version) {
-  const prefix = version.isFirstRecord ? COMMIT_MESSAGE_PREFIXES.startTracking : COMMIT_MESSAGE_PREFIXES.update;
-
-  return `${prefix} ${version.serviceId} ${version.termsType}`;
 }
 
 function buildVersionLink(baseUrl, version) {
@@ -58,7 +51,7 @@ function buildEntry(storageType, versionUrlTemplate, baseUrl, collection, versio
   return {
     id: { _text: buildEntryId(storageType, collection, version) },
     link: { _attributes: { rel: 'alternate', type: 'text/html', href } },
-    title: { _text: buildEntryTitle(version) },
+    title: { _text: version.displayTitle },
     updated: { _text: version.fetchDate.toISOString() },
     category: [
       { _attributes: { term: version.serviceId, scheme: schemes.service } },
