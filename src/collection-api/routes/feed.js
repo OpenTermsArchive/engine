@@ -28,7 +28,7 @@ function classifyRecordType(version) {
   return version.isFirstRecord ? RECORD_TYPES.firstRecord : RECORD_TYPES.change;
 }
 
-// xml-js does not escape attribute values: it assumes the caller passes them already escaped. Apply the XML attribute-value escapes manually wherever an attribute may carry user-provided text (notably category term), otherwise a serviceId like "AT&T Mobile" would emit malformed XML that strict feed readers (libxml2-based) reject.
+// xml-js does not escape attribute values by default — callers are expected to pre-escape. We wire this helper to js2xml's attributeValueFn so every emitted attribute goes through it, regardless of where it's built. Without this, a serviceId like "AT&T Mobile" would yield malformed XML rejected by strict feed readers (libxml2-based).
 function escapeXmlAttribute(value) {
   return String(value)
     .replace(/&/g, '&amp;')
@@ -63,8 +63,8 @@ function buildEntry(storageType, versionUrlTemplate, baseUrl, collection, versio
     title: { _text: version.displayTitle },
     updated: { _text: version.fetchDate.toISOString() },
     category: [
-      { _attributes: { term: escapeXmlAttribute(version.serviceId), scheme: SCHEMES.service } },
-      { _attributes: { term: escapeXmlAttribute(version.termsType), scheme: SCHEMES.termsType } },
+      { _attributes: { term: version.serviceId, scheme: SCHEMES.service } },
+      { _attributes: { term: version.termsType, scheme: SCHEMES.termsType } },
       { _attributes: { term: classifyRecordType(version), scheme: SCHEMES.recordType } },
     ],
   };
@@ -112,7 +112,7 @@ function sendFeed(req, res, opts) {
   res.set('Content-Type', 'application/atom+xml; charset=utf-8');
   const document = buildFeedDocument({ ...opts, latestFetchDate });
 
-  return res.status(200).send(js2xml(document, { compact: true, spaces: 2 }));
+  return res.status(200).send(js2xml(document, { compact: true, spaces: 2, attributeValueFn: escapeXmlAttribute }));
 }
 
 /**

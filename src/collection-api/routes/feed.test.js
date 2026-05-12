@@ -613,6 +613,39 @@ describe('Feed API', () => {
       expect(response.text).to.match(/<category[^/]*term="AT&amp;T Mobile"/);
       expect(response.text).to.not.match(/<category[^/]*term="AT&T Mobile"/);
     });
+
+    context('with a versionUrlTemplate that contains XML-special characters', () => {
+      const TEMPLATE = 'https://example.test/v?ref=main&id=%VERSION_ID';
+
+      let templatedResponse;
+      let templatedRepository;
+
+      before(async function () {
+        this.timeout(5000);
+        templatedRepository = RepositoryFactory.create(storageConfig);
+        await templatedRepository.initialize();
+        await templatedRepository.removeAll();
+        await templatedRepository.save(new Version({
+          serviceId: 'service-1',
+          termsType: 'Terms of Service',
+          content: 'content',
+          fetchDate: new Date('2024-01-01T00:00:00Z'),
+          snapshotIds: ['s_tpl_escape'],
+        }));
+
+        const services = await Services.load();
+        const templatedApp = express();
+
+        templatedApp.use(feedRouter(services, templatedRepository, storageConfig.type, 10, TEMPLATE));
+        templatedResponse = await supertest(templatedApp).get('/feed');
+      });
+
+      after(() => templatedRepository.removeAll());
+
+      it('escapes the ampersand in the alternate link href', () => {
+        expect(templatedResponse.text).to.match(/<link[^>]*rel="alternate"[^>]*href="https:\/\/example\.test\/v\?ref=main&amp;id=[^"]+"/);
+      });
+    });
   });
 
   describe('conditional GET via Last-Modified', () => {
