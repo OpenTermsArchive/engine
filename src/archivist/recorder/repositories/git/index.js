@@ -163,7 +163,7 @@ export default class GitRepository extends RepositoryInterface {
   async #getCommits({ pathFilter, reverse = false, limit, offset, includeTechnicalUpgrades = true } = {}) {
     const prefixes = includeTechnicalUpgrades
       ? DataMapper.COMMIT_MESSAGE_PREFIXES
-      : DataMapper.REAL_CHANGE_COMMIT_MESSAGE_PREFIXES;
+      : DataMapper.CHANGE_COMMIT_MESSAGE_PREFIXES;
     const grepOptions = Object.values(prefixes).flatMap(prefix => [ '--grep', prefix ]);
     const pathOptions = pathFilter
       ? [ '--', pathFilter ]

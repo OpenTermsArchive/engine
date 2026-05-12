@@ -6,22 +6,22 @@ import { TITLE_PREFIXES } from '../../record.js';
 import Snapshot from '../../snapshot.js';
 import Version from '../../version.js';
 
-export const COMMIT_MESSAGE_PREFIXES = {
+// Prefixes for commits that represent an actual content change detected at the service source
+const CHANGE_PREFIXES = {
   startTracking: TITLE_PREFIXES.firstRecord,
-  technicalUpgrade: TITLE_PREFIXES.technicalUpgrade,
   update: TITLE_PREFIXES.update,
   deprecated_startTracking: 'Start tracking',
-  deprecated_refilter: 'Refilter',
   deprecated_update: 'Update',
 };
 
-// Subset of COMMIT_MESSAGE_PREFIXES that exclude technical upgrades (re-renders of existing snapshots with updated extraction rules) and only represent content changes detected at the service source
-export const REAL_CHANGE_COMMIT_MESSAGE_PREFIXES = {
-  startTracking: COMMIT_MESSAGE_PREFIXES.startTracking,
-  update: COMMIT_MESSAGE_PREFIXES.update,
-  deprecated_startTracking: COMMIT_MESSAGE_PREFIXES.deprecated_startTracking,
-  deprecated_update: COMMIT_MESSAGE_PREFIXES.deprecated_update,
+// Prefixes for commits that re-render an existing snapshot (e.g. with updated extraction rules) without any change at the service source
+const TECHNICAL_UPGRADE_PREFIXES = {
+  technicalUpgrade: TITLE_PREFIXES.technicalUpgrade,
+  deprecated_refilter: 'Refilter',
 };
+
+export const CHANGE_COMMIT_MESSAGE_PREFIXES = CHANGE_PREFIXES;
+export const COMMIT_MESSAGE_PREFIXES = { ...CHANGE_PREFIXES, ...TECHNICAL_UPGRADE_PREFIXES };
 
 export const TERMS_TYPE_AND_DOCUMENT_ID_SEPARATOR = ' #';
 export const SNAPSHOT_ID_MARKER = '%SNAPSHOT_ID';
