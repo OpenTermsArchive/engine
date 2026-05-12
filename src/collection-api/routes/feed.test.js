@@ -579,6 +579,42 @@ describe('Feed API', () => {
     });
   });
 
+  describe('XML escape of special characters', () => {
+    const SERVICE = 'AT&T Mobile';
+    const TERMS = 'Terms of Service';
+
+    let response;
+    let repository;
+
+    before(async function () {
+      this.timeout(5000);
+      repository = RepositoryFactory.create(storageConfig);
+      await repository.initialize();
+      await repository.removeAll();
+      await repository.save(new Version({
+        serviceId: SERVICE,
+        termsType: TERMS,
+        content: 'content',
+        fetchDate: new Date('2024-05-15T10:00:00Z'),
+        snapshotIds: ['s_xmlesc'],
+      }));
+
+      response = await request.get(`${basePath}/v1/feed`);
+    });
+
+    after(() => repository.removeAll());
+
+    it('escapes ampersands in the entry title text', () => {
+      expect(response.text).to.match(/<title>[^<]*AT&amp;T Mobile[^<]*<\/title>/);
+      expect(response.text).to.not.match(/<title>[^<]*AT&T Mobile/);
+    });
+
+    it('escapes ampersands in the category term attribute', () => {
+      expect(response.text).to.match(/<category[^/]*term="AT&amp;T Mobile"/);
+      expect(response.text).to.not.match(/<category[^/]*term="AT&T Mobile"/);
+    });
+  });
+
   describe('conditional GET via Last-Modified', () => {
     const FETCH_DATE = new Date('2024-05-15T10:00:00Z');
 

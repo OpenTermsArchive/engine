@@ -28,6 +28,15 @@ function classifyRecordType(version) {
   return version.isFirstRecord ? RECORD_TYPES.firstRecord : RECORD_TYPES.change;
 }
 
+// xml-js does not escape attribute values: it assumes the caller passes them already escaped. Apply the XML attribute-value escapes manually wherever an attribute may carry user-provided text (notably category term), otherwise a serviceId like "AT&T Mobile" would emit malformed XML that strict feed readers (libxml2-based) reject.
+function escapeXmlAttribute(value) {
+  return String(value)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
 function buildVersionLink(baseUrl, version) {
   const encodedDate = encodeURIComponent(toISODateWithoutMilliseconds(version.fetchDate));
   const encodedService = encodeURIComponent(version.serviceId);
@@ -54,8 +63,8 @@ function buildEntry(storageType, versionUrlTemplate, baseUrl, collection, versio
     title: { _text: version.displayTitle },
     updated: { _text: version.fetchDate.toISOString() },
     category: [
-      { _attributes: { term: version.serviceId, scheme: SCHEMES.service } },
-      { _attributes: { term: version.termsType, scheme: SCHEMES.termsType } },
+      { _attributes: { term: escapeXmlAttribute(version.serviceId), scheme: SCHEMES.service } },
+      { _attributes: { term: escapeXmlAttribute(version.termsType), scheme: SCHEMES.termsType } },
       { _attributes: { term: classifyRecordType(version), scheme: SCHEMES.recordType } },
     ],
   };
