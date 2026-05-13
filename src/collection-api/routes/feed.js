@@ -130,6 +130,14 @@ function sendFeed(req, res, opts) {
 export default function feedRouter(services, versionsRepository, storageType, feedLimit, versionUrlTemplate) {
   const router = express.Router();
 
+  async function renderFeed(req, res, { selfHref, suffix = [], versions }) {
+    const collection = await getCollection();
+    const baseUrl = buildAbsoluteBaseUrl(req);
+    const feedId = buildFeedId(collection, ...suffix);
+
+    return sendFeed(req, res, { storageType, versionUrlTemplate, collection, selfHref, feedId, versions, baseUrl });
+  }
+
   /**
    * @swagger
    * /feed:
@@ -147,14 +155,10 @@ export default function feedRouter(services, versionsRepository, storageType, fe
    *               type: string
    */
   router.get('/feed', async (req, res) => {
-    const collection = await getCollection();
-    const baseUrl = buildAbsoluteBaseUrl(req);
-    const selfHref = `${baseUrl}/feed`;
-    const feedId = buildFeedId(collection);
-
     const versions = await versionsRepository.findAll({ limit: feedLimit, includeTechnicalUpgrades: false });
+    const selfHref = `${buildAbsoluteBaseUrl(req)}/feed`;
 
-    sendFeed(req, res, { storageType, versionUrlTemplate, collection, selfHref, feedId, versions, baseUrl });
+    return renderFeed(req, res, { selfHref, versions });
   });
 
   /**
@@ -189,14 +193,10 @@ export default function feedRouter(services, versionsRepository, storageType, fe
       return res.status(404).send('Service not found');
     }
 
-    const collection = await getCollection();
-    const baseUrl = buildAbsoluteBaseUrl(req);
-    const selfHref = `${baseUrl}/feed/${encodeURIComponent(service.id)}`;
-    const feedId = buildFeedId(collection, service.id);
-
     const versions = await versionsRepository.findByService(service.id, { limit: feedLimit, includeTechnicalUpgrades: false });
+    const selfHref = `${buildAbsoluteBaseUrl(req)}/feed/${encodeURIComponent(service.id)}`;
 
-    return sendFeed(req, res, { storageType, versionUrlTemplate, collection, selfHref, feedId, versions, baseUrl });
+    return renderFeed(req, res, { selfHref, suffix: [service.id], versions });
   });
 
   /**
@@ -243,14 +243,10 @@ export default function feedRouter(services, versionsRepository, storageType, fe
       return res.status(404).send('Terms type not found for this service');
     }
 
-    const collection = await getCollection();
-    const baseUrl = buildAbsoluteBaseUrl(req);
-    const selfHref = `${baseUrl}/feed/${encodeURIComponent(service.id)}/${encodeURIComponent(termsType)}`;
-    const feedId = buildFeedId(collection, service.id, termsType);
-
     const versions = await versionsRepository.findByServiceAndTermsType(service.id, termsType, { limit: feedLimit, includeTechnicalUpgrades: false });
+    const selfHref = `${buildAbsoluteBaseUrl(req)}/feed/${encodeURIComponent(service.id)}/${encodeURIComponent(termsType)}`;
 
-    return sendFeed(req, res, { storageType, versionUrlTemplate, collection, selfHref, feedId, versions, baseUrl });
+    return renderFeed(req, res, { selfHref, suffix: [ service.id, termsType ], versions });
   });
 
   return router;
