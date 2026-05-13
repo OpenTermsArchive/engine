@@ -96,9 +96,8 @@ function generateFileName(termsType, documentId, extension) {
 }
 
 export function generateFilePath(serviceId, termsType, documentId, mimeType) {
-  // If only serviceId is provided, return a pattern to match all files for that service
   if (termsType === undefined) {
-    return `${serviceId}/*`;
+    return `${serviceId}/*`; // If only serviceId is provided, return a pattern to match all files for that service
   }
 
   const extension = mime.getExtension(mimeType) || '*'; // If mime type is undefined, an asterisk is set as an extension. Used to match all files for the given service ID, terms type and document ID when mime type is unknown

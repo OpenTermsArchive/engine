@@ -113,13 +113,11 @@ export default class GitRepository extends RepositoryInterface {
 
       pathOptions.push('--', pathPattern);
     } else if (serviceId) {
-      // Count all records for a service (all terms types)
       const pathPattern = DataMapper.generateFilePath(serviceId);
 
       pathOptions.push('--', pathPattern);
     } else {
-      // Count all records (exclude root directory files)
-      pathOptions.push('--', '*/*');
+      pathOptions.push('--', '*/*'); // Count all records (exclude root directory files)
     }
 
     return (await this.git.log([ ...grepOptions, ...pathOptions ])).length;
@@ -171,9 +169,10 @@ export default class GitRepository extends RepositoryInterface {
 
     const options = [ ...grepOptions, ...pathOptions ];
 
-    // Use git-level pagination when available
-    // Note: --skip and --max-count work in topological order, not chronological order
-    // This means pagination may not be strictly chronological, but it's acceptable for performance
+    // Use git-level pagination for performance: `--skip` and `--max-count` count in topological order, not strictly chronological.
+    // In records history, the only commits whose author date is out of step with their topological position are technical upgrades.
+    // The only caller currently relying on pagination is the feed endpoint, which already filters technical upgrades out via `includeTechnicalUpgrades: false`, so the paginated set has no chronological/topological divergence in practice.
+    // If a future caller needs paginated access that includes technical upgrades, switch to the approach proposed in https://github.com/OpenTermsArchive/engine/issues/1243.
     const paginationOptions = {};
 
     if (offset !== undefined) {
@@ -186,8 +185,6 @@ export default class GitRepository extends RepositoryInterface {
 
     const commits = await this.git.listCommits(options, { reverse: false, ...paginationOptions }); // Get commits without git's --reverse for better performance, filtered at git level
 
-    // Sort by date in JavaScript for accuracy - git's date ordering may not be reliable with backdated commits
-    // Default order is descending (newest to oldest), reverse gives ascending (oldest to newest)
     commits.sort((commitA, commitB) => {
       const dateA = new Date(commitA.date);
       const dateB = new Date(commitB.date);
