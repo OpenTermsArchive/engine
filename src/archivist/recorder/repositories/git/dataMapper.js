@@ -2,17 +2,26 @@ import path from 'path';
 
 import mime from 'mime';
 
+import { TITLE_PREFIXES } from '../../record.js';
 import Snapshot from '../../snapshot.js';
 import Version from '../../version.js';
 
-export const COMMIT_MESSAGE_PREFIXES = {
-  startTracking: 'First record of',
-  technicalUpgrade: 'Apply technical or declaration upgrade on',
-  update: 'Record new changes of',
+// Prefixes for commits that represent an actual content change detected at the service source
+const CHANGE_PREFIXES = {
+  startTracking: TITLE_PREFIXES.firstRecord,
+  update: TITLE_PREFIXES.update,
   deprecated_startTracking: 'Start tracking',
-  deprecated_refilter: 'Refilter',
   deprecated_update: 'Update',
 };
+
+// Prefixes for commits that re-render an existing snapshot (e.g. with updated extraction rules) without any change at the service source
+const TECHNICAL_UPGRADE_PREFIXES = {
+  technicalUpgrade: TITLE_PREFIXES.technicalUpgrade,
+  deprecated_refilter: 'Refilter',
+};
+
+export const CHANGE_COMMIT_MESSAGE_PREFIXES = CHANGE_PREFIXES;
+export const COMMIT_MESSAGE_PREFIXES = { ...CHANGE_PREFIXES, ...TECHNICAL_UPGRADE_PREFIXES };
 
 export const TERMS_TYPE_AND_DOCUMENT_ID_SEPARATOR = ' #';
 export const SNAPSHOT_ID_MARKER = '%SNAPSHOT_ID';
@@ -22,13 +31,9 @@ const MULTIPLE_SOURCE_DOCUMENTS_PREFIX = 'This version was recorded after extrac
 export const COMMIT_MESSAGE_PREFIXES_REGEXP = new RegExp(`^(${Object.values(COMMIT_MESSAGE_PREFIXES).join('|')})`);
 
 export function toPersistence(record, snapshotIdentiferTemplate) {
-  const { serviceId, termsType, documentId, isTechnicalUpgrade, snapshotIds = [], mimeType, isFirstRecord, metadata } = record;
+  const { serviceId, termsType, documentId, snapshotIds = [], mimeType, metadata } = record;
 
-  let prefix = isTechnicalUpgrade ? COMMIT_MESSAGE_PREFIXES.technicalUpgrade : COMMIT_MESSAGE_PREFIXES.update;
-
-  prefix = isFirstRecord ? COMMIT_MESSAGE_PREFIXES.startTracking : prefix;
-
-  const subject = `${prefix} ${serviceId} ${termsType}`;
+  const subject = record.displayTitle;
   const documentIdMessage = `${documentId ? `Document ID ${documentId}\n\n` : ''}`;
   let snapshotIdsMessage;
 
@@ -91,6 +96,10 @@ function generateFileName(termsType, documentId, extension) {
 }
 
 export function generateFilePath(serviceId, termsType, documentId, mimeType) {
+  if (termsType === undefined) {
+    return `${serviceId}/*`; // If only serviceId is provided, return a pattern to match all files for that service
+  }
+
   const extension = mime.getExtension(mimeType) || '*'; // If mime type is undefined, an asterisk is set as an extension. Used to match all files for the given service ID, terms type and document ID when mime type is unknown
 
   return `${serviceId}/${generateFileName(termsType, documentId, extension)}`; // Do not use `path.join` as even for Windows, the path should be with `/` and not `\`

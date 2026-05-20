@@ -130,8 +130,7 @@ export default function servicesRouter(services) {
    *         description: No service matching the provided ID is found.
    */
   router.get('/service/:serviceId', (req, res) => {
-    const matchedServiceID = Object.keys(services).find(key => key.toLowerCase() === req.params.serviceId?.toLowerCase());
-    const service = services[matchedServiceID];
+    const service = Object.hasOwn(services, req.params.serviceId) ? services[req.params.serviceId] : null;
 
     if (!service) {
       res.status(404).send('Service not found');

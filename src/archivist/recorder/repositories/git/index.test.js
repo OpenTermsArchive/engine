@@ -540,8 +540,253 @@ describe('GitRepository', () => {
         }
       });
 
-      it('returns records in ascending order', () => {
-        expect(records.map(record => record.fetchDate)).to.deep.equal([ FETCH_DATE_EARLIER, FETCH_DATE, FETCH_DATE_LATER ]);
+      it('returns records in descending order', () => {
+        expect(records.map(record => record.fetchDate)).to.deep.equal([ FETCH_DATE_LATER, FETCH_DATE, FETCH_DATE_EARLIER ]);
+      });
+
+      context('with includeTechnicalUpgrades: false', () => {
+        let filteredRecords;
+
+        before(async () => {
+          filteredRecords = await subject.findAll({ includeTechnicalUpgrades: false });
+        });
+
+        it('excludes technical upgrade records', () => {
+          expect(filteredRecords.length).to.equal(2);
+        });
+
+        it('only returns records that represent actual content changes', () => {
+          for (const record of filteredRecords) {
+            expect(record.isTechnicalUpgrade).to.not.be.true;
+          }
+        });
+
+        it('returns the expected records in descending order', () => {
+          expect(filteredRecords.map(record => record.fetchDate)).to.deep.equal([ FETCH_DATE_LATER, FETCH_DATE ]);
+        });
+      });
+    });
+
+    describe('#findByServiceAndTermsType', () => {
+      const expectedIds = [];
+      let records;
+
+      before(async function () {
+        this.timeout(5000);
+
+        const { id: id1 } = await subject.save(new Version({
+          serviceId: SERVICE_PROVIDER_ID,
+          termsType: TERMS_TYPE,
+          content: CONTENT,
+          fetchDate: FETCH_DATE,
+          snapshotIds: [SNAPSHOT_ID],
+        }));
+
+        expectedIds.push(id1);
+
+        const { id: id2 } = await subject.save(new Version({
+          serviceId: SERVICE_PROVIDER_ID,
+          termsType: TERMS_TYPE,
+          content: `${CONTENT} - updated`,
+          fetchDate: FETCH_DATE_LATER,
+          snapshotIds: [SNAPSHOT_ID],
+        }));
+
+        expectedIds.push(id2);
+
+        await subject.save(new Version({
+          serviceId: 'other_service',
+          termsType: 'Privacy Policy',
+          content: `${CONTENT} - other`,
+          fetchDate: FETCH_DATE,
+          snapshotIds: [SNAPSHOT_ID],
+        }));
+
+        (records = await subject.findByServiceAndTermsType(SERVICE_PROVIDER_ID, TERMS_TYPE));
+      });
+
+      after(() => subject.removeAll());
+
+      it('returns only matching records', () => {
+        expect(records.length).to.equal(2);
+      });
+
+      it('returns Version objects', () => {
+        for (const record of records) {
+          expect(record).to.be.an.instanceof(Version);
+        }
+      });
+
+      it('returns records with matching service ID', () => {
+        for (const record of records) {
+          expect(record.serviceId).to.equal(SERVICE_PROVIDER_ID);
+        }
+      });
+
+      it('returns records with matching terms type', () => {
+        for (const record of records) {
+          expect(record.termsType).to.equal(TERMS_TYPE);
+        }
+      });
+
+      it('returns records in descending order', () => {
+        expect(records.map(record => record.fetchDate)).to.deep.equal([ FETCH_DATE_LATER, FETCH_DATE ]);
+      });
+
+      it('returns records with correct IDs', () => {
+        expect(records.map(record => record.id)).to.have.members(expectedIds);
+      });
+
+      context('when no matching records exist', () => {
+        it('returns an empty array', async () => {
+          const result = await subject.findByServiceAndTermsType('non_existent_service', 'Non Existent Terms');
+
+          expect(result).to.be.an('array').that.is.empty;
+        });
+      });
+
+      context('with includeTechnicalUpgrades: false', () => {
+        let filteredRecords;
+        let technicalUpgradeId;
+
+        before(async () => {
+          ({ id: technicalUpgradeId } = await subject.save(new Version({
+            serviceId: SERVICE_PROVIDER_ID,
+            termsType: TERMS_TYPE,
+            content: `${CONTENT} - technical upgrade`,
+            fetchDate: FETCH_DATE_EARLIER,
+            snapshotIds: [SNAPSHOT_ID],
+            isTechnicalUpgrade: true,
+          })));
+
+          filteredRecords = await subject.findByServiceAndTermsType(SERVICE_PROVIDER_ID, TERMS_TYPE, { includeTechnicalUpgrades: false });
+        });
+
+        it('excludes technical upgrade records', () => {
+          expect(filteredRecords.map(record => record.id)).to.not.include(technicalUpgradeId);
+        });
+
+        it('only returns records that represent actual content changes', () => {
+          for (const record of filteredRecords) {
+            expect(record.isTechnicalUpgrade).to.not.be.true;
+          }
+        });
+      });
+    });
+
+    describe('#findByService', () => {
+      const OTHER_TERMS_TYPE = 'Privacy Policy';
+      const expectedIds = [];
+      let records;
+
+      before(async function () {
+        this.timeout(5000);
+
+        const { id: id1 } = await subject.save(new Version({
+          serviceId: SERVICE_PROVIDER_ID,
+          termsType: TERMS_TYPE,
+          content: CONTENT,
+          fetchDate: FETCH_DATE,
+          snapshotIds: [SNAPSHOT_ID],
+        }));
+
+        expectedIds.push(id1);
+
+        const { id: id2 } = await subject.save(new Version({
+          serviceId: SERVICE_PROVIDER_ID,
+          termsType: TERMS_TYPE,
+          content: `${CONTENT} - updated`,
+          fetchDate: FETCH_DATE_LATER,
+          snapshotIds: [SNAPSHOT_ID],
+        }));
+
+        expectedIds.push(id2);
+
+        const { id: id3 } = await subject.save(new Version({
+          serviceId: SERVICE_PROVIDER_ID,
+          termsType: OTHER_TERMS_TYPE,
+          content: `${CONTENT} - other terms type`,
+          fetchDate: FETCH_DATE_EARLIER,
+          snapshotIds: [SNAPSHOT_ID],
+        }));
+
+        expectedIds.push(id3);
+
+        await subject.save(new Version({
+          serviceId: 'other_service',
+          termsType: TERMS_TYPE,
+          content: `${CONTENT} - other service`,
+          fetchDate: FETCH_DATE,
+          snapshotIds: [SNAPSHOT_ID],
+        }));
+
+        (records = await subject.findByService(SERVICE_PROVIDER_ID));
+      });
+
+      after(() => subject.removeAll());
+
+      it('returns only matching records', () => {
+        expect(records.length).to.equal(3);
+      });
+
+      it('returns Version objects', () => {
+        for (const record of records) {
+          expect(record).to.be.an.instanceof(Version);
+        }
+      });
+
+      it('returns records with matching service ID', () => {
+        for (const record of records) {
+          expect(record.serviceId).to.equal(SERVICE_PROVIDER_ID);
+        }
+      });
+
+      it('returns records across all terms types of the service', () => {
+        expect(new Set(records.map(record => record.termsType))).to.deep.equal(new Set([ TERMS_TYPE, OTHER_TERMS_TYPE ]));
+      });
+
+      it('returns records in descending order', () => {
+        expect(records.map(record => record.fetchDate)).to.deep.equal([ FETCH_DATE_LATER, FETCH_DATE, FETCH_DATE_EARLIER ]);
+      });
+
+      it('returns records with correct IDs', () => {
+        expect(records.map(record => record.id)).to.have.members(expectedIds);
+      });
+
+      context('when no matching records exist', () => {
+        it('returns an empty array', async () => {
+          const result = await subject.findByService('non_existent_service');
+
+          expect(result).to.be.an('array').that.is.empty;
+        });
+      });
+
+      context('with includeTechnicalUpgrades: false', () => {
+        let filteredRecords;
+        let technicalUpgradeId;
+
+        before(async () => {
+          ({ id: technicalUpgradeId } = await subject.save(new Version({
+            serviceId: SERVICE_PROVIDER_ID,
+            termsType: TERMS_TYPE,
+            content: `${CONTENT} - technical upgrade`,
+            fetchDate: new Date('2000-01-03T12:00:00.000Z'),
+            snapshotIds: [SNAPSHOT_ID],
+            isTechnicalUpgrade: true,
+          })));
+
+          filteredRecords = await subject.findByService(SERVICE_PROVIDER_ID, { includeTechnicalUpgrades: false });
+        });
+
+        it('excludes technical upgrade records', () => {
+          expect(filteredRecords.map(record => record.id)).to.not.include(technicalUpgradeId);
+        });
+
+        it('only returns records that represent actual content changes', () => {
+          for (const record of filteredRecords) {
+            expect(record.isTechnicalUpgrade).to.not.be.true;
+          }
+        });
       });
     });
 
@@ -581,6 +826,37 @@ describe('GitRepository', () => {
 
       it('returns the proper count', () => {
         expect(count).to.equal(3);
+      });
+
+      context('with serviceId and termsType filters', () => {
+        it('returns count for specific service and terms type', async () => {
+          const filteredCount = await subject.count(SERVICE_PROVIDER_ID, TERMS_TYPE);
+
+          expect(filteredCount).to.equal(3);
+        });
+
+        it('returns zero for non-existent service', async () => {
+          const filteredCount = await subject.count('non-existent-service', TERMS_TYPE);
+
+          expect(filteredCount).to.equal(0);
+        });
+      });
+
+      context('with only serviceId filter', () => {
+        it('returns count for all terms types of a service', async () => {
+          // Add a version with different terms type
+          await subject.save(new Version({
+            serviceId: SERVICE_PROVIDER_ID,
+            termsType: 'Different Terms',
+            content: CONTENT,
+            fetchDate: FETCH_DATE,
+            snapshotIds: [SNAPSHOT_ID],
+          }));
+
+          const filteredCount = await subject.count(SERVICE_PROVIDER_ID);
+
+          expect(filteredCount).to.equal(4); // 3 from TERMS_TYPE + 1 from 'Different Terms'
+        });
       });
     });
 
@@ -1101,8 +1377,8 @@ describe('GitRepository', () => {
         }
       });
 
-      it('returns records in ascending order', () => {
-        expect(records.map(record => record.fetchDate)).to.deep.equal([ FETCH_DATE_EARLIER, FETCH_DATE, FETCH_DATE_LATER ]);
+      it('returns records in descending order', () => {
+        expect(records.map(record => record.fetchDate)).to.deep.equal([ FETCH_DATE_LATER, FETCH_DATE, FETCH_DATE_EARLIER ]);
       });
     });
 
@@ -1462,8 +1738,8 @@ describe('GitRepository', () => {
         }
       });
 
-      it('returns records in ascending order', () => {
-        expect(records.map(record => record.fetchDate)).to.deep.equal(expectedDates);
+      it('returns records in descending order', () => {
+        expect(records.map(record => record.fetchDate)).to.deep.equal([...expectedDates].reverse());
       });
     });
 

@@ -2,6 +2,22 @@
 
 All changes that impact users of this module are documented in this file, in the [Common Changelog](https://common-changelog.org) format with some additional specifications defined in the CONTRIBUTING file. This codebase adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased [major]
+
+> Development of this release was supported by the [NGI0 Commons Fund](https://nlnet.nl/project/Modular-OTA/), a fund established by [NLnet](https://nlnet.nl/) with financial support from the European Commission's [Next Generation Internet](https://www.ngi.eu) programme, under the aegis of DG CNECT under grant agreement N°101069594.
+
+### Added
+
+- Add `GET /feed` endpoint on the Collection API exposing an Atom feed of the latest version changes across the whole collection
+- Add `GET /feed/:serviceId` endpoint on the Collection API exposing an Atom feed scoped to a single service
+- Add `GET /feed/:serviceId/:termsType` endpoint on the Collection API exposing an Atom feed scoped to a single service and terms type
+- Add [`@opentermsarchive/engine.collection-api.feed.limit`](https://docs.opentermsarchive.org/collections/reference/configuration/) configuration option controlling the maximum number of entries returned by feed endpoints (default: `100`)
+- Add [`@opentermsarchive/engine.collection-api.feed.versionUrlTemplate`](https://docs.opentermsarchive.org/collections/reference/configuration/) configuration option to customize the `alternate` link of feed entries with a URL template (e.g. `https://github.com/openTermsArchive/demo-versions/commit/%VERSION_ID`); useful to point feed readers to a human-readable page instead of the default version API endpoint
+
+### Changed
+
+- **Breaking:** Resolve `serviceId` path parameter case-sensitively on the `GET /service/:serviceId` endpoint, in line with the documented service ID format; clients relying on case-insensitive matching must now use the exact ID casing
+
 ## 11.0.2 - 2026-04-14
 
 > Development of this release was supported by [Reset Tech](https://www.reset.tech).
