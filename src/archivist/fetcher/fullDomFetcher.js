@@ -1,9 +1,18 @@
 import puppeteer from 'puppeteer-extra';
 import stealthPlugin from 'puppeteer-extra-plugin-stealth';
+import navigatorLanguages from 'puppeteer-extra-plugin-stealth/evasions/navigator.languages/index.js';
+import userAgentOverride from 'puppeteer-extra-plugin-stealth/evasions/user-agent-override/index.js';
 
 import { resolveProxyConfiguration, extractProxyCredentials } from './proxyUtils.js';
 
 let browser;
+
+function parseLanguage(value) {
+  return {
+    locale: value,
+    languages: value.split(',').map(part => part.split(';')[0].trim()),
+  };
+}
 
 export default async function fetch(url, cssSelectors, config) {
   if (!browser) {
@@ -104,7 +113,14 @@ export async function launchHeadlessBrowser(language) {
     return browser;
   }
 
-  puppeteer.use(stealthPlugin({ locale: language }));
+  const { locale, languages } = parseLanguage(language);
+  const stealth = stealthPlugin();
+
+  stealth.enabledEvasions.delete('user-agent-override');
+  stealth.enabledEvasions.delete('navigator.languages');
+  puppeteer.use(stealth);
+  puppeteer.use(userAgentOverride({ locale }));
+  puppeteer.use(navigatorLanguages({ languages }));
 
   const options = {
     args: [],
