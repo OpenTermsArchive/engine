@@ -2,6 +2,14 @@
 
 All changes that impact users of this module are documented in this file, in the [Common Changelog](https://common-changelog.org) format with some additional specifications defined in the CONTRIBUTING file. This codebase adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased [patch]
+
+> Development of this release was supported by [User Rights](https://www.user-rights.org).
+
+### Fixed
+
+- Update `@accordproject/markdown-cicero` to fix `npm ci` failures in collections caused by broken `file:..` references in the deprecated transitive `@accordproject/concerto-core@3.19.8`
+
 ## 12.0.1 - 2026-05-26
 
 > Development of this release was supported by [User Rights](https://www.user-rights.org).
