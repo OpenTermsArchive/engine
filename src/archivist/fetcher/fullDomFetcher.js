@@ -8,10 +8,9 @@ import { resolveProxyConfiguration, extractProxyCredentials } from './proxyUtils
 let browser;
 
 function parseLanguage(value) {
-  return {
-    locale: value,
-    languages: value.split(',').map(part => part.split(';')[0].trim()),
-  };
+  const languages = value.split(',').map(part => part.split(';')[0].trim());
+
+  return { locale: languages.join(','), languages };
 }
 
 export default async function fetch(url, cssSelectors, config) {
@@ -28,7 +27,7 @@ export default async function fetch(url, cssSelectors, config) {
     page = await context.newPage();
     client = await page.createCDPSession();
 
-    await configurePage(page, client, config);
+    await configurePage(page, config);
 
     const selectors = [].concat(cssSelectors).filter(Boolean);
 
@@ -173,16 +172,9 @@ function isValidHttpStatus(status) {
   return (status >= 200 && status < 300) || status === 304;
 }
 
-async function configurePage(page, client, config) {
+async function configurePage(page, config) {
   await page.setViewport({ width: 1920, height: 1080 }); // Realistic viewport to avoid detection based on default Puppeteer dimensions (800x600)
   await page.setDefaultNavigationTimeout(config.navigationTimeout);
-  await page.setExtraHTTPHeaders({ 'Accept-Language': config.language });
-
-  // Use CDP to ensure browser language is set correctly (see https://zirkelc.dev/posts/puppeteer-language-experiment)
-  await client.send('Network.setUserAgentOverride', {
-    userAgent: await browser.userAgent(),
-    acceptLanguage: config.language,
-  });
 
   if (browser.proxyCredentials?.username && browser.proxyCredentials?.password) {
     await page.authenticate(browser.proxyCredentials);

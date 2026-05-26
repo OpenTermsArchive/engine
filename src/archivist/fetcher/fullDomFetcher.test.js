@@ -166,6 +166,12 @@ describe('Full DOM Fetcher', function () {
         expect(result.content).to.match(/<div class="lang-detected">Conditions<\/div>/);
         expect(result.content).not.to.match(/>Terms</);
       });
+
+      it('sends every configured tag as Accept-Language header', async () => {
+        const result = await fetch(`http://127.0.0.1:${SERVER_PORT}/lang-header`, [], config);
+
+        expect(result.content).to.match(/data-accept-language="fr-FR,fr[^"]*"/);
+      });
     });
 
     context('with quality factors such as en-IE,en-GB;q=0.9,en;q=0.8', () => {
@@ -181,6 +187,12 @@ describe('Full DOM Fetcher', function () {
         const result = await fetch(`http://127.0.0.1:${SERVER_PORT}/lang-echo`, [], config);
 
         expect(result.content).to.match(/data-languages="en-IE,en-GB,en"/);
+      });
+
+      it('preserves the configured quality factors in the Accept-Language header', async () => {
+        const result = await fetch(`http://127.0.0.1:${SERVER_PORT}/lang-header`, [], config);
+
+        expect(result.content).to.match(/data-accept-language="en-IE,en-GB;q=0\.9,en;q=0\.8"/);
       });
     });
   });
