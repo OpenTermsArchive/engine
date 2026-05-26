@@ -24,7 +24,7 @@ describe('Full DOM Fetcher', function () {
   let expectedPDFContent;
 
   before(async () => {
-    await launchHeadlessBrowser();
+    await launchHeadlessBrowser('en');
 
     temporaryServer = http.createServer((request, response) => {
       if (request.url === '/dynamic') {
@@ -59,12 +59,12 @@ describe('Full DOM Fetcher', function () {
       await stopHeadlessBrowser();
       await expect(fetch('http://example.com', [], { navigationTimeout: 5000, waitForElementsTimeout: 5000, language: 'en' }))
         .to.be.rejectedWith('The headless browser should be controlled manually');
-      await launchHeadlessBrowser();
+      await launchHeadlessBrowser('en');
     });
 
     it('reuses existing browser instance', async () => {
-      const browser1 = await launchHeadlessBrowser();
-      const browser2 = await launchHeadlessBrowser();
+      const browser1 = await launchHeadlessBrowser('en');
+      const browser2 = await launchHeadlessBrowser('en');
 
       expect(browser1).to.equal(browser2);
     });

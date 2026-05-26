@@ -45,6 +45,7 @@ export default class Archivist extends events.EventEmitter {
 
   constructor({ recorderConfig, fetcherConfig }) {
     super();
+    this.fetcherConfig = fetcherConfig;
     this.recorder = new Recorder(recorderConfig);
     this.fetch = params => fetch({ ...params, config: fetcherConfig });
     this.extract = extract;
@@ -151,7 +152,7 @@ export default class Archivist extends events.EventEmitter {
 
     this.emit('trackingStarted', servicesIds.length, numberOfTerms, technicalUpgradeOnly);
 
-    await Promise.all([ launchHeadlessBrowser(), this.recorder.initialize() ]);
+    await Promise.all([ launchHeadlessBrowser(this.fetcherConfig.language), this.recorder.initialize() ]);
 
     this.trackingQueue.concurrency = concurrency;
 

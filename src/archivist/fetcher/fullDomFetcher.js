@@ -6,8 +6,6 @@ import { resolveProxyConfiguration, extractProxyCredentials } from './proxyUtils
 let browser;
 
 export default async function fetch(url, cssSelectors, config) {
-  puppeteer.use(stealthPlugin({ locale: config.language }));
-
   if (!browser) {
     throw new Error('The headless browser should be controlled manually with "launchHeadlessBrowser" and "stopHeadlessBrowser".');
   }
@@ -97,13 +95,16 @@ export default async function fetch(url, cssSelectors, config) {
 /**
  * Launches a headless browser instance using Puppeteer if one is not already running. Returns the existing browser instance if one is already running, otherwise creates and returns a new instance.
  * @function launchHeadlessBrowser
- * @returns {Promise<puppeteer.Browser>} The Puppeteer browser instance.
+ * @param   {string}                     language Accept-Language header value applied to the browser context
+ * @returns {Promise<puppeteer.Browser>}          The Puppeteer browser instance.
  * @async
  */
-export async function launchHeadlessBrowser() {
+export async function launchHeadlessBrowser(language) {
   if (browser) {
     return browser;
   }
+
+  puppeteer.use(stealthPlugin({ locale: language }));
 
   const options = {
     args: [],
