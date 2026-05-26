@@ -137,7 +137,11 @@ No changes were found in the last run, so no new version has been recorded.`,
     });
     const contributionToolUrl = `${CONTRIBUTION_TOOL_URL}?${contributionToolParams}`;
 
-    const latestDeclarationLink = `[Latest declaration](${this.reporter.generateDeclarationURL(terms.service.name)})`;
+    const declarationFileUrl = this.reporter.generateDeclarationURL(terms.service.name);
+    const updateDeclarationLink = terms.hasMultipleSourceDocuments ? `[on GitHub](${declarationFileUrl})` : `[on the contribution tool](${contributionToolUrl})`;
+    const multiDocumentsUpdateInfo = terms.hasMultipleSourceDocuments ? ' (the contribution tool does not support multi-document)' : '';
+
+    const latestDeclarationLink = `[Latest declaration](${declarationFileUrl})`;
     const latestVersionLink = `[Latest version](${this.reporter.generateVersionURL(terms.service.name, terms.type)})`;
     const snapshotsBaseUrl = this.reporter.generateSnapshotsBaseUrl(terms.service.name, terms.type);
     const latestSnapshotsLink = terms.hasMultipleSourceDocuments
@@ -163,13 +167,13 @@ First of all, check if the source documents are accessible through a web browser
 
 #### If the source documents are accessible through a web browser
 
-[Edit the declaration](${contributionToolUrl}):
+Edit the declaration ${updateDeclarationLink}${multiDocumentsUpdateInfo}:
 - Try updating the selectors.
 - Try switching client scripts on with expert mode.
 
 #### If the source documents are not accessible anymore
 
-- If the source documents have moved, find their new location and [update it](${contributionToolUrl}).
+- If the source documents have moved, find their new location and update it ${updateDeclarationLink}.
 - If these terms have been removed, move them from the declaration to its [history file](${DOC_URL}/terms/explanation/declarations-maintenance/#service-history-reference), using \`${validUntil}\` as the \`validUntil\` value.
 - If the service has closed, move the entire contents of the declaration to its [history file](${DOC_URL}/contributing-terms/#service-history), using \`${validUntil}\` as the \`validUntil\` value.
 
