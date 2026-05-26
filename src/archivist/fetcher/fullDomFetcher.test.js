@@ -33,6 +33,11 @@ describe('Full DOM Fetcher', function () {
       if (request.url === '/delayed-content') {
         response.writeHead(200, { 'Content-Type': 'text/html' }).write(delayedContentHTML);
       }
+      if (request.url === '/lang-header') {
+        const acceptLanguage = request.headers['accept-language'] || '';
+
+        response.writeHead(200, { 'Content-Type': 'text/html' }).write(`<!DOCTYPE html><html><body data-accept-language="${acceptLanguage}"></body></html>`);
+      }
       if (request.url === '/terms.pdf') {
         expectedPDFContent = fs.readFileSync(path.resolve(__dirname, '../../../test/fixtures/terms.pdf'));
         response.writeHead(200, { 'Content-Type': 'application/pdf' }).write(expectedPDFContent);
@@ -79,6 +84,12 @@ describe('Full DOM Fetcher', function () {
       const timeout = 10;
 
       await expect(fetch(url, ['.non-existent'], { ...config, navigationTimeout: timeout })).to.be.rejectedWith(`Timed out after ${timeout / 1000} seconds when trying to fetch '${url}'`);
+    });
+
+    it('sends the configured language as Accept-Language header', async () => {
+      const result = await fetch(`http://127.0.0.1:${SERVER_PORT}/lang-header`, [], config);
+
+      expect(result.content).to.match(/data-accept-language="en"/);
     });
 
     context('when a DOM element exists but its content is loaded asynchronously', () => {
