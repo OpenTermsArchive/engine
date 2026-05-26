@@ -18,6 +18,7 @@ const dynamicHTML = '<!DOCTYPE html><html><head><title>Dynamic Page</title><scri
 const delayedContentHTML = '<!DOCTYPE html><html><head><title>Delayed Content</title><script>setTimeout(() => { document.querySelector(".content").textContent = "Final content"; }, 100);</script></head><body><div class="content"></div></body></html>';
 const langEchoHTML = '<!DOCTYPE html><html><body><script>document.body.setAttribute("data-language", navigator.language); document.body.setAttribute("data-languages", navigator.languages.join(","));</script></body></html>';
 const langDetectHTML = '<!DOCTYPE html><html><body><div class="lang-detected"></div><script>const lang = navigator.language.split("-")[0]; const labels = { fr: "Conditions", en: "Terms" }; document.querySelector(".lang-detected").textContent = labels[lang] || labels.en;</script></body></html>';
+const stealthProbeHTML = '<!DOCTYPE html><html><body><script>document.body.setAttribute("data-webdriver", String(navigator.webdriver)); document.body.setAttribute("data-user-agent", navigator.userAgent); document.body.setAttribute("data-plugin-count", String(navigator.plugins.length));</script></body></html>';
 
 describe('Full DOM Fetcher', function () {
   this.timeout(60000);
@@ -45,6 +46,9 @@ describe('Full DOM Fetcher', function () {
       }
       if (request.url === '/lang-detect') {
         response.writeHead(200, { 'Content-Type': 'text/html' }).write(langDetectHTML);
+      }
+      if (request.url === '/stealth-probe') {
+        response.writeHead(200, { 'Content-Type': 'text/html' }).write(stealthProbeHTML);
       }
       if (request.url === '/terms.pdf') {
         expectedPDFContent = fs.readFileSync(path.resolve(__dirname, '../../../test/fixtures/terms.pdf'));
@@ -194,6 +198,36 @@ describe('Full DOM Fetcher', function () {
 
         expect(result.content).to.match(/data-accept-language="en-IE,en-GB;q=0\.9,en;q=0\.8"/);
       });
+    });
+  });
+
+  describe('Stealth evasions', () => {
+    // These assertions guard against a class of regressions where the
+    // puppeteer-extra-plugin-stealth fails to be registered before
+    // puppeteer.launch(): if it is registered later, puppeteer-extra never
+    // binds its onPageCreated hooks and all evasions stay inactive,
+    // leaving navigator.webdriver === true and HeadlessChrome in the UA.
+    const config = { navigationTimeout: 5000, waitForElementsTimeout: 5000, language: 'en' };
+
+    it('hides navigator.webdriver', async () => {
+      const result = await fetch(`http://127.0.0.1:${SERVER_PORT}/stealth-probe`, [], config);
+
+      expect(result.content).to.match(/data-webdriver="false"/);
+    });
+
+    it('removes HeadlessChrome from the user agent', async () => {
+      const result = await fetch(`http://127.0.0.1:${SERVER_PORT}/stealth-probe`, [], config);
+
+      expect(result.content).not.to.match(/HeadlessChrome/);
+    });
+
+    it('exposes a non-empty navigator.plugins list', async () => {
+      const result = await fetch(`http://127.0.0.1:${SERVER_PORT}/stealth-probe`, [], config);
+
+      const match = result.content.match(/data-plugin-count="(\d+)"/);
+
+      expect(match).to.not.be.null;
+      expect(Number(match[1])).to.be.greaterThan(0);
     });
   });
 });
