@@ -1,3 +1,4 @@
+import config from 'config';
 import puppeteer from 'puppeteer-extra';
 import stealthPlugin from 'puppeteer-extra-plugin-stealth';
 import navigatorLanguages from 'puppeteer-extra-plugin-stealth/evasions/navigator.languages/index.js';
@@ -103,8 +104,8 @@ export default async function fetch(url, cssSelectors, config) {
 /**
  * Launches a headless browser instance using Puppeteer if one is not already running. Returns the existing browser instance if one is already running, otherwise creates and returns a new instance.
  * @function launchHeadlessBrowser
- * @param   {string}                     language Accept-Language header value applied to the browser context
- * @returns {Promise<puppeteer.Browser>}          The Puppeteer browser instance.
+ * @param   {string}                     [language] Accept-Language header value applied to the browser context. Defaults to `@opentermsarchive/engine.fetcher.language`
+ * @returns {Promise<puppeteer.Browser>}            The Puppeteer browser instance.
  * @async
  */
 export async function launchHeadlessBrowser(language) {
@@ -112,7 +113,8 @@ export async function launchHeadlessBrowser(language) {
     return browser;
   }
 
-  const { locale, languages } = parseLanguage(language);
+  const acceptLanguage = language ?? config.get('@opentermsarchive/engine.fetcher.language');
+  const { locale, languages } = parseLanguage(acceptLanguage);
   const stealth = stealthPlugin();
 
   stealth.enabledEvasions.delete('user-agent-override');
