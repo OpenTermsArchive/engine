@@ -2,14 +2,21 @@
 
 All changes that impact users of this module are documented in this file, in the [Common Changelog](https://common-changelog.org) format with some additional specifications defined in the CONTRIBUTING file. This codebase adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased [minor]
+## Unreleased [major]
 
 > Development of this release was supported by [User Rights](https://www.user-rights.org).
+
+### Changed
+
+- **Breaking:** Apply `@opentermsarchive/engine.fetcher.language` to `navigator.language` and `navigator.languages` in addition to the `Accept-Language` header; `language: "en"` now exposes `navigator.languages` as `["en"]` instead of `["en-US", "en"]`, set `language: "en-US,en"` to restore the previous default
+
+### Removed
+
+- **Breaking:** Drop support for quality factors (`;q=…`) in `@opentermsarchive/engine.fetcher.language`; previously accepted values such as `en-IE,en-GB;q=0.9,en;q=0.8` now throw at launch. Replace with a plain comma-separated priority list, e.g. `en-IE,en-GB,en`
 
 ### Fixed
 
 - Reactivate the `puppeteer-extra` stealth plugin in the full DOM fetcher, which had been silently inert since v10.3.1 because it was registered after `puppeteer.launch()`, restoring removal of `navigator.webdriver` and `HeadlessChrome` from the user agent
-- Apply `@opentermsarchive/engine.fetcher.language` to `navigator.language` and `navigator.languages` in addition to the `Accept-Language` header; `language: "en"` now exposes `navigator.languages` as `["en"]` instead of `["en-US", "en"]`, set `language: "en-US,en"` to restore the previous default
 
 ## 12.0.2 - 2026-05-26
 
