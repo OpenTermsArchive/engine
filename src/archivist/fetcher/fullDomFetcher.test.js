@@ -18,7 +18,7 @@ const dynamicHTML = '<!DOCTYPE html><html><head><title>Dynamic Page</title><scri
 const delayedContentHTML = '<!DOCTYPE html><html><head><title>Delayed Content</title><script>setTimeout(() => { document.querySelector(".content").textContent = "Final content"; }, 100);</script></head><body><div class="content"></div></body></html>';
 const langEchoHTML = '<!DOCTYPE html><html><body><script>document.body.setAttribute("data-language", navigator.language); document.body.setAttribute("data-languages", navigator.languages.join(","));</script></body></html>';
 const langDetectHTML = '<!DOCTYPE html><html><body><div class="lang-detected"></div><script>const lang = navigator.language.split("-")[0]; const labels = { fr: "Conditions", en: "Terms" }; document.querySelector(".lang-detected").textContent = labels[lang] || labels.en;</script></body></html>';
-const stealthProbeHTML = '<!DOCTYPE html><html><body><script>document.body.setAttribute("data-webdriver", String(navigator.webdriver)); document.body.setAttribute("data-user-agent", navigator.userAgent); document.body.setAttribute("data-plugin-count", String(navigator.plugins.length));</script></body></html>';
+const stealthProbeHTML = '<!DOCTYPE html><html><body><script>document.body.setAttribute("data-webdriver", String(navigator.webdriver)); document.body.setAttribute("data-user-agent", navigator.userAgent); document.body.setAttribute("data-plugin-count", String(navigator.plugins.length)); document.body.setAttribute("data-viewport-width", String(window.innerWidth)); document.body.setAttribute("data-viewport-height", String(window.innerHeight));</script></body></html>';
 
 describe('Full DOM Fetcher', function () {
   this.timeout(60000);
@@ -225,6 +225,13 @@ describe('Full DOM Fetcher', function () {
       const result = await fetch(`http://127.0.0.1:${SERVER_PORT}/stealth-probe`, [], config);
 
       expect(result.content).not.to.match(/HeadlessChrome/);
+    });
+
+    it('uses a realistic viewport instead of Puppeteer default', async () => {
+      const result = await fetch(`http://127.0.0.1:${SERVER_PORT}/stealth-probe`, [], config);
+
+      expect(result.content).to.match(/data-viewport-width="1920"/);
+      expect(result.content).to.match(/data-viewport-height="1080"/);
     });
 
     it('exposes a non-empty navigator.plugins list', async () => {
