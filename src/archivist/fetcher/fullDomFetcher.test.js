@@ -214,30 +214,27 @@ describe('Full DOM Fetcher', function () {
     // binds its onPageCreated hooks and all evasions stay inactive,
     // leaving navigator.webdriver === true and HeadlessChrome in the UA.
     const config = { navigationTimeout: 5000, waitForElementsTimeout: 5000, language: 'en' };
+    let content;
 
-    it('hides navigator.webdriver', async () => {
-      const result = await fetch(`http://127.0.0.1:${SERVER_PORT}/stealth-probe`, [], config);
-
-      expect(result.content).to.match(/data-webdriver="false"/);
+    before(async () => {
+      ({ content } = await fetch(`http://127.0.0.1:${SERVER_PORT}/stealth-probe`, [], config));
     });
 
-    it('removes HeadlessChrome from the user agent', async () => {
-      const result = await fetch(`http://127.0.0.1:${SERVER_PORT}/stealth-probe`, [], config);
-
-      expect(result.content).not.to.match(/HeadlessChrome/);
+    it('hides navigator.webdriver', () => {
+      expect(content).to.match(/data-webdriver="false"/);
     });
 
-    it('uses a realistic viewport instead of Puppeteer default', async () => {
-      const result = await fetch(`http://127.0.0.1:${SERVER_PORT}/stealth-probe`, [], config);
-
-      expect(result.content).to.match(/data-viewport-width="1920"/);
-      expect(result.content).to.match(/data-viewport-height="1080"/);
+    it('removes HeadlessChrome from the user agent', () => {
+      expect(content).not.to.match(/HeadlessChrome/);
     });
 
-    it('exposes a non-empty navigator.plugins list', async () => {
-      const result = await fetch(`http://127.0.0.1:${SERVER_PORT}/stealth-probe`, [], config);
+    it('uses a realistic viewport instead of Puppeteer default', () => {
+      expect(content).to.match(/data-viewport-width="1920"/);
+      expect(content).to.match(/data-viewport-height="1080"/);
+    });
 
-      const match = result.content.match(/data-plugin-count="(\d+)"/);
+    it('exposes a non-empty navigator.plugins list', () => {
+      const match = content.match(/data-plugin-count="(\d+)"/);
 
       expect(match).to.not.be.null;
       expect(Number(match[1])).to.be.greaterThan(0);
