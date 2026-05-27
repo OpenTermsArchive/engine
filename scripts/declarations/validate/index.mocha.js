@@ -51,9 +51,11 @@ export default async options => {
       const filePath = path.join(declarationsPath, `${serviceId}.json`);
       const historyFilePath = path.join(declarationsPath, `${serviceId}.history.json`);
 
-      before(() => launchHeadlessBrowser(config.get('@opentermsarchive/engine.fetcher.language')));
+      if (!schemaOnly) {
+        before(() => launchHeadlessBrowser(config.get('@opentermsarchive/engine.fetcher.language')));
 
-      after(stopHeadlessBrowser);
+        after(stopHeadlessBrowser);
+      }
 
       context(serviceId, () => {
         before(function () {
