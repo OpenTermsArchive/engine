@@ -178,8 +178,8 @@ describe('Full DOM Fetcher', function () {
       });
     });
 
-    context('with quality factors such as en-IE,en-GB;q=0.9,en;q=0.8', () => {
-      const language = 'en-IE,en-GB;q=0.9,en;q=0.8';
+    context('with multiple comma-separated tags such as en-IE,en-GB,en', () => {
+      const language = 'en-IE,en-GB,en';
       const config = { navigationTimeout: 5000, waitForElementsTimeout: 5000, language };
 
       before(async () => {
@@ -187,16 +187,22 @@ describe('Full DOM Fetcher', function () {
         await launchHeadlessBrowser(language);
       });
 
-      it('strips quality factors from navigator.languages', async () => {
-        const result = await fetch(`http://127.0.0.1:${SERVER_PORT}/lang-echo`, [], config);
-
-        expect(result.content).to.match(/data-languages="en-IE,en-GB,en"/);
-      });
-
-      it('preserves the configured quality factors in the Accept-Language header', async () => {
+      it('derives Accept-Language quality factors from tag order', async () => {
         const result = await fetch(`http://127.0.0.1:${SERVER_PORT}/lang-header`, [], config);
 
         expect(result.content).to.match(/data-accept-language="en-IE,en-GB;q=0\.9,en;q=0\.8"/);
+      });
+    });
+
+    context('with quality factors in the configured value', () => {
+      after(async () => {
+        await launchHeadlessBrowser('en');
+      });
+
+      it('rejects language values containing quality factors', async () => {
+        await stopHeadlessBrowser();
+        await expect(launchHeadlessBrowser('en-IE,en-GB;q=0.9,en;q=0.8'))
+          .to.be.rejectedWith('Quality factors are not supported');
       });
     });
   });
