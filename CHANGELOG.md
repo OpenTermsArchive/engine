@@ -2,6 +2,14 @@
 
 All changes that impact users of this module are documented in this file, in the [Common Changelog](https://common-changelog.org) format with some additional specifications defined in the CONTRIBUTING file. This codebase adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased [minor]
+
+> Development of this release was made on a volunteer basis by Clément Biron.
+
+### Added
+
+- Compress Collection API responses with gzip when clients advertise support through the Accept-Encoding header
+
 ## 10.6.0 - 2026-01-26
 
 > Development of this release was supported by [Reset Tech](https://www.reset.tech).
