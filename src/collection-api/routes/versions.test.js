@@ -683,4 +683,32 @@ describe('Versions API', () => {
       });
     });
   });
+
+  describe('Response compression', () => {
+    const LONG_CONTENT = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. '.repeat(100); // exceeds the default 1 KB compression threshold
+
+    let response;
+
+    before(async () => {
+      await versionsRepository.save(new Version({
+        serviceId: 'service-1',
+        termsType: 'Imprint',
+        snapshotId: ['snapshot_id'],
+        content: LONG_CONTENT,
+        fetchDate: FETCH_DATE,
+      }));
+
+      response = await request
+        .get(`${basePath}/v1/version/service-1/Imprint/latest`)
+        .set('Accept-Encoding', 'gzip');
+    });
+
+    it('compresses the response with gzip when the client accepts it', () => {
+      expect(response.headers['content-encoding']).to.equal('gzip');
+    });
+
+    it('returns the original content once decompressed', () => {
+      expect(response.body.content).to.equal(LONG_CONTENT);
+    });
+  });
 });

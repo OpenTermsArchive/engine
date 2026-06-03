@@ -1,3 +1,4 @@
+import compression from 'compression';
 import config from 'config';
 import express from 'express';
 
@@ -7,6 +8,8 @@ import loggerMiddleware from './middlewares/logger.js';
 import apiRouter from './routes/index.js';
 
 const app = express();
+
+app.use(compression()); // Compress responses, notably the large version documents the Explorer downloads, to reduce transfer size and speed up consumption
 
 if (process.env.NODE_ENV !== 'test') {
   app.use(loggerMiddleware);

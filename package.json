@@ -63,6 +63,7 @@
     "chai": "^6.0.1",
     "chai-as-promised": "^8.0.2",
     "commander": "^14.0.1",
+    "compression": "^1.8.1",
     "config": "^4.1.1",
     "croner": "^9.1.0",
     "cronstrue": "^3.3.0",
