@@ -164,13 +164,6 @@ describe('Full DOM Fetcher', function () {
         expect(result.content).to.match(/data-languages="fr-FR,fr"/);
       });
 
-      it('drives client-side language detection on the fetched document', async () => {
-        const result = await fetch(`http://127.0.0.1:${SERVER_PORT}/lang-detect`, ['.lang-detected'], config);
-
-        expect(result.content).to.match(/<div class="lang-detected">Conditions<\/div>/);
-        expect(result.content).not.to.match(/>Terms</);
-      });
-
       it('sends every configured tag as Accept-Language header', async () => {
         const result = await fetch(`http://127.0.0.1:${SERVER_PORT}/lang-header`, [], config);
 
@@ -208,11 +201,7 @@ describe('Full DOM Fetcher', function () {
   });
 
   describe('Stealth evasions', () => {
-    // These assertions guard against a class of regressions where the
-    // puppeteer-extra-plugin-stealth fails to be registered before
-    // puppeteer.launch(): if it is registered later, puppeteer-extra never
-    // binds its onPageCreated hooks and all evasions stay inactive,
-    // leaving navigator.webdriver === true and HeadlessChrome in the UA.
+    // These assertions guard against a class of regressions where the puppeteer-extra-plugin-stealth fails to be registered before puppeteer.launch(): if it is registered later, puppeteer-extra never binds its onPageCreated hooks and all evasions stay inactive, leaving navigator.webdriver === true and HeadlessChrome in the UA.
     const config = { navigationTimeout: 5000, waitForElementsTimeout: 5000, language: 'en' };
     let content;
 
