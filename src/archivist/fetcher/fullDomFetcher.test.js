@@ -257,6 +257,10 @@ describe('parseLanguage', () => {
     it('throws for a single tag carrying a quality factor', () => {
       expect(() => parseLanguage('en;q=1.0')).to.throw('Quality factors are not supported');
     });
+
+    it('throws regardless of quality-factor letter case', () => {
+      expect(() => parseLanguage('en-GB;Q=0.9,en')).to.throw('Quality factors are not supported');
+    });
   });
 
   context('with invalid input', () => {

@@ -12,7 +12,7 @@ export function parseLanguage(value) {
     throw new Error(`Fetcher language must be a string; received ${JSON.stringify(value)}. Pass the value of "@opentermsarchive/engine.fetcher.language" explicitly.`);
   }
 
-  if (value.includes(';q=')) {
+  if (value.toLowerCase().includes(';q=')) {
     throw new Error(`Quality factors are not supported in fetcher language configuration; received "${value}". Provide a comma-separated list of BCP 47 tags in priority order, for example "en-IE,en-GB,en".`);
   }
 
