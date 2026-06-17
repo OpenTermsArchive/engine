@@ -79,42 +79,30 @@ class RepositoryInterface {
   }
 
   /**
-   * Find all records
+   * Find all records, in descending chronological order (newest first; opposite of #iterate)
    * For performance reasons, the content of the records will not be loaded by default. Use #loadRecordContent to load the content of individual records
-   * @see    RepositoryInterface#loadRecordContent
-   * @param   {object}                 [options]        - Pagination options
-   * @param   {number}                 [options.limit]  - Maximum number of records to return
-   * @param   {number}                 [options.offset] - Number of records to skip
-   * @returns {Promise<Array<Record>>}                  Promise that will be resolved with an array of all records
+   * @see     RepositoryInterface#loadRecordContent
+   * @see     RepositoryInterface#iterate
+   * @param   {object}                 [options]                          - Query options
+   * @param   {number}                 [options.limit]                    - Maximum number of records to return
+   * @param   {number}                 [options.offset]                   - Number of records to skip
+   * @param   {boolean}                [options.includeTechnicalUpgrades] - When false, exclude technical upgrade records (re-renders of existing snapshots) and only return records that represent actual content changes. Default: true
+   * @returns {Promise<Array<Record>>}                                    Promise that will be resolved with an array of records in descending chronological order
    */
   async findAll(options = {}) {
     throw new Error(`#findAll method is not implemented in ${this.constructor.name}`);
   }
 
   /**
-   * Find all records for a specific service and terms type
+   * Find all records for a specific service, in descending chronological order
    * For performance reasons, the content of the records will not be loaded by default. Use #loadRecordContent to load the content of individual records
-   * @see    RepositoryInterface#loadRecordContent
-   * @param   {string}                 serviceId        - Service ID of records to find
-   * @param   {string}                 termsType        - Terms type of records to find
-   * @param   {object}                 [options]        - Pagination options
-   * @param   {number}                 [options.limit]  - Maximum number of records to return
-   * @param   {number}                 [options.offset] - Number of records to skip
-   * @returns {Promise<Array<Record>>}                  Promise that will be resolved with an array of matching records
-   */
-  async findByServiceAndTermsType(serviceId, termsType, options = {}) {
-    throw new Error(`#findByServiceAndTermsType method is not implemented in ${this.constructor.name}`);
-  }
-
-  /**
-   * Find all records for a specific service (across all terms types)
-   * For performance reasons, the content of the records will not be loaded by default. Use #loadRecordContent to load the content of individual records
-   * @see    RepositoryInterface#loadRecordContent
-   * @param   {string}                 serviceId        - Service ID of records to find
-   * @param   {object}                 [options]        - Pagination options
-   * @param   {number}                 [options.limit]  - Maximum number of records to return
-   * @param   {number}                 [options.offset] - Number of records to skip
-   * @returns {Promise<Array<Record>>}                  Promise that will be resolved with an array of matching records
+   * @see     RepositoryInterface#loadRecordContent
+   * @param   {string}                 serviceId                          - Service ID of records to find
+   * @param   {object}                 [options]                          - Query options
+   * @param   {number}                 [options.limit]                    - Maximum number of records to return
+   * @param   {number}                 [options.offset]                   - Number of records to skip
+   * @param   {boolean}                [options.includeTechnicalUpgrades] - When false, exclude technical upgrade records (re-renders of existing snapshots) and only return records that represent actual content changes. Default: true
+   * @returns {Promise<Array<Record>>}                                    Promise that will be resolved with an array of matching records in descending chronological order
    */
   async findByService(serviceId, options = {}) {
     throw new Error(`#findByService method is not implemented in ${this.constructor.name}`);
@@ -146,6 +134,22 @@ class RepositoryInterface {
    */
   async findNext(versionId) {
     throw new Error(`#findNext method is not implemented in ${this.constructor.name}`);
+  }
+
+  /**
+   * Find all records for a specific service and terms type, in descending chronological order
+   * For performance reasons, the content of the records will not be loaded by default. Use #loadRecordContent to load the content of individual records
+   * @see     RepositoryInterface#loadRecordContent
+   * @param   {string}                 serviceId                          - Service ID of records to find
+   * @param   {string}                 termsType                          - Terms type of records to find
+   * @param   {object}                 [options]                          - Query options
+   * @param   {number}                 [options.limit]                    - Maximum number of records to return
+   * @param   {number}                 [options.offset]                   - Number of records to skip
+   * @param   {boolean}                [options.includeTechnicalUpgrades] - When false, exclude technical upgrade records (re-renders of existing snapshots) and only return records that represent actual content changes. Default: true
+   * @returns {Promise<Array<Record>>}                                    Promise that will be resolved with an array of matching records in descending chronological order
+   */
+  async findByServiceAndTermsType(serviceId, termsType, options = {}) {
+    throw new Error(`#findByServiceAndTermsType method is not implemented in ${this.constructor.name}`);
   }
 
   /**

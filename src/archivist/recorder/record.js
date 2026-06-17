@@ -3,6 +3,13 @@
  * @class Record
  * @private
  */
+
+export const TITLE_PREFIXES = Object.freeze({
+  firstRecord: 'First record of',
+  technicalUpgrade: 'Apply technical or declaration upgrade on',
+  update: 'Record new changes of',
+});
+
 export default class Record {
   #content;
 
@@ -30,6 +37,20 @@ export default class Record {
 
   set content(content) {
     this.#content = content;
+  }
+
+  get displayTitle() {
+    let prefix;
+
+    if (this.isFirstRecord) {
+      prefix = TITLE_PREFIXES.firstRecord;
+    } else if (this.isTechnicalUpgrade) {
+      prefix = TITLE_PREFIXES.technicalUpgrade;
+    } else {
+      prefix = TITLE_PREFIXES.update;
+    }
+
+    return `${prefix} ${this.serviceId} ${this.termsType}`;
   }
 
   validate() {

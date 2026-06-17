@@ -95,14 +95,15 @@ export default class MongoRepository extends RepositoryInterface {
 
     const document = await this.collection.findOne(
       { _id: ObjectId.createFromHexString(recordId) },
-      { projection: { content: 0 } }
+      { projection: { content: 0 } },
     );
 
     return document ? this.#toDomain(document, { deferContentLoading: true }) : null;
   }
 
-  async findAll({ limit, offset } = {}) {
-    let query = this.collection.find().project({ content: 0 }).sort({ fetchDate: -1 });
+  async findAll({ limit, offset, includeTechnicalUpgrades = true } = {}) {
+    const filter = includeTechnicalUpgrades ? {} : { isTechnicalUpgrade: { $ne: true } };
+    let query = this.collection.find(filter).project({ content: 0 }).sort({ fetchDate: -1 });
 
     if (offset !== undefined) {
       query = query.skip(offset);
@@ -116,8 +117,14 @@ export default class MongoRepository extends RepositoryInterface {
       .map(mongoDocument => this.#toDomain(mongoDocument, { deferContentLoading: true })));
   }
 
-  async findByServiceAndTermsType(serviceId, termsType, { limit, offset } = {}) {
-    let query = this.collection.find({ serviceId, termsType }).project({ content: 0 }).sort({ fetchDate: -1 });
+  async findByServiceAndTermsType(serviceId, termsType, { limit, offset, includeTechnicalUpgrades = true } = {}) {
+    const filter = { serviceId, termsType };
+
+    if (!includeTechnicalUpgrades) {
+      filter.isTechnicalUpgrade = { $ne: true };
+    }
+
+    let query = this.collection.find(filter).project({ content: 0 }).sort({ fetchDate: -1 });
 
     if (offset !== undefined) {
       query = query.skip(offset);
@@ -131,8 +138,14 @@ export default class MongoRepository extends RepositoryInterface {
       .map(mongoDocument => this.#toDomain(mongoDocument, { deferContentLoading: true })));
   }
 
-  async findByService(serviceId, { limit, offset } = {}) {
-    let query = this.collection.find({ serviceId }).project({ content: 0 }).sort({ fetchDate: -1 });
+  async findByService(serviceId, { limit, offset, includeTechnicalUpgrades = true } = {}) {
+    const filter = { serviceId };
+
+    if (!includeTechnicalUpgrades) {
+      filter.isTechnicalUpgrade = { $ne: true };
+    }
+
+    let query = this.collection.find(filter).project({ content: 0 }).sort({ fetchDate: -1 });
 
     if (offset !== undefined) {
       query = query.skip(offset);
@@ -210,8 +223,8 @@ export default class MongoRepository extends RepositoryInterface {
     record.content = content instanceof Binary ? content.buffer : content;
   }
 
-  // eslint-disable-next-line no-unused-vars
-  async getDiffStats(recordId) {
+  // eslint-disable-next-line class-methods-use-this, no-unused-vars
+  getDiffStats(recordId) {
     return { additions: null, deletions: null }; // Diff stats are not available for MongoDB storage
   }
 

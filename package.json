@@ -1,6 +1,6 @@
 {
   "name": "@opentermsarchive/engine",
-  "version": "10.6.0",
+  "version": "12.0.2",
   "description": "Tracks and makes visible changes to the terms of online services",
   "homepage": "https://opentermsarchive.org",
   "bugs": {
@@ -53,7 +53,7 @@
   "dependencies": {
     "@accordproject/concerto-cto": "^3.24.0",
     "@accordproject/concerto-util": "^3.24.0",
-    "@accordproject/markdown-cicero": "^0.16.26",
+    "@accordproject/markdown-cicero": "^0.18.0",
     "@accordproject/markdown-pdf": "^0.16.25",
     "abort-controller": "^3.0.0",
     "ajv": "^8.17.1",
@@ -84,7 +84,7 @@
     "iconv-lite": "^0.7.0",
     "joplin-turndown-plugin-gfm": "^1.0.12",
     "js-yaml": "^4.1.0",
-    "jsdom": "^27.0.0",
+    "jsdom": "^29.0.1",
     "json-source-map": "^0.6.1",
     "mime": "^4.1.0",
     "mocha": "^11.7.2",
@@ -95,13 +95,13 @@
     "puppeteer": "^24.22.0",
     "puppeteer-extra": "^3.3.6",
     "puppeteer-extra-plugin-stealth": "^2.11.2",
-    "sib-api-v3-sdk": "^8.5.0",
     "simple-git": "^3.28.0",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1",
     "turndown": "^7.2.1",
     "winston": "^3.17.0",
-    "winston-mail": "^2.0.0"
+    "winston-mail": "^2.0.0",
+    "xml-js": "^1.6.11"
   },
   "devDependencies": {
     "@commitlint/cli": "^19.8.1",
@@ -117,5 +117,10 @@
   },
   "engines": {
     "node": ">=20 <=24"
+  },
+  "overrides": {
+    "jsdom": {
+      "lru-cache": "11.2.7"
+    }
   }
 }

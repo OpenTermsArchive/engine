@@ -1,10 +1,11 @@
-import config from 'config';
 import express from 'express';
 
-import RepositoryFactory from '../../archivist/recorder/repositories/factory.js';
 import { toISODateWithoutMilliseconds } from '../../archivist/utils/date.js';
 
 /**
+ * @param   {object}         versionsRepository  The versions repository instance
+ * @param   {object}         snapshotsRepository The snapshots repository instance
+ * @returns {express.Router}                     The router instance
  * @private
  * @swagger
  * tags:
@@ -190,419 +191,421 @@ import { toISODateWithoutMilliseconds } from '../../archivist/utils/date.js';
  *           schema:
  *             $ref: '#/components/schemas/ErrorResponse'
  */
-const router = express.Router();
+export default function versionsRouter(versionsRepository, snapshotsRepository) {
+  const router = express.Router();
 
-const versionsRepository = await RepositoryFactory.create(config.get('@opentermsarchive/engine.recorder.versions.storage')).initialize();
-const snapshotsRepository = await RepositoryFactory.create(config.get('@opentermsarchive/engine.recorder.snapshots.storage')).initialize();
+  function parsePaginationParams(query) {
+    const limit = query.limit ? parseInt(query.limit, 10) : 100;
+    const offset = query.offset ? parseInt(query.offset, 10) : 0;
 
-function parsePaginationParams(query) {
-  const limit = query.limit ? parseInt(query.limit, 10) : 100;
-  const offset = query.offset ? parseInt(query.offset, 10) : 0;
-
-  return { limit, offset };
-}
-
-function validatePaginationParams(limit, offset) {
-  if (Number.isNaN(limit) || limit < 1) {
-    return { error: 'Invalid limit parameter. Must be a positive integer.' };
+    return { limit, offset };
   }
 
-  if (limit > 500) {
-    return { error: 'Invalid limit parameter. Must not exceed 500.' };
+  function validatePaginationParams(limit, offset) {
+    if (Number.isNaN(limit) || limit < 1) {
+      return { error: 'Invalid limit parameter. Must be a positive integer.' };
+    }
+
+    if (limit > 500) {
+      return { error: 'Invalid limit parameter. Must not exceed 500.' };
+    }
+
+    if (Number.isNaN(offset) || offset < 0) {
+      return { error: 'Invalid offset parameter. Must be a non-negative integer.' };
+    }
+
+    return null;
   }
 
-  if (Number.isNaN(offset) || offset < 0) {
-    return { error: 'Invalid offset parameter. Must be a non-negative integer.' };
-  }
-
-  return null;
-}
-
-function mapVersionToListItem(version) {
-  return {
-    id: version.id,
-    serviceId: version.serviceId,
-    termsType: version.termsType,
-    fetchDate: toISODateWithoutMilliseconds(version.fetchDate),
-    isFirstRecord: version.isFirstRecord,
-    isTechnicalUpgrade: version.isTechnicalUpgrade,
-  };
-}
-
-async function getFetchUrls(snapshotIds) {
-  if (!snapshotIds?.length) return [];
-  const snapshots = await Promise.all(snapshotIds.map(id => snapshotsRepository.findMetadataById(id)));
-
-  return snapshots
-    .filter(Boolean)
-    .map(snapshot => snapshot.metadata?.['x-source-document-location'])
-    .filter(Boolean);
-}
-
-function mapVersionToDetailResponse(version, links, fetchUrls) {
-  return {
-    id: version.id,
-    serviceId: version.serviceId,
-    termsType: version.termsType,
-    fetchDate: toISODateWithoutMilliseconds(version.fetchDate),
-    content: version.content,
-    isFirstRecord: version.isFirstRecord,
-    isTechnicalUpgrade: version.isTechnicalUpgrade,
-    fetchUrls,
-    links: {
-      first: links.first?.id || null,
-      prev: links.prev?.id || null,
-      next: links.next?.id || null,
-      last: links.last?.id || null,
-    },
-  };
-}
-
-/**
- * @private
- * @swagger
- * /versions:
- *   get:
- *     summary: Get all versions.
- *     tags: [Versions]
- *     produces:
- *       - application/json
- *     parameters:
- *       - $ref: '#/components/parameters/LimitParam'
- *       - $ref: '#/components/parameters/OffsetParam'
- *     responses:
- *       200:
- *         description: A JSON object containing the list of all versions and metadata.
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/PaginatedVersionsResponse'
- *       400:
- *         $ref: '#/components/responses/BadRequestError'
- */
-router.get('/versions', async (req, res) => {
-  const { limit, offset } = parsePaginationParams(req.query);
-  const validationError = validatePaginationParams(limit, offset);
-
-  if (validationError) {
-    return res.status(400).json(validationError);
-  }
-
-  const paginatedVersions = await versionsRepository.findAll({ limit, offset });
-
-  const versionsList = paginatedVersions.map(mapVersionToListItem);
-
-  const response = {
-    data: versionsList,
-    count: await versionsRepository.count(),
-    limit,
-    offset,
-  };
-
-  return res.status(200).json(response);
-});
-
-/**
- * @private
- * @swagger
- * /versions/{serviceId}:
- *   get:
- *     summary: Get all versions for a specific service.
- *     tags: [Versions]
- *     produces:
- *       - application/json
- *     parameters:
- *       - in: path
- *         name: serviceId
- *         description: The ID of the service whose versions will be returned.
- *         schema:
- *           type: string
- *         required: true
- *       - $ref: '#/components/parameters/LimitParam'
- *       - $ref: '#/components/parameters/OffsetParam'
- *     responses:
- *       200:
- *         description: A JSON object containing the list of versions and metadata.
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/PaginatedVersionsResponse'
- *       400:
- *         $ref: '#/components/responses/BadRequestError'
- *       404:
- *         $ref: '#/components/responses/NotFoundError'
- */
-router.get('/versions/:serviceId', async (req, res) => {
-  const { serviceId } = req.params;
-  const { limit, offset } = parsePaginationParams(req.query);
-  const validationError = validatePaginationParams(limit, offset);
-
-  if (validationError) {
-    return res.status(400).json(validationError);
-  }
-
-  const totalCount = await versionsRepository.count(serviceId);
-
-  if (totalCount === 0) {
-    return res.status(404).json({ error: `No versions found for service "${serviceId}"` });
-  }
-
-  const paginatedVersions = await versionsRepository.findByService(serviceId, { limit, offset });
-
-  const versionsList = paginatedVersions.map(mapVersionToListItem);
-
-  const response = {
-    data: versionsList,
-    count: totalCount,
-    limit,
-    offset,
-  };
-
-  return res.status(200).json(response);
-});
-
-/**
- * @private
- * @swagger
- * /versions/{serviceId}/{termsType}:
- *   get:
- *     summary: Get all versions of some terms for a specific service.
- *     tags: [Versions]
- *     produces:
- *       - application/json
- *     parameters:
- *       - in: path
- *         name: serviceId
- *         description: The ID of the service whose versions will be returned.
- *         schema:
- *           type: string
- *         required: true
- *       - in: path
- *         name: termsType
- *         description: The type of terms whose versions will be returned.
- *         schema:
- *           type: string
- *         required: true
- *       - $ref: '#/components/parameters/LimitParam'
- *       - $ref: '#/components/parameters/OffsetParam'
- *     responses:
- *       200:
- *         description: A JSON object containing the list of versions with diff statistics and metadata.
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/PaginatedVersionsWithStatsResponse'
- *       400:
- *         $ref: '#/components/responses/BadRequestError'
- *       404:
- *         $ref: '#/components/responses/NotFoundError'
- */
-router.get('/versions/:serviceId/:termsType', async (req, res) => {
-  const { serviceId, termsType } = req.params;
-  const { limit, offset } = parsePaginationParams(req.query);
-  const validationError = validatePaginationParams(limit, offset);
-
-  if (validationError) {
-    return res.status(400).json(validationError);
-  }
-
-  const totalCount = await versionsRepository.count(serviceId, termsType);
-
-  if (totalCount === 0) {
-    return res.status(404).json({ error: `No versions found for service "${serviceId}" and terms type "${termsType}"` });
-  }
-
-  const paginatedVersions = await versionsRepository.findByServiceAndTermsType(serviceId, termsType, { limit, offset });
-
-  const versionsList = await Promise.all(paginatedVersions.map(async version => {
-    const stats = await versionsRepository.getDiffStats(version.id);
-
+  function mapVersionToListItem(version) {
     return {
-      ...mapVersionToListItem(version),
-      ...stats,
+      id: version.id,
+      serviceId: version.serviceId,
+      termsType: version.termsType,
+      fetchDate: toISODateWithoutMilliseconds(version.fetchDate),
+      isFirstRecord: version.isFirstRecord,
+      isTechnicalUpgrade: version.isTechnicalUpgrade,
     };
-  }));
-
-  const response = {
-    data: versionsList,
-    count: totalCount,
-    limit,
-    offset,
-  };
-
-  return res.status(200).json(response);
-});
-
-/**
- * @private
- * @swagger
- * /version/{versionId}:
- *   get:
- *     summary: Get a specific version by its ID.
- *     tags: [Versions]
- *     produces:
- *       - application/json
- *     parameters:
- *       - in: path
- *         name: versionId
- *         description: The ID of the version to retrieve.
- *         schema:
- *           type: string
- *         required: true
- *     responses:
- *       200:
- *         description: A JSON object containing the version content, metadata, and navigation links.
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/VersionWithLinks'
- *       404:
- *         $ref: '#/components/responses/NotFoundError'
- */
-router.get('/version/:versionId', async (req, res) => {
-  const { versionId } = req.params;
-
-  const version = await versionsRepository.findById(versionId);
-
-  if (!version) {
-    return res.status(404).json({ error: `No version found with ID "${versionId}"` });
   }
 
-  const [ first, prev, next, last, stats, fetchUrls ] = await Promise.all([
-    versionsRepository.findFirst(version.serviceId, version.termsType),
-    versionsRepository.findPrevious(versionId),
-    versionsRepository.findNext(versionId),
-    versionsRepository.findLatest(version.serviceId, version.termsType),
-    versionsRepository.getDiffStats(versionId),
-    getFetchUrls(version.snapshotIds),
-  ]);
+  async function getFetchUrls(snapshotIds) {
+    if (!snapshotIds?.length) {
+      return [];
+    }
 
-  return res.status(200).json({
-    ...mapVersionToDetailResponse(version, { first, prev, next, last }, fetchUrls),
-    ...stats,
+    const snapshots = await Promise.all(snapshotIds.map(id => snapshotsRepository.findMetadataById(id)));
+
+    return snapshots
+      .filter(Boolean)
+      .map(snapshot => snapshot.metadata?.['x-source-document-location'])
+      .filter(Boolean);
+  }
+
+  function mapVersionToDetailResponse(version, links, fetchUrls) {
+    return {
+      id: version.id,
+      serviceId: version.serviceId,
+      termsType: version.termsType,
+      fetchDate: toISODateWithoutMilliseconds(version.fetchDate),
+      content: version.content,
+      isFirstRecord: version.isFirstRecord,
+      isTechnicalUpgrade: version.isTechnicalUpgrade,
+      fetchUrls,
+      links: {
+        first: links.first?.id || null,
+        prev: links.prev?.id || null,
+        next: links.next?.id || null,
+        last: links.last?.id || null,
+      },
+    };
+  }
+
+  /**
+   * @private
+   * @swagger
+   * /versions:
+   *   get:
+   *     summary: Get all versions.
+   *     tags: [Versions]
+   *     produces:
+   *       - application/json
+   *     parameters:
+   *       - $ref: '#/components/parameters/LimitParam'
+   *       - $ref: '#/components/parameters/OffsetParam'
+   *     responses:
+   *       200:
+   *         description: A JSON object containing the list of all versions and metadata.
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/PaginatedVersionsResponse'
+   *       400:
+   *         $ref: '#/components/responses/BadRequestError'
+   */
+  router.get('/versions', async (req, res) => {
+    const { limit, offset } = parsePaginationParams(req.query);
+    const validationError = validatePaginationParams(limit, offset);
+
+    if (validationError) {
+      return res.status(400).json(validationError);
+    }
+
+    const paginatedVersions = await versionsRepository.findAll({ limit, offset });
+
+    const versionsList = paginatedVersions.map(mapVersionToListItem);
+
+    const response = {
+      data: versionsList,
+      count: await versionsRepository.count(),
+      limit,
+      offset,
+    };
+
+    return res.status(200).json(response);
   });
-});
 
-/**
- * @private
- * @swagger
- * /version/{serviceId}/{termsType}/latest:
- *   get:
- *     summary: Get the latest version of some terms for a service.
- *     tags: [Versions]
- *     produces:
- *       - application/json
- *     parameters:
- *       - in: path
- *         name: serviceId
- *         description: The ID of the service whose version will be returned.
- *         schema:
- *           type: string
- *         required: true
- *       - in: path
- *         name: termsType
- *         description: The type of terms whose version will be returned.
- *         schema:
- *           type: string
- *         required: true
- *     responses:
- *       200:
- *         description: A JSON object containing the version content, metadata, and navigation links.
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/VersionWithLinks'
- *       404:
- *         $ref: '#/components/responses/NotFoundError'
- */
-router.get('/version/:serviceId/:termsType/latest', async (req, res) => {
-  const { serviceId, termsType } = req.params;
+  /**
+   * @private
+   * @swagger
+   * /versions/{serviceId}:
+   *   get:
+   *     summary: Get all versions for a specific service.
+   *     tags: [Versions]
+   *     produces:
+   *       - application/json
+   *     parameters:
+   *       - in: path
+   *         name: serviceId
+   *         description: The ID of the service whose versions will be returned.
+   *         schema:
+   *           type: string
+   *         required: true
+   *       - $ref: '#/components/parameters/LimitParam'
+   *       - $ref: '#/components/parameters/OffsetParam'
+   *     responses:
+   *       200:
+   *         description: A JSON object containing the list of versions and metadata.
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/PaginatedVersionsResponse'
+   *       400:
+   *         $ref: '#/components/responses/BadRequestError'
+   *       404:
+   *         $ref: '#/components/responses/NotFoundError'
+   */
+  router.get('/versions/:serviceId', async (req, res) => {
+    const { serviceId } = req.params;
+    const { limit, offset } = parsePaginationParams(req.query);
+    const validationError = validatePaginationParams(limit, offset);
 
-  const version = await versionsRepository.findLatest(serviceId, termsType);
+    if (validationError) {
+      return res.status(400).json(validationError);
+    }
 
-  if (!version) {
-    return res.status(404).json({ error: `No version found for service "${serviceId}" and terms type "${termsType}"` });
-  }
+    const totalCount = await versionsRepository.count(serviceId);
 
-  const [ first, prev, next, last, fetchUrls ] = await Promise.all([
-    versionsRepository.findFirst(version.serviceId, version.termsType),
-    versionsRepository.findPrevious(version.id),
-    versionsRepository.findNext(version.id),
-    versionsRepository.findLatest(version.serviceId, version.termsType),
-    getFetchUrls(version.snapshotIds),
-  ]);
+    if (totalCount === 0) {
+      return res.status(404).json({ error: `No versions found for service "${serviceId}"` });
+    }
 
-  return res.status(200).json(mapVersionToDetailResponse(version, { first, prev, next, last }, fetchUrls));
-});
+    const paginatedVersions = await versionsRepository.findByService(serviceId, { limit, offset });
 
-/**
- * @private
- * @swagger
- * /version/{serviceId}/{termsType}/{date}:
- *   get:
- *     summary: Get a specific version of some terms at a given date.
- *     tags: [Versions]
- *     produces:
- *       - application/json
- *     parameters:
- *       - in: path
- *         name: serviceId
- *         description: The ID of the service whose version will be returned.
- *         schema:
- *           type: string
- *         required: true
- *       - in: path
- *         name: termsType
- *         description: The type of terms whose version will be returned.
- *         schema:
- *           type: string
- *         required: true
- *       - in: path
- *         name: date
- *         description: The date and time for which the version is requested, in ISO 8601 format.
- *         schema:
- *           type: string
- *           format: date-time
- *         required: true
- *     responses:
- *       200:
- *         description: A JSON object containing the version content, metadata, and navigation links.
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/VersionWithLinks'
- *       404:
- *         $ref: '#/components/responses/NotFoundError'
- *       416:
- *         description: The requested date is in the future.
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
- */
-router.get('/version/:serviceId/:termsType/:date', async (req, res) => {
-  const { serviceId, termsType, date } = req.params;
-  const requestedDate = new Date(date);
+    const versionsList = paginatedVersions.map(mapVersionToListItem);
 
-  if (requestedDate > new Date()) {
-    return res.status(416).json({ error: 'Requested version is in the future' });
-  }
+    const response = {
+      data: versionsList,
+      count: totalCount,
+      limit,
+      offset,
+    };
 
-  const version = await versionsRepository.findByDate(serviceId, termsType, requestedDate);
+    return res.status(200).json(response);
+  });
 
-  if (!version) {
-    return res.status(404).json({ error: `No version found for service "${serviceId}" and terms type "${termsType}" at date ${date}` });
-  }
+  /**
+   * @private
+   * @swagger
+   * /versions/{serviceId}/{termsType}:
+   *   get:
+   *     summary: Get all versions of some terms for a specific service.
+   *     tags: [Versions]
+   *     produces:
+   *       - application/json
+   *     parameters:
+   *       - in: path
+   *         name: serviceId
+   *         description: The ID of the service whose versions will be returned.
+   *         schema:
+   *           type: string
+   *         required: true
+   *       - in: path
+   *         name: termsType
+   *         description: The type of terms whose versions will be returned.
+   *         schema:
+   *           type: string
+   *         required: true
+   *       - $ref: '#/components/parameters/LimitParam'
+   *       - $ref: '#/components/parameters/OffsetParam'
+   *     responses:
+   *       200:
+   *         description: A JSON object containing the list of versions with diff statistics and metadata.
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/PaginatedVersionsWithStatsResponse'
+   *       400:
+   *         $ref: '#/components/responses/BadRequestError'
+   *       404:
+   *         $ref: '#/components/responses/NotFoundError'
+   */
+  router.get('/versions/:serviceId/:termsType', async (req, res) => {
+    const { serviceId, termsType } = req.params;
+    const { limit, offset } = parsePaginationParams(req.query);
+    const validationError = validatePaginationParams(limit, offset);
 
-  const [ first, prev, next, last, fetchUrls ] = await Promise.all([
-    versionsRepository.findFirst(version.serviceId, version.termsType),
-    versionsRepository.findPrevious(version.id),
-    versionsRepository.findNext(version.id),
-    versionsRepository.findLatest(version.serviceId, version.termsType),
-    getFetchUrls(version.snapshotIds),
-  ]);
+    if (validationError) {
+      return res.status(400).json(validationError);
+    }
 
-  return res.status(200).json(mapVersionToDetailResponse(version, { first, prev, next, last }, fetchUrls));
-});
+    const totalCount = await versionsRepository.count(serviceId, termsType);
 
-export default router;
+    if (totalCount === 0) {
+      return res.status(404).json({ error: `No versions found for service "${serviceId}" and terms type "${termsType}"` });
+    }
+
+    const paginatedVersions = await versionsRepository.findByServiceAndTermsType(serviceId, termsType, { limit, offset });
+
+    const versionsList = await Promise.all(paginatedVersions.map(async version => {
+      const stats = await versionsRepository.getDiffStats(version.id);
+
+      return {
+        ...mapVersionToListItem(version),
+        ...stats,
+      };
+    }));
+
+    const response = {
+      data: versionsList,
+      count: totalCount,
+      limit,
+      offset,
+    };
+
+    return res.status(200).json(response);
+  });
+
+  /**
+   * @private
+   * @swagger
+   * /version/{versionId}:
+   *   get:
+   *     summary: Get a specific version by its ID.
+   *     tags: [Versions]
+   *     produces:
+   *       - application/json
+   *     parameters:
+   *       - in: path
+   *         name: versionId
+   *         description: The ID of the version to retrieve.
+   *         schema:
+   *           type: string
+   *         required: true
+   *     responses:
+   *       200:
+   *         description: A JSON object containing the version content, metadata, and navigation links.
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/VersionWithLinks'
+   *       404:
+   *         $ref: '#/components/responses/NotFoundError'
+   */
+  router.get('/version/:versionId', async (req, res) => {
+    const { versionId } = req.params;
+
+    const version = await versionsRepository.findById(versionId);
+
+    if (!version) {
+      return res.status(404).json({ error: `No version found with ID "${versionId}"` });
+    }
+
+    const [ first, prev, next, last, stats, fetchUrls ] = await Promise.all([
+      versionsRepository.findFirst(version.serviceId, version.termsType),
+      versionsRepository.findPrevious(versionId),
+      versionsRepository.findNext(versionId),
+      versionsRepository.findLatest(version.serviceId, version.termsType),
+      versionsRepository.getDiffStats(versionId),
+      getFetchUrls(version.snapshotIds),
+    ]);
+
+    return res.status(200).json({
+      ...mapVersionToDetailResponse(version, { first, prev, next, last }, fetchUrls),
+      ...stats,
+    });
+  });
+
+  /**
+   * @private
+   * @swagger
+   * /version/{serviceId}/{termsType}/latest:
+   *   get:
+   *     summary: Get the latest version of some terms for a service.
+   *     tags: [Versions]
+   *     produces:
+   *       - application/json
+   *     parameters:
+   *       - in: path
+   *         name: serviceId
+   *         description: The ID of the service whose version will be returned.
+   *         schema:
+   *           type: string
+   *         required: true
+   *       - in: path
+   *         name: termsType
+   *         description: The type of terms whose version will be returned.
+   *         schema:
+   *           type: string
+   *         required: true
+   *     responses:
+   *       200:
+   *         description: A JSON object containing the version content, metadata, and navigation links.
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/VersionWithLinks'
+   *       404:
+   *         $ref: '#/components/responses/NotFoundError'
+   */
+  router.get('/version/:serviceId/:termsType/latest', async (req, res) => {
+    const { serviceId, termsType } = req.params;
+
+    const version = await versionsRepository.findLatest(serviceId, termsType);
+
+    if (!version) {
+      return res.status(404).json({ error: `No version found for service "${serviceId}" and terms type "${termsType}"` });
+    }
+
+    const [ first, prev, next, last, fetchUrls ] = await Promise.all([
+      versionsRepository.findFirst(version.serviceId, version.termsType),
+      versionsRepository.findPrevious(version.id),
+      versionsRepository.findNext(version.id),
+      versionsRepository.findLatest(version.serviceId, version.termsType),
+      getFetchUrls(version.snapshotIds),
+    ]);
+
+    return res.status(200).json(mapVersionToDetailResponse(version, { first, prev, next, last }, fetchUrls));
+  });
+
+  /**
+   * @private
+   * @swagger
+   * /version/{serviceId}/{termsType}/{date}:
+   *   get:
+   *     summary: Get a specific version of some terms at a given date.
+   *     tags: [Versions]
+   *     produces:
+   *       - application/json
+   *     parameters:
+   *       - in: path
+   *         name: serviceId
+   *         description: The ID of the service whose version will be returned.
+   *         schema:
+   *           type: string
+   *         required: true
+   *       - in: path
+   *         name: termsType
+   *         description: The type of terms whose version will be returned.
+   *         schema:
+   *           type: string
+   *         required: true
+   *       - in: path
+   *         name: date
+   *         description: The date and time for which the version is requested, in ISO 8601 format.
+   *         schema:
+   *           type: string
+   *           format: date-time
+   *         required: true
+   *     responses:
+   *       200:
+   *         description: A JSON object containing the version content, metadata, and navigation links.
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/VersionWithLinks'
+   *       404:
+   *         $ref: '#/components/responses/NotFoundError'
+   *       416:
+   *         description: The requested date is in the future.
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/ErrorResponse'
+   */
+  router.get('/version/:serviceId/:termsType/:date', async (req, res) => {
+    const { serviceId, termsType, date } = req.params;
+    const requestedDate = new Date(date);
+
+    if (requestedDate > new Date()) {
+      return res.status(416).json({ error: 'Requested version is in the future' });
+    }
+
+    const version = await versionsRepository.findByDate(serviceId, termsType, requestedDate);
+
+    if (!version) {
+      return res.status(404).json({ error: `No version found for service "${serviceId}" and terms type "${termsType}" at date ${date}` });
+    }
+
+    const [ first, prev, next, last, fetchUrls ] = await Promise.all([
+      versionsRepository.findFirst(version.serviceId, version.termsType),
+      versionsRepository.findPrevious(version.id),
+      versionsRepository.findNext(version.id),
+      versionsRepository.findLatest(version.serviceId, version.termsType),
+      getFetchUrls(version.snapshotIds),
+    ]);
+
+    return res.status(200).json(mapVersionToDetailResponse(version, { first, prev, next, last }, fetchUrls));
+  });
+
+  return router;
+}

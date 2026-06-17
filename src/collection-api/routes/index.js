@@ -1,10 +1,13 @@
+import config from 'config';
 import express from 'express';
 import helmet from 'helmet';
 
 import { getCollection } from '../../archivist/collection/index.js';
+import RepositoryFactory from '../../archivist/recorder/repositories/factory.js';
 import * as Services from '../../archivist/services/index.js';
 
 import docsRouter from './docs.js';
+import feedRouter from './feed.js';
 import metadataRouter from './metadata.js';
 import servicesRouter from './services.js';
 import versionsRouter from './versions.js';
@@ -33,10 +36,23 @@ export default async function apiRouter(basePath) {
 
   const services = await Services.load();
   const collection = await getCollection();
+  const versionsStorageConfig = config.get('@opentermsarchive/engine.recorder.versions.storage');
+  const versionsRepository = await RepositoryFactory.create(versionsStorageConfig).initialize();
+  const snapshotsRepository = await RepositoryFactory.create(config.get('@opentermsarchive/engine.recorder.snapshots.storage')).initialize();
+  const feedConfig = config.get('@opentermsarchive/engine.collection-api.feed');
+
+  if (!collection.metadata?.id) {
+    throw new Error('Collection metadata "id" is required to expose feed endpoints, as it is used to build the tag URIs that uniquely identify the feed and its entries. Add an "id" field to the collection metadata file.');
+  }
+
+  if (!collection.metadata?.name) {
+    throw new Error('Collection metadata "name" is required to expose feed endpoints, as it is used as the Atom feed title which the Atom 1.0 specification requires to be non-empty. Add a "name" field to the collection metadata file.');
+  }
 
   router.use(await metadataRouter(collection, services));
   router.use(servicesRouter(services));
-  router.use(versionsRouter);
+  router.use(versionsRouter(versionsRepository, snapshotsRepository));
+  router.use(feedRouter(services, versionsRepository, versionsStorageConfig.type, feedConfig.limit, feedConfig.versionUrlTemplate));
 
   return router;
 }

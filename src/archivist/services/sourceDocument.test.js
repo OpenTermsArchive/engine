@@ -157,6 +157,63 @@ describe('SourceDocument', () => {
     });
   });
 
+  describe('#generateId', () => {
+    it('generates ID from URL pathname', () => {
+      expect(new SourceDocument({ location: 'https://example.com/legal/terms' }).id).to.equal('legal-terms');
+    });
+
+    it('returns empty string for root URL', () => {
+      expect(new SourceDocument({ location: 'https://example.com/' }).id).to.equal('');
+    });
+
+    it('decodes URL-encoded characters', () => {
+      expect(new SourceDocument({ location: 'https://example.com/terms%20of%20service' }).id).to.equal('terms of service');
+    });
+
+    it('removes known file extension from URL pathname', () => {
+      expect(new SourceDocument({ location: 'https://example.com/en.html' }).id).to.equal('en');
+    });
+
+    it('removes only the last file extension', () => {
+      expect(new SourceDocument({ location: 'https://example.com/terms.backup.html' }).id).to.equal('terms.backup');
+    });
+
+    it('keeps unknown extension in URL pathname', () => {
+      expect(new SourceDocument({ location: 'https://example.com/terms.of.service' }).id).to.equal('terms.of.service');
+    });
+    it('decodes URL-encoded characters before replacing illegal ones', () => {
+      expect(new SourceDocument({ location: 'https://example.com/terms%3Aof%3Aservice' }).id).to.equal('terms_of_service');
+    });
+
+    context('replaces characters that are illegal in filenames for cross-platform compatibility', () => {
+      const ILLEGAL_CHARACTERS_IN_URL_PATHNAME = {
+        ':': 'colon',
+        '"': 'double quote',
+        '<': 'less than',
+        '>': 'greater than',
+        '|': 'vertical bar',
+        '*': 'asterisk',
+      };
+
+      for (const [ character, name ] of Object.entries(ILLEGAL_CHARACTERS_IN_URL_PATHNAME)) {
+        it(`replaces ${name} "${character}"`, () => {
+          expect(new SourceDocument({ location: `https://example.com/before${character}after` }).id).to.equal('before_after');
+        });
+      }
+
+      const ILLEGAL_CHARACTERS_ENCODED_IN_URL = {
+        '%5C': 'backslash',
+        '%3F': 'question mark',
+      };
+
+      for (const [ encoded, name ] of Object.entries(ILLEGAL_CHARACTERS_ENCODED_IN_URL)) {
+        it(`replaces ${name} decoded from "${encoded}"`, () => {
+          expect(new SourceDocument({ location: `https://example.com/before${encoded}after` }).id).to.equal('before_after');
+        });
+      }
+    });
+  });
+
   describe('#toPersistence', () => {
     it('converts basic source document declarations into JSON representation', () => {
       const result = new SourceDocument({

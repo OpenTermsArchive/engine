@@ -2,6 +2,72 @@
 
 All changes that impact users of this module are documented in this file, in the [Common Changelog](https://common-changelog.org) format with some additional specifications defined in the CONTRIBUTING file. This codebase adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 12.0.2 - 2026-05-26
+
+> Development of this release was supported by [User Rights](https://www.user-rights.org).
+
+### Fixed
+
+- Update `@accordproject/markdown-cicero` to fix `npm ci` failures in collections caused by broken `file:..` references in the deprecated transitive `@accordproject/concerto-core@3.19.8`
+
+## 12.0.1 - 2026-05-26
+
+> Development of this release was supported by [User Rights](https://www.user-rights.org).
+
+### Fixed
+
+- Avoid GitHub API "body is too long" error when reporting issues for declarations using `combine`, by linking directly to the declaration file on GitHub instead of embedding the full declaration JSON in the contribution tool URL.
+
+## 12.0.0 - 2026-05-20
+
+> Development of this release was supported by the [NGI0 Commons Fund](https://nlnet.nl/project/Modular-OTA/), a fund established by [NLnet](https://nlnet.nl/) with financial support from the European Commission's [Next Generation Internet](https://www.ngi.eu) programme, under the aegis of DG CNECT under grant agreement N°101069594.
+
+### Added
+
+- Add `GET /feed` endpoint on the Collection API exposing an Atom feed of the latest version changes across the whole collection
+- Add `GET /feed/:serviceId` endpoint on the Collection API exposing an Atom feed scoped to a single service
+- Add `GET /feed/:serviceId/:termsType` endpoint on the Collection API exposing an Atom feed scoped to a single service and terms type
+- Add [`@opentermsarchive/engine.collection-api.feed.limit`](https://docs.opentermsarchive.org/collections/reference/configuration/) configuration option controlling the maximum number of entries returned by feed endpoints (default: `100`)
+- Add [`@opentermsarchive/engine.collection-api.feed.versionUrlTemplate`](https://docs.opentermsarchive.org/collections/reference/configuration/) configuration option to customize the `alternate` link of feed entries with a URL template (e.g. `https://github.com/openTermsArchive/demo-versions/commit/%VERSION_ID`); useful to point feed readers to a human-readable page instead of the default version API endpoint
+
+### Changed
+
+- **Breaking:** Resolve `serviceId` path parameter case-sensitively on the `GET /service/:serviceId` endpoint, in line with the documented service ID format; clients relying on case-insensitive matching must now use the exact ID casing
+
+## 11.0.2 - 2026-04-14
+
+> Development of this release was supported by [Reset Tech](https://www.reset.tech).
+
+### Fixed
+
+- Fix snapshot storage failure when source document URLs contain characters forbidden in filenames
+- Fix duplicate file extension in snapshot filenames when source document URLs end with an extension
+
+## 11.0.1 - 2026-04-06
+
+> Development of this release was supported by [Reset Tech](https://www.reset.tech).
+
+### Fixed
+
+- Update JSDOM to fix extraction of terms with large inline stylesheets
+
+## 11.0.0 - 2026-03-30
+
+> Development of this release was supported by the [NGI0 Commons Fund](https://nlnet.nl/project/Modular-OTA/), a fund established by [NLnet](https://nlnet.nl/) with financial support from the European Commission's [Next Generation Internet](https://www.ngi.eu) programme, under the aegis of DG CNECT under grant agreement N°101069594.
+
+### Removed
+
+- Remove Notifier module
+- **Breaking:** Remove all default SMTP values (`host`, `port`, `username`) from logger configuration; operators enabling `sendMailOnError` must now explicitly set all three in [`@opentermsarchive/engine.logger.smtp`](https://docs.opentermsarchive.org/collections/reference/configuration/#logger)
+
+## 10.6.1 - 2026-02-05
+
+> Development of this release was supported by [Reset Tech](https://www.reset.tech).
+
+### Fixed
+
+- Fix declaration validation when a new service is added along with a filters file
+
 ## 10.6.0 - 2026-01-26
 
 > Development of this release was supported by [Reset Tech](https://www.reset.tech).

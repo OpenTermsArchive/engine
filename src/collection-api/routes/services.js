@@ -145,8 +145,7 @@ export default function servicesRouter(services) {
    *         $ref: '#/components/responses/NotFoundError'
    */
   router.get('/service/:serviceId', (req, res) => {
-    const matchedServiceID = Object.keys(services).find(key => key.toLowerCase() === req.params.serviceId?.toLowerCase());
-    const service = services[matchedServiceID];
+    const service = Object.hasOwn(services, req.params.serviceId) ? services[req.params.serviceId] : null;
 
     if (!service) {
       return res.status(404).json({ error: 'Service not found' });

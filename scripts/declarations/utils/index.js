@@ -50,6 +50,10 @@ export default class DeclarationUtils {
       if (modifiedFilePath.endsWith('.filters.js') || modifiedFilePath.endsWith('.filters.history.js')) {
         const declaration = await this.getJSONFromFile(this.defaultBranch, `declarations/${serviceId}.json`);
 
+        if (!declaration) { // Happens when the file declaration exists in the branch but not in the default branch
+          return;
+        }
+
         servicesTermsTypes[serviceId] = Object.keys(declaration.terms); // Considering how rarely filters are used, simply return all term types that could potentially be impacted to spare implementing a function change check
 
         return;

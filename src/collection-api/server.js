@@ -8,6 +8,8 @@ import apiRouter from './routes/index.js';
 
 const app = express();
 
+app.set('trust proxy', 'loopback'); // The API binds to 127.0.0.1 and is expected to run behind a reverse proxy. Honour X-Forwarded-* headers only when they come from a local proxy so absolute URLs emitted by routes (notably Atom feed links) reflect the URL seen by clients rather than the internal http://127.0.0.1 hop.
+
 if (process.env.NODE_ENV !== 'test') {
   app.use(loggerMiddleware);
 }
