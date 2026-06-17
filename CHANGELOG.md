@@ -8,7 +8,7 @@ All changes that impact users of this module are documented in this file, in the
 
 ### Changed
 
-- **Breaking:** Apply `@opentermsarchive/engine.fetcher.language` to `navigator.language` and `navigator.languages` in addition to the `Accept-Language` header; `language: "en"` now exposes `navigator.languages` as `["en"]` instead of `["en-US", "en"]`, set `language: "en-US,en"` to restore the previous default
+- **Breaking:** Set `navigator.language` and `navigator.languages` in the full DOM fetcher strictly from the tags in `@opentermsarchive/engine.fetcher.language` through the stealth evasions registered at browser launch rather than a per-page CDP override
 
 ### Removed
 
