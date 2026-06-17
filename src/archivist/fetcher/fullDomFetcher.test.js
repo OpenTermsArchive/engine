@@ -6,7 +6,7 @@ import { fileURLToPath } from 'url';
 import { expect, use } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 
-import fetch, { launchHeadlessBrowser, stopHeadlessBrowser } from './fullDomFetcher.js';
+import fetch, { launchHeadlessBrowser, stopHeadlessBrowser, parseLanguage } from './fullDomFetcher.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -186,18 +186,6 @@ describe('Full DOM Fetcher', function () {
         expect(result.content).to.match(/data-accept-language="en-IE,en-GB;q=0\.9,en;q=0\.8"/);
       });
     });
-
-    context('with quality factors in the configured value', () => {
-      after(async () => {
-        await launchHeadlessBrowser('en');
-      });
-
-      it('rejects language values containing quality factors', async () => {
-        await stopHeadlessBrowser();
-        await expect(launchHeadlessBrowser('en-IE,en-GB;q=0.9,en;q=0.8'))
-          .to.be.rejectedWith('Quality factors are not supported');
-      });
-    });
   });
 
   describe('Stealth evasions', () => {
@@ -232,6 +220,38 @@ describe('Full DOM Fetcher', function () {
     it('hides headless WebGL vendor and renderer signature', () => {
       expect(content).to.not.match(/data-webgl-vendor="[^"]*Google[^"]*"/);
       expect(content).to.not.match(/data-webgl-renderer="[^"]*(?:SwiftShader|ANGLE)[^"]*"/);
+    });
+  });
+});
+
+describe('parseLanguage', () => {
+  context('with a single tag', () => {
+    it('returns the tag as both locale and a singleton languages array', () => {
+      expect(parseLanguage('en')).to.deep.equal({ locale: 'en', languages: ['en'] });
+    });
+
+    it('preserves the region of a regional tag', () => {
+      expect(parseLanguage('fr-FR')).to.deep.equal({ locale: 'fr-FR', languages: ['fr-FR'] });
+    });
+  });
+
+  context('with a comma-separated priority list', () => {
+    it('splits every tag into the languages array and rejoins them as locale', () => {
+      expect(parseLanguage('en-IE,en-GB,en')).to.deep.equal({ locale: 'en-IE,en-GB,en', languages: [ 'en-IE', 'en-GB', 'en' ] });
+    });
+
+    it('trims whitespace surrounding each tag', () => {
+      expect(parseLanguage('fr-FR, fr')).to.deep.equal({ locale: 'fr-FR,fr', languages: [ 'fr-FR', 'fr' ] });
+    });
+  });
+
+  context('with quality factors', () => {
+    it('throws for a priority list carrying quality factors', () => {
+      expect(() => parseLanguage('en-IE,en-GB;q=0.9,en;q=0.8')).to.throw('Quality factors are not supported');
+    });
+
+    it('throws for a single tag carrying a quality factor', () => {
+      expect(() => parseLanguage('en;q=1.0')).to.throw('Quality factors are not supported');
     });
   });
 });

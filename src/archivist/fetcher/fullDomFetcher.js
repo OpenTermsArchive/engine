@@ -7,7 +7,7 @@ import { resolveProxyConfiguration, extractProxyCredentials } from './proxyUtils
 
 let browser;
 
-function parseLanguage(value) {
+export function parseLanguage(value) {
   if (value.includes(';q=')) {
     throw new Error(`Quality factors are not supported in fetcher language configuration; received "${value}". Provide a comma-separated list of BCP 47 tags in priority order, for example "en-IE,en-GB,en".`);
   }
