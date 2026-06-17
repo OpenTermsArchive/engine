@@ -243,6 +243,14 @@ describe('parseLanguage', () => {
     it('trims whitespace surrounding each tag', () => {
       expect(parseLanguage('fr-FR, fr')).to.deep.equal({ locale: 'fr-FR,fr', languages: [ 'fr-FR', 'fr' ] });
     });
+
+    it('drops empty entries produced by consecutive commas', () => {
+      expect(parseLanguage('en,,fr')).to.deep.equal({ locale: 'en,fr', languages: [ 'en', 'fr' ] });
+    });
+
+    it('drops a trailing comma', () => {
+      expect(parseLanguage('en,fr,')).to.deep.equal({ locale: 'en,fr', languages: [ 'en', 'fr' ] });
+    });
   });
 
   context('with quality factors', () => {
@@ -252,6 +260,22 @@ describe('parseLanguage', () => {
 
     it('throws for a single tag carrying a quality factor', () => {
       expect(() => parseLanguage('en;q=1.0')).to.throw('Quality factors are not supported');
+    });
+  });
+
+  context('with invalid input', () => {
+    it('throws when the value is not a string', () => {
+      expect(() => parseLanguage(undefined)).to.throw('must be a string');
+      expect(() => parseLanguage(42)).to.throw('must be a string');
+    });
+
+    it('throws when the value is empty or blank', () => {
+      expect(() => parseLanguage('')).to.throw('must contain at least one tag');
+      expect(() => parseLanguage('   ')).to.throw('must contain at least one tag');
+    });
+
+    it('throws when the value contains only separators', () => {
+      expect(() => parseLanguage(',,')).to.throw('must contain at least one tag');
     });
   });
 });
