@@ -78,10 +78,15 @@ const schema = {
       additionalProperties: false,
       required: ['combine'],
       properties: {
+        // combine: {
+        //   type: 'array',
+        //   items: { $ref: '#/definitions/sourceDocument' },
+        // },
         combine: {
-          type: 'array',
-          items: { $ref: '#/definitions/sourceDocument' },
-        },
+  type: 'array',
+  minItems: 1,
+  items: { $ref: '#/definitions/sourceDocument' },
+},
         select: { $ref: '#/definitions/contentSelectors' },
         filter: { $ref: '#/definitions/filters' },
         remove: { $ref: '#/definitions/insignificantContentSelectors' },
