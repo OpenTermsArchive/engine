@@ -33,7 +33,8 @@ export default class Git {
       .addConfig('user.name', this.author.name)
       .addConfig('user.email', this.author.email)
       .addConfig('core.quotePath', false) // Disable Git's encoding of special characters in pathnames. For example, `service·A` will be encoded as `service\302\267A` without this setting, leading to issues. See https://git-scm.com/docs/git-config#Documentation/git-config.txt-corequotePath
-      .addConfig('core.commitGraph', true); // Enable `commit-graph` feature for efficient commit data storage, improving performance of operations like `git log`
+      .addConfig('core.commitGraph', true) // Enable `commit-graph` feature for efficient commit data storage, improving performance of operations like `git log`
+      .addConfig('gc.writeCommitGraph', false); // Prevent automatic `git gc` from also writing the commit-graph: the engine writes it explicitly (see `writeCommitGraph`/`updateCommitGraph`), and a concurrent gc write races those, which can leave a stale `commit-graph.lock` and make subsequent operations fail
   }
 
   add(filePath) {
