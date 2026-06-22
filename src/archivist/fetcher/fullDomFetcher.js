@@ -1,13 +1,31 @@
 import puppeteer from 'puppeteer-extra';
 import stealthPlugin from 'puppeteer-extra-plugin-stealth';
+import navigatorLanguages from 'puppeteer-extra-plugin-stealth/evasions/navigator.languages/index.js';
+import userAgentOverride from 'puppeteer-extra-plugin-stealth/evasions/user-agent-override/index.js';
 
 import { resolveProxyConfiguration, extractProxyCredentials } from './proxyUtils.js';
 
 let browser;
 
-export default async function fetch(url, cssSelectors, config) {
-  puppeteer.use(stealthPlugin({ locale: config.language }));
+export function parseLanguage(value) {
+  if (typeof value !== 'string') {
+    throw new Error(`Fetcher language must be a string; received ${JSON.stringify(value)}. Pass the value of "@opentermsarchive/engine.fetcher.language" explicitly.`);
+  }
 
+  if (value.toLowerCase().includes(';q=')) {
+    throw new Error(`Quality factors are not supported in fetcher language configuration; received "${value}". Provide a comma-separated list of BCP 47 tags in priority order, for example "en-IE,en-GB,en".`);
+  }
+
+  const languages = value.split(',').map(tag => tag.trim()).filter(Boolean);
+
+  if (!languages.length) {
+    throw new Error(`Fetcher language must contain at least one tag; received "${value}".`);
+  }
+
+  return { locale: languages.join(','), languages };
+}
+
+export default async function fetch(url, cssSelectors, config) {
   if (!browser) {
     throw new Error('The headless browser should be controlled manually with "launchHeadlessBrowser" and "stopHeadlessBrowser".');
   }
@@ -21,7 +39,7 @@ export default async function fetch(url, cssSelectors, config) {
     page = await context.newPage();
     client = await page.createCDPSession();
 
-    await configurePage(page, client, config);
+    await configurePage(page, config);
 
     const selectors = [].concat(cssSelectors).filter(Boolean);
 
@@ -97,13 +115,23 @@ export default async function fetch(url, cssSelectors, config) {
 /**
  * Launches a headless browser instance using Puppeteer if one is not already running. Returns the existing browser instance if one is already running, otherwise creates and returns a new instance.
  * @function launchHeadlessBrowser
- * @returns {Promise<puppeteer.Browser>} The Puppeteer browser instance.
+ * @param   {string}                     language Accept-Language header value applied to the browser context
+ * @returns {Promise<puppeteer.Browser>}          The Puppeteer browser instance.
  * @async
  */
-export async function launchHeadlessBrowser() {
+export async function launchHeadlessBrowser(language) {
   if (browser) {
     return browser;
   }
+
+  const { locale, languages } = parseLanguage(language);
+  const stealth = stealthPlugin();
+
+  stealth.enabledEvasions.delete('user-agent-override');
+  stealth.enabledEvasions.delete('navigator.languages');
+  puppeteer.use(stealth);
+  puppeteer.use(userAgentOverride({ locale }));
+  puppeteer.use(navigatorLanguages({ languages }));
 
   const options = {
     args: [],
@@ -156,16 +184,9 @@ function isValidHttpStatus(status) {
   return (status >= 200 && status < 300) || status === 304;
 }
 
-async function configurePage(page, client, config) {
+async function configurePage(page, config) {
   await page.setViewport({ width: 1920, height: 1080 }); // Realistic viewport to avoid detection based on default Puppeteer dimensions (800x600)
   await page.setDefaultNavigationTimeout(config.navigationTimeout);
-  await page.setExtraHTTPHeaders({ 'Accept-Language': config.language });
-
-  // Use CDP to ensure browser language is set correctly (see https://zirkelc.dev/posts/puppeteer-language-experiment)
-  await client.send('Network.setUserAgentOverride', {
-    userAgent: await browser.userAgent(),
-    acceptLanguage: config.language,
-  });
 
   if (browser.proxyCredentials?.username && browser.proxyCredentials?.password) {
     await page.authenticate(browser.proxyCredentials);
