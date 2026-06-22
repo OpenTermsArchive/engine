@@ -2,6 +2,14 @@
 
 All changes that impact users of this module are documented in this file, in the [Common Changelog](https://common-changelog.org) format with some additional specifications defined in the CONTRIBUTING file. This codebase adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased [patch]
+
+> Development of this release was supported by [Reset Tech](https://www.reset.tech).
+
+### Fixed
+
+- Recover automatically from a stale `commit-graph.lock` left behind when a `commit-graph write` is interrupted
+
 ## 13.0.1 - 2026-06-23
 
 > Development of this release was made on a volunteer basis by Bhavy Singhal.
