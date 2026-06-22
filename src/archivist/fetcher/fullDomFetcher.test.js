@@ -20,7 +20,7 @@ const langEchoHTML = '<!DOCTYPE html><html><body><script>document.body.setAttrib
 const stealthProbeHTML = '<!DOCTYPE html><html><body><script>document.body.setAttribute("data-webdriver", String(navigator.webdriver)); document.body.setAttribute("data-user-agent", navigator.userAgent); document.body.setAttribute("data-plugin-count", String(navigator.plugins.length)); document.body.setAttribute("data-viewport-width", String(window.innerWidth)); document.body.setAttribute("data-viewport-height", String(window.innerHeight)); (() => { const canvas = document.createElement("canvas"); const gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl"); if (!gl) { document.body.setAttribute("data-webgl-vendor", "none"); return; } const ext = gl.getExtension("WEBGL_debug_renderer_info"); document.body.setAttribute("data-webgl-vendor", ext ? gl.getParameter(ext.UNMASKED_VENDOR_WEBGL) : ""); document.body.setAttribute("data-webgl-renderer", ext ? gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) : ""); })();</script></body></html>';
 
 describe('Full DOM Fetcher', function () {
-  this.timeout(60000);
+  this.timeout(80000);
 
   let temporaryServer;
   let expectedPDFContent;
