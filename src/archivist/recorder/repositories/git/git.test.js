@@ -83,4 +83,32 @@ describe('Git', () => {
       });
     });
   });
+
+  describe('#cleanUp', () => {
+    context('when a commit-graph lock has been left behind by an interrupted process', () => {
+      const infoDirectoryPath = path.join(RECORDER_PATH, '.git', 'objects', 'info');
+      const lockFilePath = path.join(infoDirectoryPath, 'commit-graph.lock');
+
+      before(async () => {
+        const filePath = `${RECORDER_PATH}/file-to-clean.md`;
+
+        await fs.writeFile(filePath, DEFAULT_CONTENT);
+        await subject.add(filePath);
+        await subject.commit({ filePath, message: DEFAULT_COMMIT_MESSAGE });
+
+        await fs.mkdir(infoDirectoryPath, { recursive: true });
+        await fs.writeFile(lockFilePath, '');
+
+        await subject.cleanUp();
+      });
+
+      after(() => subject.destroyHistory());
+
+      it('removes the stale commit-graph lock', async () => {
+        const infoDirectoryContent = await fs.readdir(infoDirectoryPath);
+
+        expect(infoDirectoryContent).to.not.include('commit-graph.lock');
+      });
+    });
+  });
 });

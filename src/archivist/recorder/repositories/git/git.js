@@ -128,6 +128,7 @@ export default class Git {
   }
 
   async cleanUp() {
+    await fs.rm(path.join(this.path, '.git', 'objects', 'info', 'commit-graph.lock'), { force: true }); // Remove a leftover commit-graph lock from a previous `commit-graph write` that was killed mid-write (e.g. the process was terminated during a deploy or restart). The commit-graph is a disposable cache rebuilt by `writeCommitGraph`, so clearing a stale lock is safe and prevents every subsequent run from failing.
     await this.git.reset('hard');
 
     return this.git.clean('f', '-d');
