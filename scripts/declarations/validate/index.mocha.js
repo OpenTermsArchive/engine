@@ -118,6 +118,14 @@ export default async options => {
               describe(type, () => {
                 const terms = service.getTerms({ type });
 
+                if (terms.hasMultipleSourceDocuments) {
+                  it('does not declare the same source document more than once', () => {
+                    const duplicateLocations = [...new Set(terms.duplicateSourceDocuments.map(sourceDocument => sourceDocument.location))];
+
+                    expect(duplicateLocations, `The same source document is declared more than once within the "${type}" combine: ${duplicateLocations.join(', ')}`).to.be.empty;
+                  });
+                }
+
                 terms.sourceDocuments.forEach(sourceDocument => {
                   let filteredContent;
 
