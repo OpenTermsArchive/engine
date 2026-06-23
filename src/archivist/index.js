@@ -156,6 +156,7 @@ export default class Archivist extends events.EventEmitter {
     this.trackingQueue.concurrency = concurrency;
 
     const tasksToQueue = [];
+
     servicesIds.forEach(serviceId => {
       this.services[serviceId].getTermsTypes().forEach(termsType => {
         if (termsTypes.length && !termsTypes.includes(termsType)) {
@@ -169,7 +170,8 @@ export default class Archivist extends events.EventEmitter {
     const shuffledTasksToQueue = tasksToQueue
       .map(value => ({ value, sort: Math.random() }))
       .sort((a, b) => a.sort - b.sort)
-      .map(({ value }) => value)
+      .map(({ value }) => value);
+
     shuffledTasksToQueue.forEach(task => {
       this.trackingQueue.push(task);
     });
