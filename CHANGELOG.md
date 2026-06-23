@@ -2,11 +2,12 @@
 
 All changes that impact users of this module are documented in this file, in the [Common Changelog](https://common-changelog.org) format with some additional specifications defined in the CONTRIBUTING file. This codebase adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased [patch]
+## 13.0.1 - 2026-06-23
 
 > Development of this release was made on a volunteer basis by Bhavy Singhal.
 
 ### Fixed
+
 - Improve error message when history file is wrongly formatted as an object instead of an array
 
 ## 13.0.0 - 2026-06-22
