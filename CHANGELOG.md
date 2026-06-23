@@ -14,6 +14,7 @@ All changes that impact users of this module are documented in this file, in the
 ### Fixed
 
 - Recover automatically from a stale `commit-graph.lock` left behind when a `commit-graph write` is interrupted
+- Prevent the full DOM fetcher from hanging indefinitely when a page navigation exceeds the configured timeout
 
 ## 13.0.1 - 2026-06-23
 
