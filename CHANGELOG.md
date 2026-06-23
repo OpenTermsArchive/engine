@@ -2,6 +2,20 @@
 
 All changes that impact users of this module are documented in this file, in the [Common Changelog](https://common-changelog.org) format with some additional specifications defined in the CONTRIBUTING file. This codebase adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased [major]
+
+> Development of this release was supported by [Reset Tech](https://www.reset.tech).
+
+### Changed
+
+- **Breaking:** Update minimum supported Node.js version to v22
+- Update supported Node.js version to v26
+
+### Fixed
+
+- Recover automatically from a stale `commit-graph.lock` left behind when a `commit-graph write` is interrupted
+- Prevent the full DOM fetcher from hanging indefinitely when a page navigation exceeds the configured timeout
+
 ## 13.0.1 - 2026-06-23
 
 > Development of this release was made on a volunteer basis by Bhavy Singhal.

@@ -92,7 +92,7 @@
     "morgan": "^1.10.1",
     "node-fetch": "^3.3.2",
     "octokit": "^5.0.3",
-    "puppeteer": "^25.1.0",
+    "puppeteer": "^25.2.0",
     "puppeteer-extra": "^3.3.6",
     "puppeteer-extra-plugin-stealth": "^2.11.2",
     "simple-git": "^3.28.0",
@@ -116,7 +116,7 @@
     "@opentermsarchive/terms-types": "^2.2.0"
   },
   "engines": {
-    "node": ">=20 <=24"
+    "node": ">=22 <=26"
   },
   "overrides": {
     "jsdom": {
