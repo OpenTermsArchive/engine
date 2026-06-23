@@ -2,6 +2,14 @@
 
 All changes that impact users of this module are documented in this file, in the [Common Changelog](https://common-changelog.org) format with some additional specifications defined in the CONTRIBUTING file. This codebase adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased [major]
+
+> Development of this release was supported by [User Rights](https://www.user-rights.org).
+
+### Changed
+
+- **Breaking:** Wait in the full DOM fetcher for the text content of the selected elements to remain unchanged before capturing the page, tunable through `@opentermsarchive/engine.fetcher.stabilizationDelay` and restored to the previous immediate capture by setting it to `0`
+
 ## 13.0.0 - 2026-06-22
 
 > Development of this release was supported by [User Rights](https://www.user-rights.org).
