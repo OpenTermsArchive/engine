@@ -155,14 +155,23 @@ export default class Archivist extends events.EventEmitter {
 
     this.trackingQueue.concurrency = concurrency;
 
+    const tasksToQueue = [];
     servicesIds.forEach(serviceId => {
       this.services[serviceId].getTermsTypes().forEach(termsType => {
         if (termsTypes.length && !termsTypes.includes(termsType)) {
           return;
         }
 
-        this.trackingQueue.push({ terms: this.services[serviceId].getTerms({ type: termsType }), technicalUpgradeOnly });
+        tasksToQueue.push({ terms: this.services[serviceId].getTerms({ type: termsType }), technicalUpgradeOnly });
       });
+    });
+    // Shuffle the tasks not to scrape always in the exact same order, also within a given provider
+    const shuffledTasksToQueue = tasksToQueue
+      .map(value => ({ value, sort: Math.random() }))
+      .sort((a, b) => a.sort - b.sort)
+      .map(({ value }) => value)
+    shuffledTasksToQueue.forEach(task => {
+      this.trackingQueue.push(task);
     });
 
     if (this.trackingQueue.length()) {
