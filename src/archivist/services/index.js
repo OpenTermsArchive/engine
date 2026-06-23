@@ -260,6 +260,9 @@ async function loadServiceHistoryFiles(serviceId) {
   ]);
 
   Object.entries(serviceDeclaration.terms).forEach(([ termsType, declaration ]) => {
+    if (!Array.isArray(serviceHistory[termsType]) && serviceHistory[termsType] !== undefined) {
+      throw new Error(`History file for "${termsType}" is not properly formatted: expected an array but got an object. Please use [] instead of {}.`);
+    }
     serviceHistory[termsType] = serviceHistory[termsType] || [];
     serviceHistory[termsType].push(declaration);
   });
