@@ -80,4 +80,12 @@ describe('Terms', () => {
       expect(result).to.deep.equal(expectedResult);
     });
   });
+
+  describe('#duplicateSourceDocuments', () => {
+    it('returns the source documents that repeat a location', () => {
+      const terms = new Terms({ service, type: termsType, sourceDocuments: [ document1, document2 ] });
+
+      expect(terms.duplicateSourceDocuments).to.deep.equal([document2]);
+    });
+  });
 });
