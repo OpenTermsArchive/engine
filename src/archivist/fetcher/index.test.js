@@ -21,7 +21,7 @@ const termsWithOtherCharsetHTML = '<!DOCTYPE html><html><head><meta http-equiv="
 describe('Fetcher', function () {
   this.timeout(60000);
 
-  before(launchHeadlessBrowser);
+  before(() => launchHeadlessBrowser('en'));
 
   after(stopHeadlessBrowser);
 

@@ -33,7 +33,8 @@ export default class Git {
       .addConfig('user.name', this.author.name)
       .addConfig('user.email', this.author.email)
       .addConfig('core.quotePath', false) // Disable Git's encoding of special characters in pathnames. For example, `service·A` will be encoded as `service\302\267A` without this setting, leading to issues. See https://git-scm.com/docs/git-config#Documentation/git-config.txt-corequotePath
-      .addConfig('core.commitGraph', true); // Enable `commit-graph` feature for efficient commit data storage, improving performance of operations like `git log`
+      .addConfig('core.commitGraph', true) // Enable `commit-graph` feature for efficient commit data storage, improving performance of operations like `git log`
+      .addConfig('gc.writeCommitGraph', false); // Prevent automatic `git gc` from also writing the commit-graph: the engine writes it explicitly (see `writeCommitGraph`/`updateCommitGraph`), and a concurrent gc write races those, which can leave a stale `commit-graph.lock` and make subsequent operations fail
   }
 
   add(filePath) {
@@ -128,6 +129,7 @@ export default class Git {
   }
 
   async cleanUp() {
+    await fs.rm(path.join(this.path, '.git', 'objects', 'info', 'commit-graph.lock'), { force: true }); // Remove a leftover commit-graph lock from a previous `commit-graph write` that was killed mid-write (e.g. the process was terminated during a deploy or restart). The commit-graph is a disposable cache rebuilt by `writeCommitGraph`, so clearing a stale lock is safe and prevents every subsequent run from failing.
     await this.git.reset('hard');
 
     return this.git.clean('f', '-d');

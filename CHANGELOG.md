@@ -2,6 +2,44 @@
 
 All changes that impact users of this module are documented in this file, in the [Common Changelog](https://common-changelog.org) format with some additional specifications defined in the CONTRIBUTING file. This codebase adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 14.0.0 - 2026-06-23
+
+> Development of this release was supported by [Reset Tech](https://www.reset.tech).
+
+### Changed
+
+- **Breaking:** Update minimum supported Node.js version to v22
+- Update supported Node.js version to v26
+
+### Fixed
+
+- Recover automatically from a stale `commit-graph.lock` left behind when a `commit-graph write` is interrupted
+- Prevent the full DOM fetcher from hanging indefinitely when a page navigation exceeds the configured timeout
+
+## 13.0.1 - 2026-06-23
+
+> Development of this release was made on a volunteer basis by Bhavy Singhal.
+
+### Fixed
+
+- Improve error message when history file is wrongly formatted as an object instead of an array
+
+## 13.0.0 - 2026-06-22
+
+> Development of this release was supported by [User Rights](https://www.user-rights.org).
+
+### Changed
+
+- **Breaking:** Set `navigator.language` and `navigator.languages` in the full DOM fetcher strictly from the tags in `@opentermsarchive/engine.fetcher.language` through the stealth evasions registered at browser launch rather than a per-page CDP override
+
+### Removed
+
+- **Breaking:** Drop support for quality factors (`;q=…`) in `@opentermsarchive/engine.fetcher.language`; previously accepted values such as `en-IE,en-GB;q=0.9,en;q=0.8` now throw at launch. Replace with a plain comma-separated priority list, e.g. `en-IE,en-GB,en`
+
+### Fixed
+
+- Reactivate the `puppeteer-extra` stealth plugin in the full DOM fetcher, which had been silently inert since v10.3.1 because it was registered after `puppeteer.launch()`, restoring removal of `navigator.webdriver` and `HeadlessChrome` from the user agent
+
 ## 12.0.2 - 2026-05-26
 
 > Development of this release was supported by [User Rights](https://www.user-rights.org).
