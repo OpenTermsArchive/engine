@@ -5,6 +5,8 @@ import userAgentOverride from 'puppeteer-extra-plugin-stealth/evasions/user-agen
 
 import { resolveProxyConfiguration, extractProxyCredentials } from './proxyUtils.js';
 
+const STABILIZATION_TIMEOUT_FACTOR = 5; // The selected content is allowed to keep changing for several quiet periods before stabilization gives up and captures whatever is available; keeping the cap proportional to the delay guarantees it always exceeds it
+
 let browser;
 
 export function parseLanguage(value) {
@@ -96,6 +98,7 @@ export default async function fetch(url, cssSelectors, config) {
     }
 
     await waitForSelectors(page, selectors, config.waitForElementsTimeout);
+    await waitForStableContent(page, selectors, config.stabilizationDelay);
 
     return {
       mimeType: 'text/html',
@@ -235,6 +238,43 @@ function setupPdfInterception(client) {
   });
 
   return { pdf, handled };
+}
+
+function isInterruptedByNavigation(error) {
+  return /execution context was destroyed|detached frame|target closed|session closed|cannot find context/i.test(error.message);
+}
+
+async function waitForStableContent(page, selectors, stabilizationDelay) {
+  const validSelectors = selectors.filter(Boolean);
+
+  if (!stabilizationDelay || !validSelectors.length) { // A zero or missing delay disables stabilization
+    return;
+  }
+
+  const stabilizationTimeout = stabilizationDelay * STABILIZATION_TIMEOUT_FACTOR;
+
+  await page.waitForFunction(
+    (cssSelectors, quietPeriod) => {
+      const text = cssSelectors.map(selector => document.querySelector(selector)?.textContent ?? '').join(' '); // eslint-disable-line no-undef
+      const now = Date.now();
+
+      if (window.__otaStabilizationText !== text) { // eslint-disable-line no-undef
+        window.__otaStabilizationText = text; // eslint-disable-line no-undef
+        window.__otaStabilizationSince = now; // eslint-disable-line no-undef
+
+        return false;
+      }
+
+      return now - window.__otaStabilizationSince >= quietPeriod; // eslint-disable-line no-undef
+    },
+    { timeout: stabilizationTimeout, polling: 100 }, // Poll on a timer rather than on mutations: once the DOM stops mutating no mutation event fires, so only a timed re-evaluation can observe that the content has remained stable
+    validSelectors,
+    stabilizationDelay,
+  ).catch(error => {
+    if (error.name != 'TimeoutError' && !isInterruptedByNavigation(error)) { // Stabilization is best-effort: a timeout, or a client-side navigation that destroys the execution context mid-wait, must fall back to capturing available content rather than fail the fetch
+      throw error;
+    }
+  });
 }
 
 async function waitForSelectors(page, selectors, timeout) {

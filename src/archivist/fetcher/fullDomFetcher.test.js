@@ -18,6 +18,10 @@ const dynamicHTML = '<!DOCTYPE html><html><head><title>Dynamic Page</title><scri
 const delayedContentHTML = '<!DOCTYPE html><html><head><title>Delayed Content</title><script>setTimeout(() => { document.querySelector(".content").textContent = "Final content"; }, 100);</script></head><body><div class="content"></div></body></html>';
 const langEchoHTML = '<!DOCTYPE html><html><body><script>document.body.setAttribute("data-language", navigator.language); document.body.setAttribute("data-languages", navigator.languages.join(","));</script></body></html>';
 const stealthProbeHTML = '<!DOCTYPE html><html><body><script>document.body.setAttribute("data-webdriver", String(navigator.webdriver)); document.body.setAttribute("data-user-agent", navigator.userAgent); document.body.setAttribute("data-plugin-count", String(navigator.plugins.length)); document.body.setAttribute("data-viewport-width", String(window.innerWidth)); document.body.setAttribute("data-viewport-height", String(window.innerHeight)); (() => { const canvas = document.createElement("canvas"); const gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl"); if (!gl) { document.body.setAttribute("data-webgl-vendor", "none"); return; } const ext = gl.getExtension("WEBGL_debug_renderer_info"); document.body.setAttribute("data-webgl-vendor", ext ? gl.getParameter(ext.UNMASKED_VENDOR_WEBGL) : ""); document.body.setAttribute("data-webgl-renderer", ext ? gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) : ""); })();</script></body></html>';
+const progressiveHTML = '<!DOCTYPE html><html><head><script>let n = 0; const t = setInterval(() => { n += 1; const p = document.createElement("p"); p.textContent = "item" + n; document.querySelector("#list").appendChild(p); if (n >= 3) { clearInterval(t); } }, 80);</script></head><body><div id="list"><p>item0</p></div></body></html>';
+const neverStableHTML = '<!DOCTYPE html><html><head><script>setInterval(() => { document.querySelector("#live").textContent = String(Date.now()); }, 50);</script></head><body><div id="live">0</div></body></html>';
+const lateAppendHTML = '<!DOCTYPE html><html><head><script>setTimeout(() => { const p = document.createElement("p"); p.textContent = "late"; document.querySelector("#list").appendChild(p); }, 1500);</script></head><body><div id="list"><p>item0</p></div></body></html>';
+const clientRedirectHTML = '<!DOCTYPE html><html><head><script>setTimeout(() => { window.location.href = "/redirect-target"; }, 150);</script></head><body><div id="content">original</div></body></html>';
 
 describe('Full DOM Fetcher', function () {
   this.timeout(60000);
@@ -45,6 +49,21 @@ describe('Full DOM Fetcher', function () {
       }
       if (request.url === '/stealth-probe') {
         response.writeHead(200, { 'Content-Type': 'text/html' }).write(stealthProbeHTML);
+      }
+      if (request.url === '/progressive') {
+        response.writeHead(200, { 'Content-Type': 'text/html' }).write(progressiveHTML);
+      }
+      if (request.url === '/never-stable') {
+        response.writeHead(200, { 'Content-Type': 'text/html' }).write(neverStableHTML);
+      }
+      if (request.url === '/late-append') {
+        response.writeHead(200, { 'Content-Type': 'text/html' }).write(lateAppendHTML);
+      }
+      if (request.url === '/client-redirect') {
+        response.writeHead(200, { 'Content-Type': 'text/html' }).write(clientRedirectHTML);
+      }
+      if (request.url === '/redirect-target') {
+        response.writeHead(200, { 'Content-Type': 'text/html' }).write('<!DOCTYPE html><html><body><div id="content">redirected</div></body></html>');
       }
       if (request.url === '/terms.pdf') {
         expectedPDFContent = fs.readFileSync(path.resolve(__dirname, '../../../test/fixtures/terms.pdf'));
@@ -134,6 +153,53 @@ describe('Full DOM Fetcher', function () {
 
       it('returns the PDF file content', () => {
         expect(content.equals(expectedPDFContent)).to.be.true;
+      });
+    });
+
+    context('when the content of a selected element is injected progressively', () => {
+      const stabilizingConfig = { navigationTimeout: 5000, waitForElementsTimeout: 5000, language: 'en', stabilizationDelay: 300 };
+
+      it('waits for the content to stop changing before capturing', async () => {
+        const result = await fetch(`http://127.0.0.1:${SERVER_PORT}/progressive`, ['#list'], stabilizingConfig);
+
+        expect(result.content).to.match(/item1/);
+        expect(result.content).to.match(/item2/);
+        expect(result.content).to.match(/item3/);
+      });
+    });
+
+    context('when the content of a selected element never stabilizes', () => {
+      const stabilizationDelay = 120;
+      const stabilizingConfig = { navigationTimeout: 5000, waitForElementsTimeout: 5000, language: 'en', stabilizationDelay };
+
+      it('returns the available content once the stabilization timeout is reached instead of failing', async () => {
+        const start = process.hrtime.bigint();
+        const result = await fetch(`http://127.0.0.1:${SERVER_PORT}/never-stable`, ['#live'], stabilizingConfig);
+        const elapsedMs = Number(process.hrtime.bigint() - start) / 1e6;
+
+        expect(result.mimeType).to.equal('text/html');
+        expect(result.content).to.match(/id="live"/);
+        expect(elapsedMs).to.be.greaterThan(stabilizationDelay * 3); // Content never stabilizes, so the capture cannot happen before the stabilization timeout (a larger multiple of the delay) elapses, well after a mere immediate capture
+      });
+    });
+
+    context('when stabilization is disabled', () => {
+      it('captures immediately without waiting for later content when stabilizationDelay is 0', async () => {
+        const result = await fetch(`http://127.0.0.1:${SERVER_PORT}/late-append`, ['#list'], { navigationTimeout: 5000, waitForElementsTimeout: 5000, language: 'en', stabilizationDelay: 0 });
+
+        expect(result.content).to.match(/item0/);
+        expect((result.content.match(/<p>/g) || []).length).to.equal(1); // Only the initial item0 paragraph; the paragraph appended at 1500ms must not have been captured (the script source itself contains no "<p>" literal)
+      });
+    });
+
+    context('when the page navigates away during stabilization', () => {
+      const stabilizingConfig = { navigationTimeout: 5000, waitForElementsTimeout: 5000, language: 'en', stabilizationDelay: 500 };
+
+      it('falls back to capturing content instead of failing the fetch', async () => {
+        const result = await fetch(`http://127.0.0.1:${SERVER_PORT}/client-redirect`, ['#content'], stabilizingConfig);
+
+        expect(result.mimeType).to.equal('text/html');
+        expect(result.content).to.match(/id="content"/);
       });
     });
   });
