@@ -108,7 +108,7 @@ export default async function fetch(url, cssSelectors, config) {
 
     throw new Error(error.message);
   } finally {
-    await cleanupPage(client, page, context);
+    await cleanupPage(client, context);
   }
 }
 
@@ -261,14 +261,11 @@ async function waitForSelectors(page, selectors, timeout) {
   });
 }
 
-async function cleanupPage(client, page, context) {
+async function cleanupPage(client, context) {
   if (client) {
     await client.detach().catch(() => {});
   }
-  if (page) {
-    await page.close().catch(() => {});
-  }
   if (context) {
-    await context.close().catch(() => {}); // Close the isolated context to free resources and ensure complete cleanup
+    await context.close().catch(() => {}); // Closing the context disposes its page too; closing the page explicitly is not only redundant but can hang indefinitely when a navigation is still in flight, for instance after a navigation timeout
   }
 }
