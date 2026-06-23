@@ -17,6 +17,7 @@ use(chaiAsPromised);
 
 const termsHTML = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>First provider TOS</title></head><body><h1>Terms of service</h1><p>Dapibus quis diam sagittis</p></body></html>';
 const termsWithOtherCharsetHTML = '<!DOCTYPE html><html><head><meta http-equiv="Content-Type" content="text/html; charset=windows-1251"><title>TOS на първия доставчик</title></head><body><h1>Условия за ползване</h1><p>Dapibus quis diam sagittis</p></body></html>';
+const progressiveHTML = '<!DOCTYPE html><html><head><script>let n = 0; const t = setInterval(() => { n += 1; const p = document.createElement("p"); p.textContent = "item" + n; document.querySelector("#list").appendChild(p); if (n >= 3) { clearInterval(t); } }, 80);</script></head><body><div id="list"><p>item0</p></div></body></html>';
 
 describe('Fetcher', function () {
   this.timeout(60000);
@@ -59,6 +60,9 @@ describe('Fetcher', function () {
         }
         if (request.url === '/always-block') {
           response.writeHead(403, { 'Content-Type': 'text/html' }).write('<!DOCTYPE html><html><body>Access Denied - Bot Detected</body></html>');
+        }
+        if (request.url === '/progressive') {
+          response.writeHead(200, { 'Content-Type': 'text/html' }).write(progressiveHTML);
         }
 
         return response.end();
@@ -295,6 +299,16 @@ describe('Fetcher', function () {
 
         it('still throws FetchDocumentError if both fetchers fail', async () => {
           await expect(fetch({ url: `http://127.0.0.1:${SERVER_PORT}/always-block` })).to.be.rejectedWith(FetchDocumentError);
+        });
+      });
+    });
+
+    describe('Content stabilization', () => {
+      context('with client script enabled and a stabilization delay', () => {
+        it('forwards the stabilization delay to the full DOM fetcher', async () => {
+          const { content } = await fetch({ url: `http://127.0.0.1:${SERVER_PORT}/progressive`, cssSelectors: '#list', executeClientScripts: true, config: { stabilizationDelay: 300 } });
+
+          expect(content).to.match(/item3/);
         });
       });
     });
