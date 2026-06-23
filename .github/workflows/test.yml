@@ -14,13 +14,13 @@ jobs:
           - windows-latest
           - macos-latest
         node_version:
-          - 20
-          - 24
+          - 22
+          - 26
         exclude:
           - operating_system: windows-latest
-            node_version: 24
+            node_version: 26
           - operating_system: macos-latest
-            node_version: 24
+            node_version: 26
       fail-fast: false # run tests on other operating systems even if one fails
 
     runs-on: ${{ matrix.operating_system }}
@@ -49,13 +49,13 @@ jobs:
           - windows-latest
           - macos-latest
         node_version:
-          - 20
-          - 24
+          - 22
+          - 26
         exclude:
           - operating_system: windows-latest
-            node_version: 24
+            node_version: 26
           - operating_system: macos-latest
-            node_version: 24
+            node_version: 26
       fail-fast: false # run tests on other operating systems even if one fails
 
     runs-on: ${{ matrix.operating_system }}
@@ -84,13 +84,13 @@ jobs:
           - windows-latest
           - macos-latest
         node_version:
-          - 20
-          - 24
+          - 22
+          - 26
         exclude:
           - operating_system: windows-latest
-            node_version: 24
+            node_version: 26
           - operating_system: macos-latest
-            node_version: 24
+            node_version: 26
       fail-fast: false
 
     runs-on: ${{ matrix.operating_system }}

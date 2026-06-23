@@ -116,7 +116,7 @@
     "@opentermsarchive/terms-types": "^2.2.0"
   },
   "engines": {
-    "node": ">=20 <=24"
+    "node": ">=22 <=26"
   },
   "overrides": {
     "jsdom": {
