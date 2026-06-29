@@ -29,6 +29,12 @@ jobs:
       - run: |
           git config --global core.autocrlf false
       - uses: actions/checkout@v4
+      # Homebrew refuses formulae from untrusted third-party taps, so trust mongodb/brew before ankane/setup-mongodb installs from it. See https://github.com/ankane/setup-mongodb/issues/7
+      - name: Trust MongoDB Homebrew tap on macOS
+        if: ${{ runner.os == 'macOS' }}
+        run: |
+          brew tap mongodb/brew
+          brew trust mongodb/brew
       - uses: ankane/setup-mongodb@v1
       - uses: actions/setup-node@v4
         with:
