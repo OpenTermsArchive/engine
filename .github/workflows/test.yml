@@ -30,7 +30,7 @@ jobs:
           git config --global core.autocrlf false
       - uses: actions/checkout@v7
       - uses: ankane/setup-mongodb@a01a9a4888b0b7bb1813656d8653fb2b06ae50d8
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
           node-version: ${{ matrix.node_version }}
       - run: npm ci
@@ -68,7 +68,7 @@ jobs:
         with:
           repository: OpenTermsArchive/demo-declarations
           path: ./demo-declarations
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
           node-version: ${{ matrix.node_version }}
       - run: cd ./demo-declarations && npm install
@@ -103,7 +103,7 @@ jobs:
         with:
           repository: OpenTermsArchive/demo-declarations
           path: ./demo-declarations
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
           node-version: ${{ matrix.node_version }}
       - run: cd ./demo-declarations && npm install
