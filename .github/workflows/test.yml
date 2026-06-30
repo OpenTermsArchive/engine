@@ -71,7 +71,7 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version: ${{ matrix.node_version }}
-      - run: cd ./demo-declarations && npm install
+      - run: cd ./demo-declarations && npm ci
       - run: npm ci
       - run: ./node_modules/.bin/cross-env NODE_ENV=ci npm run declarations:lint
       - run: ./node_modules/.bin/cross-env NODE_ENV=ci npm run declarations:validate:schema
@@ -106,6 +106,6 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version: ${{ matrix.node_version }}
-      - run: cd ./demo-declarations && npm install
+      - run: cd ./demo-declarations && npm ci
       - run: npm ci
       - run: ./node_modules/.bin/cross-env NODE_ENV=ci npm run metadata:validate
