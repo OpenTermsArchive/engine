@@ -28,7 +28,7 @@ jobs:
     steps:
       - run: |
           git config --global core.autocrlf false
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: ankane/setup-mongodb@a01a9a4888b0b7bb1813656d8653fb2b06ae50d8
       - uses: actions/setup-node@v4
         with:
@@ -63,8 +63,8 @@ jobs:
     steps:
       - run: |
           git config --global core.autocrlf false
-      - uses: actions/checkout@v4
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
+      - uses: actions/checkout@v7
         with:
           repository: OpenTermsArchive/demo-declarations
           path: ./demo-declarations
@@ -98,8 +98,8 @@ jobs:
     steps:
       - run: |
           git config --global core.autocrlf false
-      - uses: actions/checkout@v4
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
+      - uses: actions/checkout@v7
         with:
           repository: OpenTermsArchive/demo-declarations
           path: ./demo-declarations
