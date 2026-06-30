@@ -28,15 +28,9 @@ jobs:
     steps:
       - run: |
           git config --global core.autocrlf false
-      - uses: actions/checkout@v4
-      # Homebrew refuses formulae from untrusted third-party taps, so trust mongodb/brew before ankane/setup-mongodb installs from it. See https://github.com/ankane/setup-mongodb/issues/7
-      - name: Trust MongoDB Homebrew tap on macOS
-        if: ${{ runner.os == 'macOS' }}
-        run: |
-          brew tap mongodb/brew
-          brew trust mongodb/brew
-      - uses: ankane/setup-mongodb@v1
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: ankane/setup-mongodb@a01a9a4888b0b7bb1813656d8653fb2b06ae50d8
+      - uses: actions/setup-node@v6
         with:
           node-version: ${{ matrix.node_version }}
       - run: npm ci
@@ -69,15 +63,15 @@ jobs:
     steps:
       - run: |
           git config --global core.autocrlf false
-      - uses: actions/checkout@v4
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
+      - uses: actions/checkout@v7
         with:
           repository: OpenTermsArchive/demo-declarations
           path: ./demo-declarations
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
           node-version: ${{ matrix.node_version }}
-      - run: cd ./demo-declarations && npm install
+      - run: cd ./demo-declarations && npm ci
       - run: npm ci
       - run: ./node_modules/.bin/cross-env NODE_ENV=ci npm run declarations:lint
       - run: ./node_modules/.bin/cross-env NODE_ENV=ci npm run declarations:validate:schema
@@ -104,14 +98,14 @@ jobs:
     steps:
       - run: |
           git config --global core.autocrlf false
-      - uses: actions/checkout@v4
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
+      - uses: actions/checkout@v7
         with:
           repository: OpenTermsArchive/demo-declarations
           path: ./demo-declarations
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
           node-version: ${{ matrix.node_version }}
-      - run: cd ./demo-declarations && npm install
+      - run: cd ./demo-declarations && npm ci
       - run: npm ci
       - run: ./node_modules/.bin/cross-env NODE_ENV=ci npm run metadata:validate
