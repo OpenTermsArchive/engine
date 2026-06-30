@@ -18,9 +18,9 @@ jobs:
           - 26
         exclude:
           - operating_system: windows-latest
-            node_version: 26
+            node_version: 22
           - operating_system: macos-latest
-            node_version: 26
+            node_version: 22
       fail-fast: false # run tests on other operating systems even if one fails
 
     runs-on: ${{ matrix.operating_system }}
