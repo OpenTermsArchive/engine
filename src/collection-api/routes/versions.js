@@ -1,10 +1,12 @@
 import express from 'express';
 
 import { toISODateWithoutMilliseconds } from '../../archivist/utils/date.js';
+import logger from '../logger.js';
 
 /**
- * @param   {object}         versionsRepository The versions repository instance
- * @returns {express.Router}                    The router instance
+ * @param   {object}         versionsRepository  The versions repository instance
+ * @param   {object}         snapshotsRepository The snapshots repository instance
+ * @returns {express.Router}                     The router instance
  * @private
  * @swagger
  * tags:
@@ -46,13 +48,25 @@ import { toISODateWithoutMilliseconds } from '../../archivist/utils/date.js';
  *       type: object
  *       description: Version content and metadata
  *       properties:
+ *         id:
+ *           type: string
+ *           description: The ID of the version.
+ *         serviceId:
+ *           type: string
+ *           description: The ID of the service.
+ *         termsType:
+ *           type: string
+ *           description: The type of terms.
  *         fetchDate:
  *           type: string
  *           format: date-time
  *           description: The ISO 8601 datetime string when the version was recorded.
- *         id:
- *           type: string
- *           description: The ID of the version.
+ *         isFirstRecord:
+ *           type: boolean
+ *           description: Whether this version is the first one recorded for this service and terms type.
+ *         isTechnicalUpgrade:
+ *           type: boolean
+ *           description: Whether this version is a technical upgrade (a re-render of an existing snapshot) rather than a content change at the source.
  *         content:
  *           type: string
  *           description: The JSON-escaped Markdown content of the version
@@ -125,6 +139,45 @@ import { toISODateWithoutMilliseconds } from '../../archivist/utils/date.js';
  *         offset:
  *           type: integer
  *           description: The number of versions skipped before returning results.
+ *     VersionWithLinks:
+ *       allOf:
+ *         - $ref: '#/components/schemas/Version'
+ *         - type: object
+ *           properties:
+ *             additions:
+ *               type: integer
+ *               nullable: true
+ *               description: The number of lines added in this version, or null if not available.
+ *             deletions:
+ *               type: integer
+ *               nullable: true
+ *               description: The number of lines deleted in this version, or null if not available.
+ *             fetchUrls:
+ *               type: array
+ *               description: The URLs of the source documents that were fetched to produce this version.
+ *               items:
+ *                 type: string
+ *                 format: uri
+ *             links:
+ *               type: object
+ *               description: Navigation links to related versions.
+ *               properties:
+ *                 first:
+ *                   type: string
+ *                   description: The ID of the first version for this service and terms type.
+ *                   nullable: true
+ *                 prev:
+ *                   type: string
+ *                   description: The ID of the previous version, or null if this is the first.
+ *                   nullable: true
+ *                 next:
+ *                   type: string
+ *                   description: The ID of the next version, or null if this is the last.
+ *                   nullable: true
+ *                 last:
+ *                   type: string
+ *                   description: The ID of the last version for this service and terms type.
+ *                   nullable: true
  *     ErrorResponse:
  *       type: object
  *       properties:
@@ -145,7 +198,7 @@ import { toISODateWithoutMilliseconds } from '../../archivist/utils/date.js';
  *           schema:
  *             $ref: '#/components/schemas/ErrorResponse'
  */
-export default function versionsRouter(versionsRepository) {
+export default function versionsRouter(versionsRepository, snapshotsRepository) {
   const router = express.Router();
 
   function parsePaginationParams(query) {
@@ -179,6 +232,54 @@ export default function versionsRouter(versionsRepository) {
       fetchDate: toISODateWithoutMilliseconds(version.fetchDate),
       isFirstRecord: version.isFirstRecord,
       isTechnicalUpgrade: version.isTechnicalUpgrade,
+    };
+  }
+
+  async function getFetchUrls(snapshotIds) {
+    if (!snapshotIds?.length) {
+      return [];
+    }
+
+    const snapshots = await Promise.all(snapshotIds.map(async id => {
+      const snapshot = await snapshotsRepository.findMetadataById(id);
+
+      if (!snapshot) {
+        logger.warn(`Could not resolve source snapshot ${id}; its fetch URL will be missing from the version. The snapshots repository is likely missing or out of sync with the versions repository.`);
+      }
+
+      return snapshot;
+    }));
+
+    return snapshots
+      .filter(Boolean)
+      .map(snapshot => snapshot.metadata?.['x-source-document-location'])
+      .filter(Boolean);
+  }
+
+  // Builds the full detail response shared by every single-version endpoint, so they cannot drift apart
+  async function buildVersionDetail(version) {
+    const [ navigationIds, stats, fetchUrls ] = await Promise.all([
+      versionsRepository.getNavigationIds(version.serviceId, version.termsType, version.id),
+      versionsRepository.getDiffStats(version.id),
+      getFetchUrls(version.snapshotIds),
+    ]);
+
+    return {
+      id: version.id,
+      serviceId: version.serviceId,
+      termsType: version.termsType,
+      fetchDate: toISODateWithoutMilliseconds(version.fetchDate),
+      content: version.content,
+      isFirstRecord: version.isFirstRecord,
+      isTechnicalUpgrade: version.isTechnicalUpgrade,
+      fetchUrls,
+      links: {
+        first: navigationIds.first,
+        prev: navigationIds.prev,
+        next: navigationIds.next,
+        last: navigationIds.last,
+      },
+      ...stats,
     };
   }
 
@@ -360,6 +461,88 @@ export default function versionsRouter(versionsRepository) {
   /**
    * @private
    * @swagger
+   * /version/{versionId}:
+   *   get:
+   *     summary: Get a specific version by its ID.
+   *     tags: [Versions]
+   *     produces:
+   *       - application/json
+   *     parameters:
+   *       - in: path
+   *         name: versionId
+   *         description: The ID of the version to retrieve.
+   *         schema:
+   *           type: string
+   *         required: true
+   *     responses:
+   *       200:
+   *         description: A JSON object containing the version content, metadata, and navigation links.
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/VersionWithLinks'
+   *       404:
+   *         $ref: '#/components/responses/NotFoundError'
+   */
+  router.get('/version/:versionId', async (req, res) => {
+    const { versionId } = req.params;
+
+    const version = await versionsRepository.findById(versionId);
+
+    if (!version) {
+      return res.status(404).json({ error: `No version found with ID "${versionId}"` });
+    }
+
+    return res.status(200).json(await buildVersionDetail(version));
+  });
+
+  /**
+   * @private
+   * @swagger
+   * /version/{serviceId}/{termsType}/latest:
+   *   get:
+   *     summary: Get the latest version of some terms for a service.
+   *     tags: [Versions]
+   *     produces:
+   *       - application/json
+   *     parameters:
+   *       - in: path
+   *         name: serviceId
+   *         description: The ID of the service whose version will be returned.
+   *         schema:
+   *           type: string
+   *         required: true
+   *       - in: path
+   *         name: termsType
+   *         description: The type of terms whose version will be returned.
+   *         schema:
+   *           type: string
+   *         required: true
+   *     responses:
+   *       200:
+   *         description: A JSON object containing the version content, metadata, and navigation links.
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/VersionWithLinks'
+   *       404:
+   *         $ref: '#/components/responses/NotFoundError'
+   */
+  router.get('/version/:serviceId/:termsType/latest', async (req, res) => {
+    const { serviceId, termsType } = req.params;
+
+    const version = await versionsRepository.findLatest(serviceId, termsType);
+
+    if (!version) {
+      return res.status(404).json({ error: `No version found for service "${serviceId}" and terms type "${termsType}"` });
+    }
+
+    return res.status(200).json(await buildVersionDetail(version));
+  });
+
+  /**
+   * @private
+   * @swagger
    * /version/{serviceId}/{termsType}/{date}:
    *   get:
    *     summary: Get a specific version of some terms at a given date.
@@ -388,31 +571,19 @@ export default function versionsRouter(versionsRepository) {
    *         required: true
    *     responses:
    *       200:
-   *         description: A JSON object containing the version content and metadata.
+   *         description: A JSON object containing the version content, metadata, and navigation links.
    *         content:
    *           application/json:
    *             schema:
-   *               $ref: '#/components/schemas/Version'
+   *               $ref: '#/components/schemas/VersionWithLinks'
    *       404:
-   *         description: No version found for the specified combination of service ID, terms type and date.
-   *         content:
-   *           application/json:
-   *             schema:
-   *               type: object
-   *               properties:
-   *                 error:
-   *                   type: string
-   *                   description: Error message indicating that no version is found.
+   *         $ref: '#/components/responses/NotFoundError'
    *       416:
    *         description: The requested date is in the future.
    *         content:
    *           application/json:
    *             schema:
-   *               type: object
-   *               properties:
-   *                 error:
-   *                   type: string
-   *                   description: Error message indicating that the requested date is in the future.
+   *               $ref: '#/components/schemas/ErrorResponse'
    */
   router.get('/version/:serviceId/:termsType/:date', async (req, res) => {
     const { serviceId, termsType, date } = req.params;
@@ -425,14 +596,10 @@ export default function versionsRouter(versionsRepository) {
     const version = await versionsRepository.findByDate(serviceId, termsType, requestedDate);
 
     if (!version) {
-      return res.status(404).json({ error: `No version found for date ${date}` });
+      return res.status(404).json({ error: `No version found for service "${serviceId}" and terms type "${termsType}" at date ${date}` });
     }
 
-    return res.status(200).json({
-      id: version.id,
-      fetchDate: toISODateWithoutMilliseconds(version.fetchDate),
-      content: version.content,
-    });
+    return res.status(200).json(await buildVersionDetail(version));
   });
 
   return router;
