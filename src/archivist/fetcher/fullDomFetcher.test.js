@@ -16,6 +16,8 @@ use(chaiAsPromised);
 
 const dynamicHTML = '<!DOCTYPE html><html><head><title>Dynamic Page</title><script>setTimeout(() => { document.body.innerHTML += "<div class=\'dynamic\'>Loaded</div>"; }, 100);</script></head><body></body></html>';
 const delayedContentHTML = '<!DOCTYPE html><html><head><title>Delayed Content</title><script>setTimeout(() => { document.querySelector(".content").textContent = "Final content"; }, 100);</script></head><body><div class="content"></div></body></html>';
+const multiWaveHTML = '<!DOCTYPE html><html><head><title>Multi Wave</title><script>const list = () => document.querySelector(".list"); setTimeout(() => { list().innerHTML += "<li>one</li>"; }, 50); setTimeout(() => { list().innerHTML += "<li>two</li>"; }, 150); setTimeout(() => { list().innerHTML += "<li>three</li>"; }, 250);</script></head><body><ul class="list"></ul></body></html>';
+const neverSettleHTML = '<!DOCTYPE html><html><head><title>Never Settle</title><script>const target = () => document.querySelector(".content"); setTimeout(() => { target().textContent = "started"; }, 50); setInterval(() => { const node = document.createElement("span"); node.textContent = "tick"; target().appendChild(node); }, 20);</script></head><body><div class="content"></div></body></html>';
 const langEchoHTML = '<!DOCTYPE html><html><body><script>document.body.setAttribute("data-language", navigator.language); document.body.setAttribute("data-languages", navigator.languages.join(","));</script></body></html>';
 const stealthProbeHTML = '<!DOCTYPE html><html><body><script>document.body.setAttribute("data-webdriver", String(navigator.webdriver)); document.body.setAttribute("data-user-agent", navigator.userAgent); document.body.setAttribute("data-plugin-count", String(navigator.plugins.length)); document.body.setAttribute("data-viewport-width", String(window.innerWidth)); document.body.setAttribute("data-viewport-height", String(window.innerHeight)); (() => { const canvas = document.createElement("canvas"); const gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl"); if (!gl) { document.body.setAttribute("data-webgl-vendor", "none"); return; } const ext = gl.getExtension("WEBGL_debug_renderer_info"); document.body.setAttribute("data-webgl-vendor", ext ? gl.getParameter(ext.UNMASKED_VENDOR_WEBGL) : ""); document.body.setAttribute("data-webgl-renderer", ext ? gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) : ""); })();</script></body></html>';
 
@@ -34,6 +36,12 @@ describe('Full DOM Fetcher', function () {
       }
       if (request.url === '/delayed-content') {
         response.writeHead(200, { 'Content-Type': 'text/html' }).write(delayedContentHTML);
+      }
+      if (request.url === '/multi-wave') {
+        response.writeHead(200, { 'Content-Type': 'text/html' }).write(multiWaveHTML);
+      }
+      if (request.url === '/never-settle') {
+        response.writeHead(200, { 'Content-Type': 'text/html' }).write(neverSettleHTML);
       }
       if (request.url === '/lang-header') {
         const acceptLanguage = request.headers['accept-language'] || '';
@@ -79,7 +87,7 @@ describe('Full DOM Fetcher', function () {
   });
 
   describe('#fetch', () => {
-    const config = { navigationTimeout: 1000, waitForElementsTimeout: 1000, language: 'en' };
+    const config = { navigationTimeout: 1000, waitForElementsTimeout: 1000, stabilityTimeout: 1000, stabilityQuietWindow: 50, language: 'en' };
 
     it('waits for dynamically injected elements to appear in the DOM', async () => {
       const result = await fetch(`http://127.0.0.1:${SERVER_PORT}/dynamic`, ['.dynamic'], config);
@@ -112,6 +120,25 @@ describe('Full DOM Fetcher', function () {
         const timeout = 10;
 
         await expect(fetch(url, ['.content'], { ...config, navigationTimeout: timeout })).to.be.rejectedWith(`Timed out after ${timeout / 1000} seconds when trying to fetch '${url}'`);
+      });
+    });
+
+    context('when content is injected in several waves', () => {
+      it('waits for the matched element to stop mutating before capturing', async () => {
+        const result = await fetch(`http://127.0.0.1:${SERVER_PORT}/multi-wave`, ['.list'], config);
+
+        expect(result.content).to.match(/<li>three<\/li>/); // The last wave (250ms) proves the capture awaited the whole injection sequence, not just the first present-with-text state
+      });
+    });
+
+    context('when the matched element never stops mutating', () => {
+      it('returns the content present once the stability timeout is exceeded', async () => {
+        const url = `http://127.0.0.1:${SERVER_PORT}/never-settle`;
+
+        const result = await fetch(url, ['.content'], config); // Must resolve, not reject, even though the subtree mutates forever
+
+        expect(result.mimeType).to.equal('text/html');
+        expect(result.content).to.match(/class="content"/);
       });
     });
 

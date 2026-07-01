@@ -38,6 +38,8 @@
     },
     "fetcher": {
       "waitForElementsTimeout": 10000,
+      "stabilityTimeout": 10000,
+      "stabilityQuietWindow": 1500,
       "navigationTimeout": 30000,
       "language": "en"
     },

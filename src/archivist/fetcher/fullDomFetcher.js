@@ -96,6 +96,7 @@ export default async function fetch(url, cssSelectors, config) {
     }
 
     await waitForSelectors(page, selectors, config.waitForElementsTimeout);
+    await waitForStability(page, selectors, config);
 
     return {
       mimeType: 'text/html',
@@ -259,6 +260,65 @@ async function waitForSelectors(page, selectors, timeout) {
 
     throw error;
   });
+}
+
+async function waitForStability(page, selectors, { stabilityTimeout, stabilityQuietWindow }) {
+  if (!selectors.length) { // No selectors means there is no dynamic content to settle
+    return;
+  }
+
+  // A single in-page promise resolves once the watched elements have stopped mutating for a full quiet window, or once the in-page ceiling is reached.
+  const settled = page.evaluate((cssSelectors, quietWindow, maxWait) => {
+    const globalScope = window; // eslint-disable-line no-undef
+    const matches = cssSelectors.flatMap(cssSelector => [...globalScope.document.querySelectorAll(cssSelector)]);
+
+    return new Promise(resolve => {
+      let quietTimer;
+
+      const observer = new globalScope.MutationObserver(() => {
+        clearTimeout(quietTimer);
+        quietTimer = setTimeout(settle, quietWindow); // Each mutation restarts the quiet window
+      });
+
+      const settle = () => {
+        observer.disconnect();
+        clearTimeout(quietTimer);
+        clearTimeout(capTimer);
+        resolve();
+      };
+
+      matches.forEach(element => {
+        observer.observe(element, { // Catch content injected anywhere inside the matched element, which is what usually keeps mutating after the selector first appears
+          childList: true, // Child nodes being added or removed
+          subtree: true, // Extend childList and characterData to every descendant, not just direct children, so content injected deep inside is caught
+          characterData: true, // Text of existing text nodes being modified
+          // `attributes` is intentionally not observed: class or ARIA churn from spinners and animations would never settle
+        });
+
+        if (element.parentNode) {
+          observer.observe(element.parentNode, { childList: true }); // Catch sibling insertions and wholesale replacement of the matched element itself
+        }
+      });
+
+      quietTimer = setTimeout(settle, quietWindow); // Start the quiet window now; settles if nothing ever mutates
+      const capTimer = setTimeout(settle, maxWait); // Overall ceiling: stop waiting and return whatever content exists
+    });
+  }, selectors, stabilityQuietWindow, stabilityTimeout);
+
+  let hangGuard; // page.evaluate has no built-in timeout, so a frozen page event loop, where the in-page timers never fire, would otherwise hang the fetch forever. Under normal operation the in-page ceiling at stabilityTimeout settles first; this guard only fires if the page stops running timers entirely
+  const guarded = new Promise(resolve => { hangGuard = setTimeout(resolve, stabilityTimeout * 2); });
+
+  try {
+    await Promise.race([ settled, guarded ]); // Promise.race attaches a handler to the losing promise, so a late rejection from the abandoned evaluate (for instance TargetCloseError once cleanupPage closes the context) cannot surface as an unhandled rejection
+  } catch (error) {
+    if (error.name == 'TargetCloseError') { // The page closed mid-wait: not an error for an optional wait, mirroring waitForSelectors
+      return;
+    }
+
+    throw error;
+  } finally {
+    clearTimeout(hangGuard);
+  }
 }
 
 async function cleanupPage(client, context) {

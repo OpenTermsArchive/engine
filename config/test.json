@@ -39,7 +39,9 @@
       }
     },
     "fetcher": {
-      "waitForElementsTimeout": 1000
+      "waitForElementsTimeout": 1000,
+      "stabilityTimeout": 1000,
+      "stabilityQuietWindow": 50
     },
     "dataset": {
       "title": "sandbox",

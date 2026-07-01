@@ -9,6 +9,7 @@ All changes that impact users of this module are documented in this file, in the
 ### Added
 
 - Validate that no `combine` lists the same source document location more than once within a terms type
+- Wait for content injected by client scripts to stop mutating before capturing the page in the full DOM fetcher, reducing run-to-run differences on JavaScript-heavy pages; tune with the new `@opentermsarchive/engine.fetcher.stabilityTimeout` and `@opentermsarchive/engine.fetcher.stabilityQuietWindow` configuration options
 
 ## 14.0.0 - 2026-06-23
 
