@@ -6,6 +6,8 @@ import userAgentOverride from 'puppeteer-extra-plugin-stealth/evasions/user-agen
 import { resolveProxyConfiguration, extractProxyCredentials } from './proxyUtils.js';
 
 const SCROLL_TO_BOTTOM_DURATION = 1500; // Milliseconds spent smoothly scrolling to the bottom of the page before capture, to trigger content that renders lazily as it enters the viewport
+const COOKIE_ACCEPT_SELECTOR = '[data-testid="cookie-policy-manage-dialog"] [aria-label="Allow all cookies"]'; // Hardcoded for now: dismiss the cookie consent dialog before capture
+const COOKIE_DIALOG_TIMEOUT = 5000; // Milliseconds to wait for the cookie dialog to appear before giving up
 
 let browser;
 
@@ -97,6 +99,7 @@ export default async function fetch(url, cssSelectors, config) {
       throw new Error(`Received HTTP code ${statusCode} when trying to fetch '${url}'`);
     }
 
+    await dismissCookieDialog(page);
     await scrollToBottom(page, SCROLL_TO_BOTTOM_DURATION);
 
     const unmatchedSelectors = await waitForSelectors(page, selectors, config.waitForElementsTimeout);
@@ -246,6 +249,14 @@ function setupPdfInterception(client) {
   });
 
   return { pdf, handled };
+}
+
+async function dismissCookieDialog(page) {
+  const acceptButton = await page.waitForSelector(COOKIE_ACCEPT_SELECTOR, { timeout: COOKIE_DIALOG_TIMEOUT }).catch(() => null); // The cookie dialog may not appear; do not fail the fetch when it is absent
+
+  if (acceptButton) {
+    await acceptButton.click().catch(() => {}); // Ignore if the button became stale between finding it and clicking
+  }
 }
 
 async function scrollToBottom(page, duration) {
