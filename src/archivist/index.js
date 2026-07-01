@@ -257,10 +257,10 @@ export default class Archivist extends events.EventEmitter {
   }
 
   async fetchSourceDocument(sourceDocument, terms) {
-    const { location: url, executeClientScripts, cssSelectors } = sourceDocument;
+    const { location: url, executeClientScripts, contentCssSelectors } = sourceDocument;
 
     try {
-      const { mimeType, content, fetcher, unmatchedSelectors } = await this.fetch({ url, executeClientScripts, cssSelectors });
+      const { mimeType, content, fetcher, unmatchedSelectors } = await this.fetch({ url, executeClientScripts, cssSelectors: contentCssSelectors }); // Only wait for and report on content selectors: "remove" selectors target elements to strip, which need not be present and often carry no text
 
       sourceDocument.content = content;
       sourceDocument.mimeType = mimeType;

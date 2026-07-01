@@ -39,6 +39,10 @@ export default class SourceDocument {
     return result.filter(selector => selector);
   }
 
+  get contentCssSelectors() { // Only the content ("select") selectors, used to wait for the meaningful content to load: "remove" selectors are excluded because they target elements to be stripped, which need not be present and often carry no text (for example images)
+    return SourceDocument.extractCssSelectorsFromProperty(this.contentSelectors).filter(selector => selector);
+  }
+
   clearContent() {
     this.content = null;
     this.mimeType = null;

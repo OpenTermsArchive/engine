@@ -12,6 +12,10 @@ All changes that impact users of this module are documented in this file, in the
 - Wait for content injected by client scripts to stop mutating before capturing the page in the full DOM fetcher, reducing run-to-run differences on JavaScript-heavy pages; tune with the new `@opentermsarchive/engine.fetcher.stabilityTimeout` and `@opentermsarchive/engine.fetcher.stabilityQuietWindow` configuration options
 - Surface content selectors that never matched an element during a fetch as a warning, so out-of-date declarations can be spotted instead of silently extracting partial content
 
+### Fixed
+
+- Wait only for content (`select`) selectors in the full DOM fetcher; `remove` selectors are no longer awaited, avoiding a full-timeout wait on elements that carry no text such as images and no longer reporting them as unmatched
+
 ## 14.0.0 - 2026-06-23
 
 > Development of this release was supported by [Reset Tech](https://www.reset.tech).

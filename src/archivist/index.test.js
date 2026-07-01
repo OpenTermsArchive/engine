@@ -605,7 +605,7 @@ describe('Archivist', function () {
   describe('#fetchSourceDocument', () => {
     let app;
     let unmatchedSelectorsSpy;
-    const sourceDocument = { location: 'https://example.com/doc', id: 'doc-id', executeClientScripts: true, cssSelectors: [ '.present', '.missing' ] };
+    const sourceDocument = { location: 'https://example.com/doc', id: 'doc-id', executeClientScripts: true, contentCssSelectors: [ '.present', '.missing' ] };
     const fetchResult = { mimeType: 'text/html', content: '<html></html>', fetcher: 'fullDom' };
 
     before(async () => {
@@ -662,6 +662,20 @@ describe('Archivist', function () {
 
       it('includes the source document id as documentId', () => {
         expect(unmatchedSelectorsSpy).to.have.been.calledWithMatch({ documentId: 'doc-id' });
+      });
+    });
+
+    context('when the source document declares both content and remove selectors', () => {
+      const terms = { service: { id: 'test-service' }, type: 'test-type', hasMultipleSourceDocuments: false };
+      const sourceDocumentWithRemove = new SourceDocument({ location: 'https://example.com/doc', executeClientScripts: true, contentSelectors: 'main', insignificantContentSelectors: '.img' });
+
+      beforeEach(async () => {
+        sinon.stub(app, 'fetch').resolves(fetchResult);
+        await app.fetchSourceDocument(sourceDocumentWithRemove, terms);
+      });
+
+      it('waits only for the content selectors, not the "remove" selectors', () => {
+        expect(app.fetch).to.have.been.calledWithMatch({ cssSelectors: ['main'] });
       });
     });
   });

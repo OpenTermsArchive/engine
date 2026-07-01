@@ -157,6 +157,26 @@ describe('SourceDocument', () => {
     });
   });
 
+  describe('#contentCssSelectors', () => {
+    it('returns the content selectors', () => {
+      const result = new SourceDocument({ location: URL, contentSelectors: 'body' }).contentCssSelectors;
+
+      expect(result).to.deep.equal(['body']);
+    });
+
+    it('excludes the "remove" selectors', () => {
+      const result = new SourceDocument({ location: URL, contentSelectors: 'body', insignificantContentSelectors: '.img' }).contentCssSelectors;
+
+      expect(result).to.deep.equal(['body']);
+    });
+
+    it('returns an empty array when only "remove" selectors are declared', () => {
+      const result = new SourceDocument({ location: URL, insignificantContentSelectors: '.img' }).contentCssSelectors;
+
+      expect(result).to.deep.equal([]);
+    });
+  });
+
   describe('#generateId', () => {
     it('generates ID from URL pathname', () => {
       expect(new SourceDocument({ location: 'https://example.com/legal/terms' }).id).to.equal('legal-terms');
