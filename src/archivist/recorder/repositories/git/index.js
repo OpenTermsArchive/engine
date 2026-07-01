@@ -110,6 +110,32 @@ export default class GitRepository extends RepositoryInterface {
     return Promise.all((await this.#getCommits({ pathFilter: pathPattern, limit, offset, includeTechnicalUpgrades })).map(commit => this.#toDomain(commit, { deferContentLoading: true })));
   }
 
+  async getNavigationIds(serviceId, termsType, versionId, { includeTechnicalUpgrades = true } = {}) {
+    const pathPattern = DataMapper.generateFilePath(serviceId, termsType);
+    let revisions = await this.git.listPathRevisions(pathPattern); // single lean walk of the terms history
+
+    if (!includeTechnicalUpgrades) {
+      revisions = revisions.filter(revision => !DataMapper.isTechnicalUpgrade(revision.subject));
+    }
+
+    // Deterministic total order: most recent first, commit SHA as a stable tiebreaker for versions sharing the same fetch date (git stores second precision).
+    // prev/next are then adjacent entries in this single order, so navigation always round-trips, unlike the previous chronological/topological mix.
+    revisions.sort((a, b) => b.timestamp - a.timestamp || (a.hash < b.hash ? -1 : 1));
+
+    const index = revisions.findIndex(revision => revision.hash === versionId);
+
+    if (index === -1) {
+      return { first: null, prev: null, next: null, last: null };
+    }
+
+    return {
+      last: revisions[0].hash, // newest version of these terms
+      first: revisions[revisions.length - 1].hash, // oldest version of these terms
+      next: index > 0 ? revisions[index - 1].hash : null, // the version recorded just after this one
+      prev: index < revisions.length - 1 ? revisions[index + 1].hash : null, // the version recorded just before this one
+    };
+  }
+
   async count(serviceId, termsType) {
     const grepOptions = Object.values(DataMapper.COMMIT_MESSAGE_PREFIXES).map(prefix => `--grep=${prefix}`);
     const pathOptions = [];

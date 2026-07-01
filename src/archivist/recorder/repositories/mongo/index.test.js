@@ -988,6 +988,156 @@ describe('MongoRepository', () => {
       });
     });
 
+    describe('#getNavigationIds', () => {
+      let firstVersion;
+      let middleVersion;
+      let lastVersion;
+
+      before(async () => {
+        firstVersion = await subject.save(new Version({
+          serviceId: SERVICE_PROVIDER_ID,
+          termsType: TERMS_TYPE,
+          content: 'first content',
+          fetchDate: FETCH_DATE_EARLIER,
+          snapshotIds: [SNAPSHOT_ID],
+        }));
+
+        middleVersion = await subject.save(new Version({
+          serviceId: SERVICE_PROVIDER_ID,
+          termsType: TERMS_TYPE,
+          content: 'middle content',
+          fetchDate: FETCH_DATE,
+          snapshotIds: [SNAPSHOT_ID],
+        }));
+
+        lastVersion = await subject.save(new Version({
+          serviceId: SERVICE_PROVIDER_ID,
+          termsType: TERMS_TYPE,
+          content: 'last content',
+          fetchDate: FETCH_DATE_LATER,
+          snapshotIds: [SNAPSHOT_ID],
+        }));
+      });
+
+      after(() => subject.removeAll());
+
+      context('for the oldest version', () => {
+        let navigationIds;
+
+        before(async () => { navigationIds = await subject.getNavigationIds(SERVICE_PROVIDER_ID, TERMS_TYPE, firstVersion.id); });
+
+        it('has no previous version', () => expect(navigationIds.prev).to.be.null);
+        it('points to the next version', () => expect(navigationIds.next).to.equal(middleVersion.id));
+        it('points to itself as first', () => expect(navigationIds.first).to.equal(firstVersion.id));
+        it('points to the newest version as last', () => expect(navigationIds.last).to.equal(lastVersion.id));
+      });
+
+      context('for a middle version', () => {
+        let navigationIds;
+
+        before(async () => { navigationIds = await subject.getNavigationIds(SERVICE_PROVIDER_ID, TERMS_TYPE, middleVersion.id); });
+
+        it('points to the previous version', () => expect(navigationIds.prev).to.equal(firstVersion.id));
+        it('points to the next version', () => expect(navigationIds.next).to.equal(lastVersion.id));
+        it('points to the oldest version as first', () => expect(navigationIds.first).to.equal(firstVersion.id));
+        it('points to the newest version as last', () => expect(navigationIds.last).to.equal(lastVersion.id));
+      });
+
+      context('for the newest version', () => {
+        let navigationIds;
+
+        before(async () => { navigationIds = await subject.getNavigationIds(SERVICE_PROVIDER_ID, TERMS_TYPE, lastVersion.id); });
+
+        it('points to the previous version', () => expect(navigationIds.prev).to.equal(middleVersion.id));
+        it('has no next version', () => expect(navigationIds.next).to.be.null);
+        it('points to itself as last', () => expect(navigationIds.last).to.equal(lastVersion.id));
+      });
+
+      context('when the version does not exist', () => {
+        it('returns only null IDs', async () => {
+          expect(await subject.getNavigationIds(SERVICE_PROVIDER_ID, TERMS_TYPE, 'ffffffffffffffffffffffff')).to.deep.equal({ first: null, prev: null, next: null, last: null });
+        });
+      });
+
+      context('when a technical upgrade is recorded out of chronological order', () => {
+        // A technical upgrade re-renders an old snapshot: it carries an OLD fetch date but is inserted last.
+        // The navigation IDs are derived from a single chronological order, so prev/next stay exact inverses.
+        const TECHNICAL_UPGRADE_DATE = new Date('2000-01-01T09:00:00.000Z'); // between firstVersion (06:00) and middleVersion (12:00)
+        let technicalUpgrade;
+
+        before(async () => {
+          technicalUpgrade = await subject.save(new Version({
+            serviceId: SERVICE_PROVIDER_ID,
+            termsType: TERMS_TYPE,
+            content: 'technical upgrade content',
+            fetchDate: TECHNICAL_UPGRADE_DATE,
+            isTechnicalUpgrade: true,
+            snapshotIds: [SNAPSHOT_ID],
+          }));
+        });
+
+        it('orders it by its fetch date, not its insertion order', async () => {
+          const navigationIds = await subject.getNavigationIds(SERVICE_PROVIDER_ID, TERMS_TYPE, technicalUpgrade.id);
+
+          expect(navigationIds.prev).to.equal(firstVersion.id);
+          expect(navigationIds.next).to.equal(middleVersion.id);
+        });
+
+        it('keeps prev and next as exact inverses (round-trips)', async () => {
+          const fromFirst = await subject.getNavigationIds(SERVICE_PROVIDER_ID, TERMS_TYPE, firstVersion.id);
+
+          expect(fromFirst.next).to.equal(technicalUpgrade.id);
+
+          const backFromUpgrade = await subject.getNavigationIds(SERVICE_PROVIDER_ID, TERMS_TYPE, fromFirst.next);
+
+          expect(backFromUpgrade.prev).to.equal(firstVersion.id);
+        });
+
+        it('can exclude technical upgrades from the sequence', async () => {
+          const navigationIds = await subject.getNavigationIds(SERVICE_PROVIDER_ID, TERMS_TYPE, firstVersion.id, { includeTechnicalUpgrades: false });
+
+          expect(navigationIds.next).to.equal(middleVersion.id);
+        });
+      });
+    });
+
+    describe('#getNavigationIds with versions sharing the same fetch date', () => {
+      // Distinct versions can share a fetch date; the _id tiebreaker must keep the order deterministic so prev/next still round-trip.
+      let ids;
+
+      before(async () => {
+        ids = [];
+        for (const content of [ 'tie A', 'tie B', 'tie C' ]) {
+          ids.push((await subject.save(new Version({ serviceId: SERVICE_PROVIDER_ID, termsType: TERMS_TYPE, content, fetchDate: FETCH_DATE, snapshotIds: [SNAPSHOT_ID] }))).id);
+        }
+      });
+
+      after(() => subject.removeAll());
+
+      it('round-trips next then prev for every version', async () => {
+        for (const id of ids) {
+          const navigationIds = await subject.getNavigationIds(SERVICE_PROVIDER_ID, TERMS_TYPE, id);
+
+          if (navigationIds.next) {
+            expect((await subject.getNavigationIds(SERVICE_PROVIDER_ID, TERMS_TYPE, navigationIds.next)).prev).to.equal(id);
+          }
+        }
+      });
+
+      it('exposes all three versions as a single ordered chain', async () => {
+        const head = await subject.getNavigationIds(SERVICE_PROVIDER_ID, TERMS_TYPE, ids[0]);
+        const walked = new Set([head.first]);
+        let cursor = head.first;
+
+        while (cursor) {
+          walked.add(cursor);
+          cursor = (await subject.getNavigationIds(SERVICE_PROVIDER_ID, TERMS_TYPE, cursor)).next;
+        }
+
+        expect(walked).to.have.lengthOf(ids.length);
+      });
+    });
+
     describe('#findLatest', () => {
       context('when there are records for the given service', () => {
         let lastSnapshotId;

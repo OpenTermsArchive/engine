@@ -165,4 +165,30 @@ export default class Git {
   async updateCommitGraph() {
     await this.git.raw([ 'commit-graph', 'write', '--reachable', '--changed-paths', '--append' ]);
   }
+
+  async listPathRevisions(pathFilter) {
+    let output;
+
+    try {
+      // Lean log: only the data needed to order versions (hash, author timestamp, subject), no diff or message body.
+      // Ordering and technical-upgrade filtering are done by the caller in memory, so `--author-date-order`/`--grep`/`--name-only` are deliberately omitted.
+      output = await this.git.raw([ 'log', '--no-merges', '--format=%H%x09%at%x09%s', '--', pathFilter ]);
+    } catch (error) {
+      if (/unknown revision or path not in the working tree|does not have any commits yet/.test(error.message)) {
+        return [];
+      }
+
+      throw error;
+    }
+
+    if (!output) {
+      return [];
+    }
+
+    return output.trim().split('\n').filter(Boolean).map(line => {
+      const [ hash, timestamp, ...subjectParts ] = line.split('\t');
+
+      return { hash, timestamp: parseInt(timestamp, 10), subject: subjectParts.join('\t') };
+    });
+  }
 }
