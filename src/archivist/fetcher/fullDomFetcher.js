@@ -142,7 +142,7 @@ export async function launchHeadlessBrowser(language) {
 
   const options = {
     args: [],
-    headless: !process.env.OTA_ENGINE_FETCHER_NO_HEADLESS,
+    headless: !(process.env.OTA_ENGINE_FETCHER_NO_HEADLESS || process.env.OTA_ENGINE_FETCHER_KEEP_OPEN), // KEEP_OPEN implies a visible window so the persisted pages can actually be inspected
   };
 
   const { httpProxy, httpsProxy } = resolveProxyConfiguration();
@@ -180,6 +180,10 @@ export async function launchHeadlessBrowser(language) {
  */
 export async function stopHeadlessBrowser() {
   if (!browser) {
+    return;
+  }
+
+  if (process.env.OTA_ENGINE_FETCHER_KEEP_OPEN) { // Debug mode: keep Chrome running so the pages left open by previous fetches stay available for inspection and comparison
     return;
   }
 
@@ -350,6 +354,10 @@ async function waitForStability(page, selectors, { stabilityTimeout, stabilityQu
 }
 
 async function cleanupPage(client, context) {
+  if (process.env.OTA_ENGINE_FETCHER_KEEP_OPEN) { // Debug mode: leave the page and context open so each run's page can be inspected and compared with the others
+    return;
+  }
+
   if (client) {
     await client.detach().catch(() => {});
   }
