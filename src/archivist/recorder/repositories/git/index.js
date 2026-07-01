@@ -190,6 +190,10 @@ export default class GitRepository extends RepositoryInterface {
     record.content = pdfBuffer;
   }
 
+  getDiffStats(recordId) {
+    return this.git.getDiffStats(recordId);
+  }
+
   async #getCommits({ pathFilter, reverse = false, limit, offset, includeTechnicalUpgrades = true } = {}) {
     const prefixes = includeTechnicalUpgrades
       ? DataMapper.COMMIT_MESSAGE_PREFIXES

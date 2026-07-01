@@ -233,6 +233,11 @@ export default class MongoRepository extends RepositoryInterface {
     record.content = content instanceof Binary ? content.buffer : content;
   }
 
+  // eslint-disable-next-line class-methods-use-this, no-unused-vars
+  getDiffStats(recordId) {
+    return { additions: null, deletions: null }; // Diff stats are not available for MongoDB storage
+  }
+
   async #toDomain(mongoDocument, { deferContentLoading } = {}) {
     if (!mongoDocument) {
       return null;
