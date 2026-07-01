@@ -5,6 +5,8 @@ import userAgentOverride from 'puppeteer-extra-plugin-stealth/evasions/user-agen
 
 import { resolveProxyConfiguration, extractProxyCredentials } from './proxyUtils.js';
 
+const SCROLL_TO_BOTTOM_DURATION = 1500; // Milliseconds spent smoothly scrolling to the bottom of the page before capture, to trigger content that renders lazily as it enters the viewport
+
 let browser;
 
 export function parseLanguage(value) {
@@ -94,6 +96,8 @@ export default async function fetch(url, cssSelectors, config) {
     if (!isValidHttpStatus(statusCode)) {
       throw new Error(`Received HTTP code ${statusCode} when trying to fetch '${url}'`);
     }
+
+    await scrollToBottom(page, SCROLL_TO_BOTTOM_DURATION);
 
     const unmatchedSelectors = await waitForSelectors(page, selectors, config.waitForElementsTimeout);
 
@@ -238,6 +242,23 @@ function setupPdfInterception(client) {
   });
 
   return { pdf, handled };
+}
+
+async function scrollToBottom(page, duration) {
+  await page.evaluate(scrollDuration => new Promise(resolve => {
+    const globalScope = window; // eslint-disable-line no-undef
+    const start = Date.now();
+    const timer = setInterval(() => {
+      const progress = Math.min(1, (Date.now() - start) / scrollDuration);
+
+      globalScope.scrollTo(0, globalScope.document.documentElement.scrollHeight * progress); // scrollHeight is recomputed each step since lazily rendered content can grow the page during the scroll
+
+      if (progress >= 1) {
+        clearInterval(timer);
+        resolve();
+      }
+    }, 50);
+  }), duration);
 }
 
 async function waitForSelectors(page, selectors, timeout) {
