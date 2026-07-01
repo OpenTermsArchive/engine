@@ -88,6 +88,19 @@ export default class MongoRepository extends RepositoryInterface {
     return this.#toDomain(mongoDocument);
   }
 
+  async findMetadataById(recordId) {
+    if (!ObjectId.isValid(recordId)) {
+      return null;
+    }
+
+    const document = await this.collection.findOne(
+      { _id: ObjectId.createFromHexString(recordId) },
+      { projection: { content: 0 } },
+    );
+
+    return document ? this.#toDomain(document, { deferContentLoading: true }) : null;
+  }
+
   async findAll({ limit, offset, includeTechnicalUpgrades = true } = {}) {
     const filter = includeTechnicalUpgrades ? {} : { isTechnicalUpgrade: { $ne: true } };
     let query = this.collection.find(filter).project({ content: 0 }).sort({ fetchDate: -1 });
