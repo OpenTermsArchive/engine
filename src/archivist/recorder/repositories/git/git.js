@@ -106,7 +106,8 @@ export default class Git {
 
       return commits;
     } catch (error) {
-      if (/unknown revision or path not in the working tree|does not have any commits yet/.test(error.message)) {
+      // `bad object` is raised for a well-formed but absent object ID (e.g. a snapshot referenced by a version but missing from this repository); like an unknown revision, it means "no match" rather than a hard failure
+      if (/unknown revision or path not in the working tree|does not have any commits yet|bad object/.test(error.message)) {
         return [];
       }
 

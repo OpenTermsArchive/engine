@@ -92,14 +92,14 @@ export default class GitRepository extends RepositoryInterface {
     return Promise.all((await this.#getCommits({ limit, offset, includeTechnicalUpgrades })).map(commit => this.#toDomain(commit, { deferContentLoading: true })));
   }
 
-  async findByService(serviceId, { limit, offset, includeTechnicalUpgrades = true } = {}) {
-    const pathPattern = DataMapper.generateFilePath(serviceId);
+  async findByServiceAndTermsType(serviceId, termsType, { limit, offset, includeTechnicalUpgrades = true } = {}) {
+    const pathPattern = DataMapper.generateFilePath(serviceId, termsType);
 
     return Promise.all((await this.#getCommits({ pathFilter: pathPattern, limit, offset, includeTechnicalUpgrades })).map(commit => this.#toDomain(commit, { deferContentLoading: true })));
   }
 
-  async findByServiceAndTermsType(serviceId, termsType, { limit, offset, includeTechnicalUpgrades = true } = {}) {
-    const pathPattern = DataMapper.generateFilePath(serviceId, termsType);
+  async findByService(serviceId, { limit, offset, includeTechnicalUpgrades = true } = {}) {
+    const pathPattern = DataMapper.generateFilePath(serviceId);
 
     return Promise.all((await this.#getCommits({ pathFilter: pathPattern, limit, offset, includeTechnicalUpgrades })).map(commit => this.#toDomain(commit, { deferContentLoading: true })));
   }

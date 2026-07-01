@@ -400,6 +400,12 @@ describe('GitRepository', () => {
           expect(await subject.findById('inexistantID')).to.equal(null);
         });
       });
+
+      context('when the requested ID is well formed but absent from the repository', () => {
+        it('returns null rather than throwing a "bad object" error', async () => {
+          expect(await subject.findById('ecd9407eb26b1bf0613186175ee80edbdeedd47f')).to.equal(null);
+        });
+      });
     });
 
     describe('#findByDate', () => {
