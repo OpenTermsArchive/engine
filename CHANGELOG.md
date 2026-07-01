@@ -2,6 +2,20 @@
 
 All changes that impact users of this module are documented in this file, in the [Common Changelog](https://common-changelog.org) format with some additional specifications defined in the CONTRIBUTING file. This codebase adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased [minor]
+
+### Added
+
+- Wait for content injected by client scripts to stop mutating before capturing the page in the full DOM fetcher, reducing run-to-run differences on JavaScript-heavy pages; tune with the new `@opentermsarchive/engine.fetcher.stabilityTimeout` and `@opentermsarchive/engine.fetcher.stabilityQuietWindow` configuration options
+- Surface content selectors that never matched an element during a fetch as a warning, so out-of-date declarations can be spotted instead of silently extracting partial content
+- Scroll smoothly to the bottom of the page before capturing in the full DOM fetcher, to trigger content that renders lazily on scroll — experimental: the scroll duration is hardcoded
+- Dismiss the cookie consent dialog before capturing in the full DOM fetcher — experimental: the accepted button selector is hardcoded
+- Add an `OTA_ENGINE_FETCHER_KEEP_OPEN` environment variable that keeps each fetch's page and the browser open across runs — debugging aid to inspect and compare rendered pages
+
+### Fixed
+
+- Wait only for content (`select`) selectors in the full DOM fetcher; `remove` selectors are no longer awaited, which could otherwise make the fetcher wait the full timeout on text-less elements such as images
+
 ## 14.1.0 - 2026-06-29
 
 > Development of this release was supported by [the Research Chair in Content Moderation](https://regulation-tech.cnam.fr/) at the Conservatoire National des Arts et Métiers.
@@ -9,12 +23,6 @@ All changes that impact users of this module are documented in this file, in the
 ### Added
 
 - Validate that no `combine` lists the same source document location more than once within a terms type
-- Wait for content injected by client scripts to stop mutating before capturing the page in the full DOM fetcher, reducing run-to-run differences on JavaScript-heavy pages; tune with the new `@opentermsarchive/engine.fetcher.stabilityTimeout` and `@opentermsarchive/engine.fetcher.stabilityQuietWindow` configuration options
-- Surface content selectors that never matched an element during a fetch as a warning, so out-of-date declarations can be spotted instead of silently extracting partial content
-
-### Fixed
-
-- Wait only for content (`select`) selectors in the full DOM fetcher; `remove` selectors are no longer awaited, avoiding a full-timeout wait on elements that carry no text such as images and no longer reporting them as unmatched
 
 ## 14.0.0 - 2026-06-23
 
