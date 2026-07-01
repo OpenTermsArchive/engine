@@ -95,12 +95,14 @@ export default async function fetch(url, cssSelectors, config) {
       throw new Error(`Received HTTP code ${statusCode} when trying to fetch '${url}'`);
     }
 
-    await waitForSelectors(page, selectors, config.waitForElementsTimeout);
+    const unmatchedSelectors = await waitForSelectors(page, selectors, config.waitForElementsTimeout);
+
     await waitForStability(page, selectors, config);
 
     return {
       mimeType: 'text/html',
       content: await page.content(),
+      unmatchedSelectors,
     };
   } catch (error) {
     if (error.name === 'TimeoutError') {
@@ -239,7 +241,8 @@ function setupPdfInterception(client) {
 }
 
 async function waitForSelectors(page, selectors, timeout) {
-  const waitForSelectorsPromises = selectors.filter(Boolean).map(selector =>
+  const presentSelectors = selectors.filter(Boolean);
+  const results = await Promise.allSettled(presentSelectors.map(selector =>
     page.waitForFunction(
       cssSelector => {
         const element = document.querySelector(cssSelector); // eslint-disable-line no-undef
@@ -248,18 +251,22 @@ async function waitForSelectors(page, selectors, timeout) {
       },
       { timeout },
       selector,
-    ));
+    )));
 
-  // We expect all elements to be present on the page…
-  await Promise.all(waitForSelectorsPromises).catch(error => {
-    if (error.name == 'TimeoutError') {
-      // however, if they are not, this is not considered as an error since selectors may be out of date
-      // and the whole content of the page should still be returned.
-      return;
+  const unmatchedSelectors = [];
+
+  // We expect every selector to match an element with text. A selector that never does is not fatal (the whole page content is still returned), but it is collected and surfaced so the declaration can be reviewed: it may be out of date, or the content may not have loaded
+  results.forEach((result, index) => {
+    if (result.status == 'rejected') {
+      if (result.reason?.name == 'TimeoutError') {
+        unmatchedSelectors.push(presentSelectors[index]);
+      } else {
+        throw result.reason;
+      }
     }
-
-    throw error;
   });
+
+  return unmatchedSelectors;
 }
 
 async function waitForStability(page, selectors, { stabilityTimeout, stabilityQuietWindow }) {

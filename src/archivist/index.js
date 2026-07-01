@@ -32,6 +32,7 @@ export const EVENTS = [
   'trackingStarted',
   'trackingCompleted',
   'inaccessibleContent',
+  'unmatchedSelectors',
   'info',
   'warn',
   'error',
@@ -196,7 +197,7 @@ export default class Archivist extends events.EventEmitter {
     const fetchDocumentErrors = [];
 
     for (const sourceDocument of terms.sourceDocuments) {
-      const error = await this.fetchSourceDocument(sourceDocument);
+      const error = await this.fetchSourceDocument(sourceDocument, terms);
 
       if (error) {
         fetchDocumentErrors.push(error);
@@ -240,7 +241,7 @@ export default class Archivist extends events.EventEmitter {
     const fetchDocumentErrors = [];
 
     for (const sourceDocument of missingSourceDocuments) {
-      const error = await this.fetchSourceDocument(sourceDocument);
+      const error = await this.fetchSourceDocument(sourceDocument, terms);
 
       if (error) {
         fetchDocumentErrors.push(error);
@@ -255,15 +256,24 @@ export default class Archivist extends events.EventEmitter {
     }
   }
 
-  async fetchSourceDocument(sourceDocument) {
+  async fetchSourceDocument(sourceDocument, terms) {
     const { location: url, executeClientScripts, cssSelectors } = sourceDocument;
 
     try {
-      const { mimeType, content, fetcher } = await this.fetch({ url, executeClientScripts, cssSelectors });
+      const { mimeType, content, fetcher, unmatchedSelectors } = await this.fetch({ url, executeClientScripts, cssSelectors });
 
       sourceDocument.content = content;
       sourceDocument.mimeType = mimeType;
       sourceDocument.fetcher = fetcher;
+
+      if (unmatchedSelectors?.length) {
+        this.emit('unmatchedSelectors', {
+          selectors: unmatchedSelectors,
+          serviceId: terms.service.id,
+          termsType: terms.type,
+          documentId: terms.hasMultipleSourceDocuments ? sourceDocument.id : undefined,
+        });
+      }
     } catch (error) {
       if (!(error instanceof FetchDocumentError)) {
         throw error;

@@ -95,6 +95,18 @@ describe('Full DOM Fetcher', function () {
       expect(result.content).to.match(/<body[^>]*>.*<div class="dynamic">Loaded<\/div>.*<\/body>/s);
     });
 
+    it('returns an empty list of unmatched selectors when every selector matches', async () => {
+      const result = await fetch(`http://127.0.0.1:${SERVER_PORT}/dynamic`, ['.dynamic'], config);
+
+      expect(result.unmatchedSelectors).to.deep.equal([]);
+    });
+
+    it('surfaces the selectors that never matched an element with text', async () => {
+      const result = await fetch(`http://127.0.0.1:${SERVER_PORT}/dynamic`, [ '.dynamic', '.never-there' ], config);
+
+      expect(result.unmatchedSelectors).to.deep.equal(['.never-there']);
+    });
+
     it('fails when waiting for non-existent elements exceeds timeout', async () => {
       const url = `http://127.0.0.1:${SERVER_PORT}/dynamic`;
       const timeout = 10;

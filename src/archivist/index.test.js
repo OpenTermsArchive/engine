@@ -602,6 +602,70 @@ describe('Archivist', function () {
     });
   });
 
+  describe('#fetchSourceDocument', () => {
+    let app;
+    let unmatchedSelectorsSpy;
+    const sourceDocument = { location: 'https://example.com/doc', id: 'doc-id', executeClientScripts: true, cssSelectors: [ '.present', '.missing' ] };
+    const fetchResult = { mimeType: 'text/html', content: '<html></html>', fetcher: 'fullDom' };
+
+    before(async () => {
+      app = await createAndInitializeArchivist();
+    });
+
+    beforeEach(() => {
+      unmatchedSelectorsSpy = sinon.spy();
+      app.on('unmatchedSelectors', unmatchedSelectorsSpy);
+    });
+
+    afterEach(() => {
+      app.fetch.restore();
+      app.removeListener('unmatchedSelectors', unmatchedSelectorsSpy);
+    });
+
+    context('when the fetcher reports selectors that did not match', () => {
+      const terms = { service: { id: 'test-service' }, type: 'test-type', hasMultipleSourceDocuments: false };
+
+      beforeEach(async () => {
+        sinon.stub(app, 'fetch').resolves({ ...fetchResult, unmatchedSelectors: ['.missing'] });
+        await app.fetchSourceDocument(sourceDocument, terms);
+      });
+
+      it('emits an "unmatchedSelectors" event with the selectors and terms context', () => {
+        expect(unmatchedSelectorsSpy).to.have.been.calledWithMatch({
+          selectors: ['.missing'],
+          serviceId: 'test-service',
+          termsType: 'test-type',
+        });
+      });
+    });
+
+    context('when every selector matched', () => {
+      const terms = { service: { id: 'test-service' }, type: 'test-type', hasMultipleSourceDocuments: false };
+
+      beforeEach(async () => {
+        sinon.stub(app, 'fetch').resolves({ ...fetchResult, unmatchedSelectors: [] });
+        await app.fetchSourceDocument(sourceDocument, terms);
+      });
+
+      it('does not emit an "unmatchedSelectors" event', () => {
+        expect(unmatchedSelectorsSpy).to.not.have.been.called;
+      });
+    });
+
+    context('when the terms has multiple source documents', () => {
+      const terms = { service: { id: 'test-service' }, type: 'test-type', hasMultipleSourceDocuments: true };
+
+      beforeEach(async () => {
+        sinon.stub(app, 'fetch').resolves({ ...fetchResult, unmatchedSelectors: ['.missing'] });
+        await app.fetchSourceDocument(sourceDocument, terms);
+      });
+
+      it('includes the source document id as documentId', () => {
+        expect(unmatchedSelectorsSpy).to.have.been.calledWithMatch({ documentId: 'doc-id' });
+      });
+    });
+  });
+
   describe('Plugin system', () => {
     const plugin = {};
 

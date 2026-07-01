@@ -223,6 +223,10 @@ logger.onInaccessibleContent = ({ message }, terms) => {
   logger.warn({ message, serviceId: terms.service.id, termsType: terms.type });
 };
 
+logger.onUnmatchedSelectors = ({ selectors, serviceId, termsType, documentId }) => {
+  logger.warn({ message: `The following content selectors matched no element with text and may be out of date: ${selectors.map(selector => `"${selector}"`).join(', ')}`, serviceId, termsType, documentId });
+};
+
 const createLogHandler = level => params => {
   if (typeof params === 'string') {
     logger[level]({ message: params });
