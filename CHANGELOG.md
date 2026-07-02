@@ -2,6 +2,12 @@
 
 All changes that impact users of this module are documented in this file, in the [Common Changelog](https://common-changelog.org) format with some additional specifications defined in the CONTRIBUTING file. This codebase adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased [minor]
+
+### Added
+
+- Add `normalizeWhitespace` built-in filter that replaces Unicode space separators (non-breaking space, narrow no-break space, ...) with a regular space; see more in the [built-in filters documentation](https://docs.opentermsarchive.org/terms/reference/built-in-filters/)
+
 ## 14.1.0 - 2026-06-29
 
 > Development of this release was supported by [the Research Chair in Content Moderation](https://regulation-tech.cnam.fr/) at the Conservatoire National des Arts et Métiers.
