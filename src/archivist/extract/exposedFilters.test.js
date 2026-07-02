@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 
 import createWebPageDOM from './dom.js';
-import { removeQueryParams } from './exposedFilters.js';
+import { normalizeWhitespace, removeQueryParams } from './exposedFilters.js';
 
 describe('exposedFilters', () => {
   let webPageDOM;
@@ -263,6 +263,48 @@ fetch(trackingUrl);
 
         expect(preElement.textContent).to.equal(originalPreContent);
       });
+    });
+  });
+
+  describe('#normalizeWhitespace', () => {
+    let element;
+
+    afterEach(() => {
+      element.remove();
+    });
+
+    it('replaces Unicode space separators with a regular space', () => {
+      element = webPageDOM.createElement('p');
+      element.textContent = 'a\u00A0b\u202Fc\u2009d\u3000e';
+      webPageDOM.body.appendChild(element);
+
+      normalizeWhitespace(webPageDOM);
+
+      expect(element.textContent).to.equal('a b c d e');
+    });
+
+    it('normalizes text across nested elements', () => {
+      element = webPageDOM.createElement('div');
+      element.innerHTML = '<span>first\u00A0part</span><span>second\u00A0part</span>';
+      webPageDOM.body.appendChild(element);
+
+      normalizeWhitespace(webPageDOM);
+
+      expect(element.textContent).to.equal('first partsecond part');
+    });
+
+    it('does not alter element attributes or URLs, only text content', () => {
+      const href = 'https://example.com/page?label=gen173__nr-1';
+
+      element = webPageDOM.createElement('a');
+      element.setAttribute('href', href);
+      element.textContent = 'read\u00A0the\u00A0policy';
+      webPageDOM.body.appendChild(element);
+
+      normalizeWhitespace(webPageDOM);
+
+      expect(element.getAttribute('href')).to.equal(href);
+      expect(element.textContent).to.equal('read the policy');
     });
   });
 });

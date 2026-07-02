@@ -431,7 +431,7 @@ describe('Services', () => {
         expect(secondSourceDocument.filters).to.be.an('array');
         expect(secondSourceDocument.filters).to.have.length(2);
         expect(secondSourceDocument.filters[0]).to.be.a('function');
-        expect(secondSourceDocument.filters[0].name).to.equal('removeQueryParams');
+        expect(secondSourceDocument.filters[0].name).to.equal(realFilterNames[0]);
         expect(secondSourceDocument.filters[1]).to.be.a('function');
         expect(secondSourceDocument.filters[1].name).to.equal('removePrintButton');
       });

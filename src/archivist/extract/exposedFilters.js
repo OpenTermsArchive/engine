@@ -26,3 +26,18 @@ export function removeQueryParams(webPageDOM, paramsToRemove = []) {
     }
   }
 }
+
+const SPACE_SEPARATORS = /\p{Zs}/gu;
+
+export function normalizeWhitespace(webPageDOM) {
+  const walker = webPageDOM.createTreeWalker(webPageDOM.body, webPageDOM.defaultView.NodeFilter.SHOW_TEXT);
+
+  for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+    const original = node.nodeValue;
+    const normalized = original.replace(SPACE_SEPARATORS, ' ');
+
+    if (normalized !== original) {
+      node.nodeValue = normalized;
+    }
+  }
+}
