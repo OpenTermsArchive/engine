@@ -19,6 +19,7 @@ All changes that impact users of this module are documented in this file, in the
 ### Fixed
 
 - Return `404` instead of a server error when a version lookup contains path separators or relative path segments; the error previously exposed the repository filesystem location
+- Return a generic message instead of internal error details in Collection API `500` responses
 
 ## 14.1.0 - 2026-06-29
 
