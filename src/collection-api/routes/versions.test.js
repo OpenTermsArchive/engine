@@ -285,6 +285,38 @@ describe('Versions API', () => {
         expect(response.body.error).to.contain('No versions found').and.to.contain('non-existent-service').and.to.contain('Terms of Service');
       });
     });
+
+    context('when the service ID is a path traversal attempt', () => {
+      before(async () => {
+        response = await request.get(`${basePath}/v1/versions/..%2F..%2Foutside/Terms%20of%20Service`);
+      });
+
+      it('responds with 404 status code', () => {
+        expect(response.status).to.equal(404);
+      });
+
+      it('does not expose the repository location', () => {
+        expect(response.body.error).to.contain('No versions found').and.to.not.contain('outside repository');
+      });
+    });
+  });
+
+  describe('GET /versions/:serviceId', () => {
+    let response;
+
+    context('when the service ID is a path traversal attempt', () => {
+      before(async () => {
+        response = await request.get(`${basePath}/v1/versions/..%2F..%2Foutside`);
+      });
+
+      it('responds with 404 status code', () => {
+        expect(response.status).to.equal(404);
+      });
+
+      it('does not expose the repository location', () => {
+        expect(response.body.error).to.contain('No versions found').and.to.not.contain('outside repository');
+      });
+    });
   });
 
   describe('GET /version/:versionId', () => {
@@ -574,6 +606,20 @@ describe('Versions API', () => {
         expect(response.body.error).to.contain('No version found').and.to.contain('non-existent-service');
       });
     });
+
+    context('when the service ID is a path traversal attempt', () => {
+      before(async () => {
+        response = await request.get(`${basePath}/v1/version/..%2F..%2Foutside/Terms%20of%20Service/latest`);
+      });
+
+      it('responds with 404 status code', () => {
+        expect(response.status).to.equal(404);
+      });
+
+      it('does not expose the repository location', () => {
+        expect(response.body.error).to.contain('No version found').and.to.not.contain('outside repository');
+      });
+    });
   });
 
   describe('GET /version/:serviceId/:termsType/:date', () => {
@@ -683,6 +729,20 @@ describe('Versions API', () => {
 
       it('returns an error message', () => {
         expect(response.body.error).to.equal('Requested version is in the future');
+      });
+    });
+
+    context('when the service ID is a path traversal attempt', () => {
+      before(async () => {
+        response = await request.get(`${basePath}/v1/version/..%2F..%2Foutside/Terms%20of%20Service/2023-01-01T12:00:00Z`);
+      });
+
+      it('responds with 404 status code', () => {
+        expect(response.status).to.equal(404);
+      });
+
+      it('does not expose the repository location', () => {
+        expect(response.body.error).to.contain('No version found').and.to.not.contain('outside repository');
       });
     });
   });

@@ -17,6 +17,24 @@ const fs = fsApi.promises;
 
 const RECORD_ID_REGEXP = /^[0-9a-f]{7,40}$/i; // A record ID is a Git commit SHA: 7 (abbreviated) to 40 (full) hexadecimal characters. Anything else cannot be a record and is rejected before reaching git, so a value such as `--output=…` can never be parsed as a command-line option
 
+const CONTROL_CHARACTERS_REGEXP = /\p{Cc}/u; // Matches any Unicode "control" character (general category Cc): the C0 range (U+0000 to U+001F), DEL (U+007F) and the C1 range (U+0080 to U+009F), i.e. 65 non-printable characters including NUL. The `u` flag is required for the `\p{...}` property escape to be recognised, otherwise the pattern would match the literal text `p{Cc}`. Legitimate service IDs, terms types and document IDs never contain these, and NUL in particular can truncate a value once it reaches git or the filesystem, so any segment holding one is rejected.
+
+// A service ID, terms type or document ID forms a single segment of a record file path (see DataMapper.generateFilePath): it may not be empty, be a relative segment (`.` or `..`), or contain a path separator or a control character.
+// Rejecting anything else keeps hostile values from reaching git, where a pathspec that resolves outside the repository (such as `../foo/*`) aborts with an error that exposes the repository location.
+function isPlainPathSegment(segment) {
+  return segment.length > 0
+    && segment !== '.'
+    && segment !== '..'
+    && !segment.includes('/')
+    && !segment.includes('\\')
+    && !CONTROL_CHARACTERS_REGEXP.test(segment);
+}
+
+function canMatchRecordFilePath(...pathSegments) {
+  // A non-string segment means "not provided" (`undefined`, or `false` for an absent document ID) and constrains nothing
+  return pathSegments.every(segment => typeof segment !== 'string' || isPlainPathSegment(segment));
+}
+
 export default class GitRepository extends RepositoryInterface {
   constructor({ path, author, publish, snapshotIdentiferTemplate }) {
     super();
@@ -66,6 +84,10 @@ export default class GitRepository extends RepositoryInterface {
   }
 
   async findLatest(serviceId, termsType, documentId) {
+    if (!canMatchRecordFilePath(serviceId, termsType, documentId)) {
+      return null;
+    }
+
     const matchingFilesPaths = await this.git.listFiles(DataMapper.generateFilePath(serviceId, termsType, documentId));
 
     if (!matchingFilesPaths.length) {
@@ -78,6 +100,10 @@ export default class GitRepository extends RepositoryInterface {
   }
 
   async findByDate(serviceId, termsType, date, documentId) {
+    if (!canMatchRecordFilePath(serviceId, termsType, documentId)) {
+      return null;
+    }
+
     const filePath = DataMapper.generateFilePath(serviceId, termsType, documentId);
     const commit = await this.git.getCommit([ `--until=${date?.toISOString()}`, '--', filePath ]);
 
@@ -109,18 +135,30 @@ export default class GitRepository extends RepositoryInterface {
   }
 
   async findByServiceAndTermsType(serviceId, termsType, { limit, offset, includeTechnicalUpgrades = true } = {}) {
+    if (!canMatchRecordFilePath(serviceId, termsType)) {
+      return [];
+    }
+
     const pathPattern = DataMapper.generateFilePath(serviceId, termsType);
 
     return Promise.all((await this.#getCommits({ pathFilter: pathPattern, limit, offset, includeTechnicalUpgrades })).map(commit => this.#toDomain(commit, { deferContentLoading: true })));
   }
 
   async findByService(serviceId, { limit, offset, includeTechnicalUpgrades = true } = {}) {
+    if (!canMatchRecordFilePath(serviceId)) {
+      return [];
+    }
+
     const pathPattern = DataMapper.generateFilePath(serviceId);
 
     return Promise.all((await this.#getCommits({ pathFilter: pathPattern, limit, offset, includeTechnicalUpgrades })).map(commit => this.#toDomain(commit, { deferContentLoading: true })));
   }
 
   async getNavigationIds(serviceId, termsType, versionId, { includeTechnicalUpgrades = true } = {}) {
+    if (!canMatchRecordFilePath(serviceId, termsType)) {
+      return { first: null, prev: null, next: null, last: null };
+    }
+
     const pathPattern = DataMapper.generateFilePath(serviceId, termsType);
     let revisions = await this.git.listPathRevisions(pathPattern); // single lean walk of the terms history
 
@@ -147,6 +185,10 @@ export default class GitRepository extends RepositoryInterface {
   }
 
   async count(serviceId, termsType) {
+    if (!canMatchRecordFilePath(serviceId, termsType)) {
+      return 0;
+    }
+
     const grepOptions = Object.values(DataMapper.COMMIT_MESSAGE_PREFIXES).map(prefix => `--grep=${prefix}`);
     const pathOptions = [];
 

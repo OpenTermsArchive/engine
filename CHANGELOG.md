@@ -16,6 +16,10 @@ All changes that impact users of this module are documented in this file, in the
 
 - **Breaking:** Return the `GET /service/{serviceId}` not-found response as JSON instead of plain text
 
+### Fixed
+
+- Return `404` instead of a server error when a version lookup contains path separators or relative path segments; the error previously exposed the repository filesystem location
+
 ## 14.1.0 - 2026-06-29
 
 > Development of this release was supported by [the Research Chair in Content Moderation](https://regulation-tech.cnam.fr/) at the Conservatoire National des Arts et Métiers.

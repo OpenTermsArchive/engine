@@ -563,6 +563,12 @@ describe('GitRepository', () => {
           expect(fs.existsSync(INJECTION_PROOF_FILE_PATH), 'a service ID must never be interpreted as a git option').to.be.false;
         });
       });
+
+      context('when the service ID is a path traversal attempt', () => {
+        it('returns null instead of erroring', async () => {
+          expect(await subject.findByDate('../../outside', TERMS_TYPE, FETCH_DATE)).to.equal(null);
+        });
+      });
     });
 
     describe('#findAll', () => {
@@ -723,6 +729,13 @@ describe('GitRepository', () => {
         });
       });
 
+      context('when the service ID or terms type is a path traversal attempt', () => {
+        it('returns an empty array instead of erroring', async () => {
+          expect(await subject.findByServiceAndTermsType('../../outside', TERMS_TYPE)).to.be.an('array').that.is.empty;
+          expect(await subject.findByServiceAndTermsType(SERVICE_PROVIDER_ID, '../../outside')).to.be.an('array').that.is.empty;
+        });
+      });
+
       context('with includeTechnicalUpgrades: false', () => {
         let filteredRecords;
         let technicalUpgradeId;
@@ -839,6 +852,12 @@ describe('GitRepository', () => {
         });
       });
 
+      context('when the service ID is a path traversal attempt', () => {
+        it('returns an empty array instead of erroring', async () => {
+          expect(await subject.findByService('../../outside')).to.be.an('array').that.is.empty;
+        });
+      });
+
       context('with includeTechnicalUpgrades: false', () => {
         let filteredRecords;
         let technicalUpgradeId;
@@ -917,6 +936,12 @@ describe('GitRepository', () => {
           const filteredCount = await subject.count('non-existent-service', TERMS_TYPE);
 
           expect(filteredCount).to.equal(0);
+        });
+      });
+
+      context('when the service ID is a path traversal attempt', () => {
+        it('returns zero instead of erroring', async () => {
+          expect(await subject.count('../../outside', TERMS_TYPE)).to.equal(0);
         });
       });
 
@@ -1008,6 +1033,12 @@ describe('GitRepository', () => {
       context('when the version does not exist', () => {
         it('returns only null IDs', async () => {
           expect(await subject.getNavigationIds(SERVICE_PROVIDER_ID, TERMS_TYPE, 'ffffffffffffffffffffffffffffffffffffffff')).to.deep.equal({ first: null, prev: null, next: null, last: null });
+        });
+      });
+
+      context('when the service ID is a path traversal attempt', () => {
+        it('returns only null IDs instead of erroring', async () => {
+          expect(await subject.getNavigationIds('../../outside', TERMS_TYPE, firstVersion.id)).to.deep.equal({ first: null, prev: null, next: null, last: null });
         });
       });
 
@@ -1169,6 +1200,12 @@ describe('GitRepository', () => {
 
         it('treats the service ID as a path and returns null instead of erroring', async () => {
           expect(await subject.findLatest('--not-a-git-option', TERMS_TYPE)).to.equal(null);
+        });
+      });
+
+      context('when the service ID is a path traversal attempt', () => {
+        it('returns null instead of erroring', async () => {
+          expect(await subject.findLatest('../../outside', TERMS_TYPE)).to.equal(null);
         });
       });
     });
