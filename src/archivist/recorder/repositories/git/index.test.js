@@ -406,6 +406,53 @@ describe('GitRepository', () => {
           expect(await subject.findById('ecd9407eb26b1bf0613186175ee80edbdeedd47f')).to.equal(null);
         });
       });
+
+      context('when the requested ID could be interpreted as a git option', () => {
+        const INJECTION_PROOF_FILE_PATH = path.resolve(__dirname, 'findById-argument-injection-proof.txt');
+
+        after(() => fs.rmSync(INJECTION_PROOF_FILE_PATH, { force: true }));
+
+        it('returns null without letting the ID reach git as an argument', async () => {
+          expect(await subject.findById(`--output=${INJECTION_PROOF_FILE_PATH}`)).to.equal(null);
+          expect(fs.existsSync(INJECTION_PROOF_FILE_PATH), 'a version ID must never be interpreted as a git option').to.be.false;
+        });
+      });
+    });
+
+    describe('#findMetadataById', () => {
+      let id;
+
+      before(async () => {
+        ({ id } = await subject.save(new Version({
+          serviceId: SERVICE_PROVIDER_ID,
+          termsType: TERMS_TYPE,
+          content: CONTENT,
+          fetchDate: FETCH_DATE,
+          snapshotIds: [SNAPSHOT_ID],
+          mimeType: HTML_MIME_TYPE,
+          metadata: METADATA,
+        })));
+      });
+
+      after(() => subject.removeAll());
+
+      it('returns the record', async () => {
+        const record = await subject.findMetadataById(id);
+
+        expect(record).to.be.an.instanceof(Version);
+        expect(record.id).to.include(id);
+      });
+
+      context('when the requested ID could be interpreted as a git option', () => {
+        const INJECTION_PROOF_FILE_PATH = path.resolve(__dirname, 'findMetadataById-argument-injection-proof.txt');
+
+        after(() => fs.rmSync(INJECTION_PROOF_FILE_PATH, { force: true }));
+
+        it('returns null without letting the ID reach git as an argument', async () => {
+          expect(await subject.findMetadataById(`--output=${INJECTION_PROOF_FILE_PATH}`)).to.equal(null);
+          expect(fs.existsSync(INJECTION_PROOF_FILE_PATH), 'a version ID must never be interpreted as a git option').to.be.false;
+        });
+      });
     });
 
     describe('#findByDate', () => {

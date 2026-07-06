@@ -15,6 +15,8 @@ import Git from './git.js';
 
 const fs = fsApi.promises;
 
+const RECORD_ID_REGEXP = /^[0-9a-f]{7,40}$/i; // A record ID is a Git commit SHA: 7 (abbreviated) to 40 (full) hexadecimal characters. Anything else cannot be a record and is rejected before reaching git, so a value such as `--output=…` can never be parsed as a command-line option
+
 export default class GitRepository extends RepositoryInterface {
   constructor({ path, author, publish, snapshotIdentiferTemplate }) {
     super();
@@ -83,13 +85,21 @@ export default class GitRepository extends RepositoryInterface {
   }
 
   async findById(recordId) {
-    const commit = await this.git.getCommit([recordId]);
+    if (!RECORD_ID_REGEXP.test(recordId)) {
+      return null;
+    }
+
+    const commit = await this.git.getCommit([ '--end-of-options', recordId ]); // `--end-of-options` forces git to treat `recordId` as a revision, never as an option: a second line of defence that keeps the lookup safe from argument injection even if the format guard above is ever relaxed
 
     return this.#toDomain(commit);
   }
 
   async findMetadataById(recordId) {
-    const commit = await this.git.getCommit([recordId]);
+    if (!RECORD_ID_REGEXP.test(recordId)) {
+      return null;
+    }
+
+    const commit = await this.git.getCommit([ '--end-of-options', recordId ]); // `--end-of-options` forces git to treat `recordId` as a revision, never as an option: a second line of defence that keeps the lookup safe from argument injection even if the format guard above is ever relaxed
 
     return this.#toDomain(commit, { deferContentLoading: true });
   }
