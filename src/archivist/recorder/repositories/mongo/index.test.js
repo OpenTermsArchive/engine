@@ -1138,6 +1138,27 @@ describe('MongoRepository', () => {
       });
     });
 
+    describe('#getDiffStats', () => {
+      // Diff statistics are an optional repository capability; MongoDB stores full snapshots rather than diffs, so it inherits the interface default that reports them as unavailable.
+      let versionId;
+
+      before(async () => {
+        ({ id: versionId } = await subject.save(new Version({
+          serviceId: SERVICE_PROVIDER_ID,
+          termsType: TERMS_TYPE,
+          content: CONTENT,
+          fetchDate: FETCH_DATE,
+          snapshotIds: [SNAPSHOT_ID],
+        })));
+      });
+
+      after(() => subject.removeAll());
+
+      it('reports additions and deletions as unavailable', async () => {
+        expect(await subject.getDiffStats(versionId)).to.deep.equal({ additions: null, deletions: null });
+      });
+    });
+
     describe('#findLatest', () => {
       context('when there are records for the given service', () => {
         let lastSnapshotId;

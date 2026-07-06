@@ -177,12 +177,14 @@ class RepositoryInterface {
   }
 
   /**
-   * Get diff statistics for a specific record
-   * @param   {string}                                          recordId - Record ID to get diff stats for
-   * @returns {Promise<{additions: number, deletions: number}>}          Promise that will be resolved with the diff statistics
+   * Get the number of lines added and deleted by a record, relative to the previous state of the same terms
+   * This is an optional capability: backends that retain diffs (Git) override it, while backends that store full snapshots (MongoDB) inherit this default and report the statistics as unavailable
+   * @param   {string}                                            recordId - Record ID to get diff stats for
+   * @returns {Promise<{additions: ?number, deletions: ?number}>}          Promise resolved with the number of added and deleted lines, each null when the backend cannot provide them
    */
-  async getDiffStats(recordId) {
-    throw new Error(`#getDiffStats method is not implemented in ${this.constructor.name}`);
+  // eslint-disable-next-line class-methods-use-this, no-unused-vars
+  getDiffStats(recordId) {
+    return { additions: null, deletions: null };
   }
 }
 
