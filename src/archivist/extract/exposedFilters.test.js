@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 
 import createWebPageDOM from './dom.js';
-import { normalizeWhitespace, removeQueryParams } from './exposedFilters.js';
+import { convertSpacesToStandard, removeQueryParams } from './exposedFilters.js';
 
 describe('exposedFilters', () => {
   let webPageDOM;
@@ -266,7 +266,7 @@ fetch(trackingUrl);
     });
   });
 
-  describe('#normalizeWhitespace', () => {
+  describe('#convertSpacesToStandard', () => {
     let element;
 
     afterEach(() => {
@@ -278,7 +278,7 @@ fetch(trackingUrl);
       element.textContent = 'a\u00A0b\u202Fc\u2009d\u3000e';
       webPageDOM.body.appendChild(element);
 
-      normalizeWhitespace(webPageDOM);
+      convertSpacesToStandard(webPageDOM);
 
       expect(element.textContent).to.equal('a b c d e');
     });
@@ -288,7 +288,7 @@ fetch(trackingUrl);
       element.innerHTML = '<span>first\u00A0part</span><span>second\u00A0part</span>';
       webPageDOM.body.appendChild(element);
 
-      normalizeWhitespace(webPageDOM);
+      convertSpacesToStandard(webPageDOM);
 
       expect(element.textContent).to.equal('first partsecond part');
     });
@@ -301,7 +301,7 @@ fetch(trackingUrl);
       element.textContent = 'read\u00A0the\u00A0policy';
       webPageDOM.body.appendChild(element);
 
-      normalizeWhitespace(webPageDOM);
+      convertSpacesToStandard(webPageDOM);
 
       expect(element.getAttribute('href')).to.equal(href);
       expect(element.textContent).to.equal('read the policy');

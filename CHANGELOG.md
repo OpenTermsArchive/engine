@@ -6,7 +6,7 @@ All changes that impact users of this module are documented in this file, in the
 
 ### Added
 
-- Add `normalizeWhitespace` built-in filter that replaces Unicode space separators (non-breaking space, narrow no-break space, ...) with a regular space; see more in the [built-in filters documentation](https://docs.opentermsarchive.org/terms/reference/built-in-filters/)
+- Add `convertSpacesToStandard` built-in filter that replaces Unicode space separators (non-breaking space, narrow no-break space, ...) with a regular space; see more in the [built-in filters documentation](https://docs.opentermsarchive.org/terms/reference/built-in-filters/)
 
 ## 15.0.0 - 2026-07-07
 
