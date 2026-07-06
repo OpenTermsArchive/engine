@@ -18,6 +18,7 @@ All changes that impact users of this module are documented in this file, in the
 
 ### Fixed
 
+- Reject version lookups whose service ID, terms type or record ID would be parsed as a Git option, which previously let an unauthenticated caller overwrite arbitrary files through the Collection API
 - Return `404` instead of a server error when a version lookup contains path separators or relative path segments; the error previously exposed the repository filesystem location
 - Return a generic message instead of internal error details in Collection API `500` responses
 
