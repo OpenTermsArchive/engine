@@ -538,6 +538,31 @@ describe('GitRepository', () => {
           expect(record.metadata).to.deep.equal(METADATA);
         });
       });
+
+      context('when the service ID is a git argument injection attempt', () => {
+        const INJECTION_PROOF_FILE_PATH = path.resolve(__dirname, 'findByDate-argument-injection-proof.*');
+
+        before(async () => {
+          await subject.save(new Version({
+            serviceId: SERVICE_PROVIDER_ID,
+            termsType: TERMS_TYPE,
+            content: CONTENT,
+            fetchDate: FETCH_DATE,
+            snapshotIds: [SNAPSHOT_ID],
+          }));
+        });
+
+        after(async () => {
+          fs.rmSync(INJECTION_PROOF_FILE_PATH, { force: true });
+          await subject.removeAll();
+        });
+
+        it('treats the service ID as a path so it cannot reach git as an option', async () => {
+          await subject.findByDate(`--output=${__dirname}`, 'findByDate-argument-injection-proof', FETCH_DATE_LATER);
+
+          expect(fs.existsSync(INJECTION_PROOF_FILE_PATH), 'a service ID must never be interpreted as a git option').to.be.false;
+        });
+      });
     });
 
     describe('#findAll', () => {
@@ -1126,6 +1151,24 @@ describe('GitRepository', () => {
 
         it('returns null', () => {
           expect(latestRecord).to.equal(null);
+        });
+      });
+
+      context('when the service ID could be interpreted as a git option', () => {
+        before(async () => {
+          await subject.save(new Version({
+            serviceId: SERVICE_PROVIDER_ID,
+            termsType: TERMS_TYPE,
+            content: CONTENT,
+            fetchDate: FETCH_DATE,
+            snapshotIds: [SNAPSHOT_ID],
+          }));
+        });
+
+        after(() => subject.removeAll());
+
+        it('treats the service ID as a path and returns null instead of erroring', async () => {
+          expect(await subject.findLatest('--not-a-git-option', TERMS_TYPE)).to.equal(null);
         });
       });
     });

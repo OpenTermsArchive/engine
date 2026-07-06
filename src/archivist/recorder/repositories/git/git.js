@@ -155,7 +155,7 @@ export default class Git {
   }
 
   async listFiles(path) {
-    return (await this.git.raw([ 'ls-files', path ])).split('\n');
+    return (await this.git.raw([ 'ls-files', '--', path ])).split('\n');
   }
 
   async writeCommitGraph() {
