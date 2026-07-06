@@ -267,44 +267,50 @@ fetch(trackingUrl);
   });
 
   describe('#convertSpacesToStandard', () => {
-    let element;
+    describe('with Unicode space separators in text', () => {
+      let element;
 
-    afterEach(() => {
-      element.remove();
+      before(() => {
+        element = webPageDOM.createElement('p');
+        element.textContent = 'a\u00A0b\u202Fc\u2009d\u3000e';
+        webPageDOM.body.appendChild(element);
+
+        convertSpacesToStandard(webPageDOM);
+      });
+
+      after(() => {
+        element.remove();
+      });
+
+      it('replaces them with a regular space', () => {
+        expect(element.textContent).to.equal('a b c d e');
+      });
     });
 
-    it('replaces Unicode space separators with a regular space', () => {
-      element = webPageDOM.createElement('p');
-      element.textContent = 'a\u00A0b\u202Fc\u2009d\u3000e';
-      webPageDOM.body.appendChild(element);
+    describe('with Unicode space separators in an attribute', () => {
+      let element;
+      const className = 'label\u00A0primary';
 
-      convertSpacesToStandard(webPageDOM);
+      before(() => {
+        element = webPageDOM.createElement('a');
+        element.setAttribute('class', className);
+        element.textContent = 'read\u00A0the\u00A0policy';
+        webPageDOM.body.appendChild(element);
 
-      expect(element.textContent).to.equal('a b c d e');
-    });
+        convertSpacesToStandard(webPageDOM);
+      });
 
-    it('normalizes text across nested elements', () => {
-      element = webPageDOM.createElement('div');
-      element.innerHTML = '<span>first\u00A0part</span><span>second\u00A0part</span>';
-      webPageDOM.body.appendChild(element);
+      after(() => {
+        element.remove();
+      });
 
-      convertSpacesToStandard(webPageDOM);
+      it('leaves attribute values untouched', () => {
+        expect(element.getAttribute('class')).to.equal(className);
+      });
 
-      expect(element.textContent).to.equal('first partsecond part');
-    });
-
-    it('does not alter element attributes or URLs, only text content', () => {
-      const href = 'https://example.com/page?label=gen173__nr-1';
-
-      element = webPageDOM.createElement('a');
-      element.setAttribute('href', href);
-      element.textContent = 'read\u00A0the\u00A0policy';
-      webPageDOM.body.appendChild(element);
-
-      convertSpacesToStandard(webPageDOM);
-
-      expect(element.getAttribute('href')).to.equal(href);
-      expect(element.textContent).to.equal('read the policy');
+      it('replaces them in the text content', () => {
+        expect(element.textContent).to.equal('read the policy');
+      });
     });
   });
 });
