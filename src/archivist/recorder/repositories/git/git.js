@@ -22,7 +22,7 @@ export default class Git {
 
     this.git = simpleGit(this.path, {
       trimmed: true,
-      maxConcurrentProcesses: 1,
+      maxConcurrentProcesses: 1, // Serialise git processes: concurrent runs on the same repository race the index and the commit-graph and can corrupt them
     });
 
     await this.git.init();
@@ -131,17 +131,26 @@ export default class Git {
 
   async cleanUp() {
     await fs.rm(path.join(this.path, '.git', 'objects', 'info', 'commit-graph.lock'), { force: true }); // Remove a leftover commit-graph lock from a previous `commit-graph write` that was killed mid-write (e.g. the process was terminated during a deploy or restart). The commit-graph is a disposable cache rebuilt by `writeCommitGraph`, so clearing a stale lock is safe and prevents every subsequent run from failing.
-    await this.git.reset('hard');
+    await this.git.reset('hard'); // Discard staged and unstaged changes to tracked files
 
-    return this.git.clean('f', '-d');
+    return this.git.clean('f', '-d'); // Force-remove untracked files (`f`) and untracked directories (`-d`)
   }
 
   getFullHash(shortHash) {
-    return this.git.show([ shortHash, '--pretty=%H', '-s' ]);
+    return this.git.show([
+      shortHash,
+      '--pretty=%H', // Print the full 40-character commit hash
+      '-s', // Suppress the diff output, only the formatted hash is wanted
+    ]);
   }
 
   restore(path, commit) {
-    return this.git.raw([ 'restore', '-s', commit, '--', path ]);
+    return this.git.raw([
+      'restore',
+      '-s', commit, // Take the file contents from this specific commit rather than from the index
+      '--', // Everything after is a pathspec, never a revision or an option
+      path,
+    ]);
   }
 
   async destroyHistory() {
@@ -155,24 +164,40 @@ export default class Git {
   }
 
   async listFiles(path) {
-    return (await this.git.raw([ 'ls-files', '--', path ])).split('\n');
+    return (await this.git.raw([ 'ls-files', '--', path ])).split('\n'); // "--" tells Git that everything following is a file path, not a revision or option.
   }
 
   async writeCommitGraph() {
-    await this.git.raw([ 'commit-graph', 'write', '--reachable', '--changed-paths' ]);
+    await this.git.raw([
+      'commit-graph',
+      'write',
+      '--reachable', // Cover every commit reachable from the refs, so the whole history is indexed
+      '--changed-paths', // Also store changed-path Bloom filters, which speed up the path-limited log/diff behind version lookups
+    ]);
   }
 
   async updateCommitGraph() {
-    await this.git.raw([ 'commit-graph', 'write', '--reachable', '--changed-paths', '--append' ]);
+    await this.git.raw([
+      'commit-graph',
+      'write',
+      '--reachable', // Cover every commit reachable from the refs
+      '--changed-paths', // Also store the changed-path Bloom filters that speed up path-limited log/diff
+      '--append', // Extend the existing commit-graph instead of rewriting it in full
+    ]);
   }
 
   async listPathRevisions(pathFilter) {
     let output;
 
     try {
-      // Lean log: only the data needed to order versions (hash, author timestamp, subject), no diff or message body.
-      // Ordering and technical-upgrade filtering are done by the caller in memory, so `--author-date-order`/`--grep`/`--name-only` are deliberately omitted.
-      output = await this.git.raw([ 'log', '--no-merges', '--format=%H%x09%at%x09%s', '--', pathFilter ]);
+      // Ordering and technical-upgrade filtering are done by the caller in memory, so `--author-date-order`/`--grep`/`--name-only` are deliberately omitted to keep this walk lean.
+      output = await this.git.raw([
+        'log',
+        '--no-merges', // Records are stored as regular commits, never as merges
+        '--format=%H%x09%at%x09%s', // Tab-separated hash, author date (epoch seconds) and subject: the minimum needed to order versions and detect technical upgrades, with no diff or message body loaded
+        '--', // Everything after is a pathspec, never a revision or an option
+        pathFilter,
+      ]);
     } catch (error) {
       if (/unknown revision or path not in the working tree|does not have any commits yet/.test(error.message)) {
         return [];
@@ -193,7 +218,12 @@ export default class Git {
   }
 
   async getDiffStats(commitHash) {
-    const output = await this.git.raw([ 'show', '--numstat', '--format=', commitHash ]);
+    const output = await this.git.raw([
+      'show',
+      '--numstat', // Report added/deleted line counts per file as tab-separated numbers, instead of a textual diff
+      '--format=', // Drop the commit header so the output holds only the numstat lines
+      commitHash,
+    ]);
 
     let additions = 0;
     let deletions = 0;
