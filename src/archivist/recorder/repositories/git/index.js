@@ -15,12 +15,11 @@ import Git from './git.js';
 
 const fs = fsApi.promises;
 
-const RECORD_ID_REGEXP = /^[0-9a-f]{7,40}$/i; // A record ID is a Git commit SHA: 7 (abbreviated) to 40 (full) hexadecimal characters. Anything else cannot be a record and is rejected before reaching git, so a value such as `--output=…` can never be parsed as a command-line option
+const RECORD_ID_REGEXP = /^[0-9a-f]{7,40}$/i; // Git commit SHA 7 (abbreviated) to 40 (full) hexadecimal characters. Prevent value such as `--output=…` to be parsed as a command-line option
 
-const CONTROL_CHARACTERS_REGEXP = /\p{Cc}/u; // Matches any Unicode "control" character (general category Cc): the C0 range (U+0000 to U+001F), DEL (U+007F) and the C1 range (U+0080 to U+009F), i.e. 65 non-printable characters including NUL. The `u` flag is required for the `\p{...}` property escape to be recognised, otherwise the pattern would match the literal text `p{Cc}`. Legitimate service IDs, terms types and document IDs never contain these, and NUL in particular can truncate a value once it reaches git or the filesystem, so any segment holding one is rejected.
+const CONTROL_CHARACTERS_REGEXP = /\p{Cc}/u; // Matches any Unicode "control" character: the C0 range (U+0000 to U+001F), DEL (U+007F) and the C1 range (U+0080 to U+009F), i.e. 65 non-printable characters including NUL. The `u` flag is required for the `\p{...}` property escape to be recognised, otherwise the pattern would match the literal text `p{Cc}`. Legitimate service IDs, terms types and document IDs never contain these, and NUL in particular can truncate a value once it reaches git or the filesystem, so any segment holding one is rejected.
 
-// A service ID, terms type or document ID forms a single segment of a record file path (see DataMapper.generateFilePath): it may not be empty, be a relative segment (`.` or `..`), or contain a path separator or a control character.
-// Rejecting anything else keeps hostile values from reaching git, where a pathspec that resolves outside the repository (such as `../foo/*`) aborts with an error that exposes the repository location.
+// Keeps hostile values from reaching git, where a pathspec that resolves outside the repository (such as `../foo/*`) aborts with an error that exposes the repository location.
 function isPlainPathSegment(segment) {
   return segment.length > 0
     && segment !== '.'
@@ -177,10 +176,10 @@ export default class GitRepository extends RepositoryInterface {
     }
 
     return {
-      last: revisions[0].hash, // newest version of these terms
-      first: revisions[revisions.length - 1].hash, // oldest version of these terms
-      next: index > 0 ? revisions[index - 1].hash : null, // the version recorded just after this one
-      prev: index < revisions.length - 1 ? revisions[index + 1].hash : null, // the version recorded just before this one
+      last: revisions[0].hash,
+      first: revisions[revisions.length - 1].hash,
+      next: index > 0 ? revisions[index - 1].hash : null,
+      prev: index < revisions.length - 1 ? revisions[index + 1].hash : null,
     };
   }
 

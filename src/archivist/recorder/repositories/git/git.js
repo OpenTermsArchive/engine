@@ -22,7 +22,7 @@ export default class Git {
 
     this.git = simpleGit(this.path, {
       trimmed: true,
-      maxConcurrentProcesses: 1, // Serialise git processes: concurrent runs on the same repository race the index and the commit-graph and can corrupt them
+      maxConcurrentProcesses: 1, // Concurrent runs on the same repository race the index and the commit-graph and can corrupt them
     });
 
     await this.git.init();
@@ -106,7 +106,7 @@ export default class Git {
 
       return commits;
     } catch (error) {
-      // `bad object` is raised for a well-formed but absent object ID (e.g. a snapshot referenced by a version but missing from this repository); like an unknown revision, it means "no match" rather than a hard failure
+      // `bad object` is raised for a well-formed but absent object ID; like an unknown revision, it means "no match" rather than a hard failure
       if (/unknown revision or path not in the working tree|does not have any commits yet|bad object/.test(error.message)) {
         return [];
       }
@@ -131,7 +131,7 @@ export default class Git {
 
   async cleanUp() {
     await fs.rm(path.join(this.path, '.git', 'objects', 'info', 'commit-graph.lock'), { force: true }); // Remove a leftover commit-graph lock from a previous `commit-graph write` that was killed mid-write (e.g. the process was terminated during a deploy or restart). The commit-graph is a disposable cache rebuilt by `writeCommitGraph`, so clearing a stale lock is safe and prevents every subsequent run from failing.
-    await this.git.reset('hard'); // Discard staged and unstaged changes to tracked files
+    await this.git.reset('hard');
 
     return this.git.clean('f', '-d'); // Force-remove untracked files (`f`) and untracked directories (`-d`)
   }
@@ -148,7 +148,7 @@ export default class Git {
     return this.git.raw([
       'restore',
       '-s', commit, // Take the file contents from this specific commit rather than from the index
-      '--', // Everything after is a pathspec, never a revision or an option
+      '--', // Everything after is a pathspec, not a revision or option
       path,
     ]);
   }
@@ -164,7 +164,7 @@ export default class Git {
   }
 
   async listFiles(path) {
-    return (await this.git.raw([ 'ls-files', '--', path ])).split('\n'); // "--" tells Git that everything following is a file path, not a revision or option.
+    return (await this.git.raw([ 'ls-files', '--', path ])).split('\n'); // Everything after "--" is a pathspec, not a revision or option
   }
 
   async writeCommitGraph() {
@@ -172,7 +172,7 @@ export default class Git {
       'commit-graph',
       'write',
       '--reachable', // Cover every commit reachable from the refs, so the whole history is indexed
-      '--changed-paths', // Also store changed-path Bloom filters, which speed up the path-limited log/diff behind version lookups
+      '--changed-paths', // Also store the changed-path Bloom filters that speed up path-limited log/diff
     ]);
   }
 
@@ -180,8 +180,8 @@ export default class Git {
     await this.git.raw([
       'commit-graph',
       'write',
-      '--reachable', // Cover every commit reachable from the refs
-      '--changed-paths', // Also store the changed-path Bloom filters that speed up path-limited log/diff
+      '--reachable',
+      '--changed-paths',
       '--append', // Extend the existing commit-graph instead of rewriting it in full
     ]);
   }
@@ -190,11 +190,11 @@ export default class Git {
     let output;
 
     try {
-      // Ordering and technical-upgrade filtering are done by the caller in memory, so `--author-date-order`/`--grep`/`--name-only` are deliberately omitted to keep this walk lean.
+      // Ordering and technical-upgrade filtering are done by the caller in memory, so `--author-date-order`/`--grep`/`--name-only` are deliberately omitted to keep this walk lean
       output = await this.git.raw([
         'log',
-        '--no-merges', // Records are stored as regular commits, never as merges
-        '--format=%H%x09%at%x09%s', // Tab-separated hash, author date (epoch seconds) and subject: the minimum needed to order versions and detect technical upgrades, with no diff or message body loaded
+        '--no-merges',
+        '--format=%H%x09%at%x09%s', // Tab-separated hash, author date and subject: the minimum needed to order versions and detect technical upgrades, with no diff or message body loaded
         '--', // Everything after is a pathspec, never a revision or an option
         pathFilter,
       ]);
@@ -236,8 +236,12 @@ export default class Git {
       const [ added, deleted ] = line.split('\t');
 
       // Binary files show '-' for additions/deletions
-      if (added !== '-') { additions += parseInt(added, 10); }
-      if (deleted !== '-') { deletions += parseInt(deleted, 10); }
+      if (added !== '-') { 
+        additions += parseInt(added, 10); 
+      }
+      if (deleted !== '-') { 
+        deletions += parseInt(deleted, 10); 
+      }
     }
 
     return { additions, deletions };
