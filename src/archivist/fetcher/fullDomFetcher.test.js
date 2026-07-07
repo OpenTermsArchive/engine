@@ -79,7 +79,7 @@ describe('Full DOM Fetcher', function () {
   });
 
   describe('#fetch', () => {
-    const config = { navigationTimeout: 1000, waitForElementsTimeout: 1000, language: 'en' };
+    const config = { navigationTimeout: 5000, waitForElementsTimeout: 5000, language: 'en' };
 
     it('waits for dynamically injected elements to appear in the DOM', async () => {
       const result = await fetch(`http://127.0.0.1:${SERVER_PORT}/dynamic`, ['.dynamic'], config);

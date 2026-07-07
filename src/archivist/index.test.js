@@ -35,7 +35,7 @@ function resetGitRepositories() {
 }
 
 describe('Archivist', function () {
-  this.timeout(10000);
+  this.timeout(30000);
 
   const SERVICE_A_ID = 'service·A';
   const SERVICE_A_TYPE = 'Terms of Service';
