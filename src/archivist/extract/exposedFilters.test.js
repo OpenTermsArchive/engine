@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 
 import createWebPageDOM from './dom.js';
-import { removeQueryParams } from './exposedFilters.js';
+import { convertSpacesToStandard, removeQueryParams } from './exposedFilters.js';
 
 describe('exposedFilters', () => {
   let webPageDOM;
@@ -262,6 +262,54 @@ fetch(trackingUrl);
         removeQueryParams(webPageDOM, [ 'utm_source', 'utm_campaign', 'utm_medium', 'session_id', 'user_id' ]);
 
         expect(preElement.textContent).to.equal(originalPreContent);
+      });
+    });
+  });
+
+  describe('#convertSpacesToStandard', () => {
+    describe('with Unicode space separators in text', () => {
+      let element;
+
+      before(() => {
+        element = webPageDOM.createElement('p');
+        element.textContent = 'a\u00A0b\u202Fc\u2009d\u3000e';
+        webPageDOM.body.appendChild(element);
+
+        convertSpacesToStandard(webPageDOM);
+      });
+
+      after(() => {
+        element.remove();
+      });
+
+      it('replaces them with a regular space', () => {
+        expect(element.textContent).to.equal('a b c d e');
+      });
+    });
+
+    describe('with Unicode space separators in an attribute', () => {
+      let element;
+      const className = 'label\u00A0primary';
+
+      before(() => {
+        element = webPageDOM.createElement('a');
+        element.setAttribute('class', className);
+        element.textContent = 'read\u00A0the\u00A0policy';
+        webPageDOM.body.appendChild(element);
+
+        convertSpacesToStandard(webPageDOM);
+      });
+
+      after(() => {
+        element.remove();
+      });
+
+      it('leaves attribute values untouched', () => {
+        expect(element.getAttribute('class')).to.equal(className);
+      });
+
+      it('replaces them in the text content', () => {
+        expect(element.textContent).to.equal('read the policy');
       });
     });
   });
