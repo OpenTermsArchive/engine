@@ -70,6 +70,15 @@ class RepositoryInterface {
   }
 
   /**
+   * Find the metadata of the record that matches the given record ID, without loading its content
+   * @param   {string}          recordId - Record ID of the record to find
+   * @returns {Promise<Record>}          Promise that will be resolved with the found record (without content) or null if none match the given ID
+   */
+  async findMetadataById(recordId) {
+    throw new Error(`#findMetadataById method is not implemented in ${this.constructor.name}`);
+  }
+
+  /**
    * Find all records, in descending chronological order (newest first; opposite of #iterate)
    * For performance reasons, the content of the records will not be loaded by default. Use #loadRecordContent to load the content of individual records
    * @see     RepositoryInterface#loadRecordContent
@@ -97,6 +106,20 @@ class RepositoryInterface {
    */
   async findByService(serviceId, options = {}) {
     throw new Error(`#findByService method is not implemented in ${this.constructor.name}`);
+  }
+
+  /**
+   * Get the IDs locating a version within the history of its terms: the first (oldest) and last (newest) versions, as well as the immediately previous (older) and next (newer) ones
+   * These IDs are computed from a single deterministic chronological order (by fetch date, with the record ID as a stable tiebreaker), so navigating prev/next always round-trips
+   * @param   {string}                                                                 serviceId                          - Service ID of the version
+   * @param   {string}                                                                 termsType                          - Terms type of the version
+   * @param   {string}                                                                 versionId                          - ID of the version to locate within its terms history
+   * @param   {object}                                                                 [options]                          - Query options
+   * @param   {boolean}                                                                [options.includeTechnicalUpgrades] - When false, exclude technical upgrade records from the sequence. Default: true
+   * @returns {Promise<{first: ?string, prev: ?string, next: ?string, last: ?string}>}                                    Promise resolved with the related version IDs, each null when there is none
+   */
+  async getNavigationIds(serviceId, termsType, versionId, options = {}) {
+    throw new Error(`#getNavigationIds method is not implemented in ${this.constructor.name}`);
   }
 
   /**
@@ -151,6 +174,17 @@ class RepositoryInterface {
    */
   async loadRecordContent(record) {
     throw new Error(`#loadRecordContent method is not implemented in ${this.constructor.name}`);
+  }
+
+  /**
+   * Get the number of lines added and deleted by a record, relative to the previous state of the same terms
+   * This is an optional capability: backends that retain diffs (Git) override it, while backends that store full snapshots (MongoDB) inherit this default and report the statistics as unavailable
+   * @param   {string}                                            recordId - Record ID to get diff stats for
+   * @returns {Promise<{additions: ?number, deletions: ?number}>}          Promise resolved with the number of added and deleted lines, each null when the backend cannot provide them
+   */
+  // eslint-disable-next-line class-methods-use-this, no-unused-vars
+  getDiffStats(recordId) {
+    return { additions: null, deletions: null };
   }
 }
 

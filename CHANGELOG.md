@@ -2,6 +2,26 @@
 
 All changes that impact users of this module are documented in this file, in the [Common Changelog](https://common-changelog.org) format with some additional specifications defined in the CONTRIBUTING file. This codebase adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased [major]
+
+> Development of this release was supported by the [NGI0 Commons Fund](https://nlnet.nl/project/Modular-OTA/), a fund established by [NLnet](https://nlnet.nl/) with financial support from the European Commission's [Next Generation Internet](https://www.ngi.eu) programme, under the aegis of DG CNECT under grant agreement N°101069594.
+
+### Added
+
+- Add paginated `GET /versions`, `GET /versions/{serviceId}` and `GET /versions/{serviceId}/{termsType}` endpoints to the Collection API to list versions
+- Add `GET /version/{versionId}` and `GET /version/{serviceId}/{termsType}/latest` endpoints to the Collection API to retrieve a single version
+- Expose `serviceId`, `termsType`, `isFirstRecord`, `isTechnicalUpgrade`, source `fetchUrls`, navigation `links` and diff statistics (`additions` and `deletions`) in Collection API version responses
+
+### Changed
+
+- **Breaking:** Return the `GET /service/{serviceId}` not-found response as JSON instead of plain text
+
+### Fixed
+
+- Reject version lookups whose service ID, terms type or record ID would be parsed as a Git option, which previously let an unauthenticated caller overwrite arbitrary files through the Collection API
+- Return `404` instead of a server error when a version lookup contains path separators or relative path segments; the error previously exposed the repository filesystem location
+- Return a generic message instead of internal error details in Collection API `500` responses
+
 ## 14.1.0 - 2026-06-29
 
 > Development of this release was supported by [the Research Chair in Content Moderation](https://regulation-tech.cnam.fr/) at the Conservatoire National des Arts et Métiers.

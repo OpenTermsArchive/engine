@@ -30,6 +30,10 @@ const MULTIPLE_SOURCE_DOCUMENTS_PREFIX = 'This version was recorded after extrac
 
 export const COMMIT_MESSAGE_PREFIXES_REGEXP = new RegExp(`^(${Object.values(COMMIT_MESSAGE_PREFIXES).join('|')})`);
 
+export function isTechnicalUpgrade(message) {
+  return message.startsWith(COMMIT_MESSAGE_PREFIXES.technicalUpgrade) || message.startsWith(COMMIT_MESSAGE_PREFIXES.deprecated_refilter);
+}
+
 export function toPersistence(record, snapshotIdentiferTemplate) {
   const { serviceId, termsType, documentId, snapshotIds = [], mimeType, metadata } = record;
 

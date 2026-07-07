@@ -38,6 +38,7 @@ export default async function apiRouter(basePath) {
   const collection = await getCollection();
   const versionsStorageConfig = config.get('@opentermsarchive/engine.recorder.versions.storage');
   const versionsRepository = await RepositoryFactory.create(versionsStorageConfig).initialize();
+  const snapshotsRepository = await RepositoryFactory.create(config.get('@opentermsarchive/engine.recorder.snapshots.storage')).initialize();
   const feedConfig = config.get('@opentermsarchive/engine.collection-api.feed');
 
   if (!collection.metadata?.id) {
@@ -50,7 +51,7 @@ export default async function apiRouter(basePath) {
 
   router.use(await metadataRouter(collection, services));
   router.use(servicesRouter(services));
-  router.use(versionsRouter(versionsRepository));
+  router.use(versionsRouter(versionsRepository, snapshotsRepository));
   router.use(feedRouter(services, versionsRepository, versionsStorageConfig.type, feedConfig.limit, feedConfig.versionUrlTemplate));
 
   return router;

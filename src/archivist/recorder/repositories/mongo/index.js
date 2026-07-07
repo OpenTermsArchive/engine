@@ -88,6 +88,19 @@ export default class MongoRepository extends RepositoryInterface {
     return this.#toDomain(mongoDocument);
   }
 
+  async findMetadataById(recordId) {
+    if (!ObjectId.isValid(recordId)) {
+      return null;
+    }
+
+    const document = await this.collection.findOne(
+      { _id: ObjectId.createFromHexString(recordId) },
+      { projection: { content: 0 } },
+    );
+
+    return document ? this.#toDomain(document, { deferContentLoading: true }) : null;
+  }
+
   async findAll({ limit, offset, includeTechnicalUpgrades = true } = {}) {
     const filter = includeTechnicalUpgrades ? {} : { isTechnicalUpgrade: { $ne: true } };
     let query = this.collection.find(filter).project({ content: 0 }).sort({ fetchDate: -1 });
@@ -144,6 +157,46 @@ export default class MongoRepository extends RepositoryInterface {
 
     return Promise.all((await query.toArray())
       .map(mongoDocument => this.#toDomain(mongoDocument, { deferContentLoading: true })));
+  }
+
+  async getNavigationIds(serviceId, termsType, versionId, { includeTechnicalUpgrades = true } = {}) {
+    const empty = { first: null, prev: null, next: null, last: null };
+
+    if (!ObjectId.isValid(versionId)) {
+      return empty;
+    }
+
+    const _id = ObjectId.createFromHexString(versionId);
+    const filter = { serviceId, termsType };
+
+    if (!includeTechnicalUpgrades) {
+      filter.isTechnicalUpgrade = { $ne: true };
+    }
+
+    const current = await this.collection.findOne({ ...filter, _id }, { projection: { fetchDate: 1 } });
+
+    if (!current) {
+      return empty;
+    }
+
+    const { fetchDate } = current;
+    const idOnly = { projection: { _id: 1 } };
+
+    // Deterministic total order (fetchDate, then _id) ascending; prev is the greatest record strictly before the current one, next the least strictly after.
+    // Using _id as a tiebreaker makes prev and next well-defined even for versions sharing the same fetch date, so navigation always round-trips.
+    const [ oldest, newest, previous, next ] = await Promise.all([
+      this.collection.find(filter, idOnly).sort({ fetchDate: 1, _id: 1 }).limit(1).next(),
+      this.collection.find(filter, idOnly).sort({ fetchDate: -1, _id: -1 }).limit(1).next(),
+      this.collection.find({ ...filter, $or: [{ fetchDate: { $lt: fetchDate } }, { fetchDate, _id: { $lt: _id } }] }, idOnly).sort({ fetchDate: -1, _id: -1 }).limit(1).next(),
+      this.collection.find({ ...filter, $or: [{ fetchDate: { $gt: fetchDate } }, { fetchDate, _id: { $gt: _id } }] }, idOnly).sort({ fetchDate: 1, _id: 1 }).limit(1).next(),
+    ]);
+
+    return {
+      first: oldest?._id?.toString() || null,
+      last: newest?._id?.toString() || null,
+      prev: previous?._id?.toString() || null,
+      next: next?._id?.toString() || null,
+    };
   }
 
   count(serviceId, termsType) {

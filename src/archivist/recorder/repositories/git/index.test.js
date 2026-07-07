@@ -400,6 +400,59 @@ describe('GitRepository', () => {
           expect(await subject.findById('inexistantID')).to.equal(null);
         });
       });
+
+      context('when the requested ID is well formed but absent from the repository', () => {
+        it('returns null rather than throwing a "bad object" error', async () => {
+          expect(await subject.findById('ecd9407eb26b1bf0613186175ee80edbdeedd47f')).to.equal(null);
+        });
+      });
+
+      context('when the requested ID could be interpreted as a git option', () => {
+        const INJECTION_PROOF_FILE_PATH = path.resolve(__dirname, 'findById-argument-injection-proof.txt');
+
+        after(() => fs.rmSync(INJECTION_PROOF_FILE_PATH, { force: true }));
+
+        it('returns null without letting the ID reach git as an argument', async () => {
+          expect(await subject.findById(`--output=${INJECTION_PROOF_FILE_PATH}`)).to.equal(null);
+          expect(fs.existsSync(INJECTION_PROOF_FILE_PATH), 'a version ID must never be interpreted as a git option').to.be.false;
+        });
+      });
+    });
+
+    describe('#findMetadataById', () => {
+      let id;
+
+      before(async () => {
+        ({ id } = await subject.save(new Version({
+          serviceId: SERVICE_PROVIDER_ID,
+          termsType: TERMS_TYPE,
+          content: CONTENT,
+          fetchDate: FETCH_DATE,
+          snapshotIds: [SNAPSHOT_ID],
+          mimeType: HTML_MIME_TYPE,
+          metadata: METADATA,
+        })));
+      });
+
+      after(() => subject.removeAll());
+
+      it('returns the record', async () => {
+        const record = await subject.findMetadataById(id);
+
+        expect(record).to.be.an.instanceof(Version);
+        expect(record.id).to.include(id);
+      });
+
+      context('when the requested ID could be interpreted as a git option', () => {
+        const INJECTION_PROOF_FILE_PATH = path.resolve(__dirname, 'findMetadataById-argument-injection-proof.txt');
+
+        after(() => fs.rmSync(INJECTION_PROOF_FILE_PATH, { force: true }));
+
+        it('returns null without letting the ID reach git as an argument', async () => {
+          expect(await subject.findMetadataById(`--output=${INJECTION_PROOF_FILE_PATH}`)).to.equal(null);
+          expect(fs.existsSync(INJECTION_PROOF_FILE_PATH), 'a version ID must never be interpreted as a git option').to.be.false;
+        });
+      });
     });
 
     describe('#findByDate', () => {
@@ -483,6 +536,37 @@ describe('GitRepository', () => {
 
         it('retrieves metadata', () => {
           expect(record.metadata).to.deep.equal(METADATA);
+        });
+      });
+
+      context('when the service ID is a git argument injection attempt', () => {
+        const INJECTION_PROOF_FILE_PATH = path.resolve(__dirname, 'findByDate-argument-injection-proof.*');
+
+        before(async () => {
+          await subject.save(new Version({
+            serviceId: SERVICE_PROVIDER_ID,
+            termsType: TERMS_TYPE,
+            content: CONTENT,
+            fetchDate: FETCH_DATE,
+            snapshotIds: [SNAPSHOT_ID],
+          }));
+        });
+
+        after(async () => {
+          fs.rmSync(INJECTION_PROOF_FILE_PATH, { force: true });
+          await subject.removeAll();
+        });
+
+        it('treats the service ID as a path so it cannot reach git as an option', async () => {
+          await subject.findByDate(`--output=${__dirname}`, 'findByDate-argument-injection-proof', FETCH_DATE_LATER);
+
+          expect(fs.existsSync(INJECTION_PROOF_FILE_PATH), 'a service ID must never be interpreted as a git option').to.be.false;
+        });
+      });
+
+      context('when the service ID is a path traversal attempt', () => {
+        it('returns null instead of erroring', async () => {
+          expect(await subject.findByDate('../../outside', TERMS_TYPE, FETCH_DATE)).to.equal(null);
         });
       });
     });
@@ -645,6 +729,13 @@ describe('GitRepository', () => {
         });
       });
 
+      context('when the service ID or terms type is a path traversal attempt', () => {
+        it('returns an empty array instead of erroring', async () => {
+          expect(await subject.findByServiceAndTermsType('../../outside', TERMS_TYPE)).to.be.an('array').that.is.empty;
+          expect(await subject.findByServiceAndTermsType(SERVICE_PROVIDER_ID, '../../outside')).to.be.an('array').that.is.empty;
+        });
+      });
+
       context('with includeTechnicalUpgrades: false', () => {
         let filteredRecords;
         let technicalUpgradeId;
@@ -761,6 +852,12 @@ describe('GitRepository', () => {
         });
       });
 
+      context('when the service ID is a path traversal attempt', () => {
+        it('returns an empty array instead of erroring', async () => {
+          expect(await subject.findByService('../../outside')).to.be.an('array').that.is.empty;
+        });
+      });
+
       context('with includeTechnicalUpgrades: false', () => {
         let filteredRecords;
         let technicalUpgradeId;
@@ -842,6 +939,12 @@ describe('GitRepository', () => {
         });
       });
 
+      context('when the service ID is a path traversal attempt', () => {
+        it('returns zero instead of erroring', async () => {
+          expect(await subject.count('../../outside', TERMS_TYPE)).to.equal(0);
+        });
+      });
+
       context('with only serviceId filter', () => {
         it('returns count for all terms types of a service', async () => {
           // Add a version with different terms type
@@ -857,6 +960,167 @@ describe('GitRepository', () => {
 
           expect(filteredCount).to.equal(4); // 3 from TERMS_TYPE + 1 from 'Different Terms'
         });
+      });
+    });
+
+    describe('#getNavigationIds', () => {
+      let firstVersion;
+      let middleVersion;
+      let lastVersion;
+
+      before(async function () {
+        this.timeout(5000);
+
+        firstVersion = await subject.save(new Version({
+          serviceId: SERVICE_PROVIDER_ID,
+          termsType: TERMS_TYPE,
+          content: 'first content',
+          fetchDate: FETCH_DATE_EARLIER,
+          snapshotIds: [SNAPSHOT_ID],
+        }));
+
+        middleVersion = await subject.save(new Version({
+          serviceId: SERVICE_PROVIDER_ID,
+          termsType: TERMS_TYPE,
+          content: 'middle content',
+          fetchDate: FETCH_DATE,
+          snapshotIds: [SNAPSHOT_ID],
+        }));
+
+        lastVersion = await subject.save(new Version({
+          serviceId: SERVICE_PROVIDER_ID,
+          termsType: TERMS_TYPE,
+          content: 'last content',
+          fetchDate: FETCH_DATE_LATER,
+          snapshotIds: [SNAPSHOT_ID],
+        }));
+      });
+
+      after(() => subject.removeAll());
+
+      context('for the oldest version', () => {
+        let navigationIds;
+
+        before(async () => { navigationIds = await subject.getNavigationIds(SERVICE_PROVIDER_ID, TERMS_TYPE, firstVersion.id); });
+
+        it('has no previous version', () => expect(navigationIds.prev).to.be.null);
+        it('points to the next version', () => expect(navigationIds.next).to.equal(middleVersion.id));
+        it('points to itself as first', () => expect(navigationIds.first).to.equal(firstVersion.id));
+        it('points to the newest version as last', () => expect(navigationIds.last).to.equal(lastVersion.id));
+      });
+
+      context('for a middle version', () => {
+        let navigationIds;
+
+        before(async () => { navigationIds = await subject.getNavigationIds(SERVICE_PROVIDER_ID, TERMS_TYPE, middleVersion.id); });
+
+        it('points to the previous version', () => expect(navigationIds.prev).to.equal(firstVersion.id));
+        it('points to the next version', () => expect(navigationIds.next).to.equal(lastVersion.id));
+        it('points to the oldest version as first', () => expect(navigationIds.first).to.equal(firstVersion.id));
+        it('points to the newest version as last', () => expect(navigationIds.last).to.equal(lastVersion.id));
+      });
+
+      context('for the newest version', () => {
+        let navigationIds;
+
+        before(async () => { navigationIds = await subject.getNavigationIds(SERVICE_PROVIDER_ID, TERMS_TYPE, lastVersion.id); });
+
+        it('points to the previous version', () => expect(navigationIds.prev).to.equal(middleVersion.id));
+        it('has no next version', () => expect(navigationIds.next).to.be.null);
+        it('points to itself as last', () => expect(navigationIds.last).to.equal(lastVersion.id));
+      });
+
+      context('when the version does not exist', () => {
+        it('returns only null IDs', async () => {
+          expect(await subject.getNavigationIds(SERVICE_PROVIDER_ID, TERMS_TYPE, 'ffffffffffffffffffffffffffffffffffffffff')).to.deep.equal({ first: null, prev: null, next: null, last: null });
+        });
+      });
+
+      context('when the service ID is a path traversal attempt', () => {
+        it('returns only null IDs instead of erroring', async () => {
+          expect(await subject.getNavigationIds('../../outside', TERMS_TYPE, firstVersion.id)).to.deep.equal({ first: null, prev: null, next: null, last: null });
+        });
+      });
+
+      context('when a technical upgrade is recorded out of chronological order', () => {
+        // A technical upgrade re-renders an old snapshot: it carries an OLD fetch date but is committed last (topologically recent).
+        // The previous implementation mixed chronological (findPrevious) and topological (findNext) order, so prev/next disagreed here.
+        // The navigation IDs are now derived from a single chronological order, so they stay exact inverses.
+        const TECHNICAL_UPGRADE_DATE = new Date('2000-01-01T09:00:00.000Z'); // between firstVersion (06:00) and middleVersion (12:00)
+        let technicalUpgrade;
+
+        before(async () => {
+          technicalUpgrade = await subject.save(new Version({
+            serviceId: SERVICE_PROVIDER_ID,
+            termsType: TERMS_TYPE,
+            content: 'technical upgrade content',
+            fetchDate: TECHNICAL_UPGRADE_DATE,
+            isTechnicalUpgrade: true,
+            snapshotIds: [SNAPSHOT_ID],
+          }));
+        });
+
+        it('orders it by its fetch date, not its commit position', async () => {
+          const navigationIds = await subject.getNavigationIds(SERVICE_PROVIDER_ID, TERMS_TYPE, technicalUpgrade.id);
+
+          expect(navigationIds.prev).to.equal(firstVersion.id);
+          expect(navigationIds.next).to.equal(middleVersion.id);
+        });
+
+        it('keeps prev and next as exact inverses (round-trips)', async () => {
+          const fromFirst = await subject.getNavigationIds(SERVICE_PROVIDER_ID, TERMS_TYPE, firstVersion.id);
+
+          expect(fromFirst.next).to.equal(technicalUpgrade.id);
+
+          const backFromUpgrade = await subject.getNavigationIds(SERVICE_PROVIDER_ID, TERMS_TYPE, fromFirst.next);
+
+          expect(backFromUpgrade.prev).to.equal(firstVersion.id);
+        });
+
+        it('can exclude technical upgrades from the sequence', async () => {
+          const navigationIds = await subject.getNavigationIds(SERVICE_PROVIDER_ID, TERMS_TYPE, firstVersion.id, { includeTechnicalUpgrades: false });
+
+          expect(navigationIds.next).to.equal(middleVersion.id);
+        });
+      });
+    });
+
+    describe('#getNavigationIds with versions sharing the same fetch date', () => {
+      // Git stores commit dates at second precision, so distinct versions can share a fetch date.
+      // The record ID tiebreaker must keep the order deterministic so prev/next still round-trip.
+      let ids;
+
+      before(async function () {
+        this.timeout(5000);
+        ids = [];
+        for (const content of [ 'tie A', 'tie B', 'tie C' ]) {
+          ids.push((await subject.save(new Version({ serviceId: SERVICE_PROVIDER_ID, termsType: TERMS_TYPE, content, fetchDate: FETCH_DATE, snapshotIds: [SNAPSHOT_ID] }))).id);
+        }
+      });
+
+      after(() => subject.removeAll());
+
+      it('round-trips next then prev for every version', async () => {
+        for (const id of ids) {
+          const navigationIds = await subject.getNavigationIds(SERVICE_PROVIDER_ID, TERMS_TYPE, id);
+
+          if (navigationIds.next) {
+            expect((await subject.getNavigationIds(SERVICE_PROVIDER_ID, TERMS_TYPE, navigationIds.next)).prev).to.equal(id);
+          }
+        }
+      });
+
+      it('exposes all three versions as a single ordered chain', async () => {
+        const head = await subject.getNavigationIds(SERVICE_PROVIDER_ID, TERMS_TYPE, ids[0]);
+        const walked = new Set([head.first]);
+        let cursor = head.first;
+
+        while (cursor) {
+          walked.add(cursor);
+          cursor = (await subject.getNavigationIds(SERVICE_PROVIDER_ID, TERMS_TYPE, cursor)).next;
+        }
+
+        expect(walked).to.have.lengthOf(ids.length);
       });
     });
 
@@ -918,6 +1182,30 @@ describe('GitRepository', () => {
 
         it('returns null', () => {
           expect(latestRecord).to.equal(null);
+        });
+      });
+
+      context('when the service ID could be interpreted as a git option', () => {
+        before(async () => {
+          await subject.save(new Version({
+            serviceId: SERVICE_PROVIDER_ID,
+            termsType: TERMS_TYPE,
+            content: CONTENT,
+            fetchDate: FETCH_DATE,
+            snapshotIds: [SNAPSHOT_ID],
+          }));
+        });
+
+        after(() => subject.removeAll());
+
+        it('treats the service ID as a path and returns null instead of erroring', async () => {
+          expect(await subject.findLatest('--not-a-git-option', TERMS_TYPE)).to.equal(null);
+        });
+      });
+
+      context('when the service ID is a path traversal attempt', () => {
+        it('returns null instead of erroring', async () => {
+          expect(await subject.findLatest('../../outside', TERMS_TYPE)).to.equal(null);
         });
       });
     });
