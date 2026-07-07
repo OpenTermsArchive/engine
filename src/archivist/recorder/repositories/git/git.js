@@ -236,11 +236,11 @@ export default class Git {
       const [ added, deleted ] = line.split('\t');
 
       // Binary files show '-' for additions/deletions
-      if (added !== '-') { 
-        additions += parseInt(added, 10); 
+      if (added !== '-') {
+        additions += parseInt(added, 10);
       }
-      if (deleted !== '-') { 
-        deletions += parseInt(deleted, 10); 
+      if (deleted !== '-') {
+        deletions += parseInt(deleted, 10);
       }
     }
 
