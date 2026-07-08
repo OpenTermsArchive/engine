@@ -575,7 +575,7 @@ describe('Archivist', function () {
         });
 
         it('pushes terms to tracking queue for retry', () => {
-          expect(pushSpy).to.have.been.calledWith({ terms, isRetry: true });
+          expect(pushSpy).to.have.been.calledWith(sinon.match({ terms, isRetry: true }));
         });
       });
 

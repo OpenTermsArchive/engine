@@ -101,7 +101,7 @@ export default class Archivist extends events.EventEmitter {
     return this.fatalShutdownPromise;
   }
 
-  async handleTrackingError(error, { terms, isRetry }) {
+  async handleTrackingError(error, { terms, isRetry, technicalUpgradeOnly }) {
     if (!(error instanceof InaccessibleContentError)) {
       this.emit('error', {
         message: error.stack,
@@ -121,7 +121,7 @@ export default class Archivist extends events.EventEmitter {
         termsType: terms.type,
       });
 
-      this.trackingQueue.push({ terms, isRetry: true });
+      this.trackingQueue.push({ terms, isRetry: true, technicalUpgradeOnly });
 
       return;
     }
