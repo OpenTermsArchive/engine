@@ -575,7 +575,13 @@ describe('Archivist', function () {
         });
 
         it('pushes terms to tracking queue for retry', () => {
-          expect(pushSpy).to.have.been.calledWith({ terms, isRetry: true });
+          expect(pushSpy).to.have.been.calledWith(sinon.match({ terms, isRetry: true }));
+        });
+
+        it('keeps the technical upgrade flag on the retry', async () => {
+          await app.handleTrackingError(new InaccessibleContentError([retryableError]), { terms, technicalUpgradeOnly: true });
+
+          expect(pushSpy).to.have.been.calledWith(sinon.match({ isRetry: true, technicalUpgradeOnly: true }));
         });
       });
 
