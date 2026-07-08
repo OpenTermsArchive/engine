@@ -38,6 +38,18 @@
         }
       }
     },
+    "tracking-results": {
+      "storage": {
+        "git": {
+          "path": "./test/data/tracking-results",
+          "publish": false,
+          "author": {
+            "name": "Open Terms Archive Testing Bot",
+            "email": "bot@opentermsarchive.org"
+          }
+        }
+      }
+    },
     "fetcher": {
       "waitForElementsTimeout": 1000
     },
