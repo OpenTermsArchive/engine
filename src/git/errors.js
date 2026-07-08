@@ -1,0 +1,1 @@
+export class GitObjectNotFoundError extends Error {} // The requested commit, tree or file cannot be resolved in the repository (unknown SHA, shallow clone, rewritten history, file absent from the commit)

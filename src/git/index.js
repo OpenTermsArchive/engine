@@ -3,16 +3,19 @@ import path from 'path';
 
 import simpleGit from 'simple-git';
 
+import { GitObjectNotFoundError } from './errors.js';
 import { parseTrailers, formatTrailers } from './trailers.js';
+
+export { GitObjectNotFoundError } from './errors.js';
 
 process.env.LC_ALL = 'en_GB'; // Ensure git messages will be in English as some errors are handled by analysing the message content
 
 const fs = fsApi.promises;
 
+const OBJECT_NOT_FOUND_MESSAGES = /bad object|not a tree|invalid object name|unknown revision|does not exist|exists on disk, but not in/i;
+
 export default class Git {
-  // Read-only helper: returns the SHA of HEAD on a Git repository at `repositoryPath`, or null if the path is not a Git repo or has no commits yet.
-  // Used by callers that need to capture the current state of a repository without instantiating a full Git wrapper (which would mutate the repo via `init`).
-  static async getHeadSha(repositoryPath) {
+  static async getHeadSha(repositoryPath) { // Used by callers that need to capture the current state of a repository without instantiating a full Git wrapper (which would mutate the repo via `init`).
     try {
       const git = simpleGit(repositoryPath, { trimmed: true });
 
@@ -24,6 +27,17 @@ export default class Git {
 
       throw error; // An actual git failure, which callers must not conflate with the absence of a repository
     }
+  }
+
+  static async listFilesAtCommit(repositoryPath, commit) {
+    const output = await readObjectAtCommit(repositoryPath, [ 'ls-tree', '--name-only', commit, '--', './' ]); // `repositoryPath` may be a subdirectory of the repository; git resolves the `./` pathspec against its cwd.
+
+    return output ? output.split('\n') : [];
+  }
+
+  // Read-only helper: returns the content of `fileName` (relative to `repositoryPath`) at the given commit.
+  static readFileAtCommit(repositoryPath, commit, fileName) {
+    return readObjectAtCommit(repositoryPath, [ 'show', `${commit}:./${fileName}` ]); // The `rev:./path` syntax makes git resolve the path against its cwd, which supports repositoryPath being a subdirectory of the repository
   }
 
   constructor({ path: repositoryPath, author }) {
@@ -270,5 +284,17 @@ export default class Git {
     }
 
     return { additions, deletions };
+  }
+}
+
+async function readObjectAtCommit(repositoryPath, args) {
+  try {
+    return await simpleGit(repositoryPath, { trimmed: true, config: ['core.quotePath=false'] }).raw(args); // Disable pathname quoting for the same reason Git.initialize sets it on managed repositories: names with special characters (e.g. "service·A") must come back verbatim, and this repository's configuration is not under the engine's control
+  } catch (error) {
+    if (OBJECT_NOT_FOUND_MESSAGES.test(error.message)) {
+      throw new GitObjectNotFoundError(error.message); // Typed so callers can distinguish "this commit or file cannot be resolved, ever" from a transient git failure worth retrying
+    }
+
+    throw error;
   }
 }

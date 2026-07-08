@@ -6,7 +6,7 @@ import { fileURLToPath } from 'url';
 import { expect } from 'chai';
 import config from 'config';
 
-import Git from './index.js';
+import Git, { GitObjectNotFoundError } from './index.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const RECORDER_PATH = path.resolve(__dirname, '../../', config.get('@opentermsarchive/engine.recorder.versions.storage.git.path'));
@@ -164,6 +164,77 @@ describe('Git', () => {
 
       it('returns the SHA of HEAD', async () => {
         expect(await Git.getHeadSha(RECORDER_PATH)).to.equal(commitId);
+      });
+    });
+  });
+
+  describe('reading at a specific commit', () => {
+    let repositoryPath;
+    let subdirectoryPath;
+    let firstCommitSha;
+    let secondCommitSha;
+
+    before(async () => {
+      repositoryPath = await fs.mkdtemp(path.join(os.tmpdir(), 'ota-git-test-')); // Under the OS temp directory so the fixture repository is not nested in the engine's own repository
+      subdirectoryPath = path.join(repositoryPath, 'declarations');
+      await fs.mkdir(subdirectoryPath);
+
+      const git = new Git({ path: repositoryPath, author: { name: 'Test', email: 'test@example.com' } });
+
+      await git.initialize();
+
+      const firstFilePath = path.join(subdirectoryPath, 'Service A.json');
+
+      await fs.writeFile(firstFilePath, '{ "name": "Service A" }');
+      await git.add(firstFilePath);
+      firstCommitSha = await git.commit({ filePath: firstFilePath, message: 'Add Service A' });
+
+      const secondFilePath = path.join(subdirectoryPath, 'Service B.json');
+
+      await fs.writeFile(secondFilePath, '{ "name": "Service B" }');
+      await git.add(secondFilePath);
+      secondCommitSha = await git.commit({ filePath: secondFilePath, message: 'Add Service B' });
+    });
+
+    after(() => fs.rm(repositoryPath, { recursive: true, force: true }));
+
+    describe('.listFilesAtCommit', () => {
+      it('lists the files of the subdirectory as they were at the given commit', async () => {
+        expect(await Git.listFilesAtCommit(subdirectoryPath, firstCommitSha)).to.deep.equal(['Service A.json']);
+      });
+
+      it('reflects later commits when given their SHA', async () => {
+        expect(await Git.listFilesAtCommit(subdirectoryPath, secondCommitSha)).to.deep.equal([ 'Service A.json', 'Service B.json' ]);
+      });
+
+      it('throws a GitObjectNotFoundError for an unknown commit', async () => {
+        try {
+          await Git.listFilesAtCommit(subdirectoryPath, 'deadbeefdeadbeefdeadbeefdeadbeefdeadbeef');
+        } catch (error) {
+          expect(error).to.be.an.instanceOf(GitObjectNotFoundError);
+
+          return;
+        }
+
+        expect.fail('No error was thrown');
+      });
+    });
+
+    describe('.readFileAtCommit', () => {
+      it('returns the file content as it was at the given commit', async () => {
+        expect(await Git.readFileAtCommit(subdirectoryPath, firstCommitSha, 'Service A.json')).to.equal('{ "name": "Service A" }');
+      });
+
+      it('throws a GitObjectNotFoundError for a file absent from the commit', async () => {
+        try {
+          await Git.readFileAtCommit(subdirectoryPath, firstCommitSha, 'Service B.json');
+        } catch (error) {
+          expect(error).to.be.an.instanceOf(GitObjectNotFoundError);
+
+          return;
+        }
+
+        expect.fail('No error was thrown');
       });
     });
   });
