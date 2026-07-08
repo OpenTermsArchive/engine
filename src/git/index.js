@@ -59,7 +59,7 @@ export default class Git {
       const trailersSection = formatTrailers(trailers);
       const finalMessage = trailersSection ? `${message}\n\n${trailersSection}` : message;
 
-      summary = await this.git.commit(finalMessage, filePath, ['--no-verify']); // Skip pre-commit and commit-msg hooks, as commits are programmatically managed, to optimize performance
+      summary = await this.git.commit(finalMessage, this.relativePath(filePath), ['--no-verify']); // Skip pre-commit and commit-msg hooks, as commits are programmatically managed, to optimize performance. The pathspec must be expressed relative to the repository root; passing the absolute or process-cwd-relative path causes git to look for it under the repo's working directory, which fails when the repo's own path components appear in the resolved location
     } finally {
       process.env.GIT_AUTHOR_DATE = '';
       process.env.GIT_COMMITTER_DATE = '';
