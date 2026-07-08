@@ -48,6 +48,8 @@ export default class Git {
     return this.git.add(this.relativePath(filePath));
   }
 
+  // Not safe to call concurrently: GIT_AUTHOR_DATE / GIT_COMMITTER_DATE are process-wide env vars, so two overlapping calls can stamp each other's commits.
+  // simple-git's `maxConcurrentProcesses: 1` serializes child processes but not the env-var mutation that precedes them. Callers must await each commit before issuing the next.
   async commit({ filePath, message, date = new Date(), trailers = {} }) {
     const commitDate = new Date(date).toISOString();
     let summary;
