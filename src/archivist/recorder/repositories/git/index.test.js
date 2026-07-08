@@ -6,11 +6,11 @@ import { expect } from 'chai';
 import config from 'config';
 import mime from 'mime';
 
+import Git from '../../../../git/index.js';
 import Snapshot from '../../snapshot.js';
 import Version from '../../version.js';
 
 import { TERMS_TYPE_AND_DOCUMENT_ID_SEPARATOR, SNAPSHOT_ID_MARKER, COMMIT_MESSAGE_PREFIXES } from './dataMapper.js';
-import Git from './git.js';
 
 import GitRepository from './index.js';
 

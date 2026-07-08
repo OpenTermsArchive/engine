@@ -8,9 +8,10 @@ import nock from 'nock';
 import sinon from 'sinon';
 import sinonChai from 'sinon-chai';
 
+import Git from '../git/index.js';
+
 import { InaccessibleContentError } from './errors.js';
 import { FetchDocumentError } from './fetcher/index.js';
-import Git from './recorder/repositories/git/git.js';
 import SourceDocument from './services/sourceDocument.js';
 
 import Archivist, { EVENTS } from './index.js';

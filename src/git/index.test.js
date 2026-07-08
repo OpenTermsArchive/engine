@@ -5,10 +5,10 @@ import { fileURLToPath } from 'url';
 import { expect } from 'chai';
 import config from 'config';
 
-import Git from './git.js';
+import Git from './index.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const RECORDER_PATH = path.resolve(__dirname, '../../../../../', config.get('@opentermsarchive/engine.recorder.versions.storage.git.path'));
+const RECORDER_PATH = path.resolve(__dirname, '../../', config.get('@opentermsarchive/engine.recorder.versions.storage.git.path'));
 
 describe('Git', () => {
   const DEFAULT_CONTENT = 'default content';
