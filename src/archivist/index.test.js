@@ -556,10 +556,10 @@ describe('Archivist', function () {
 
     context('with an InaccessibleContentError', () => {
       context('when error may be transient', () => {
-        beforeEach(() => {
+        beforeEach(async () => {
           const error = new InaccessibleContentError([retryableError]);
 
-          app.handleTrackingError(error, { terms });
+          await app.handleTrackingError(error, { terms });
         });
 
         it('does not emit an error event', () => {
@@ -580,10 +580,10 @@ describe('Archivist', function () {
       });
 
       context('when error comes from a retry', () => {
-        beforeEach(() => {
+        beforeEach(async () => {
           const error = new InaccessibleContentError([retryableError]);
 
-          app.handleTrackingError(error, { terms, isRetry: true });
+          await app.handleTrackingError(error, { terms, isRetry: true });
         });
 
         it('does not emit an error event', () => {
