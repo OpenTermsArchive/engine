@@ -258,6 +258,8 @@ export default class Archivist extends events.EventEmitter {
   async fetchSourceDocument(sourceDocument) {
     const { location: url, executeClientScripts, cssSelectors } = sourceDocument;
 
+    sourceDocument.resetObservations(); // A failed fetch must be recorded with the observations of this attempt, not with the previous run's values
+
     try {
       const { mimeType, content, fetcher } = await this.fetch({ url, executeClientScripts, cssSelectors });
 

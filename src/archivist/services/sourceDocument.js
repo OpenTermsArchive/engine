@@ -44,6 +44,13 @@ export default class SourceDocument {
     // Keep `mimeType` as it is a short metadata string, the memory-saving rationale only applies to the potentially large content payload, and downstream observers (e.g. tracking-results) need it after the content is cleared
   }
 
+  resetObservations() {
+    // mimeType and snapshotId are observations of a single tracking attempt, but they are stored on declaration objects that live for the whole process: without this reset, a failed fetch would expose the previous run's values as if they belonged to the failed attempt.
+    // The proper pattern would be for the fetch and extract pipeline to return its observations instead of mutating the declarations, letting consumers build their records from run-scoped data; this reset contains that debt rather than fixing it.
+    this.mimeType = null;
+    this.snapshotId = null;
+  }
+
   static extractCssSelectorsFromProperty(property) {
     if (Array.isArray(property)) {
       return []
