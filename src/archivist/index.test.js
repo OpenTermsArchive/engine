@@ -605,6 +605,41 @@ describe('Archivist', function () {
     });
   });
 
+  describe('fatal error shutdown', () => {
+    let archivist;
+    let exitStub;
+    let finalizeSpy;
+
+    before(async function () {
+      this.timeout(10000);
+      archivist = await createAndInitializeArchivist();
+      exitStub = sinon.stub(process, 'exit');
+      finalizeSpy = sinon.spy(archivist.recorder, 'finalize');
+
+      archivist.emit('error', { message: 'first fatal error' });
+      archivist.emit('error', { message: 'second fatal error' });
+
+      await new Promise(resolve => { // The shutdown sequence is asynchronous; wait until it reaches its process.exit call
+        const checkDone = () => (exitStub.called ? resolve() : setTimeout(checkDone, 10));
+
+        checkDone();
+      });
+    });
+
+    after(() => {
+      exitStub.restore();
+      finalizeSpy.restore();
+    });
+
+    it('runs the cleanup sequence only once', () => {
+      expect(finalizeSpy).to.have.been.calledOnce;
+    });
+
+    it('exits the process once, with the expected exit code', () => {
+      expect(exitStub).to.have.been.calledOnceWith(1);
+    });
+  });
+
   describe('#extractContentsFromSnapshots', () => {
     context('when several source documents fail extraction', () => {
       let app;
