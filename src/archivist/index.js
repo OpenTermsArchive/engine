@@ -69,8 +69,13 @@ export default class Archivist extends events.EventEmitter {
   }
 
   initQueue() {
-    this.trackingQueue = async.queue(this.trackTermsChanges.bind(this), MAX_PARALLEL_TRACKING);
-    this.trackingQueue.error(this.handleTrackingError.bind(this));
+    this.trackingQueue = async.queue(async item => {
+      try {
+        await this.trackTermsChanges(item);
+      } catch (error) {
+        await this.handleTrackingError(error, item); // Handled inside the worker so drain() also waits for the failure handling, including the tracking-results write; async.queue's error callback is fire-and-forget and would let completeRun race the recording
+      }
+    }, MAX_PARALLEL_TRACKING);
   }
 
   fatalShutdownPromise = null;
@@ -96,7 +101,7 @@ export default class Archivist extends events.EventEmitter {
     return this.fatalShutdownPromise;
   }
 
-  handleTrackingError(error, { terms, isRetry }) {
+  async handleTrackingError(error, { terms, isRetry }) {
     if (!(error instanceof InaccessibleContentError)) {
       this.emit('error', {
         message: error.stack,
