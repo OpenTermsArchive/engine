@@ -170,6 +170,10 @@ export async function getDeclaredTermsAtCommit(commit) {
   });
 }
 
+export async function getDeclaredTerms() { // Working-tree counterpart of getDeclaredTermsAtCommit; used as approximation when a declarations commit is not reachable anymore
+  return declaredTermsOf(await getDeclaredServicesIds(), loadServiceDeclaration);
+}
+
 async function declaredTermsOf(serviceIds, loadDeclaration) {
   const declaredTermsPerService = await async.mapLimit(serviceIds, MAX_PARALLEL_DECLARATIONS_READS, async serviceId => {
     const declaration = await loadDeclaration(serviceId);
