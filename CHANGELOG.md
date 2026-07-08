@@ -2,6 +2,16 @@
 
 All changes that impact users of this module are documented in this file, in the [Common Changelog](https://common-changelog.org) format with some additional specifications defined in the CONTRIBUTING file. This codebase adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased [minor]
+
+> Development of this release was supported by [User Rights](https://www.user-rights.org) and by the [NGI0 Commons Fund](https://nlnet.nl/project/Modular-OTA/), a fund established by [NLnet](https://nlnet.nl/) with financial support from the European Commission's [Next Generation Internet](https://www.ngi.eu) programme, under the aegis of DG CNECT under grant agreement N°101069594.
+
+### Added
+
+- Add a `tracking-results` data repository recording the tracking status of each terms and the lifecycle of every run in a tamper-evident Git history ([RFC](https://github.com/OpenTermsArchive/engine/issues/1241))
+- Add [`@opentermsarchive/engine.tracking-results`](https://docs.opentermsarchive.org/collections/reference/configuration/) configuration defining the storage location, author and publication of the tracking-results repository; defaults record locally to `./data/tracking-results` without publication
+- Add an `x-run-id` trailer to snapshot and version commits recorded while a tracking-results run is in progress, tying each record to the run that produced it
+
 ## 15.1.0 - 2026-07-13
 
 > Development of this release was supported by [User Rights](https://www.user-rights.org).
