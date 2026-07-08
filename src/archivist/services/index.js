@@ -166,6 +166,11 @@ export async function getDeclaredTermsAtCommit(commit) {
   });
 }
 
+// Working-tree counterpart of getDeclaredTermsAtCommit; used as approximation when a declarations commit is not reachable anymore
+export async function getDeclaredTerms() {
+  return declaredTermsOf(await getDeclaredServicesIds(), loadServiceDeclaration);
+}
+
 async function declaredTermsOf(serviceIds, loadDeclaration) {
   const declaredTermsPerService = await Promise.all(serviceIds.map(async serviceId => {
     const declaration = await loadDeclaration(serviceId);
