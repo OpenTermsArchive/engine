@@ -2,6 +2,28 @@
 
 All changes that impact users of this module are documented in this file, in the [Common Changelog](https://common-changelog.org) format with some additional specifications defined in the CONTRIBUTING file. This codebase adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased [minor]
+
+> Development of this release was supported by [User Rights](https://www.user-rights.org) and by the [NGI0 Commons Fund](https://nlnet.nl/project/Modular-OTA/), a fund established by [NLnet](https://nlnet.nl/) with financial support from the European Commission's [Next Generation Internet](https://www.ngi.eu) programme, under the aegis of DG CNECT under grant agreement N°101069594.
+
+### Added
+
+- Add a `tracking-results` data repository recording the tracking status of each terms and the lifecycle of every run in a tamper-evident Git history ([RFC](https://github.com/OpenTermsArchive/engine/issues/1241#issuecomment-4499539428))
+- Add [`@opentermsarchive/engine.tracking-results`](https://docs.opentermsarchive.org/collections/reference/configuration/) configuration defining the storage location, author and publication of the tracking-results repository; defaults record locally to `./data/tracking-results` without publication; set it to `null` to disable tracking-results
+- Add an `x-run-id` metadata to snapshots and versions recorded while a tracking-results run is in progress, tying each record to the run that produced it; it is a commit trailer with Git storage
+
+### Changed
+
+- Mention the declared URL instead of the last redirect target in the errors of fetches that fail because of redirects, so that the error stays the same from one tracking to the next
+
+### Fixed
+
+- Record as a technical upgrade the version of combined terms whose newly declared source document could only be fetched on a retry, instead of refetching all their source documents and recording a regular change that notified a false modification of the terms
+- Stop stating in tracking issues that the source documents were recorded as snapshots and that missed versions may be recovered, when they could actually not be fetched
+- Fix the links to the latest snapshots in the tracking issues of combined terms, which pointed to a nonexistent file with a `.null` extension for every source document that was successfully fetched
+- Pass falsy parameters, such as `false` or `0`, to collection-specific filters, which received the extraction context in their place
+- Track only once a service whose ID is given several times to `ota track --services`
+
 ## 16.0.2 - 2026-09-16
 
 > Development of this release was supported by [Anthelia](https://anthelia.tech).
