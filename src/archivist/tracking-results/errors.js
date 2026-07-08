@@ -1,0 +1,1 @@
+export class UnreadableRunError extends Error {} // The persisted run.json cannot be read as a valid Run (corrupted JSON, incompatible schema from another engine version): recovery is impossible by construction, unlike infrastructure failures for which a retry is meaningful
