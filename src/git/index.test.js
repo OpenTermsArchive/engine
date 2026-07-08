@@ -82,6 +82,31 @@ describe('Git', () => {
         expect(committedFiles).to.have.lengthOf(1);
       });
     });
+
+    context('when no file path is given', () => {
+      const stagedFileNames = [ 'first-staged-file.md', 'second-staged-file.md' ];
+      let committedFileNames;
+
+      before(async () => {
+        for (const fileName of stagedFileNames) {
+          const filePath = `${RECORDER_PATH}/${fileName}`;
+
+          await fs.writeFile(filePath, DEFAULT_CONTENT);
+          await subject.add(filePath);
+        }
+
+        const commitId = await subject.commit({ message: DEFAULT_COMMIT_MESSAGE });
+        const commit = await subject.getCommit([commitId]);
+
+        committedFileNames = commit.diff.files.map(({ file }) => file);
+      });
+
+      after(() => subject.destroyHistory());
+
+      it('commits all the staged files', () => {
+        expect(committedFileNames).to.have.members(stagedFileNames);
+      });
+    });
   });
 
   describe('#cleanUp', () => {
