@@ -10,6 +10,22 @@ process.env.LC_ALL = 'en_GB'; // Ensure git messages will be in English as some 
 const fs = fsApi.promises;
 
 export default class Git {
+  // Read-only helper: returns the SHA of HEAD on a Git repository at `repositoryPath`, or null if the path is not a Git repo or has no commits yet.
+  // Used by callers that need to capture the current state of a repository without instantiating a full Git wrapper (which would mutate the repo via `init`).
+  static async getHeadSha(repositoryPath) {
+    try {
+      const git = simpleGit(repositoryPath, { trimmed: true });
+
+      return await git.revparse(['HEAD']);
+    } catch (error) {
+      if (/not a git repository|does not exist|unknown revision|ambiguous argument|does not have any commits/i.test(error.message)) {
+        return null; // Not a repository, or an empty one: a legitimate "no commit to reference" answer
+      }
+
+      throw error; // An actual git failure, which callers must not conflate with the absence of a repository
+    }
+  }
+
   constructor({ path: repositoryPath, author }) {
     this.path = repositoryPath;
     this.author = author;

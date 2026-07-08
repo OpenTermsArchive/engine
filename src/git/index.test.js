@@ -1,4 +1,5 @@
 import fs from 'fs/promises';
+import os from 'os';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
@@ -108,6 +109,61 @@ describe('Git', () => {
         const infoDirectoryContent = await fs.readdir(infoDirectoryPath);
 
         expect(infoDirectoryContent).to.not.include('commit-graph.lock');
+      });
+    });
+  });
+
+  describe('.getHeadSha', () => {
+    context('with a directory that does not exist', () => {
+      it('returns null', async () => {
+        expect(await Git.getHeadSha(path.join(os.tmpdir(), 'ota-nonexistent-directory'))).to.be.null;
+      });
+    });
+
+    context('with a directory that is not inside a Git repository', () => {
+      let directory;
+
+      before(async () => {
+        directory = await fs.mkdtemp(path.join(os.tmpdir(), 'ota-git-test-')); // Under the OS temp directory, so no enclosing Git repository can be found by walking up
+      });
+
+      after(() => fs.rm(directory, { recursive: true, force: true }));
+
+      it('returns null', async () => {
+        expect(await Git.getHeadSha(directory)).to.be.null;
+      });
+    });
+
+    context('with a repository that has no commits yet', () => {
+      let directory;
+
+      before(async () => {
+        directory = await fs.mkdtemp(path.join(os.tmpdir(), 'ota-git-test-'));
+        await new Git({ path: directory, author: { name: 'Test', email: 'test@example.com' } }).initialize();
+      });
+
+      after(() => fs.rm(directory, { recursive: true, force: true }));
+
+      it('returns null', async () => {
+        expect(await Git.getHeadSha(directory)).to.be.null;
+      });
+    });
+
+    context('with a repository that has commits', () => {
+      let commitId;
+
+      before(async () => {
+        const filePath = `${RECORDER_PATH}/test.md`;
+
+        await fs.writeFile(filePath, DEFAULT_CONTENT);
+        await subject.add(filePath);
+        commitId = await subject.commit({ filePath, message: DEFAULT_COMMIT_MESSAGE });
+      });
+
+      after(() => subject.destroyHistory());
+
+      it('returns the SHA of HEAD', async () => {
+        expect(await Git.getHeadSha(RECORDER_PATH)).to.equal(commitId);
       });
     });
   });
