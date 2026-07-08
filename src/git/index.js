@@ -27,14 +27,21 @@ export default class Git {
 
     await this.git.init();
 
+    const configFile = path.resolve(this.path, '.git', 'config'); // Anchored to an absolute path: git resolves a relative `--file` argument against its own cwd (the repository), not against process.cwd, so a relative repository path would silently point the write at a nonexistent nested location
+
+    if (!fsApi.existsSync(configFile)) { // Defensive: init should always produce this file; if it does not, refuse to continue rather than risk writing config to an unintended location
+      throw new Error(`Git initialisation failed: expected config file at ${configFile} was not created`);
+    }
+
+    // Each setting is written to the explicit config file path rather than via `addConfig` so neither simpleGit nor git itself can walk up to a parent .git and pollute the configuration of an enclosing project (e.g. the engine's own checkout when this.path is `./data/versions`).
     return this.git
-      .addConfig('core.autocrlf', false)
-      .addConfig('push.default', 'current')
-      .addConfig('user.name', this.author.name)
-      .addConfig('user.email', this.author.email)
-      .addConfig('core.quotePath', false) // Disable Git's encoding of special characters in pathnames. For example, `service·A` will be encoded as `service\302\267A` without this setting, leading to issues. See https://git-scm.com/docs/git-config#Documentation/git-config.txt-corequotePath
-      .addConfig('core.commitGraph', true) // Enable `commit-graph` feature for efficient commit data storage, improving performance of operations like `git log`
-      .addConfig('gc.writeCommitGraph', false); // Prevent automatic `git gc` from also writing the commit-graph: the engine writes it explicitly (see `writeCommitGraph`/`updateCommitGraph`), and a concurrent gc write races those, which can leave a stale `commit-graph.lock` and make subsequent operations fail
+      .raw([ 'config', '--file', configFile, 'core.autocrlf', 'false' ])
+      .raw([ 'config', '--file', configFile, 'push.default', 'current' ])
+      .raw([ 'config', '--file', configFile, 'user.name', this.author.name ])
+      .raw([ 'config', '--file', configFile, 'user.email', this.author.email ])
+      .raw([ 'config', '--file', configFile, 'core.quotePath', 'false' ]) // Disable Git's encoding of special characters in pathnames. For example, `service·A` will be encoded as `service\302\267A` without this setting, leading to issues. See https://git-scm.com/docs/git-config#Documentation/git-config.txt-corequotePath
+      .raw([ 'config', '--file', configFile, 'core.commitGraph', 'true' ]) // Enable `commit-graph` feature for efficient commit data storage, improving performance of operations like `git log`
+      .raw([ 'config', '--file', configFile, 'gc.writeCommitGraph', 'false' ]); // Prevent automatic `git gc` from also writing the commit-graph: the engine writes it explicitly (see `writeCommitGraph`/`updateCommitGraph`), and a concurrent gc write races those, which can leave a stale `commit-graph.lock` and make subsequent operations fail
   }
 
   add(filePath) {
