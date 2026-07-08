@@ -41,7 +41,7 @@ export default class SourceDocument {
 
   clearContent() {
     this.content = null;
-    this.mimeType = null;
+    // Keep `mimeType` as it is a short metadata string, the memory-saving rationale only applies to the potentially large content payload, and downstream observers (e.g. tracking-results) need it after the content is cleared
   }
 
   static extractCssSelectorsFromProperty(property) {
