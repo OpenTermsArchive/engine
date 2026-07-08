@@ -2,17 +2,19 @@ import fs from 'fs/promises';
 import path from 'path';
 
 import { expect, use } from 'chai';
+import config from 'config';
 import sinon from 'sinon';
 import sinonChai from 'sinon-chai';
 
 import expectedServices from '../../../test/fixtures/services.js';
+import Git, { GitObjectNotFoundError } from '../../git/index.js';
 import * as exposedFilters from '../extract/exposedFilters.js';
 
 import Service from './service.js';
 import SourceDocument from './sourceDocument.js';
 import Terms from './terms.js';
 
-import { getDeclaredServicesIds, loadServiceDeclaration, loadServiceFilters, getServiceFilters, createSourceDocuments, createServiceFromDeclaration, load, loadWithHistory } from './index.js';
+import { getDeclaredServicesIds, getDeclaredTermsAtCommit, loadServiceDeclaration, loadServiceFilters, getServiceFilters, createSourceDocuments, createServiceFromDeclaration, load, loadWithHistory } from './index.js';
 
 use(sinonChai);
 
@@ -147,6 +149,32 @@ describe('Services', () => {
           'normal-service',
         ]);
       });
+    });
+  });
+
+  describe('#getDeclaredTermsAtCommit', () => {
+    const declarationsPath = path.resolve(process.cwd(), config.get('@opentermsarchive/engine.collectionPath'), './declarations');
+
+    it('returns the terms declared at the given commit', async function () {
+      this.timeout(10000);
+
+      const commit = await Git.getHeadSha(declarationsPath); // The test declarations are committed in the engine repository itself, so its HEAD reflects them exactly
+      const services = await load();
+      const expected = Object.keys(services).flatMap(serviceId => services[serviceId].getTermsTypes().map(termsType => ({ serviceId, termsType })));
+
+      expect(await getDeclaredTermsAtCommit(commit)).to.have.deep.members(expected);
+    });
+
+    it('throws a GitObjectNotFoundError for an unknown commit', async () => {
+      try {
+        await getDeclaredTermsAtCommit('deadbeefdeadbeefdeadbeefdeadbeefdeadbeef');
+      } catch (error) {
+        expect(error).to.be.an.instanceOf(GitObjectNotFoundError);
+
+        return;
+      }
+
+      expect.fail('No error was thrown');
     });
   });
 

@@ -4,6 +4,7 @@ import { pathToFileURL } from 'url';
 
 import config from 'config';
 
+import Git from '../../git/index.js';
 import * as exposedFilters from '../extract/exposedFilters.js';
 
 import Service from './service.js';
@@ -145,6 +146,37 @@ export function getServiceFilters(serviceFilters, declaredFilters) {
 export async function getDeclaredServicesIds() {
   const fileNames = await fs.readdir(declarationsPath);
 
+  return declaredServicesIdsFromFileNames(fileNames);
+}
+
+// Returns the [{ serviceId, termsType }] declared at the given commit of the declarations repository.
+// Reads through git so the answer reflects the declarations exactly as they were at that commit, not as they are on disk; used by crash recovery to derive the coverage of a run that referenced this commit.
+export async function getDeclaredTermsAtCommit(commit) {
+  const fileNames = await Git.listFilesAtCommit(declarationsPath, commit);
+  const serviceIds = declaredServicesIdsFromFileNames(fileNames);
+
+  return declaredTermsOf(serviceIds, async serviceId => {
+    const rawDeclaration = await Git.readFileAtCommit(declarationsPath, commit, `${serviceId}${JSON_EXT}`);
+
+    try {
+      return JSON.parse(rawDeclaration);
+    } catch (error) {
+      throw new Error(`The "${serviceId}" service declaration at commit ${commit} is malformed and cannot be parsed`);
+    }
+  });
+}
+
+async function declaredTermsOf(serviceIds, loadDeclaration) {
+  const declaredTermsPerService = await Promise.all(serviceIds.map(async serviceId => {
+    const declaration = await loadDeclaration(serviceId);
+
+    return Object.keys(declaration.terms ?? {}).map(termsType => ({ serviceId, termsType }));
+  }));
+
+  return declaredTermsPerService.flat(); // Flattened in serviceIds order to keep the result deterministic regardless of read completion order
+}
+
+function declaredServicesIdsFromFileNames(fileNames) {
   return fileNames
     .filter(fileName => fileName.endsWith(JSON_EXT) && !fileName.includes(`${HISTORY_SUFFIX}${JSON_EXT}`))
     .map(fileName => path.basename(fileName, JSON_EXT));
