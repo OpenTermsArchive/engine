@@ -86,12 +86,24 @@ export default class SourceDocument {
   }
 
   toPersistence() {
-    return {
+    const persistence = {
       fetch: this.location,
       select: this.contentSelectors,
-      remove: this.insignificantContentSelectors,
-      filter: this.filters ? this.filters.map(filter => filter.name) : undefined,
-      executeClientScripts: this.executeClientScripts,
     };
+
+    // Undeclared fields are omitted rather than set to undefined: JSON.stringify would drop undefined-valued keys on write, so re-reading the persisted form would otherwise yield a different key set than the in-memory one and defeat change detection
+    if (this.insignificantContentSelectors !== undefined) {
+      persistence.remove = this.insignificantContentSelectors;
+    }
+
+    if (this.filters) {
+      persistence.filter = this.filters.map(filter => filter.name);
+    }
+
+    if (this.executeClientScripts !== undefined) {
+      persistence.executeClientScripts = this.executeClientScripts;
+    }
+
+    return persistence;
   }
 }

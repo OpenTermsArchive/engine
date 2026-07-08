@@ -224,12 +224,20 @@ describe('SourceDocument', () => {
       const expectedResult = {
         fetch: URL,
         select: 'body',
-        remove: undefined,
-        filter: undefined,
-        executeClientScripts: undefined,
       };
 
       expect(result).to.deep.equal(expectedResult);
+    });
+
+    it('omits undeclared fields rather than setting them to undefined', () => {
+      const result = new SourceDocument({
+        location: URL,
+        contentSelectors: 'body',
+      }).toPersistence();
+
+      expect(result).to.not.have.property('remove');
+      expect(result).to.not.have.property('filter');
+      expect(result).to.not.have.property('executeClientScripts');
     });
 
     it('converts full source document declarations to JSON representation', () => {

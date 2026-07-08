@@ -40,8 +40,6 @@ describe('Terms', () => {
       },
       'body',
     ],
-    filter: undefined,
-    executeClientScripts: undefined,
   };
 
   const document2 = new SourceDocument({
@@ -52,9 +50,6 @@ describe('Terms', () => {
   const document2AsJSON = {
     fetch: URL,
     select: 'body',
-    remove: undefined,
-    filter: undefined,
-    executeClientScripts: undefined,
   };
 
   describe('#toPersistence', () => {
