@@ -8,10 +8,10 @@ import path from 'path';
 
 import mime from 'mime';
 
+import Git from '../../../../git/index.js';
 import RepositoryInterface from '../interface.js';
 
 import * as DataMapper from './dataMapper.js';
-import Git from './git.js';
 
 const fs = fsApi.promises;
 
