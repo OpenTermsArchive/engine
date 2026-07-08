@@ -11,6 +11,7 @@ import sinonChai from 'sinon-chai';
 import Git from '../git/index.js';
 
 import { InaccessibleContentError } from './errors.js';
+import { ExtractDocumentError } from './extract/index.js';
 import { FetchDocumentError } from './fetcher/index.js';
 import SourceDocument from './services/sourceDocument.js';
 
@@ -600,6 +601,56 @@ describe('Archivist', function () {
         it('does not push terms to tracking queue for retry', () => {
           expect(pushSpy).to.not.have.been.called;
         });
+      });
+    });
+  });
+
+  describe('#extractContentsFromSnapshots', () => {
+    context('when several source documents fail extraction', () => {
+      let app;
+      let error;
+      let getLatestSnapshotStub;
+
+      before(async () => {
+        app = await createAndInitializeArchivist();
+
+        const terms = {
+          service: { id: 'test-service' },
+          type: 'test-type',
+          sourceDocuments: [
+            { id: 'doc1', location: 'https://example.com/doc1' },
+            { id: 'doc2', location: 'https://example.com/doc2' },
+          ],
+        };
+
+        getLatestSnapshotStub = sinon.stub(app.recorder, 'getLatestSnapshot').callsFake((_, sourceDocumentId) => Promise.resolve({
+          id: `snapshot-of-${sourceDocumentId}`,
+          content: 'content',
+          mimeType: 'text/html',
+          fetchDate: FETCH_DATE,
+        }));
+
+        app.extract = sourceDocument => new Promise((resolve, reject) => {
+          const delay = sourceDocument.id === 'doc1' ? 20 : 0; // Make the first declared document fail last, so an ordering based on completion time would be exposed
+
+          setTimeout(() => reject(new ExtractDocumentError(`extraction failure of ${sourceDocument.id}`)), delay);
+        });
+
+        try {
+          await app.extractContentsFromSnapshots(terms);
+        } catch (thrownError) {
+          error = thrownError;
+        }
+      });
+
+      after(() => getLatestSnapshotStub.restore());
+
+      it('throws an InaccessibleContentError', () => {
+        expect(error).to.be.an.instanceOf(InaccessibleContentError);
+      });
+
+      it('collects the errors in the source documents declaration order', () => {
+        expect(error.errors.map(extractError => extractError.message)).to.deep.equal([ 'Extract failed: extraction failure of doc1', 'Extract failed: extraction failure of doc2' ]);
       });
     });
   });

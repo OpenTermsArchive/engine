@@ -276,14 +276,13 @@ export default class Archivist extends events.EventEmitter {
   }
 
   async extractContentsFromSnapshots(terms) {
-    const extractDocumentErrors = [];
-
-    const contents = await Promise.all(terms.sourceDocuments.map(async sourceDocument => {
+    // Each callback returns { content } or { error } instead of pushing into a shared array: Promise.all preserves input order while side-effect pushes from concurrent callbacks would order errors by completion time, making event.reasons non-deterministic and triggering spurious "Update failure reasons" tracking-results commits
+    const results = await Promise.all(terms.sourceDocuments.map(async sourceDocument => {
       const snapshot = await this.recorder.getLatestSnapshot(terms, sourceDocument.id);
 
       try {
         if (!snapshot) { // This can happen if one of the source documents for a terms has not yet been fetched
-          return;
+          return {};
         }
 
         sourceDocument.content = snapshot.content;
@@ -299,21 +298,23 @@ export default class Archivist extends events.EventEmitter {
 
         sourceDocument.clearContent(); // Reduce memory usage by clearing no longer needed large content strings
 
-        return content;
+        return { content };
       } catch (error) {
         if (!(error instanceof ExtractDocumentError)) {
           throw error;
         }
 
-        extractDocumentErrors.push(error);
+        return { error };
       }
     }));
+
+    const extractDocumentErrors = results.map(({ error }) => error).filter(Boolean);
 
     if (extractDocumentErrors.length) {
       throw new InaccessibleContentError(extractDocumentErrors);
     }
 
-    return contents;
+    return results.map(({ content }) => content);
   }
 
   async recordVersion(terms, content, technicalUpgradeOnly) {
