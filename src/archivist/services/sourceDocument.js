@@ -40,8 +40,7 @@ export default class SourceDocument {
   }
 
   clearContent() {
-    this.content = null;
-    this.mimeType = null;
+    this.content = null; // Only the potentially large content is cleared: the MIME type is read after the extraction, to record the tracking results
   }
 
   static extractCssSelectorsFromProperty(property) {

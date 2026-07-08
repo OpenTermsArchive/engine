@@ -214,6 +214,17 @@ describe('SourceDocument', () => {
     });
   });
 
+  describe('#clearContent', () => {
+    it('clears the content but keeps the MIME type', () => {
+      const sourceDocument = new SourceDocument({ location: URL, content: '<html></html>', mimeType: 'text/html' });
+
+      sourceDocument.clearContent();
+
+      expect(sourceDocument.content).to.be.null;
+      expect(sourceDocument.mimeType).to.equal('text/html');
+    });
+  });
+
   describe('#toPersistence', () => {
     it('converts basic source document declarations into JSON representation', () => {
       const result = new SourceDocument({
