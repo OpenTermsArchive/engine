@@ -16,6 +16,7 @@ async function initialize(services) {
   const archivist = new Archivist({
     recorderConfig: config.get('@opentermsarchive/engine.recorder'),
     fetcherConfig: config.get('@opentermsarchive/engine.fetcher'),
+    trackingResultsConfig: config.get('@opentermsarchive/engine.tracking-results'),
   });
 
   archivist.attach(logger);
