@@ -61,19 +61,7 @@ export default class Archivist extends events.EventEmitter {
     this.initQueue();
     this.services = await services.load();
 
-    this.on('error', async () => {
-      console.log('Abort and clean up operations before exiting…');
-
-      setTimeout(() => {
-        console.log('Cleaning timed out, force process to exit');
-        process.exit(2);
-      }, 60 * 1000);
-
-      this.trackingQueue.kill();
-      await stopHeadlessBrowser().then(() => console.log('Headless browser stopped'));
-      await this.recorder.finalize().then(() => console.log('Recorder finalized'));
-      process.exit(1);
-    });
+    this.on('error', () => this.shutdownOnFatalError());
 
     this.emit('info', 'Initialization completed');
 
@@ -83,6 +71,29 @@ export default class Archivist extends events.EventEmitter {
   initQueue() {
     this.trackingQueue = async.queue(this.trackTermsChanges.bind(this), MAX_PARALLEL_TRACKING);
     this.trackingQueue.error(this.handleTrackingError.bind(this));
+  }
+
+  fatalShutdownPromise = null;
+
+  shutdownOnFatalError() {
+    this.fatalShutdownPromise ||= (async () => { // Memoised so a second fatal error while the sequence is in flight awaits the same promise, instead of running a concurrent cleanup that would race the finalize pushes and process.exit
+      console.log('Abort and clean up operations before exiting…');
+
+      const forceExitTimeout = setTimeout(() => {
+        console.log('Cleaning timed out, force process to exit');
+        process.exit(2);
+      }, 60 * 1000);
+
+      this.trackingQueue.kill();
+      await stopHeadlessBrowser().then(() => console.log('Headless browser stopped'));
+      await this.recorder.finalize().then(() => console.log('Recorder finalized'));
+
+      clearTimeout(forceExitTimeout); // The guard is only needed while the cleanup above may hang; leaving it armed would fire a stray forced exit when process.exit is stubbed in tests
+
+      process.exit(1);
+    })();
+
+    return this.fatalShutdownPromise;
   }
 
   handleTrackingError(error, { terms, isRetry }) {
