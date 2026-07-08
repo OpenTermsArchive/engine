@@ -225,6 +225,18 @@ describe('SourceDocument', () => {
     });
   });
 
+  describe('#resetObservations', () => {
+    it('clears the MIME type and the snapshot ID observed by a previous tracking', () => {
+      const sourceDocument = new SourceDocument({ location: URL, mimeType: 'text/html' });
+
+      sourceDocument.snapshotId = 'abc123';
+      sourceDocument.resetObservations();
+
+      expect(sourceDocument.mimeType).to.be.null;
+      expect(sourceDocument.snapshotId).to.be.null;
+    });
+  });
+
   describe('#toPersistence', () => {
     it('converts basic source document declarations into JSON representation', () => {
       const result = new SourceDocument({

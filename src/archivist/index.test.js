@@ -524,6 +524,7 @@ describe('Archivist', function () {
 
     before(async () => {
       app = await createAndInitializeArchivist();
+      app.trackingQueue.pause(); // These tests assert what gets pushed onto the queue, not its processing: a live worker would fetch the plain-object fixtures in the background and its failure would race the following suites
     });
 
     beforeEach(() => {
@@ -599,6 +600,33 @@ describe('Archivist', function () {
         it('does not push terms to tracking queue for retry', () => {
           expect(pushSpy).to.not.have.been.called;
         });
+      });
+    });
+  });
+
+  describe('#fetchSourceDocument', () => {
+    context('when the fetch fails after a previous successful run', () => {
+      let app;
+      let error;
+      let sourceDocument;
+
+      before(async () => {
+        app = await createAndInitializeArchivist();
+        sourceDocument = new SourceDocument({ location: 'https://example.com/terms', contentSelectors: 'body' });
+        sourceDocument.mimeType = 'text/html'; // Observations left by a previous run on the long-lived services map
+        sourceDocument.snapshotId = 'stale123';
+        app.fetch = () => Promise.reject(new FetchDocumentError('HTTP code 500'));
+
+        error = await app.fetchSourceDocument(sourceDocument);
+      });
+
+      it('reports the fetch error', () => {
+        expect(error).to.be.an.instanceOf(FetchDocumentError);
+      });
+
+      it('clears the stale observations so the failure is recorded with null values', () => {
+        expect(sourceDocument.mimeType).to.be.null;
+        expect(sourceDocument.snapshotId).to.be.null;
       });
     });
   });

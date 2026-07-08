@@ -67,12 +67,12 @@ describe('Reporter', () => {
       repositories: { declarations: 'OpenTermsArchive/test-declarations' },
     });
 
-    const buildTerms = ({ sourceCount = 1 } = {}) => {
+    const buildTerms = ({ sourceCount = 1, hasSnapshots = true } = {}) => {
       const sourceDocuments = Array.from({ length: sourceCount }, (_, index) => ({
         id: `source-${index}`,
         location: `https://example.com/source-${index}`,
         mimeType: 'text/html',
-        snapshotId: `snapshot-${index}`,
+        snapshotId: hasSnapshots ? `snapshot-${index}` : null,
         toPersistence: () => ({ fetch: `https://example.com/source-${index}` }),
       }));
 
@@ -93,6 +93,23 @@ describe('Reporter', () => {
     };
 
     const error = { reasons: ['HTTP code 404'] };
+
+    context('when the source documents have been recorded as snapshots', () => {
+      it('mentions that the missed versions might be recovered', () => {
+        const description = buildReporter().generateDescription({ error, terms: buildTerms() });
+
+        expect(description).to.include('it might still be possible to recover the missed versions');
+      });
+    });
+
+    context('when the source documents could not be recorded as snapshots', () => {
+      it('does not suggest that the missed versions might be recovered', () => {
+        const description = buildReporter().generateDescription({ error, terms: buildTerms({ hasSnapshots: false }) });
+
+        expect(description).to.include('has not been recorded as a snapshot');
+        expect(description).to.not.include('it might still be possible to recover the missed versions');
+      });
+    });
 
     context('when the terms has a single source document', () => {
       it('deep-links to the contribution tool with the serialized declaration as the edit target', () => {
