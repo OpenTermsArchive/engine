@@ -14,7 +14,7 @@ import { InaccessibleContentError } from './errors.js';
 import { ExtractDocumentError } from './extract/index.js';
 import { FetchDocumentError } from './fetcher/index.js';
 import SourceDocument from './services/sourceDocument.js';
-import TrackingResults, { MissingCollectionIdError } from './tracking-results/index.js';
+import TrackingResults, { MissingCollectionIdError, RUN_ID_TRAILER_KEY } from './tracking-results/index.js';
 
 import Archivist, { EVENTS } from './index.js';
 
@@ -216,6 +216,19 @@ describe('Archivist', function () {
         const { event } = await repository.findLatestTermsResult(SERVICE_B_ID, SERVICE_B_TYPE);
 
         expect(event.sourceDocuments.map(({ mimeType }) => mimeType)).to.deep.equal(['application/pdf']);
+      });
+
+      it('ties the versions to the run', async () => {
+        const commit = await gitVersion.getCommit([ '--', SERVICE_A_EXPECTED_VERSION_FILE_PATH ]);
+
+        expect(commit.trailers[RUN_ID_TRAILER_KEY]).to.equal(run.runId);
+      });
+
+      it('keeps the snapshot IDs of the versions readable', async () => {
+        const version = await archivist.recorder.versionsRepository.findLatest(SERVICE_A_ID, SERVICE_A_TYPE);
+        const snapshot = await archivist.recorder.snapshotsRepository.findLatest(SERVICE_A_ID, SERVICE_A_TYPE);
+
+        expect(version.snapshotIds).to.deep.equal([snapshot.id]);
       });
 
       context('when tracking again without any change', () => {
@@ -1567,6 +1580,69 @@ describe('Archivist', function () {
       it('relays the module warnings on the engine event surface', () => {
         archivist.trackingResults.emit('warn', { message: 'relayed warning' });
         expect(warnSpy).to.have.been.calledWithMatch({ message: 'relayed warning' });
+      });
+    });
+
+    context('when recording snapshots and versions', () => {
+      const RUN_ID = 'ota-run-f47ac10b-58cc-4372-a567-0e02b2c3d479';
+      let archivist;
+      let terms;
+
+      before(async () => {
+        archivist = new Archivist({
+          recorderConfig: config.get('@opentermsarchive/engine.recorder'),
+          fetcherConfig: config.get('@opentermsarchive/engine.fetcher'),
+        });
+        await archivist.initialize();
+        terms = archivist.services.service·A.getTerms({ type: SERVICE_A_TYPE });
+        terms.fetchDate = FETCH_DATE;
+        terms.sourceDocuments.forEach(sourceDocument => {
+          sourceDocument.content = serviceASnapshotExpectedContent;
+          sourceDocument.mimeType = MIME_TYPE;
+        });
+      });
+
+      after(async () => {
+        await Promise.all([
+          archivist.recorder.snapshotsRepository.removeAll(),
+          archivist.recorder.versionsRepository.removeAll(),
+        ]);
+      });
+
+      context('while a tracking-results run is in progress', () => {
+        before(() => {
+          archivist.trackingResults = { currentRunId: RUN_ID }; // Faked at the boundary: only the run identity matters to the records
+        });
+
+        after(() => {
+          delete archivist.trackingResults;
+        });
+
+        it('ties the snapshot to the run through its metadata', async () => {
+          const snapshot = await archivist.recordSnapshot(terms, terms.sourceDocuments[0]);
+
+          expect(snapshot.metadata[RUN_ID_TRAILER_KEY]).to.equal(RUN_ID);
+        });
+
+        it('ties the version to the run through its metadata', async () => {
+          const version = await archivist.recordVersion(terms, 'content');
+
+          expect(version.metadata[RUN_ID_TRAILER_KEY]).to.equal(RUN_ID);
+        });
+      });
+
+      context('without an active tracking-results run', () => {
+        it('records no run id on the snapshot', async () => {
+          const snapshot = await archivist.recordSnapshot(terms, terms.sourceDocuments[0]);
+
+          expect(snapshot.metadata).to.not.have.property(RUN_ID_TRAILER_KEY);
+        });
+
+        it('records no run id on the version', async () => {
+          const version = await archivist.recordVersion(terms, 'content');
+
+          expect(version.metadata).to.not.have.property(RUN_ID_TRAILER_KEY);
+        });
       });
     });
 

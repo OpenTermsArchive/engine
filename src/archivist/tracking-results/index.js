@@ -17,6 +17,7 @@ import TrackingResultsRepository from './repository.js';
 import { STATUSES } from './terms-result/index.js';
 
 export { MissingCollectionIdError } from './errors.js';
+export { RUN_ID_TRAILER_KEY } from './recorder.js';
 
 const require = createRequire(import.meta.url);
 const { version: PACKAGE_VERSION } = require('../../../package.json');
@@ -69,6 +70,10 @@ export default class TrackingResults extends events.EventEmitter {
 
   get hasRunInProgress() {
     return Boolean(this.recorder.currentRun);
+  }
+
+  get currentRunId() {
+    return this.recorder.currentRun?.runId ?? null;
   }
 
   async getDeclarationsCommit() { // Meant to be called right before the declarations are loaded, so that the commit identifies the declarations applied by every run of this process, whatever happens to their repository afterwards
