@@ -247,4 +247,15 @@ describe('TrackingResults', () => {
       expect(subject.hasRunInProgress).to.be.true;
     });
   });
+
+  describe('#currentRunId', () => {
+    it('returns null when no run is in progress', () => {
+      expect(subject.currentRunId).to.be.null;
+    });
+
+    it('returns the id of the run in progress', () => {
+      recorder.currentRun = { runId: 'ota-run-f47ac10b-58cc-4372-a567-0e02b2c3d479' };
+      expect(subject.currentRunId).to.equal('ota-run-f47ac10b-58cc-4372-a567-0e02b2c3d479');
+    });
+  });
 });

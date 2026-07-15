@@ -12,7 +12,7 @@ import Version from './recorder/version.js';
 import * as services from './services/index.js';
 import Service from './services/service.js';
 import { MissingCollectionIdError } from './tracking-results/errors.js';
-import TrackingResults from './tracking-results/index.js';
+import TrackingResults, { RUN_ID_TRAILER_KEY } from './tracking-results/index.js';
 
 const require = createRequire(import.meta.url);
 const { version: PACKAGE_VERSION } = require('../../package.json');
@@ -398,6 +398,12 @@ export default class Archivist extends events.EventEmitter {
     return results.map(({ content }) => content);
   }
 
+  get runIdMetadata() { // Ties snapshots and versions to the tracking-results run that records them; empty outside an active run (module disabled, failed run start, technical upgrades) so the trailer is simply absent
+    const runId = this.trackingResults?.currentRunId;
+
+    return runId ? { [RUN_ID_TRAILER_KEY]: runId } : {};
+  }
+
   async recordVersion(terms, content, technicalUpgradeOnly) {
     const record = new Version({
       content,
@@ -406,7 +412,7 @@ export default class Archivist extends events.EventEmitter {
       termsType: terms.type,
       fetchDate: terms.fetchDate,
       isTechnicalUpgrade: technicalUpgradeOnly,
-      metadata: { 'x-engine-version': PACKAGE_VERSION },
+      metadata: { 'x-engine-version': PACKAGE_VERSION, ...this.runIdMetadata },
     });
 
     await this.recorder.record(record);
@@ -434,6 +440,7 @@ export default class Archivist extends events.EventEmitter {
         'x-engine-version': PACKAGE_VERSION,
         'x-fetcher': sourceDocument.fetcher,
         'x-source-document-location': sourceDocument.location,
+        ...this.runIdMetadata,
       },
     });
 

@@ -31,6 +31,8 @@ import TrackingResultsRecorder from './recorder.js';
 import TrackingResultsRepository from './repository.js';
 import { STATUSES } from './terms-result/index.js';
 
+export { RUN_ID_TRAILER_KEY } from './recorder.js';
+
 const require = createRequire(import.meta.url);
 const { version: PACKAGE_VERSION } = require('../../../package.json');
 
@@ -75,6 +77,10 @@ export default class TrackingResults extends events.EventEmitter {
 
   get hasRunInProgress() {
     return Boolean(this.recorder.currentRun);
+  }
+
+  get currentRunId() {
+    return this.recorder.currentRun?.runId ?? null;
   }
 
   async startRun({ services, selectedServicesIds, selectedTermsTypes }) {
