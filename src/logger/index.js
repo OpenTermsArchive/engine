@@ -5,7 +5,7 @@ import winston from 'winston';
 
 import { getCollection } from '../archivist/collection/index.js';
 
-import MailTransportWithRetry from './mail-transport-with-retry.js';
+import { createErrorMailTransports, handleTransportErrors } from './error-mail.js';
 import { formatDuration } from './utils.js';
 
 const { combine, timestamp, printf, colorize } = winston.format;
@@ -30,45 +30,15 @@ const alignedWithColorsAndTime = combine(
 
 const consoleTransport = new winston.transports.Console({ silent: process.env.NODE_ENV === 'test' });
 
-const transports = [consoleTransport];
+const transports = [
+  consoleTransport,
+  ...createErrorMailTransports({
+    formatter({ message, level }) {
+      const isError = level.includes('error');
+      const titleColor = isError ? '#dc3545' : '#ffc107';
+      const titleText = isError ? 'Error details' : 'Warning details';
 
-const logger = winston.createLogger({
-  format: alignedWithColorsAndTime,
-  transports,
-  rejectionHandlers: transports,
-  exitOnError: true,
-});
-
-logger.on('error', err => {
-  if ('smtp' in err) { // Check if err has an `smtp` property, even if it's undefined
-    logger.warn({ message: `Uncaught exception from SMTP mailer detected and treated as an operational error; process will continue running:\n${err.stack}` });
-
-    return; // Prevent process exit
-  }
-
-  return process.exit(1); // Exit process for other errors
-});
-
-if (config.get('@opentermsarchive/engine.logger.sendMailOnError')) {
-  if (process.env.OTA_ENGINE_SMTP_PASSWORD === undefined) {
-    logger.warn('Environment variable "OTA_ENGINE_SMTP_PASSWORD" was not found; log emails cannot be sent');
-  } else {
-    const mailerOptions = {
-      to: config.get('@opentermsarchive/engine.logger.sendMailOnError.to'),
-      from: config.get('@opentermsarchive/engine.logger.sendMailOnError.from'),
-      host: config.get('@opentermsarchive/engine.logger.smtp.host'),
-      port: config.get('@opentermsarchive/engine.logger.smtp.port'),
-      username: config.get('@opentermsarchive/engine.logger.smtp.username'),
-      password: process.env.OTA_ENGINE_SMTP_PASSWORD,
-      tls: true,
-      timeout: 60 * 1000,
-      html: false,
-      formatter({ message, level }) {
-        const isError = level.includes('error');
-        const titleColor = isError ? '#dc3545' : '#ffc107';
-        const titleText = isError ? 'Error details' : 'Warning details';
-
-        return `
+      return `
           <!DOCTYPE html>
           <html lang="en">
             <head>
@@ -139,30 +109,20 @@ if (config.get('@opentermsarchive/engine.logger.sendMailOnError')) {
             </body>
           </html>
         `;
-      },
-    };
+    },
+    subject: `Server error on ${collection.id} collection`,
+    warningSubject: `Inaccessible content on ${collection.id} collection`,
+  }),
+];
 
-    transports.push(new MailTransportWithRetry({
-      ...mailerOptions,
-      level: 'error',
-      subject: `Server error on ${collection.id} collection`,
-    }));
-
-    if (config.get('@opentermsarchive/engine.logger.sendMailOnError.sendWarnings')) {
-      transports.push(new MailTransportWithRetry({
-        ...mailerOptions,
-        level: 'warn',
-        subject: `Inaccessible content on ${collection.id} collection`,
-      }));
-    }
-  }
-}
-
-logger.configure({
+const logger = winston.createLogger({
+  format: alignedWithColorsAndTime,
   transports,
   rejectionHandlers: transports,
   exitOnError: true,
 });
+
+handleTransportErrors(logger);
 
 let recordedSnapshotsCount;
 let recordedVersionsCount;
