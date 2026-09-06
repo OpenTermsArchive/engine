@@ -51,6 +51,53 @@ describe('exposedFilters', () => {
       });
     });
 
+    describe('with default parameters', () => {
+      let link;
+      const trackingParams = [
+        'fbclid',
+        'gclid',
+        'msclkid',
+        'mc_eid',
+        'dclid',
+        'oly_anon_id',
+        'oly_enc_id',
+        '_openstat',
+        'vero_conv',
+        'vero_id',
+        'wickedid',
+        'yclid',
+        '__s',
+        'rb_clickid',
+        's_cid',
+        'ml_subscriber',
+        'ml_subscriber_hash',
+        '_hsenc',
+        '__hssc',
+        '__hstc',
+        '__hsfp',
+        'hsCtaTracking',
+        'mkt_tok',
+      ];
+
+      before(() => {
+        const query = [ ...trackingParams.map(param => `${param}=tracking`), 'keep=value' ].join('&');
+
+        link = webPageDOM.createElement('a');
+        link.setAttribute('href', `https://example.com/page?${query}`);
+        webPageDOM.body.appendChild(link);
+      });
+
+      after(() => {
+        link.remove();
+      });
+
+      it('removes well-known tracking parameters', () => {
+        removeQueryParams(webPageDOM);
+
+        expect(link.getAttribute('href')).to.equal('https://example.com/page?keep=value');
+      });
+    });
+
     describe('with string parameter', () => {
       let link;
 

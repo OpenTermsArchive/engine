@@ -1,5 +1,40 @@
-export function removeQueryParams(webPageDOM, paramsToRemove = []) {
-  const normalizedParams = Array.isArray(paramsToRemove) ? paramsToRemove : [paramsToRemove];
+// PrivacyTests tracking-query set at dda473a462e5c37f9f2c8b2367fbc5f834796be4.
+// Keep explicit filter parameters authoritative; this list applies only when a
+// declaration enables removeQueryParams without configuration.
+const DEFAULT_TRACKING_QUERY_PARAMS = Object.freeze([
+  'fbclid',
+  'gclid',
+  'msclkid',
+  'mc_eid',
+  'dclid',
+  'oly_anon_id',
+  'oly_enc_id',
+  '_openstat',
+  'vero_conv',
+  'vero_id',
+  'wickedid',
+  'yclid',
+  '__s',
+  'rb_clickid',
+  's_cid',
+  'ml_subscriber',
+  'ml_subscriber_hash',
+  '_hsenc',
+  '__hssc',
+  '__hstc',
+  '__hsfp',
+  'hsCtaTracking',
+  'mkt_tok',
+]);
+
+export function removeQueryParams(webPageDOM, paramsToRemove) {
+  let normalizedParams = DEFAULT_TRACKING_QUERY_PARAMS;
+
+  if (Array.isArray(paramsToRemove)) {
+    normalizedParams = paramsToRemove;
+  } else if (typeof paramsToRemove === 'string') {
+    normalizedParams = [paramsToRemove];
+  }
 
   if (!normalizedParams.length) {
     return;

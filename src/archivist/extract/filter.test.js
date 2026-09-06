@@ -1,6 +1,7 @@
 import { expect } from 'chai';
 
 import createWebPageDOM from './dom.js';
+import { removeQueryParams } from './exposedFilters.js';
 import filter from './filter.js';
 
 const delay = ms => new Promise(resolve => { setTimeout(resolve, ms); });
@@ -95,6 +96,19 @@ describe('Filter', () => {
         await filter(webPageDOM, sourceDocument);
 
         expect(webPageDOM.querySelector('.custom-content').innerHTML).to.equal('Async content');
+      });
+
+      it('applies built-in filter defaults when passed the filter context', async () => {
+        const link = webPageDOM.createElement('a');
+
+        link.setAttribute('href', 'https://example.com/page?fbclid=tracking&keep=value');
+        webPageDOM.body.appendChild(link);
+        sourceDocument.filters = [removeQueryParams];
+
+        await filter(webPageDOM, sourceDocument);
+
+        expect(link.getAttribute('href')).to.equal('https://example.com/page?keep=value');
+        link.remove();
       });
 
       it('throws error on filter failure', async () => {
