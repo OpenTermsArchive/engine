@@ -3,6 +3,7 @@ import { js2xml } from 'xml-js';
 
 import { getCollection } from '../../archivist/collection/index.js';
 import { toISODateWithoutMilliseconds } from '../../archivist/utils/date.js';
+import { buildAbsoluteBaseUrl } from '../utils/url.js';
 
 const RECORD_TYPES = {
   firstRecord: 'First record',
@@ -17,12 +18,6 @@ const SCHEMES = Object.freeze({
   termsType: `tag:${TAG_AUTHORITY}:scheme:terms-type`,
   recordType: `tag:${TAG_AUTHORITY}:scheme:record-type`,
 });
-
-function buildAbsoluteBaseUrl(req) {
-  const host = req.get('X-Forwarded-Host') ?? req.get('host'); // Behind a trusted reverse proxy, the public host comes from X-Forwarded-Host. req.get('host') only sees the internal Host header, so we read the forwarded value explicitly and fall back to the direct host for non-proxied setups (dev, tests).
-
-  return `${req.protocol}://${host}${req.baseUrl}`;
-}
 
 function classifyRecordType(version) {
   return version.isFirstRecord ? RECORD_TYPES.firstRecord : RECORD_TYPES.change;
