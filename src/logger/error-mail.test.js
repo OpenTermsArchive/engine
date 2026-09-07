@@ -22,11 +22,13 @@ const SEND_MAIL_ON_ERROR = {
 describe('Error mail', () => {
   let configValues;
   let originalPassword;
+  let originalEnvironment;
   let consoleWarnStub;
   let consoleErrorStub;
 
   before(() => {
     originalPassword = process.env.OTA_ENGINE_SMTP_PASSWORD;
+    originalEnvironment = process.env.NODE_ENV;
   });
 
   after(() => {
@@ -35,6 +37,7 @@ describe('Error mail', () => {
     } else {
       process.env.OTA_ENGINE_SMTP_PASSWORD = originalPassword;
     }
+    process.env.NODE_ENV = originalEnvironment;
   });
 
   beforeEach(() => {
@@ -48,6 +51,7 @@ describe('Error mail', () => {
       '@opentermsarchive/engine.logger.smtp.username': 'user',
     };
     sinon.stub(config, 'get').callsFake(key => configValues[key]);
+    process.env.NODE_ENV = 'production';
     consoleWarnStub = sinon.stub(console, 'warn');
     consoleErrorStub = sinon.stub(console, 'error');
     process.env.OTA_ENGINE_SMTP_PASSWORD = 'secret';
@@ -239,6 +243,37 @@ describe('Error mail', () => {
           it('omits the command to connect to the server', () => {
             expect(body).to.not.include('ssh ');
           });
+        });
+      });
+
+      context('outside production', () => {
+        beforeEach(() => {
+          process.env.NODE_ENV = 'staging';
+          configValues['@opentermsarchive/engine.logger.sendMailOnError.sendWarnings'] = true;
+          transports = createErrorMailTransports({ collection, component, subject, warningSubject });
+        });
+
+        it('prefixes the error subject with the environment', () => {
+          expect(transports[0].mailTransport.subject).to.equal(`[staging] ${subject}`);
+        });
+
+        it('prefixes the warning subject with the environment', () => {
+          expect(transports[1].mailTransport.subject).to.equal(`[staging] ${warningSubject}`);
+        });
+
+        it('prefixes the title of the body with the environment', () => {
+          expect(transports[0].mailTransport.formatter({ message: 'Error', level: 'error' })).to.include(`[staging] Open Terms Archive ${component} error report`);
+        });
+      });
+
+      context('when the environment is not defined', () => {
+        beforeEach(() => {
+          delete process.env.NODE_ENV;
+          transports = createErrorMailTransports({ collection, component, subject, warningSubject });
+        });
+
+        it('prefixes the subject with the development environment', () => {
+          expect(transports[0].mailTransport.subject).to.equal(`[development] ${subject}`);
         });
       });
     });

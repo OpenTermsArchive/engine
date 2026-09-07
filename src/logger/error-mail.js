@@ -8,7 +8,7 @@ const SMTP_TIMEOUT = 60 * 1000;
 
 const escapeHtml = text => String(text).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
-function formatBody({ collection, component }, { message, level }) {
+function formatBody({ collection, component, environmentPrefix }, { message, level }) {
   const isError = level.includes('error');
   const titleColor = isError ? '#dc3545' : '#ffc107';
   const titleText = isError ? 'Error details' : 'Warning details';
@@ -23,7 +23,7 @@ function formatBody({ collection, component }, { message, level }) {
               <title>OTA Error Report</title>
             </head>
             <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; color: #333333; max-width: 800px; margin: 0 auto; padding: 0px 20px 20px 20px;">
-              <h1 style="color: #212529; font-size: 24px; margin: 10px 0; text-align: center; padding-bottom: 10px;">Open Terms Archive ${component} error report — ${collection.name} Collection</h1>
+              <h1 style="color: #212529; font-size: 24px; margin: 10px 0; text-align: center; padding-bottom: 10px;">${environmentPrefix}Open Terms Archive ${component} error report — ${collection.name} Collection</h1>
               
               <div style="background-color: #f8f9fa; border-radius: 8px; padding: 15px; margin-bottom: 0;">
                 <h2 style="color: ${titleColor}; margin: 0 0 0 0; font-size: 20px; border-bottom: 2px solid ${titleColor}; padding-bottom: 8px;">${titleText}</h2>
@@ -97,6 +97,9 @@ export function createErrorMailTransports({ collection, component, subject, warn
     return [];
   }
 
+  const environment = process.env.NODE_ENV || 'development'; // Same default as node-config, so the prefix matches the loaded configuration
+  const environmentPrefix = environment == 'production' ? '' : `[${environment}] `; // Make emails sent from a developer machine recognisable at a glance
+
   const mailerOptions = {
     to: config.get('@opentermsarchive/engine.logger.sendMailOnError.to'),
     from: config.get('@opentermsarchive/engine.logger.sendMailOnError.from'),
@@ -107,14 +110,14 @@ export function createErrorMailTransports({ collection, component, subject, warn
     tls: true,
     timeout: SMTP_TIMEOUT,
     html: true,
-    formatter: info => formatBody({ collection, component }, info),
+    formatter: info => formatBody({ collection, component, environmentPrefix }, info),
     handleRejections: true,
   };
 
-  const transports = [new MailTransportWithRetry({ ...mailerOptions, level: 'error', subject })];
+  const transports = [new MailTransportWithRetry({ ...mailerOptions, level: 'error', subject: `${environmentPrefix}${subject}` })];
 
   if (warningSubject && config.get('@opentermsarchive/engine.logger.sendMailOnError.sendWarnings')) { // Only callers providing a subject for warnings can send them
-    transports.push(new MailTransportWithRetry({ ...mailerOptions, level: 'warn', subject: warningSubject }));
+    transports.push(new MailTransportWithRetry({ ...mailerOptions, level: 'warn', subject: `${environmentPrefix}${warningSubject}` }));
   }
 
   return transports;
