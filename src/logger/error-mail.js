@@ -25,6 +25,7 @@ export function createErrorMailTransports({ formatter, subject, warningSubject }
     tls: true,
     timeout: SMTP_TIMEOUT,
     formatter,
+    handleRejections: true,
   };
 
   const transports = [new MailTransportWithRetry({ ...mailerOptions, level: 'error', subject })];
