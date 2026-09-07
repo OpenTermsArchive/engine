@@ -6,6 +6,8 @@ import MailTransportWithRetry from './mail-transport-with-retry.js';
 
 const SMTP_TIMEOUT = 60 * 1000;
 
+const escapeHtml = text => String(text).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
 function formatBody({ collection }, { message, level }) {
   const isError = level.includes('error');
   const titleColor = isError ? '#dc3545' : '#ffc107';
@@ -26,7 +28,7 @@ function formatBody({ collection }, { message, level }) {
               <div style="background-color: #f8f9fa; border-radius: 8px; padding: 15px; margin-bottom: 0;">
                 <h2 style="color: ${titleColor}; margin: 0 0 0 0; font-size: 20px; border-bottom: 2px solid ${titleColor}; padding-bottom: 8px;">${titleText}</h2>
                 <div style="background-color: #ffffff; border: 1px solid #dee2e6; border-radius: 4px; padding: 12px; margin: 8px 0;">
-                  <code style="maring: 0; font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace; font-size: 14px; color: #212529; white-space: pre-wrap; display: block;">${message}</code>
+                  <code style="maring: 0; font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace; font-size: 14px; color: #212529; white-space: pre-wrap; display: block;">${escapeHtml(message)}</code>
                 </div>
               </div>
 
