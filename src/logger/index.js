@@ -28,7 +28,7 @@ const alignedWithColorsAndTime = combine(
   }),
 );
 
-const consoleTransport = new winston.transports.Console({ silent: process.env.NODE_ENV === 'test' });
+const consoleTransport = new winston.transports.Console({ silent: process.env.NODE_ENV === 'test', handleRejections: true });
 
 const transports = [
   consoleTransport,
@@ -118,7 +118,6 @@ const transports = [
 const logger = winston.createLogger({
   format: alignedWithColorsAndTime,
   transports,
-  rejectionHandlers: transports,
   exitOnError: true,
 });
 
