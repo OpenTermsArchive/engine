@@ -104,6 +104,7 @@ export function createErrorMailTransports({ collection, subject, warningSubject 
     password: process.env.OTA_ENGINE_SMTP_PASSWORD,
     tls: true,
     timeout: SMTP_TIMEOUT,
+    html: true,
     formatter: info => formatBody({ collection }, info),
     handleRejections: true,
   };

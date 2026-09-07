@@ -129,6 +129,10 @@ describe('Error mail', () => {
           expect(transports[0].mailTransport.from).to.equal(SEND_MAIL_ON_ERROR.from);
         });
 
+        it('sends HTML emails', () => {
+          expect(transports[0].mailTransport.html).to.be.true;
+        });
+
         it('handles unhandled rejections', () => {
           expect(transports[0].handleRejections).to.be.true;
         });
