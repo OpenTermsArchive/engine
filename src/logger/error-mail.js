@@ -38,8 +38,8 @@ export function createErrorMailTransports({ formatter, subject, warningSubject }
 }
 
 export function handleTransportErrors(logger) {
-  logger.on('error', err => {
-    if ('smtp' in err) { // Check if err has an `smtp` property, even if it's undefined
+  logger.on('error', (err, transport) => {
+    if (transport instanceof MailTransportWithRetry) {
       console.warn(`Uncaught exception from SMTP mailer detected and treated as an operational error; process will continue running:\n${err.stack}`); // Reported on the console rather than through the logger, which would send this warning back to the failing mailer
 
       return; // Prevent process exit
