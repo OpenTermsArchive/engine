@@ -1,4 +1,5 @@
 import { EventEmitter } from 'node:events';
+import os from 'node:os';
 
 import { expect, use } from 'chai';
 import config from 'config';
@@ -57,7 +58,12 @@ describe('Error mail', () => {
   });
 
   describe('#createErrorMailTransports', () => {
-    const formatter = ({ message }) => message;
+    const collection = {
+      id: 'test',
+      name: 'Test',
+      host: '203.0.113.1',
+      hostConfig: { ansible_user: 'ota' },
+    };
     const subject = 'Error on test collection';
     const warningSubject = 'Warning on test collection';
 
@@ -67,11 +73,11 @@ describe('Error mail', () => {
       });
 
       it('returns no transport', () => {
-        expect(createErrorMailTransports({ formatter, subject, warningSubject })).to.be.empty;
+        expect(createErrorMailTransports({ collection, subject, warningSubject })).to.be.empty;
       });
 
       it('does not warn', () => {
-        createErrorMailTransports({ formatter, subject, warningSubject });
+        createErrorMailTransports({ collection, subject, warningSubject });
 
         expect(consoleWarnStub).to.not.have.been.called;
       });
@@ -83,11 +89,11 @@ describe('Error mail', () => {
       });
 
       it('returns no transport', () => {
-        expect(createErrorMailTransports({ formatter, subject, warningSubject })).to.be.empty;
+        expect(createErrorMailTransports({ collection, subject, warningSubject })).to.be.empty;
       });
 
       it('warns that emails cannot be sent', () => {
-        createErrorMailTransports({ formatter, subject, warningSubject });
+        createErrorMailTransports({ collection, subject, warningSubject });
 
         expect(consoleWarnStub).to.have.been.calledOnce;
         expect(consoleWarnStub.firstCall.args[0]).to.include('OTA_ENGINE_SMTP_PASSWORD');
@@ -99,7 +105,7 @@ describe('Error mail', () => {
 
       context('without warnings', () => {
         beforeEach(() => {
-          transports = createErrorMailTransports({ formatter, subject, warningSubject });
+          transports = createErrorMailTransports({ collection, subject, warningSubject });
         });
 
         it('returns a single transport', () => {
@@ -123,10 +129,6 @@ describe('Error mail', () => {
           expect(transports[0].mailTransport.from).to.equal(SEND_MAIL_ON_ERROR.from);
         });
 
-        it('uses the given formatter', () => {
-          expect(transports[0].mailTransport.formatter).to.equal(formatter);
-        });
-
         it('handles unhandled rejections', () => {
           expect(transports[0].handleRejections).to.be.true;
         });
@@ -135,7 +137,7 @@ describe('Error mail', () => {
       context('with warnings enabled and a subject for them', () => {
         beforeEach(() => {
           configValues['@opentermsarchive/engine.logger.sendMailOnError.sendWarnings'] = true;
-          transports = createErrorMailTransports({ formatter, subject, warningSubject });
+          transports = createErrorMailTransports({ collection, subject, warningSubject });
         });
 
         it('returns two transports', () => {
@@ -154,7 +156,7 @@ describe('Error mail', () => {
       context('with warnings enabled but no subject for them', () => {
         beforeEach(() => {
           configValues['@opentermsarchive/engine.logger.sendMailOnError.sendWarnings'] = true;
-          transports = createErrorMailTransports({ formatter, subject });
+          transports = createErrorMailTransports({ collection, subject });
         });
 
         it('returns the error transport only', () => {
@@ -165,12 +167,68 @@ describe('Error mail', () => {
 
       context('with a subject for warnings but warnings disabled', () => {
         beforeEach(() => {
-          transports = createErrorMailTransports({ formatter, subject, warningSubject });
+          transports = createErrorMailTransports({ collection, subject, warningSubject });
         });
 
         it('returns the error transport only', () => {
           expect(transports).to.have.lengthOf(1);
           expect(transports[0].level).to.equal('error');
+        });
+      });
+
+      context('email body', () => {
+        let formatter;
+        let body;
+
+        beforeEach(() => {
+          [{ mailTransport: { formatter } }] = createErrorMailTransports({ collection, subject, warningSubject });
+        });
+
+        context('for an error', () => {
+          beforeEach(() => {
+            body = formatter({ message: 'Error: <boom> & co', level: 'error' });
+          });
+
+          it('is titled as an error', () => {
+            expect(body).to.include('Error details');
+          });
+
+          it('includes the message', () => {
+            expect(body).to.include('Error: <boom> & co');
+          });
+
+          it('names the collection', () => {
+            expect(body).to.include(`${collection.name} Collection`);
+          });
+
+          it('includes the hostname', () => {
+            expect(body).to.include(os.hostname());
+          });
+
+          it('includes the command to connect to the server', () => {
+            expect(body).to.include(`ssh ${collection.hostConfig.ansible_user}@${collection.host}`);
+          });
+        });
+
+        context('for a warning', () => {
+          beforeEach(() => {
+            body = formatter({ message: 'Inaccessible content', level: 'warn' });
+          });
+
+          it('is titled as a warning', () => {
+            expect(body).to.include('Warning details');
+          });
+        });
+
+        context('when the collection has no deployment inventory', () => {
+          beforeEach(() => {
+            [{ mailTransport: { formatter } }] = createErrorMailTransports({ collection: { id: 'test', name: 'Test' }, subject, warningSubject });
+            body = formatter({ message: 'Error', level: 'error' });
+          });
+
+          it('omits the command to connect to the server', () => {
+            expect(body).to.not.include('ssh ');
+          });
         });
       });
     });

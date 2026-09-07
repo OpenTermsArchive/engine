@@ -1,5 +1,3 @@
-import os from 'os';
-
 import config from 'config';
 import dotenv from 'dotenv';
 import winston from 'winston';
@@ -16,7 +14,7 @@ const collection = await getCollection();
 const transports = [
   new winston.transports.Console({ handleRejections: true }),
   ...createErrorMailTransports({
-    formatter: ({ message }) => `${message}\n\nHostname: ${os.hostname()}`, // The raw message, without the timestamp and colorised level added by the console format
+    collection,
     subject: `API error on ${collection.id} collection`,
   }),
 ];
