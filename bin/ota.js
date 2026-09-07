@@ -14,6 +14,6 @@ program
   .command('apply-technical-upgrades', 'Apply technical upgrades by generating new versions from the latest snapshots using updated declarations, engine logic, or dependencies')
   .command('validate', 'Run a series of tests to check the validity of terms declarations')
   .command('lint', 'Check format and stylistic errors in declarations and auto fix them')
-  .command('dataset', 'Export the versions dataset into a ZIP file and optionally publish it to GitHub releases')
+  .command('dataset', 'Export the versions dataset into a ZIP file stored locally and optionally publish it to GitHub releases, GitLab releases, or data.gouv.fr')
   .command('serve', 'Start the collection metadata API server')
   .parse(process.argv);
