@@ -1,3 +1,4 @@
+import { createHash } from 'crypto';
 import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -46,6 +47,7 @@ describe('Export', () => {
     const EXPECTED_DATASET_PATH = path.resolve(__dirname, './test/fixtures/dataset');
 
     let repository;
+    let stats;
     let zip;
 
     before(async function () {
@@ -89,7 +91,7 @@ describe('Export', () => {
         snapshotId: SNAPSHOT_ID,
       }));
 
-      await generateArchive({
+      stats = await generateArchive({
         archivePath: ARCHIVE_PATH,
         releaseDate: new Date(RELEASE_DATE),
       });
@@ -112,6 +114,36 @@ describe('Export', () => {
 
     it('has the proper contents', () => {
       expect(`${TMP_PATH}/${ARCHIVE_NAME}`).to.have.sameContentAs(EXPECTED_DATASET_PATH);
+    });
+
+    describe('returned stats', () => {
+      it('count the services', () => {
+        expect(stats.servicesCount).to.equal(2);
+      });
+
+      it('count the distinct terms', () => {
+        expect(stats.termsCount).to.equal(3);
+      });
+
+      it('count the versions', () => {
+        expect(stats.versionsCount).to.equal(4);
+      });
+
+      it('expose the first version date', () => {
+        expect(stats.firstVersionDate).to.deep.equal(new Date(FIRST_FETCH_DATE));
+      });
+
+      it('expose the last version date', () => {
+        expect(stats.lastVersionDate).to.deep.equal(new Date(THIRD_FETCH_DATE));
+      });
+
+      it('expose the archive size in bytes', async () => {
+        expect(stats.size).to.equal((await fs.stat(ARCHIVE_PATH)).size);
+      });
+
+      it('expose the archive SHA-256 checksum', async () => {
+        expect(stats.sha256).to.equal(createHash('sha256').update(await fs.readFile(ARCHIVE_PATH)).digest('hex'));
+      });
     });
   });
 
