@@ -64,6 +64,7 @@ describe('Error mail', () => {
       host: '203.0.113.1',
       hostConfig: { ansible_user: 'ota' },
     };
+    const component = 'test component';
     const subject = 'Error on test collection';
     const warningSubject = 'Warning on test collection';
 
@@ -73,11 +74,11 @@ describe('Error mail', () => {
       });
 
       it('returns no transport', () => {
-        expect(createErrorMailTransports({ collection, subject, warningSubject })).to.be.empty;
+        expect(createErrorMailTransports({ collection, component, subject, warningSubject })).to.be.empty;
       });
 
       it('does not warn', () => {
-        createErrorMailTransports({ collection, subject, warningSubject });
+        createErrorMailTransports({ collection, component, subject, warningSubject });
 
         expect(consoleWarnStub).to.not.have.been.called;
       });
@@ -89,11 +90,11 @@ describe('Error mail', () => {
       });
 
       it('returns no transport', () => {
-        expect(createErrorMailTransports({ collection, subject, warningSubject })).to.be.empty;
+        expect(createErrorMailTransports({ collection, component, subject, warningSubject })).to.be.empty;
       });
 
       it('warns that emails cannot be sent', () => {
-        createErrorMailTransports({ collection, subject, warningSubject });
+        createErrorMailTransports({ collection, component, subject, warningSubject });
 
         expect(consoleWarnStub).to.have.been.calledOnce;
         expect(consoleWarnStub.firstCall.args[0]).to.include('OTA_ENGINE_SMTP_PASSWORD');
@@ -105,7 +106,7 @@ describe('Error mail', () => {
 
       context('without warnings', () => {
         beforeEach(() => {
-          transports = createErrorMailTransports({ collection, subject, warningSubject });
+          transports = createErrorMailTransports({ collection, component, subject, warningSubject });
         });
 
         it('returns a single transport', () => {
@@ -141,7 +142,7 @@ describe('Error mail', () => {
       context('with warnings enabled and a subject for them', () => {
         beforeEach(() => {
           configValues['@opentermsarchive/engine.logger.sendMailOnError.sendWarnings'] = true;
-          transports = createErrorMailTransports({ collection, subject, warningSubject });
+          transports = createErrorMailTransports({ collection, component, subject, warningSubject });
         });
 
         it('returns two transports', () => {
@@ -160,7 +161,7 @@ describe('Error mail', () => {
       context('with warnings enabled but no subject for them', () => {
         beforeEach(() => {
           configValues['@opentermsarchive/engine.logger.sendMailOnError.sendWarnings'] = true;
-          transports = createErrorMailTransports({ collection, subject });
+          transports = createErrorMailTransports({ collection, component, subject });
         });
 
         it('returns the error transport only', () => {
@@ -171,7 +172,7 @@ describe('Error mail', () => {
 
       context('with a subject for warnings but warnings disabled', () => {
         beforeEach(() => {
-          transports = createErrorMailTransports({ collection, subject, warningSubject });
+          transports = createErrorMailTransports({ collection, component, subject, warningSubject });
         });
 
         it('returns the error transport only', () => {
@@ -185,7 +186,7 @@ describe('Error mail', () => {
         let body;
 
         beforeEach(() => {
-          [{ mailTransport: { formatter } }] = createErrorMailTransports({ collection, subject, warningSubject });
+          [{ mailTransport: { formatter } }] = createErrorMailTransports({ collection, component, subject, warningSubject });
         });
 
         context('for an error', () => {
@@ -204,6 +205,10 @@ describe('Error mail', () => {
 
           it('names the collection', () => {
             expect(body).to.include(`${collection.name} Collection`);
+          });
+
+          it('names the component', () => {
+            expect(body).to.include(`Open Terms Archive ${component} error report`);
           });
 
           it('includes the hostname', () => {
@@ -227,7 +232,7 @@ describe('Error mail', () => {
 
         context('when the collection has no deployment inventory', () => {
           beforeEach(() => {
-            [{ mailTransport: { formatter } }] = createErrorMailTransports({ collection: { id: 'test', name: 'Test' }, subject, warningSubject });
+            [{ mailTransport: { formatter } }] = createErrorMailTransports({ collection: { id: 'test', name: 'Test' }, component, subject, warningSubject });
             body = formatter({ message: 'Error', level: 'error' });
           });
 
