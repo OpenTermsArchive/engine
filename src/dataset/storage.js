@@ -43,6 +43,15 @@ export default class DatasetStorage {
 
     await fs.writeFile(temporaryPath, JSON.stringify(metadata, null, 2));
     await fs.rename(temporaryPath, this.metadataPath); // Readers see either the previous or the new metadata, never a partial file
+  }
+
+  async removePreviousArchives() {
+    const metadata = await this.findLatest();
+
+    if (!metadata) {
+      return;
+    }
+
     await this.#removeArchivesExcept(metadata.filename);
   }
 

@@ -4,6 +4,7 @@ import { fileURLToPath } from 'url';
 
 import { expect, use } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
+import sinon from 'sinon';
 
 import DatasetStorage, { TEMPORARY_SUFFIX } from './storage.js';
 
@@ -70,6 +71,17 @@ describe('DatasetStorage', () => {
       });
     });
 
+    context('when the metadata file is corrupted', () => {
+      beforeEach(async () => {
+        await fs.mkdir(TMP_PATH, { recursive: true });
+        await fs.writeFile(storage.metadataPath, '{ not json');
+      });
+
+      it('rejects', async () => {
+        await expect(storage.findLatest()).to.be.rejected;
+      });
+    });
+
     context('when the metadata file and the archive exist', () => {
       beforeEach(async () => {
         await fs.mkdir(TMP_PATH, { recursive: true });
@@ -104,9 +116,6 @@ describe('DatasetStorage', () => {
       beforeEach(async () => {
         await fs.mkdir(TMP_PATH, { recursive: true });
         await fs.writeFile(storage.archivePath(ARCHIVE_FILENAME), 'archive content');
-        await fs.writeFile(storage.archivePath(PREVIOUS_ARCHIVE_FILENAME), 'previous archive');
-        await fs.writeFile(storage.archivePath(INTERRUPTED_ARCHIVE_FILENAME), 'interrupted archive');
-        await fs.writeFile(storage.archivePath(UNRELATED_FILENAME), 'unrelated content');
         await storage.save(METADATA);
       });
 
@@ -121,6 +130,35 @@ describe('DatasetStorage', () => {
       it('keeps the archive', async () => {
         await expect(fs.access(storage.archivePath(ARCHIVE_FILENAME))).to.be.fulfilled;
       });
+    });
+  });
+
+  describe('#removePreviousArchives', () => {
+    context('when no metadata exists', () => {
+      beforeEach(async () => {
+        await fs.mkdir(TMP_PATH, { recursive: true });
+      });
+
+      it('does nothing', async () => {
+        await expect(storage.removePreviousArchives()).to.be.fulfilled;
+      });
+    });
+
+    context('when metadata exists', () => {
+      beforeEach(async () => {
+        await fs.mkdir(TMP_PATH, { recursive: true });
+        await fs.writeFile(storage.archivePath(ARCHIVE_FILENAME), 'archive content');
+        await fs.writeFile(storage.archivePath(PREVIOUS_ARCHIVE_FILENAME), 'previous archive');
+        await fs.writeFile(storage.archivePath(INTERRUPTED_ARCHIVE_FILENAME), 'interrupted archive');
+        await fs.writeFile(storage.archivePath(UNRELATED_FILENAME), 'unrelated content');
+        await fs.writeFile(storage.metadataPath, JSON.stringify(METADATA));
+
+        await storage.removePreviousArchives();
+      });
+
+      it('keeps the current archive', async () => {
+        await expect(fs.access(storage.archivePath(ARCHIVE_FILENAME))).to.be.fulfilled;
+      });
 
       it('removes previous archives', async () => {
         await expect(fs.access(storage.archivePath(PREVIOUS_ARCHIVE_FILENAME))).to.be.rejected;
@@ -132,6 +170,25 @@ describe('DatasetStorage', () => {
 
       it('keeps unrelated files', async () => {
         await expect(fs.access(storage.archivePath(UNRELATED_FILENAME))).to.be.fulfilled;
+      });
+    });
+
+    context('when a previous archive fails to be removed', () => {
+      beforeEach(async () => {
+        await fs.mkdir(TMP_PATH, { recursive: true });
+        await fs.writeFile(storage.archivePath(ARCHIVE_FILENAME), 'archive content');
+        await fs.writeFile(storage.archivePath(PREVIOUS_ARCHIVE_FILENAME), 'previous archive');
+        await fs.writeFile(storage.metadataPath, JSON.stringify(METADATA));
+
+        sinon.stub(fs, 'rm').rejects(new Error('Permission denied'));
+      });
+
+      after(() => {
+        sinon.restore();
+      });
+
+      it('rejects', async () => {
+        await expect(storage.removePreviousArchives()).to.be.rejected;
       });
     });
   });
