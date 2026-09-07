@@ -3,17 +3,22 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 
 import { expect, use } from 'chai';
+import chaiAsPromised from 'chai-as-promised';
 import config from 'config';
 import dircompare from 'dir-compare';
 import mime from 'mime';
 import StreamZip from 'node-stream-zip';
+import sinon from 'sinon';
 
 import GitRepository from '../../../src/archivist/recorder/repositories/git/index.js';
 import Version from '../../../src/archivist/recorder/version.js';
+import { TEMPORARY_SUFFIX } from '../../../src/dataset/storage.js';
 
 import generateArchive from './index.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+use(chaiAsPromised);
 
 const FIRST_SERVICE_PROVIDER_ID = 'ServiceA';
 const SECOND_SERVICE_PROVIDER_ID = 'ServiceB';
@@ -107,6 +112,41 @@ describe('Export', () => {
 
     it('has the proper contents', () => {
       expect(`${TMP_PATH}/${ARCHIVE_NAME}`).to.have.sameContentAs(EXPECTED_DATASET_PATH);
+    });
+  });
+
+  context('when the generation fails', () => {
+    const TMP_PATH = path.resolve(__dirname, './tmp');
+    const FAILING_ARCHIVE_PATH = path.resolve(TMP_PATH, 'failing-dataset.zip');
+
+    let error;
+
+    before(async function () {
+      this.timeout(10000);
+      sinon.stub(GitRepository.prototype, 'iterate').throws(new Error('Repository failure'));
+
+      try {
+        await generateArchive({ archivePath: FAILING_ARCHIVE_PATH, releaseDate: new Date(RELEASE_DATE) });
+      } catch (generationError) {
+        error = generationError;
+      }
+    });
+
+    after(async () => {
+      sinon.restore();
+      await fs.rm(TMP_PATH, { recursive: true, force: true });
+    });
+
+    it('rejects with the underlying error', () => {
+      expect(error).to.be.an('error').with.property('message', 'Repository failure');
+    });
+
+    it('leaves no archive at the target path', async () => {
+      await expect(fs.access(FAILING_ARCHIVE_PATH)).to.be.rejected;
+    });
+
+    it('leaves no temporary file', async () => {
+      await expect(fs.access(`${FAILING_ARCHIVE_PATH}${TEMPORARY_SUFFIX}`)).to.be.rejected;
     });
   });
 });
