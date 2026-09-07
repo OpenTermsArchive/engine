@@ -45,6 +45,8 @@ export function handleTransportErrors(logger) {
       return; // Prevent process exit
     }
 
+    console.error(err); // Registering a listener stops Node from printing the error itself; print it before exiting so the cause stays in the logs
+
     return process.exit(1); // Exit process for other errors
   });
 }
