@@ -5,7 +5,9 @@ import helmet from 'helmet';
 import { getCollection } from '../../archivist/collection/index.js';
 import RepositoryFactory from '../../archivist/recorder/repositories/factory.js';
 import * as Services from '../../archivist/services/index.js';
+import DatasetStorage from '../../dataset/storage.js';
 
+import datasetRouter from './dataset.js';
 import docsRouter from './docs.js';
 import feedRouter from './feed.js';
 import metadataRouter from './metadata.js';
@@ -40,6 +42,7 @@ export default async function apiRouter(basePath) {
   const versionsRepository = await RepositoryFactory.create(versionsStorageConfig).initialize();
   const snapshotsRepository = await RepositoryFactory.create(config.get('@opentermsarchive/engine.recorder.snapshots.storage')).initialize();
   const feedConfig = config.get('@opentermsarchive/engine.collection-api.feed');
+  const datasetStorage = new DatasetStorage(config.get('@opentermsarchive/engine.dataset.storagePath'));
 
   if (!collection.metadata?.id) {
     throw new Error('Collection metadata "id" is required to expose feed endpoints, as it is used to build the tag URIs that uniquely identify the feed and its entries. Add an "id" field to the collection metadata file.');
@@ -53,6 +56,7 @@ export default async function apiRouter(basePath) {
   router.use(servicesRouter(services));
   router.use(versionsRouter(versionsRepository, snapshotsRepository));
   router.use(feedRouter(services, versionsRepository, versionsStorageConfig.type, feedConfig.limit, feedConfig.versionUrlTemplate));
+  router.use(datasetRouter(datasetStorage));
 
   return router;
 }
