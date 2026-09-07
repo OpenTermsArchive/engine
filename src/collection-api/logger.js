@@ -14,7 +14,7 @@ const collection = await getCollection();
 const transports = [
   new winston.transports.Console({ handleRejections: true }),
   ...createErrorMailTransports({
-    formatter: args => args[Object.getOwnPropertySymbols(args)[1]], // Returns the full error message, the same visible in the console. It is referenced in the argument object with a Symbol of which we do not have the reference but we know it is the second one.
+    formatter: ({ message }) => message, // The raw message, without the timestamp and colorised level added by the console format
     subject: `API error on ${collection.id} collection`,
   }),
 ];
