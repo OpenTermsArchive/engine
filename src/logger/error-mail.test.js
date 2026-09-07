@@ -197,8 +197,9 @@ describe('Error mail', () => {
             expect(body).to.include('Error details');
           });
 
-          it('includes the message', () => {
-            expect(body).to.include('Error: <boom> & co');
+          it('includes the escaped message', () => {
+            expect(body).to.include('Error: &lt;boom&gt; &amp; co');
+            expect(body).to.not.include('<boom>');
           });
 
           it('names the collection', () => {
