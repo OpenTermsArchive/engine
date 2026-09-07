@@ -8,7 +8,7 @@ const SMTP_TIMEOUT = 60 * 1000;
 
 const escapeHtml = text => String(text).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
-function formatBody({ collection }, { message, level }) {
+function formatBody({ collection, component }, { message, level }) {
   const isError = level.includes('error');
   const titleColor = isError ? '#dc3545' : '#ffc107';
   const titleText = isError ? 'Error details' : 'Warning details';
@@ -23,7 +23,7 @@ function formatBody({ collection }, { message, level }) {
               <title>OTA Error Report</title>
             </head>
             <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; color: #333333; max-width: 800px; margin: 0 auto; padding: 0px 20px 20px 20px;">
-              <h1 style="color: #212529; font-size: 24px; margin: 10px 0; text-align: center; padding-bottom: 10px;">Open Terms Archive engine error report — ${collection.name} Collection</h1>
+              <h1 style="color: #212529; font-size: 24px; margin: 10px 0; text-align: center; padding-bottom: 10px;">Open Terms Archive ${component} error report — ${collection.name} Collection</h1>
               
               <div style="background-color: #f8f9fa; border-radius: 8px; padding: 15px; margin-bottom: 0;">
                 <h2 style="color: ${titleColor}; margin: 0 0 0 0; font-size: 20px; border-bottom: 2px solid ${titleColor}; padding-bottom: 8px;">${titleText}</h2>
@@ -86,7 +86,7 @@ function formatBody({ collection }, { message, level }) {
         `;
 }
 
-export function createErrorMailTransports({ collection, subject, warningSubject }) {
+export function createErrorMailTransports({ collection, component, subject, warningSubject }) {
   if (!config.get('@opentermsarchive/engine.logger.sendMailOnError')) {
     return [];
   }
@@ -107,7 +107,7 @@ export function createErrorMailTransports({ collection, subject, warningSubject 
     tls: true,
     timeout: SMTP_TIMEOUT,
     html: true,
-    formatter: info => formatBody({ collection }, info),
+    formatter: info => formatBody({ collection, component }, info),
     handleRejections: true,
   };
 

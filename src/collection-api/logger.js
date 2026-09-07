@@ -15,6 +15,7 @@ const transports = [
   new winston.transports.Console({ handleRejections: true }),
   ...createErrorMailTransports({
     collection,
+    component: 'Collection API',
     subject: `API error on ${collection.id} collection`,
   }),
 ];

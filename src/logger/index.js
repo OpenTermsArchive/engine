@@ -32,6 +32,7 @@ const transports = [
   consoleTransport,
   ...createErrorMailTransports({
     collection,
+    component: 'engine',
     subject: `Server error on ${collection.id} collection`,
     warningSubject: `Inaccessible content on ${collection.id} collection`,
   }),
