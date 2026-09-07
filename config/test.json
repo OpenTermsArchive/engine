@@ -44,7 +44,8 @@
     "dataset": {
       "title": "sandbox",
       "versionsRepositoryURL": "https://github.com/OpenTermsArchive/sandbox-versions",
-      "apiBaseURL": "https://gitlab.example.test/api/v4"
+      "apiBaseURL": "https://gitlab.example.test/api/v4",
+      "storagePath": "./test/data/datasets"
     },
     "collection-api": {
       "port": 3000,
