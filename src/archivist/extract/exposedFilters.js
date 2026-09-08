@@ -27,14 +27,8 @@ const DEFAULT_TRACKING_QUERY_PARAMS = Object.freeze([
   'mkt_tok',
 ]);
 
-export function removeQueryParams(webPageDOM, paramsToRemove) {
-  let normalizedParams = DEFAULT_TRACKING_QUERY_PARAMS;
-
-  if (Array.isArray(paramsToRemove)) {
-    normalizedParams = paramsToRemove;
-  } else if (typeof paramsToRemove === 'string') {
-    normalizedParams = [paramsToRemove];
-  }
+export function removeQueryParams(webPageDOM, paramsToRemove = DEFAULT_TRACKING_QUERY_PARAMS) {
+  const normalizedParams = Array.isArray(paramsToRemove) ? paramsToRemove : [paramsToRemove];
 
   if (!normalizedParams.length) {
     return;
