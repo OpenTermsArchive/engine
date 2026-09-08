@@ -2,6 +2,14 @@
 
 All changes that impact users of this module are documented in this file, in the [Common Changelog](https://common-changelog.org) format with some additional specifications defined in the CONTRIBUTING file. This codebase adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased [minor]
+
+> Development of this release was supported by [Anthelia](https://anthelia.tech).
+
+### Changed
+
+- Identify, in the commit message of versions assembled from multiple source documents, the source documents whose content changed since the previous version and the location of each listed snapshot, to make the originating snapshot of a change easy to trace
+
 ## 15.1.0 - 2026-07-13
 
 > Development of this release was supported by [User Rights](https://www.user-rights.org).
