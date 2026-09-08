@@ -8,7 +8,7 @@ All changes that impact users of this module are documented in this file, in the
 
 ### Fixed
 
-- Check duplicate source document locations during schema-only declaration validation
+- Reject duplicate source document locations in `combine` during schema-only validation, as full validation already does
 
 ## 15.1.0 - 2026-07-13
 
