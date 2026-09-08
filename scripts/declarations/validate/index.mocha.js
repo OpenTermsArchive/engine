@@ -99,22 +99,6 @@ export default async options => {
 
         if (service) {
           service.getTermsTypes()
-            .filter(type => service.terms[type]?.latest)
-            .forEach(type => {
-              const terms = service.getTerms({ type });
-
-              if (terms.hasMultipleSourceDocuments) {
-                it(`does not declare the same source document more than once within "${type}"`, () => {
-                  const duplicateLocations = [...new Set(terms.duplicateSourceDocuments.map(sourceDocument => sourceDocument.location))];
-
-                  expect(duplicateLocations, `The same source document is declared more than once within the "${type}" combine: ${duplicateLocations.join(', ')}`).to.be.empty;
-                });
-              }
-            });
-        }
-
-        if (!schemaOnly && service) {
-          service.getTermsTypes()
             .filter(termsType => {
               if (!service.terms[termsType]?.latest) { // If this terms type has been deleted and there is only a historical record for it, but no current valid declaration
                 return false;
@@ -133,6 +117,18 @@ export default async options => {
             .forEach(type => {
               describe(type, () => {
                 const terms = service.getTerms({ type });
+
+                if (terms.hasMultipleSourceDocuments) {
+                  it('does not declare the same source document more than once', () => {
+                    const duplicateLocations = [...new Set(terms.duplicateSourceDocuments.map(sourceDocument => sourceDocument.location))];
+
+                    expect(duplicateLocations, `The same source document is declared more than once within the "${type}" combine: ${duplicateLocations.join(', ')}`).to.be.empty;
+                  });
+                }
+
+                if (schemaOnly) {
+                  return; // Remaining checks require fetching the source documents
+                }
 
                 terms.sourceDocuments.forEach(sourceDocument => {
                   let filteredContent;
