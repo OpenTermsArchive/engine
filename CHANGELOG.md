@@ -8,7 +8,7 @@ All changes that impact users of this module are documented in this file, in the
 
 ### Changed
 
-- Remove well-known tracking query parameters (`utm_*`, `fbclid`, `gclid`, ...) by default when the built-in `removeQueryParams` filter is declared without parameters; see the full list in the [built-in filters documentation](https://docs.opentermsarchive.org/terms/reference/built-in-filters/)
+- Remove well-known tracking query parameters (`utm_*`, `fbclid`, `gclid`, ...) by default when the built-in `removeQueryParams` filter is declared without parameters; see the [built-in filters documentation](https://docs.opentermsarchive.org/terms/reference/built-in-filters/)
 
 ## 15.1.0 - 2026-07-13
 
