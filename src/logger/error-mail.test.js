@@ -5,7 +5,6 @@ import { expect, use } from 'chai';
 import config from 'config';
 import sinon from 'sinon';
 import sinonChai from 'sinon-chai';
-
 import winston from 'winston';
 
 import { createErrorMailTransports, handleTransportErrors } from './error-mail.js';
