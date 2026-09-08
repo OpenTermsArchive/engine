@@ -2,13 +2,13 @@
 
 All changes that impact users of this module are documented in this file, in the [Common Changelog](https://common-changelog.org) format with some additional specifications defined in the CONTRIBUTING file. This codebase adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased [patch]
+## Unreleased [minor]
 
 > Development of this release was made on a volunteer basis by [be-student](https://github.com/be-student).
 
 ### Changed
 
-- Remove well-known tracking query parameters by default with the built-in `removeQueryParams` filter
+- Remove well-known tracking query parameters (`utm_*`, `fbclid`, `gclid`, ...) by default when the built-in `removeQueryParams` filter is declared without parameters; see the full list in the [built-in filters documentation](https://docs.opentermsarchive.org/terms/reference/built-in-filters/)
 
 ## 15.1.0 - 2026-07-13
 
