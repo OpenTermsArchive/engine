@@ -1,8 +1,10 @@
-// PrivacyTests tracking-query set at dda473a462e5c37f9f2c8b2367fbc5f834796be4.
-// Keep explicit filter parameters authoritative; this list applies only when a
-// declaration enables removeQueryParams without configuration.
 const DEFAULT_TRACKING_QUERY_PARAMS = Object.freeze([
-  'fbclid',
+  'utm_source', // Campaign parameters, see https://en.wikipedia.org/wiki/UTM_parameters
+  'utm_medium',
+  'utm_campaign',
+  'utm_term',
+  'utm_content',
+  'fbclid', // Click and user identifiers, see https://github.com/privacytests/privacytests/blob/dda473a462e5c37f9f2c8b2367fbc5f834796be4/live/results.js#L31-L65
   'gclid',
   'msclkid',
   'mc_eid',
