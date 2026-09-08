@@ -11,6 +11,7 @@ import sinonChai from 'sinon-chai';
 import { InaccessibleContentError } from './errors.js';
 import { FetchDocumentError } from './fetcher/index.js';
 import Git from './recorder/repositories/git/git.js';
+import Version from './recorder/version.js';
 import SourceDocument from './services/sourceDocument.js';
 
 import Archivist, { EVENTS } from './index.js';
@@ -354,6 +355,12 @@ describe('Archivist', function () {
             expect(versionContent).to.include(MULTI_SOURCE_DOCS.EXPECTED_TEXTS.VIOLENCE_INCITEMENT);
             expect(versionContent).to.include(MULTI_SOURCE_DOCS.EXPECTED_TEXTS.NEW_POLICY);
           });
+
+          it('names the added source document as the origin of the changes', async () => {
+            const [upgradeVersionCommit] = await gitVersion.log({ file: `${VERSIONS_PATH}/${SERVICE_ID}/${TERMS_TYPE}.md` });
+
+            expect(upgradeVersionCommit.body).to.include(`Changes since the previous version come from 1 of the 4 source documents:\n4. ${MULTI_SOURCE_DOCS.BASE_URL}${MULTI_SOURCE_DOCS.PATHS.NEW_POLICY}`);
+          });
         });
 
         context('when a source document location is modified in combined terms', () => {
@@ -465,6 +472,95 @@ describe('Archivist', function () {
 
           it('regenerates version with updated extraction logic', () => {
             expect(upgradeVersionContent).to.not.equal(initialVersionContent);
+          });
+        });
+
+        context('when one source document changes in combined terms', () => {
+          const VERSION_FILE_PATH = `${VERSIONS_PATH}/${SERVICE_ID}/${TERMS_TYPE}.md`;
+          const SNAPSHOT_IDENTIFIER_TEMPLATE = config.get('@opentermsarchive/engine.recorder.versions.storage.git.snapshotIdentiferTemplate');
+          let terms;
+          let initialVersionCommit;
+          let changedVersionCommit;
+          let changedSnapshot;
+
+          before(async () => {
+            setupNockForMultiSourceDocs([ 'COMMUNITY_STANDARDS', 'HATE_SPEECH', 'VIOLENCE_INCITEMENT' ]);
+
+            app = await createAndInitializeArchivist();
+            terms = app.services[SERVICE_ID].getTerms({ type: TERMS_TYPE });
+
+            disableClientScriptsForTerms(terms);
+
+            await app.track({ services: [SERVICE_ID], types: [TERMS_TYPE] });
+            ([initialVersionCommit] = await gitVersion.log({ file: VERSION_FILE_PATH }));
+
+            nock.cleanAll();
+            setupNockForMultiSourceDocs([ 'COMMUNITY_STANDARDS', 'VIOLENCE_INCITEMENT' ]);
+            nock(MULTI_SOURCE_DOCS.BASE_URL)
+              .persist()
+              .get(MULTI_SOURCE_DOCS.PATHS.HATE_SPEECH)
+              .reply(200, '<html><body><p>Updated hate speech content</p></body></html>', { 'Content-Type': 'text/html' });
+
+            await app.track({ services: [SERVICE_ID], types: [TERMS_TYPE] });
+            ([changedVersionCommit] = await gitVersion.log({ file: VERSION_FILE_PATH }));
+            changedSnapshot = await app.recorder.snapshotsRepository.findLatest(SERVICE_ID, TERMS_TYPE, terms.sourceDocuments[1].id);
+          });
+
+          after(async () => {
+            await resetGitRepositories();
+            nock.cleanAll();
+          });
+
+          it('lists the location of each source document in the first version', () => {
+            expect(initialVersionCommit.body).to.include(`2. ${MULTI_SOURCE_DOCS.BASE_URL}${MULTI_SOURCE_DOCS.PATHS.HATE_SPEECH}`);
+          });
+
+          it('does not name changed source documents in the first version', () => {
+            expect(initialVersionCommit.body).to.not.include('Changes since the previous version');
+          });
+
+          it('names the changed source document and its snapshot in the new version', () => {
+            expect(changedVersionCommit.body).to.include(`Changes since the previous version come from 1 of the 3 source documents:\n2. ${MULTI_SOURCE_DOCS.BASE_URL}${MULTI_SOURCE_DOCS.PATHS.HATE_SPEECH}\n   ${SNAPSHOT_IDENTIFIER_TEMPLATE.replace('%SNAPSHOT_ID', changedSnapshot.id)}`);
+          });
+        });
+
+        context('when the previous version was recorded without source document locations', () => {
+          const VERSION_FILE_PATH = `${VERSIONS_PATH}/${SERVICE_ID}/${TERMS_TYPE}.md`;
+          let latestVersionCommit;
+
+          before(async () => {
+            setupNockForMultiSourceDocs([ 'COMMUNITY_STANDARDS', 'HATE_SPEECH', 'VIOLENCE_INCITEMENT' ]);
+
+            app = await createAndInitializeArchivist();
+
+            disableClientScriptsForTerms(app.services[SERVICE_ID].getTerms({ type: TERMS_TYPE }));
+
+            await app.track({ services: [SERVICE_ID], types: [TERMS_TYPE] });
+
+            const initialVersion = await app.recorder.versionsRepository.findLatest(SERVICE_ID, TERMS_TYPE);
+            const sections = initialVersion.content.split(Version.SOURCE_DOCUMENTS_SEPARATOR);
+
+            sections[1] = 'Outdated hate speech content';
+
+            await app.recorder.versionsRepository.save(new Version({ // Mimic a version recorded by an earlier engine version, which listed snapshots without their locations
+              serviceId: SERVICE_ID,
+              termsType: TERMS_TYPE,
+              content: sections.join(Version.SOURCE_DOCUMENTS_SEPARATOR),
+              fetchDate: new Date(),
+              snapshotIds: initialVersion.snapshotIds,
+            }));
+
+            await app.track({ services: [SERVICE_ID], types: [TERMS_TYPE] });
+            ([latestVersionCommit] = await gitVersion.log({ file: VERSION_FILE_PATH }));
+          });
+
+          after(async () => {
+            await resetGitRepositories();
+            nock.cleanAll();
+          });
+
+          it('names the changed source document by position', () => {
+            expect(latestVersionCommit.body).to.include(`Changes since the previous version come from 1 of the 3 source documents:\n2. ${MULTI_SOURCE_DOCS.BASE_URL}${MULTI_SOURCE_DOCS.PATHS.HATE_SPEECH}`);
           });
         });
 
@@ -793,7 +889,7 @@ describe('Archivist', function () {
 
       context('when it is the first record', () => {
         before(async () => {
-          version = await app.recordVersion(terms, 'content');
+          version = await app.recordVersion(terms, ['content']);
         });
 
         after(() => {
@@ -814,12 +910,12 @@ describe('Archivist', function () {
           let changedVersion;
 
           before(async () => {
-            await app.recordVersion(terms, 'content');
+            await app.recordVersion(terms, ['content']);
             resetSpiesHistory();
             terms.sourceDocuments.forEach(sourceDocument => {
               sourceDocument.content = serviceBSnapshotExpectedContent;
             });
-            changedVersion = await app.recordVersion(terms, 'content updated');
+            changedVersion = await app.recordVersion(terms, ['content updated']);
           });
 
           after(() => {
@@ -839,9 +935,9 @@ describe('Archivist', function () {
           let version;
 
           before(async () => {
-            await app.recordVersion(terms, 'content');
+            await app.recordVersion(terms, ['content']);
             resetSpiesHistory();
-            version = await app.recordVersion(terms, 'content');
+            version = await app.recordVersion(terms, ['content']);
           });
 
           after(() => {

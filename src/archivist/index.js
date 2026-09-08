@@ -188,7 +188,7 @@ export default class Archivist extends events.EventEmitter {
       return;
     }
 
-    await this.recordVersion(terms, contents.join(Version.SOURCE_DOCUMENTS_SEPARATOR), technicalUpgradeOnly);
+    await this.recordVersion(terms, contents, technicalUpgradeOnly);
   }
 
   async fetchAndRecordSnapshots(terms) {
@@ -314,16 +314,21 @@ export default class Archivist extends events.EventEmitter {
     return contents;
   }
 
-  async recordVersion(terms, content, technicalUpgradeOnly) {
+  async recordVersion(terms, contents, technicalUpgradeOnly) {
     const record = new Version({
-      content,
-      snapshotIds: terms.sourceDocuments.map(sourceDocuments => sourceDocuments.snapshotId),
+      content: contents.join(Version.SOURCE_DOCUMENTS_SEPARATOR),
+      snapshotIds: terms.sourceDocuments.map(sourceDocument => sourceDocument.snapshotId),
+      sourceDocumentLocations: terms.sourceDocuments.map(sourceDocument => sourceDocument.location),
       serviceId: terms.service.id,
       termsType: terms.type,
       fetchDate: terms.fetchDate,
       isTechnicalUpgrade: technicalUpgradeOnly,
       metadata: { 'x-engine-version': PACKAGE_VERSION },
     });
+
+    if (terms.hasMultipleSourceDocuments) {
+      record.changedSourceDocumentIndexes = await this.findChangedSourceDocumentIndexes(terms, contents);
+    }
 
     await this.recorder.record(record);
 
@@ -336,6 +341,29 @@ export default class Archivist extends events.EventEmitter {
     this.emit(record.isFirstRecord ? 'firstVersionRecorded' : 'versionRecorded', record);
 
     return record;
+  }
+
+  async findChangedSourceDocumentIndexes(terms, contents) { // Source documents whose extracted content differs from the previous version, so that the recorded version can tell where its changes come from
+    const previousVersion = await this.recorder.versionsRepository.findLatest(terms.service.id, terms.type);
+
+    if (!previousVersion) {
+      return; // Every source document is new in a first version
+    }
+
+    const previousContents = previousVersion.content.split(Version.SOURCE_DOCUMENTS_SEPARATOR);
+    const canAlignByLocation = previousVersion.sourceDocumentLocations?.length === previousContents.length; // Versions recorded before locations were stored can only be aligned by position
+
+    if (!canAlignByLocation && previousContents.length !== contents.length) {
+      return; // Positional alignment is unreliable once the number of source documents has changed
+    }
+
+    return terms.sourceDocuments
+      .map((sourceDocument, index) => {
+        const previousIndex = canAlignByLocation ? previousVersion.sourceDocumentLocations.indexOf(sourceDocument.location) : index;
+
+        return contents[index] === previousContents[previousIndex] ? null : index; // A source document missing from the previous version is new, hence changed
+      })
+      .filter(index => index !== null);
   }
 
   async recordSnapshot(terms, sourceDocument) {

@@ -318,6 +318,73 @@ describe('GitRepository', () => {
         });
       });
 
+      context('when source document locations are specified', () => {
+        const SNAPSHOT_ID_1 = 'c01533c0e546ef430eea84d23c1b18a2b8420dfb';
+        const SNAPSHOT_ID_2 = '0fd16cca9e1a86a2267bd587107c485f06099d7d';
+        const LOCATION_1 = 'https://www.example.com/terms';
+        const LOCATION_2 = 'https://www.example.com/hc/articles/360012345-community-guidelines';
+        const SNAPSHOT_IDENTIFIER_TEMPLATE = config.get('@opentermsarchive/engine.recorder.versions.storage.git.snapshotIdentiferTemplate');
+
+        function save(changedSourceDocumentIndexes) {
+          return subject.save(new Version({
+            serviceId: SERVICE_PROVIDER_ID,
+            termsType: TERMS_TYPE,
+            content: CONTENT,
+            fetchDate: FETCH_DATE,
+            snapshotIds: [ SNAPSHOT_ID_1, SNAPSHOT_ID_2 ],
+            sourceDocumentLocations: [ LOCATION_1, LOCATION_2 ],
+            changedSourceDocumentIndexes,
+          }));
+        }
+
+        context('when some source documents changed', () => {
+          before(async () => {
+            ({ id, isFirstRecord } = await save([1]));
+
+            ([commit] = await git.log());
+          });
+
+          after(() => subject.removeAll());
+
+          it('lists each snapshot under its numbered source document location', () => {
+            expect(commit.body).to.include(`1. ${LOCATION_1}\n   ${SNAPSHOT_IDENTIFIER_TEMPLATE.replace(SNAPSHOT_ID_MARKER, SNAPSHOT_ID_1)}\n2. ${LOCATION_2}\n   ${SNAPSHOT_IDENTIFIER_TEMPLATE.replace(SNAPSHOT_ID_MARKER, SNAPSHOT_ID_2)}`);
+          });
+
+          it('names the changed source documents before the full list', () => {
+            expect(commit.body).to.include(`Changes since the previous version come from 1 of the 2 source documents:\n2. ${LOCATION_2}\n   ${SNAPSHOT_IDENTIFIER_TEMPLATE.replace(SNAPSHOT_ID_MARKER, SNAPSHOT_ID_2)}\n\nThis version was recorded`);
+          });
+        });
+
+        context('when all source documents changed', () => {
+          before(async () => {
+            ({ id, isFirstRecord } = await save([ 0, 1 ]));
+
+            ([commit] = await git.log());
+          });
+
+          after(() => subject.removeAll());
+
+          it('states that all source documents changed without listing them twice', () => {
+            expect(commit.body).to.include('Changes since the previous version come from all 2 source documents.');
+            expect(commit.body.match(/www\.example\.com/g)).to.have.length(2);
+          });
+        });
+
+        context('when the changed source documents are unknown', () => {
+          before(async () => {
+            ({ id, isFirstRecord } = await save(undefined));
+
+            ([commit] = await git.log());
+          });
+
+          after(() => subject.removeAll());
+
+          it('does not mention changed source documents', () => {
+            expect(commit.body).to.not.include('Changes since the previous version');
+          });
+        });
+      });
+
       context('when metadata is provided', () => {
         before(async () => {
           ({ id, isFirstRecord } = await subject.save(new Version({
@@ -393,6 +460,34 @@ describe('GitRepository', () => {
 
       it('returns metadata', () => {
         expect(record.metadata).to.deep.equal(METADATA);
+      });
+
+      context('when the version was assembled from several source documents', () => {
+        const SNAPSHOT_IDS = [ 'c01533c0e546ef430eea84d23c1b18a2b8420dfb', '0fd16cca9e1a86a2267bd587107c485f06099d7d' ];
+        const SOURCE_DOCUMENT_LOCATIONS = [ 'https://www.example.com/hc/articles/360012345-community-guidelines', 'https://www.example.com/legal/facade' ]; // Locations with segments that look like snapshot IDs
+        let multiSourceRecord;
+
+        before(async () => {
+          const { id: multiSourceId } = await subject.save(new Version({
+            serviceId: SERVICE_PROVIDER_ID,
+            termsType: TERMS_TYPE,
+            content: `${CONTENT} assembled from several source documents`,
+            fetchDate: FETCH_DATE_LATER,
+            snapshotIds: SNAPSHOT_IDS,
+            sourceDocumentLocations: SOURCE_DOCUMENT_LOCATIONS,
+            changedSourceDocumentIndexes: [1],
+          }));
+
+          multiSourceRecord = await subject.findById(multiSourceId);
+        });
+
+        it('returns the snapshot IDs in source documents order', () => {
+          expect(multiSourceRecord.snapshotIds).to.deep.equal(SNAPSHOT_IDS);
+        });
+
+        it('returns the source document locations', () => {
+          expect(multiSourceRecord.sourceDocumentLocations).to.deep.equal(SOURCE_DOCUMENT_LOCATIONS);
+        });
       });
 
       context('when requested record does not exist', () => {

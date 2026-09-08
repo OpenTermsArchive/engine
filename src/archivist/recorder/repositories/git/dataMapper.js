@@ -27,6 +27,11 @@ export const TERMS_TYPE_AND_DOCUMENT_ID_SEPARATOR = ' #';
 export const SNAPSHOT_ID_MARKER = '%SNAPSHOT_ID';
 const SINGLE_SOURCE_DOCUMENT_PREFIX = 'This version was recorded after extracting from snapshot';
 const MULTIPLE_SOURCE_DOCUMENTS_PREFIX = 'This version was recorded after extracting from and assembling the following snapshots from %NUMBER source documents:';
+const CHANGED_SOURCE_DOCUMENTS_PREFIX = 'Changes since the previous version come from %CHANGED of the %NUMBER source documents:';
+const ALL_SOURCE_DOCUMENTS_CHANGED_MESSAGE = 'Changes since the previous version come from all %NUMBER source documents.';
+const CHANGED_SOURCE_DOCUMENTS_REGEXP = /^Changes since the previous version come from/;
+const SOURCE_DOCUMENT_LOCATION_LINE_REGEXP = /^\d+\. (.+)$/; // A numbered line holds a source document location and is followed by an indented line holding its snapshot identifier
+const SNAPSHOT_ID_REGEXP = /\b[0-9a-f]{5,40}\b/g;
 
 export const COMMIT_MESSAGE_PREFIXES_REGEXP = new RegExp(`^(${Object.values(COMMIT_MESSAGE_PREFIXES).join('|')})`);
 
@@ -35,22 +40,32 @@ export function isTechnicalUpgrade(message) {
 }
 
 export function toPersistence(record, snapshotIdentiferTemplate) {
-  const { serviceId, termsType, documentId, snapshotIds = [], mimeType, metadata } = record;
+  const { serviceId, termsType, documentId, snapshotIds = [], sourceDocumentLocations = [], changedSourceDocumentIndexes = [], mimeType, metadata } = record;
 
   const subject = record.displayTitle;
   const documentIdMessage = `${documentId ? `Document ID ${documentId}\n\n` : ''}`;
+  const snapshotIdentifiers = snapshotIds.map(snapshotId => snapshotIdentiferTemplate.replace(SNAPSHOT_ID_MARKER, snapshotId));
+  let changedSourceDocumentsMessage;
   let snapshotIdsMessage;
 
   if (snapshotIds.length == 1) {
-    snapshotIdsMessage = `${SINGLE_SOURCE_DOCUMENT_PREFIX} ${snapshotIdentiferTemplate.replace(SNAPSHOT_ID_MARKER, snapshotIds[0])}`;
+    snapshotIdsMessage = `${SINGLE_SOURCE_DOCUMENT_PREFIX} ${snapshotIdentifiers[0]}`;
   } else if (snapshotIds.length > 1) {
-    snapshotIdsMessage = `${MULTIPLE_SOURCE_DOCUMENTS_PREFIX.replace('%NUMBER', snapshotIds.length)}\n${snapshotIds.map(snapshotId => `- ${snapshotIdentiferTemplate.replace(SNAPSHOT_ID_MARKER, snapshotId)}`).join('\n')}`;
+    const sourceDocumentsList = snapshotIdentifiers.map((snapshotIdentifier, index) => formatSourceDocument({ number: index + 1, location: sourceDocumentLocations[index], snapshotIdentifier }));
+
+    snapshotIdsMessage = `${MULTIPLE_SOURCE_DOCUMENTS_PREFIX.replace('%NUMBER', snapshotIds.length)}\n${sourceDocumentsList.join('\n')}`;
+
+    if (changedSourceDocumentIndexes.length == snapshotIds.length) {
+      changedSourceDocumentsMessage = ALL_SOURCE_DOCUMENTS_CHANGED_MESSAGE.replace('%NUMBER', snapshotIds.length);
+    } else if (changedSourceDocumentIndexes.length) {
+      changedSourceDocumentsMessage = `${CHANGED_SOURCE_DOCUMENTS_PREFIX.replace('%CHANGED', changedSourceDocumentIndexes.length).replace('%NUMBER', snapshotIds.length)}\n${changedSourceDocumentIndexes.map(index => sourceDocumentsList[index]).join('\n')}`;
+    }
   }
 
   const filePath = generateFilePath(serviceId, termsType, documentId, mimeType);
 
   return {
-    message: `${subject}\n\n${documentIdMessage || ''}\n\n${snapshotIdsMessage || ''}`,
+    message: `${subject}\n\n${documentIdMessage || ''}\n\n${changedSourceDocumentsMessage ? `${changedSourceDocumentsMessage}\n\n` : ''}${snapshotIdsMessage || ''}`,
     content: record.content,
     filePath,
     metadata,
@@ -67,7 +82,6 @@ export function toDomain(commit) {
   }
 
   const [relativeFilePath] = modifiedFilesInCommit;
-  const snapshotIdsMatch = body.match(/\b[0-9a-f]{5,40}\b/g);
 
   const [ termsType, documentId ] = path.basename(relativeFilePath, path.extname(relativeFilePath)).split(TERMS_TYPE_AND_DOCUMENT_ID_SEPARATOR);
 
@@ -85,7 +99,14 @@ export function toDomain(commit) {
 
   if (mimeTypeValue == mime.getType('markdown')) {
     attributes.isTechnicalUpgrade = message.startsWith(COMMIT_MESSAGE_PREFIXES.technicalUpgrade) || message.startsWith(COMMIT_MESSAGE_PREFIXES.deprecated_refilter);
-    attributes.snapshotIds = snapshotIdsMatch;
+
+    const { snapshotIds, sourceDocumentLocations } = parseSourceDocuments(body);
+
+    attributes.snapshotIds = snapshotIds;
+
+    if (sourceDocumentLocations.length) {
+      attributes.sourceDocumentLocations = sourceDocumentLocations;
+    }
 
     return new Version(attributes);
   }
@@ -93,6 +114,32 @@ export function toDomain(commit) {
   attributes.mimeType = mimeTypeValue;
 
   return new Snapshot(attributes);
+}
+
+function formatSourceDocument({ number, location, snapshotIdentifier }) {
+  if (!location) {
+    return `- ${snapshotIdentifier}`; // Keep the plain list when locations are unknown
+  }
+
+  const prefix = `${number}. `;
+
+  return `${prefix}${location}\n${' '.repeat(prefix.length)}${snapshotIdentifier}`;
+}
+
+function parseSourceDocuments(body) {
+  const lines = body
+    .split(/\n\n+/)
+    .filter(paragraph => !CHANGED_SOURCE_DOCUMENTS_REGEXP.test(paragraph)) // The changed source documents paragraph repeats, out of order, snapshots already listed in full
+    .join('\n')
+    .split('\n');
+
+  const sourceDocumentLocations = lines.map(line => line.match(SOURCE_DOCUMENT_LOCATION_LINE_REGEXP)?.[1]).filter(Boolean);
+  const snapshotIds = lines
+    .filter(line => !SOURCE_DOCUMENT_LOCATION_LINE_REGEXP.test(line)) // Locations can contain segments that look like snapshot IDs, such as numeric article IDs
+    .join('\n')
+    .match(SNAPSHOT_ID_REGEXP);
+
+  return { snapshotIds, sourceDocumentLocations };
 }
 
 function generateFileName(termsType, documentId, extension) {

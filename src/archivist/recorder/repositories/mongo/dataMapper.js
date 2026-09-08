@@ -17,7 +17,7 @@ export function toPersistence(record) {
 }
 
 export function toDomain(mongoDocument) {
-  const { _id, serviceId, termsType, documentId, fetchDate, mimeType, isTechnicalUpgrade, isExtractOnly, isRefilter, isFirstRecord, snapshotIds, metadata } = mongoDocument;
+  const { _id, serviceId, termsType, documentId, fetchDate, mimeType, isTechnicalUpgrade, isExtractOnly, isRefilter, isFirstRecord, snapshotIds, sourceDocumentLocations, metadata } = mongoDocument;
 
   const attributes = {
     id: _id.toString(),
@@ -33,6 +33,10 @@ export function toDomain(mongoDocument) {
   };
 
   if (snapshotIds) {
+    if (sourceDocumentLocations) {
+      attributes.sourceDocumentLocations = sourceDocumentLocations;
+    }
+
     return new Version(attributes);
   }
 
