@@ -3,7 +3,7 @@ import winston from 'winston';
 
 import { getCollection } from '../archivist/collection/index.js';
 
-import { createErrorMailTransports } from './error-mail.js';
+import { createErrorMailTransports, exitOnUnhandledRejection } from './error-mail.js';
 import { formatDuration } from './utils.js';
 
 const { combine, timestamp, printf, colorize } = winston.format;
@@ -41,8 +41,10 @@ const transports = [
 const logger = winston.createLogger({
   format: alignedWithColorsAndTime,
   transports,
-  exitOnError: true,
+  exitOnError: false,
 });
+
+exitOnUnhandledRejection(transports);
 
 let recordedSnapshotsCount;
 let recordedVersionsCount;

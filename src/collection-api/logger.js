@@ -3,7 +3,7 @@ import dotenv from 'dotenv';
 import winston from 'winston';
 
 import { getCollection } from '../archivist/collection/index.js';
-import { createErrorMailTransports } from '../logger/error-mail.js';
+import { createErrorMailTransports, exitOnUnhandledRejection } from '../logger/error-mail.js';
 
 dotenv.config({ quiet: true });
 
@@ -31,6 +31,9 @@ const logger = winston.createLogger({
     }),
   ),
   transports,
+  exitOnError: false,
 });
+
+exitOnUnhandledRejection(transports);
 
 export default logger;
