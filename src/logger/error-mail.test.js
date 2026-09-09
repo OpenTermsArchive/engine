@@ -7,7 +7,7 @@ import sinon from 'sinon';
 import sinonChai from 'sinon-chai';
 import winston from 'winston';
 
-import { createErrorMailTransports, exitOnUnhandledRejection } from './error-mail.js';
+import { addErrorMail, createErrorMailTransports, exitOnUnhandledRejection } from './error-mail.js';
 import MailTransportWithRetry from './mail-transport-with-retry.js';
 
 use(sinonChai);
@@ -22,7 +22,6 @@ describe('Error mail', () => {
   let configValues;
   let originalPassword;
   let getEnvStub;
-  let consoleWarnStub;
 
   before(() => {
     originalPassword = process.env.OTA_ENGINE_SMTP_PASSWORD;
@@ -45,11 +44,11 @@ describe('Error mail', () => {
       '@opentermsarchive/engine.logger.smtp.host': 'smtp.example.com',
       '@opentermsarchive/engine.logger.smtp.port': 587,
       '@opentermsarchive/engine.logger.smtp.username': 'user',
+      '@opentermsarchive/engine.collectionPath': './test/test-declarations',
     };
     sinon.stub(config, 'get').callsFake(key => configValues[key]);
     sinon.stub(config, 'has').callsFake(key => configValues[key] !== undefined);
     getEnvStub = sinon.stub(config.util, 'getEnv').returns('production');
-    consoleWarnStub = sinon.stub(console, 'warn');
     process.env.OTA_ENGINE_SMTP_PASSWORD = 'secret';
   });
 
@@ -58,6 +57,7 @@ describe('Error mail', () => {
   });
 
   describe('#createErrorMailTransports', () => {
+    const logger = { warn: () => {} };
     const collection = {
       id: 'test',
       name: 'Test',
@@ -74,13 +74,15 @@ describe('Error mail', () => {
       });
 
       it('returns no transport', () => {
-        expect(createErrorMailTransports({ collection, component, subject, warningSubject })).to.be.empty;
+        expect(createErrorMailTransports(logger, { collection, component, subject, warningSubject })).to.be.empty;
       });
 
       it('does not warn', () => {
-        createErrorMailTransports({ collection, component, subject, warningSubject });
+        const warnSpy = sinon.spy(logger, 'warn');
 
-        expect(consoleWarnStub).to.not.have.been.called;
+        createErrorMailTransports(logger, { collection, component, subject, warningSubject });
+
+        expect(warnSpy).to.not.have.been.called;
       });
     });
 
@@ -90,14 +92,16 @@ describe('Error mail', () => {
       });
 
       it('returns no transport', () => {
-        expect(createErrorMailTransports({ collection, component, subject, warningSubject })).to.be.empty;
+        expect(createErrorMailTransports(logger, { collection, component, subject, warningSubject })).to.be.empty;
       });
 
-      it('warns that emails cannot be sent', () => {
-        createErrorMailTransports({ collection, component, subject, warningSubject });
+      it('warns through the logger that emails cannot be sent', () => {
+        const warnSpy = sinon.spy(logger, 'warn');
 
-        expect(consoleWarnStub).to.have.been.calledOnce;
-        expect(consoleWarnStub.firstCall.args[0]).to.include('OTA_ENGINE_SMTP_PASSWORD');
+        createErrorMailTransports(logger, { collection, component, subject, warningSubject });
+
+        expect(warnSpy).to.have.been.calledOnce;
+        expect(warnSpy.firstCall.args[0]).to.include('OTA_ENGINE_SMTP_PASSWORD');
       });
     });
 
@@ -106,7 +110,7 @@ describe('Error mail', () => {
 
       context('without warnings', () => {
         beforeEach(() => {
-          transports = createErrorMailTransports({ collection, component, subject, warningSubject });
+          transports = createErrorMailTransports(logger, { collection, component, subject, warningSubject });
         });
 
         it('returns a single transport', () => {
@@ -142,7 +146,7 @@ describe('Error mail', () => {
       context('with warnings enabled and a subject for them', () => {
         beforeEach(() => {
           configValues['@opentermsarchive/engine.logger.sendMailOnError.sendWarnings'] = true;
-          transports = createErrorMailTransports({ collection, component, subject, warningSubject });
+          transports = createErrorMailTransports(logger, { collection, component, subject, warningSubject });
         });
 
         it('returns two transports', () => {
@@ -196,7 +200,7 @@ describe('Error mail', () => {
       context('with warnings enabled but no subject for them', () => {
         beforeEach(() => {
           configValues['@opentermsarchive/engine.logger.sendMailOnError.sendWarnings'] = true;
-          transports = createErrorMailTransports({ collection, component, subject });
+          transports = createErrorMailTransports(logger, { collection, component, subject });
         });
 
         it('returns the error transport only', () => {
@@ -208,7 +212,7 @@ describe('Error mail', () => {
       context('with a subject for warnings but warnings not configured', () => {
         beforeEach(() => {
           delete configValues['@opentermsarchive/engine.logger.sendMailOnError.sendWarnings'];
-          transports = createErrorMailTransports({ collection, component, subject, warningSubject });
+          transports = createErrorMailTransports(logger, { collection, component, subject, warningSubject });
         });
 
         it('returns the error transport only', () => {
@@ -219,7 +223,7 @@ describe('Error mail', () => {
 
       context('with a subject for warnings but warnings disabled', () => {
         beforeEach(() => {
-          transports = createErrorMailTransports({ collection, component, subject, warningSubject });
+          transports = createErrorMailTransports(logger, { collection, component, subject, warningSubject });
         });
 
         it('returns the error transport only', () => {
@@ -233,7 +237,7 @@ describe('Error mail', () => {
         let body;
 
         beforeEach(() => {
-          [{ mailTransport: { formatter } }] = createErrorMailTransports({ collection, component, subject, warningSubject });
+          [{ mailTransport: { formatter } }] = createErrorMailTransports(logger, { collection, component, subject, warningSubject });
         });
 
         context('for an error', () => {
@@ -283,7 +287,7 @@ describe('Error mail', () => {
 
         context('when interpolated values contain HTML characters', () => {
           beforeEach(() => {
-            [{ mailTransport: { formatter } }] = createErrorMailTransports({ collection: { id: 'test', name: 'R&D <beta>', host: '203.0.113.1', hostConfig: { ansible_user: 'ota<x>' } }, component: 'API <v2>', subject, warningSubject });
+            [{ mailTransport: { formatter } }] = createErrorMailTransports(logger, { collection: { id: 'test', name: 'R&D <beta>', host: '203.0.113.1', hostConfig: { ansible_user: 'ota<x>' } }, component: 'API <v2>', subject, warningSubject });
             body = formatter({ message: 'Error', level: 'error' });
           });
 
@@ -308,7 +312,7 @@ describe('Error mail', () => {
 
         context('when the collection has no deployment inventory', () => {
           beforeEach(() => {
-            [{ mailTransport: { formatter } }] = createErrorMailTransports({ collection: { id: 'test', name: 'Test' }, component, subject, warningSubject });
+            [{ mailTransport: { formatter } }] = createErrorMailTransports(logger, { collection: { id: 'test', name: 'Test' }, component, subject, warningSubject });
             body = formatter({ message: 'Error', level: 'error' });
           });
 
@@ -322,7 +326,7 @@ describe('Error mail', () => {
         beforeEach(() => {
           getEnvStub.returns('staging');
           configValues['@opentermsarchive/engine.logger.sendMailOnError.sendWarnings'] = true;
-          transports = createErrorMailTransports({ collection, component, subject, warningSubject });
+          transports = createErrorMailTransports(logger, { collection, component, subject, warningSubject });
         });
 
         it('prefixes the error subject with the environment', () => {
@@ -336,6 +340,50 @@ describe('Error mail', () => {
         it('prefixes the title of the body with the environment', () => {
           expect(transports[0].mailTransport.formatter({ message: 'Error', level: 'error' })).to.include(`[staging] Open Terms Archive ${component} error report`);
         });
+      });
+    });
+  });
+
+  describe('#addErrorMail', () => {
+    let logger;
+    let warnSpy;
+
+    beforeEach(() => {
+      logger = winston.createLogger({ transports: [new winston.transports.Console({ silent: true })], exitOnError: false });
+      warnSpy = sinon.spy(logger, 'warn');
+    });
+
+    context('when sending mail on error is enabled with warnings', () => {
+      beforeEach(async () => {
+        configValues['@opentermsarchive/engine.logger.sendMailOnError.sendWarnings'] = true;
+        await addErrorMail(logger, { component: 'engine', subject: 'Server error', warningSubject: 'Inaccessible content' }, { emitter: new EventEmitter() });
+      });
+
+      it('adds the mail transports to the logger', () => {
+        expect(logger.transports).to.have.lengthOf(3);
+        expect(logger.transports[1]).to.be.an.instanceOf(MailTransportWithRetry);
+        expect(logger.transports[2]).to.be.an.instanceOf(MailTransportWithRetry);
+      });
+
+      it('names the collection in the subjects', () => {
+        expect(logger.transports[1].mailTransport.subject).to.equal('Server error on test collection');
+        expect(logger.transports[2].mailTransport.subject).to.equal('Inaccessible content on test collection');
+      });
+    });
+
+    context('when the SMTP password is not defined', () => {
+      beforeEach(async () => {
+        delete process.env.OTA_ENGINE_SMTP_PASSWORD;
+        await addErrorMail(logger, { component: 'engine', subject: 'Server error' }, { emitter: new EventEmitter() });
+      });
+
+      it('warns through the logger', () => {
+        expect(warnSpy).to.have.been.calledOnce;
+        expect(warnSpy.firstCall.args[0]).to.include('OTA_ENGINE_SMTP_PASSWORD');
+      });
+
+      it('adds no transport', () => {
+        expect(logger.transports).to.have.lengthOf(1);
       });
     });
   });

@@ -3,6 +3,8 @@ import os from 'os';
 import config from 'config';
 import winston from 'winston';
 
+import { getCollection } from '../archivist/collection/index.js';
+
 import MailTransportWithRetry, { RETRY_DELAYS } from './mail-transport-with-retry.js';
 import { escapeHtml } from './utils.js';
 
@@ -77,13 +79,13 @@ function formatBody({ collection, component, environmentPrefix }, { message, lev
         `;
 }
 
-export function createErrorMailTransports({ collection, component, subject, warningSubject }) {
+export function createErrorMailTransports(logger, { collection, component, subject, warningSubject }) {
   if (!config.get('@opentermsarchive/engine.logger.sendMailOnError')) {
     return [];
   }
 
   if (process.env.OTA_ENGINE_SMTP_PASSWORD === undefined) {
-    console.warn('Environment variable "OTA_ENGINE_SMTP_PASSWORD" was not found; log emails cannot be sent');
+    logger.warn('Environment variable "OTA_ENGINE_SMTP_PASSWORD" was not found; log emails cannot be sent');
 
     return [];
   }
@@ -130,4 +132,17 @@ export function exitOnUnhandledRejection(transports, { emitter = process } = {})
     ]);
     process.exit(1);
   });
+}
+
+export async function addErrorMail(logger, { component, subject, warningSubject }, { emitter = process } = {}) {
+  const collection = await getCollection();
+  const transports = createErrorMailTransports(logger, {
+    collection,
+    component,
+    subject: `${subject} on ${collection.id} collection`,
+    warningSubject: warningSubject && `${warningSubject} on ${collection.id} collection`,
+  });
+
+  transports.forEach(transport => logger.add(transport));
+  exitOnUnhandledRejection(logger.transports, { emitter });
 }

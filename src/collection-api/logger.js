@@ -2,23 +2,11 @@ import config from 'config';
 import dotenv from 'dotenv';
 import winston from 'winston';
 
-import { getCollection } from '../archivist/collection/index.js';
-import { createErrorMailTransports, exitOnUnhandledRejection } from '../logger/error-mail.js';
+import { addErrorMail } from '../logger/error-mail.js';
 
 dotenv.config({ quiet: true });
 
 const { combine, timestamp, printf, colorize } = winston.format;
-
-const collection = await getCollection();
-
-const transports = [
-  new winston.transports.Console({ handleRejections: true }),
-  ...createErrorMailTransports({
-    collection,
-    component: 'Collection API',
-    subject: `API error on ${collection.id} collection`,
-  }),
-];
 
 const logger = winston.createLogger({
   format: combine(
@@ -30,10 +18,10 @@ const logger = winston.createLogger({
       return `${timestampPrefix}${level.padEnd(15)} ${message}`;
     }),
   ),
-  transports,
+  transports: [new winston.transports.Console({ handleRejections: true })],
   exitOnError: false,
 });
 
-exitOnUnhandledRejection(transports);
+await addErrorMail(logger, { component: 'Collection API', subject: 'API error' });
 
 export default logger;

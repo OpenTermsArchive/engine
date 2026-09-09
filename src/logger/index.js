@@ -1,14 +1,10 @@
 import config from 'config';
 import winston from 'winston';
 
-import { getCollection } from '../archivist/collection/index.js';
-
-import { createErrorMailTransports, exitOnUnhandledRejection } from './error-mail.js';
+import { addErrorMail } from './error-mail.js';
 import { formatDuration } from './utils.js';
 
 const { combine, timestamp, printf, colorize } = winston.format;
-
-const collection = await getCollection();
 
 const alignedWithColorsAndTime = combine(
   colorize(),
@@ -28,23 +24,13 @@ const alignedWithColorsAndTime = combine(
 
 const consoleTransport = new winston.transports.Console({ silent: process.env.NODE_ENV === 'test', handleRejections: true });
 
-const transports = [
-  consoleTransport,
-  ...createErrorMailTransports({
-    collection,
-    component: 'engine',
-    subject: `Server error on ${collection.id} collection`,
-    warningSubject: `Inaccessible content on ${collection.id} collection`,
-  }),
-];
-
 const logger = winston.createLogger({
   format: alignedWithColorsAndTime,
-  transports,
+  transports: [consoleTransport],
   exitOnError: false,
 });
 
-exitOnUnhandledRejection(transports);
+await addErrorMail(logger, { component: 'engine', subject: 'Server error', warningSubject: 'Inaccessible content' });
 
 let recordedSnapshotsCount;
 let recordedVersionsCount;
