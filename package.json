@@ -34,7 +34,7 @@
   "scripts": {
     "commit-messages:lint": "commitlint --from=main --to=HEAD",
     "dataset:generate": "node bin/ota.js dataset",
-    "dataset:release": "node bin/ota.js dataset --publish --remove-local-copy",
+    "dataset:release": "node bin/ota.js dataset --publish",
     "dataset:scheduler": "npm run dataset:release -- --schedule",
     "declarations:lint": "node bin/ota.js lint",
     "declarations:validate": "node bin/ota.js validate declarations",

@@ -33,6 +33,7 @@ logger.format = combine(
 
 export function createModuleLogger(moduleName) {
   return {
+    debug: message => logger.debug(message, { module: moduleName }),
     info: message => logger.info(message, { module: moduleName }),
     warn: message => logger.warn(message, { module: moduleName }),
     error: message => logger.error(message, { module: moduleName }),
