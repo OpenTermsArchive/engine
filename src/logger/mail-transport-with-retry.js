@@ -1,5 +1,3 @@
-import { once } from 'node:events';
-
 import async from 'async';
 import winston from 'winston';
 
@@ -21,24 +19,52 @@ class MailTransportWithRetry extends winston.Transport {
   constructor(options) {
     super(options);
     this.mailTransport = new winston.transports.Mail(options);
+    this.pending = new Set();
   }
 
-  async log(info, callback) {
+  log(info, callback) {
+    callback(); // Winston delivers each log to every transport in sequence, so waiting for the SMTP retries here would hold back the other transports too
+
+    const sending = this.send(info).finally(() => this.pending.delete(sending));
+
+    this.pending.add(sending);
+
+    return sending;
+  }
+
+  async send(info) {
     try {
-      await async.retry(RETRY_OPTIONS, async () => {
-        const result = Promise.race([
-          once(this.mailTransport, 'logged'),
-          once(this.mailTransport, 'error').then(([err]) => { throw err; }),
-        ]);
-
-        this.mailTransport.log(info, () => {});
-
-        return result;
-      });
+      await async.retry(RETRY_OPTIONS, async () => { await this.attempt(info); }); // The task must be an async function for async.retry to await it rather than wait for a callback
     } catch (error) {
       console.warn(`SMTP mail sending failed after ${RETRY_OPTIONS.times} attempts; giving up on this email:\n${error.stack}`);
     }
-    callback();
+  }
+
+  attempt(info) {
+    return new Promise((resolve, reject) => {
+      const removeListeners = () => {
+        this.mailTransport.off('logged', onLogged);
+        this.mailTransport.off('error', onError);
+      };
+
+      function onLogged() {
+        removeListeners();
+        resolve();
+      }
+
+      function onError(error) {
+        removeListeners();
+        reject(error);
+      }
+
+      this.mailTransport.once('logged', onLogged);
+      this.mailTransport.once('error', onError);
+      this.mailTransport.log(info, () => {});
+    });
+  }
+
+  async flush() {
+    await Promise.allSettled(this.pending);
   }
 }
 
