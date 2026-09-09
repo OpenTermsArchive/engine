@@ -1,5 +1,7 @@
 import config from 'config';
 
+import { DISPLAY_NAME, INFO_URL } from '../../../src/dataset/license.js';
+
 const LOCALE = 'en-EN';
 const DATE_OPTIONS = { year: 'numeric', month: 'long', day: 'numeric' };
 
@@ -60,6 +62,6 @@ This dataset represents each version of a document as a separate [Markdown](http
 
 ### License
 
-This dataset is made available under an [Open Database (OdBL) License](https://opendatacommons.org/licenses/odbl/1.0/) by Open Terms Archive Contributors.
+This dataset is made available under an [${DISPLAY_NAME}](${INFO_URL}) by Open Terms Archive Contributors.
 `;
 }

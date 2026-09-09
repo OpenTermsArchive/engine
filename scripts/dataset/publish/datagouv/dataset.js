@@ -4,11 +4,11 @@ import path from 'path';
 import FormData from 'form-data';
 import nodeFetch from 'node-fetch';
 
+import { DATAGOUV_LICENSE_ID } from '../../../../src/dataset/license.js';
 import { createModuleLogger } from '../../logger/index.js';
 
 const logger = createModuleLogger('datagouv');
 
-const DATASET_LICENSE = 'odc-odbl';
 const DEFAULT_RESOURCE_DESCRIPTION = 'See README.md inside the archive for dataset structure and usage information.';
 
 const routes = {
@@ -116,7 +116,7 @@ export async function updateDatasetMetadata({ apiBaseUrl, headers, datasetId, ti
   const updatePayload = {
     title,
     description,
-    license: DATASET_LICENSE,
+    license: DATAGOUV_LICENSE_ID,
     frequency,
   };
 

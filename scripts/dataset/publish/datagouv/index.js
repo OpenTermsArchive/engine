@@ -1,5 +1,6 @@
 import config from 'config';
 
+import { DATAGOUV_LICENSE_ID } from '../../../../src/dataset/license.js';
 import * as readme from '../../assets/README.template.js';
 import { createModuleLogger } from '../../logger/index.js';
 
@@ -9,7 +10,6 @@ const logger = createModuleLogger('datagouv');
 
 const PRODUCTION_API_BASE_URL = 'https://www.data.gouv.fr/api/1';
 const DEMO_API_BASE_URL = 'https://demo.data.gouv.fr/api/1';
-const DATASET_LICENSE = 'odc-odbl';
 
 export default async function publish({ archivePath, stats }) {
   const { datasetId, organizationIdOrSlug, apiBaseUrl, headers, datasetTitle, frequency } = loadConfiguration();
@@ -73,7 +73,7 @@ async function ensureDatasetExists({ apiBaseUrl, headers, organizationIdOrSlug, 
   let dataset = await findDatasetByTitle({ apiBaseUrl, headers, organizationId: organization.id, title: datasetTitle });
 
   if (!dataset) {
-    dataset = await createDataset({ apiBaseUrl, headers, organizationId: organization.id, title: datasetTitle, description, license: DATASET_LICENSE, frequency });
+    dataset = await createDataset({ apiBaseUrl, headers, organizationId: organization.id, title: datasetTitle, description, license: DATAGOUV_LICENSE_ID, frequency });
   }
 
   return dataset;

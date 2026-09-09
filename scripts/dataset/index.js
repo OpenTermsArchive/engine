@@ -3,13 +3,12 @@ import path from 'path';
 import config from 'config';
 
 import { toISODateWithoutMilliseconds } from '../../src/archivist/utils/date.js';
+import { SPDX_LICENSE_ID } from '../../src/dataset/license.js';
 import DatasetStorage from '../../src/dataset/storage.js';
 
 import generateRelease from './export/index.js';
 import logger from './logger/index.js';
 import publishRelease from './publish/index.js';
-
-const DATASET_LICENSE = 'ODbL-1.0'; // SPDX identifier of the license shipped in assets/LICENSE
 
 export async function release({ shouldPublish, fileName }) {
   const releaseDate = new Date();
@@ -26,7 +25,7 @@ export async function release({ shouldPublish, fileName }) {
   await storage.save({
     filename,
     title,
-    license: DATASET_LICENSE,
+    license: SPDX_LICENSE_ID,
     releaseDate: toISODateWithoutMilliseconds(releaseDate),
     firstVersionDate: toISODateWithoutMilliseconds(stats.firstVersionDate),
     lastVersionDate: toISODateWithoutMilliseconds(stats.lastVersionDate),
