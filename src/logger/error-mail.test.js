@@ -7,7 +7,7 @@ import sinon from 'sinon';
 import sinonChai from 'sinon-chai';
 import winston from 'winston';
 
-import { addErrorMail, createErrorMailTransports, exitOnUnhandledRejection } from './error-mail.js';
+import { SENDING_BUDGET, addErrorMail, createErrorMailTransports, exitOnUnhandledRejection } from './error-mail.js';
 import MailTransportWithRetry from './mail-transport-with-retry.js';
 
 use(sinonChai);
@@ -411,22 +411,48 @@ describe('Error mail', () => {
       mailTransport = Object.create(MailTransportWithRetry.prototype);
       mailTransport.flush = () => new Promise(resolve => { sent = resolve; });
       exitOnUnhandledRejection([ new winston.transports.Console({ silent: true }), mailTransport ], { emitter });
-      emitter.emit('unhandledRejection', new Error('boom'));
     });
 
-    it('waits for pending emails before exiting', async () => {
-      await tick();
-      await tick();
+    context('when emails are sent', () => {
+      beforeEach(() => {
+        emitter.emit('unhandledRejection', new Error('boom'));
+      });
 
-      expect(processExitStub).to.not.have.been.called;
+      it('waits for pending emails before exiting', async () => {
+        await tick();
+        await tick();
+
+        expect(processExitStub).to.not.have.been.called;
+      });
+
+      it('exits with a failure code once emails are sent', async () => {
+        await tick();
+        sent();
+        await tick();
+
+        expect(processExitStub).to.have.been.calledOnceWithExactly(1);
+      });
     });
 
-    it('exits with a failure code once emails are sent', async () => {
-      await tick();
-      sent();
-      await tick();
+    context('when emails cannot be sent', () => {
+      let clock;
 
-      expect(processExitStub).to.have.been.calledOnceWithExactly(1);
+      beforeEach(() => {
+        clock = sinon.useFakeTimers();
+        emitter.emit('unhandledRejection', new Error('boom'));
+      });
+
+      afterEach(() => {
+        clock.restore();
+      });
+
+      it('exits with a failure code after one sending attempt', async () => {
+        await clock.tickAsync(SENDING_BUDGET - 1);
+        expect(processExitStub).to.not.have.been.called;
+
+        await clock.tickAsync(1);
+        expect(processExitStub).to.have.been.calledOnceWithExactly(1);
+      });
     });
   });
 });

@@ -5,10 +5,11 @@ import winston from 'winston';
 
 import { getCollection } from '../archivist/collection/index.js';
 
-import MailTransportWithRetry, { RETRY_DELAYS } from './mail-transport-with-retry.js';
+import MailTransportWithRetry from './mail-transport-with-retry.js';
 
 const SMTP_TIMEOUT = 60 * 1000;
-const SENDING_BUDGET = RETRY_DELAYS.reduce((total, delay) => total + delay, 0) + SMTP_TIMEOUT * (RETRY_DELAYS.length + 1);
+
+export const SENDING_BUDGET = SMTP_TIMEOUT; // The duration of one attempt: retries would only delay the restart when the relay is down
 
 const escapeHtml = text => String(text).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
