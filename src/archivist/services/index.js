@@ -106,7 +106,7 @@ function createWrappedFilter(baseFunction, filterName, filterParams) {
     return;
   }
 
-  if (filterParams) {
+  if (filterParams || exposedFilters[filterName]) { // Built-in filters always receive their parameters before the context, even when none are declared
     const wrappedFilter = (webPageDOM, context) => baseFunction(webPageDOM, filterParams, context);
 
     Object.defineProperty(wrappedFilter, 'name', { value: filterName });
