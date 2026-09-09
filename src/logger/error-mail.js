@@ -21,7 +21,7 @@ const command = (label, code) => `
                     <code style="${CODE_STYLE}">${escapeHtml(code)}</code>
                   </li>`;
 
-function formatBody({ collection, component, environmentPrefix }, { message, level }) {
+function formatBody({ collection, component, environmentPrefix }, { message, level, timestamp }) {
   const isError = level.includes('error');
   const titleColor = isError ? '#dc3545' : '#ffc107';
   const titleText = isError ? 'Error details' : 'Warning details';
@@ -46,6 +46,7 @@ function formatBody({ collection, component, environmentPrefix }, { message, lev
             <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; color: #333333; max-width: 800px; margin: 0 auto; padding: 0px 20px 20px 20px;">
               <h1 style="color: #212529; font-size: 24px; margin: 10px 0; text-align: center; padding-bottom: 10px;">${escapeHtml(`${environmentPrefix}Open Terms Archive ${component} error report — ${collection.name} Collection`)}</h1>
               ${section(titleText, titleColor, `
+                <div style="color: #6c757d; font-size: 14px; margin: 8px 0 0 0;">Time: ${escapeHtml(timestamp || new Date().toISOString())}</div>
                 <div style="background-color: #ffffff; border: 1px solid #dee2e6; border-radius: 4px; padding: 12px; margin: 8px 0;">
                   <code style="margin: 0; font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace; font-size: 14px; color: #212529; white-space: pre-wrap; display: block;">${escapeHtml(message)}</code>
                 </div>`)}

@@ -251,6 +251,10 @@ describe('Error mail', () => {
             expect(body).to.include(os.hostname());
           });
 
+          it('includes the time of the error', () => {
+            expect(formatter({ message: 'Error', level: 'error', timestamp: '2026-09-09T10:00:00+02:00' })).to.include('Time: 2026-09-09T10:00:00+02:00');
+          });
+
           it('includes the command to connect to the server', () => {
             expect(body).to.include(`ssh ${collection.hostConfig.ansible_user}@${collection.host}`);
           });
