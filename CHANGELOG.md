@@ -2,6 +2,14 @@
 
 All changes that impact users of this module are documented in this file, in the [Common Changelog](https://common-changelog.org) format with some additional specifications defined in the CONTRIBUTING file. This codebase adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased [patch]
+
+> Development of this release was made on a volunteer basis by [be-student](https://github.com/be-student).
+
+### Fixed
+
+- Reject duplicate source document locations in `combine` during schema-only validation, as full validation already does
+
 ## 15.3.0 - 2026-09-09
 
 > Development of this release was supported by [Anthelia](https://anthelia.tech).

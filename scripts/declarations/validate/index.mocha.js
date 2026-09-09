@@ -97,7 +97,7 @@ export default async options => {
           }
         });
 
-        if (!schemaOnly && service) {
+        if (service) {
           service.getTermsTypes()
             .filter(termsType => {
               if (!service.terms[termsType]?.latest) { // If this terms type has been deleted and there is only a historical record for it, but no current valid declaration
@@ -124,6 +124,10 @@ export default async options => {
 
                     expect(duplicateLocations, `The same source document is declared more than once within the "${type}" combine: ${duplicateLocations.join(', ')}`).to.be.empty;
                   });
+                }
+
+                if (schemaOnly) {
+                  return; // Remaining checks require fetching the source documents
                 }
 
                 terms.sourceDocuments.forEach(sourceDocument => {
