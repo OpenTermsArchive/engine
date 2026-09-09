@@ -2,6 +2,25 @@
 
 All changes that impact users of this module are documented in this file, in the [Common Changelog](https://common-changelog.org) format with some additional specifications defined in the CONTRIBUTING file. This codebase adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased [minor]
+
+> Development of this release was supported by [Anthelia](https://anthelia.tech).
+
+### Changed
+
+- Name the collection in the subject of Collection API error emails and give them the same body as engine error emails
+- Prefix the subject and title of error emails with the environment name, such as `[development]`, when `NODE_ENV` is not `production`
+
+### Fixed
+
+- Keep the Collection API running when sending an error email fails
+- Send one error email per unhandled promise rejection instead of two
+- Wait for the error email to be sent before exiting on an unhandled promise rejection
+- Stop sending errors a second time as warnings when [`logger.sendMailOnError.sendWarnings`](https://docs.opentermsarchive.org/collections/reference/configuration/#logger) is enabled
+- Send error emails as HTML instead of plain text
+- Start the engine when [`logger.sendMailOnError`](https://docs.opentermsarchive.org/collections/reference/configuration/#logger) is enabled without `sendWarnings`
+- Start the Collection API with a warning instead of failing when `OTA_ENGINE_SMTP_PASSWORD` is missing while [`logger.sendMailOnError`](https://docs.opentermsarchive.org/collections/reference/configuration/#logger) is enabled
+
 ## 15.2.0 - 2026-09-09
 
 > Development of this release was made on a volunteer basis by [be-student](https://github.com/be-student).

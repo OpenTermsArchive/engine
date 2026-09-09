@@ -1,33 +1,12 @@
-import os from 'os';
-
 import config from 'config';
 import dotenv from 'dotenv';
 import winston from 'winston';
 
-import MailTransportWithRetry from '../logger/mail-transport-with-retry.js';
+import { addErrorMail } from '../logger/error-mail.js';
 
 dotenv.config({ quiet: true });
 
 const { combine, timestamp, printf, colorize } = winston.format;
-
-const transports = [new winston.transports.Console()];
-
-if (config.get('@opentermsarchive/engine.logger.sendMailOnError')) {
-  transports.push(new MailTransportWithRetry({
-    to: config.get('@opentermsarchive/engine.logger.sendMailOnError.to'),
-    from: config.get('@opentermsarchive/engine.logger.sendMailOnError.from'),
-    host: config.get('@opentermsarchive/engine.logger.smtp.host'),
-    port: config.get('@opentermsarchive/engine.logger.smtp.port'),
-    username: config.get('@opentermsarchive/engine.logger.smtp.username'),
-    password: process.env.OTA_ENGINE_SMTP_PASSWORD,
-    tls: true,
-    timeout: 60 * 1000,
-    formatter: args => args[Object.getOwnPropertySymbols(args)[1]], // Returns the full error message, the same visible in the console. It is referenced in the argument object with a Symbol of which we do not have the reference but we know it is the second one.
-    exitOnError: true,
-    level: 'error',
-    subject: `[OTA API] Error Report — ${os.hostname()}`,
-  }));
-}
 
 const logger = winston.createLogger({
   format: combine(
@@ -39,8 +18,10 @@ const logger = winston.createLogger({
       return `${timestampPrefix}${level.padEnd(15)} ${message}`;
     }),
   ),
-  transports,
-  rejectionHandlers: transports,
+  transports: [new winston.transports.Console({ handleRejections: true })],
+  exitOnError: false,
 });
+
+await addErrorMail(logger, { component: 'Collection API', subject: 'API error' });
 
 export default logger;
