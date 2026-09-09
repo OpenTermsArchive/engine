@@ -231,6 +231,31 @@ describe('Error mail', () => {
           });
         });
 
+        context('when interpolated values contain HTML characters', () => {
+          beforeEach(() => {
+            [{ mailTransport: { formatter } }] = createErrorMailTransports({ collection: { id: 'test', name: 'R&D <beta>', host: '203.0.113.1', hostConfig: { ansible_user: 'ota<x>' } }, component: 'API <v2>', subject, warningSubject });
+            body = formatter({ message: 'Error', level: 'error' });
+          });
+
+          it('escapes the collection name', () => {
+            expect(body).to.include('R&amp;D &lt;beta&gt; Collection');
+            expect(body).to.not.include('<beta>');
+          });
+
+          it('escapes the component', () => {
+            expect(body).to.include('Open Terms Archive API &lt;v2&gt; error report');
+          });
+
+          it('escapes the command to connect to the server', () => {
+            expect(body).to.include('ssh ota&lt;x&gt;@203.0.113.1');
+            expect(body).to.not.include('ota<x>');
+          });
+
+          it('escapes the commands placeholders', () => {
+            expect(body).to.include('pm2 logs &lt;process-name&gt;');
+          });
+        });
+
         context('when the collection has no deployment inventory', () => {
           beforeEach(() => {
             [{ mailTransport: { formatter } }] = createErrorMailTransports({ collection: { id: 'test', name: 'Test' }, component, subject, warningSubject });
