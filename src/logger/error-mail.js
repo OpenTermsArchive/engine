@@ -3,10 +3,9 @@ import os from 'os';
 import config from 'config';
 
 import MailTransportWithRetry from './mail-transport-with-retry.js';
+import { escapeHtml } from './utils.js';
 
 const SMTP_TIMEOUT = 60 * 1000;
-
-const escapeHtml = text => String(text).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
 function formatBody({ collection, component, environmentPrefix }, { message, level }) {
   const isError = level.includes('error');

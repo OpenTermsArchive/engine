@@ -3,6 +3,7 @@ import { js2xml } from 'xml-js';
 
 import { getCollection } from '../../archivist/collection/index.js';
 import { toISODateWithoutMilliseconds } from '../../archivist/utils/date.js';
+import { escapeHtml } from '../../logger/utils.js';
 
 const RECORD_TYPES = {
   firstRecord: 'First record',
@@ -26,15 +27,6 @@ function buildAbsoluteBaseUrl(req) {
 
 function classifyRecordType(version) {
   return version.isFirstRecord ? RECORD_TYPES.firstRecord : RECORD_TYPES.change;
-}
-
-// xml-js does not escape attribute values by default — callers are expected to pre-escape. We wire this helper to js2xml's attributeValueFn so every emitted attribute goes through it, regardless of where it's built. Without this, a serviceId like "AT&T Mobile" would yield malformed XML rejected by strict feed readers (libxml2-based).
-function escapeXmlAttribute(value) {
-  return String(value)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
 }
 
 function buildVersionLink(baseUrl, version) {
@@ -112,7 +104,7 @@ function sendFeed(req, res, opts) {
   res.set('Content-Type', 'application/atom+xml; charset=utf-8');
   const document = buildFeedDocument({ ...opts, latestFetchDate });
 
-  return res.status(200).send(js2xml(document, { compact: true, spaces: 2, attributeValueFn: escapeXmlAttribute }));
+  return res.status(200).send(js2xml(document, { compact: true, spaces: 2, attributeValueFn: escapeHtml })); // xml-js does not escape attribute values by default; without this a serviceId like "AT&T Mobile" would yield malformed XML rejected by strict feed readers (libxml2-based)
 }
 
 /**

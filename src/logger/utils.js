@@ -20,3 +20,9 @@ export const formatDuration = milliseconds => {
 
   return parts.join(' and ');
 };
+
+export const escapeHtml = value => String(value)
+  .replace(/&/g, '&amp;')
+  .replace(/</g, '&lt;')
+  .replace(/>/g, '&gt;')
+  .replace(/"/g, '&quot;');
