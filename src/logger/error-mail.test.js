@@ -159,6 +159,41 @@ describe('Error mail', () => {
         it('uses the warning subject for the second transport', () => {
           expect(transports[1].mailTransport.subject).to.equal(warningSubject);
         });
+
+        context('when logging through both transports', () => {
+          let sent;
+
+          beforeEach(() => {
+            sent = [];
+            transports.forEach((transport, index) => {
+              sinon.stub(transport.mailTransport, 'log').callsFake((info, callback) => {
+                sent.push(index);
+                setImmediate(() => {
+                  transport.mailTransport.emit('logged');
+                  callback();
+                });
+              });
+            });
+          });
+
+          it('sends errors through the error transport only', async () => {
+            const logger = winston.createLogger({ format: winston.format.colorize(), transports });
+
+            logger.error('boom');
+            await new Promise(resolve => { setTimeout(resolve, 10); });
+
+            expect(sent).to.deep.equal([0]);
+          });
+
+          it('sends warnings through the warning transport only', async () => {
+            const logger = winston.createLogger({ format: winston.format.colorize(), transports });
+
+            logger.warn('inaccessible');
+            await new Promise(resolve => { setTimeout(resolve, 10); });
+
+            expect(sent).to.deep.equal([1]);
+          });
+        });
       });
 
       context('with warnings enabled but no subject for them', () => {

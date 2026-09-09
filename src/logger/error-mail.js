@@ -1,6 +1,7 @@
 import os from 'os';
 
 import config from 'config';
+import winston from 'winston';
 
 import MailTransportWithRetry from './mail-transport-with-retry.js';
 
@@ -106,7 +107,12 @@ export function createErrorMailTransports({ collection, component, subject, warn
   const transports = [new MailTransportWithRetry({ ...mailerOptions, level: 'error', subject: `${environmentPrefix}${subject}` })];
 
   if (warningSubject && config.get('@opentermsarchive/engine.logger.sendMailOnError.sendWarnings')) { // Only callers providing a subject for warnings can send them
-    transports.push(new MailTransportWithRetry({ ...mailerOptions, level: 'warn', subject: `${environmentPrefix}${warningSubject}` }));
+    transports.push(new MailTransportWithRetry({
+      ...mailerOptions,
+      level: 'warn',
+      subject: `${environmentPrefix}${warningSubject}`,
+      format: winston.format(info => (info[Symbol.for('level')] === 'warn' ? info : false))(), // Winston transports receive every level at or above theirs, so errors would otherwise be emailed a second time as warnings
+    }));
   }
 
   return transports;
