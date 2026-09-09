@@ -50,6 +50,7 @@ describe('Error mail', () => {
       '@opentermsarchive/engine.logger.smtp.username': 'user',
     };
     sinon.stub(config, 'get').callsFake(key => configValues[key]);
+    sinon.stub(config, 'has').callsFake(key => configValues[key] !== undefined);
     process.env.NODE_ENV = 'production';
     consoleWarnStub = sinon.stub(console, 'warn');
     consoleErrorStub = sinon.stub(console, 'error');
@@ -200,6 +201,18 @@ describe('Error mail', () => {
         beforeEach(() => {
           configValues['@opentermsarchive/engine.logger.sendMailOnError.sendWarnings'] = true;
           transports = createErrorMailTransports({ collection, component, subject });
+        });
+
+        it('returns the error transport only', () => {
+          expect(transports).to.have.lengthOf(1);
+          expect(transports[0].level).to.equal('error');
+        });
+      });
+
+      context('with a subject for warnings but warnings not configured', () => {
+        beforeEach(() => {
+          delete configValues['@opentermsarchive/engine.logger.sendMailOnError.sendWarnings'];
+          transports = createErrorMailTransports({ collection, component, subject, warningSubject });
         });
 
         it('returns the error transport only', () => {
