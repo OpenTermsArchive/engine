@@ -29,6 +29,25 @@ describe('MailTransportWithRetry', () => {
     clock.restore();
   });
 
+  describe('#flush', () => {
+    it('resolves once pending emails are sent', async () => {
+      let flushed = false;
+
+      transport.log({ message: 'test' }, () => {});
+
+      const flushPromise = transport.flush().then(() => { flushed = true; });
+
+      await clock.tickAsync(0);
+      expect(flushed).to.be.false;
+
+      mockMailTransport.emit('logged');
+      await flushPromise;
+
+      expect(flushed).to.be.true;
+      expect(transport.pending).to.be.empty;
+    });
+  });
+
   describe('#log', () => {
     context('when email is sent successfully on first attempt', () => {
       it('calls callback without error', async () => {
@@ -61,6 +80,24 @@ describe('MailTransportWithRetry', () => {
         await logPromise;
 
         expect(consoleWarnStub).not.to.have.been.called;
+      });
+
+      it('calls callback before the email is sent', () => {
+        const callback = sinon.spy();
+
+        transport.log({ message: 'test' }, callback);
+
+        expect(callback).to.have.been.calledOnce;
+      });
+
+      it('removes its listeners from the mail transport', async () => {
+        const logPromise = transport.log({ message: 'test' }, () => {});
+
+        mockMailTransport.emit('logged');
+        await logPromise;
+
+        expect(mockMailTransport.listenerCount('logged')).to.equal(0);
+        expect(mockMailTransport.listenerCount('error')).to.equal(0);
       });
     });
 
@@ -157,6 +194,25 @@ describe('MailTransportWithRetry', () => {
 
         expect(consoleWarnStub.lastCall.args[0]).to.include(`failed after ${RETRY_DELAYS.length + 1} attempts`);
         expect(consoleWarnStub.lastCall.args[0]).to.include('Error: SMTP timeout');
+      });
+
+      it('removes its listeners from the mail transport', async () => {
+        const logPromise = transport.log({ message: 'test' }, () => {});
+
+        mockMailTransport.emit('error', new Error('SMTP timeout'));
+        await clock.tickAsync(RETRY_DELAYS[0]);
+
+        mockMailTransport.emit('error', new Error('SMTP timeout'));
+        await clock.tickAsync(RETRY_DELAYS[1]);
+
+        mockMailTransport.emit('error', new Error('SMTP timeout'));
+        await clock.tickAsync(RETRY_DELAYS[2]);
+
+        mockMailTransport.emit('error', new Error('SMTP timeout'));
+        await logPromise;
+
+        expect(mockMailTransport.listenerCount('logged')).to.equal(0);
+        expect(mockMailTransport.listenerCount('error')).to.equal(0);
       });
     });
 
