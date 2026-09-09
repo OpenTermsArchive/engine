@@ -3,10 +3,11 @@ import os from 'os';
 import config from 'config';
 import winston from 'winston';
 
-import MailTransportWithRetry from './mail-transport-with-retry.js';
+import MailTransportWithRetry, { RETRY_DELAYS } from './mail-transport-with-retry.js';
 import { escapeHtml } from './utils.js';
 
 const SMTP_TIMEOUT = 60 * 1000;
+const SENDING_BUDGET = RETRY_DELAYS.reduce((total, delay) => total + delay, 0) + SMTP_TIMEOUT * (RETRY_DELAYS.length + 1);
 
 const CODE_STYLE = "font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace; background-color: #ffffff; border: 1px solid #dee2e6; border-radius: 4px; padding: 6px 10px; display: inline-block; color: #212529; cursor: text; user-select: all; -webkit-user-select: all; -moz-user-select: all; -ms-user-select: all;";
 
@@ -116,4 +117,17 @@ export function createErrorMailTransports({ collection, component, subject, warn
   }
 
   return transports;
+}
+
+export function exitOnUnhandledRejection(transports, { emitter = process } = {}) {
+  const mailTransports = transports.filter(transport => transport instanceof MailTransportWithRetry);
+
+  emitter.on('unhandledRejection', async () => {
+    await new Promise(resolve => { setImmediate(resolve); }); // Winston's own listener, registered before this one, logs the rejection on the current tick; give the transports a chance to receive it before waiting for them
+    await Promise.race([
+      Promise.all(mailTransports.map(transport => transport.flush())),
+      new Promise(resolve => { setTimeout(resolve, SENDING_BUDGET).unref(); }),
+    ]);
+    process.exit(1);
+  });
 }

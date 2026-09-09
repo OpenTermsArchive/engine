@@ -17,6 +17,7 @@ All changes that impact users of this module are documented in this file, in the
 
 - Keep the engine and the Collection API running when sending an error email fails
 - Send one error email per unhandled promise rejection instead of two
+- Wait for the error email to be sent before exiting on an unhandled promise rejection
 - Stop sending errors a second time as warnings when [`logger.sendMailOnError.sendWarnings`](https://docs.opentermsarchive.org/collections/reference/configuration/#logger) is enabled
 - Send error emails as HTML instead of plain text
 - Start the engine when [`logger.sendMailOnError`](https://docs.opentermsarchive.org/collections/reference/configuration/#logger) is enabled without `sendWarnings`

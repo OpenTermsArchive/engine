@@ -1,3 +1,4 @@
+import { EventEmitter } from 'node:events';
 import os from 'node:os';
 
 import { expect, use } from 'chai';
@@ -6,7 +7,7 @@ import sinon from 'sinon';
 import sinonChai from 'sinon-chai';
 import winston from 'winston';
 
-import { createErrorMailTransports } from './error-mail.js';
+import { createErrorMailTransports, exitOnUnhandledRejection } from './error-mail.js';
 import MailTransportWithRetry from './mail-transport-with-retry.js';
 
 use(sinonChai);
@@ -336,6 +337,39 @@ describe('Error mail', () => {
           expect(transports[0].mailTransport.formatter({ message: 'Error', level: 'error' })).to.include(`[staging] Open Terms Archive ${component} error report`);
         });
       });
+    });
+  });
+
+  describe('#exitOnUnhandledRejection', () => {
+    let emitter;
+    let processExitStub;
+    let mailTransport;
+    let sent;
+
+    const tick = () => new Promise(resolve => { setImmediate(resolve); });
+
+    beforeEach(() => {
+      emitter = new EventEmitter();
+      processExitStub = sinon.stub(process, 'exit');
+      mailTransport = Object.create(MailTransportWithRetry.prototype);
+      mailTransport.flush = () => new Promise(resolve => { sent = resolve; });
+      exitOnUnhandledRejection([ new winston.transports.Console({ silent: true }), mailTransport ], { emitter });
+      emitter.emit('unhandledRejection', new Error('boom'));
+    });
+
+    it('waits for pending emails before exiting', async () => {
+      await tick();
+      await tick();
+
+      expect(processExitStub).to.not.have.been.called;
+    });
+
+    it('exits with a failure code once emails are sent', async () => {
+      await tick();
+      sent();
+      await tick();
+
+      expect(processExitStub).to.have.been.calledOnceWithExactly(1);
     });
   });
 });
