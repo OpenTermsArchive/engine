@@ -10,6 +10,33 @@ All changes that impact users of this module are documented in this file, in the
 
 - Reject duplicate source document locations in `combine` during schema-only validation, as full validation already does
 
+## 15.3.0 - 2026-09-09
+
+> Development of this release was supported by [Anthelia](https://anthelia.tech).
+
+### Changed
+
+- Name the collection in the subject of Collection API error emails and give them the same body as engine error emails
+- Prefix the subject and title of error emails with the environment name, such as `[development]`, when `NODE_ENV` is not `production`
+
+### Fixed
+
+- Keep the Collection API running when sending an error email fails
+- Send one error email per unhandled promise rejection instead of two
+- Wait for the error email to be sent before exiting on an unhandled promise rejection
+- Stop sending errors a second time as warnings when [`logger.sendMailOnError.sendWarnings`](https://docs.opentermsarchive.org/collections/reference/configuration/#logger) is enabled
+- Send error emails as HTML instead of plain text
+- Start the engine when [`logger.sendMailOnError`](https://docs.opentermsarchive.org/collections/reference/configuration/#logger) is enabled without `sendWarnings`
+- Start the Collection API with a warning instead of failing when `OTA_ENGINE_SMTP_PASSWORD` is missing while [`logger.sendMailOnError`](https://docs.opentermsarchive.org/collections/reference/configuration/#logger) is enabled
+
+## 15.2.0 - 2026-09-09
+
+> Development of this release was made on a volunteer basis by [be-student](https://github.com/be-student).
+
+### Changed
+
+- Remove well-known tracking query parameters (`utm_*`, `fbclid`, `gclid`, ...) by default when the built-in `removeQueryParams` filter is declared without parameters; see the [built-in filters documentation](https://docs.opentermsarchive.org/terms/reference/built-in-filters/)
+
 ## 15.1.0 - 2026-07-13
 
 > Development of this release was supported by [User Rights](https://www.user-rights.org).

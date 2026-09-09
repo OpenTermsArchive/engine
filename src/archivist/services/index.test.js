@@ -6,6 +6,7 @@ import sinon from 'sinon';
 import sinonChai from 'sinon-chai';
 
 import expectedServices from '../../../test/fixtures/services.js';
+import createWebPageDOM from '../extract/dom.js';
 import * as exposedFilters from '../extract/exposedFilters.js';
 
 import Service from './service.js';
@@ -272,7 +273,18 @@ describe('Services', () => {
       const filterName = filterNames[0];
       const result = getServiceFilters({}, [filterName]);
 
-      expect(result).to.deep.equal([exposedFilters[filterName]]);
+      expect(result).to.have.length(1);
+      expect(result[0]).to.be.a('function');
+      expect(result[0].name).to.equal(filterName);
+    });
+
+    it('calls exposedFilters with their default parameters when declared by string name', () => {
+      const webPageDOM = createWebPageDOM('<!DOCTYPE html><html><body><a href="https://example.com/page?fbclid=abc&keep=value"></a></body></html>', 'https://example.com');
+      const [removeQueryParams] = getServiceFilters({}, ['removeQueryParams']);
+
+      removeQueryParams(webPageDOM, { fetch: 'https://example.com', select: [], remove: [], filter: ['removeQueryParams'] });
+
+      expect(webPageDOM.querySelector('a').getAttribute('href')).to.equal('https://example.com/page?keep=value');
     });
 
     it('returns filters from serviceFilters by string name', () => {
@@ -371,7 +383,7 @@ describe('Services', () => {
         expect(sourceDocument.filters).to.be.an('array');
         expect(sourceDocument.filters).to.have.length(2);
         expect(sourceDocument.filters[0]).to.be.a('function');
-        expect(sourceDocument.filters[0]).to.equal(exposedFilters[realFilterNames[0]]);
+        expect(sourceDocument.filters[0].name).to.equal(realFilterNames[0]);
         expect(sourceDocument.filters[1]).to.be.a('function');
         expect(sourceDocument.filters[1].name).to.equal('removePrintButton');
       });

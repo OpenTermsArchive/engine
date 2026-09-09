@@ -1,4 +1,35 @@
-export function removeQueryParams(webPageDOM, paramsToRemove = []) {
+const DEFAULT_TRACKING_QUERY_PARAMS = Object.freeze([
+  'utm_source', // Campaign parameters, see https://en.wikipedia.org/wiki/UTM_parameters
+  'utm_medium',
+  'utm_campaign',
+  'utm_term',
+  'utm_content',
+  'fbclid', // Click and user identifiers, see https://github.com/privacytests/privacytests/blob/dda473a462e5c37f9f2c8b2367fbc5f834796be4/live/results.js#L31-L65
+  'gclid',
+  'msclkid',
+  'mc_eid',
+  'dclid',
+  'oly_anon_id',
+  'oly_enc_id',
+  '_openstat',
+  'vero_conv',
+  'vero_id',
+  'wickedid',
+  'yclid',
+  '__s',
+  'rb_clickid',
+  's_cid',
+  'ml_subscriber',
+  'ml_subscriber_hash',
+  '_hsenc',
+  '__hssc',
+  '__hstc',
+  '__hsfp',
+  'hsCtaTracking',
+  'mkt_tok',
+]);
+
+export function removeQueryParams(webPageDOM, paramsToRemove = DEFAULT_TRACKING_QUERY_PARAMS) {
   const normalizedParams = Array.isArray(paramsToRemove) ? paramsToRemove : [paramsToRemove];
 
   if (!normalizedParams.length) {
