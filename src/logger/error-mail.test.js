@@ -1,4 +1,3 @@
-import { EventEmitter } from 'node:events';
 import os from 'node:os';
 
 import { expect, use } from 'chai';
@@ -7,7 +6,7 @@ import sinon from 'sinon';
 import sinonChai from 'sinon-chai';
 import winston from 'winston';
 
-import { createErrorMailTransports, handleTransportErrors } from './error-mail.js';
+import { createErrorMailTransports } from './error-mail.js';
 import MailTransportWithRetry from './mail-transport-with-retry.js';
 
 use(sinonChai);
@@ -23,7 +22,6 @@ describe('Error mail', () => {
   let originalPassword;
   let getEnvStub;
   let consoleWarnStub;
-  let consoleErrorStub;
 
   before(() => {
     originalPassword = process.env.OTA_ENGINE_SMTP_PASSWORD;
@@ -51,7 +49,6 @@ describe('Error mail', () => {
     sinon.stub(config, 'has').callsFake(key => configValues[key] !== undefined);
     getEnvStub = sinon.stub(config.util, 'getEnv').returns('production');
     consoleWarnStub = sinon.stub(console, 'warn');
-    consoleErrorStub = sinon.stub(console, 'error');
     process.env.OTA_ENGINE_SMTP_PASSWORD = 'secret';
   });
 
@@ -338,52 +335,6 @@ describe('Error mail', () => {
         it('prefixes the title of the body with the environment', () => {
           expect(transports[0].mailTransport.formatter({ message: 'Error', level: 'error' })).to.include(`[staging] Open Terms Archive ${component} error report`);
         });
-      });
-    });
-  });
-
-  describe('#handleTransportErrors', () => {
-    let logger;
-    let processExitStub;
-
-    beforeEach(() => {
-      logger = new EventEmitter();
-      processExitStub = sinon.stub(process, 'exit');
-      handleTransportErrors(logger);
-    });
-
-    context('when the error comes from the mail transport', () => {
-      let error;
-
-      beforeEach(() => {
-        error = new Error('Connection refused');
-        logger.emit('error', error, Object.create(MailTransportWithRetry.prototype));
-      });
-
-      it('does not exit the process', () => {
-        expect(processExitStub).to.not.have.been.called;
-      });
-
-      it('warns with the error stack', () => {
-        expect(consoleWarnStub).to.have.been.calledOnce;
-        expect(consoleWarnStub.firstCall.args[0]).to.include(error.stack);
-      });
-    });
-
-    context('when the error comes from another transport', () => {
-      let error;
-
-      beforeEach(() => {
-        error = new Error('Broken pipe');
-        logger.emit('error', error, new winston.transports.Console({ silent: true }));
-      });
-
-      it('exits the process with a failure code', () => {
-        expect(processExitStub).to.have.been.calledOnceWithExactly(1);
-      });
-
-      it('prints the error before exiting', () => {
-        expect(consoleErrorStub).to.have.been.calledOnceWithExactly(error);
       });
     });
   });

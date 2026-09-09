@@ -98,7 +98,7 @@ describe('MailTransportWithRetry', () => {
     });
 
     context('when email fails after all retry attempts', () => {
-      it('emits error event after all retries are exhausted', async () => {
+      it('does not emit an error event after all retries are exhausted', async () => {
         const errorHandler = sinon.spy();
 
         transport.on('error', errorHandler);
@@ -117,14 +117,11 @@ describe('MailTransportWithRetry', () => {
         mockMailTransport.emit('error', new Error('SMTP timeout'));
         await logPromise;
 
-        expect(errorHandler).to.have.been.calledOnce;
-        expect(errorHandler.firstCall.args[0].message).to.equal('SMTP timeout');
+        expect(errorHandler).not.to.have.been.called;
       });
 
       it('calls callback even after failure', async () => {
         const callback = sinon.spy();
-
-        transport.on('error', () => {}); // Prevent unhandled error
 
         const logPromise = transport.log({ message: 'test' }, callback);
 
@@ -144,8 +141,6 @@ describe('MailTransportWithRetry', () => {
       });
 
       it('logs final failure warning', async () => {
-        transport.on('error', () => {}); // Prevent unhandled error
-
         const logPromise = transport.log({ message: 'test' }, () => {});
 
         mockMailTransport.emit('error', new Error('SMTP timeout'));
@@ -161,6 +156,7 @@ describe('MailTransportWithRetry', () => {
         await logPromise;
 
         expect(consoleWarnStub.lastCall.args[0]).to.include(`failed after ${RETRY_DELAYS.length + 1} attempts`);
+        expect(consoleWarnStub.lastCall.args[0]).to.include('Error: SMTP timeout');
       });
     });
 

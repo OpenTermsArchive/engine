@@ -11,15 +11,15 @@ All changes that impact users of this module are documented in this file, in the
 - Name the collection in the subject of Collection API error emails and give them the same body as engine error emails
 - Prefix the subject and title of error emails with the environment name, such as `[development]`, when the configuration environment (`NODE_CONFIG_ENV` or `NODE_ENV`) is not `production`
 - Include the time of the error in error email bodies
+- Skip Collection API error emails with a warning when `OTA_ENGINE_SMTP_PASSWORD` is missing while [`logger.sendMailOnError`](https://docs.opentermsarchive.org/collections/reference/configuration/#logger) is enabled, as the engine already does
 
 ### Fixed
 
-- Keep the Collection API running when sending an error email fails
+- Keep the engine and the Collection API running when sending an error email fails
 - Send one error email per unhandled promise rejection instead of two
 - Stop sending errors a second time as warnings when [`logger.sendMailOnError.sendWarnings`](https://docs.opentermsarchive.org/collections/reference/configuration/#logger) is enabled
 - Send error emails as HTML instead of plain text
 - Start the engine when [`logger.sendMailOnError`](https://docs.opentermsarchive.org/collections/reference/configuration/#logger) is enabled without `sendWarnings`
-- Start the Collection API with a warning instead of failing when `OTA_ENGINE_SMTP_PASSWORD` is missing while [`logger.sendMailOnError`](https://docs.opentermsarchive.org/collections/reference/configuration/#logger) is enabled
 
 ## 15.1.0 - 2026-07-13
 

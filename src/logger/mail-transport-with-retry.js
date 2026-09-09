@@ -36,8 +36,7 @@ class MailTransportWithRetry extends winston.Transport {
         return result;
       });
     } catch (error) {
-      console.warn(`SMTP mail sending failed after ${RETRY_OPTIONS.times} attempts: ${error.message}`);
-      this.emit('error', error);
+      console.warn(`SMTP mail sending failed after ${RETRY_OPTIONS.times} attempts; giving up on this email:\n${error.stack}`);
     }
     callback();
   }
