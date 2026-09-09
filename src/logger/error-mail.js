@@ -117,17 +117,3 @@ export function createErrorMailTransports({ collection, component, subject, warn
 
   return transports;
 }
-
-export function handleTransportErrors(logger) {
-  logger.on('error', (err, transport) => {
-    if (transport instanceof MailTransportWithRetry) {
-      console.warn(`Uncaught exception from SMTP mailer detected and treated as an operational error; process will continue running:\n${err.stack}`); // Reported on the console rather than through the logger, which would send this warning back to the failing mailer
-
-      return; // Prevent process exit
-    }
-
-    console.error(err); // Registering a listener stops Node from printing the error itself; print it before exiting so the cause stays in the logs
-
-    return process.exit(1); // Exit process for other errors
-  });
-}
