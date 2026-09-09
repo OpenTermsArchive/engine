@@ -106,7 +106,7 @@ export function createErrorMailTransports({ collection, component, subject, warn
 
   const transports = [new MailTransportWithRetry({ ...mailerOptions, level: 'error', subject: `${environmentPrefix}${subject}` })];
 
-  if (warningSubject && config.get('@opentermsarchive/engine.logger.sendMailOnError.sendWarnings')) { // Only callers providing a subject for warnings can send them
+  if (warningSubject && config.has('@opentermsarchive/engine.logger.sendMailOnError.sendWarnings') && config.get('@opentermsarchive/engine.logger.sendMailOnError.sendWarnings')) { // Only callers providing a subject for warnings can send them
     transports.push(new MailTransportWithRetry({
       ...mailerOptions,
       level: 'warn',

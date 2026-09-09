@@ -18,6 +18,7 @@ All changes that impact users of this module are documented in this file, in the
 - Send one error email per unhandled promise rejection instead of two
 - Stop sending errors a second time as warnings when [`logger.sendMailOnError.sendWarnings`](https://docs.opentermsarchive.org/collections/reference/configuration/#logger) is enabled
 - Send error emails as HTML instead of plain text
+- Start the engine when [`logger.sendMailOnError`](https://docs.opentermsarchive.org/collections/reference/configuration/#logger) is enabled without `sendWarnings`
 - Start the Collection API with a warning instead of failing when `OTA_ENGINE_SMTP_PASSWORD` is missing while [`logger.sendMailOnError`](https://docs.opentermsarchive.org/collections/reference/configuration/#logger) is enabled
 
 ## 15.1.0 - 2026-07-13
