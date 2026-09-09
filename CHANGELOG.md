@@ -9,7 +9,7 @@ All changes that impact users of this module are documented in this file, in the
 ### Changed
 
 - Name the collection in the subject of Collection API error emails and give them the same body as engine error emails
-- Prefix the subject and title of error emails with the environment name, such as `[development]`, when `NODE_ENV` is not `production`
+- Prefix the subject and title of error emails with the environment name, such as `[development]`, when the configuration environment (`NODE_CONFIG_ENV` or `NODE_ENV`) is not `production`
 
 ### Fixed
 

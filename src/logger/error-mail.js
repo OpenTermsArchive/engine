@@ -97,8 +97,8 @@ export function createErrorMailTransports({ collection, component, subject, warn
     return [];
   }
 
-  const environment = process.env.NODE_ENV || 'development'; // Same default as node-config, so the prefix matches the loaded configuration
-  const environmentPrefix = environment == 'production' ? '' : `[${environment}] `; // Make emails sent from a developer machine recognisable at a glance
+  const environment = config.util.getEnv('NODE_CONFIG_ENV');
+  const environmentPrefix = environment === 'production' ? '' : `[${environment}] `; // Make emails sent from a developer machine recognisable at a glance
 
   const mailerOptions = {
     to: config.get('@opentermsarchive/engine.logger.sendMailOnError.to'),
