@@ -22,6 +22,7 @@ All changes that impact users of this module are documented in this file, in the
 ### Fixed
 
 - Fix GitLab dataset publishing failing after the release creation because of a missing `debug` log level
+- Fix the dataset scheduler exiting after a failed release; the error is now logged and the next scheduled release still runs
 
 ## 15.3.1 - 2026-09-09
 
