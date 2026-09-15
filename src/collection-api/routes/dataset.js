@@ -18,13 +18,13 @@ function handleTransferError(error, res, next) {
     return next(error);
   }
 
+  TRANSFER_HEADERS.forEach(header => res.removeHeader(header)); // `send` has already described the archive on the response when it fails, whether it rejects the request or cannot read the file; those headers must not describe the JSON error instead
+
   if (error.status === 404) { // The archive was replaced under another name between the metadata lookup and the transfer
     return res.status(404).json({ error: NO_DATASET_ERROR });
   }
 
   if (error.status < 500) { // Client errors raised by `send`, such as an unsatisfiable range or a failed precondition
-    TRANSFER_HEADERS.forEach(header => res.removeHeader(header)); // `send` has already described the archive on the response when it rejects the request; those headers must not describe the JSON error instead
-
     return res.status(error.status).set(error.headers ?? {}).json({ error: http.STATUS_CODES[error.status] });
   }
 

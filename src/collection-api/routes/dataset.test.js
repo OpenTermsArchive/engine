@@ -1,8 +1,11 @@
 import { createHash } from 'crypto';
+import fsApi from 'fs';
 import fs from 'fs/promises';
+import { Readable } from 'stream';
 
 import { expect } from 'chai';
 import config from 'config';
+import sinon from 'sinon';
 import supertest from 'supertest';
 
 import DatasetStorage from '../../dataset/storage.js';
@@ -332,6 +335,36 @@ describe('Dataset API', () => {
 
       it('returns the archive content', () => {
         expect(response.body.equals(ARCHIVE_CONTENT)).to.be.true;
+      });
+    });
+
+    context('when the archive cannot be read', () => {
+      before(async () => {
+        await storeDataset();
+        sinon.stub(fsApi, 'createReadStream').returns(new Readable({ read() { this.destroy(new Error('Disk failure')); } })); // `send` opens the archive through the `fs` module at transfer time, once it has already described the archive on the response
+        response = await request.get(DOWNLOAD_URL);
+      });
+
+      after(async () => {
+        sinon.restore();
+        await removeDataset();
+      });
+
+      it('responds with 500 status code', () => {
+        expect(response.status).to.equal(500);
+      });
+
+      it('responds with Content-Type application/json', () => {
+        expect(response.type).to.equal('application/json');
+      });
+
+      it('returns a generic error message', () => {
+        expect(response.body).to.deep.equal({ error: 'Internal Server Error' });
+      });
+
+      it('does not describe the archive', () => {
+        expect(response.headers).to.not.have.any.keys('content-disposition', 'last-modified', 'accept-ranges');
+        expect(response.headers.etag).to.not.equal(`"${METADATA.sha256}"`);
       });
     });
   });
