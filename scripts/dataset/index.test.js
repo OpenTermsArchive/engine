@@ -96,43 +96,43 @@ describe('Dataset release', () => {
     });
 
     describe('metadata', () => {
-      it('describe the dataset title', () => {
+      it('describes the dataset title', () => {
         expect(metadata.title).to.equal('sandbox');
       });
 
-      it('describe the license as an SPDX identifier', () => {
+      it('describes the license as an SPDX identifier', () => {
         expect(metadata.license).to.equal('ODbL-1.0');
       });
 
-      it('describe the release date as an ISO 8601 date without milliseconds', () => {
+      it('describes the release date as an ISO 8601 date without milliseconds', () => {
         expect(metadata.releaseDate).to.match(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/);
       });
 
-      it('describe the first version date', () => {
+      it('describes the first version date', () => {
         expect(metadata.firstVersionDate).to.equal('2021-01-01T11:27:00Z');
       });
 
-      it('describe the last version date', () => {
+      it('describes the last version date', () => {
         expect(metadata.lastVersionDate).to.equal('2022-01-06T11:32:47Z');
       });
 
-      it('count the services', () => {
+      it('counts the services', () => {
         expect(metadata.servicesCount).to.equal(2);
       });
 
-      it('count the distinct terms', () => {
+      it('counts the distinct terms', () => {
         expect(metadata.termsCount).to.equal(3);
       });
 
-      it('count the versions', () => {
+      it('counts the versions', () => {
         expect(metadata.versionsCount).to.equal(4);
       });
 
-      it('describe the archive size in bytes', async () => {
+      it('describes the archive size in bytes', async () => {
         expect(metadata.size).to.equal((await fs.stat(storage.archivePath(metadata.filename))).size);
       });
 
-      it('describe the archive SHA-256 checksum', async () => {
+      it('describes the archive SHA-256 checksum', async () => {
         expect(metadata.sha256).to.equal(createHash('sha256').update(await fs.readFile(storage.archivePath(metadata.filename))).digest('hex'));
       });
     });
