@@ -11,7 +11,7 @@ import supertest from 'supertest';
 import DatasetStorage from '../../dataset/storage.js';
 import app from '../server.js';
 
-import { REPLACED_DATASET_ERROR } from './dataset.js';
+import { NO_DATASET_ERROR, REPLACED_DATASET_ERROR } from './dataset.js';
 
 const basePath = config.get('@opentermsarchive/engine.collection-api.basePath');
 const request = supertest(app);
@@ -25,7 +25,6 @@ function binaryParser(res, callback) { // superagent only buffers text, JSON and
 
 const METADATA_URL = `${basePath}/v1/dataset/latest`;
 const DOWNLOAD_URL = `${basePath}/v1/dataset/latest/download`;
-const NO_DATASET_ERROR = 'No dataset has been generated yet';
 const ARCHIVE_FILENAME = 'sandbox-2026-01-01.zip';
 const ARCHIVE_CONTENT = Buffer.from('Archive content standing for a ZIP file in tests');
 const METADATA = {

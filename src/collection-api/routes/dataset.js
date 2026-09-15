@@ -4,9 +4,9 @@ import express from 'express';
 
 import { buildAbsoluteBaseUrl } from '../utils/url.js';
 
+export const NO_DATASET_ERROR = 'No dataset has been generated yet';
 export const REPLACED_DATASET_ERROR = 'The dataset was replaced during the request, retry to get the latest one';
 
-const NO_DATASET_ERROR = 'No dataset has been generated yet';
 const TRANSFER_HEADERS = [ 'Accept-Ranges', 'Cache-Control', 'Content-Disposition', 'Content-Length', 'Content-Range', 'Content-Type', 'ETag', 'Last-Modified' ];
 const METADATA_PATH = '/dataset/latest';
 const DOWNLOAD_PATH = `${METADATA_PATH}/download`;
