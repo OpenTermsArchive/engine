@@ -11,6 +11,8 @@ import supertest from 'supertest';
 import DatasetStorage from '../../dataset/storage.js';
 import app from '../server.js';
 
+import { REPLACED_DATASET_ERROR } from './dataset.js';
+
 const basePath = config.get('@opentermsarchive/engine.collection-api.basePath');
 const request = supertest(app);
 
@@ -365,6 +367,31 @@ describe('Dataset API', () => {
       it('does not describe the archive', () => {
         expect(response.headers).to.not.have.any.keys('content-disposition', 'last-modified', 'accept-ranges');
         expect(response.headers.etag).to.not.equal(`"${METADATA.sha256}"`);
+      });
+    });
+
+    context('when the archive is replaced between the metadata lookup and the transfer', () => {
+      before(async () => {
+        await storeDataset();
+        sinon.stub(DatasetStorage.prototype, 'findLatest').resolves({ ...METADATA, filename: 'sandbox-2026-01-02.zip' }); // The metadata describes an archive that is no longer on disk, as when a generation completes right after the lookup
+        response = await request.get(DOWNLOAD_URL);
+      });
+
+      after(async () => {
+        sinon.restore();
+        await removeDataset();
+      });
+
+      it('responds with 404 status code', () => {
+        expect(response.status).to.equal(404);
+      });
+
+      it('responds with Content-Type application/json', () => {
+        expect(response.type).to.equal('application/json');
+      });
+
+      it('returns an explicit error message', () => {
+        expect(response.body).to.deep.equal({ error: REPLACED_DATASET_ERROR });
       });
     });
   });
