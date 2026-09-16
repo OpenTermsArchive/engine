@@ -35,15 +35,22 @@ function canMatchRecordFilePath(...pathSegments) {
 }
 
 export default class GitRepository extends RepositoryInterface {
-  constructor({ path, author, publish, snapshotIdentiferTemplate }) {
+  constructor({ path, author, publish, snapshotIdentiferTemplate, readOnly = false }) {
     super();
     this.path = path;
     this.needsPublication = publish;
+    this.readOnly = readOnly; // Readers such as the Collection API and the dataset export run alongside the tracker on the same repository, so they must neither reset the working tree nor rewrite the commit-graph: both race the tracker, and the commit-graph write then fails with `commit-graph.lock: File exists`
     this.git = new Git({ path: this.path, author });
     this.snapshotIdentiferTemplate = snapshotIdentiferTemplate;
   }
 
   async initialize() {
+    if (this.readOnly) {
+      await this.git.attach();
+
+      return this;
+    }
+
     await this.git.initialize();
     await this.git.cleanUp(); // Drop all uncommitted changes and remove all leftover files that may be present if the process was killed aggressively
     await this.git.writeCommitGraph(); // Create or replace the commit graph with a new one to ensure it's fully consistent
@@ -52,6 +59,8 @@ export default class GitRepository extends RepositoryInterface {
   }
 
   async save(record) {
+    this.#assertWritable('save records');
+
     const { serviceId, termsType, documentId, fetchDate } = record;
 
     if (record.isFirstRecord === undefined || record.isFirstRecord === null) {
@@ -75,6 +84,10 @@ export default class GitRepository extends RepositoryInterface {
   }
 
   async finalize() {
+    if (this.readOnly) {
+      return;
+    }
+
     if (this.needsPublication) {
       await this.git.pushChanges();
     }
@@ -215,6 +228,8 @@ export default class GitRepository extends RepositoryInterface {
   }
 
   removeAll() {
+    this.#assertWritable('remove records');
+
     return this.git.destroyHistory();
   }
 
@@ -306,6 +321,12 @@ export default class GitRepository extends RepositoryInterface {
 
   #isTracked(serviceId, termsType, documentId) {
     return this.git.isTracked(`${this.path}/${DataMapper.generateFilePath(serviceId, termsType, documentId)}`);
+  }
+
+  #assertWritable(operation) {
+    if (this.readOnly) {
+      throw new Error(`Cannot ${operation} in read-only repository ${this.path}`);
+    }
   }
 
   async #toDomain(commit, { deferContentLoading } = {}) {

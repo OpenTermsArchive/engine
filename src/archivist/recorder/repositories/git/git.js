@@ -16,15 +16,7 @@ export default class Git {
   }
 
   async initialize() {
-    if (!fsApi.existsSync(this.path)) {
-      await fs.mkdir(this.path, { recursive: true });
-    }
-
-    this.git = simpleGit(this.path, {
-      trimmed: true,
-      maxConcurrentProcesses: 1, // Concurrent runs on the same repository race the index and the commit-graph and can corrupt them
-    });
-
+    await this.attach();
     await this.git.init();
 
     return this.git
@@ -35,6 +27,17 @@ export default class Git {
       .addConfig('core.quotePath', false) // Disable Git's encoding of special characters in pathnames. For example, `service·A` will be encoded as `service\302\267A` without this setting, leading to issues. See https://git-scm.com/docs/git-config#Documentation/git-config.txt-corequotePath
       .addConfig('core.commitGraph', true) // Enable `commit-graph` feature for efficient commit data storage, improving performance of operations like `git log`
       .addConfig('gc.writeCommitGraph', false); // Prevent automatic `git gc` from also writing the commit-graph: the engine writes it explicitly (see `writeCommitGraph`/`updateCommitGraph`), and a concurrent gc write races those, which can leave a stale `commit-graph.lock` and make subsequent operations fail
+  }
+
+  async attach() {
+    if (!fsApi.existsSync(this.path)) {
+      await fs.mkdir(this.path, { recursive: true }); // simple-git cannot be instantiated on a missing directory
+    }
+
+    this.git = simpleGit(this.path, {
+      trimmed: true,
+      maxConcurrentProcesses: 1, // Concurrent runs on the same repository race the index and the commit-graph and can corrupt them
+    });
   }
 
   add(filePath) {
