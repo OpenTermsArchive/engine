@@ -2080,7 +2080,7 @@ describe('GitRepository', () => {
         path: RECORDER_PATH,
       });
 
-      await writer.git.initialize(); // Bypass #initialize, which writes the commit-graph, to check that the read-only repository does not write it either
+      await writer.git.initialize(); // Bypass GitRepository#initialize, which writes the commit-graph, to check that the read-only repository does not write it either
       fs.rmSync(COMMIT_GRAPH_PATH, { force: true });
 
       record = await writer.save(new Version({

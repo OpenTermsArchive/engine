@@ -39,7 +39,7 @@ export default class GitRepository extends RepositoryInterface {
     super();
     this.path = path;
     this.needsPublication = publish;
-    this.readOnly = readOnly; // Readers such as the Collection API and the dataset export run alongside the tracker on the same repository, so they must neither reset the working tree nor rewrite the commit-graph: both race the tracker, and the commit-graph write then fails with `commit-graph.lock: File exists`
+    this.readOnly = readOnly; // Readers share the repository with the tracker, so they must never touch the working tree nor the commit-graph: both race the tracker, and the commit-graph write then fails with `commit-graph.lock: File exists`
     this.git = new Git({ path: this.path, author });
     this.snapshotIdentiferTemplate = snapshotIdentiferTemplate;
   }
