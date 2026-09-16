@@ -201,7 +201,20 @@ async function captureUserAgentOverride(browser, locale) { // The stealth user-a
   let override;
 
   await evasion.beforeLaunch({ headless: true }); // The evasion includes acceptLanguage only when it believes the browser is headless and delegates it to browser preferences otherwise, while the fetcher always relies on the CDP override
-  await evasion.onPageCreated({ browser: () => browser, _client: () => ({ send: (method, params) => { override = params; } }) }); // The stand-in page exposes just what the evasion reads: the browser, for its user agent and version, and a CDP session whose send records the override instead of sending it
+  await evasion.onPageCreated({ // The stand-in page exposes just what the evasion reads: the browser, for its user agent and version, and a CDP session whose send records the override instead of sending it
+    browser: () => browser,
+    _client: () => ({
+      send: (method, params) => {
+        if (method === 'Network.setUserAgentOverride') {
+          override = params;
+        }
+      },
+    }),
+  });
+
+  if (!override?.userAgent) {
+    throw new Error('Could not capture the user agent override from the stealth user-agent-override evasion');
+  }
 
   return override;
 }
