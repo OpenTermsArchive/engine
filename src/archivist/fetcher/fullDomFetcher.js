@@ -1,4 +1,5 @@
-import puppeteer from 'puppeteer-extra';
+import puppeteer from 'puppeteer';
+import { addExtra } from 'puppeteer-extra';
 import stealthPlugin from 'puppeteer-extra-plugin-stealth';
 import navigatorLanguages from 'puppeteer-extra-plugin-stealth/evasions/navigator.languages/index.js';
 import userAgentOverride from 'puppeteer-extra-plugin-stealth/evasions/user-agent-override/index.js';
@@ -125,12 +126,13 @@ export async function launchHeadlessBrowser(language) {
   }
 
   const { locale, languages } = parseLanguage(language);
+  const puppeteerExtra = addExtra(puppeteer); // Fresh instance for each launch, as plugins registered on the shared instance accumulate across launches and their hooks would run once per copy on every page
   const stealth = stealthPlugin();
 
   stealth.enabledEvasions.delete('user-agent-override');
   stealth.enabledEvasions.delete('navigator.languages');
-  puppeteer.use(stealth);
-  puppeteer.use(navigatorLanguages({ languages }));
+  puppeteerExtra.use(stealth);
+  puppeteerExtra.use(navigatorLanguages({ languages }));
 
   const options = {
     args: [],
@@ -155,7 +157,7 @@ export async function launchHeadlessBrowser(language) {
     options.args.push('--disable-setuid-sandbox');
   }
 
-  browser = await puppeteer.launch(options);
+  browser = await puppeteerExtra.launch(options);
   browser.userAgentOverride = await captureUserAgentOverride(browser, locale); // Computed once since the user agent is the same for every page of the browser
 
   if (proxyCredentials) {
