@@ -13,7 +13,7 @@ export default class RepositoryFactory {
         readOnly,
       });
     case 'mongo':
-      return new MongoRepository(params.mongo); // Initializing a Mongo repository only connects and ensures an index, which is harmless for readers
+      return new MongoRepository({ ...params.mongo, readOnly });
     default:
       throw new Error(`Unknown storage repository configuration for type '${params.type}'`);
     }

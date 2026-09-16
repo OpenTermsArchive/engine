@@ -10,12 +10,13 @@ import RepositoryInterface from '../interface.js';
 import * as DataMapper from './dataMapper.js';
 
 export default class MongoRepository extends RepositoryInterface {
-  constructor({ database: databaseName, collection: collectionName, connectionURI }) {
+  constructor({ database: databaseName, collection: collectionName, connectionURI, readOnly = false }) {
     super();
 
     this.client = new MongoClient(connectionURI);
     this.databaseName = databaseName;
     this.collectionName = collectionName;
+    this.readOnly = readOnly;
   }
 
   async initialize() {
@@ -34,6 +35,8 @@ export default class MongoRepository extends RepositoryInterface {
   }
 
   async save(record) {
+    this.#assertWritable('save records');
+
     const { serviceId, termsType, documentId } = record;
 
     if (record.isFirstRecord === undefined || record.isFirstRecord === null) {
@@ -223,8 +226,16 @@ export default class MongoRepository extends RepositoryInterface {
     }
   }
 
-  removeAll() {
-    return this.collection.deleteMany();
+  async removeAll() {
+    this.#assertWritable('remove records');
+
+    await this.collection.deleteMany();
+  }
+
+  #assertWritable(operation) {
+    if (this.readOnly) {
+      throw new Error(`Cannot ${operation} in read-only repository ${this.databaseName}.${this.collectionName}`);
+    }
   }
 
   async loadRecordContent(record) {

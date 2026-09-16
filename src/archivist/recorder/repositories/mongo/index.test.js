@@ -2,7 +2,8 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-import { expect } from 'chai';
+import { expect, use } from 'chai';
+import chaiAsPromised from 'chai-as-promised';
 import config from 'config';
 import mime from 'mime';
 import { MongoClient, ObjectId } from 'mongodb';
@@ -11,6 +12,8 @@ import Snapshot from '../../snapshot.js';
 import Version from '../../version.js';
 
 import MongoRepository from './index.js';
+
+use(chaiAsPromised);
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -1942,6 +1945,29 @@ describe('MongoRepository', () => {
       it('iterates in ascending order', () => {
         expect(fetchDates).to.deep.equal([ FETCH_DATE_EARLIER, FETCH_DATE, FETCH_DATE_LATER ]);
       });
+    });
+  });
+
+  context('when read-only', () => {
+    before(() => {
+      subject = new MongoRepository({
+        ...config.get('@opentermsarchive/engine.recorder.versions.storage.mongo'),
+        readOnly: true,
+      });
+    });
+
+    it('rejects saving records', async () => {
+      await expect(subject.save(new Version({
+        serviceId: SERVICE_PROVIDER_ID,
+        termsType: TERMS_TYPE,
+        content: CONTENT,
+        fetchDate: FETCH_DATE,
+        snapshotIds: [SNAPSHOT_ID],
+      }))).to.be.rejectedWith(Error, /read-only/);
+    });
+
+    it('rejects removing records', async () => {
+      await expect(subject.removeAll()).to.be.rejectedWith(Error, /read-only/);
     });
   });
 });
