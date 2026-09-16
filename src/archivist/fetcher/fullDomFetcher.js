@@ -157,12 +157,20 @@ export async function launchHeadlessBrowser(language) {
     options.args.push('--disable-setuid-sandbox');
   }
 
-  browser = await puppeteerExtra.launch(options);
-  browser.userAgentOverride = await captureUserAgentOverride(browser, locale); // Computed once since the user agent is the same for every page of the browser
+  const launchedBrowser = await puppeteerExtra.launch(options);
+
+  try {
+    launchedBrowser.userAgentOverride = await captureUserAgentOverride(launchedBrowser, locale); // Computed once since the user agent is the same for every page of the browser
+  } catch (error) {
+    await launchedBrowser.close().catch(() => {});
+    throw error;
+  }
 
   if (proxyCredentials) {
-    browser.proxyCredentials = proxyCredentials;
+    launchedBrowser.proxyCredentials = proxyCredentials;
   }
+
+  browser = launchedBrowser; // Set only once fully configured, so that no caller gets a browser without its user agent override
 
   return browser;
 }
