@@ -240,7 +240,8 @@ The HTML-Only fetcher **intentionally has no evasion mechanisms**. Since fallbac
 
 The Full DOM fetcher uses:
 
-- **Stealth plugin** (`puppeteer-extra-plugin-stealth`) with default configuration to mask browser automation markers
+- **Stealth plugin** (`puppeteer-extra-plugin-stealth`) to mask browser automation markers, with `navigator.languages` configured from the fetcher language and without the `user-agent-override` evasion
+- **User agent override** applied by the engine itself before each navigation, with `Accept-Language` and client hints derived from the fetcher language, since the stealth evasion sends its CDP command without awaiting it and any failure would escape as an unhandled rejection
 - **Realistic viewport** of 1920x1080 pixels
 - **Isolated browser context** for each request, ensuring complete isolation (cookies, storage, cache)
 
