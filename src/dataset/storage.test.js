@@ -32,16 +32,13 @@ const METADATA = {
 };
 
 describe('DatasetStorage', () => {
-  let storage;
+  const storage = new DatasetStorage(TMP_PATH);
 
-  beforeEach(async () => {
+  async function removeStorage() {
     await fs.rm(TMP_PATH, { recursive: true, force: true });
-    storage = new DatasetStorage(TMP_PATH);
-  });
+  }
 
-  after(async () => {
-    await fs.rm(TMP_PATH, { recursive: true, force: true });
-  });
+  before(removeStorage);
 
   describe('#findLatest', () => {
     context('when the storage directory does not exist', () => {
@@ -51,9 +48,11 @@ describe('DatasetStorage', () => {
     });
 
     context('when no metadata file exists', () => {
-      beforeEach(async () => {
+      before(async () => {
         await fs.mkdir(TMP_PATH, { recursive: true });
       });
+
+      after(removeStorage);
 
       it('returns null', async () => {
         expect(await storage.findLatest()).to.be.null;
@@ -61,10 +60,12 @@ describe('DatasetStorage', () => {
     });
 
     context('when the metadata file references a missing archive', () => {
-      beforeEach(async () => {
+      before(async () => {
         await fs.mkdir(TMP_PATH, { recursive: true });
         await fs.writeFile(storage.metadataPath, JSON.stringify(METADATA));
       });
+
+      after(removeStorage);
 
       it('returns null', async () => {
         expect(await storage.findLatest()).to.be.null;
@@ -72,10 +73,12 @@ describe('DatasetStorage', () => {
     });
 
     context('when the metadata file is corrupted', () => {
-      beforeEach(async () => {
+      before(async () => {
         await fs.mkdir(TMP_PATH, { recursive: true });
         await fs.writeFile(storage.metadataPath, '{ not json');
       });
+
+      after(removeStorage);
 
       it('rejects', async () => {
         await expect(storage.findLatest()).to.be.rejected;
@@ -83,11 +86,13 @@ describe('DatasetStorage', () => {
     });
 
     context('when the metadata file and the archive exist', () => {
-      beforeEach(async () => {
+      before(async () => {
         await fs.mkdir(TMP_PATH, { recursive: true });
         await fs.writeFile(storage.archivePath(ARCHIVE_FILENAME), 'archive content');
         await fs.writeFile(storage.metadataPath, JSON.stringify(METADATA));
       });
+
+      after(removeStorage);
 
       it('returns the metadata', async () => {
         expect(await storage.findLatest()).to.deep.equal(METADATA);
@@ -97,9 +102,11 @@ describe('DatasetStorage', () => {
 
   describe('#save', () => {
     context('when the archive is missing', () => {
-      beforeEach(async () => {
+      before(async () => {
         await fs.mkdir(TMP_PATH, { recursive: true });
       });
+
+      after(removeStorage);
 
       it('rejects', async () => {
         await expect(storage.save(METADATA)).to.be.rejected;
@@ -113,11 +120,13 @@ describe('DatasetStorage', () => {
     });
 
     context('when the archive exists', () => {
-      beforeEach(async () => {
+      before(async () => {
         await fs.mkdir(TMP_PATH, { recursive: true });
         await fs.writeFile(storage.archivePath(ARCHIVE_FILENAME), 'archive content');
         await storage.save(METADATA);
       });
+
+      after(removeStorage);
 
       it('writes the metadata file', async () => {
         expect(JSON.parse(await fs.readFile(storage.metadataPath, 'utf8'))).to.deep.equal(METADATA);
@@ -135,9 +144,11 @@ describe('DatasetStorage', () => {
 
   describe('#removePreviousArchives', () => {
     context('when no metadata exists', () => {
-      beforeEach(async () => {
+      before(async () => {
         await fs.mkdir(TMP_PATH, { recursive: true });
       });
+
+      after(removeStorage);
 
       it('does nothing', async () => {
         await expect(storage.removePreviousArchives()).to.be.fulfilled;
@@ -145,7 +156,7 @@ describe('DatasetStorage', () => {
     });
 
     context('when metadata exists', () => {
-      beforeEach(async () => {
+      before(async () => {
         await fs.mkdir(TMP_PATH, { recursive: true });
         await fs.writeFile(storage.archivePath(ARCHIVE_FILENAME), 'archive content');
         await fs.writeFile(storage.archivePath(PREVIOUS_ARCHIVE_FILENAME), 'previous archive');
@@ -155,6 +166,8 @@ describe('DatasetStorage', () => {
 
         await storage.removePreviousArchives();
       });
+
+      after(removeStorage);
 
       it('keeps the current archive', async () => {
         await expect(fs.access(storage.archivePath(ARCHIVE_FILENAME))).to.be.fulfilled;
@@ -174,7 +187,7 @@ describe('DatasetStorage', () => {
     });
 
     context('when a previous archive fails to be removed', () => {
-      beforeEach(async () => {
+      before(async () => {
         await fs.mkdir(TMP_PATH, { recursive: true });
         await fs.writeFile(storage.archivePath(ARCHIVE_FILENAME), 'archive content');
         await fs.writeFile(storage.archivePath(PREVIOUS_ARCHIVE_FILENAME), 'previous archive');
@@ -183,8 +196,9 @@ describe('DatasetStorage', () => {
         sinon.stub(fs, 'rm').rejects(new Error('Permission denied'));
       });
 
-      after(() => {
-        sinon.restore();
+      after(async () => {
+        sinon.restore(); // Restored first, so that the cleanup below runs the real `fs.rm`
+        await removeStorage();
       });
 
       it('rejects', async () => {
