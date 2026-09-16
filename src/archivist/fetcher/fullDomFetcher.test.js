@@ -17,7 +17,7 @@ use(chaiAsPromised);
 const dynamicHTML = '<!DOCTYPE html><html><head><title>Dynamic Page</title><script>setTimeout(() => { document.body.innerHTML += "<div class=\'dynamic\'>Loaded</div>"; }, 100);</script></head><body></body></html>';
 const delayedContentHTML = '<!DOCTYPE html><html><head><title>Delayed Content</title><script>setTimeout(() => { document.querySelector(".content").textContent = "Final content"; }, 100);</script></head><body><div class="content"></div></body></html>';
 const langEchoHTML = '<!DOCTYPE html><html><body><script>document.body.setAttribute("data-language", navigator.language); document.body.setAttribute("data-languages", navigator.languages.join(","));</script></body></html>';
-const stealthProbeHTML = '<!DOCTYPE html><html><body><script>document.body.setAttribute("data-webdriver", String(navigator.webdriver)); document.body.setAttribute("data-user-agent", navigator.userAgent); document.body.setAttribute("data-plugin-count", String(navigator.plugins.length)); document.body.setAttribute("data-viewport-width", String(window.innerWidth)); document.body.setAttribute("data-viewport-height", String(window.innerHeight)); (() => { const canvas = document.createElement("canvas"); const gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl"); if (!gl) { document.body.setAttribute("data-webgl-vendor", "none"); return; } const ext = gl.getExtension("WEBGL_debug_renderer_info"); document.body.setAttribute("data-webgl-vendor", ext ? gl.getParameter(ext.UNMASKED_VENDOR_WEBGL) : ""); document.body.setAttribute("data-webgl-renderer", ext ? gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) : ""); })();</script></body></html>';
+const stealthProbeHTML = '<!DOCTYPE html><html><body><script>document.body.setAttribute("data-webdriver", String(navigator.webdriver)); document.body.setAttribute("data-user-agent", navigator.userAgent); document.body.setAttribute("data-platform", navigator.platform); document.body.setAttribute("data-ua-brands", navigator.userAgentData ? navigator.userAgentData.brands.map(entry => entry.brand).join(",") : ""); document.body.setAttribute("data-plugin-count", String(navigator.plugins.length)); document.body.setAttribute("data-viewport-width", String(window.innerWidth)); document.body.setAttribute("data-viewport-height", String(window.innerHeight)); (() => { const canvas = document.createElement("canvas"); const gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl"); if (!gl) { document.body.setAttribute("data-webgl-vendor", "none"); return; } const ext = gl.getExtension("WEBGL_debug_renderer_info"); document.body.setAttribute("data-webgl-vendor", ext ? gl.getParameter(ext.UNMASKED_VENDOR_WEBGL) : ""); document.body.setAttribute("data-webgl-renderer", ext ? gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) : ""); })();</script></body></html>';
 
 describe('Full DOM Fetcher', function () {
   this.timeout(60000);
@@ -39,6 +39,11 @@ describe('Full DOM Fetcher', function () {
         const acceptLanguage = request.headers['accept-language'] || '';
 
         response.writeHead(200, { 'Content-Type': 'text/html' }).write(`<!DOCTYPE html><html><body data-accept-language="${acceptLanguage}"></body></html>`);
+      }
+      if (request.url === '/client-hints-header') {
+        const clientHintsBrands = request.headers['sec-ch-ua'] || '';
+
+        response.writeHead(200, { 'Content-Type': 'text/html' }).write(`<!DOCTYPE html><html><body>${clientHintsBrands}</body></html>`);
       }
       if (request.url === '/lang-echo') {
         response.writeHead(200, { 'Content-Type': 'text/html' }).write(langEchoHTML);
@@ -75,6 +80,16 @@ describe('Full DOM Fetcher', function () {
       const browser2 = await launchHeadlessBrowser('en');
 
       expect(browser1).to.equal(browser2);
+    });
+
+    it('registers plugin hooks once per launch', async () => {
+      const initialListenerCount = (await launchHeadlessBrowser('en')).listenerCount('targetcreated');
+
+      await stopHeadlessBrowser();
+
+      const relaunchedBrowser = await launchHeadlessBrowser('en');
+
+      expect(relaunchedBrowser.listenerCount('targetcreated')).to.equal(initialListenerCount);
     });
   });
 
@@ -134,6 +149,25 @@ describe('Full DOM Fetcher', function () {
 
       it('returns the PDF file content', () => {
         expect(content.equals(expectedPDFContent)).to.be.true;
+      });
+    });
+
+    context('when the user agent override cannot be applied', () => {
+      let browser;
+      let userAgentOverride;
+
+      before(async () => {
+        browser = await launchHeadlessBrowser('en');
+        ({ userAgentOverride } = browser);
+        browser.userAgentOverride = {}; // Rejected by Chrome since the user agent is mandatory
+      });
+
+      after(() => {
+        browser.userAgentOverride = userAgentOverride;
+      });
+
+      it('rejects with the protocol error', async () => {
+        await expect(fetch(`http://127.0.0.1:${SERVER_PORT}/dynamic`, [], config)).to.be.rejectedWith('Network.setUserAgentOverride');
       });
     });
   });
@@ -199,6 +233,23 @@ describe('Full DOM Fetcher', function () {
 
     it('removes HeadlessChrome from the user agent', () => {
       expect(content).not.to.match(/HeadlessChrome/);
+    });
+
+    it('removes HeadlessChrome from navigator.userAgentData brands', () => {
+      expect(content).to.match(/data-ua-brands="[^"]*Google Chrome[^"]*"/);
+      expect(content).not.to.match(/data-ua-brands="[^"]*Headless[^"]*"/);
+    });
+
+    it('sends the Sec-CH-UA header without HeadlessChrome', async () => {
+      const result = await fetch(`http://127.0.0.1:${SERVER_PORT}/client-hints-header`, [], config);
+
+      expect(result.content).to.match(/"Google Chrome";v="\d+"/);
+      expect(result.content).not.to.match(/Headless/);
+    });
+
+    it('does not expose a Linux host through navigator.platform', () => {
+      expect(content).to.match(/data-platform="[^"]+"/);
+      expect(content).not.to.match(/data-platform="Linux/);
     });
 
     it('uses a realistic viewport instead of Puppeteer default', () => {

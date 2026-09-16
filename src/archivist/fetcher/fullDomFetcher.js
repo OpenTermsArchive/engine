@@ -1,4 +1,5 @@
-import puppeteer from 'puppeteer-extra';
+import puppeteer from 'puppeteer';
+import { addExtra } from 'puppeteer-extra';
 import stealthPlugin from 'puppeteer-extra-plugin-stealth';
 import navigatorLanguages from 'puppeteer-extra-plugin-stealth/evasions/navigator.languages/index.js';
 import userAgentOverride from 'puppeteer-extra-plugin-stealth/evasions/user-agent-override/index.js';
@@ -39,7 +40,7 @@ export default async function fetch(url, cssSelectors, config) {
     page = await context.newPage();
     client = await page.createCDPSession();
 
-    await configurePage(page, config);
+    await configurePage(page, client, config);
 
     const selectors = [].concat(cssSelectors).filter(Boolean);
 
@@ -47,7 +48,7 @@ export default async function fetch(url, cssSelectors, config) {
     let handled = null;
 
     if (!selectors.length) { // CSS selectors are specified only for HTML content and omitted when fetching a PDF
-      ({ pdf, handled } = setupPdfInterception(client));
+      ({ pdf, handled } = await setupPdfInterception(client));
     }
 
     let response;
@@ -125,13 +126,13 @@ export async function launchHeadlessBrowser(language) {
   }
 
   const { locale, languages } = parseLanguage(language);
+  const puppeteerExtra = addExtra(puppeteer); // Fresh instance for each launch, as plugins registered on the shared instance accumulate across launches and their hooks would run once per copy on every page
   const stealth = stealthPlugin();
 
   stealth.enabledEvasions.delete('user-agent-override');
   stealth.enabledEvasions.delete('navigator.languages');
-  puppeteer.use(stealth);
-  puppeteer.use(userAgentOverride({ locale }));
-  puppeteer.use(navigatorLanguages({ languages }));
+  puppeteerExtra.use(stealth);
+  puppeteerExtra.use(navigatorLanguages({ languages }));
 
   const options = {
     args: [],
@@ -156,11 +157,20 @@ export async function launchHeadlessBrowser(language) {
     options.args.push('--disable-setuid-sandbox');
   }
 
-  browser = await puppeteer.launch(options);
+  const launchedBrowser = await puppeteerExtra.launch(options);
+
+  try {
+    launchedBrowser.userAgentOverride = await captureUserAgentOverride(launchedBrowser, locale); // Computed once since the user agent is the same for every page of the browser
+  } catch (error) {
+    await launchedBrowser.close().catch(() => {});
+    throw error;
+  }
 
   if (proxyCredentials) {
-    browser.proxyCredentials = proxyCredentials;
+    launchedBrowser.proxyCredentials = proxyCredentials;
   }
+
+  browser = launchedBrowser; // Set only once fully configured, so that no caller gets a browser without its user agent override
 
   return browser;
 }
@@ -184,21 +194,43 @@ function isValidHttpStatus(status) {
   return (status >= 200 && status < 300) || status === 304;
 }
 
-async function configurePage(page, config) {
+async function configurePage(page, client, config) {
   await page.setViewport({ width: 1920, height: 1080 }); // Realistic viewport to avoid detection based on default Puppeteer dimensions (800x600)
   await page.setDefaultNavigationTimeout(config.navigationTimeout);
+  await client.send('Network.setUserAgentOverride', browser.userAgentOverride);
 
   if (browser.proxyCredentials?.username && browser.proxyCredentials?.password) {
     await page.authenticate(browser.proxyCredentials);
   }
 }
 
-function setupPdfInterception(client) {
+async function captureUserAgentOverride(browser, locale) { // The stealth evasion sends the override without awaiting it, so a failure would crash the process on an unhandled rejection; running it once on a stand-in page records the override for the fetcher to send itself
+  const evasion = userAgentOverride({ locale });
+  let override;
+
+  await evasion.beforeLaunch({ headless: true }); // Otherwise the evasion leaves Accept-Language to browser preferences
+  await evasion.onPageCreated({ // The stand-in page exposes only what the evasion reads
+    browser: () => browser,
+    _client: () => ({
+      send: (method, params) => {
+        if (method === 'Network.setUserAgentOverride') {
+          override = params;
+        }
+      },
+    }),
+  });
+
+  if (!override?.userAgent) {
+    throw new Error('Could not capture the user agent override from the stealth user-agent-override evasion');
+  }
+
+  return override;
+}
+
+async function setupPdfInterception(client) {
   const pdf = { content: null, status: null };
   let onHandled;
   const handled = new Promise(resolve => { onHandled = resolve; });
-
-  client.send('Fetch.enable', { patterns: [{ urlPattern: '*', requestStage: 'Response' }] }); // Intercept all responses before Chrome processes them, allowing to capture PDF content before it's handled by the PDF viewer
 
   client.on('Fetch.requestPaused', async ({ requestId, resourceType, responseHeaders, responseStatusCode }) => {
     try {
@@ -233,6 +265,8 @@ function setupPdfInterception(client) {
       }
     }
   });
+
+  await client.send('Fetch.enable', { patterns: [{ urlPattern: '*', requestStage: 'Response' }] }); // Intercept all responses before Chrome processes them, allowing to capture PDF content before it is handled by the PDF viewer; enabled once the listener is registered so that no paused request is missed
 
   return { pdf, handled };
 }
