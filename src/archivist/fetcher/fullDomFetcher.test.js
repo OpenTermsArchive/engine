@@ -43,7 +43,7 @@ describe('Full DOM Fetcher', function () {
       if (request.url === '/client-hints-header') {
         const clientHintsBrands = request.headers['sec-ch-ua'] || '';
 
-        response.writeHead(200, { 'Content-Type': 'text/html' }).write(`<!DOCTYPE html><html><body data-client-hints-brands='${clientHintsBrands}'></body></html>`);
+        response.writeHead(200, { 'Content-Type': 'text/html' }).write(`<!DOCTYPE html><html><body>${clientHintsBrands}</body></html>`);
       }
       if (request.url === '/lang-echo') {
         response.writeHead(200, { 'Content-Type': 'text/html' }).write(langEchoHTML);
@@ -235,16 +235,16 @@ describe('Full DOM Fetcher', function () {
       expect(content).not.to.match(/HeadlessChrome/);
     });
 
-    it('removes HeadlessChrome from the client hints brands', () => {
+    it('removes HeadlessChrome from navigator.userAgentData brands', () => {
       expect(content).to.match(/data-ua-brands="[^"]*Google Chrome[^"]*"/);
       expect(content).not.to.match(/data-ua-brands="[^"]*Headless[^"]*"/);
     });
 
-    it('sends client hints brands without HeadlessChrome', async () => {
+    it('sends the Sec-CH-UA header without HeadlessChrome', async () => {
       const result = await fetch(`http://127.0.0.1:${SERVER_PORT}/client-hints-header`, [], config);
 
-      expect(result.content).to.match(/data-client-hints-brands="[^"]*Google Chrome[^"]*"/);
-      expect(result.content).not.to.match(/data-client-hints-brands="[^"]*Headless[^"]*"/);
+      expect(result.content).to.match(/"Google Chrome";v="\d+"/);
+      expect(result.content).not.to.match(/Headless/);
     });
 
     it('does not expose a Linux host through navigator.platform', () => {
