@@ -47,7 +47,7 @@ export default async function fetch(url, cssSelectors, config) {
     let handled = null;
 
     if (!selectors.length) { // CSS selectors are specified only for HTML content and omitted when fetching a PDF
-      ({ pdf, handled } = setupPdfInterception(client));
+      ({ pdf, handled } = await setupPdfInterception(client));
     }
 
     let response;
@@ -204,12 +204,10 @@ async function captureUserAgentOverride(browser, locale) { // The stealth user-a
   return override;
 }
 
-function setupPdfInterception(client) {
+async function setupPdfInterception(client) {
   const pdf = { content: null, status: null };
   let onHandled;
   const handled = new Promise(resolve => { onHandled = resolve; });
-
-  client.send('Fetch.enable', { patterns: [{ urlPattern: '*', requestStage: 'Response' }] }); // Intercept all responses before Chrome processes them, allowing to capture PDF content before it's handled by the PDF viewer
 
   client.on('Fetch.requestPaused', async ({ requestId, resourceType, responseHeaders, responseStatusCode }) => {
     try {
@@ -244,6 +242,8 @@ function setupPdfInterception(client) {
       }
     }
   });
+
+  await client.send('Fetch.enable', { patterns: [{ urlPattern: '*', requestStage: 'Response' }] }); // Intercept all responses before Chrome processes them, allowing to capture PDF content before it is handled by the PDF viewer; enabled once the listener is registered so that no paused request is missed
 
   return { pdf, handled };
 }
