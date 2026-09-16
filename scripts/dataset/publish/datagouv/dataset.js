@@ -8,7 +8,6 @@ import { createModuleLogger } from '../../logger/index.js';
 
 const logger = createModuleLogger('datagouv');
 
-const DATASET_LICENSE = 'odc-odbl';
 const DEFAULT_RESOURCE_DESCRIPTION = 'See README.md inside the archive for dataset structure and usage information.';
 
 const routes = {
@@ -112,11 +111,11 @@ export async function createDataset({ apiBaseUrl, headers, organizationId, title
   return dataset;
 }
 
-export async function updateDatasetMetadata({ apiBaseUrl, headers, datasetId, title, description, stats, frequency }) {
+export async function updateDatasetMetadata({ apiBaseUrl, headers, datasetId, title, description, license, stats, frequency }) {
   const updatePayload = {
     title,
     description,
-    license: DATASET_LICENSE,
+    license,
     frequency,
   };
 

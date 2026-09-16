@@ -46,7 +46,8 @@
       "timestampPrefix": true
     },
     "dataset": {
-      "publishingSchedule": "30 8 * * MON"
+      "publishingSchedule": "30 8 * * MON",
+      "storagePath": "./data/datasets"
     },
     "collection-api": {
       "feed": {

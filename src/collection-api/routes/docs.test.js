@@ -54,6 +54,14 @@ describe('Docs API', () => {
           it('/version/{serviceId}/{termsType}/{date}', () => {
             expect(subject).to.have.property('/version/{serviceId}/{termsType}/{date}');
           });
+
+          it('/dataset/latest', () => {
+            expect(subject).to.have.property('/dataset/latest');
+          });
+
+          it('/dataset/latest/download', () => {
+            expect(subject).to.have.property('/dataset/latest/download');
+          });
         });
       });
     });

@@ -51,7 +51,8 @@ export default async function publish({
     projectId = null;
   }
 
-  const tagName = `${path.basename(archivePath, path.extname(archivePath))}`; // use archive filename as Git tag
+  const archiveFilename = path.basename(archivePath);
+  const tagName = path.basename(archiveFilename, path.extname(archiveFilename)); // use archive filename as Git tag
 
   try {
     let options = GitLab.baseOptionsHttpReq(process.env.OTA_ENGINE_GITLAB_RELEASES_TOKEN);
@@ -88,7 +89,7 @@ export default async function publish({
     // restrict characters to the ones allowed by GitLab APIs
     const packageName = config.get('@opentermsarchive/engine.dataset.title').replace(/[^a-zA-Z0-9.\-_]/g, '-');
     const packageVersion = tagName.replace(/[^a-zA-Z0-9.\-_]/g, '-');
-    const packageFileName = archivePath.replace(/[^a-zA-Z0-9.\-_/]/g, '-');
+    const packageFileName = archiveFilename.replace(/[^a-zA-Z0-9.\-_]/g, '-');
 
     logger.debug(`packageName: ${packageName}, packageVersion: ${packageVersion} packageFileName: ${packageFileName}`);
 
@@ -108,9 +109,9 @@ export default async function publish({
     // Create the release and link the package
     const formData = new FormData();
 
-    formData.append('name', archivePath);
+    formData.append('name', archiveFilename);
     formData.append('url', publishedPackageUrl);
-    formData.append('file', fsApi.createReadStream(archivePath), { filename: path.basename(archivePath) });
+    formData.append('file', fsApi.createReadStream(archivePath), { filename: archiveFilename });
 
     options = GitLab.baseOptionsHttpReq(process.env.OTA_ENGINE_GITLAB_RELEASES_TOKEN);
     options.method = 'POST';
