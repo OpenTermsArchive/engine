@@ -227,10 +227,10 @@ export default class GitRepository extends RepositoryInterface {
     }
   }
 
-  removeAll() {
+  async removeAll() {
     this.#assertWritable('remove records');
 
-    return this.git.destroyHistory();
+    await this.git.destroyHistory();
   }
 
   async loadRecordContent(record) {

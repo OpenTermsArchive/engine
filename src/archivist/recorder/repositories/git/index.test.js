@@ -2123,8 +2123,8 @@ describe('GitRepository', () => {
       await expect(subject.save(record)).to.be.rejectedWith(Error, /read-only/);
     });
 
-    it('rejects removing records', () => {
-      expect(() => subject.removeAll()).to.throw(/read-only/);
+    it('rejects removing records', async () => {
+      await expect(subject.removeAll()).to.be.rejectedWith(Error, /read-only/);
     });
 
     it('rejects opening a missing repository', async () => {
