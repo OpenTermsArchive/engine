@@ -13,6 +13,7 @@ describe('Collection', () => {
   let metadataBackup;
   let getCollection;
   let collection;
+  let instanceCount = 0;
 
   before(async () => {
     try {
@@ -29,7 +30,7 @@ describe('Collection', () => {
   });
 
   beforeEach(async () => {
-    const { getCollection: reloadedGetCollection } = await import(`./index.js?t=${Date.now()}`); // Ensure a new instance is loaded for each test
+    const { getCollection: reloadedGetCollection } = await import(`./index.js?instance=${++instanceCount}`); // Ensure a new instance is loaded for each test, even when two tests start within the same millisecond
 
     getCollection = reloadedGetCollection;
   });
