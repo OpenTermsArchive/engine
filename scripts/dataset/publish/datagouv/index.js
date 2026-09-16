@@ -1,6 +1,6 @@
 import config from 'config';
 
-import { DATAGOUV_LICENSE_ID } from '../../../../src/dataset/license.js';
+import * as license from '../../../../src/dataset/license.js';
 import * as readme from '../../assets/README.template.js';
 import { createModuleLogger } from '../../logger/index.js';
 
@@ -19,7 +19,7 @@ export default async function publish({ archivePath, stats }) {
     ? await getDataset({ apiBaseUrl, headers, datasetId })
     : await ensureDatasetExists({ apiBaseUrl, headers, organizationIdOrSlug, datasetTitle, description, frequency });
 
-  await updateDatasetMetadata({ apiBaseUrl, headers, datasetId: dataset.id, title: datasetTitle, description, stats, frequency });
+  await updateDatasetMetadata({ apiBaseUrl, headers, datasetId: dataset.id, title: datasetTitle, description, license: license.DATAGOUV_ID, stats, frequency });
 
   const { resourceId, fileName } = await handleResourceUpload({ apiBaseUrl, headers, datasetId: dataset.id, dataset, archivePath });
 
@@ -73,7 +73,7 @@ async function ensureDatasetExists({ apiBaseUrl, headers, organizationIdOrSlug, 
   let dataset = await findDatasetByTitle({ apiBaseUrl, headers, organizationId: organization.id, title: datasetTitle });
 
   if (!dataset) {
-    dataset = await createDataset({ apiBaseUrl, headers, organizationId: organization.id, title: datasetTitle, description, license: DATAGOUV_LICENSE_ID, frequency });
+    dataset = await createDataset({ apiBaseUrl, headers, organizationId: organization.id, title: datasetTitle, description, license: license.DATAGOUV_ID, frequency });
   }
 
   return dataset;

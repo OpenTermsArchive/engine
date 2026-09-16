@@ -3,7 +3,7 @@ import path from 'path';
 import config from 'config';
 
 import { toISODateWithoutMilliseconds } from '../../src/archivist/utils/date.js';
-import { SPDX_LICENSE_ID } from '../../src/dataset/license.js';
+import * as license from '../../src/dataset/license.js';
 import DatasetStorage from '../../src/dataset/storage.js';
 
 import generateRelease from './export/index.js';
@@ -25,7 +25,7 @@ export async function release({ shouldPublish, fileName }) {
   await storage.save({
     filename,
     title,
-    license: SPDX_LICENSE_ID,
+    license: license.SPDX_ID,
     releaseDate: toISODateWithoutMilliseconds(releaseDate),
     firstVersionDate: toISODateWithoutMilliseconds(stats.firstVersionDate),
     lastVersionDate: toISODateWithoutMilliseconds(stats.lastVersionDate),

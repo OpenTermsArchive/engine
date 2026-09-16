@@ -4,7 +4,6 @@ import path from 'path';
 import FormData from 'form-data';
 import nodeFetch from 'node-fetch';
 
-import { DATAGOUV_LICENSE_ID } from '../../../../src/dataset/license.js';
 import { createModuleLogger } from '../../logger/index.js';
 
 const logger = createModuleLogger('datagouv');
@@ -112,11 +111,11 @@ export async function createDataset({ apiBaseUrl, headers, organizationId, title
   return dataset;
 }
 
-export async function updateDatasetMetadata({ apiBaseUrl, headers, datasetId, title, description, stats, frequency }) {
+export async function updateDatasetMetadata({ apiBaseUrl, headers, datasetId, title, description, license, stats, frequency }) {
   const updatePayload = {
     title,
     description,
-    license: DATAGOUV_LICENSE_ID,
+    license,
     frequency,
   };
 
