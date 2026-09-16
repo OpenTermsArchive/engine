@@ -20,7 +20,7 @@ const fs = fsApi.promises;
 const ARCHIVE_FORMAT = 'zip'; // for supported formats, see https://www.archiverjs.com/docs/archive-formats
 
 export default async function generate({ archivePath, releaseDate }) {
-  const versionsRepository = await RepositoryFactory.create(config.get('@opentermsarchive/engine.recorder.versions.storage')).initialize();
+  const versionsRepository = await RepositoryFactory.create(config.get('@opentermsarchive/engine.recorder.versions.storage'), { readOnly: true }).initialize(); // The export only reads the repository the tracker writes to
 
   const temporaryArchivePath = `${archivePath}${TEMPORARY_SUFFIX}`;
   const archive = await initializeArchive(temporaryArchivePath, path.basename(archivePath, path.extname(archivePath)));
