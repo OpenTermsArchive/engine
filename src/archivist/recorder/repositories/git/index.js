@@ -236,24 +236,11 @@ export default class GitRepository extends RepositoryInterface {
   async loadRecordContent(record) {
     const relativeFilePath = DataMapper.generateFilePath(record.serviceId, record.termsType, record.documentId, record.mimeType);
 
-    if (record.mimeType != mime.getType('pdf')) {
-      record.content = await this.git.show(`${record.id}:${relativeFilePath}`);
+    const objectPath = `${record.id}:${relativeFilePath}`;
 
-      return;
-    }
-
-    // In case of PDF files, `git show` cannot be used as it converts PDF binary into strings that do not retain the original binary representation
-    // It is impossible to restore the original binary data from the resulting string
-    let pdfBuffer;
-
-    try {
-      await this.git.restore(relativeFilePath, record.id); // Temporarily restore the PDF file to a specific commit
-      pdfBuffer = await fs.readFile(`${this.path}/${relativeFilePath}`); // …read the content
-    } finally {
-      await this.git.restore(relativeFilePath, 'HEAD'); // …and finally restore the file to its most recent state
-    }
-
-    record.content = pdfBuffer;
+    record.content = record.mimeType == mime.getType('pdf')
+      ? await this.git.showBuffer(objectPath) // Binary content is read straight from the object database, so nothing is ever written to the working tree shared with the tracker
+      : await this.git.show(objectPath);
   }
 
   getDiffStats(recordId) {

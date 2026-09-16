@@ -132,6 +132,10 @@ export default class Git {
     return this.git.show(options);
   }
 
+  showBuffer(options) {
+    return this.git.showBuffer(options);
+  }
+
   async cleanUp() {
     await fs.rm(path.join(this.path, '.git', 'objects', 'info', 'commit-graph.lock'), { force: true }); // Remove a leftover commit-graph lock from a previous `commit-graph write` that was killed mid-write (e.g. the process was terminated during a deploy or restart). The commit-graph is a disposable cache rebuilt by `writeCommitGraph`, so clearing a stale lock is safe and prevents every subsequent run from failing.
     await this.git.reset('hard');
@@ -144,15 +148,6 @@ export default class Git {
       shortHash,
       '--pretty=%H', // Print the full 40-character commit hash
       '-s', // Suppress the diff output, only the formatted hash is wanted
-    ]);
-  }
-
-  restore(path, commit) {
-    return this.git.raw([
-      'restore',
-      '-s', commit, // Take the file contents from this specific commit rather than from the index
-      '--', // Everything after is a pathspec, not a revision or option
-      path,
     ]);
   }
 
