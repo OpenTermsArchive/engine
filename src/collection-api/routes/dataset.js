@@ -5,7 +5,6 @@ import express from 'express';
 import { buildAbsoluteBaseUrl } from '../utils/url.js';
 
 export const NO_DATASET_ERROR = 'No dataset has been generated yet';
-export const REPLACED_DATASET_ERROR = 'The dataset was replaced during the request, retry to get the latest one';
 
 const TRANSFER_HEADERS = [ 'Accept-Ranges', 'Cache-Control', 'Content-Disposition', 'Content-Length', 'Content-Range', 'Content-Type', 'ETag', 'Last-Modified' ];
 const METADATA_PATH = '/dataset/latest';
@@ -23,7 +22,7 @@ function handleTransferError(error, res, next) {
   TRANSFER_HEADERS.forEach(header => res.removeHeader(header)); // `send` has already described the archive on the response when it fails, whether it rejects the request or cannot read the file; those headers must not describe the JSON error instead
 
   if (error.status === 404) { // The archive was replaced under another name between the metadata lookup and the transfer; the new metadata is already in place, so a retry succeeds
-    return res.status(404).json({ error: REPLACED_DATASET_ERROR });
+    return res.status(404).json({ error: NO_DATASET_ERROR });
   }
 
   if (error.status < 500) { // Client errors raised by `send`, such as an unsatisfiable range or a failed precondition

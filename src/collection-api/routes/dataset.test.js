@@ -11,7 +11,7 @@ import supertest from 'supertest';
 import DatasetStorage from '../../dataset/storage.js';
 import app from '../server.js';
 
-import { NO_DATASET_ERROR, REPLACED_DATASET_ERROR } from './dataset.js';
+import { NO_DATASET_ERROR } from './dataset.js';
 
 const basePath = config.get('@opentermsarchive/engine.collection-api.basePath');
 const request = supertest(app);
@@ -381,17 +381,7 @@ describe('Dataset API', () => {
         await removeDataset();
       });
 
-      it('responds with 404 status code', () => {
-        expect(response.status).to.equal(404);
-      });
-
-      it('responds with Content-Type application/json', () => {
-        expect(response.type).to.equal('application/json');
-      });
-
-      it('returns an explicit error message', () => {
-        expect(response.body).to.deep.equal({ error: REPLACED_DATASET_ERROR });
-      });
+      itRespondsWithNoDatasetError(() => response);
     });
   });
 
