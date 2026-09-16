@@ -9,7 +9,7 @@ All changes that impact users of this module are documented in this file, in the
 ### Fixed
 
 - Report a failure to apply the user agent override or to enable PDF interception in the full DOM fetcher as an error on the fetched document instead of exiting the whole tracking process on an unhandled promise rejection
-- Register the stealth plugin once per browser launch in the full DOM fetcher instead of adding a copy on every scheduled tracking run, which multiplied the commands sent to Chrome for every page
+- Register the full DOM fetcher evasions once per browser launch instead of adding a copy on every tracking run, which multiplied the scripts and commands sent to Chrome for every page
 
 ## 16.0.0 - 2026-09-16
 
