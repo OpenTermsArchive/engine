@@ -8,7 +8,7 @@ All changes that impact users of this module are documented in this file, in the
 
 ### Fixed
 
-- Report a failure to apply the user agent override in the full DOM fetcher as an error on the fetched document instead of exiting the whole tracking process on an unhandled promise rejection
+- Report a failure to apply the user agent override or to enable PDF interception in the full DOM fetcher as an error on the fetched document instead of exiting the whole tracking process on an unhandled promise rejection
 
 ## 16.0.0 - 2026-09-16
 
