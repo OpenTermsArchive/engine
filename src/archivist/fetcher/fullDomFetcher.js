@@ -197,19 +197,19 @@ function isValidHttpStatus(status) {
 async function configurePage(page, client, config) {
   await page.setViewport({ width: 1920, height: 1080 }); // Realistic viewport to avoid detection based on default Puppeteer dimensions (800x600)
   await page.setDefaultNavigationTimeout(config.navigationTimeout);
-  await client.send('Network.setUserAgentOverride', browser.userAgentOverride); // Applied here rather than through the stealth user-agent-override evasion, whose fire-and-forget CDP call turns any failure into an unhandled rejection that kills the process
+  await client.send('Network.setUserAgentOverride', browser.userAgentOverride);
 
   if (browser.proxyCredentials?.username && browser.proxyCredentials?.password) {
     await page.authenticate(browser.proxyCredentials);
   }
 }
 
-async function captureUserAgentOverride(browser, locale) { // The stealth user-agent-override evasion computes the override the fetcher needs, namely a user agent without HeadlessChrome, the matching platform and client hints, and Accept-Language, but it sends it from its page creation hook without awaiting it, so any CDP failure escapes as an unhandled rejection that stops the whole process. Running the evasion once on a stand-in page captures the override instead, so that the fetcher can send it itself before each navigation and handle failures like any other fetch error
+async function captureUserAgentOverride(browser, locale) { // The stealth evasion sends the override without awaiting it, so a failure would crash the process on an unhandled rejection; running it once on a stand-in page records the override for the fetcher to send itself
   const evasion = userAgentOverride({ locale });
   let override;
 
-  await evasion.beforeLaunch({ headless: true }); // The evasion includes acceptLanguage only when it believes the browser is headless and delegates it to browser preferences otherwise, while the fetcher always relies on the CDP override
-  await evasion.onPageCreated({ // The stand-in page exposes just what the evasion reads: the browser, for its user agent and version, and a CDP session whose send records the override instead of sending it
+  await evasion.beforeLaunch({ headless: true }); // Otherwise the evasion leaves Accept-Language to browser preferences
+  await evasion.onPageCreated({ // The stand-in page exposes only what the evasion reads
     browser: () => browser,
     _client: () => ({
       send: (method, params) => {
