@@ -35,15 +35,22 @@ function canMatchRecordFilePath(...pathSegments) {
 }
 
 export default class GitRepository extends RepositoryInterface {
-  constructor({ path, author, publish, snapshotIdentiferTemplate }) {
+  constructor({ path, author, publish, snapshotIdentiferTemplate, readOnly = false }) {
     super();
     this.path = path;
     this.needsPublication = publish;
+    this.readOnly = readOnly; // Readers share the repository with the tracker, so they must never touch the working tree nor the commit-graph: both race the tracker, and the commit-graph write then fails with `commit-graph.lock: File exists`
     this.git = new Git({ path: this.path, author });
     this.snapshotIdentiferTemplate = snapshotIdentiferTemplate;
   }
 
   async initialize() {
+    if (this.readOnly) {
+      this.git.open();
+
+      return this;
+    }
+
     await this.git.initialize();
     await this.git.cleanUp(); // Drop all uncommitted changes and remove all leftover files that may be present if the process was killed aggressively
     await this.git.writeCommitGraph(); // Create or replace the commit graph with a new one to ensure it's fully consistent
@@ -52,6 +59,8 @@ export default class GitRepository extends RepositoryInterface {
   }
 
   async save(record) {
+    this.#assertWritable('save records');
+
     const { serviceId, termsType, documentId, fetchDate } = record;
 
     if (record.isFirstRecord === undefined || record.isFirstRecord === null) {
@@ -75,6 +84,10 @@ export default class GitRepository extends RepositoryInterface {
   }
 
   async finalize() {
+    if (this.readOnly) {
+      return;
+    }
+
     if (this.needsPublication) {
       await this.git.pushChanges();
     }
@@ -214,31 +227,20 @@ export default class GitRepository extends RepositoryInterface {
     }
   }
 
-  removeAll() {
-    return this.git.destroyHistory();
+  async removeAll() {
+    this.#assertWritable('remove records');
+
+    await this.git.destroyHistory();
   }
 
   async loadRecordContent(record) {
     const relativeFilePath = DataMapper.generateFilePath(record.serviceId, record.termsType, record.documentId, record.mimeType);
 
-    if (record.mimeType != mime.getType('pdf')) {
-      record.content = await this.git.show(`${record.id}:${relativeFilePath}`);
+    const objectPath = `${record.id}:${relativeFilePath}`;
 
-      return;
-    }
-
-    // In case of PDF files, `git show` cannot be used as it converts PDF binary into strings that do not retain the original binary representation
-    // It is impossible to restore the original binary data from the resulting string
-    let pdfBuffer;
-
-    try {
-      await this.git.restore(relativeFilePath, record.id); // Temporarily restore the PDF file to a specific commit
-      pdfBuffer = await fs.readFile(`${this.path}/${relativeFilePath}`); // …read the content
-    } finally {
-      await this.git.restore(relativeFilePath, 'HEAD'); // …and finally restore the file to its most recent state
-    }
-
-    record.content = pdfBuffer;
+    record.content = record.mimeType == mime.getType('pdf')
+      ? await this.git.showBuffer(objectPath) // Binary content is read straight from the object database, so nothing is ever written to the working tree shared with the tracker
+      : await this.git.show(objectPath);
   }
 
   getDiffStats(recordId) {
@@ -306,6 +308,12 @@ export default class GitRepository extends RepositoryInterface {
 
   #isTracked(serviceId, termsType, documentId) {
     return this.git.isTracked(`${this.path}/${DataMapper.generateFilePath(serviceId, termsType, documentId)}`);
+  }
+
+  #assertWritable(operation) {
+    if (this.readOnly) {
+      throw new Error(`Cannot ${operation} in read-only repository ${this.path}`);
+    }
   }
 
   async #toDomain(commit, { deferContentLoading } = {}) {

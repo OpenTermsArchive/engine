@@ -2,7 +2,8 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-import { expect } from 'chai';
+import { expect, use } from 'chai';
+import chaiAsPromised from 'chai-as-promised';
 import config from 'config';
 import mime from 'mime';
 
@@ -13,6 +14,8 @@ import { TERMS_TYPE_AND_DOCUMENT_ID_SEPARATOR, SNAPSHOT_ID_MARKER, COMMIT_MESSAG
 import Git from './git.js';
 
 import GitRepository from './index.js';
+
+use(chaiAsPromised);
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -2061,6 +2064,77 @@ describe('GitRepository', () => {
       it('iterates in ascending order', () => {
         expect(fetchDates).to.deep.equal(expectedDates);
       });
+    });
+  });
+
+  context('when read-only', () => {
+    const UNTRACKED_FILE_PATH = `${RECORDER_PATH}/untracked-file.md`;
+    const COMMIT_GRAPH_PATH = `${RECORDER_PATH}/.git/objects/info/commit-graph`;
+
+    let writer;
+    let record;
+
+    before(async () => {
+      writer = new GitRepository({
+        ...config.get('@opentermsarchive/engine.recorder.versions.storage.git'),
+        path: RECORDER_PATH,
+      });
+
+      await writer.git.initialize(); // Bypass GitRepository#initialize, which writes the commit-graph, to check that the read-only repository does not write it either
+      fs.rmSync(COMMIT_GRAPH_PATH, { force: true });
+
+      record = await writer.save(new Version({
+        serviceId: SERVICE_PROVIDER_ID,
+        termsType: TERMS_TYPE,
+        content: CONTENT,
+        fetchDate: FETCH_DATE,
+        snapshotIds: [SNAPSHOT_ID],
+      }));
+
+      fs.writeFileSync(UNTRACKED_FILE_PATH, CONTENT);
+
+      subject = new GitRepository({
+        ...config.get('@opentermsarchive/engine.recorder.versions.storage.git'),
+        path: RECORDER_PATH,
+        readOnly: true,
+      });
+
+      await subject.initialize();
+      await subject.finalize();
+    });
+
+    after(() => writer.removeAll());
+
+    it('reads the records', async () => {
+      const records = await subject.findAll();
+
+      expect(records.map(({ id }) => id)).to.deep.equal([record.id]);
+    });
+
+    it('leaves uncommitted changes untouched', () => {
+      expect(fs.existsSync(UNTRACKED_FILE_PATH)).to.be.true;
+    });
+
+    it('does not write the commit-graph', () => {
+      expect(fs.existsSync(COMMIT_GRAPH_PATH)).to.be.false;
+    });
+
+    it('rejects saving records', async () => {
+      await expect(subject.save(record)).to.be.rejectedWith(Error, /read-only/);
+    });
+
+    it('rejects removing records', async () => {
+      await expect(subject.removeAll()).to.be.rejectedWith(Error, /read-only/);
+    });
+
+    it('rejects opening a missing repository', async () => {
+      const missingRepository = new GitRepository({
+        ...config.get('@opentermsarchive/engine.recorder.versions.storage.git'),
+        path: `${RECORDER_PATH}-missing`,
+        readOnly: true,
+      });
+
+      await expect(missingRepository.initialize()).to.be.rejectedWith(Error, /does not exist/);
     });
   });
 });

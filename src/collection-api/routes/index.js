@@ -39,8 +39,8 @@ export default async function apiRouter(basePath) {
   const services = await Services.load();
   const collection = await getCollection();
   const versionsStorageConfig = config.get('@opentermsarchive/engine.recorder.versions.storage');
-  const versionsRepository = await RepositoryFactory.create(versionsStorageConfig).initialize();
-  const snapshotsRepository = await RepositoryFactory.create(config.get('@opentermsarchive/engine.recorder.snapshots.storage')).initialize();
+  const versionsRepository = await RepositoryFactory.create(versionsStorageConfig, { readOnly: true }).initialize(); // The API only reads the repositories the tracker writes to
+  const snapshotsRepository = await RepositoryFactory.create(config.get('@opentermsarchive/engine.recorder.snapshots.storage'), { readOnly: true }).initialize();
   const feedConfig = config.get('@opentermsarchive/engine.collection-api.feed');
   const datasetStorage = new DatasetStorage(config.get('@opentermsarchive/engine.dataset.storagePath'));
 
