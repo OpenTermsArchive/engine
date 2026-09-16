@@ -81,6 +81,16 @@ describe('Full DOM Fetcher', function () {
 
       expect(browser1).to.equal(browser2);
     });
+
+    it('registers plugin hooks once per launch', async () => {
+      const initialListenerCount = (await launchHeadlessBrowser('en')).listenerCount('targetcreated');
+
+      await stopHeadlessBrowser();
+
+      const relaunchedBrowser = await launchHeadlessBrowser('en');
+
+      expect(relaunchedBrowser.listenerCount('targetcreated')).to.equal(initialListenerCount);
+    });
   });
 
   describe('#fetch', () => {
