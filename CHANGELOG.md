@@ -9,6 +9,8 @@ All changes that impact users of this module are documented in this file, in the
 ### Fixed
 
 - Stop the Collection API and the dataset export from resetting the working tree and rewriting the commit-graph of the repositories they only read, which raced the tracker started at the same time and made either fail with `commit-graph.lock: File exists`
+- Read PDF versions and snapshots straight from the Git object database instead of temporarily restoring them in the working tree, which could make a concurrent tracker commit stale content
+- Fail with an explicit error when the Collection API or the dataset export opens a repository that does not exist yet, instead of silently querying the enclosing repository
 
 ## 16.0.1 - 2026-09-16
 
