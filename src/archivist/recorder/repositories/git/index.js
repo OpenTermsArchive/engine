@@ -46,7 +46,7 @@ export default class GitRepository extends RepositoryInterface {
 
   async initialize() {
     if (this.readOnly) {
-      await this.git.attach();
+      this.git.open();
 
       return this;
     }

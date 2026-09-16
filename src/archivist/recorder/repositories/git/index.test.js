@@ -2126,5 +2126,15 @@ describe('GitRepository', () => {
     it('rejects removing records', () => {
       expect(() => subject.removeAll()).to.throw(/read-only/);
     });
+
+    it('rejects opening a missing repository', async () => {
+      const missingRepository = new GitRepository({
+        ...config.get('@opentermsarchive/engine.recorder.versions.storage.git'),
+        path: `${RECORDER_PATH}-missing`,
+        readOnly: true,
+      });
+
+      await expect(missingRepository.initialize()).to.be.rejectedWith(Error, /does not exist/);
+    });
   });
 });

@@ -16,7 +16,11 @@ export default class Git {
   }
 
   async initialize() {
-    await this.attach();
+    if (!fsApi.existsSync(this.path)) {
+      await fs.mkdir(this.path, { recursive: true }); // simple-git cannot be instantiated on a missing directory
+    }
+
+    this.#connect();
     await this.git.init();
 
     return this.git
@@ -29,11 +33,15 @@ export default class Git {
       .addConfig('gc.writeCommitGraph', false); // Prevent automatic `git gc` from also writing the commit-graph: the engine writes it explicitly (see `writeCommitGraph`/`updateCommitGraph`), and a concurrent gc write races those, which can leave a stale `commit-graph.lock` and make subsequent operations fail
   }
 
-  async attach() {
-    if (!fsApi.existsSync(this.path)) {
-      await fs.mkdir(this.path, { recursive: true }); // simple-git cannot be instantiated on a missing directory
+  open() {
+    if (!fsApi.existsSync(path.join(this.path, '.git'))) {
+      throw new Error(`Repository ${this.path} does not exist, it has to be created by a writer such as the tracker first`); // Without this check, git would silently walk up to an enclosing repository, such as the collection one
     }
 
+    this.#connect();
+  }
+
+  #connect() {
     this.git = simpleGit(this.path, {
       trimmed: true,
       maxConcurrentProcesses: 1, // Concurrent runs on the same repository race the index and the commit-graph and can corrupt them
