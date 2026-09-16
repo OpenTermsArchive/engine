@@ -151,6 +151,25 @@ describe('Full DOM Fetcher', function () {
         expect(content.equals(expectedPDFContent)).to.be.true;
       });
     });
+
+    context('when the user agent override cannot be applied', () => {
+      let browser;
+      let userAgentOverride;
+
+      before(async () => {
+        browser = await launchHeadlessBrowser('en');
+        ({ userAgentOverride } = browser);
+        browser.userAgentOverride = {}; // Rejected by Chrome since the user agent is mandatory
+      });
+
+      after(() => {
+        browser.userAgentOverride = userAgentOverride;
+      });
+
+      it('rejects with the protocol error', async () => {
+        await expect(fetch(`http://127.0.0.1:${SERVER_PORT}/dynamic`, [], config)).to.be.rejectedWith('Network.setUserAgentOverride');
+      });
+    });
   });
 
   describe('Language configuration', () => {
