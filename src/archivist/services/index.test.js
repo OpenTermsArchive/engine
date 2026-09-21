@@ -348,6 +348,12 @@ describe('Services', () => {
           testParameterPassing({ param1: 'param1', param2: 'param2' });
         });
       });
+
+      context('as a falsy value', () => {
+        it('passes parameters correctly', () => {
+          testParameterPassing(false);
+        });
+      });
     });
   });
 
