@@ -110,6 +110,7 @@ function createWrappedFilter(baseFunction, filterName, filterParams) {
     const wrappedFilter = (webPageDOM, context) => baseFunction(webPageDOM, filterParams, context);
 
     Object.defineProperty(wrappedFilter, 'name', { value: filterName });
+    Object.defineProperty(wrappedFilter, 'declaration', { value: filterParams === undefined ? filterName : { [filterName]: filterParams } }); // Keep the declared form, as the parameters are otherwise only reachable through the closure
 
     return wrappedFilter;
   }

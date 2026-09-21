@@ -89,7 +89,7 @@ export default class SourceDocument {
       fetch: this.location,
       select: this.contentSelectors,
       remove: this.insignificantContentSelectors,
-      filter: this.filters ? this.filters.map(filter => filter.name) : undefined,
+      filter: this.filters ? this.filters.map(filter => filter.declaration ?? filter.name) : undefined, // Filters declared with parameters carry their declared form, so that a change of parameters is persisted
       executeClientScripts: this.executeClientScripts,
     };
   }

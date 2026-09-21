@@ -310,6 +310,19 @@ describe('Services', () => {
       expect(result[0](null, 'context')).to.equal('foo');
     });
 
+    it('keeps the declared form of filters declared with parameters', () => {
+      const [filter] = getServiceFilters({ paramFilter: (dom, param) => param }, [{ paramFilter: [ 'foo', 'bar' ] }]);
+
+      expect(filter.declaration).to.deep.equal({ paramFilter: [ 'foo', 'bar' ] });
+    });
+
+    it('keeps the name as the declared form of exposed filters declared by string name', () => {
+      const [filterName] = Object.keys(exposedFilters);
+      const [filter] = getServiceFilters({}, [filterName]);
+
+      expect(filter.declaration).to.equal(filterName);
+    });
+
     describe('parameters passed to filters', () => {
       let serviceLoadedFilters;
       let passedDOM;

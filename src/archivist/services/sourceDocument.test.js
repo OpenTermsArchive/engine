@@ -298,5 +298,19 @@ describe('SourceDocument', () => {
 
       expect(result).to.deep.equal(expectedResult);
     });
+
+    it('converts filters declared with parameters to their declared form', () => {
+      const filterWithParameters = () => {};
+
+      Object.defineProperty(filterWithParameters, 'declaration', { value: { removeQueryParams: ['utm_source'] } });
+
+      const result = new SourceDocument({
+        location: URL,
+        contentSelectors: 'body',
+        filters: [ filterWithParameters, function filterSomething() {} ],
+      }).toPersistence();
+
+      expect(result.filter).to.deep.equal([{ removeQueryParams: ['utm_source'] }, 'filterSomething' ]);
+    });
   });
 });
