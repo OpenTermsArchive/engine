@@ -28,7 +28,7 @@ async function initialize(services) {
   logger.info(`Start engine v${PACKAGE_VERSION}${collectionName}\n`);
 
   if (services?.length) {
-    services = services.filter(serviceId => {
+    services = [...new Set(services)].filter(serviceId => { // Deduplicated so that a service ID given twice is not tracked twice in the same run
       const isServiceDeclared = archivist.services[serviceId];
 
       if (!isServiceDeclared) {
