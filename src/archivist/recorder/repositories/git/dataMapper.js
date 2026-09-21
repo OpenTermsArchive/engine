@@ -67,7 +67,8 @@ export function toDomain(commit) {
   }
 
   const [relativeFilePath] = modifiedFilesInCommit;
-  const snapshotIdsMatch = body.match(/\b[0-9a-f]{5,40}\b/g);
+  const bodyWithoutTrailers = Object.keys(trailers).length ? body.split(/\n\n+/).slice(0, -1).join('\n\n') : body; // Trailers, when present, are the last section of the body; their values, such as the hexadecimal segments of a run ID, must not be read as snapshot IDs
+  const snapshotIdsMatch = bodyWithoutTrailers.match(/\b[0-9a-f]{5,40}\b/g);
 
   const [ termsType, documentId ] = path.basename(relativeFilePath, path.extname(relativeFilePath)).split(TERMS_TYPE_AND_DOCUMENT_ID_SEPARATOR);
 

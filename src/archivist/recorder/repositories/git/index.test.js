@@ -398,6 +398,28 @@ describe('GitRepository', () => {
         expect(record.metadata).to.deep.equal(METADATA);
       });
 
+      context('when a metadata value contains hexadecimal segments', () => {
+        let recordWithRunId;
+
+        before(async () => {
+          const { id: recordId } = await subject.save(new Version({
+            serviceId: SERVICE_PROVIDER_ID,
+            termsType: TERMS_TYPE,
+            content: `${CONTENT} (updated)`,
+            fetchDate: FETCH_DATE_LATER,
+            snapshotIds: [SNAPSHOT_ID],
+            mimeType: HTML_MIME_TYPE,
+            metadata: { ...METADATA, 'x-run-id': 'ota-run-189e7be3-60ef-40c7-ac28-81a44288e105' },
+          }));
+
+          recordWithRunId = await subject.findById(recordId);
+        });
+
+        it('returns only the snapshot ID', () => {
+          expect(recordWithRunId.snapshotIds).to.deep.equal([SNAPSHOT_ID]);
+        });
+      });
+
       context('when requested record does not exist', () => {
         it('returns null', async () => {
           expect(await subject.findById('inexistantID')).to.equal(null);
