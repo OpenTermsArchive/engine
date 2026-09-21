@@ -153,6 +153,10 @@ export async function getDeclaredServicesIds() {
   return declaredServicesIdsFromFileNames(fileNames);
 }
 
+export function getDeclarationsCommit() { // Resolves to null when the declarations are not versioned with Git
+  return Git.getHeadSha(declarationsPath);
+}
+
 // Returns the [{ serviceId, termsType }] declared at the given commit of the declarations repository.
 // Reads through git so the answer reflects the declarations exactly as they were at that commit, not as they are on disk; used by crash recovery to derive the coverage of a run that referenced this commit.
 export async function getDeclaredTermsAtCommit(commit) {
