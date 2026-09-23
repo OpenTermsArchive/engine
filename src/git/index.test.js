@@ -185,6 +185,36 @@ describe('Git', () => {
         expect(infoDirectoryContent).to.not.include('commit-graph.lock');
       });
     });
+    context('when an index lock has been left behind by an interrupted process', () => {
+      const indexLockFilePath = path.join(RECORDER_PATH, '.git', 'index.lock');
+
+      before(async () => {
+        const filePath = `${RECORDER_PATH}/file-to-clean.md`;
+
+        await fs.writeFile(filePath, DEFAULT_CONTENT);
+        await subject.add(filePath);
+        await subject.commit({ filePath, message: DEFAULT_COMMIT_MESSAGE });
+
+        await fs.writeFile(indexLockFilePath, '');
+
+        await subject.cleanUp();
+      });
+
+      after(() => subject.destroyHistory());
+
+      it('removes the stale index lock', async () => {
+        await expect(fs.access(indexLockFilePath)).to.be.rejected;
+      });
+
+      it('leaves the repository writable', async () => {
+        const filePath = `${RECORDER_PATH}/file-after-clean.md`;
+
+        await fs.writeFile(filePath, DEFAULT_CONTENT);
+        await subject.add(filePath);
+
+        expect(await subject.commit({ filePath, message: DEFAULT_COMMIT_MESSAGE })).to.be.a('string');
+      });
+    });
   });
 
   describe('.getHeadSha', () => {

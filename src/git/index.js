@@ -201,6 +201,7 @@ export default class Git {
   }
 
   async cleanUp() {
+    await fs.rm(path.join(this.path, '.git', 'index.lock'), { force: true }); // Remove a leftover index lock from a Git operation that was killed mid-write, which would otherwise make every subsequent reset, add and commit fail. Safe as the writer lock guarantees that no other process writes to the repository, and readers never lock the index
     await fs.rm(path.join(this.path, '.git', 'objects', 'info', 'commit-graph.lock'), { force: true }); // Remove a leftover commit-graph lock from a previous `commit-graph write` that was killed mid-write (e.g. the process was terminated during a deploy or restart). The commit-graph is a disposable cache rebuilt by `writeCommitGraph`, so clearing a stale lock is safe and prevents every subsequent run from failing.
     await this.git.reset('hard');
 
