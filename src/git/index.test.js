@@ -331,6 +331,35 @@ describe('Git', () => {
       });
     });
 
+    describe('.getLatestCommitSha', () => {
+      it('returns the newest commit touching the file whose message matches', async () => {
+        expect(await Git.getLatestCommitSha(repositoryPath, { grep: '^Add Service [AB]$', filePath: 'declarations' })).to.equal(secondCommitSha);
+      });
+
+      it('ignores newer commits whose message does not match', async () => {
+        expect(await Git.getLatestCommitSha(repositoryPath, { grep: '^Add Service A$', filePath: 'declarations' })).to.equal(firstCommitSha);
+      });
+
+      it('returns null when no commit matches', async () => {
+        expect(await Git.getLatestCommitSha(repositoryPath, { grep: '^Remove', filePath: 'declarations' })).to.be.null;
+      });
+
+      context('with a repository that has no commits yet', () => {
+        let directory;
+
+        before(async () => {
+          directory = await fs.mkdtemp(path.join(os.tmpdir(), 'ota-git-test-'));
+          await new Git({ path: directory, author: { name: 'Test', email: 'test@example.com' } }).initialize();
+        });
+
+        after(() => fs.rm(directory, { recursive: true, force: true }));
+
+        it('returns null', async () => {
+          expect(await Git.getLatestCommitSha(directory, { grep: '^Add', filePath: 'declarations' })).to.be.null;
+        });
+      });
+    });
+
     describe('.readFileAtCommit', () => {
       it('returns the file content as it was at the given commit', async () => {
         expect(await Git.readFileAtCommit(subdirectoryPath, firstCommitSha, 'Service A.json')).to.equal('{ "name": "Service A" }');
