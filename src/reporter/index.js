@@ -144,9 +144,14 @@ No changes were found in the last run, so no new version has been recorded.`,
     const latestDeclarationLink = `[Latest declaration](${declarationFileUrl})`;
     const latestVersionLink = `[Latest version](${this.reporter.generateVersionURL(terms.service.name, terms.type)})`;
     const snapshotsBaseUrl = this.reporter.generateSnapshotsBaseUrl(terms.service.name, terms.type);
-    const latestSnapshotsLink = terms.hasMultipleSourceDocuments
-      ? `Latest snapshots:\n  - ${terms.sourceDocuments.map(sourceDocument => `[${sourceDocument.id}](${snapshotsBaseUrl}.%20#${sourceDocument.id}.${mime.getExtension(sourceDocument.mimeType)})`).join('\n  - ')}`
-      : `[Latest snapshot](${snapshotsBaseUrl}.${mime.getExtension(terms.sourceDocuments[0].mimeType)})`;
+    const recordedSourceDocuments = terms.sourceDocuments.filter(sourceDocument => sourceDocument.snapshotId); // A source document that has never been recorded has no snapshot file to link to, and its unknown MIME type would produce a link to a nonexistent ".null" file
+    let latestSnapshotsLink = '';
+
+    if (recordedSourceDocuments.length) {
+      latestSnapshotsLink = terms.hasMultipleSourceDocuments
+        ? `Latest snapshots:\n  - ${recordedSourceDocuments.map(sourceDocument => `[${sourceDocument.id}](${snapshotsBaseUrl}.%20#${sourceDocument.id}.${mime.getExtension(sourceDocument.mimeType)})`).join('\n  - ')}`
+        : `[Latest snapshot](${snapshotsBaseUrl}.${mime.getExtension(recordedSourceDocuments[0].mimeType)})`;
+    }
 
     /* eslint-disable no-irregular-whitespace */
     return `
@@ -185,7 +190,7 @@ If the source documents are accessible in a browser but fetching them always fai
 
 - ${latestDeclarationLink}
 ${this.repositories.versions ? `- ${latestVersionLink}` : ''}
-${this.repositories.snapshots ? `- ${latestSnapshotsLink}` : ''} 
+${this.repositories.snapshots && latestSnapshotsLink ? `- ${latestSnapshotsLink}` : ''}
 `;
   /* eslint-enable no-irregular-whitespace */
   }

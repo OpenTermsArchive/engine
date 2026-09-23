@@ -64,17 +64,21 @@ describe('Reporter', () => {
   describe('#generateDescription', () => {
     const buildReporter = () => new Reporter({
       type: 'github',
-      repositories: { declarations: 'OpenTermsArchive/test-declarations' },
+      repositories: { declarations: 'OpenTermsArchive/test-declarations', snapshots: 'OpenTermsArchive/test-snapshots' },
     });
 
-    const buildTerms = ({ sourceCount = 1, hasSnapshots = true } = {}) => {
-      const sourceDocuments = Array.from({ length: sourceCount }, (_, index) => ({
-        id: `source-${index}`,
-        location: `https://example.com/source-${index}`,
-        mimeType: 'text/html',
-        snapshotId: hasSnapshots ? `snapshot-${index}` : null,
-        toPersistence: () => ({ fetch: `https://example.com/source-${index}` }),
-      }));
+    const buildTerms = ({ sourceCount = 1, hasSnapshots = true, withoutSnapshotIndexes = [] } = {}) => {
+      const sourceDocuments = Array.from({ length: sourceCount }, (_, index) => {
+        const hasSnapshot = hasSnapshots && !withoutSnapshotIndexes.includes(index); // A document that has never been recorded has neither a snapshot ID nor an observed MIME type
+
+        return {
+          id: `source-${index}`,
+          location: `https://example.com/source-${index}`,
+          mimeType: hasSnapshot ? 'text/html' : null,
+          snapshotId: hasSnapshot ? `snapshot-${index}` : null,
+          toPersistence: () => ({ fetch: `https://example.com/source-${index}` }),
+        };
+      });
 
       return {
         service: { id: 'TestService', name: 'TestService' },
@@ -108,6 +112,23 @@ describe('Reporter', () => {
 
         expect(description).to.include('has not been recorded as a snapshot');
         expect(description).to.not.include('it might still be possible to recover the missed versions');
+      });
+
+      it('omits the snapshot link, which would point to a nonexistent file', () => {
+        const description = buildReporter().generateDescription({ error, terms: buildTerms({ hasSnapshots: false }) });
+
+        expect(description).to.not.include('Latest snapshot');
+        expect(description).to.not.include('.null');
+      });
+    });
+
+    context('when a source document of combined terms has never been recorded as a snapshot', () => {
+      it('omits its snapshot link and keeps the ones of the recorded documents', () => {
+        const description = buildReporter().generateDescription({ error, terms: buildTerms({ sourceCount: 2, withoutSnapshotIndexes: [1] }) });
+
+        expect(description).to.include('#source-0.html'); // The `#<id>` fragment only appears in snapshot links, unlike the document locations listed in the accessibility checklist
+        expect(description).to.not.include('#source-1');
+        expect(description).to.not.include('.null');
       });
     });
 

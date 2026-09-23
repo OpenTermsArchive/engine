@@ -20,7 +20,7 @@ All changes that impact users of this module are documented in this file, in the
 
 - Record as a technical upgrade the version of combined terms whose newly declared source document could only be fetched on a retry, instead of refetching all their source documents and recording a regular change that notified a false modification of the terms
 - Stop stating in tracking issues that the source documents were recorded as snapshots and that missed versions may be recovered, when they could actually not be fetched
-- Fix the links to the latest snapshots in the tracking issues of combined terms, which pointed to a nonexistent file with a `.null` extension for every source document that was successfully fetched
+- Fix the links to the latest snapshots in the tracking issues of combined terms, which pointed to a nonexistent file with a `.null` extension for every source document that was successfully fetched; also omit these links for source documents that have never been recorded as snapshots, as there is no file to link to
 - Pass falsy parameters, such as `false` or `0`, to collection-specific filters, which received the extraction context in their place
 - Track only once a service whose ID is given several times to `ota track --services`
 
