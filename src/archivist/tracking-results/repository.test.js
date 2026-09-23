@@ -992,6 +992,62 @@ describe('TrackingResultsRepository', () => {
             expect(await subject.findTermsResultsAt(commit, { serviceId: 'Unknown' })).to.deep.equal([]);
           });
         });
+
+        context('when read again at the same commit', () => {
+          let readFilesSpy;
+          let results;
+
+          before(async () => {
+            await subject.findTermsResultsAt(commit);
+            readFilesSpy = sinon.spy(Git, 'readFilesAtCommit');
+            results = await subject.findTermsResultsAt(commit, { serviceId: 'Google' });
+            readFilesSpy.restore();
+          });
+
+          it('does not read the files from git again', () => {
+            expect(readFilesSpy.called).to.be.false;
+          });
+
+          it('returns the results as they were at the given commit', () => {
+            expect(results.map(({ serviceId, termsType, status }) => ({ serviceId, termsType, status }))).to.deep.equal([{ serviceId: 'Google', termsType: 'Privacy Policy', status: 'failed' }]);
+          });
+        });
+
+        context('when read concurrently at the same commit', () => {
+          let readFilesSpy;
+
+          before(async () => {
+            const reader = new TrackingResultsRepository({ path: REPOSITORY_PATH, readOnly: true });
+
+            readFilesSpy = sinon.spy(Git, 'readFilesAtCommit');
+            await Promise.all([ reader.findTermsResultsAt(commit), reader.findTermsResultsAt(commit, { serviceId: 'Google' }) ]);
+            readFilesSpy.restore();
+          });
+
+          it('reads the files from git once', () => {
+            expect(readFilesSpy.callCount).to.equal(1);
+          });
+        });
+
+        context('when a read failed', () => {
+          let results;
+
+          before(async () => {
+            const reader = new TrackingResultsRepository({ path: REPOSITORY_PATH, readOnly: true });
+            const readFilesStub = sinon.stub(Git, 'readFilesAtCommit').rejects(new Error('Transient failure'));
+
+            await reader.findTermsResultsAt(commit).catch(() => {});
+            readFilesStub.restore();
+            results = await reader.findTermsResultsAt(commit);
+          });
+
+          it('reads the files again at the next request', () => {
+            expect(results.map(({ serviceId, termsType }) => ({ serviceId, termsType }))).to.deep.equal([
+              { serviceId: 'Facebook', termsType: 'Terms of Service' },
+              { serviceId: 'Google', termsType: 'Privacy Policy' },
+            ]);
+          });
+        });
       });
 
       describe('#findTermsResultAt', () => {

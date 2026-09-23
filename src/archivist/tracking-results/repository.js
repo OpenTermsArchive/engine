@@ -112,13 +112,23 @@ export default class TrackingResultsRepository {
   }
 
   async findTermsResultsAt(commit, { serviceId } = {}) { // Lists the terms results as they were at the given commit, optionally restricted to a service; files of terms removed from the declarations are kept as a historical record, and so are listed too
-    const files = (await Git.listFilesAtCommit(this.path, commit, { recursive: true }))
-      .map(filePath => ({ filePath, ...TermsResultMapper.parseFilePath(filePath) }))
-      .filter(file => file.serviceId && (serviceId === undefined || file.serviceId === serviceId));
+    if (this.termsResultsAtCommit?.commit !== commit) { // The results at a given commit never change, so the read of the latest commit requested is kept, and shared with the requests arriving while it is pending, as readers request the same commit until the next run completes
+      this.termsResultsAtCommit = { commit, termsResults: readTermsResultsAt(this.path, commit) };
+    }
 
-    const contents = await Git.readFilesAtCommit(this.path, commit, files.map(({ filePath }) => filePath));
+    const { termsResults: pendingTermsResults } = this.termsResultsAtCommit; // Captured before waiting, as a request for another commit may replace the kept read meanwhile
 
-    return files.map(({ filePath, serviceId: fileServiceId, termsType }, index) => TermsResultMapper.toDomain({ serviceId: fileServiceId, termsType, data: parseJson(contents[index], `${filePath} at ${commit}`) }));
+    try {
+      const termsResults = await pendingTermsResults;
+
+      return serviceId === undefined ? [...termsResults] : termsResults.filter(termsResult => termsResult.serviceId === serviceId);
+    } catch (error) {
+      if (this.termsResultsAtCommit?.termsResults === pendingTermsResults) { // A failed read is not kept, so that the next request tries again
+        this.termsResultsAtCommit = null;
+      }
+
+      throw error;
+    }
   }
 
   async findTermsResultAt(commit, serviceId, termsType) {
@@ -165,6 +175,16 @@ export default class TrackingResultsRepository {
       throw new Error(`Cannot ${operation} in the read-only tracking-results repository ${this.path}`);
     }
   }
+}
+
+async function readTermsResultsAt(repositoryPath, commit) {
+  const files = (await Git.listFilesAtCommit(repositoryPath, commit, { recursive: true }))
+    .map(filePath => ({ filePath, ...TermsResultMapper.parseFilePath(filePath) }))
+    .filter(file => file.serviceId);
+
+  const contents = await Git.readFilesAtCommit(repositoryPath, commit, files.map(({ filePath }) => filePath));
+
+  return files.map(({ filePath, serviceId, termsType }, index) => TermsResultMapper.toDomain({ serviceId, termsType, data: parseJson(contents[index], `${filePath} at ${commit}`) }));
 }
 
 async function readFile(absolutePath) { // Resolves to null when the file does not exist, while other I/O failures are propagated
