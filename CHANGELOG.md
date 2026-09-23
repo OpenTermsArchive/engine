@@ -2,6 +2,18 @@
 
 All changes that impact users of this module are documented in this file, in the [Common Changelog](https://common-changelog.org) format with some additional specifications defined in the CONTRIBUTING file. This codebase adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased [minor]
+
+> Development of this release was supported by [Anthelia](https://anthelia.tech).
+
+### Changed
+
+- Refuse to start a process that writes to a Git repository already written by another running process, such as a second `ota track` started while the scheduled tracker runs, instead of letting both race the working tree and the index, which made one of them fail or discard the uncommitted changes of the other; stop the running writer first, the error names it and the `.git/ota-writer.lock` file that holds the lock until it exits
+
+### Fixed
+
+- Remove at each tracking run the `index.lock` file left behind by a Git operation interrupted by a kill, which otherwise made the tracker fail at every restart with `index.lock: File exists`
+
 ## 16.1.1 - 2026-09-23
 
 > Development of this release was supported by [Anthelia](https://anthelia.tech).
