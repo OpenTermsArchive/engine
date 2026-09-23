@@ -11,6 +11,7 @@ All changes that impact users of this module are documented in this file, in the
 - Add a `tracking-results` data repository recording the tracking status of each terms and the lifecycle of every run in a tamper-evident Git history ([RFC](https://github.com/OpenTermsArchive/engine/issues/1241#issuecomment-4499539428))
 - Add [`@opentermsarchive/engine.tracking-results`](https://docs.opentermsarchive.org/collections/reference/configuration/) configuration defining the storage location, author and publication of the tracking-results repository; defaults record locally to `./data/tracking-results` without publication; set it to `null` to disable tracking-results
 - Add an `x-run-id` metadata to snapshots and versions recorded while a tracking-results run is in progress, tying each record to the run that produced it; it is a commit trailer with Git storage
+- Reject in `ota validate` the service IDs containing characters that cannot be used in file names on every supported platform (`/`, `\`, `:`, `"`, `<`, `>`, `|`, `*`, `?`, control characters), as documented in the [service ID guidelines](https://docs.opentermsarchive.org/terms/how-to/track-terms/#service-id)
 
 ### Changed
 
