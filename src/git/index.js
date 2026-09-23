@@ -32,8 +32,9 @@ export default class Git {
     }
   }
 
-  static async listFilesAtCommit(repositoryPath, commit) {
-    const output = await readObjectAtCommit(repositoryPath, [ 'ls-tree', '--name-only', commit, '--', './' ]); // `repositoryPath` may be a subdirectory of the repository; git resolves the `./` pathspec against its cwd.
+  static async listFilesAtCommit(repositoryPath, commit, { recursive = false } = {}) {
+    const recursiveOption = recursive ? ['-r'] : []; // Lists the files of subdirectories instead of the subdirectories themselves
+    const output = await readObjectAtCommit(repositoryPath, [ 'ls-tree', ...recursiveOption, '--name-only', commit, '--', './' ]); // `repositoryPath` may be a subdirectory of the repository; git resolves the `./` pathspec against its cwd.
 
     return output ? output.split('\n') : [];
   }

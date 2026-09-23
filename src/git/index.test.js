@@ -311,6 +311,12 @@ describe('Git', () => {
         expect(await Git.listFilesAtCommit(subdirectoryPath, secondCommitSha)).to.deep.equal([ 'Service A.json', 'Service B.json' ]);
       });
 
+      context('when listing recursively', () => {
+        it('lists the files of the subdirectories', async () => {
+          expect(await Git.listFilesAtCommit(repositoryPath, secondCommitSha, { recursive: true })).to.deep.equal([ 'declarations/Service A.json', 'declarations/Service B.json' ]);
+        });
+      });
+
       it('throws a GitObjectNotFoundError for an unknown commit', async () => {
         try {
           await Git.listFilesAtCommit(subdirectoryPath, 'deadbeefdeadbeefdeadbeefdeadbeefdeadbeef');
