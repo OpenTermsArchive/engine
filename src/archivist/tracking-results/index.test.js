@@ -19,6 +19,7 @@ const DECLARATIONS_COMMIT = 'c0ffee1234567890c0ffee1234567890c0ffee12';
 function makeRecorder(overrides = {}) {
   return {
     currentRun: null,
+    repository: { path: '/data/tracking-results' },
     initialize: sinon.stub().resolves(),
     finalize: sinon.stub().resolves(),
     startRun: sinon.stub().resolves(),
@@ -122,6 +123,12 @@ describe('TrackingResults', () => {
 
         expect(recorder.recoverCrashedRunIfAny).to.not.have.been.called;
         expect(warnings.join('\n')).to.include('Unable to create index.lock');
+      });
+
+      it('points operators to the repository to inspect if the warning persists', async () => {
+        await subject.initialize();
+
+        expect(warnings.join('\n')).to.include('inspect or delete the repository at "/data/tracking-results"');
       });
 
       it('retries the initialization at the next run', async () => {

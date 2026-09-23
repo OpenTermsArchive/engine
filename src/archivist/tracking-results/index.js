@@ -173,7 +173,7 @@ export default class TrackingResults extends events.EventEmitter {
         return true;
       }
 
-      this.emit('warn', { message: `Could not prepare the tracking-results repository: ${error.message}; tracking-results is disabled for this run and the preparation will be retried at the next one` }); // An auxiliary audit trail must not prevent tracking itself, be it at initialization
+      this.emit('warn', { message: `Could not prepare the tracking-results repository: ${error.message}; tracking-results is disabled for this run and the preparation will be retried at the next one. If this warning persists across runs, inspect or delete the repository at "${this.recorder.repository.path}" so it can be recreated` }); // An auxiliary audit trail must not prevent tracking itself, be it at initialization
 
       return false;
     }
