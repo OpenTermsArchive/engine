@@ -492,9 +492,9 @@ describe('TrackingResultsRecorder', () => {
         expect(savedRun.coverage.processed).to.equal(2);
       });
 
-      it('marks declared-but-not-committed terms as skipped with reason "engine crashed"', () => {
+      it('marks declared-but-not-committed terms as skipped for lack of a recorded outcome', () => {
         expect(savedRun.coverage.skipped).to.deep.equal([
-          { serviceId: 'Facebook', termsType: 'Imprint', reason: 'engine crashed' },
+          { serviceId: 'Facebook', termsType: 'Imprint', reason: 'no outcome recorded before the engine crashed' },
         ]);
       });
 
@@ -537,7 +537,7 @@ describe('TrackingResultsRecorder', () => {
       });
 
       it('attributes only the unaccounted terms to the crash', () => {
-        expect(savedRun.coverage.skipped).to.deep.include({ serviceId: 'Facebook', termsType: 'Privacy Policy', reason: 'engine crashed' });
+        expect(savedRun.coverage.skipped).to.deep.include({ serviceId: 'Facebook', termsType: 'Privacy Policy', reason: 'no outcome recorded before the engine crashed' });
         expect(savedRun.coverage.skipped).to.have.lengthOf(2);
       });
     });

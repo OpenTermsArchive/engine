@@ -107,7 +107,7 @@ export default class TrackingResultsRecorder {
     const declaredTerms = await getDeclaredTermsAtCommit(run.declarations.commit);
     const crashSkipped = declaredTerms
       .filter(({ serviceId, termsType }) => !accountedKeys.has(termsKey(serviceId, termsType)))
-      .map(({ serviceId, termsType }) => ({ serviceId, termsType, reason: 'engine crashed' }));
+      .map(({ serviceId, termsType }) => ({ serviceId, termsType, reason: 'no outcome recorded before the engine crashed' })); // Terms processed without a substantive change leave no commit, so they cannot be told apart from unprocessed ones and end up here, understating `processed`: the reason states the absence of a record rather than claiming the terms was not processed
 
     run.coverage = { processed: committedTerms.length, skipped: [ ...persistedSkipped, ...crashSkipped ] };
     ({ tracked: run.tracked, transientErrors: run.transientErrors } = await this.deriveCounts(committedTerms));

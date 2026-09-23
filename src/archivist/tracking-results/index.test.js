@@ -83,7 +83,7 @@ describe('TrackingResults', () => {
 
     context('when a crashed run has been recovered', () => {
       beforeEach(() => {
-        recorder.recoverCrashedRunIfAny.resolves({ shortRunId: 'ota-run-f47ac10b', coverage: { processed: 2, skipped: [{ serviceId: 'Service B', termsType: 'Terms of Service', reason: 'engine crashed' }] } });
+        recorder.recoverCrashedRunIfAny.resolves({ shortRunId: 'ota-run-f47ac10b', coverage: { processed: 2, skipped: [{ serviceId: 'Service B', termsType: 'Terms of Service', reason: 'no outcome recorded before the engine crashed' }] } });
       });
 
       it('announces it', async () => {

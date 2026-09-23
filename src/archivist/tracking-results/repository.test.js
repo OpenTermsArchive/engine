@@ -747,7 +747,7 @@ describe('TrackingResultsRepository', () => {
       found.markCrashed('2026-04-06T11:00:00Z');
       found.coverage = {
         processed: 2,
-        skipped: [{ serviceId: 'Google', termsType: 'Terms of Service', reason: 'engine crashed' }],
+        skipped: [{ serviceId: 'Google', termsType: 'Terms of Service', reason: 'no outcome recorded before the engine crashed' }],
       };
 
       await subject.saveRun(found);
@@ -757,7 +757,7 @@ describe('TrackingResultsRepository', () => {
       expect(refound.lastRun.status).to.equal('crashed');
       expect(refound.lastRun.endDate).to.equal('2026-04-06T11:00:00Z');
       expect(refound.coverage.processed).to.equal(2);
-      expect(refound.coverage.skipped).to.deep.equal([{ serviceId: 'Google', termsType: 'Terms of Service', reason: 'engine crashed' }]);
+      expect(refound.coverage.skipped).to.deep.equal([{ serviceId: 'Google', termsType: 'Terms of Service', reason: 'no outcome recorded before the engine crashed' }]);
     });
   });
 });
