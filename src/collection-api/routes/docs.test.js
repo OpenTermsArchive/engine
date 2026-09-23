@@ -62,6 +62,22 @@ describe('Docs API', () => {
           it('/dataset/latest/download', () => {
             expect(subject).to.have.property('/dataset/latest/download');
           });
+
+          it('/tracking-results', () => {
+            expect(subject).to.have.property('/tracking-results');
+          });
+
+          it('/tracking-results/run', () => {
+            expect(subject).to.have.property('/tracking-results/run');
+          });
+
+          it('/tracking-result/{serviceId}', () => {
+            expect(subject).to.have.property('/tracking-result/{serviceId}');
+          });
+
+          it('/tracking-result/{serviceId}/{termsType}', () => {
+            expect(subject).to.have.property('/tracking-result/{serviceId}/{termsType}');
+          });
         });
       });
     });
