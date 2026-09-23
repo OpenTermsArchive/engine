@@ -2,6 +2,7 @@ import fsApi from 'fs';
 import path from 'path';
 
 import Git from '../../git/index.js';
+import { isPortableFileName } from '../../git/pathSegment.js';
 
 import * as RunMapper from './run/dataMapper.js';
 import * as TermsResultMapper from './terms-result/dataMapper.js';
@@ -94,6 +95,42 @@ export default class TrackingResultsRepository {
     return commit?.hash ?? null;
   }
 
+  async findLatestCompletedRunCommit() { // Readers serve the state recorded by the latest completed run, as a run in progress or crashed has only partially updated the terms results
+    if (!fsApi.existsSync(path.join(this.path, '.git'))) { // Checked at each call so that readers started before the first run do not need a restart, and so that git never falls back on an enclosing repository
+      return null;
+    }
+
+    const commit = await Git.getLatestCommitSha(this.path, { grep: `^${RunMapper.COMPLETED_RUN_MESSAGE_PREFIX}`, filePath: RunMapper.FILE_NAME });
+
+    return commit;
+  }
+
+  async findRunAt(commit) {
+    const content = await Git.readFileAtCommit(this.path, commit, RunMapper.FILE_NAME);
+
+    return RunMapper.toDomain(parseJson(content, `${RunMapper.FILE_NAME} at ${commit}`));
+  }
+
+  async findTermsResultsAt(commit, { serviceId } = {}) { // Lists the terms results as they were at the given commit, optionally restricted to a service; files of terms removed from the declarations are kept as a historical record, and so are listed too
+    const files = (await Git.listFilesAtCommit(this.path, commit, { recursive: true }))
+      .map(filePath => ({ filePath, ...TermsResultMapper.parseFilePath(filePath) }))
+      .filter(file => file.serviceId && (serviceId === undefined || file.serviceId === serviceId));
+
+    const contents = await Git.readFilesAtCommit(this.path, commit, files.map(({ filePath }) => filePath));
+
+    return files.map(({ filePath, serviceId: fileServiceId, termsType }, index) => TermsResultMapper.toDomain({ serviceId: fileServiceId, termsType, data: parseJson(contents[index], `${filePath} at ${commit}`) }));
+  }
+
+  async findTermsResultAt(commit, serviceId, termsType) {
+    if (!isPortableFileName(serviceId) || !isPortableFileName(termsType)) { // Such identifiers cannot name a file of the repository, as its files are only written with portable names, and must not reach git
+      return null;
+    }
+
+    const [content] = await Git.readFilesAtCommit(this.path, commit, [TermsResultMapper.generateFilePath(serviceId, termsType)]);
+
+    return content === null ? null : TermsResultMapper.toDomain({ serviceId, termsType, data: parseJson(content, `${serviceId}/${termsType} at ${commit}`) });
+  }
+
   async findCommittedTermsResultsSince(sha) { // Lists each distinct (serviceId, termsType) pair that had at least one per-terms commit between `sha` (exclusive) and HEAD (inclusive)
     if (!sha) {
       return [];
@@ -152,10 +189,10 @@ async function readJsonFile(absolutePath) { // Resolves to null when the file do
   return parseJson(content, absolutePath);
 }
 
-function parseJson(content, absolutePath) {
+function parseJson(content, location) {
   try {
     return JSON.parse(content);
   } catch (error) {
-    throw new Error(`Could not parse JSON in "${absolutePath}": ${error.message}`, { cause: error });
+    throw new Error(`Could not parse JSON in "${location}": ${error.message}`, { cause: error });
   }
 }

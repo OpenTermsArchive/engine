@@ -7,6 +7,7 @@ import {
   determineEventType,
   formatMessage,
   generateFilePath,
+  parseFilePath,
   toDomain,
   toPersistence,
 } from './dataMapper.js';
@@ -66,6 +67,22 @@ describe('tracking-result/dataMapper', () => {
 
       it(`rejects termsType ${JSON.stringify(bad)}`, () => {
         expect(() => generateFilePath('Facebook', bad)).to.throw(/Invalid termsType/);
+      });
+    });
+  });
+
+  describe('#parseFilePath', () => {
+    it('returns the service ID and terms type of a terms result file', () => {
+      expect(parseFilePath('Facebook v2.0/Terms of Service.json')).to.deep.equal({ serviceId: 'Facebook v2.0', termsType: 'Terms of Service' });
+    });
+
+    it('is the inverse of generateFilePath', () => {
+      expect(parseFilePath(generateFilePath('Facebook', 'Terms of Service'))).to.deep.equal({ serviceId: 'Facebook', termsType: 'Terms of Service' });
+    });
+
+    [ 'run.json', 'README.md', 'Facebook/Terms of Service.md', 'Facebook/nested/Terms of Service.json' ].forEach(filePath => {
+      it(`returns null for "${filePath}"`, () => {
+        expect(parseFilePath(filePath)).to.be.null;
       });
     });
   });
