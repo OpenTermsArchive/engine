@@ -1,4 +1,5 @@
 import fsApi from 'fs';
+import os from 'os';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
@@ -709,6 +710,91 @@ describe('TrackingResultsRepository', () => {
 
       it('does not include run.json in the results', () => {
         expect(results).to.deep.equal([{ serviceId: 'Facebook', termsType: 'Terms of Service' }]);
+      });
+    });
+  });
+
+  describe('read-only mode', () => {
+    let readOnlySubject;
+
+    context('when the repository does not exist yet', () => {
+      let missingRepositoryPath;
+
+      before(async () => {
+        missingRepositoryPath = path.join(await fs.mkdtemp(path.join(os.tmpdir(), 'ota-tracking-results-')), 'tracking-results'); // Under the OS temp directory so that git cannot fall back on the engine's own repository
+        readOnlySubject = await new TrackingResultsRepository({ path: missingRepositoryPath, readOnly: true }).initialize();
+      });
+
+      after(() => fs.rm(path.dirname(missingRepositoryPath), { recursive: true, force: true }));
+
+      it('does not create it', () => {
+        expect(fsApi.existsSync(missingRepositoryPath)).to.be.false;
+      });
+    });
+
+    context('when the repository exists', () => {
+      const UNTRACKED_FILE_PATH = path.join(REPOSITORY_PATH, 'untracked.json');
+      const RUN_FILE_PATH = path.join(REPOSITORY_PATH, 'run.json');
+      const COMMIT_GRAPH_PATH = path.join(REPOSITORY_PATH, '.git', 'objects', 'info', 'commit-graph');
+      const UNCOMMITTED_CONTENT = '{ "uncommitted": true }';
+
+      before(async () => {
+        await subject.saveRun(makeRun());
+        await fs.rm(COMMIT_GRAPH_PATH, { force: true }); // So that a reader writing the commit-graph is noticed
+        await fs.writeFile(UNTRACKED_FILE_PATH, UNCOMMITTED_CONTENT);
+        await fs.writeFile(RUN_FILE_PATH, UNCOMMITTED_CONTENT);
+        readOnlySubject = await new TrackingResultsRepository({ path: REPOSITORY_PATH, readOnly: true }).initialize();
+      });
+
+      after(() => subject.removeAll());
+
+      it('leaves untracked files untouched', () => {
+        expect(fsApi.existsSync(UNTRACKED_FILE_PATH)).to.be.true;
+      });
+
+      it('leaves uncommitted changes untouched', async () => {
+        expect(await fs.readFile(RUN_FILE_PATH, 'utf8')).to.equal(UNCOMMITTED_CONTENT);
+      });
+
+      it('does not write the commit-graph', () => {
+        expect(fsApi.existsSync(COMMIT_GRAPH_PATH)).to.be.false;
+      });
+
+      it('rejects commits', async () => {
+        try {
+          await readOnlySubject.saveRun(makeRun());
+        } catch (error) {
+          expect(error.message).to.match(/read-only/);
+
+          return;
+        }
+
+        expect.fail('No error was thrown');
+      });
+
+      it('rejects finalization', async () => {
+        try {
+          await readOnlySubject.finalize();
+        } catch (error) {
+          expect(error.message).to.match(/read-only/);
+
+          return;
+        }
+
+        expect.fail('No error was thrown');
+      });
+
+      it('rejects removal', async () => {
+        try {
+          await readOnlySubject.removeAll();
+        } catch (error) {
+          expect(error.message).to.match(/read-only/);
+          expect(fsApi.existsSync(path.join(REPOSITORY_PATH, 'run.json'))).to.be.true;
+
+          return;
+        }
+
+        expect.fail('No error was thrown');
       });
     });
   });

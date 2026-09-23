@@ -9,13 +9,18 @@ import * as TermsResultMapper from './terms-result/dataMapper.js';
 const fs = fsApi.promises;
 
 export default class TrackingResultsRepository {
-  constructor({ path: repositoryPath, author, publish }) {
+  constructor({ path: repositoryPath, author, publish, readOnly = false }) {
     this.path = path.resolve(process.cwd(), repositoryPath); // Same resolution as RepositoryFactory: configured storage paths are project-relative and must not depend on the cwd of downstream git processes
     this.needsPublication = publish;
+    this.readOnly = readOnly; // Readers share the repository with the tracker, so they must never touch the working tree nor the commit-graph, and never run the crash recovery, which is only safe for the single writer
     this.git = new Git({ path: this.path, author });
   }
 
   async initialize() {
+    if (this.readOnly) { // Unlike snapshots and versions, a missing repository is not an error for readers: the tracker creates it at its first run, and tracking-results can be disabled
+      return this;
+    }
+
     await this.git.initialize();
     await this.git.cleanUp(); // Drop any uncommitted leftovers that would otherwise pollute the next commit
     await this.git.writeCommitGraph(); // Keep the commit graph in sync with the existing history for fast log operations
@@ -24,6 +29,8 @@ export default class TrackingResultsRepository {
   }
 
   async finalize() {
+    this.assertWritable('finalize');
+
     if (this.needsPublication) {
       await this.git.pushChanges();
     }
@@ -31,8 +38,10 @@ export default class TrackingResultsRepository {
     return this.git.updateCommitGraph();
   }
 
-  removeAll() { // Test-only: destroys all history
-    return this.git.destroyHistory();
+  async removeAll() { // Test-only: destroys all history
+    this.assertWritable('remove all history');
+
+    await this.git.destroyHistory();
   }
 
   async saveTermsResult(newResult, { trailers = {} } = {}) { // Trailers carry run-scoped context (e.g. x-run-id); they are not TermsResult state, so they are passed alongside rather than through the mapper
@@ -89,6 +98,8 @@ export default class TrackingResultsRepository {
   }
 
   async commit({ filePath: relativePath, content, message, date, trailers, previousContent }) {
+    this.assertWritable('commit');
+
     const absolutePath = path.join(this.path, relativePath);
     const backupContent = previousContent === undefined ? await readFile(absolutePath) : previousContent; // Read only when the caller does not already hold the previous content; null means the file is known to be absent
 
@@ -101,6 +112,12 @@ export default class TrackingResultsRepository {
     } catch (error) {
       await (backupContent === null ? fs.rm(absolutePath, { force: true }) : fs.writeFile(absolutePath, backupContent)).catch(() => {}); // Readers rely on the working tree matching HEAD, so a content that was not committed must not stay in it. Restored through the file system as git may be the very cause of the failure; best effort, as the next initialization cleans up anyway
       throw new Error(`Could not commit "${relativePath}" with message "${message}": ${error.message}`, { cause: error }); // Preserve the original stack via `cause` so operators can trace back to the underlying simple-git or fs error
+    }
+  }
+
+  assertWritable(operation) {
+    if (this.readOnly) {
+      throw new Error(`Cannot ${operation} in the read-only tracking-results repository ${this.path}`);
     }
   }
 }
