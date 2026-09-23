@@ -10,12 +10,13 @@ describe('GitHub', function () {
 
   let MANAGED_LABELS;
   let github;
+  const REPOSITORIES = { declarations: 'owner/repo', versions: 'owner/versions-repo', snapshots: 'owner/snapshots-repo' };
   const EXISTING_OPEN_ISSUE = { number: 1, title: 'Opened issue', description: 'Issue description', state: GitHub.ISSUE_STATE_OPEN, labels: [{ name: LABELS.HTTP_403.name }] };
   const EXISTING_CLOSED_ISSUE = { number: 2, title: 'Closed issue', description: 'Issue description', state: GitHub.ISSUE_STATE_CLOSED, labels: [{ name: LABELS.EMPTY_CONTENT.name }] };
 
   before(async () => {
     MANAGED_LABELS = Object.values(LABELS);
-    github = new GitHub('owner/repo');
+    github = new GitHub(REPOSITORIES);
     nock('https://api.github.com')
       .get('/repos/owner/repo/issues')
       .query(true)
@@ -516,6 +517,20 @@ describe('GitHub', function () {
           });
         });
       });
+    });
+  });
+
+  describe('URL generation', () => {
+    it('links the declaration into the declarations repository', () => {
+      expect(github.generateDeclarationURL('Service A')).to.equal('https://github.com/owner/repo/blob/main/declarations/Service%20A.json');
+    });
+
+    it('links the version into the versions repository', () => {
+      expect(github.generateVersionURL('Service A', 'Terms of Service')).to.equal('https://github.com/owner/versions-repo/blob/main/Service%20A/Terms%20of%20Service.md');
+    });
+
+    it('links the snapshots into the snapshots repository', () => {
+      expect(github.generateSnapshotsBaseUrl('Service A', 'Terms of Service')).to.equal('https://github.com/owner/snapshots-repo/blob/main/Service%20A/Terms%20of%20Service');
     });
   });
 });

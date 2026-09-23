@@ -13,7 +13,7 @@ export default class GitHub {
   static ISSUE_STATE_ALL = 'all';
   static MAX_LABEL_DESCRIPTION_LENGTH = 100;
 
-  constructor(repository) {
+  constructor(repositories) {
     const { version } = require('../../../package.json');
 
     this.octokit = new Octokit({
@@ -25,7 +25,9 @@ export default class GitHub {
       },
     });
 
-    const [ owner, repo ] = repository.split('/');
+    this.repositories = repositories; // Each generated link points into its own repository, while the issues live in the declarations one
+
+    const [ owner, repo ] = repositories.declarations.split('/');
 
     this.commonParams = { owner, repo };
 
@@ -272,14 +274,14 @@ export default class GitHub {
   }
 
   generateDeclarationURL(serviceName) {
-    return `https://github.com/${this.commonParams.owner}/${this.commonParams.repo}/blob/main/declarations/${encodeURIComponent(serviceName)}.json`;
+    return `https://github.com/${this.repositories.declarations}/blob/main/declarations/${encodeURIComponent(serviceName)}.json`;
   }
 
   generateVersionURL(serviceName, termsType) {
-    return `https://github.com/${this.commonParams.owner}/${this.commonParams.repo}/blob/main/${encodeURIComponent(serviceName)}/${encodeURIComponent(termsType)}.md`;
+    return `https://github.com/${this.repositories.versions}/blob/main/${encodeURIComponent(serviceName)}/${encodeURIComponent(termsType)}.md`;
   }
 
   generateSnapshotsBaseUrl(serviceName, termsType) {
-    return `https://github.com/${this.commonParams.owner}/${this.commonParams.repo}/blob/main/${encodeURIComponent(serviceName)}/${encodeURIComponent(termsType)}`;
+    return `https://github.com/${this.repositories.snapshots}/blob/main/${encodeURIComponent(serviceName)}/${encodeURIComponent(termsType)}`;
   }
 }

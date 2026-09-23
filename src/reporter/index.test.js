@@ -64,7 +64,7 @@ describe('Reporter', () => {
   describe('#generateDescription', () => {
     const buildReporter = () => new Reporter({
       type: 'github',
-      repositories: { declarations: 'OpenTermsArchive/test-declarations', snapshots: 'OpenTermsArchive/test-snapshots' },
+      repositories: { declarations: 'OpenTermsArchive/test-declarations', versions: 'OpenTermsArchive/test-versions', snapshots: 'OpenTermsArchive/test-snapshots' },
     });
 
     const buildTerms = ({ sourceCount = 1, hasSnapshots = true, withoutSnapshotIndexes = [] } = {}) => {
@@ -157,6 +157,33 @@ describe('Reporter', () => {
         const description = buildReporter().generateDescription({ error, terms: buildTerms({ sourceCount: 50 }) });
 
         expect(description.length).to.be.lessThan(65000);
+      });
+    });
+
+    context('references links', () => {
+      it('links the latest version into the versions repository', () => {
+        const description = buildReporter().generateDescription({ error, terms: buildTerms() });
+
+        expect(description).to.include('github.com/OpenTermsArchive/test-versions/blob/main/TestService/Terms%20of%20Service.md');
+      });
+
+      it('links the latest snapshots into the snapshots repository', () => {
+        const description = buildReporter().generateDescription({ error, terms: buildTerms() });
+
+        expect(description).to.include('github.com/OpenTermsArchive/test-snapshots/blob/main/TestService/Terms%20of%20Service');
+        expect(description).to.not.include('test-declarations/blob/main/TestService/Terms%20of%20Service'); // A version or snapshot link into the declarations repository is the regression this guards against
+      });
+
+      context('when only the declarations repository is configured', () => {
+        it('omits the version and snapshots links instead of generating broken ones', () => {
+          const reporter = new Reporter({ type: 'github', repositories: { declarations: 'OpenTermsArchive/test-declarations' } });
+
+          const description = reporter.generateDescription({ error, terms: buildTerms() });
+
+          expect(description).to.not.include('Latest version');
+          expect(description).to.not.include('Latest snapshot');
+          expect(description).to.not.include('undefined');
+        });
       });
     });
   });
