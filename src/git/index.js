@@ -3,13 +3,42 @@ import path from 'path';
 
 import simpleGit from 'simple-git';
 
+import { GitObjectNotFoundError } from './errors.js';
 import { parseTrailers, formatTrailers } from './trailers.js';
+
+export { GitObjectNotFoundError } from './errors.js';
 
 process.env.LC_ALL = 'en_GB'; // Ensure git messages will be in English as some errors are handled by analysing the message content
 
 const fs = fsApi.promises;
 
+const OBJECT_NOT_FOUND_MESSAGES = /bad object|not a tree|invalid object name|unknown revision|does not exist|exists on disk, but not in/i;
+
 export default class Git {
+  static async getHeadSha(repositoryPath) { // Used by callers that need to capture the current state of a repository without instantiating a full Git wrapper (which would mutate the repo via `init`).
+    try {
+      const git = simpleGit(repositoryPath, { trimmed: true });
+
+      return await git.revparse(['HEAD']);
+    } catch (error) {
+      if (/not a git repository|does not exist|unknown revision|ambiguous argument|does not have any commits/i.test(error.message)) {
+        return null; // Not a repository, or an empty one: a legitimate "no commit to reference" answer
+      }
+
+      throw error; // An actual git failure, which callers must not conflate with the absence of a repository
+    }
+  }
+
+  static async listFilesAtCommit(repositoryPath, commit) {
+    const output = await readObjectAtCommit(repositoryPath, [ 'ls-tree', '--name-only', commit, '--', './' ]); // `repositoryPath` may be a subdirectory of the repository; git resolves the `./` pathspec against its cwd.
+
+    return output ? output.split('\n') : [];
+  }
+
+  static readFileAtCommit(repositoryPath, commit, fileName) { // Returns the content of `fileName` (relative to `repositoryPath`) at the given commit
+    return readObjectAtCommit(repositoryPath, [ 'show', `${commit}:./${fileName}` ]); // The `rev:./path` syntax makes git resolve the path against its cwd, which supports repositoryPath being a subdirectory of the repository
+  }
+
   constructor({ path: repositoryPath, author }) {
     this.path = repositoryPath;
     this.author = author;
@@ -23,14 +52,21 @@ export default class Git {
     this.#connect();
     await this.git.init();
 
+    const configFile = path.resolve(this.path, '.git', 'config'); // Anchored to an absolute path: git resolves a relative `--file` argument against its own cwd (the repository), not against process.cwd, so a relative repository path would silently point the write at a nonexistent nested location
+
+    if (!fsApi.existsSync(configFile)) { // Defensive: init should always produce this file; if it does not, refuse to continue rather than risk writing config to an unintended location
+      throw new Error(`Git initialisation failed: expected config file at ${configFile} was not created`);
+    }
+
+    // Each setting is written to the explicit config file path rather than via `addConfig` so neither simpleGit nor git itself can walk up to a parent .git and pollute the configuration of an enclosing project (e.g. the engine's own checkout when this.path is `./data/versions`).
     return this.git
-      .addConfig('core.autocrlf', false)
-      .addConfig('push.default', 'current')
-      .addConfig('user.name', this.author.name)
-      .addConfig('user.email', this.author.email)
-      .addConfig('core.quotePath', false) // Disable Git's encoding of special characters in pathnames. For example, `service·A` will be encoded as `service\302\267A` without this setting, leading to issues. See https://git-scm.com/docs/git-config#Documentation/git-config.txt-corequotePath
-      .addConfig('core.commitGraph', true) // Enable `commit-graph` feature for efficient commit data storage, improving performance of operations like `git log`
-      .addConfig('gc.writeCommitGraph', false); // Prevent automatic `git gc` from also writing the commit-graph: the engine writes it explicitly (see `writeCommitGraph`/`updateCommitGraph`), and a concurrent gc write races those, which can leave a stale `commit-graph.lock` and make subsequent operations fail
+      .raw([ 'config', '--file', configFile, 'core.autocrlf', 'false' ])
+      .raw([ 'config', '--file', configFile, 'push.default', 'current' ])
+      .raw([ 'config', '--file', configFile, 'user.name', this.author.name ])
+      .raw([ 'config', '--file', configFile, 'user.email', this.author.email ])
+      .raw([ 'config', '--file', configFile, 'core.quotePath', 'false' ]) // Disable Git's encoding of special characters in pathnames. For example, `service·A` will be encoded as `service\302\267A` without this setting, leading to issues. See https://git-scm.com/docs/git-config#Documentation/git-config.txt-corequotePath
+      .raw([ 'config', '--file', configFile, 'core.commitGraph', 'true' ]) // Enable `commit-graph` feature for efficient commit data storage, improving performance of operations like `git log`
+      .raw([ 'config', '--file', configFile, 'gc.writeCommitGraph', 'false' ]); // Prevent automatic `git gc` from also writing the commit-graph: the engine writes it explicitly (see `writeCommitGraph`/`updateCommitGraph`), and a concurrent gc write races those, which can leave a stale `commit-graph.lock` and make subsequent operations fail
   }
 
   open() {
@@ -52,6 +88,8 @@ export default class Git {
     return this.git.add(this.relativePath(filePath));
   }
 
+  // Not safe to call concurrently: GIT_AUTHOR_DATE / GIT_COMMITTER_DATE are process-wide env vars, so two overlapping calls can stamp each other's commits.
+  // simple-git's `maxConcurrentProcesses: 1` serializes child processes but not the env-var mutation that precedes them. Callers must await each commit before issuing the next.
   async commit({ filePath, message, date = new Date(), trailers = {} }) {
     const commitDate = new Date(date).toISOString();
     let summary;
@@ -63,7 +101,7 @@ export default class Git {
       const trailersSection = formatTrailers(trailers);
       const finalMessage = trailersSection ? `${message}\n\n${trailersSection}` : message;
 
-      summary = await this.git.commit(finalMessage, filePath, ['--no-verify']); // Skip pre-commit and commit-msg hooks, as commits are programmatically managed, to optimize performance
+      summary = await this.git.commit(finalMessage, filePath ? this.relativePath(filePath) : [], ['--no-verify']); // Skip pre-commit and commit-msg hooks, as commits are programmatically managed, to optimize performance. The pathspec must be expressed relative to the repository root; passing the absolute or process-cwd-relative path causes git to look for it under the repo's working directory, which fails when the repo's own path components appear in the resolved location. Without a file path, the whole index is committed
     } finally {
       process.env.GIT_AUTHOR_DATE = '';
       process.env.GIT_COMMITTER_DATE = '';
@@ -88,7 +126,7 @@ export default class Git {
     return this.log([
       ...reverseOption, // When `reverse` is true, lists commits oldest-first; otherwise the default newest-first applies
       '--author-date-order', // Best-effort author-date ordering: with --max-count, git applies the cap topologically, so the page can miss strictly-newer commits that #getCommits' JS resort cannot recover
-      '--no-merges', // Exclude merge commits — records are stored as regular commits, never as merges
+      '--no-merges', // Exclude merge commits; records are stored as regular commits, never as merges
       '--name-only', // Append the modified file names below each commit, used by `toDomain` to extract the record's file path
       ...skipOption, // Optional `--skip=N`: drop the first N matching commits (pagination offset)
       ...maxCountOption, // Optional `--max-count=N`: cap the result to N commits (pagination limit)
@@ -251,5 +289,17 @@ export default class Git {
     }
 
     return { additions, deletions };
+  }
+}
+
+async function readObjectAtCommit(repositoryPath, args) {
+  try {
+    return await simpleGit(repositoryPath, { trimmed: true, config: ['core.quotePath=false'] }).raw(args); // Disable pathname quoting for the same reason Git.initialize sets it on managed repositories: names with special characters (e.g. "service·A") must come back verbatim, and this repository's configuration is not under the engine's control
+  } catch (error) {
+    if (OBJECT_NOT_FOUND_MESSAGES.test(error.message)) {
+      throw new GitObjectNotFoundError(error.message); // Typed so callers can distinguish "this commit or file cannot be resolved, ever" from a transient git failure worth retrying
+    }
+
+    throw error;
   }
 }

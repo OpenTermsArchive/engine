@@ -7,11 +7,11 @@ import chaiAsPromised from 'chai-as-promised';
 import config from 'config';
 import mime from 'mime';
 
+import Git from '../../../../git/index.js';
 import Snapshot from '../../snapshot.js';
 import Version from '../../version.js';
 
 import { TERMS_TYPE_AND_DOCUMENT_ID_SEPARATOR, SNAPSHOT_ID_MARKER, COMMIT_MESSAGE_PREFIXES } from './dataMapper.js';
-import Git from './git.js';
 
 import GitRepository from './index.js';
 
@@ -396,6 +396,28 @@ describe('GitRepository', () => {
 
       it('returns metadata', () => {
         expect(record.metadata).to.deep.equal(METADATA);
+      });
+
+      context('when a metadata value contains hexadecimal segments', () => {
+        let recordWithRunId;
+
+        before(async () => {
+          const { id: recordId } = await subject.save(new Version({
+            serviceId: SERVICE_PROVIDER_ID,
+            termsType: TERMS_TYPE,
+            content: `${CONTENT} (updated)`,
+            fetchDate: FETCH_DATE_LATER,
+            snapshotIds: [SNAPSHOT_ID],
+            mimeType: HTML_MIME_TYPE,
+            metadata: { ...METADATA, 'x-run-id': 'ota-run-189e7be3-60ef-40c7-ac28-81a44288e105' },
+          }));
+
+          recordWithRunId = await subject.findById(recordId);
+        });
+
+        it('returns only the snapshot ID', () => {
+          expect(recordWithRunId.snapshotIds).to.deep.equal([SNAPSHOT_ID]);
+        });
       });
 
       context('when requested record does not exist', () => {

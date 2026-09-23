@@ -11,6 +11,7 @@ import Snapshot from './recorder/snapshot.js';
 import Version from './recorder/version.js';
 import * as services from './services/index.js';
 import Service from './services/service.js';
+import TrackingResults, { MissingCollectionIdError, RUN_ID_TRAILER_KEY } from './tracking-results/index.js';
 
 const require = createRequire(import.meta.url);
 const { version: PACKAGE_VERSION } = require('../../package.json');
@@ -43,12 +44,13 @@ export default class Archivist extends events.EventEmitter {
     return Object.keys(this.services).sort((a, b) => a.localeCompare(b)); // Sort service IDs by lowercase name to have more intuitive logs;
   }
 
-  constructor({ recorderConfig, fetcherConfig }) {
+  constructor({ recorderConfig, fetcherConfig, trackingResultsConfig }) {
     super();
     this.fetcherConfig = fetcherConfig;
     this.recorder = new Recorder(recorderConfig);
     this.fetch = params => fetch({ ...params, config: fetcherConfig });
     this.extract = extract;
+    this.trackingResultsConfig = trackingResultsConfig; // Stored for use in initialize, where the tracking-results module is created asynchronously
   }
 
   async initialize() {
@@ -58,22 +60,29 @@ export default class Archivist extends events.EventEmitter {
     }
 
     await this.recorder.initialize();
+
+    if (this.trackingResultsConfig) {
+      try {
+        this.trackingResults = await TrackingResults.create(this.trackingResultsConfig);
+      } catch (error) {
+        if (!(error instanceof MissingCollectionIdError)) {
+          throw error;
+        }
+
+        this.emit('warn', { message: `${error.message} Tracking-results is disabled.` }); // An auxiliary audit trail must not prevent tracking itself
+      }
+
+      if (this.trackingResults) {
+        this.trackingResults.on('warn', (...args) => this.emit('warn', ...args)); // Relay the module's warnings onto the engine's public event surface
+        await this.trackingResults.initialize();
+      }
+    }
+
     this.initQueue();
+    this.declarationsCommit = await this.trackingResults?.getDeclarationsCommit(); // Captured right before loading the declarations, so that it identifies the declarations applied by every run of this process, even if their repository is updated in the meantime
     this.services = await services.load();
 
-    this.on('error', async () => {
-      console.log('Abort and clean up operations before exiting…');
-
-      setTimeout(() => {
-        console.log('Cleaning timed out, force process to exit');
-        process.exit(2);
-      }, 60 * 1000);
-
-      this.trackingQueue.kill();
-      await stopHeadlessBrowser().then(() => console.log('Headless browser stopped'));
-      await this.recorder.finalize().then(() => console.log('Recorder finalized'));
-      process.exit(1);
-    });
+    this.on('error', () => this.shutdownOnFatalError());
 
     this.emit('info', 'Initialization completed');
 
@@ -81,12 +90,50 @@ export default class Archivist extends events.EventEmitter {
   }
 
   initQueue() {
-    this.trackingQueue = async.queue(this.trackTermsChanges.bind(this), MAX_PARALLEL_TRACKING);
-    this.trackingQueue.error(this.handleTrackingError.bind(this));
+    this.trackingQueue = async.queue(async item => {
+      try {
+        await this.trackTermsChanges(item);
+      } catch (error) {
+        await this.handleTrackingError(error, item); // Handled inside the worker so drain() also waits for the failure handling, including the tracking-results write; async.queue's error callback is fire-and-forget and would let completeRun race the recording
+      }
+    }, MAX_PARALLEL_TRACKING);
   }
 
-  handleTrackingError(error, { terms, isRetry }) {
+  fatalShutdownPromise = null;
+
+  shutdownOnFatalError() {
+    this.fatalShutdownPromise ||= (async () => { // Memoised so a second fatal error while the sequence is in flight awaits the same promise, instead of running a concurrent cleanup that would race the finalize pushes and process.exit
+      console.log('Abort and clean up operations before exiting…');
+
+      const forceExitTimeout = setTimeout(() => {
+        console.log('Cleaning timed out, force process to exit');
+        process.exit(2);
+      }, 60 * 1000);
+
+      this.trackingQueue.kill();
+      await stopHeadlessBrowser().then(() => console.log('Headless browser stopped'));
+      await this.recorder.finalize().then(() => console.log('Recorder finalized'));
+
+      if (this.trackingResults) {
+        await this.trackingResults.finalize().then(() => console.log('Tracking-results finalized'));
+      }
+
+      clearTimeout(forceExitTimeout); // The guard is only needed while the cleanup above may hang; leaving it armed would fire a stray forced exit when process.exit is stubbed in tests
+
+      process.exit(1);
+    })();
+
+    return this.fatalShutdownPromise;
+  }
+
+  async handleTrackingError(error, { terms, isRetry, technicalUpgradeOnly }) {
     if (!(error instanceof InaccessibleContentError)) {
+      try {
+        await this.trackingResults?.recordFailure(terms, [error]); // Recorded before emitting the fatal error: the shutdown sequence finalizes the repositories and nothing may write to them once it started
+      } catch (recordError) {
+        this.emit('warn', { message: `Could not record the tracking outcome before shutdown: ${recordError.message}`, serviceId: terms.service.id, termsType: terms.type });
+      }
+
       this.emit('error', {
         message: error.stack,
         serviceId: terms.service.id,
@@ -105,12 +152,18 @@ export default class Archivist extends events.EventEmitter {
         termsType: terms.type,
       });
 
-      this.trackingQueue.push({ terms, isRetry: true });
+      this.trackingQueue.push({ terms, isRetry: true, technicalUpgradeOnly, transientErrors: error.errors }); // Propagate the transient errors across the retry boundary so a successful retry can persist them on the tracking-result
 
       return;
     }
 
     this.emit('inaccessibleContent', error, terms);
+
+    try {
+      await this.trackingResults?.recordFailure(terms, error.errors);
+    } catch (recordError) {
+      this.emit('error', { message: recordError.stack, serviceId: terms.service.id, termsType: terms.type });
+    }
   }
 
   attach(listener) {
@@ -154,6 +207,10 @@ export default class Archivist extends events.EventEmitter {
 
     await Promise.all([ launchHeadlessBrowser(this.fetcherConfig.language), this.recorder.initialize() ]);
 
+    if (!technicalUpgradeOnly) { // Technical upgrades intentionally skip the tracking-results lifecycle: they reprocess existing snapshots and do not represent a substantive tracking attempt. As no run is started for them, the recordings below have no effect
+      await this.trackingResults?.startRun({ services: this.services, declarationsCommit: this.declarationsCommit, selectedServicesIds: servicesIds, selectedTermsTypes: termsTypes });
+    }
+
     this.trackingQueue.concurrency = concurrency;
 
     servicesIds.forEach(serviceId => {
@@ -170,12 +227,22 @@ export default class Archivist extends events.EventEmitter {
       await this.trackingQueue.drain();
     }
 
-    await Promise.all([ stopHeadlessBrowser(), this.recorder.finalize() ]);
+    if (this.trackingResults?.hasRunInProgress) {
+      try {
+        await this.trackingResults.completeRun();
+      } catch (error) {
+        this.emit('error', { message: `Failed to complete tracking-results run: ${error.stack}` }); // Fatal: the idempotent shutdown stops the browser, finalizes and pushes both recorders, then exits
+
+        return this.fatalShutdownPromise; // Prevent the finalizations below from racing the shutdown sequence, and keep the tracking pending until the process exits so that the scheduler does not start a new run in the meantime; run.json stays in_progress and the next boot closes the run additively, as after a crash
+      }
+    }
+
+    await Promise.all([ stopHeadlessBrowser(), this.recorder.finalize(), this.trackingResults?.finalize() ]);
 
     this.emit('trackingCompleted', servicesIds.length, numberOfTerms, technicalUpgradeOnly);
   }
 
-  async trackTermsChanges({ terms, technicalUpgradeOnly = false }) {
+  async trackTermsChanges({ terms, technicalUpgradeOnly = false, transientErrors }) {
     if (!technicalUpgradeOnly) {
       await this.fetchAndRecordSnapshots(terms);
     } else {
@@ -189,6 +256,12 @@ export default class Archivist extends events.EventEmitter {
     }
 
     await this.recordVersion(terms, contents.join(Version.SOURCE_DOCUMENTS_SEPARATOR), technicalUpgradeOnly);
+
+    try {
+      await this.trackingResults?.recordSuccess(terms, { transientErrors });
+    } catch (error) {
+      this.emit('error', { message: `Could not record the tracking-results outcome: ${error.stack}`, serviceId: terms.service.id, termsType: terms.type }); // Emitted here rather than thrown to the tracking error handling, which would record as failed a terms that was successfully tracked, in contradiction with its snapshots and version
+    }
   }
 
   async fetchAndRecordSnapshots(terms) {
@@ -258,6 +331,8 @@ export default class Archivist extends events.EventEmitter {
   async fetchSourceDocument(sourceDocument) {
     const { location: url, executeClientScripts, cssSelectors } = sourceDocument;
 
+    sourceDocument.resetObservations(); // A failed fetch must be recorded with the observations of this attempt, not with the previous run's values
+
     try {
       const { mimeType, content, fetcher } = await this.fetch({ url, executeClientScripts, cssSelectors });
 
@@ -274,14 +349,13 @@ export default class Archivist extends events.EventEmitter {
   }
 
   async extractContentsFromSnapshots(terms) {
-    const extractDocumentErrors = [];
-
-    const contents = await Promise.all(terms.sourceDocuments.map(async sourceDocument => {
+    // Each callback returns { content } or { error } instead of pushing into a shared array: Promise.all preserves input order while side-effect pushes from concurrent callbacks would order errors by completion time, making event.reasons non-deterministic and triggering spurious "Update failure reasons" tracking-results commits
+    const results = await Promise.all(terms.sourceDocuments.map(async sourceDocument => {
       const snapshot = await this.recorder.getLatestSnapshot(terms, sourceDocument.id);
 
       try {
         if (!snapshot) { // This can happen if one of the source documents for a terms has not yet been fetched
-          return;
+          return {};
         }
 
         sourceDocument.content = snapshot.content;
@@ -297,21 +371,29 @@ export default class Archivist extends events.EventEmitter {
 
         sourceDocument.clearContent(); // Reduce memory usage by clearing no longer needed large content strings
 
-        return content;
+        return { content };
       } catch (error) {
         if (!(error instanceof ExtractDocumentError)) {
           throw error;
         }
 
-        extractDocumentErrors.push(error);
+        return { error };
       }
     }));
+
+    const extractDocumentErrors = results.map(({ error }) => error).filter(Boolean);
 
     if (extractDocumentErrors.length) {
       throw new InaccessibleContentError(extractDocumentErrors);
     }
 
-    return contents;
+    return results.map(({ content }) => content);
+  }
+
+  get runIdMetadata() { // Ties snapshots and versions to the tracking-results run that records them; empty outside an active run (module disabled, failed run start, technical upgrades) so the trailer is simply absent
+    const runId = this.trackingResults?.currentRunId;
+
+    return runId ? { [RUN_ID_TRAILER_KEY]: runId } : {};
   }
 
   async recordVersion(terms, content, technicalUpgradeOnly) {
@@ -322,7 +404,7 @@ export default class Archivist extends events.EventEmitter {
       termsType: terms.type,
       fetchDate: terms.fetchDate,
       isTechnicalUpgrade: technicalUpgradeOnly,
-      metadata: { 'x-engine-version': PACKAGE_VERSION },
+      metadata: { 'x-engine-version': PACKAGE_VERSION, ...this.runIdMetadata },
     });
 
     await this.recorder.record(record);
@@ -350,6 +432,7 @@ export default class Archivist extends events.EventEmitter {
         'x-engine-version': PACKAGE_VERSION,
         'x-fetcher': sourceDocument.fetcher,
         'x-source-document-location': sourceDocument.location,
+        ...this.runIdMetadata,
       },
     });
 

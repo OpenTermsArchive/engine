@@ -31,6 +31,7 @@ describe('Fetcher', function () {
 
     before(done => {
       let blockCount = 0;
+      let redirectCount = 0;
 
       temporaryServer = http.createServer((request, response) => {
         if (request.url === '/') {
@@ -56,6 +57,9 @@ describe('Fetcher', function () {
           } else {
             response.writeHead(200, { 'Content-Type': 'text/html' }).write(termsHTML);
           }
+        }
+        if (request.url.startsWith('/redirect-loop')) {
+          response.writeHead(302, { Location: `/redirect-loop?token=${redirectCount++}` });
         }
         if (request.url === '/always-block') {
           response.writeHead(403, { 'Content-Type': 'text/html' }).write('<!DOCTYPE html><html><body>Access Denied - Bot Detected</body></html>');
@@ -223,6 +227,14 @@ describe('Fetcher', function () {
           it('throws a FetchDocumentError error', async () => {
             await expect(fetch({ url: url404, executeClientScripts: true, cssSelectors: 'body' })).to.be.rejectedWith(FetchDocumentError, /404/);
           });
+        });
+      });
+
+      context('when server redirects endlessly to URLs that differ at each request', () => {
+        const redirectLoopUrl = `http://127.0.0.1:${SERVER_PORT}/redirect-loop`;
+
+        it('throws a FetchDocumentError error that only mentions the requested URL', async () => {
+          await expect(fetch({ url: redirectLoopUrl })).to.be.rejectedWith(FetchDocumentError, `maximum redirect reached when trying to fetch '${redirectLoopUrl}'`);
         });
       });
 

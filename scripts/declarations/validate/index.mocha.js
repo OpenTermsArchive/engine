@@ -11,6 +11,7 @@ import * as exposedFilters from '../../../src/archivist/extract/exposedFilters.j
 import extract from '../../../src/archivist/extract/index.js';
 import fetch, { launchHeadlessBrowser, stopHeadlessBrowser } from '../../../src/archivist/fetcher/index.js';
 import * as services from '../../../src/archivist/services/index.js';
+import { isPortableFileName } from '../../../src/git/pathSegment.js';
 import DeclarationUtils from '../utils/index.js';
 
 import serviceHistorySchema from './service.history.schema.js';
@@ -62,6 +63,12 @@ export default async options => {
           if (!service) {
             console.log('      (Tests skipped as declaration has been archived)');
             this.skip();
+          }
+        });
+
+        it('service ID is supported as a cross-platform file name', () => {
+          if (!isPortableFileName(serviceId)) {
+            throw new Error(`Service ID "${serviceId}" contains unsupported characters: a service ID must be usable as a file name on every platform, so it cannot contain control characters nor \`/ \\ : " < > | * ?\`, nor be "." or "..". See https://docs.opentermsarchive.org/terms/how-to/track-terms/#service-id`);
           }
         });
 

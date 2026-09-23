@@ -175,7 +175,7 @@ In order to improve the understandability of commands, we document all CLI optio
 
 ### Instances and repositories
 
-An “instance” of Open Terms Archive is comprised of a server running Open Terms Archive and up to three repositories. An instance has a _name_ describing the scope of services it aims at tracking. This scope is defined by one or several dimensions: jurisdiction, language, industry…
+An “instance” of Open Terms Archive is comprised of a server running Open Terms Archive and up to four repositories. An instance has a _name_ describing the scope of services it aims at tracking. This scope is defined by one or several dimensions: jurisdiction, language, industry…
 
 > For example, the `france` instance tracks documents in the French jurisdiction and French language, while the `dating` instance tracks services from the dating industry.
 
@@ -188,6 +188,7 @@ This name is used consistently in all communication, written references, and in 
 - The repository containing the declarations of services to be tracked is named `<instance_name>-declarations`. You can [create it from a template](https://github.com/OpenTermsArchive/template-declarations/generate).
 - The repository containing the snapshots of the tracked documents (unless the instance is storing them in an alternative database) is named `<instance_name>-snapshots`. You can [create it from a template](https://github.com/OpenTermsArchive/template-snapshots/generate).
 - The repository containing the versions of the tracked documents (unless the instance is storing them in an alternative database) is named `<instance_name>-versions`. You can [create it from a template](https://github.com/OpenTermsArchive/template-versions/generate).
+- The repository containing the tracking results, that is the tracking status of each terms and the lifecycle of each run, is named `<instance_name>-tracking-results`.
 
 ### Namespaces
 

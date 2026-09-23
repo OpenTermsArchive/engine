@@ -8,10 +8,13 @@ import nock from 'nock';
 import sinon from 'sinon';
 import sinonChai from 'sinon-chai';
 
+import Git from '../git/index.js';
+
 import { InaccessibleContentError } from './errors.js';
+import { ExtractDocumentError } from './extract/index.js';
 import { FetchDocumentError } from './fetcher/index.js';
-import Git from './recorder/repositories/git/git.js';
 import SourceDocument from './services/sourceDocument.js';
+import TrackingResults, { MissingCollectionIdError, RUN_ID_TRAILER_KEY } from './tracking-results/index.js';
 
 import Archivist, { EVENTS } from './index.js';
 
@@ -159,6 +162,201 @@ describe('Archivist', function () {
         expect(resultingTerms).to.equal(serviceBVersionExpectedContent);
       });
     });
+
+    context('with tracking-results enabled', () => { // Relies on the test declarations being versioned, which holds as they live inside the engine repository
+      let archivist;
+      let repository;
+      let run;
+      let subjects;
+
+      async function trackAndReadResults() {
+        await archivist.track({ services });
+
+        run = await repository.findLatestRun();
+        subjects = (await repository.git.listCommits()).map(commit => commit.message);
+      }
+
+      before(async () => {
+        setupNockForServices();
+        archivist = new Archivist({
+          recorderConfig: config.get('@opentermsarchive/engine.recorder'),
+          fetcherConfig: config.get('@opentermsarchive/engine.fetcher'),
+          trackingResultsConfig: config.get('@opentermsarchive/engine.tracking-results'),
+        });
+        await archivist.initialize();
+        ({ repository } = archivist.trackingResults.recorder);
+
+        await trackAndReadResults();
+      });
+
+      after(() => Promise.all([
+        repository.removeAll(),
+        archivist.recorder.snapshotsRepository.removeAll(),
+        archivist.recorder.versionsRepository.removeAll(),
+      ]));
+
+      it('records the run lifecycle around the tracking of each terms', () => {
+        expect(subjects).to.deep.equal([
+          `Start run ${run.shortRunId}`,
+          `Record first tracking of ${SERVICE_A_ID} ${SERVICE_A_TYPE}`,
+          `Record first tracking of ${SERVICE_B_ID} ${SERVICE_B_TYPE}`,
+          `Complete run ${run.shortRunId} (2 ok, 0 failed)`,
+        ]);
+      });
+
+      it('references the commit of the declarations', () => {
+        expect(run.declarations.commit).to.match(/^[0-9a-f]{40}$/);
+      });
+
+      it('accounts for every declared terms', () => {
+        expect(run.coverage.processed + run.coverage.skipped.length).to.equal(run.declarations.terms);
+      });
+
+      it('records the MIME type of the source documents', async () => {
+        const { event } = await repository.findLatestTermsResult(SERVICE_B_ID, SERVICE_B_TYPE);
+
+        expect(event.sourceDocuments.map(({ mimeType }) => mimeType)).to.deep.equal(['application/pdf']);
+      });
+
+      it('ties the versions to the run', async () => {
+        const commit = await gitVersion.getCommit([ '--', SERVICE_A_EXPECTED_VERSION_FILE_PATH ]);
+
+        expect(commit.trailers[RUN_ID_TRAILER_KEY]).to.equal(run.runId);
+      });
+
+      it('keeps the snapshot IDs of the versions readable', async () => {
+        const version = await archivist.recorder.versionsRepository.findLatest(SERVICE_A_ID, SERVICE_A_TYPE);
+        const snapshot = await archivist.recorder.snapshotsRepository.findLatest(SERVICE_A_ID, SERVICE_A_TYPE);
+
+        expect(version.snapshotIds).to.deep.equal([snapshot.id]);
+      });
+
+      context('when tracking again without any change', () => {
+        before(async () => {
+          setupNockForServices();
+          await trackAndReadResults();
+        });
+
+        it('only records the run lifecycle', () => {
+          expect(subjects.slice(4)).to.deep.equal([ `Start run ${run.shortRunId}`, `Complete run ${run.shortRunId} (2 ok, 0 failed)` ]);
+        });
+      });
+
+      context('when a terms is tracked after a likely transient error', () => {
+        before(async () => {
+          setupNockForServices({ serviceA: false, serviceB: true });
+          nock('https://www.servicea.example')
+            .get('/tos')
+            .reply(503)
+            .get('/tos')
+            .reply(200, serviceASnapshotExpectedContent, { 'Content-Type': 'text/html' });
+
+          await trackAndReadResults();
+        });
+
+        it('records the transient error with the success', () => {
+          expect(subjects.slice(6)).to.deep.equal([ `Start run ${run.shortRunId}`, `Record transient error of ${SERVICE_A_ID} ${SERVICE_A_TYPE}`, `Complete run ${run.shortRunId} (2 ok, 0 failed)` ]);
+        });
+
+        it('counts the transient error in the run', () => {
+          expect(run.transientErrors).to.equal(1);
+        });
+      });
+    });
+
+    context('when completing the tracking-results run fails', () => {
+      let errorSpy;
+      let trackingCompletedSpy;
+      let exitStub;
+      let completeRunStub;
+      let finalizeStub;
+
+      before(async () => {
+        setupNockForServices();
+        app = await createAndInitializeArchivist();
+
+        errorSpy = sinon.spy();
+        trackingCompletedSpy = sinon.spy();
+        exitStub = sinon.stub(process, 'exit');
+        completeRunStub = sinon.stub().rejects(new Error('tracking-results commit failed'));
+        finalizeStub = sinon.stub().resolves();
+
+        app.on('error', errorSpy);
+        app.on('trackingCompleted', trackingCompletedSpy);
+        app.trackingResults = { // Faked at the boundary so completeRun can be made to fail without corrupting a real repository
+          hasRunInProgress: true,
+          startRun: sinon.stub().resolves(),
+          recordSuccess: sinon.stub().resolves(),
+          recordFailure: sinon.stub().resolves(),
+          completeRun: completeRunStub,
+          finalize: finalizeStub,
+        };
+
+        await app.track({ services }); // Stays pending until the fatal shutdown sequence reaches its process.exit call
+      });
+
+      after(async () => {
+        exitStub.restore();
+        delete app.trackingResults;
+        await resetGitRepositories();
+      });
+
+      it('emits a fatal error', () => {
+        expect(errorSpy).to.have.been.calledOnce;
+        expect(errorSpy.firstCall.args[0].message).to.match(/Failed to complete tracking-results run/);
+      });
+
+      it('does not emit trackingCompleted', () => {
+        expect(trackingCompletedSpy).to.not.have.been.called;
+      });
+
+      it('triggers the fatal shutdown', () => {
+        expect(exitStub).to.have.been.calledOnceWith(1);
+      });
+
+      it('finalizes tracking-results before exiting', () => {
+        expect(finalizeStub).to.have.been.calledOnce;
+        expect(finalizeStub).to.have.been.calledBefore(exitStub);
+      });
+    });
+
+    context('when tracking a subset of services', () => {
+      const DECLARATIONS_COMMIT = 'c0ffee1234567890c0ffee1234567890c0ffee12';
+      let startRunStub;
+
+      before(async () => {
+        setupNockForServices({ serviceA: true, serviceB: false });
+        app = await createAndInitializeArchivist();
+
+        startRunStub = sinon.stub().resolves();
+        app.declarationsCommit = DECLARATIONS_COMMIT;
+        app.trackingResults = {
+          hasRunInProgress: false,
+          startRun: startRunStub,
+          recordSuccess: sinon.stub().resolves(),
+          recordFailure: sinon.stub().resolves(),
+          completeRun: sinon.stub().resolves(),
+          finalize: sinon.stub().resolves(),
+        };
+
+        await app.track({ services: ['service·A'] });
+      });
+
+      after(async () => {
+        delete app.trackingResults;
+        delete app.declarationsCommit;
+        await resetGitRepositories();
+      });
+
+      it('starts the tracking-results run with the full services, their declarations commit and the selection', () => {
+        expect(startRunStub).to.have.been.calledOnceWith({
+          services: app.services,
+          declarationsCommit: DECLARATIONS_COMMIT,
+          selectedServicesIds: ['service·A'],
+          selectedTermsTypes: [],
+        });
+      });
+    });
   });
 
   describe('#applyTechnicalUpgrades', () => {
@@ -216,6 +414,41 @@ describe('Archivist', function () {
           const serviceBCommitsAfterExtraction = await gitVersion.log({ file: SERVICE_B_EXPECTED_VERSION_FILE_PATH });
 
           expect(serviceBCommitsAfterExtraction.map(commit => commit.hash)).to.deep.equal(serviceBCommits.map(commit => commit.hash));
+        });
+      });
+
+      context('when tracking-results is enabled', () => {
+        let trackingResults;
+
+        before(async () => {
+          setupNockForServices();
+          app = await createAndInitializeArchivist();
+          await app.track({ services });
+
+          trackingResults = { // Faked at the boundary: only the calls made to the module matter here
+            hasRunInProgress: false,
+            startRun: sinon.stub().resolves(),
+            recordSuccess: sinon.stub().resolves(),
+            recordFailure: sinon.stub().resolves(),
+            completeRun: sinon.stub().resolves(),
+            finalize: sinon.stub().resolves(),
+          };
+          app.trackingResults = trackingResults;
+
+          await app.applyTechnicalUpgrades({ services });
+        });
+
+        after(async () => {
+          delete app.trackingResults;
+          await resetGitRepositories();
+        });
+
+        it('does not start a tracking-results run', () => {
+          expect(trackingResults.startRun).to.not.have.been.called;
+        });
+
+        it('does not complete a tracking-results run', () => {
+          expect(trackingResults.completeRun).to.not.have.been.called;
         });
       });
 
@@ -512,6 +745,37 @@ describe('Archivist', function () {
     });
   });
 
+  describe('#trackTermsChanges', () => {
+    context('when the tracking-results success cannot be recorded', () => {
+      let app;
+      let errorSpy;
+      let recordFailureStub;
+
+      before(async () => {
+        app = await createAndInitializeArchivist();
+        app.removeAllListeners('error'); // Detach the fatal shutdown listener registered at initialize, as this context deliberately emits the fatal error event
+        errorSpy = sinon.spy();
+        app.on('error', errorSpy);
+        recordFailureStub = sinon.stub().resolves();
+        app.trackingResults = { recordSuccess: sinon.stub().rejects(new Error('Could not commit')), recordFailure: recordFailureStub };
+        sinon.stub(app, 'fetchAndRecordSnapshots').resolves();
+        sinon.stub(app, 'extractContentsFromSnapshots').resolves(['content']);
+        sinon.stub(app, 'recordVersion').resolves();
+
+        await app.trackTermsChanges({ terms: { service: { id: 'test-service' }, type: 'test-type', sourceDocuments: [{}] } });
+      });
+
+      it('emits a fatal error', () => {
+        expect(errorSpy).to.have.been.calledOnce;
+        expect(errorSpy.firstCall.args[0].message).to.match(/Could not record the tracking-results outcome/);
+      });
+
+      it('does not record the successfully tracked terms as failed', () => {
+        expect(recordFailureStub).to.not.have.been.called;
+      });
+    });
+  });
+
   describe('#handleTrackingError', () => {
     let errorSpy;
     let warnSpy;
@@ -523,6 +787,7 @@ describe('Archivist', function () {
 
     before(async () => {
       app = await createAndInitializeArchivist();
+      app.trackingQueue.pause(); // These tests assert what gets pushed onto the queue, not its processing: a live worker would fetch the plain-object fixtures in the background and its failure would race the following suites
     });
 
     beforeEach(() => {
@@ -545,18 +810,18 @@ describe('Archivist', function () {
     });
 
     afterEach(() => {
-      errorSpy.resetHistory();
-      warnSpy.resetHistory();
-      inaccessibleContentSpy.resetHistory();
+      app.removeListener('error', errorSpy);
+      app.removeListener('warn', warnSpy);
+      app.removeListener('inaccessibleContent', inaccessibleContentSpy);
       pushSpy.restore();
     });
 
     context('with an InaccessibleContentError', () => {
       context('when error may be transient', () => {
-        beforeEach(() => {
+        beforeEach(async () => {
           const error = new InaccessibleContentError([retryableError]);
 
-          app.handleTrackingError(error, { terms });
+          await app.handleTrackingError(error, { terms });
         });
 
         it('does not emit an error event', () => {
@@ -572,15 +837,34 @@ describe('Archivist', function () {
         });
 
         it('pushes terms to tracking queue for retry', () => {
-          expect(pushSpy).to.have.been.calledWith({ terms, isRetry: true });
+          expect(pushSpy).to.have.been.calledWith(sinon.match({ terms, isRetry: true }));
+        });
+
+        it('propagates the transient errors to the retry', () => {
+          expect(pushSpy).to.have.been.calledWith(sinon.match({ transientErrors: [retryableError] }));
+        });
+
+        it('keeps the technical upgrade flag on the retry', async () => {
+          await app.handleTrackingError(new InaccessibleContentError([retryableError]), { terms, technicalUpgradeOnly: true });
+
+          expect(pushSpy).to.have.been.calledWith(sinon.match({ isRetry: true, technicalUpgradeOnly: true }));
         });
       });
 
       context('when error comes from a retry', () => {
-        beforeEach(() => {
+        let recordFailureStub;
+
+        beforeEach(async () => {
           const error = new InaccessibleContentError([retryableError]);
 
-          app.handleTrackingError(error, { terms, isRetry: true });
+          recordFailureStub = sinon.stub().resolves();
+          app.trackingResults = { recordFailure: recordFailureStub };
+
+          await app.handleTrackingError(error, { terms, isRetry: true });
+        });
+
+        afterEach(() => {
+          delete app.trackingResults;
         });
 
         it('does not emit an error event', () => {
@@ -598,6 +882,210 @@ describe('Archivist', function () {
         it('does not push terms to tracking queue for retry', () => {
           expect(pushSpy).to.not.have.been.called;
         });
+
+        it('records the failure with the underlying errors', () => {
+          expect(recordFailureStub).to.have.been.calledOnceWith(terms, [retryableError]);
+        });
+      });
+
+      context('when error is not transient', () => {
+        const errors = [ new FetchDocumentError('HTTP code 404'), new ExtractDocumentError('CSS selector has no match') ];
+        let recordFailureStub;
+
+        beforeEach(async () => {
+          recordFailureStub = sinon.stub().resolves();
+          app.trackingResults = { recordFailure: recordFailureStub };
+
+          await app.handleTrackingError(new InaccessibleContentError(errors), { terms });
+        });
+
+        afterEach(() => {
+          delete app.trackingResults;
+        });
+
+        it('emits an inaccessibleContent event', () => {
+          expect(inaccessibleContentSpy).to.have.been.called;
+        });
+
+        it('does not push terms to tracking queue for retry', () => {
+          expect(pushSpy).to.not.have.been.called;
+        });
+
+        it('records the failure with the underlying errors', () => {
+          expect(recordFailureStub).to.have.been.calledOnceWith(terms, errors);
+        });
+      });
+
+      context('when the failure cannot be recorded', () => {
+        beforeEach(async () => {
+          app.removeAllListeners('error'); // Detach the fatal shutdown listener registered at initialize, as this context deliberately emits the fatal error event
+          app.on('error', errorSpy);
+          app.trackingResults = { recordFailure: sinon.stub().rejects(new Error('Could not commit')) };
+
+          await app.handleTrackingError(new InaccessibleContentError([new FetchDocumentError('HTTP code 404')]), { terms });
+        });
+
+        afterEach(() => {
+          delete app.trackingResults;
+        });
+
+        it('emits the fatal error event', () => {
+          expect(errorSpy).to.have.been.calledOnce;
+          expect(errorSpy.firstCall.args[0].message).to.include('Could not commit');
+        });
+      });
+    });
+
+    context('with an error that is not an InaccessibleContentError', () => {
+      let recordFailureStub;
+
+      beforeEach(async () => {
+        app.removeAllListeners('error'); // Detach the fatal shutdown listener registered at initialize, as this context deliberately emits the fatal error event
+        app.on('error', errorSpy);
+        recordFailureStub = sinon.stub().resolves();
+        app.trackingResults = { recordFailure: recordFailureStub };
+
+        await app.handleTrackingError(new Error('boom'), { terms });
+      });
+
+      afterEach(() => {
+        delete app.trackingResults;
+      });
+
+      it('emits the fatal error event', () => {
+        expect(errorSpy).to.have.been.calledOnce;
+      });
+
+      it('records the failure before emitting the fatal error', () => {
+        expect(recordFailureStub).to.have.been.calledOnce;
+        expect(recordFailureStub).to.have.been.calledBefore(errorSpy);
+      });
+
+      it('passes the original error for categorisation', () => {
+        expect(recordFailureStub.firstCall.args[1].map(recordedError => recordedError.message)).to.deep.equal(['boom']);
+      });
+
+      context('when the failure cannot be recorded', () => {
+        beforeEach(async () => {
+          errorSpy.resetHistory();
+          app.trackingResults = { recordFailure: sinon.stub().rejects(new Error('Could not commit')) };
+
+          await app.handleTrackingError(new Error('boom'), { terms });
+        });
+
+        it('warns about it before emitting the fatal error event', () => {
+          expect(warnSpy).to.have.been.calledWithMatch({ message: sinon.match('Could not record the tracking outcome before shutdown') });
+          expect(warnSpy).to.have.been.calledBefore(errorSpy);
+          expect(errorSpy).to.have.been.calledOnce;
+        });
+      });
+    });
+  });
+
+  describe('fatal error shutdown', () => {
+    let archivist;
+    let exitStub;
+    let finalizeSpy;
+
+    before(async function () {
+      this.timeout(10000);
+      archivist = await createAndInitializeArchivist();
+      exitStub = sinon.stub(process, 'exit');
+      finalizeSpy = sinon.spy(archivist.recorder, 'finalize');
+
+      archivist.emit('error', { message: 'first fatal error' });
+      archivist.emit('error', { message: 'second fatal error' });
+
+      await archivist.fatalShutdownPromise; // The shutdown sequence is asynchronous; wait until it reaches its process.exit call
+    });
+
+    after(() => {
+      exitStub.restore();
+      finalizeSpy.restore();
+    });
+
+    it('runs the cleanup sequence only once', () => {
+      expect(finalizeSpy).to.have.been.calledOnce;
+    });
+
+    it('exits the process once, with the expected exit code', () => {
+      expect(exitStub).to.have.been.calledOnceWith(1);
+    });
+  });
+
+  describe('#extractContentsFromSnapshots', () => {
+    context('when several source documents fail extraction', () => {
+      let app;
+      let error;
+      let getLatestSnapshotStub;
+
+      before(async () => {
+        app = await createAndInitializeArchivist();
+
+        const terms = {
+          service: { id: 'test-service' },
+          type: 'test-type',
+          sourceDocuments: [
+            { id: 'doc1', location: 'https://example.com/doc1' },
+            { id: 'doc2', location: 'https://example.com/doc2' },
+          ],
+        };
+
+        getLatestSnapshotStub = sinon.stub(app.recorder, 'getLatestSnapshot').callsFake((_, sourceDocumentId) => Promise.resolve({
+          id: `snapshot-of-${sourceDocumentId}`,
+          content: 'content',
+          mimeType: 'text/html',
+          fetchDate: FETCH_DATE,
+        }));
+
+        app.extract = sourceDocument => new Promise((resolve, reject) => {
+          const delay = sourceDocument.id === 'doc1' ? 20 : 0; // Make the first declared document fail last, so an ordering based on completion time would be exposed
+
+          setTimeout(() => reject(new ExtractDocumentError(`extraction failure of ${sourceDocument.id}`)), delay);
+        });
+
+        try {
+          await app.extractContentsFromSnapshots(terms);
+        } catch (thrownError) {
+          error = thrownError;
+        }
+      });
+
+      after(() => getLatestSnapshotStub.restore());
+
+      it('throws an InaccessibleContentError', () => {
+        expect(error).to.be.an.instanceOf(InaccessibleContentError);
+      });
+
+      it('collects the errors in the source documents declaration order', () => {
+        expect(error.errors.map(extractError => extractError.message)).to.deep.equal([ 'Extract failed: extraction failure of doc1', 'Extract failed: extraction failure of doc2' ]);
+      });
+    });
+  });
+
+  describe('#fetchSourceDocument', () => {
+    context('when the fetch fails after a previous successful run', () => {
+      let app;
+      let error;
+      let sourceDocument;
+
+      before(async () => {
+        app = await createAndInitializeArchivist();
+        sourceDocument = new SourceDocument({ location: 'https://example.com/terms', contentSelectors: 'body' });
+        sourceDocument.mimeType = 'text/html'; // Observations left by a previous run on the long-lived services map
+        sourceDocument.snapshotId = 'stale123';
+        app.fetch = () => Promise.reject(new FetchDocumentError('HTTP code 500'));
+
+        error = await app.fetchSourceDocument(sourceDocument);
+      });
+
+      it('reports the fetch error', () => {
+        expect(error).to.be.an.instanceOf(FetchDocumentError);
+      });
+
+      it('clears the stale observations so the failure is recorded with null values', () => {
+        expect(sourceDocument.mimeType).to.be.null;
+        expect(sourceDocument.snapshotId).to.be.null;
       });
     });
   });
@@ -1024,6 +1512,168 @@ describe('Archivist', function () {
           'trackingStarted',
           'trackingCompleted',
         ]);
+      });
+    });
+  });
+
+  describe('tracking-results wiring', () => { // Unit-level wiring tests that do not require a live fetcher; the integration with a real tracking is covered in #track
+    context('when no trackingResultsConfig is provided', () => {
+      let archivist;
+
+      before(async () => {
+        archivist = new Archivist({
+          recorderConfig: config.get('@opentermsarchive/engine.recorder'),
+          fetcherConfig: config.get('@opentermsarchive/engine.fetcher'),
+        });
+        await archivist.initialize();
+      });
+
+      after(async () => {
+        await Promise.all([
+          archivist.recorder.snapshotsRepository.removeAll(),
+          archivist.recorder.versionsRepository.removeAll(),
+        ]);
+      });
+
+      it('does not construct the tracking-results module', () => {
+        expect(archivist.trackingResults).to.be.undefined;
+      });
+    });
+
+    context('when a trackingResultsConfig is provided', () => {
+      let archivist;
+      let warnSpy;
+
+      before(async () => {
+        warnSpy = sinon.spy();
+        archivist = new Archivist({
+          recorderConfig: config.get('@opentermsarchive/engine.recorder'),
+          fetcherConfig: config.get('@opentermsarchive/engine.fetcher'),
+          trackingResultsConfig: config.get('@opentermsarchive/engine.tracking-results'),
+        });
+        archivist.on('warn', warnSpy);
+        await archivist.initialize();
+      });
+
+      after(async () => {
+        await Promise.all([
+          archivist.trackingResults?.recorder.repository.removeAll(),
+          archivist.recorder.snapshotsRepository.removeAll(),
+          archivist.recorder.versionsRepository.removeAll(),
+        ]);
+      });
+
+      it('constructs and initialises the tracking-results module', () => {
+        expect(archivist.trackingResults).to.exist;
+        expect(archivist.trackingResults.recorder.repository).to.exist;
+      });
+
+      it('captures the commit of the loaded declarations', () => {
+        expect(archivist.declarationsCommit).to.match(/^[0-9a-f]{40}$/); // The test declarations live inside the engine repository, so their commit is the engine HEAD
+      });
+
+      it('resolves the collection identity and engine version', () => {
+        expect(archivist.trackingResults.recorder.collectionId).to.equal('test'); // From test/test-declarations/metadata.yml
+        expect(archivist.trackingResults.recorder.engineVersion).to.be.a('string');
+      });
+
+      it('relays the module warnings on the engine event surface', () => {
+        archivist.trackingResults.emit('warn', { message: 'relayed warning' });
+        expect(warnSpy).to.have.been.calledWithMatch({ message: 'relayed warning' });
+      });
+    });
+
+    context('when recording snapshots and versions', () => {
+      const RUN_ID = 'ota-run-f47ac10b-58cc-4372-a567-0e02b2c3d479';
+      let archivist;
+      let terms;
+
+      before(async () => {
+        archivist = new Archivist({
+          recorderConfig: config.get('@opentermsarchive/engine.recorder'),
+          fetcherConfig: config.get('@opentermsarchive/engine.fetcher'),
+        });
+        await archivist.initialize();
+        terms = archivist.services.service·A.getTerms({ type: SERVICE_A_TYPE });
+        terms.fetchDate = FETCH_DATE;
+        terms.sourceDocuments.forEach(sourceDocument => {
+          sourceDocument.content = serviceASnapshotExpectedContent;
+          sourceDocument.mimeType = MIME_TYPE;
+        });
+      });
+
+      after(async () => {
+        await Promise.all([
+          archivist.recorder.snapshotsRepository.removeAll(),
+          archivist.recorder.versionsRepository.removeAll(),
+        ]);
+      });
+
+      context('while a tracking-results run is in progress', () => {
+        before(() => {
+          archivist.trackingResults = { currentRunId: RUN_ID }; // Faked at the boundary: only the run identity matters to the records
+        });
+
+        after(() => {
+          delete archivist.trackingResults;
+        });
+
+        it('ties the snapshot to the run through its metadata', async () => {
+          const snapshot = await archivist.recordSnapshot(terms, terms.sourceDocuments[0]);
+
+          expect(snapshot.metadata[RUN_ID_TRAILER_KEY]).to.equal(RUN_ID);
+        });
+
+        it('ties the version to the run through its metadata', async () => {
+          const version = await archivist.recordVersion(terms, 'content');
+
+          expect(version.metadata[RUN_ID_TRAILER_KEY]).to.equal(RUN_ID);
+        });
+      });
+
+      context('without an active tracking-results run', () => {
+        it('records no run id on the snapshot', async () => {
+          const snapshot = await archivist.recordSnapshot(terms, terms.sourceDocuments[0]);
+
+          expect(snapshot.metadata).to.not.have.property(RUN_ID_TRAILER_KEY);
+        });
+
+        it('records no run id on the version', async () => {
+          const version = await archivist.recordVersion(terms, 'content');
+
+          expect(version.metadata).to.not.have.property(RUN_ID_TRAILER_KEY);
+        });
+      });
+    });
+
+    context('when the collection has no id', () => {
+      let archivist;
+      let warnSpy;
+      let createStub;
+
+      before(async () => {
+        createStub = sinon.stub(TrackingResults, 'create').rejects(new MissingCollectionIdError('Collection metadata "id" is required to record tracking-results.'));
+        warnSpy = sinon.spy();
+        archivist = new Archivist({
+          recorderConfig: config.get('@opentermsarchive/engine.recorder'),
+          fetcherConfig: config.get('@opentermsarchive/engine.fetcher'),
+          trackingResultsConfig: config.get('@opentermsarchive/engine.tracking-results'),
+        });
+        archivist.on('warn', warnSpy);
+        await archivist.initialize();
+      });
+
+      after(async () => {
+        createStub.restore();
+        await Promise.all([
+          archivist.recorder.snapshotsRepository.removeAll(),
+          archivist.recorder.versionsRepository.removeAll(),
+        ]);
+      });
+
+      it('disables tracking-results and keeps tracking available', () => {
+        expect(archivist.trackingResults).to.be.undefined;
+        expect(warnSpy.args.map(([payload]) => payload.message).join('\n')).to.include('Tracking-results is disabled');
       });
     });
   });

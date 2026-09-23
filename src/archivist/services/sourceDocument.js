@@ -40,8 +40,14 @@ export default class SourceDocument {
   }
 
   clearContent() {
-    this.content = null;
+    this.content = null; // Only the potentially large content is cleared: the MIME type is read after the extraction, to record the tracking results
+  }
+
+  resetObservations() {
+    // mimeType and snapshotId are observations of a single tracking attempt, but they are stored on declaration objects that live for the whole process: without this reset, a failed fetch would expose the previous run's values as if they belonged to the failed attempt.
+    // The proper pattern would be for the fetch and extract pipeline to return its observations instead of mutating the declarations, letting consumers build their records from run-scoped data; this reset contains that debt rather than fixing it.
     this.mimeType = null;
+    this.snapshotId = null;
   }
 
   static extractCssSelectorsFromProperty(property) {
@@ -83,7 +89,7 @@ export default class SourceDocument {
       fetch: this.location,
       select: this.contentSelectors,
       remove: this.insignificantContentSelectors,
-      filter: this.filters ? this.filters.map(filter => filter.name) : undefined,
+      filter: this.filters ? this.filters.map(filter => filter.declaration ?? filter.name) : undefined, // Filters declared with parameters carry their declared form, so that a change of parameters is persisted
       executeClientScripts: this.executeClientScripts,
     };
   }

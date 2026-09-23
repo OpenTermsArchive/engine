@@ -214,6 +214,29 @@ describe('SourceDocument', () => {
     });
   });
 
+  describe('#clearContent', () => {
+    it('clears the content but keeps the MIME type', () => {
+      const sourceDocument = new SourceDocument({ location: URL, content: '<html></html>', mimeType: 'text/html' });
+
+      sourceDocument.clearContent();
+
+      expect(sourceDocument.content).to.be.null;
+      expect(sourceDocument.mimeType).to.equal('text/html');
+    });
+  });
+
+  describe('#resetObservations', () => {
+    it('clears the MIME type and the snapshot ID observed by a previous tracking', () => {
+      const sourceDocument = new SourceDocument({ location: URL, mimeType: 'text/html' });
+
+      sourceDocument.snapshotId = 'abc123';
+      sourceDocument.resetObservations();
+
+      expect(sourceDocument.mimeType).to.be.null;
+      expect(sourceDocument.snapshotId).to.be.null;
+    });
+  });
+
   describe('#toPersistence', () => {
     it('converts basic source document declarations into JSON representation', () => {
       const result = new SourceDocument({
@@ -274,6 +297,20 @@ describe('SourceDocument', () => {
       };
 
       expect(result).to.deep.equal(expectedResult);
+    });
+
+    it('converts filters declared with parameters to their declared form', () => {
+      const filterWithParameters = () => {};
+
+      Object.defineProperty(filterWithParameters, 'declaration', { value: { removeQueryParams: ['utm_source'] } });
+
+      const result = new SourceDocument({
+        location: URL,
+        contentSelectors: 'body',
+        filters: [ filterWithParameters, function filterSomething() {} ],
+      }).toPersistence();
+
+      expect(result.filter).to.deep.equal([{ removeQueryParams: ['utm_source'] }, 'filterSomething' ]);
     });
   });
 });

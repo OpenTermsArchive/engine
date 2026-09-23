@@ -57,6 +57,14 @@ export default async function fetch(url, config) {
       throw new Error(`Network system error ${error.code} occurred when trying to fetch '${url}'`);
     }
 
+    if (error.type == 'max-redirect') { // Node-fetch reports the last redirect target, which may carry per-request tokens and would make the message differ at each attempt
+      throw new Error(`maximum redirect reached when trying to fetch '${url}'`);
+    }
+
+    if (error.type == 'invalid-redirect') { // Same as above, for the invalid redirect target
+      throw new Error(`invalid redirect URL received when trying to fetch '${url}'`);
+    }
+
     if (error instanceof AbortError) {
       throw new Error(`Timed out after ${config.navigationTimeout / 1000} seconds when trying to fetch '${url}'`);
     }

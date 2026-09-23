@@ -2,10 +2,12 @@ import fs from 'fs/promises';
 import path from 'path';
 
 import { expect, use } from 'chai';
+import config from 'config';
 import sinon from 'sinon';
 import sinonChai from 'sinon-chai';
 
 import expectedServices from '../../../test/fixtures/services.js';
+import Git, { GitObjectNotFoundError } from '../../git/index.js';
 import createWebPageDOM from '../extract/dom.js';
 import * as exposedFilters from '../extract/exposedFilters.js';
 
@@ -13,7 +15,7 @@ import Service from './service.js';
 import SourceDocument from './sourceDocument.js';
 import Terms from './terms.js';
 
-import { getDeclaredServicesIds, loadServiceDeclaration, loadServiceFilters, getServiceFilters, createSourceDocuments, createServiceFromDeclaration, load, loadWithHistory } from './index.js';
+import { getDeclaredServicesIds, getDeclaredTermsAtCommit, loadServiceDeclaration, loadServiceFilters, getServiceFilters, createSourceDocuments, createServiceFromDeclaration, load, loadWithHistory } from './index.js';
 
 use(sinonChai);
 
@@ -148,6 +150,36 @@ describe('Services', () => {
           'normal-service',
         ]);
       });
+    });
+  });
+
+  describe('#getDeclaredTermsAtCommit', () => {
+    const declarationsPath = path.resolve(process.cwd(), config.get('@opentermsarchive/engine.collectionPath'), './declarations');
+
+    afterEach(() => sinon.restore());
+
+    it('returns the terms declared at the given commit, whatever the working tree contains', async function () {
+      this.timeout(10000);
+
+      const commit = await Git.getHeadSha(declarationsPath); // The test declarations are committed in the engine repository itself, so its HEAD reflects them exactly
+      const expected = Object.entries(expectedServices).flatMap(([ serviceId, service ]) => service.getTermsTypes().map(termsType => ({ serviceId, termsType })));
+
+      sinon.stub(fs, 'readdir').resolves(['uncommitted-service.json']); // Make the working tree differ from the commit: it must not be read
+      sinon.stub(fs, 'readFile').resolves(JSON.stringify({ name: 'Uncommitted service', terms: { Imprint: {} } }));
+
+      expect(await getDeclaredTermsAtCommit(commit)).to.have.deep.members(expected);
+    });
+
+    it('throws a GitObjectNotFoundError for an unknown commit', async () => {
+      try {
+        await getDeclaredTermsAtCommit('deadbeefdeadbeefdeadbeefdeadbeefdeadbeef');
+      } catch (error) {
+        expect(error).to.be.an.instanceOf(GitObjectNotFoundError);
+
+        return;
+      }
+
+      expect.fail('No error was thrown');
     });
   });
 
@@ -310,6 +342,19 @@ describe('Services', () => {
       expect(result[0](null, 'context')).to.equal('foo');
     });
 
+    it('keeps the declared form of filters declared with parameters', () => {
+      const [filter] = getServiceFilters({ paramFilter: (dom, param) => param }, [{ paramFilter: [ 'foo', 'bar' ] }]);
+
+      expect(filter.declaration).to.deep.equal({ paramFilter: [ 'foo', 'bar' ] });
+    });
+
+    it('keeps the name as the declared form of exposed filters declared by string name', () => {
+      const [filterName] = Object.keys(exposedFilters);
+      const [filter] = getServiceFilters({}, [filterName]);
+
+      expect(filter.declaration).to.equal(filterName);
+    });
+
     describe('parameters passed to filters', () => {
       let serviceLoadedFilters;
       let passedDOM;
@@ -346,6 +391,12 @@ describe('Services', () => {
       context('as an object', () => {
         it('passes parameters correctly', () => {
           testParameterPassing({ param1: 'param1', param2: 'param2' });
+        });
+      });
+
+      context('as a falsy value', () => {
+        it('passes parameters correctly', () => {
+          testParameterPassing(false);
         });
       });
     });

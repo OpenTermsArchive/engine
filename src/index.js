@@ -12,10 +12,11 @@ import Reporter from './reporter/index.js';
 const require = createRequire(import.meta.url);
 const { version: PACKAGE_VERSION } = require('../package.json');
 
-async function initialize(services) {
+async function initialize(services, { trackingResultsConfig } = {}) {
   const archivist = new Archivist({
     recorderConfig: config.get('@opentermsarchive/engine.recorder'),
     fetcherConfig: config.get('@opentermsarchive/engine.fetcher'),
+    trackingResultsConfig,
   });
 
   archivist.attach(logger);
@@ -28,7 +29,7 @@ async function initialize(services) {
   logger.info(`Start engine v${PACKAGE_VERSION}${collectionName}\n`);
 
   if (services?.length) {
-    services = services.filter(serviceId => {
+    services = [...new Set(services)].filter(serviceId => { // Deduplicated so that a service ID given twice is not tracked twice in the same run
       const isServiceDeclared = archivist.services[serviceId];
 
       if (!isServiceDeclared) {
@@ -43,7 +44,7 @@ async function initialize(services) {
 }
 
 export default async function track({ services, types, schedule }) {
-  const { archivist, services: filteredServices } = await initialize(services);
+  const { archivist, services: filteredServices } = await initialize(services, { trackingResultsConfig: config.get('@opentermsarchive/engine.tracking-results') });
 
   // Technical upgrade pass: apply changes from engine, dependency, or declaration upgrades.
   // This regenerates versions from existing snapshots with updated extraction logic.
@@ -84,7 +85,7 @@ export default async function track({ services, types, schedule }) {
 }
 
 export async function applyTechnicalUpgrades({ services, types }) {
-  const { archivist, services: filteredServices } = await initialize(services);
+  const { archivist, services: filteredServices } = await initialize(services); // Without tracking-results: technical upgrades never record any, and initializing the module would finalize as crashed the run that a tracking process may have in progress
 
   await archivist.applyTechnicalUpgrades({ services: filteredServices, types });
 }
