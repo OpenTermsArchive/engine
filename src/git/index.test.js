@@ -1,12 +1,16 @@
+import { spawn } from 'child_process';
 import fs from 'fs/promises';
 import os from 'os';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-import { expect } from 'chai';
+import { expect, use } from 'chai';
+import chaiAsPromised from 'chai-as-promised';
 import config from 'config';
 
 import Git, { GitObjectNotFoundError } from './index.js';
+
+use(chaiAsPromised);
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const RECORDER_PATH = path.resolve(__dirname, '../../', config.get('@opentermsarchive/engine.recorder.versions.storage.git.path'));
@@ -26,6 +30,51 @@ describe('Git', () => {
     });
 
     return subject.initialize();
+  });
+
+  describe('#initialize', () => {
+    const AUTHOR = { name: 'Writer lock tester', email: 'writer-lock@example.com' };
+    let repositoryPath;
+    let lockFilePath;
+
+    beforeEach(async () => {
+      repositoryPath = await fs.mkdtemp(path.join(os.tmpdir(), 'ota-writer-lock-'));
+      lockFilePath = path.join(repositoryPath, '.git', 'ota-writer.lock');
+    });
+
+    afterEach(() => fs.rm(repositoryPath, { recursive: true, force: true }));
+
+    it('locks the repository with the PID of the current process', async () => {
+      await new Git({ path: repositoryPath, author: AUTHOR }).initialize();
+
+      expect(await fs.readFile(lockFilePath, 'utf8')).to.equal(String(process.pid));
+    });
+
+    it('can be initialized again by the same process', async () => {
+      await new Git({ path: repositoryPath, author: AUTHOR }).initialize();
+
+      await expect(new Git({ path: repositoryPath, author: AUTHOR }).initialize()).to.be.fulfilled;
+    });
+
+    context('when another running process holds the lock', () => {
+      let otherProcess;
+
+      beforeEach(async () => {
+        otherProcess = spawn(process.execPath, [ '-e', 'setInterval(() => {}, 1000)' ]);
+        await fs.mkdir(path.dirname(lockFilePath), { recursive: true });
+        await fs.writeFile(lockFilePath, String(otherProcess.pid));
+      });
+
+      afterEach(() => otherProcess.kill());
+
+      it('rejects with an error naming the holder', async () => {
+        await expect(new Git({ path: repositoryPath, author: AUTHOR }).initialize()).to.be.rejectedWith(`already being written by the process ${otherProcess.pid}`);
+      });
+
+      it('names the lock file in the error', async () => {
+        await expect(new Git({ path: repositoryPath, author: AUTHOR }).initialize()).to.be.rejectedWith(lockFilePath);
+      });
+    });
   });
 
   describe('#commit', () => {
