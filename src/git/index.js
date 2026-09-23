@@ -1,3 +1,4 @@
+import { execFile } from 'child_process';
 import fsApi from 'fs';
 import path from 'path';
 
@@ -41,6 +42,34 @@ export default class Git {
 
   static readFileAtCommit(repositoryPath, commit, fileName) { // Returns the content of `fileName` (relative to `repositoryPath`) at the given commit
     return readObjectAtCommit(repositoryPath, [ 'show', `${commit}:./${fileName}` ]); // The `rev:./path` syntax makes git resolve the path against its cwd, which supports repositoryPath being a subdirectory of the repository
+  }
+
+  static readFilesAtCommit(repositoryPath, commit, fileNames) { // Returns the contents of `fileNames` at the given commit, in the same order, with null for a file absent from the commit; a single git process reads them all, as spawning one per file does not scale to a whole collection
+    return new Promise((resolve, reject) => {
+      const gitProcess = execFile('git', [ 'cat-file', '--batch' ], { cwd: repositoryPath, encoding: 'buffer', maxBuffer: Infinity }, (error, output, errorOutput) => {
+        if (error) {
+          return reject(error);
+        }
+
+        const contents = parseBatchOutput(output);
+        const errorMessages = errorOutput.toString();
+
+        if (/^error:/m.test(errorMessages) && contents.includes(null)) { // Git reports an object it cannot read, such as a corrupt one, like an absent one, and only tells them apart by an error on its error output, where harmless warnings and hints may also appear
+          return reject(new Error(errorMessages.trim()));
+        }
+
+        const [ commitContent, ...filesContents ] = contents;
+
+        if (commitContent === null) {
+          return reject(new GitObjectNotFoundError(`Unknown commit ${commit}`));
+        }
+
+        resolve(filesContents);
+      });
+
+      gitProcess.stdin.on('error', () => {}); // Git may exit before reading all the names, for example on a corrupt repository, which fails the pending write; the callback above already rejects with the actual cause, whereas an unhandled write error would crash the process
+      gitProcess.stdin.end([ `${commit}^{commit}`, ...fileNames.map(fileName => `${commit}:./${fileName}`) ].map(objectName => `${objectName}\n`).join('')); // The commit itself is read first so that an unknown commit is not mistaken for absent files; one object name per line, as file names never contain a line feed: path segments with control characters are rejected before reaching the repositories
+    });
   }
 
   constructor({ path: repositoryPath, author }) {
@@ -322,4 +351,28 @@ async function readObjectAtCommit(repositoryPath, args) {
 
     throw error;
   }
+}
+
+function parseBatchOutput(output) { // Each object is printed as a "<sha> <type> <size>" header line followed by its content and a line feed, and each unresolvable name as a "<name> missing" line
+  const contents = [];
+  let position = 0;
+
+  while (position < output.length) {
+    const headerEnd = output.indexOf('\n', position);
+    const header = output.toString('utf8', position, headerEnd);
+
+    position = headerEnd + 1;
+
+    if (header.endsWith(' missing')) {
+      contents.push(null);
+      continue;
+    }
+
+    const size = Number(header.split(' ').pop());
+
+    contents.push(output.toString('utf8', position, position + size));
+    position += size + 1;
+  }
+
+  return contents;
 }
