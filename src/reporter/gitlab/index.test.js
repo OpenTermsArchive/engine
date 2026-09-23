@@ -11,10 +11,11 @@ describe('GitLab', function () {
   let MANAGED_LABELS;
   let gitlab;
   const PROJECT_ID = '4';
+  const REPOSITORIES = { declarations: 'owner/repo', versions: 'owner/versions-repo', snapshots: 'owner/snapshots-repo' };
 
   before(() => {
     MANAGED_LABELS = Object.values(LABELS);
-    gitlab = new GitLab('owner/repo');
+    gitlab = new GitLab(REPOSITORIES);
   });
 
   describe('#initialize', () => {
@@ -764,6 +765,28 @@ describe('GitLab', function () {
             expect(addCommentScope.isDone()).to.be.true;
           });
         });
+      });
+    });
+  });
+
+  describe('URL generation', () => {
+    it('links the declaration into the declarations repository', () => {
+      expect(gitlab.generateDeclarationURL('Service A')).to.equal('https://gitlab.com/owner/repo/-/blob/main/declarations/Service%20A.json');
+    });
+
+    it('links the version into the versions repository', () => {
+      expect(gitlab.generateVersionURL('Service A', 'Terms of Service')).to.equal('https://gitlab.com/owner/versions-repo/-/blob/main/Service%20A/Terms%20of%20Service.md');
+    });
+
+    it('links the snapshots into the snapshots repository', () => {
+      expect(gitlab.generateSnapshotsBaseUrl('Service A', 'Terms of Service')).to.equal('https://gitlab.com/owner/snapshots-repo/-/blob/main/Service%20A/Terms%20of%20Service');
+    });
+
+    context('with a custom base URL', () => {
+      it('links into the custom instance', () => {
+        const customGitlab = new GitLab(REPOSITORIES, 'https://gitlab.example.test');
+
+        expect(customGitlab.generateVersionURL('Service A', 'Terms of Service')).to.equal('https://gitlab.example.test/owner/versions-repo/-/blob/main/Service%20A/Terms%20of%20Service.md');
       });
     });
   });

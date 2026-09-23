@@ -14,8 +14,8 @@ export default class GitLab {
   static ISSUE_STATE_ALL = 'all';
   static MAX_LABEL_DESCRIPTION_LENGTH = 255;
 
-  constructor(repository, baseURL = BASE_URL, apiBaseURL = API_BASE_URL) {
-    this.repositoryPath = repository;
+  constructor(repositories, baseURL = BASE_URL, apiBaseURL = API_BASE_URL) {
+    this.repositories = repositories; // Each generated link points into its own repository, while the issues live in the declarations one
     this.projectId = null;
     this.baseURL = baseURL;
     this.apiBaseURL = apiBaseURL;
@@ -26,7 +26,7 @@ export default class GitLab {
 
     try {
       const response = await nodeFetch(
-        `${this.apiBaseURL}/projects/${encodeURIComponent(this.repositoryPath)}`,
+        `${this.apiBaseURL}/projects/${encodeURIComponent(this.repositories.declarations)}`,
         options,
       );
 
@@ -478,15 +478,15 @@ export default class GitLab {
   }
 
   generateDeclarationURL(serviceName) {
-    return `${this.baseURL}/${this.repositoryPath}/-/blob/main/declarations/${encodeURIComponent(serviceName)}.json`;
+    return `${this.baseURL}/${this.repositories.declarations}/-/blob/main/declarations/${encodeURIComponent(serviceName)}.json`;
   }
 
   generateVersionURL(serviceName, termsType) {
-    return `${this.baseURL}/${this.repositoryPath}/-/blob/main/${encodeURIComponent(serviceName)}/${encodeURIComponent(termsType)}.md`;
+    return `${this.baseURL}/${this.repositories.versions}/-/blob/main/${encodeURIComponent(serviceName)}/${encodeURIComponent(termsType)}.md`;
   }
 
   generateSnapshotsBaseUrl(serviceName, termsType) {
-    return `${this.baseURL}/${this.repositoryPath}/-/blob/main/${encodeURIComponent(serviceName)}/${encodeURIComponent(termsType)}`;
+    return `${this.baseURL}/${this.repositories.snapshots}/-/blob/main/${encodeURIComponent(serviceName)}/${encodeURIComponent(termsType)}`;
   }
 
   // GitLab API responses are not cached unlike GitHub, so this method only exists to satisfy the Reporter interface contract
