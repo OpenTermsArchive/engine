@@ -1,6 +1,7 @@
 # Choosing service name and service ID
 
 - Date: 2020-10-14
+- Amended: 2026-09-23, to extend the excluded characters to the full set that Windows forbids in file names (`"`, `<`, `>`, `|`, `*`, `?`): Git for Windows refuses these paths entirely, and Git C-quotes `"` in the paths it prints, which corrupted the names read back from the history by the tracking-results audit trail.
 
 ## Context and Problem Statement
 
@@ -21,7 +22,7 @@ The ID is used internally and exposed for analysis. It should be easy to handle 
 As long as this ID is stored in the filesystem:
 
 - No `/` for UNIX.
-- No `\` for Windows.
+- No `\`, `"`, `<`, `>`, `|`, `*`, `?` for Windows.
 - No `:` for APFS and HFS.
 - No case-sensitive duplicates to support case-insensitive filesystems.
 - No more than 255 characters to support transfer over [FAT32](https://en.wikipedia.org/wiki/File_Allocation_Table#FAT32).
@@ -47,7 +48,7 @@ UTF, spaces and capitals are all supported, even on case-insensitive filesystems
 - _Example: `historielærer.dk` → `historielaerer.dk`_.
 - _Example: `RTÉ` → `RTE`_.
 
-3. We support punctuation, except characters that have meaning at filesystem level (`:`, `/`, `\`). These are replaced with a dash (`-`).
+3. We support punctuation, except characters that have meaning at filesystem level (`:`, `/`, `\`) and characters that are forbidden in file names on Windows (`"`, `<`, `>`, `|`, `*`, `?`). These are replaced with a dash (`-`).
 
 - _Example: `Yahoo!` → `Yahoo!`_.
 - _Example: `Last.fm` → `Last.fm`_.
