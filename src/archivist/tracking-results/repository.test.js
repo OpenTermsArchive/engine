@@ -90,6 +90,28 @@ describe('TrackingResultsRepository', () => {
 
   after(() => subject.removeAll());
 
+  describe('.create', () => {
+    const STORAGE_CONFIG = { type: 'git', git: { path: REPOSITORY_PATH, author: AUTHOR, publish: false } };
+
+    it('creates a repository at the configured path', () => {
+      expect(TrackingResultsRepository.create(STORAGE_CONFIG).path).to.equal(REPOSITORY_PATH);
+    });
+
+    it('creates a writable repository by default', () => {
+      expect(TrackingResultsRepository.create(STORAGE_CONFIG).readOnly).to.be.false;
+    });
+
+    it('creates a read-only repository when requested', () => {
+      expect(TrackingResultsRepository.create(STORAGE_CONFIG, { readOnly: true }).readOnly).to.be.true;
+    });
+
+    context('when the storage type is not git', () => {
+      it('throws an error stating the supported type', () => {
+        expect(() => TrackingResultsRepository.create({ type: 'mongo', mongo: {} })).to.throw('only "git" is supported');
+      });
+    });
+  });
+
   describe('#saveTermsResult', () => {
     context('when no previous result exists', () => {
       let saved;

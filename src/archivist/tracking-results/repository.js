@@ -9,6 +9,14 @@ import * as TermsResultMapper from './terms-result/dataMapper.js';
 const fs = fsApi.promises;
 
 export default class TrackingResultsRepository {
+  static create(storageConfig, { readOnly = false } = {}) { // Interprets the storage configuration for both the tracker and the readers
+    if (storageConfig.type !== 'git') { // Git is the only supported backend, as the audit trail relies on its tamper-evident properties
+      throw new Error(`Unsupported tracking-results storage type "${storageConfig.type}"; only "git" is supported`);
+    }
+
+    return new TrackingResultsRepository({ ...storageConfig.git, readOnly });
+  }
+
   constructor({ path: repositoryPath, author, publish, readOnly = false }) {
     this.path = path.resolve(process.cwd(), repositoryPath); // Same resolution as RepositoryFactory: configured storage paths are project-relative and must not depend on the cwd of downstream git processes
     this.needsPublication = publish;

@@ -24,10 +24,7 @@ const { version: PACKAGE_VERSION } = require('../../../package.json');
 
 export default class TrackingResults extends events.EventEmitter {
   static async create(trackingResultsConfig) { // Resolves the engine-side wiring (collection identity, schedule, engine version) so the caller does not need to know it
-    if (trackingResultsConfig.storage.type !== 'git') { // Git is the only supported backend, as the audit trail relies on its tamper-evident properties
-      throw new Error(`Unsupported tracking-results storage type "${trackingResultsConfig.storage.type}"; only "git" is supported`);
-    }
-
+    const repository = TrackingResultsRepository.create(trackingResultsConfig.storage);
     const collection = await getCollection();
     const collectionId = collection.metadata?.id; // getCollection always resolves to a Collection instance; metadata stays undefined when the metadata file is absent, which is exactly the missing-id case reported below
 
@@ -35,7 +32,6 @@ export default class TrackingResults extends events.EventEmitter {
       throw new MissingCollectionIdError('Collection metadata "id" is required to record tracking-results, as it identifies the collection in every persisted run. Add an "id" field to the collection metadata file.');
     }
 
-    const repository = new TrackingResultsRepository(trackingResultsConfig.storage.git);
     const recorder = new TrackingResultsRecorder({
       repository,
       collectionId,
