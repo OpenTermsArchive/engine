@@ -1,6 +1,6 @@
 import { isDeepStrictEqual } from 'util';
 
-import { isPlainPathSegment } from '../../../git/pathSegment.js';
+import { isPortableFileName } from '../../../git/pathSegment.js';
 
 import TermsResult, { STATUSES } from './index.js';
 
@@ -38,9 +38,9 @@ export function generateFilePath(serviceId, termsType) {
   return `${termsKey(serviceId, termsType)}.json`; // Do not use `path.join` as Git requires forward slashes even on Windows
 }
 
-function validatePathComponent(value, name) { // Rejects identifiers that would escape their directory once joined into a file path, with the predicate shared with the snapshots and versions repositories
-  if (typeof value !== 'string' || !isPlainPathSegment(value)) {
-    throw new Error(`Invalid ${name}: must be a plain path segment (a non-empty string without separators, "." or ".." forms, or control characters), got ${JSON.stringify(value)}`);
+function validatePathComponent(value, name) { // Rejects identifiers that would escape their directory once joined into a file path, or that could not exist as a file name on every supported platform
+  if (typeof value !== 'string' || !isPortableFileName(value)) {
+    throw new Error(`Invalid ${name}: must be usable as a cross-platform file name (a non-empty string without separators, "." or ".." forms, control characters, or the Windows-reserved characters \`:"<>|*?\`), got ${JSON.stringify(value)}`);
   }
 }
 

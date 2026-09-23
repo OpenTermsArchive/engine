@@ -83,7 +83,7 @@ export default class TrackingResultsRepository {
     }
 
     const commits = await this.git.listCommits([ `${sha}..HEAD`, '--', '*/*.json' ], { reverse: false }); // The pathspec excludes root-level files such as run.json
-    const files = new Set(commits.flatMap(commit => commit.diff?.files.map(({ file }) => file) ?? []).filter(file => file.endsWith('.json'))); // Git still quotes names containing `"` even with core.quotePath disabled; a quoted name ends with `.json"` and is skipped
+    const files = new Set(commits.flatMap(commit => commit.diff?.files.map(({ file }) => file) ?? []).filter(file => file.endsWith('.json'))); // Listed names are never C-quoted by git: every file here was written by saveTermsResult, whose validation rejects each character git quotes (double quote, backslash, control characters)
 
     return [...files].map(file => ({ serviceId: path.posix.dirname(file), termsType: path.posix.basename(file, '.json') }));
   }

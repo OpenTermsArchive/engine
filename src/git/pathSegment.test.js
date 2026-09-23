@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 
-import { isPlainPathSegment } from './pathSegment.js';
+import { isPlainPathSegment, isPortableFileName } from './pathSegment.js';
 
 describe('PathSegment', () => {
   describe('#isPlainPathSegment', () => {
@@ -13,6 +13,20 @@ describe('PathSegment', () => {
     [ '', '.', '..', 'a/b', 'a\\b', 'with\0null', 'line\nbreak' ].forEach(segment => {
       it(`rejects ${JSON.stringify(segment)}`, () => {
         expect(isPlainPathSegment(segment)).to.be.false;
+      });
+    });
+  });
+
+  describe('#isPortableFileName', () => {
+    [ 'Facebook', 'Terms of Service', 'Booking.com', 'Yahoo!', 'service·A' ].forEach(segment => {
+      it(`accepts ${JSON.stringify(segment)}`, () => {
+        expect(isPortableFileName(segment)).to.be.true;
+      });
+    });
+
+    [ 'Service "A"', 're:start', 'a<b', 'a>b', 'a|b', 'a*b', 'a?b', '', '.', '..', 'a/b', 'a\\b', 'with\0null' ].forEach(segment => {
+      it(`rejects ${JSON.stringify(segment)}`, () => {
+        expect(isPortableFileName(segment)).to.be.false;
       });
     });
   });

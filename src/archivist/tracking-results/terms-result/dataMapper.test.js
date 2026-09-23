@@ -59,7 +59,7 @@ describe('tracking-result/dataMapper', () => {
       expect(generateFilePath('Facebook v2.0', 'Terms of Service')).to.equal('Facebook v2.0/Terms of Service.json');
     });
 
-    [ '../etc', 'a/b', 'a\\b', 'with\0null', 'line\nbreak', '.', '..', '', null, undefined, 123 ].forEach(bad => {
+    [ '../etc', 'a/b', 'a\\b', 'with\0null', 'line\nbreak', 'Service "A"', 're:start', '.', '..', '', null, undefined, 123 ].forEach(bad => {
       it(`rejects serviceId ${JSON.stringify(bad)}`, () => {
         expect(() => generateFilePath(bad, 'Terms of Service')).to.throw(/Invalid serviceId/);
       });
