@@ -128,6 +128,14 @@ describe('WriterLock', () => {
         await expect(fs.access(lockFilePath)).to.be.rejected;
       });
 
+      context('when the lock was left by a previous process with the same PID', () => {
+        it('releases the lock', async () => {
+          await runInSeparateProcess(`import fs from 'fs/promises'; await fs.writeFile(${JSON.stringify(lockFilePath)}, String(process.pid)); await acquireWriterLock(${JSON.stringify(lockFilePath)});`);
+
+          await expect(fs.access(lockFilePath)).to.be.rejected;
+        });
+      });
+
       context('when another process took the lock over meanwhile', () => {
         it('leaves the lock to that process', async () => {
           await runInSeparateProcess(`import fs from 'fs/promises'; await acquireWriterLock(${JSON.stringify(lockFilePath)}); await fs.writeFile(${JSON.stringify(lockFilePath)}, '${process.pid}');`);

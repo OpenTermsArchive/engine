@@ -26,7 +26,9 @@ export async function acquireWriterLock(lockFilePath) { // Held until the proces
 
     const { holderPid, writtenAt } = await read(lockFilePath);
 
-    if (holderPid === process.pid) {
+    if (holderPid === process.pid) { // Left by a previous process that had the same PID, such as the same container restarted after a kill
+      heldLocks.add(lockFilePath);
+
       return;
     }
 
