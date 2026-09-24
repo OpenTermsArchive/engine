@@ -2,7 +2,7 @@ import { execFile, spawn } from 'child_process';
 import fs from 'fs/promises';
 import os from 'os';
 import path from 'path';
-import { fileURLToPath } from 'url';
+import { fileURLToPath, pathToFileURL } from 'url';
 import { promisify } from 'util';
 
 import { expect, use } from 'chai';
@@ -119,7 +119,7 @@ describe('WriterLock', () => {
       this.timeout(10000); // Starts a separate Node.js process
 
       function runInSeparateProcess(script) {
-        return promisify(execFile)(process.execPath, [ '--input-type=module', '-e', `import { acquireWriterLock } from ${JSON.stringify(path.join(__dirname, 'writerLock.js'))}; ${script}` ]);
+        return promisify(execFile)(process.execPath, [ '--input-type=module', '-e', `import { acquireWriterLock } from ${JSON.stringify(pathToFileURL(path.join(__dirname, 'writerLock.js')).href)}; ${script}` ]); // A file URL rather than a path: on Windows, an absolute path is parsed by the ESM loader as a URL with the drive letter as scheme, which it refuses
       }
 
       it('releases the lock', async () => {
