@@ -85,7 +85,7 @@ export default async function track({ services, types, schedule }) {
 }
 
 export async function applyTechnicalUpgrades({ services, types }) {
-  const { archivist, services: filteredServices } = await initialize(services); // Without tracking-results: technical upgrades never record any, and initializing the module would finalize as crashed the run that a tracking process may have in progress
+  const { archivist, services: filteredServices } = await initialize(services); // Without tracking-results, as technical upgrades never record any
 
   await archivist.applyTechnicalUpgrades({ services: filteredServices, types });
 }
