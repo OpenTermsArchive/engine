@@ -5,12 +5,15 @@ import simpleGit from 'simple-git';
 
 import { GitObjectNotFoundError } from './errors.js';
 import { parseTrailers, formatTrailers } from './trailers.js';
+import { acquireWriterLock, WriterLockHeldError } from './writerLock.js';
 
 export { GitObjectNotFoundError } from './errors.js';
 
 process.env.LC_ALL = 'en_GB'; // Ensure git messages will be in English as some errors are handled by analysing the message content
 
 const fs = fsApi.promises;
+
+const WRITER_LOCK_FILE_NAME = 'ota-writer.lock';
 
 const OBJECT_NOT_FOUND_MESSAGES = /bad object|not a tree|invalid object name|unknown revision|does not exist|exists on disk, but not in/i;
 
@@ -51,6 +54,7 @@ export default class Git {
 
     this.#connect();
     await this.git.init();
+    await this.#acquireWriterLock();
 
     const configFile = path.resolve(this.path, '.git', 'config'); // Anchored to an absolute path: git resolves a relative `--file` argument against its own cwd (the repository), not against process.cwd, so a relative repository path would silently point the write at a nonexistent nested location
 
@@ -67,6 +71,20 @@ export default class Git {
       .raw([ 'config', '--file', configFile, 'core.quotePath', 'false' ]) // Disable Git's encoding of special characters in pathnames. For example, `service·A` will be encoded as `service\302\267A` without this setting, leading to issues. See https://git-scm.com/docs/git-config#Documentation/git-config.txt-corequotePath
       .raw([ 'config', '--file', configFile, 'core.commitGraph', 'true' ]) // Enable `commit-graph` feature for efficient commit data storage, improving performance of operations like `git log`
       .raw([ 'config', '--file', configFile, 'gc.writeCommitGraph', 'false' ]); // Prevent automatic `git gc` from also writing the commit-graph: the engine writes it explicitly (see `writeCommitGraph`/`updateCommitGraph`), and a concurrent gc write races those, which can leave a stale `commit-graph.lock` and make subsequent operations fail
+  }
+
+  async #acquireWriterLock() { // Held until the process exits, so that no other process writes to the repository meanwhile: concurrent writers race the working tree and the index, and the clean up of one discards the uncommitted changes of the other
+    const lockFilePath = path.join(this.path, '.git', WRITER_LOCK_FILE_NAME);
+
+    try {
+      await acquireWriterLock(lockFilePath); // Acquired again silently by the same process, as repositories are initialized again at each tracking run
+    } catch (error) {
+      if (!(error instanceof WriterLockHeldError)) {
+        throw error;
+      }
+
+      throw new Error(`Repository ${this.path} is already being written by the process ${error.holderPid}; stop it before starting another writer, such as the tracker or the technical upgrades, or remove ${lockFilePath} if that process is not an Open Terms Archive writer`);
+    }
   }
 
   open() {
@@ -183,6 +201,7 @@ export default class Git {
   }
 
   async cleanUp() {
+    await fs.rm(path.join(this.path, '.git', 'index.lock'), { force: true }); // Remove a leftover index lock from a Git operation that was killed mid-write, which would otherwise make every subsequent reset, add and commit fail. Safe as the writer lock guarantees that no other process writes to the repository, and readers never lock the index
     await fs.rm(path.join(this.path, '.git', 'objects', 'info', 'commit-graph.lock'), { force: true }); // Remove a leftover commit-graph lock from a previous `commit-graph write` that was killed mid-write (e.g. the process was terminated during a deploy or restart). The commit-graph is a disposable cache rebuilt by `writeCommitGraph`, so clearing a stale lock is safe and prevents every subsequent run from failing.
     await this.git.reset('hard');
 
