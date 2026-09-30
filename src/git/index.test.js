@@ -344,6 +344,24 @@ describe('Git', () => {
         expect(await Git.getLatestCommitSha(repositoryPath, { grep: '^Remove', filePath: 'declarations' })).to.be.null;
       });
 
+      context('when the git configuration makes patterns fixed strings', () => { // Operators may set `grep.patternType` in their own git configuration, and git log honours it
+        before(() => {
+          process.env.GIT_CONFIG_COUNT = '1'; // Injected in the git processes spawned meanwhile, as if set in a configuration file
+          process.env.GIT_CONFIG_KEY_0 = 'grep.patternType';
+          process.env.GIT_CONFIG_VALUE_0 = 'fixed';
+        });
+
+        after(() => {
+          delete process.env.GIT_CONFIG_COUNT;
+          delete process.env.GIT_CONFIG_KEY_0;
+          delete process.env.GIT_CONFIG_VALUE_0;
+        });
+
+        it('still matches the message as a regular expression', async () => {
+          expect(await Git.getLatestCommitSha(repositoryPath, { grep: '^Add Service [AB]$', filePath: 'declarations' })).to.equal(secondCommitSha);
+        });
+      });
+
       context('with a repository that has no commits yet', () => {
         let directory;
 

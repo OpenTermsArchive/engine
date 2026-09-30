@@ -72,9 +72,9 @@ export default class Git {
     });
   }
 
-  static async getLatestCommitSha(repositoryPath, { grep, filePath }) { // Returns the hash of the newest commit touching `filePath` whose message matches `grep`; unlike listCommits, which orders commits by date and loads their files, this lets git stop at the first match instead of walking the whole history
+  static async getLatestCommitSha(repositoryPath, { grep, filePath }) { // Returns the hash of the newest commit touching `filePath` whose message matches the basic regular expression `grep`, whatever pattern type the git configuration of the operator sets; unlike listCommits, which orders commits by date and loads their files, this lets git stop at the first match instead of walking the whole history
     try {
-      return (await simpleGit(repositoryPath, { trimmed: true }).raw([ 'log', '--max-count=1', '--format=%H', `--grep=${grep}`, '--', filePath ])) || null;
+      return (await simpleGit(repositoryPath, { trimmed: true }).raw([ 'log', '--basic-regexp', '--max-count=1', '--format=%H', `--grep=${grep}`, '--', filePath ])) || null;
     } catch (error) {
       if (/does not have any commits yet/.test(error.message)) {
         return null; // An empty repository, such as one initialized by a tracker that has not recorded anything yet
