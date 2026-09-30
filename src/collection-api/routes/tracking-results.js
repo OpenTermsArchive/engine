@@ -7,6 +7,7 @@ const VALID_STATUSES = Object.values(STATUSES);
 
 /**
  * @param   {object}         trackingResultsRepository The tracking-results repository instance
+ * @param   {object}         services                  The declared services, keyed by ID
  * @returns {express.Router}                           The router instance
  * @private
  * @swagger
@@ -45,6 +46,9 @@ const VALID_STATUSES = Object.values(STATUSES);
  *         termsType:
  *           type: string
  *           description: The type of terms.
+ *         declared:
+ *           type: boolean
+ *           description: Whether the terms are still declared in the collection. The tracking results of terms removed from the declarations are kept as a historical record.
  *         status:
  *           type: string
  *           enum: [ok, failed]
@@ -201,11 +205,15 @@ const VALID_STATUSES = Object.values(STATUSES);
  *           termsType:
  *             type: string
  */
-export default function trackingResultsRouter(trackingResultsRepository) {
+export default function trackingResultsRouter(trackingResultsRepository, services) {
   const router = express.Router();
 
   function toResponse({ serviceId, termsType, status, event }) {
-    return { serviceId, termsType, status, event };
+    return { serviceId, termsType, declared: isDeclared(serviceId, termsType), status, event };
+  }
+
+  function isDeclared(serviceId, termsType) { // The tracking results of terms removed from the declarations are kept as a historical record, so consumers need to tell them apart from the terms still tracked
+    return Object.hasOwn(services, serviceId) && services[serviceId].getTermsTypes().includes(termsType);
   }
 
   async function findTermsResults(filter) { // Every read of a request is pinned to the same commit, so that a run completing meanwhile cannot mix the states of two runs

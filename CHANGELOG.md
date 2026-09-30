@@ -8,7 +8,7 @@ All changes that impact users of this module are documented in this file, in the
 
 ### Added
 
-- Add Collection API endpoints serving the latest known tracking status of each terms and the summary of the latest completed tracking run: `/tracking-results`, filterable by `status`, `/tracking-result/{serviceId}`, `/tracking-result/{serviceId}/{termsType}` and `/tracking-results/run`; they are not exposed when tracking-results is disabled
+- Add Collection API endpoints serving the latest known tracking status of each terms and the summary of the latest completed tracking run: `/tracking-results`, filterable by `status`, `/tracking-result/{serviceId}`, `/tracking-result/{serviceId}/{termsType}` and `/tracking-results/run`; the tracking results of terms removed from the declarations are kept and flagged as not `declared`; these endpoints are not exposed when tracking-results is disabled
 
 ## 16.2.0 - 2026-09-28
 

@@ -294,6 +294,7 @@ describe('Tracking results API', () => {
           expect(response.body).to.deep.equal({
             serviceId: 'Facebook',
             termsType: 'Terms of Service',
+            declared: false,
             status: 'ok',
             event: {
               date: '2026-01-10T10:30:00Z',
@@ -330,6 +331,60 @@ describe('Tracking results API', () => {
         it('returns an error message', () => {
           expect(response.body.error).to.equal('No tracking result found for service "Facebook/../../" and terms type "run"');
         });
+      });
+    });
+  });
+
+  context('when the terms of a tracking result are no longer declared', () => { // The test collection declares service·A but not Facebook
+    before(async () => {
+      await repository.saveRun(makeRun(COMPLETED_RUN_ID));
+      await repository.saveTermsResult(makeResult({ serviceId: 'service·A', termsType: 'Terms of Service' }));
+      await repository.saveTermsResult(makeResult({ serviceId: 'Facebook', termsType: 'Terms of Service' }));
+
+      const completedRun = makeRun(COMPLETED_RUN_ID);
+
+      completedRun.markCompleted('2026-04-06T10:42:34Z');
+      await repository.saveRun(completedRun);
+    });
+
+    after(() => repository.removeAll());
+
+    describe('GET /tracking-results', () => {
+      it('tells whether the terms of each tracking result are still declared', async () => {
+        const response = await request.get(`${basePath}/v1/tracking-results`);
+
+        expect(response.body.data.map(({ serviceId, termsType, declared }) => ({ serviceId, termsType, declared }))).to.deep.equal([
+          { serviceId: 'Facebook', termsType: 'Terms of Service', declared: false },
+          { serviceId: 'service·A', termsType: 'Terms of Service', declared: true },
+        ]);
+      });
+    });
+
+    describe('GET /tracking-result/:serviceId', () => {
+      it('marks the tracking results of declared terms as declared', async () => {
+        const response = await request.get(`${basePath}/v1/tracking-result/${encodeURIComponent('service·A')}`);
+
+        expect(response.body.data[0].declared).to.be.true;
+      });
+
+      it('marks the tracking results of terms no longer declared as not declared', async () => {
+        const response = await request.get(`${basePath}/v1/tracking-result/Facebook`);
+
+        expect(response.body.data[0].declared).to.be.false;
+      });
+    });
+
+    describe('GET /tracking-result/:serviceId/:termsType', () => {
+      it('marks the tracking result of declared terms as declared', async () => {
+        const response = await request.get(`${basePath}/v1/tracking-result/${encodeURIComponent('service·A')}/Terms%20of%20Service`);
+
+        expect(response.body.declared).to.be.true;
+      });
+
+      it('marks the tracking result of terms no longer declared as not declared', async () => {
+        const response = await request.get(`${basePath}/v1/tracking-result/Facebook/Terms%20of%20Service`);
+
+        expect(response.body.declared).to.be.false;
       });
     });
   });

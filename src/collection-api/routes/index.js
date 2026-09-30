@@ -63,7 +63,7 @@ export default async function apiRouter(basePath) {
   const trackingResultsConfig = config.get('@opentermsarchive/engine.tracking-results');
 
   if (trackingResultsConfig) { // Set to null when tracking-results is disabled
-    router.use(trackingResultsRouter(await TrackingResultsRepository.create(trackingResultsConfig.storage, { readOnly: true }).initialize())); // Instantiated directly rather than through the TrackingResults module, whose initialization runs the crash recovery that only the tracker may run
+    router.use(trackingResultsRouter(await TrackingResultsRepository.create(trackingResultsConfig.storage, { readOnly: true }).initialize(), services)); // Instantiated directly rather than through the TrackingResults module, whose initialization runs the crash recovery that only the tracker may run
   }
 
   return router;
