@@ -1,4 +1,5 @@
 import { spawn } from 'child_process';
+import crypto from 'crypto';
 import fs from 'fs/promises';
 import os from 'os';
 import path from 'path';
@@ -311,6 +312,12 @@ describe('Git', () => {
         expect(await Git.listFilesAtCommit(subdirectoryPath, secondCommitSha)).to.deep.equal([ 'Service A.json', 'Service B.json' ]);
       });
 
+      context('when listing recursively', () => {
+        it('lists the files of the subdirectories', async () => {
+          expect(await Git.listFilesAtCommit(repositoryPath, secondCommitSha, { recursive: true })).to.deep.equal([ 'declarations/Service A.json', 'declarations/Service B.json' ]);
+        });
+      });
+
       it('throws a GitObjectNotFoundError for an unknown commit', async () => {
         try {
           await Git.listFilesAtCommit(subdirectoryPath, 'deadbeefdeadbeefdeadbeefdeadbeefdeadbeef');
@@ -321,6 +328,53 @@ describe('Git', () => {
         }
 
         expect.fail('No error was thrown');
+      });
+    });
+
+    describe('.getLatestCommitSha', () => {
+      it('returns the newest commit touching the file whose message matches', async () => {
+        expect(await Git.getLatestCommitSha(repositoryPath, { grep: '^Add Service [AB]$', filePath: 'declarations' })).to.equal(secondCommitSha);
+      });
+
+      it('ignores newer commits whose message does not match', async () => {
+        expect(await Git.getLatestCommitSha(repositoryPath, { grep: '^Add Service A$', filePath: 'declarations' })).to.equal(firstCommitSha);
+      });
+
+      it('returns null when no commit matches', async () => {
+        expect(await Git.getLatestCommitSha(repositoryPath, { grep: '^Remove', filePath: 'declarations' })).to.be.null;
+      });
+
+      context('when the git configuration makes patterns fixed strings', () => { // Operators may set `grep.patternType` in their own git configuration, and git log honours it
+        before(() => {
+          process.env.GIT_CONFIG_COUNT = '1'; // Injected in the git processes spawned meanwhile, as if set in a configuration file
+          process.env.GIT_CONFIG_KEY_0 = 'grep.patternType';
+          process.env.GIT_CONFIG_VALUE_0 = 'fixed';
+        });
+
+        after(() => {
+          delete process.env.GIT_CONFIG_COUNT;
+          delete process.env.GIT_CONFIG_KEY_0;
+          delete process.env.GIT_CONFIG_VALUE_0;
+        });
+
+        it('still matches the message as a regular expression', async () => {
+          expect(await Git.getLatestCommitSha(repositoryPath, { grep: '^Add Service [AB]$', filePath: 'declarations' })).to.equal(secondCommitSha);
+        });
+      });
+
+      context('with a repository that has no commits yet', () => {
+        let directory;
+
+        before(async () => {
+          directory = await fs.mkdtemp(path.join(os.tmpdir(), 'ota-git-test-'));
+          await new Git({ path: directory, author: { name: 'Test', email: 'test@example.com' } }).initialize();
+        });
+
+        after(() => fs.rm(directory, { recursive: true, force: true }));
+
+        it('returns null', async () => {
+          expect(await Git.getLatestCommitSha(directory, { grep: '^Add', filePath: 'declarations' })).to.be.null;
+        });
       });
     });
 
@@ -339,6 +393,145 @@ describe('Git', () => {
         }
 
         expect.fail('No error was thrown');
+      });
+    });
+
+    describe('.readFilesAtCommit', () => {
+      it('returns the contents of the files as they were at the given commit, in the requested order', async () => {
+        expect(await Git.readFilesAtCommit(subdirectoryPath, secondCommitSha, [ 'Service B.json', 'Service A.json' ])).to.deep.equal([ '{ "name": "Service B" }', '{ "name": "Service A" }' ]);
+      });
+
+      it('returns null for a file absent from the commit', async () => {
+        expect(await Git.readFilesAtCommit(subdirectoryPath, firstCommitSha, [ 'Service A.json', 'Service B.json' ])).to.deep.equal([ '{ "name": "Service A" }', null ]);
+      });
+
+      it('returns an empty list when no file is requested', async () => {
+        expect(await Git.readFilesAtCommit(subdirectoryPath, firstCommitSha, [])).to.deep.equal([]);
+      });
+
+      it('throws a GitObjectNotFoundError for an unknown commit', async () => {
+        try {
+          await Git.readFilesAtCommit(subdirectoryPath, 'deadbeefdeadbeefdeadbeefdeadbeefdeadbeef', ['Service A.json']);
+        } catch (error) {
+          expect(error).to.be.an.instanceOf(GitObjectNotFoundError);
+
+          return;
+        }
+
+        expect.fail('No error was thrown');
+      });
+
+      context('when a file of the commit cannot be read', () => {
+        const CONTENT = '{ "name": "Service A" }';
+        let directory;
+        let commitSha;
+
+        before(async () => {
+          directory = await fs.mkdtemp(path.join(os.tmpdir(), 'ota-git-test-'));
+
+          const git = new Git({ path: directory, author: { name: 'Test', email: 'test@example.com' } });
+          const filePath = path.join(directory, 'Service A.json');
+
+          await git.initialize();
+          await fs.writeFile(filePath, CONTENT);
+          await git.add(filePath);
+          commitSha = await git.commit({ filePath, message: 'Add Service A' });
+
+          const blobSha = crypto.createHash('sha1').update(`blob ${Buffer.byteLength(CONTENT)}\0${CONTENT}`).digest('hex'); // How git names the object holding this content
+          const objectPath = path.join(directory, '.git', 'objects', blobSha.slice(0, 2), blobSha.slice(2));
+
+          await fs.chmod(objectPath, 0o644);
+          await fs.writeFile(objectPath, ''); // An empty object file, as left by a write interrupted by a crash
+        });
+
+        after(() => fs.rm(directory, { recursive: true, force: true }));
+
+        it('rejects with the git error rather than reporting the file as absent', async () => {
+          try {
+            await Git.readFilesAtCommit(directory, commitSha, ['Service A.json']);
+          } catch (error) {
+            expect(error).not.to.be.an.instanceOf(GitObjectNotFoundError);
+            expect(error.message).to.match(/is empty/);
+
+            return;
+          }
+
+          expect.fail('No error was thrown');
+        });
+      });
+
+      context('when git prints hints on its error output', () => {
+        const CONTENT = '{ "name": "Service A" }';
+        let directory;
+        let commitSha;
+
+        before(async () => {
+          directory = await fs.mkdtemp(path.join(os.tmpdir(), 'ota-git-test-'));
+
+          const git = new Git({ path: directory, author: { name: 'Test', email: 'test@example.com' } });
+          const filePath = path.join(directory, 'Service A.json');
+
+          await git.initialize();
+          await fs.writeFile(filePath, CONTENT);
+          await git.add(filePath);
+          commitSha = await git.commit({ filePath, message: 'Add Service A' });
+
+          await fs.mkdir(path.join(directory, '.git', 'info'), { recursive: true });
+          await fs.writeFile(path.join(directory, '.git', 'info', 'grafts'), `${commitSha}\n`); // A deprecated grafts file makes git print hints at each command
+        });
+
+        after(() => fs.rm(directory, { recursive: true, force: true }));
+
+        it('still returns null for a file absent from the commit', async () => {
+          expect(await Git.readFilesAtCommit(directory, commitSha, [ 'Service A.json', 'Service B.json' ])).to.deep.equal([ CONTENT, null ]);
+        });
+      });
+
+      context('when git exits before reading all the names', () => {
+        let directory;
+
+        before(async () => {
+          directory = await fs.mkdtemp(path.join(os.tmpdir(), 'ota-git-test-')); // Not a repository, so git exits right away
+        });
+
+        after(() => fs.rm(directory, { recursive: true, force: true }));
+
+        it('rejects with the git error', async () => {
+          const fileNames = Array.from({ length: 50000 }, (value, index) => `Service ${index}/Terms of Service.json`); // Far more than a pipe buffer holds, so that writing them fails once git has exited
+
+          try {
+            await Git.readFilesAtCommit(directory, firstCommitSha, fileNames);
+          } catch (error) {
+            expect(error.message).to.match(/not a git repository/);
+
+            return;
+          }
+
+          expect.fail('No error was thrown');
+        });
+      });
+
+      context('with contents larger than a single output chunk', () => {
+        const LARGE_CONTENT = 'é'.repeat(100000); // Multi-byte characters, so that sizes are counted in bytes rather than characters
+        let largeFilesCommitSha;
+
+        before(async () => {
+          const git = new Git({ path: repositoryPath, author: { name: 'Test', email: 'test@example.com' } });
+
+          await git.initialize();
+
+          for (const fileName of [ 'Large A.json', 'Large B.json' ]) {
+            const filePath = path.join(subdirectoryPath, fileName);
+
+            await fs.writeFile(filePath, LARGE_CONTENT);
+            await git.add(filePath);
+            largeFilesCommitSha = await git.commit({ filePath, message: `Add ${fileName}` });
+          }
+        });
+
+        it('returns each content in full', async () => {
+          expect(await Git.readFilesAtCommit(subdirectoryPath, largeFilesCommitSha, [ 'Large A.json', 'Large B.json' ])).to.deep.equal([ LARGE_CONTENT, LARGE_CONTENT ]);
+        });
       });
     });
   });

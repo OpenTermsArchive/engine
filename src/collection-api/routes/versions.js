@@ -2,6 +2,7 @@ import express from 'express';
 
 import { toISODateWithoutMilliseconds } from '../../archivist/utils/date.js';
 import logger from '../logger.js';
+import { parsePaginationParams, validatePaginationParams } from '../utils/pagination.js';
 
 /**
  * @param   {object}         versionsRepository  The versions repository instance
@@ -200,29 +201,6 @@ import logger from '../logger.js';
  */
 export default function versionsRouter(versionsRepository, snapshotsRepository) {
   const router = express.Router();
-
-  function parsePaginationParams(query) {
-    const limit = query.limit ? parseInt(query.limit, 10) : 100;
-    const offset = query.offset ? parseInt(query.offset, 10) : 0;
-
-    return { limit, offset };
-  }
-
-  function validatePaginationParams(limit, offset) {
-    if (Number.isNaN(limit) || limit < 1) {
-      return { error: 'Invalid limit parameter. Must be a positive integer.' };
-    }
-
-    if (limit > 500) {
-      return { error: 'Invalid limit parameter. Must not exceed 500.' };
-    }
-
-    if (Number.isNaN(offset) || offset < 0) {
-      return { error: 'Invalid offset parameter. Must be a non-negative integer.' };
-    }
-
-    return null;
-  }
 
   function mapVersionToListItem(version) {
     return {

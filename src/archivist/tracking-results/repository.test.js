@@ -1,4 +1,5 @@
 import fsApi from 'fs';
+import os from 'os';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
@@ -88,6 +89,28 @@ describe('TrackingResultsRepository', () => {
   });
 
   after(() => subject.removeAll());
+
+  describe('.create', () => {
+    const STORAGE_CONFIG = { type: 'git', git: { path: REPOSITORY_PATH, author: AUTHOR, publish: false } };
+
+    it('creates a repository at the configured path', () => {
+      expect(TrackingResultsRepository.create(STORAGE_CONFIG).path).to.equal(REPOSITORY_PATH);
+    });
+
+    it('creates a writable repository by default', () => {
+      expect(TrackingResultsRepository.create(STORAGE_CONFIG).readOnly).to.be.false;
+    });
+
+    it('creates a read-only repository when requested', () => {
+      expect(TrackingResultsRepository.create(STORAGE_CONFIG, { readOnly: true }).readOnly).to.be.true;
+    });
+
+    context('when the storage type is not git', () => {
+      it('throws an error stating the supported type', () => {
+        expect(() => TrackingResultsRepository.create({ type: 'mongo', mongo: {} })).to.throw('only "git" is supported');
+      });
+    });
+  });
 
   describe('#saveTermsResult', () => {
     context('when no previous result exists', () => {
@@ -709,6 +732,370 @@ describe('TrackingResultsRepository', () => {
 
       it('does not include run.json in the results', () => {
         expect(results).to.deep.equal([{ serviceId: 'Facebook', termsType: 'Terms of Service' }]);
+      });
+    });
+  });
+
+  describe('read-only mode', () => {
+    let readOnlySubject;
+
+    context('when the repository does not exist yet', () => {
+      let missingRepositoryPath;
+
+      before(async () => {
+        missingRepositoryPath = path.join(await fs.mkdtemp(path.join(os.tmpdir(), 'ota-tracking-results-')), 'tracking-results'); // Under the OS temp directory so that git cannot fall back on the engine's own repository
+        readOnlySubject = await new TrackingResultsRepository({ path: missingRepositoryPath, readOnly: true }).initialize();
+      });
+
+      after(() => fs.rm(path.dirname(missingRepositoryPath), { recursive: true, force: true }));
+
+      it('does not create it', () => {
+        expect(fsApi.existsSync(missingRepositoryPath)).to.be.false;
+      });
+    });
+
+    context('when the repository exists', () => {
+      const UNTRACKED_FILE_PATH = path.join(REPOSITORY_PATH, 'untracked.json');
+      const RUN_FILE_PATH = path.join(REPOSITORY_PATH, 'run.json');
+      const COMMIT_GRAPH_PATH = path.join(REPOSITORY_PATH, '.git', 'objects', 'info', 'commit-graph');
+      const UNCOMMITTED_CONTENT = '{ "uncommitted": true }';
+
+      before(async () => {
+        await subject.saveRun(makeRun());
+        await fs.rm(COMMIT_GRAPH_PATH, { force: true }); // So that a reader writing the commit-graph is noticed
+        await fs.writeFile(UNTRACKED_FILE_PATH, UNCOMMITTED_CONTENT);
+        await fs.writeFile(RUN_FILE_PATH, UNCOMMITTED_CONTENT);
+        readOnlySubject = await new TrackingResultsRepository({ path: REPOSITORY_PATH, readOnly: true }).initialize();
+      });
+
+      after(() => subject.removeAll());
+
+      it('leaves untracked files untouched', () => {
+        expect(fsApi.existsSync(UNTRACKED_FILE_PATH)).to.be.true;
+      });
+
+      it('leaves uncommitted changes untouched', async () => {
+        expect(await fs.readFile(RUN_FILE_PATH, 'utf8')).to.equal(UNCOMMITTED_CONTENT);
+      });
+
+      it('does not write the commit-graph', () => {
+        expect(fsApi.existsSync(COMMIT_GRAPH_PATH)).to.be.false;
+      });
+
+      it('rejects commits', async () => {
+        try {
+          await readOnlySubject.saveRun(makeRun());
+        } catch (error) {
+          expect(error.message).to.match(/read-only/);
+
+          return;
+        }
+
+        expect.fail('No error was thrown');
+      });
+
+      it('rejects finalization', async () => {
+        try {
+          await readOnlySubject.finalize();
+        } catch (error) {
+          expect(error.message).to.match(/read-only/);
+
+          return;
+        }
+
+        expect.fail('No error was thrown');
+      });
+
+      it('rejects removal', async () => {
+        try {
+          await readOnlySubject.removeAll();
+        } catch (error) {
+          expect(error.message).to.match(/read-only/);
+          expect(fsApi.existsSync(path.join(REPOSITORY_PATH, 'run.json'))).to.be.true;
+
+          return;
+        }
+
+        expect.fail('No error was thrown');
+      });
+    });
+  });
+
+  describe('reading the state of the latest completed run', () => {
+    const FIRST_RUN_ID = 'ota-run-11111111-58cc-4372-a567-0e02b2c3d479';
+    const SECOND_RUN_ID = 'ota-run-22222222-58cc-4372-a567-0e02b2c3d479';
+
+    async function completeRun(run) {
+      run.markCompleted('2026-04-06T10:42:34Z');
+      await subject.saveRun(run);
+    }
+
+    describe('#findLatestCompletedRunCommit', () => {
+      context('when the repository does not exist', () => {
+        let missingRepositoryDirectory;
+        let reader;
+        let result;
+
+        before(async () => {
+          missingRepositoryDirectory = await fs.mkdtemp(path.join(os.tmpdir(), 'ota-tracking-results-'));
+          reader = new TrackingResultsRepository({ path: path.join(missingRepositoryDirectory, 'tracking-results'), readOnly: true });
+          result = await reader.findLatestCompletedRunCommit();
+        });
+
+        after(() => fs.rm(missingRepositoryDirectory, { recursive: true, force: true }));
+
+        it('returns null', () => {
+          expect(result).to.be.null;
+        });
+
+        context('when the tracker then creates it and completes a run', () => { // As when the API starts before the first tracking run
+          let completionCommit;
+
+          before(async () => {
+            const writer = await new TrackingResultsRepository({ path: reader.path, author: AUTHOR, publish: false }).initialize();
+            const run = makeRun();
+
+            await writer.saveRun(run);
+            run.markCompleted('2026-04-06T10:42:34Z');
+            await writer.saveRun(run);
+            completionCommit = await Git.getHeadSha(reader.path);
+          });
+
+          it('returns the commit that completed the run to the same reader', async () => {
+            expect(await reader.findLatestCompletedRunCommit()).to.equal(completionCommit);
+          });
+        });
+      });
+
+      context('when the repository has no commits yet', () => { // As initialized by a tracker that has not started any run
+        before(() => subject.removeAll());
+
+        it('returns null', async () => {
+          expect(await subject.findLatestCompletedRunCommit()).to.be.null;
+        });
+      });
+
+      context('when no run has completed yet', () => {
+        before(() => subject.saveRun(makeRun()));
+
+        after(() => subject.removeAll());
+
+        it('returns null', async () => {
+          expect(await subject.findLatestCompletedRunCommit()).to.be.null;
+        });
+      });
+
+      context('when a run completed and the next one is in progress', () => {
+        let completionCommit;
+
+        before(async () => {
+          await completeRun(makeRun({ runId: FIRST_RUN_ID }));
+          ([completionCommit] = await git.log());
+          await subject.saveRun(makeRun({ runId: SECOND_RUN_ID }));
+        });
+
+        after(() => subject.removeAll());
+
+        it('returns the commit that completed the run', async () => {
+          expect(await subject.findLatestCompletedRunCommit()).to.equal(completionCommit.hash);
+        });
+      });
+
+      context('when the run following a completed one crashed', () => {
+        let completionCommit;
+
+        before(async () => {
+          await completeRun(makeRun({ runId: FIRST_RUN_ID }));
+          ([completionCommit] = await git.log());
+
+          const crashedRun = makeRun({ runId: SECOND_RUN_ID });
+
+          await subject.saveRun(crashedRun);
+          crashedRun.markCrashed('2026-04-06T11:00:00Z');
+          await subject.saveRun(crashedRun);
+        });
+
+        after(() => subject.removeAll());
+
+        it('returns the commit that completed the previous run', async () => {
+          expect(await subject.findLatestCompletedRunCommit()).to.equal(completionCommit.hash);
+        });
+      });
+
+      context('when several runs completed', () => {
+        let latestCompletionCommit;
+
+        before(async () => {
+          await completeRun(makeRun({ runId: FIRST_RUN_ID }));
+          await completeRun(makeRun({ runId: SECOND_RUN_ID }));
+          ([latestCompletionCommit] = await git.log());
+        });
+
+        after(() => subject.removeAll());
+
+        it('returns the commit that completed the latest one', async () => {
+          expect(await subject.findLatestCompletedRunCommit()).to.equal(latestCompletionCommit.hash);
+        });
+      });
+    });
+
+    context('when results changed after the completion of a run', () => {
+      let commit;
+
+      before(async () => {
+        await subject.saveRun(makeRun({ runId: FIRST_RUN_ID }));
+        await subject.saveTermsResult(makeResult({ serviceId: 'Facebook', termsType: 'Terms of Service' }));
+        await subject.saveTermsResult(makeResult({ serviceId: 'Google', termsType: 'Privacy Policy', status: STATUSES.failed, reasons: ['[fetch] HTTP code 404'] }));
+        await completeRun(makeRun({ runId: FIRST_RUN_ID }));
+        commit = await subject.findLatestCompletedRunCommit();
+
+        await subject.saveRun(makeRun({ runId: SECOND_RUN_ID }));
+        await subject.saveTermsResult(makeResult({ serviceId: 'Facebook', termsType: 'Terms of Service', status: STATUSES.failed, reasons: ['[fetch] HTTP code 503'] }));
+        await subject.saveTermsResult(makeResult({ serviceId: 'Facebook', termsType: 'Privacy Policy' }));
+      });
+
+      after(() => subject.removeAll());
+
+      describe('#findRunAt', () => {
+        it('returns the run as it was at the given commit', async () => {
+          const run = await subject.findRunAt(commit);
+
+          expect(run.runId).to.equal(FIRST_RUN_ID);
+          expect(run.lastRun.status).to.equal('completed');
+        });
+      });
+
+      describe('#findTermsResultsAt', () => {
+        it('returns the results as they were at the given commit', async () => {
+          const results = await subject.findTermsResultsAt(commit);
+
+          expect(results.map(({ serviceId, termsType, status }) => ({ serviceId, termsType, status }))).to.deep.equal([
+            { serviceId: 'Facebook', termsType: 'Terms of Service', status: 'ok' },
+            { serviceId: 'Google', termsType: 'Privacy Policy', status: 'failed' },
+          ]);
+        });
+
+        it('returns TermsResult instances', async () => {
+          const [result] = await subject.findTermsResultsAt(commit);
+
+          expect(result).to.be.an.instanceOf(TermsResult);
+        });
+
+        context('when restricted to a service', () => {
+          it('returns only the results of this service', async () => {
+            const results = await subject.findTermsResultsAt(commit, { serviceId: 'Google' });
+
+            expect(results.map(({ serviceId, termsType }) => ({ serviceId, termsType }))).to.deep.equal([{ serviceId: 'Google', termsType: 'Privacy Policy' }]);
+          });
+
+          it('returns an empty list for a service without results', async () => {
+            expect(await subject.findTermsResultsAt(commit, { serviceId: 'Unknown' })).to.deep.equal([]);
+          });
+        });
+
+        context('when read again at the same commit', () => {
+          let readFilesSpy;
+          let results;
+
+          before(async () => {
+            await subject.findTermsResultsAt(commit);
+            readFilesSpy = sinon.spy(Git, 'readFilesAtCommit');
+            results = await subject.findTermsResultsAt(commit, { serviceId: 'Google' });
+            readFilesSpy.restore();
+          });
+
+          it('does not read the files from git again', () => {
+            expect(readFilesSpy.called).to.be.false;
+          });
+
+          it('returns the results as they were at the given commit', () => {
+            expect(results.map(({ serviceId, termsType, status }) => ({ serviceId, termsType, status }))).to.deep.equal([{ serviceId: 'Google', termsType: 'Privacy Policy', status: 'failed' }]);
+          });
+        });
+
+        context('when read concurrently at the same commit', () => {
+          let readFilesSpy;
+
+          before(async () => {
+            const reader = new TrackingResultsRepository({ path: REPOSITORY_PATH, readOnly: true });
+
+            readFilesSpy = sinon.spy(Git, 'readFilesAtCommit');
+            await Promise.all([ reader.findTermsResultsAt(commit), reader.findTermsResultsAt(commit, { serviceId: 'Google' }) ]);
+            readFilesSpy.restore();
+          });
+
+          it('reads the files from git once', () => {
+            expect(readFilesSpy.callCount).to.equal(1);
+          });
+        });
+
+        context('when a read failed', () => {
+          let results;
+
+          before(async () => {
+            const reader = new TrackingResultsRepository({ path: REPOSITORY_PATH, readOnly: true });
+            const readFilesStub = sinon.stub(Git, 'readFilesAtCommit').rejects(new Error('Transient failure'));
+
+            await reader.findTermsResultsAt(commit).catch(() => {});
+            readFilesStub.restore();
+            results = await reader.findTermsResultsAt(commit);
+          });
+
+          it('reads the files again at the next request', () => {
+            expect(results.map(({ serviceId, termsType }) => ({ serviceId, termsType }))).to.deep.equal([
+              { serviceId: 'Facebook', termsType: 'Terms of Service' },
+              { serviceId: 'Google', termsType: 'Privacy Policy' },
+            ]);
+          });
+        });
+      });
+
+      describe('#findTermsResultAt', () => {
+        it('returns the result as it was at the given commit', async () => {
+          const result = await subject.findTermsResultAt(commit, 'Facebook', 'Terms of Service');
+
+          expect(result.status).to.equal('ok');
+        });
+
+        it('returns null for a terms first recorded after the given commit', async () => {
+          expect(await subject.findTermsResultAt(commit, 'Facebook', 'Privacy Policy')).to.be.null;
+        });
+
+        it('returns null for identifiers that cannot name a file of the repository', async () => {
+          expect(await subject.findTermsResultAt(commit, '..', 'run')).to.be.null;
+        });
+
+        it('returns null for identifiers that are not portable file names', async () => {
+          expect(await subject.findTermsResultAt(commit, 're:start', 'Terms of Service')).to.be.null;
+        });
+      });
+    });
+
+    context('when a result is corrupt JSON at the given commit', () => {
+      let commit;
+
+      before(async () => {
+        const filePath = path.join(REPOSITORY_PATH, 'Facebook', 'Terms of Service.json');
+
+        await subject.saveTermsResult(makeResult());
+        await fs.writeFile(filePath, '{ broken json');
+        await git.add(filePath);
+        commit = await git.commit({ filePath, message: 'Corrupt result' });
+      });
+
+      after(() => subject.removeAll());
+
+      it('throws an error contextualised with the file path and the commit', async () => {
+        try {
+          await subject.findTermsResultsAt(commit);
+        } catch (error) {
+          expect(error.message).to.match(/Could not parse JSON in/);
+          expect(error.message).to.include(`Facebook/Terms of Service.json at ${commit}`);
+
+          return;
+        }
+
+        expect.fail('No error was thrown');
       });
     });
   });

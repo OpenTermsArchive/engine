@@ -38,6 +38,16 @@ export function generateFilePath(serviceId, termsType) {
   return `${termsKey(serviceId, termsType)}.json`; // Do not use `path.join` as Git requires forward slashes even on Windows
 }
 
+export function parseFilePath(filePath) { // Inverse of generateFilePath; returns null for the files that cannot be terms results, such as run.json or the README, whereas any other JSON file nested one level deep is taken as a terms result, as the tracker is the only writer of the repository and service IDs may start with a dot
+  const segments = filePath.split('/');
+
+  if (segments.length !== 2 || !segments[1].endsWith('.json')) {
+    return null;
+  }
+
+  return { serviceId: segments[0], termsType: segments[1].slice(0, -'.json'.length) };
+}
+
 function validatePathComponent(value, name) { // Rejects identifiers that would escape their directory once joined into a file path, or that could not exist as a file name on every supported platform
   if (typeof value !== 'string' || !isPortableFileName(value)) {
     throw new Error(`Invalid ${name}: must be usable as a cross-platform file name (a non-empty string without separators, "." or ".." forms, control characters, or the Windows-reserved characters \`:"<>|*?\`), got ${JSON.stringify(value)}`);

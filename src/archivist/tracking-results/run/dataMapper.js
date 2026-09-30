@@ -1,6 +1,7 @@
 import Run, { RUN_STATUSES } from './index.js';
 
 export const FILE_NAME = 'run.json';
+export const COMPLETED_RUN_MESSAGE_PREFIX = 'Complete run '; // Shared with readers, which find the latest completed run by the subject of its commit
 
 export function toPersistence(run) {
   return {
@@ -28,7 +29,7 @@ export function formatMessage(run) { // The status of the run tells which step o
   case RUN_STATUSES.inProgress:
     return `Start run ${run.shortRunId}`;
   case RUN_STATUSES.completed:
-    return `Complete run ${run.shortRunId} (${run.tracked.ok} ok, ${run.tracked.failed} failed)`;
+    return `${COMPLETED_RUN_MESSAGE_PREFIX}${run.shortRunId} (${run.tracked.ok} ok, ${run.tracked.failed} failed)`;
   case RUN_STATUSES.crashed:
     return `Finalize crashed run ${run.shortRunId}`;
   default:

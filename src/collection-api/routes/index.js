@@ -5,6 +5,7 @@ import helmet from 'helmet';
 import { getCollection } from '../../archivist/collection/index.js';
 import RepositoryFactory from '../../archivist/recorder/repositories/factory.js';
 import * as Services from '../../archivist/services/index.js';
+import TrackingResultsRepository from '../../archivist/tracking-results/repository.js';
 import DatasetStorage from '../../dataset/storage.js';
 
 import datasetRouter from './dataset.js';
@@ -12,6 +13,7 @@ import docsRouter from './docs.js';
 import feedRouter from './feed.js';
 import metadataRouter from './metadata.js';
 import servicesRouter from './services.js';
+import trackingResultsRouter from './tracking-results.js';
 import versionsRouter from './versions.js';
 
 export default async function apiRouter(basePath) {
@@ -57,6 +59,12 @@ export default async function apiRouter(basePath) {
   router.use(versionsRouter(versionsRepository, snapshotsRepository));
   router.use(feedRouter(services, versionsRepository, versionsStorageConfig.type, feedConfig.limit, feedConfig.versionUrlTemplate));
   router.use(datasetRouter(datasetStorage));
+
+  const trackingResultsConfig = config.get('@opentermsarchive/engine.tracking-results');
+
+  if (trackingResultsConfig) { // Set to null when tracking-results is disabled
+    router.use(trackingResultsRouter(await TrackingResultsRepository.create(trackingResultsConfig.storage, { readOnly: true }).initialize(), services)); // Instantiated directly rather than through the TrackingResults module, whose initialization runs the crash recovery that only the tracker may run
+  }
 
   return router;
 }

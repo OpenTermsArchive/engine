@@ -2,6 +2,7 @@ import fsApi from 'fs';
 import path from 'path';
 
 import Git from '../../git/index.js';
+import { isPortableFileName } from '../../git/pathSegment.js';
 
 import * as RunMapper from './run/dataMapper.js';
 import * as TermsResultMapper from './terms-result/dataMapper.js';
@@ -9,13 +10,26 @@ import * as TermsResultMapper from './terms-result/dataMapper.js';
 const fs = fsApi.promises;
 
 export default class TrackingResultsRepository {
-  constructor({ path: repositoryPath, author, publish }) {
+  static create(storageConfig, { readOnly = false } = {}) { // Interprets the storage configuration for both the tracker and the readers
+    if (storageConfig.type !== 'git') { // Git is the only supported backend, as the audit trail relies on its tamper-evident properties
+      throw new Error(`Unsupported tracking-results storage type "${storageConfig.type}"; only "git" is supported`);
+    }
+
+    return new TrackingResultsRepository({ ...storageConfig.git, readOnly });
+  }
+
+  constructor({ path: repositoryPath, author, publish, readOnly = false }) {
     this.path = path.resolve(process.cwd(), repositoryPath); // Same resolution as RepositoryFactory: configured storage paths are project-relative and must not depend on the cwd of downstream git processes
     this.needsPublication = publish;
+    this.readOnly = readOnly; // Readers share the repository with the tracker, so they must never touch the working tree nor the commit-graph, and never run the crash recovery, which is only safe for the single writer
     this.git = new Git({ path: this.path, author });
   }
 
   async initialize() {
+    if (this.readOnly) { // Unlike snapshots and versions, a missing repository is not an error for readers: the tracker creates it at its first run, and tracking-results can be disabled
+      return this;
+    }
+
     await this.git.initialize();
     await this.git.cleanUp(); // Drop any uncommitted leftovers that would otherwise pollute the next commit
     await this.git.writeCommitGraph(); // Keep the commit graph in sync with the existing history for fast log operations
@@ -24,6 +38,8 @@ export default class TrackingResultsRepository {
   }
 
   async finalize() {
+    this.assertWritable('finalize');
+
     if (this.needsPublication) {
       await this.git.pushChanges();
     }
@@ -31,8 +47,10 @@ export default class TrackingResultsRepository {
     return this.git.updateCommitGraph();
   }
 
-  removeAll() { // Test-only: destroys all history
-    return this.git.destroyHistory();
+  async removeAll() { // Test-only: destroys all history
+    this.assertWritable('remove all history');
+
+    await this.git.destroyHistory();
   }
 
   async saveTermsResult(newResult, { trailers = {} } = {}) { // Trailers carry run-scoped context (e.g. x-run-id); they are not TermsResult state, so they are passed alongside rather than through the mapper
@@ -77,6 +95,52 @@ export default class TrackingResultsRepository {
     return commit?.hash ?? null;
   }
 
+  async findLatestCompletedRunCommit() { // Readers serve the state recorded by the latest completed run, as a run in progress or crashed has only partially updated the terms results
+    if (!fsApi.existsSync(path.join(this.path, '.git'))) { // Checked at each call so that readers started before the first run do not need a restart, and so that git never falls back on an enclosing repository
+      return null;
+    }
+
+    const commit = await Git.getLatestCommitSha(this.path, { grep: `^${RunMapper.COMPLETED_RUN_MESSAGE_PREFIX}`, filePath: RunMapper.FILE_NAME });
+
+    return commit;
+  }
+
+  async findRunAt(commit) {
+    const content = await Git.readFileAtCommit(this.path, commit, RunMapper.FILE_NAME);
+
+    return RunMapper.toDomain(parseJson(content, `${RunMapper.FILE_NAME} at ${commit}`));
+  }
+
+  async findTermsResultsAt(commit, { serviceId } = {}) { // Lists the terms results as they were at the given commit, optionally restricted to a service; files of terms removed from the declarations are kept as a historical record, and so are listed too
+    if (this.termsResultsAtCommit?.commit !== commit) { // The results at a given commit never change, so the read of the latest commit requested is kept, and shared with the requests arriving while it is pending, as readers request the same commit until the next run completes
+      this.termsResultsAtCommit = { commit, termsResults: readTermsResultsAt(this.path, commit) };
+    }
+
+    const { termsResults: pendingTermsResults } = this.termsResultsAtCommit; // Captured before waiting, as a request for another commit may replace the kept read meanwhile
+
+    try {
+      const termsResults = await pendingTermsResults;
+
+      return serviceId === undefined ? [...termsResults] : termsResults.filter(termsResult => termsResult.serviceId === serviceId);
+    } catch (error) {
+      if (this.termsResultsAtCommit?.termsResults === pendingTermsResults) { // A failed read is not kept, so that the next request tries again
+        this.termsResultsAtCommit = null;
+      }
+
+      throw error;
+    }
+  }
+
+  async findTermsResultAt(commit, serviceId, termsType) {
+    if (!isPortableFileName(serviceId) || !isPortableFileName(termsType)) { // Such identifiers cannot name a file of the repository, as its files are only written with portable names, and must not reach git
+      return null;
+    }
+
+    const [content] = await Git.readFilesAtCommit(this.path, commit, [TermsResultMapper.generateFilePath(serviceId, termsType)]);
+
+    return content === null ? null : TermsResultMapper.toDomain({ serviceId, termsType, data: parseJson(content, `${serviceId}/${termsType} at ${commit}`) });
+  }
+
   async findCommittedTermsResultsSince(sha) { // Lists each distinct (serviceId, termsType) pair that had at least one per-terms commit between `sha` (exclusive) and HEAD (inclusive)
     if (!sha) {
       return [];
@@ -89,6 +153,8 @@ export default class TrackingResultsRepository {
   }
 
   async commit({ filePath: relativePath, content, message, date, trailers, previousContent }) {
+    this.assertWritable('commit');
+
     const absolutePath = path.join(this.path, relativePath);
     const backupContent = previousContent === undefined ? await readFile(absolutePath) : previousContent; // Read only when the caller does not already hold the previous content; null means the file is known to be absent
 
@@ -103,6 +169,22 @@ export default class TrackingResultsRepository {
       throw new Error(`Could not commit "${relativePath}" with message "${message}": ${error.message}`, { cause: error }); // Preserve the original stack via `cause` so operators can trace back to the underlying simple-git or fs error
     }
   }
+
+  assertWritable(operation) {
+    if (this.readOnly) {
+      throw new Error(`Cannot ${operation} in the read-only tracking-results repository ${this.path}`);
+    }
+  }
+}
+
+async function readTermsResultsAt(repositoryPath, commit) {
+  const files = (await Git.listFilesAtCommit(repositoryPath, commit, { recursive: true }))
+    .map(filePath => ({ filePath, ...TermsResultMapper.parseFilePath(filePath) }))
+    .filter(file => file.serviceId);
+
+  const contents = await Git.readFilesAtCommit(repositoryPath, commit, files.map(({ filePath }) => filePath));
+
+  return files.map(({ filePath, serviceId, termsType }, index) => TermsResultMapper.toDomain({ serviceId, termsType, data: parseJson(contents[index], `${filePath} at ${commit}`) }));
 }
 
 async function readFile(absolutePath) { // Resolves to null when the file does not exist, while other I/O failures are propagated
@@ -127,10 +209,10 @@ async function readJsonFile(absolutePath) { // Resolves to null when the file do
   return parseJson(content, absolutePath);
 }
 
-function parseJson(content, absolutePath) {
+function parseJson(content, location) {
   try {
     return JSON.parse(content);
   } catch (error) {
-    throw new Error(`Could not parse JSON in "${absolutePath}": ${error.message}`, { cause: error });
+    throw new Error(`Could not parse JSON in "${location}": ${error.message}`, { cause: error });
   }
 }
