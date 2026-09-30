@@ -2,6 +2,14 @@
 
 All changes that impact users of this module are documented in this file, in the [Common Changelog](https://common-changelog.org) format with some additional specifications defined in the CONTRIBUTING file. This codebase adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased [patch]
+
+> Development of this release was made on a volunteer basis by [Nathan Suttie](https://github.com/natesute).
+
+### Fixed
+
+- Reject combined source documents with colliding snapshot IDs during declaration validation, including URLs that differ only by host, query string or file extension; use source URLs with distinct IDs before tracking these declarations
+
 ## 16.2.0 - 2026-09-28
 
 > Development of this release was supported by [Anthelia](https://anthelia.tech).
