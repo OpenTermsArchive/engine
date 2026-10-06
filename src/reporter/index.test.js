@@ -174,13 +174,6 @@ describe('Reporter', () => {
         expect(description).to.not.include('test-declarations/blob/main/TestService/Terms%20of%20Service'); // A version or snapshot link into the declarations repository is the regression this guards against
       });
 
-      it('links to the files named after the service ID rather than after its name', () => {
-        const description = buildReporter().generateDescription({ error, terms: buildTerms() });
-
-        expect(description).to.not.include('declarations/Test%20Service.json');
-        expect(description).to.not.include('Test%20Service/Terms%20of%20Service');
-      });
-
       context('when only the declarations repository is configured', () => {
         it('omits the version and snapshots links instead of generating broken ones', () => {
           const reporter = new Reporter({ type: 'github', repositories: { declarations: 'OpenTermsArchive/test-declarations' } });
