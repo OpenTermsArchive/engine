@@ -51,6 +51,10 @@ export default async function track({ services, types, schedule }) {
   // All versions from this pass are labeled as technical upgrades to avoid false notifications about content changes.
   await archivist.applyTechnicalUpgrades({ services: filteredServices, types });
 
+  if (config.has('@opentermsarchive/engine.reporter')) { // Issues reporting moved to its own module, so a configuration left in place would silently stop reporting
+    logger.warn('The "reporter" configuration is no longer used by the engine; move it to the "@opentermsarchive/issue-reporter" key and run the @opentermsarchive/issue-reporter module alongside the engine, see https://github.com/OpenTermsArchive/issue-reporter');
+  }
+
   if (!schedule) {
     await archivist.track({ services: filteredServices, types });
 
