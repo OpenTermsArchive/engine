@@ -100,7 +100,7 @@ The choice between environment variables and configuration files should be made 
 **Use environment variables for:**
 
 - Secrets: API keys, passwords, tokens, or any sensitive data that should not be committed to version control. Examples:
-  - `OTA_ENGINE_GITHUB_TOKEN`: GitHub API token for creating issues and managing repositories
+  - `OTA_ENGINE_GITHUB_TOKEN`: GitHub API token for publishing datasets
   - `OTA_ENGINE_SMTP_PASSWORD`: password for SMTP server authentication
 - Debugging flags: toggles for development features. Examples:
   - `OTA_ENGINE_FETCHER_NO_HEADLESS`: disables headless mode in Puppeteer to show the browser window during fetching

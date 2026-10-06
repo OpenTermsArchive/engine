@@ -7,7 +7,6 @@ import cronstrue from 'cronstrue';
 import { getCollection } from './archivist/collection/index.js';
 import Archivist from './archivist/index.js';
 import logger from './logger/index.js';
-import Reporter from './reporter/index.js';
 
 const require = createRequire(import.meta.url);
 const { version: PACKAGE_VERSION } = require('../package.json');
@@ -51,19 +50,6 @@ export default async function track({ services, types, schedule }) {
   // For terms with combined source documents, if a new document was added to the declaration, it will be fetched and combined with existing snapshots to regenerate the complete version.
   // All versions from this pass are labeled as technical upgrades to avoid false notifications about content changes.
   await archivist.applyTechnicalUpgrades({ services: filteredServices, types });
-
-  if (process.env.OTA_ENGINE_GITHUB_TOKEN || process.env.OTA_ENGINE_GITLAB_TOKEN) {
-    try {
-      const reporter = new Reporter(config.get('@opentermsarchive/engine.reporter'));
-
-      await reporter.initialize();
-      archivist.attach(reporter);
-    } catch (error) {
-      logger.error('Cannot instantiate the Reporter module; it will be ignored:', error);
-    }
-  } else {
-    logger.warn('Environment variable with token for GitHub or GitLab was not found; the Reporter module will be ignored');
-  }
 
   if (!schedule) {
     await archivist.track({ services: filteredServices, types });
