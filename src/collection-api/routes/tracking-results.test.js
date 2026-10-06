@@ -73,7 +73,7 @@ describe('Tracking results API', () => {
       });
 
       it('returns an empty list', () => {
-        expect(response.body).to.deep.equal({ data: [], count: 0, limit: 100, offset: 0 });
+        expect(response.body).to.deep.equal({ runId: null, data: [], count: 0, limit: 100, offset: 0 });
       });
     });
 
@@ -157,6 +157,10 @@ describe('Tracking results API', () => {
 
       it('returns pagination metadata', () => {
         expect(response.body).to.include({ count: 3, limit: 100, offset: 0 });
+      });
+
+      it('identifies the completed run the list reflects', () => {
+        expect(response.body.runId).to.equal(COMPLETED_RUN_ID);
       });
 
       context('with a status filter', () => {
@@ -260,6 +264,10 @@ describe('Tracking results API', () => {
 
         it('returns pagination metadata', () => {
           expect(response.body).to.include({ count: 2, limit: 100, offset: 0 });
+        });
+
+        it('identifies the completed run the list reflects', () => {
+          expect(response.body.runId).to.equal(COMPLETED_RUN_ID);
         });
       });
 

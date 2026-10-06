@@ -103,6 +103,10 @@ const VALID_STATUSES = Object.values(STATUSES);
  *     PaginatedTrackingResultsResponse:
  *       type: object
  *       properties:
+ *         runId:
+ *           type: string
+ *           nullable: true
+ *           description: The ID of the completed tracking run whose state the list reflects, null until a first run completes. Consumers paginating through the list should start over when it changes between two pages, as the pages then come from different runs.
  *         data:
  *           type: array
  *           description: The list of tracking results.
@@ -219,11 +223,18 @@ export default function trackingResultsRouter(trackingResultsRepository, service
   async function findTermsResults(filter) { // Every read of a request is pinned to the same commit, so that a run completing meanwhile cannot mix the states of two runs
     const commit = await trackingResultsRepository.findLatestCompletedRunCommit();
 
-    return commit ? trackingResultsRepository.findTermsResultsAt(commit, filter) : [];
+    if (!commit) {
+      return { runId: null, results: [] };
+    }
+
+    const [ run, results ] = await Promise.all([ trackingResultsRepository.findRunAt(commit), trackingResultsRepository.findTermsResultsAt(commit, filter) ]);
+
+    return { runId: run.runId, results };
   }
 
-  function paginate(results, { limit, offset }) {
+  function paginate({ runId, results }, { limit, offset }) {
     return {
+      runId, // Identifies the completed run the page reflects, so that consumers paginating through the list can tell when a run completed between two pages and start over
       data: results.slice(offset, offset + limit).map(toResponse),
       count: results.length,
       limit,
@@ -273,9 +284,9 @@ export default function trackingResultsRouter(trackingResultsRepository, service
       return res.status(400).json({ error: `Invalid status parameter. Must be one of "${VALID_STATUSES.join('", "')}".` });
     }
 
-    const results = await findTermsResults();
+    const { runId, results } = await findTermsResults();
 
-    return res.status(200).json(paginate(status === undefined ? results : results.filter(result => result.status === status), { limit, offset }));
+    return res.status(200).json(paginate({ runId, results: status === undefined ? results : results.filter(result => result.status === status) }, { limit, offset }));
   });
 
   /**
@@ -346,13 +357,13 @@ export default function trackingResultsRouter(trackingResultsRepository, service
       return res.status(400).json(validationError);
     }
 
-    const results = await findTermsResults({ serviceId });
+    const { runId, results } = await findTermsResults({ serviceId });
 
     if (!results.length) {
       return res.status(404).json({ error: `No tracking results found for service "${serviceId}"` });
     }
 
-    return res.status(200).json(paginate(results, { limit, offset }));
+    return res.status(200).json(paginate({ runId, results }, { limit, offset }));
   });
 
   /**
