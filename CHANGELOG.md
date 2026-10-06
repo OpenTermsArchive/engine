@@ -9,6 +9,7 @@ All changes that impact users of this module are documented in this file, in the
 ### Fixed
 
 - Fix the links to the declaration, version and snapshot files in the tracking issues of services whose name differs from their ID, which pointed to nonexistent files named after the service name instead of its ID
+- Fix the links to the snapshots of terms combining multiple source documents in the tracking issues, which pointed to nonexistent files
 
 ## 16.3.0 - 2026-09-30
 

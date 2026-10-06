@@ -126,8 +126,8 @@ describe('Reporter', () => {
       it('omits its snapshot link and keeps the ones of the recorded documents', () => {
         const description = buildReporter().generateDescription({ error, terms: buildTerms({ sourceCount: 2, withoutSnapshotIndexes: [1] }) });
 
-        expect(description).to.include('#source-0.html'); // The `#<id>` fragment only appears in snapshot links, unlike the document locations listed in the accessibility checklist
-        expect(description).to.not.include('#source-1');
+        expect(description).to.include('test-snapshots/blob/main/TestService/Terms%20of%20Service%20%23source-0.html');
+        expect(description).to.not.include('%23source-1');
         expect(description).to.not.include('.null');
       });
     });

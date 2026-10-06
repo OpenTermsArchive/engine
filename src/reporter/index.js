@@ -1,5 +1,6 @@
 import mime from 'mime';
 
+import { TERMS_TYPE_AND_DOCUMENT_ID_SEPARATOR } from '../archivist/recorder/repositories/git/dataMapper.js';
 import { toISODateWithoutMilliseconds } from '../archivist/utils/date.js';
 import logger from '../logger/index.js';
 
@@ -149,7 +150,7 @@ No changes were found in the last run, so no new version has been recorded.`,
 
     if (recordedSourceDocuments.length) {
       latestSnapshotsLink = terms.hasMultipleSourceDocuments
-        ? `Latest snapshots:\n  - ${recordedSourceDocuments.map(sourceDocument => `[${sourceDocument.id}](${snapshotsBaseUrl}.%20#${sourceDocument.id}.${mime.getExtension(sourceDocument.mimeType)})`).join('\n  - ')}`
+        ? `Latest snapshots:\n  - ${recordedSourceDocuments.map(sourceDocument => `[${sourceDocument.id}](${snapshotsBaseUrl}${encodeURIComponent(`${TERMS_TYPE_AND_DOCUMENT_ID_SEPARATOR}${sourceDocument.id}`)}.${mime.getExtension(sourceDocument.mimeType)})`).join('\n  - ')}`
         : `[Latest snapshot](${snapshotsBaseUrl}.${mime.getExtension(recordedSourceDocuments[0].mimeType)})`;
     }
 
