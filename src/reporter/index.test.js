@@ -81,12 +81,12 @@ describe('Reporter', () => {
       });
 
       return {
-        service: { id: 'TestService', name: 'TestService' },
+        service: { id: 'TestService', name: 'Test Service' }, // The name differs from the ID on purpose, as the files of the repositories are named after the ID
         type: 'Terms of Service',
         sourceDocuments,
         hasMultipleSourceDocuments: sourceCount > 1,
         toPersistence: () => ({
-          name: 'TestService',
+          name: 'Test Service',
           terms: {
             'Terms of Service': sourceCount > 1
               ? { combine: sourceDocuments.map(sourceDocument => sourceDocument.toPersistence()) }
@@ -172,6 +172,13 @@ describe('Reporter', () => {
 
         expect(description).to.include('github.com/OpenTermsArchive/test-snapshots/blob/main/TestService/Terms%20of%20Service');
         expect(description).to.not.include('test-declarations/blob/main/TestService/Terms%20of%20Service'); // A version or snapshot link into the declarations repository is the regression this guards against
+      });
+
+      it('links to the files named after the service ID rather than after its name', () => {
+        const description = buildReporter().generateDescription({ error, terms: buildTerms() });
+
+        expect(description).to.not.include('declarations/Test%20Service.json');
+        expect(description).to.not.include('Test%20Service/Terms%20of%20Service');
       });
 
       context('when only the declarations repository is configured', () => {

@@ -477,16 +477,16 @@ export default class GitLab {
     return options;
   }
 
-  generateDeclarationURL(serviceName) {
-    return `${this.baseURL}/${this.repositories.declarations}/-/blob/main/declarations/${encodeURIComponent(serviceName)}.json`;
+  generateDeclarationURL(serviceId) {
+    return `${this.baseURL}/${this.repositories.declarations}/-/blob/main/declarations/${encodeURIComponent(serviceId)}.json`;
   }
 
-  generateVersionURL(serviceName, termsType) {
-    return `${this.baseURL}/${this.repositories.versions}/-/blob/main/${encodeURIComponent(serviceName)}/${encodeURIComponent(termsType)}.md`;
+  generateVersionURL(serviceId, termsType) {
+    return `${this.baseURL}/${this.repositories.versions}/-/blob/main/${encodeURIComponent(serviceId)}/${encodeURIComponent(termsType)}.md`;
   }
 
-  generateSnapshotsBaseUrl(serviceName, termsType) {
-    return `${this.baseURL}/${this.repositories.snapshots}/-/blob/main/${encodeURIComponent(serviceName)}/${encodeURIComponent(termsType)}`;
+  generateSnapshotsBaseUrl(serviceId, termsType) {
+    return `${this.baseURL}/${this.repositories.snapshots}/-/blob/main/${encodeURIComponent(serviceId)}/${encodeURIComponent(termsType)}`;
   }
 
   // GitLab API responses are not cached unlike GitHub, so this method only exists to satisfy the Reporter interface contract

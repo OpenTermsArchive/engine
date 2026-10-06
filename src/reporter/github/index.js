@@ -273,15 +273,15 @@ export default class GitHub {
     }
   }
 
-  generateDeclarationURL(serviceName) {
-    return `https://github.com/${this.repositories.declarations}/blob/main/declarations/${encodeURIComponent(serviceName)}.json`;
+  generateDeclarationURL(serviceId) {
+    return `https://github.com/${this.repositories.declarations}/blob/main/declarations/${encodeURIComponent(serviceId)}.json`;
   }
 
-  generateVersionURL(serviceName, termsType) {
-    return `https://github.com/${this.repositories.versions}/blob/main/${encodeURIComponent(serviceName)}/${encodeURIComponent(termsType)}.md`;
+  generateVersionURL(serviceId, termsType) {
+    return `https://github.com/${this.repositories.versions}/blob/main/${encodeURIComponent(serviceId)}/${encodeURIComponent(termsType)}.md`;
   }
 
-  generateSnapshotsBaseUrl(serviceName, termsType) {
-    return `https://github.com/${this.repositories.snapshots}/blob/main/${encodeURIComponent(serviceName)}/${encodeURIComponent(termsType)}`;
+  generateSnapshotsBaseUrl(serviceId, termsType) {
+    return `https://github.com/${this.repositories.snapshots}/blob/main/${encodeURIComponent(serviceId)}/${encodeURIComponent(termsType)}`;
   }
 }
