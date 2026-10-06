@@ -2,6 +2,19 @@
 
 All changes that impact users of this module are documented in this file, in the [Common Changelog](https://common-changelog.org) format with some additional specifications defined in the CONTRIBUTING file. This codebase adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased [major]
+
+> Development of this release was supported by the [NGI0 Commons Fund](https://nlnet.nl/project/Modular-OTA/), a fund established by [NLnet](https://nlnet.nl/) with financial support from the European Commission's [Next Generation Internet](https://www.ngi.eu) programme, under the aegis of DG CNECT under grant agreement N°101069594.
+
+### Removed
+
+- **Breaking:** Remove the reporter that created issues on GitHub or GitLab when tracking failed, along with its `reporter` configuration; install the [`@opentermsarchive/issue-reporter`](https://github.com/OpenTermsArchive/issue-reporter) module in the collection, move the `reporter` configuration to its `@opentermsarchive/issue-reporter` key with an additional `collectionApi.url` entry, rename the token environment variable to `OTA_ISSUE_REPORTER_GITHUB_TOKEN` or `OTA_ISSUE_REPORTER_GITLAB_TOKEN`, and run `ota-issue-reporter sync --schedule` alongside the engine, as described in [how to report tracking failures](https://docs.opentermsarchive.org/collections/how-to/report-tracking-failures/)
+- **Breaking:** Remove the `scripts/reporter/duplicate` script, which closed the duplicate issues that engines older than v2.3.2 could create
+
+### Changed
+
+- Use the `OTA_ENGINE_GITHUB_TOKEN` and `OTA_ENGINE_GITLAB_TOKEN` environment variables only to publish datasets, as the engine no longer needs them to track terms
+
 ## 16.4.0 - 2026-10-07
 
 > Development of this release was supported by the [NGI0 Commons Fund](https://nlnet.nl/project/Modular-OTA/), a fund established by [NLnet](https://nlnet.nl/) with financial support from the European Commission's [Next Generation Internet](https://www.ngi.eu) programme, under the aegis of DG CNECT under grant agreement N°101069594.
