@@ -1,5 +1,6 @@
 import mime from 'mime';
 
+import { TERMS_TYPE_AND_DOCUMENT_ID_SEPARATOR } from '../archivist/recorder/repositories/git/dataMapper.js';
 import { toISODateWithoutMilliseconds } from '../archivist/utils/date.js';
 import logger from '../logger/index.js';
 
@@ -137,19 +138,19 @@ No changes were found in the last run, so no new version has been recorded.`,
     });
     const contributionToolUrl = `${CONTRIBUTION_TOOL_URL}?${contributionToolParams}`;
 
-    const declarationFileUrl = this.reporter.generateDeclarationURL(terms.service.name);
+    const declarationFileUrl = this.reporter.generateDeclarationURL(terms.service.id);
     const updateDeclarationLink = terms.hasMultipleSourceDocuments ? `[on GitHub](${declarationFileUrl})` : `[on the contribution tool](${contributionToolUrl})`;
     const multiDocumentsUpdateInfo = terms.hasMultipleSourceDocuments ? ' (the contribution tool does not support multi-document)' : '';
 
     const latestDeclarationLink = `[Latest declaration](${declarationFileUrl})`;
-    const latestVersionLink = `[Latest version](${this.reporter.generateVersionURL(terms.service.name, terms.type)})`;
-    const snapshotsBaseUrl = this.reporter.generateSnapshotsBaseUrl(terms.service.name, terms.type);
+    const latestVersionLink = `[Latest version](${this.reporter.generateVersionURL(terms.service.id, terms.type)})`;
+    const snapshotsBaseUrl = this.reporter.generateSnapshotsBaseUrl(terms.service.id, terms.type);
     const recordedSourceDocuments = terms.sourceDocuments.filter(sourceDocument => sourceDocument.snapshotId); // A source document that has never been recorded has no snapshot file to link to, and its unknown MIME type would produce a link to a nonexistent ".null" file
     let latestSnapshotsLink = '';
 
     if (recordedSourceDocuments.length) {
       latestSnapshotsLink = terms.hasMultipleSourceDocuments
-        ? `Latest snapshots:\n  - ${recordedSourceDocuments.map(sourceDocument => `[${sourceDocument.id}](${snapshotsBaseUrl}.%20#${sourceDocument.id}.${mime.getExtension(sourceDocument.mimeType)})`).join('\n  - ')}`
+        ? `Latest snapshots:\n  - ${recordedSourceDocuments.map(sourceDocument => `[${sourceDocument.id}](${snapshotsBaseUrl}${encodeURIComponent(`${TERMS_TYPE_AND_DOCUMENT_ID_SEPARATOR}${sourceDocument.id}`)}.${mime.getExtension(sourceDocument.mimeType)})`).join('\n  - ')}`
         : `[Latest snapshot](${snapshotsBaseUrl}.${mime.getExtension(recordedSourceDocuments[0].mimeType)})`;
     }
 

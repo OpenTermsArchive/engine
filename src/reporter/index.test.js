@@ -81,12 +81,12 @@ describe('Reporter', () => {
       });
 
       return {
-        service: { id: 'TestService', name: 'TestService' },
+        service: { id: 'TestService', name: 'Test Service' }, // The name differs from the ID on purpose, as the files of the repositories are named after the ID
         type: 'Terms of Service',
         sourceDocuments,
         hasMultipleSourceDocuments: sourceCount > 1,
         toPersistence: () => ({
-          name: 'TestService',
+          name: 'Test Service',
           terms: {
             'Terms of Service': sourceCount > 1
               ? { combine: sourceDocuments.map(sourceDocument => sourceDocument.toPersistence()) }
@@ -126,8 +126,8 @@ describe('Reporter', () => {
       it('omits its snapshot link and keeps the ones of the recorded documents', () => {
         const description = buildReporter().generateDescription({ error, terms: buildTerms({ sourceCount: 2, withoutSnapshotIndexes: [1] }) });
 
-        expect(description).to.include('#source-0.html'); // The `#<id>` fragment only appears in snapshot links, unlike the document locations listed in the accessibility checklist
-        expect(description).to.not.include('#source-1');
+        expect(description).to.include('test-snapshots/blob/main/TestService/Terms%20of%20Service%20%23source-0.html');
+        expect(description).to.not.include('%23source-1');
         expect(description).to.not.include('.null');
       });
     });
