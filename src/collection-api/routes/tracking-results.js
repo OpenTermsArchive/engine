@@ -230,9 +230,8 @@ export default function trackingResultsRouter(trackingResultsRepository, service
     return { runId: latestRun.runId, results: await trackingResultsRepository.findTermsResultsAt(latestRun.sha, filter) };
   }
 
-  function paginate({ runId, results }, { limit, offset }) {
+  function paginate(results, { limit, offset }) {
     return {
-      runId, // Identifies the completed run the page reflects, so that consumers paginating through the list can tell when a run completed between two pages and start over
       data: results.slice(offset, offset + limit).map(toResponse),
       count: results.length,
       limit,
@@ -284,7 +283,7 @@ export default function trackingResultsRouter(trackingResultsRepository, service
 
     const { runId, results } = await findTermsResults();
 
-    return res.status(200).json(paginate({ runId, results: status === undefined ? results : results.filter(result => result.status === status) }, { limit, offset }));
+    return res.status(200).json({ runId, ...paginate(status === undefined ? results : results.filter(result => result.status === status), { limit, offset }) });
   });
 
   /**
@@ -361,7 +360,7 @@ export default function trackingResultsRouter(trackingResultsRepository, service
       return res.status(404).json({ error: `No tracking results found for service "${serviceId}"` });
     }
 
-    return res.status(200).json(paginate({ runId, results }, { limit, offset }));
+    return res.status(200).json({ runId, ...paginate(results, { limit, offset }) });
   });
 
   /**
