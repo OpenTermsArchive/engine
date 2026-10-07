@@ -8,11 +8,11 @@ All changes that impact users of this module are documented in this file, in the
 
 ### Fixed
 
-- Create new versions, snapshots and tracking-results repositories on the `main` branch expected by the deployment, instead of the default branch of the Git configuration of the server, often `master`; to move an existing repository to `main`, stop the tracker and run in its local directory:
+- Create new versions, snapshots and tracking-results repositories on the `main` branch, the default branch of GitHub and GitLab and the one used by the deployment, instead of the default branch of the Git configuration of the server, often `master`; this requires Git 2.28 or later; to move an existing repository to `main`, stop the tracker and run in its local directory:
 
   ```bash
   git branch -m master main
-  git push origin main # Add --force if the remote main branch only holds its initial README
+  git push -u origin main # Add --force if the remote main branch only holds the files created with the repository
   git push origin --delete master # After making main the default branch of the remote repository
   ```
 
