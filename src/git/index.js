@@ -15,6 +15,7 @@ process.env.LC_ALL = 'en_GB'; // Ensure git messages will be in English as some 
 const fs = fsApi.promises;
 
 const WRITER_LOCK_FILE_NAME = 'ota-writer.lock';
+const DEFAULT_BRANCH = 'main';
 
 const OBJECT_NOT_FOUND_MESSAGES = /bad object|not a tree|invalid object name|unknown revision|does not exist|exists on disk, but not in/i;
 
@@ -95,7 +96,7 @@ export default class Git {
     }
 
     this.#connect();
-    await this.git.init();
+    await this.git.init([`--initial-branch=${DEFAULT_BRANCH}`]); // Otherwise the branch of a new repository would depend on the `init.defaultBranch` setting of the server, which is often `master`, whereas the published repositories and the deployment use `main`. Git ignores this option for an existing repository, which thus keeps its branch, as renaming it would diverge from its remote
     await this.#acquireWriterLock();
 
     const configFile = path.resolve(this.path, '.git', 'config'); // Anchored to an absolute path: git resolves a relative `--file` argument against its own cwd (the repository), not against process.cwd, so a relative repository path would silently point the write at a nonexistent nested location

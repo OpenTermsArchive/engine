@@ -8,6 +8,7 @@ import { fileURLToPath } from 'url';
 import { expect, use } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import config from 'config';
+import simpleGit from 'simple-git';
 
 import Git, { GitObjectNotFoundError } from './index.js';
 
@@ -55,6 +56,43 @@ describe('Git', () => {
       await new Git({ path: repositoryPath, author: AUTHOR }).initialize();
 
       await expect(new Git({ path: repositoryPath, author: AUTHOR }).initialize()).to.be.fulfilled;
+    });
+
+    context('when the repository does not exist', () => {
+      const GIT_CONFIG_ENVIRONMENT = { GIT_CONFIG_COUNT: '1', GIT_CONFIG_KEY_0: 'init.defaultBranch', GIT_CONFIG_VALUE_0: 'master' };
+
+      beforeEach(() => Object.assign(process.env, GIT_CONFIG_ENVIRONMENT));
+
+      afterEach(() => Object.keys(GIT_CONFIG_ENVIRONMENT).forEach(name => delete process.env[name]));
+
+      it('creates it on the main branch, whatever the Git default initial branch', async () => {
+        await new Git({ path: repositoryPath, author: AUTHOR }).initialize();
+
+        expect(await runGit(repositoryPath, [ 'symbolic-ref', '--short', 'HEAD' ])).to.equal('main');
+      });
+
+      context('when a previous initialization was interrupted', () => {
+        beforeEach(() => fs.mkdir(path.join(repositoryPath, '.git')));
+
+        it('creates it on the main branch', async () => {
+          await new Git({ path: repositoryPath, author: AUTHOR }).initialize();
+
+          expect(await runGit(repositoryPath, [ 'symbolic-ref', '--short', 'HEAD' ])).to.equal('main');
+        });
+      });
+    });
+
+    context('when the repository already exists on another branch', () => {
+      beforeEach(async () => {
+        await runGit(repositoryPath, [ '-c', 'init.defaultBranch=master', 'init' ]);
+        await runGit(repositoryPath, [ '-c', `user.name=${AUTHOR.name}`, '-c', `user.email=${AUTHOR.email}`, 'commit', '--allow-empty', '--message=Initial commit' ]);
+      });
+
+      it('keeps its branch', async () => {
+        await new Git({ path: repositoryPath, author: AUTHOR }).initialize();
+
+        expect(await runGit(repositoryPath, [ 'symbolic-ref', '--short', 'HEAD' ])).to.equal('master');
+      });
     });
 
     context('when another running process holds the lock', () => {
@@ -536,3 +574,7 @@ describe('Git', () => {
     });
   });
 });
+
+function runGit(repositoryPath, args) {
+  return simpleGit(repositoryPath, { trimmed: true }).raw(args);
+}
