@@ -17,7 +17,7 @@ import TrackingResultsRepository from './repository.js';
 import { STATUSES } from './terms-result/index.js';
 
 export { MissingCollectionIdError } from './errors.js';
-export { RUN_ID_TRAILER_KEY } from './recorder.js';
+export { RUN_ID_TRAILER_KEY } from './run/dataMapper.js';
 
 const require = createRequire(import.meta.url);
 const { version: PACKAGE_VERSION } = require('../../../package.json');

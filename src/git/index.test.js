@@ -316,13 +316,14 @@ describe('Git', () => {
     let subdirectoryPath;
     let firstCommitSha;
     let secondCommitSha;
+    let git;
 
     before(async () => {
       repositoryPath = await fs.mkdtemp(path.join(os.tmpdir(), 'ota-git-test-')); // Under the OS temp directory so the fixture repository is not nested in the engine's own repository
       subdirectoryPath = path.join(repositoryPath, 'declarations');
       await fs.mkdir(subdirectoryPath);
 
-      const git = new Git({ path: repositoryPath, author: { name: 'Test', email: 'test@example.com' } });
+      git = new Git({ path: repositoryPath, author: { name: 'Test', email: 'test@example.com' } });
 
       await git.initialize();
 
@@ -369,17 +370,34 @@ describe('Git', () => {
       });
     });
 
-    describe('.getLatestCommitSha', () => {
+    describe('.getLatestCommit', () => {
       it('returns the newest commit touching the file whose message matches', async () => {
-        expect(await Git.getLatestCommitSha(repositoryPath, { grep: '^Add Service [AB]$', filePath: 'declarations' })).to.equal(secondCommitSha);
+        expect(await Git.getLatestCommit(repositoryPath, { grep: '^Add Service [AB]$', filePath: 'declarations' })).to.deep.equal({ hash: secondCommitSha, trailers: {} });
       });
 
       it('ignores newer commits whose message does not match', async () => {
-        expect(await Git.getLatestCommitSha(repositoryPath, { grep: '^Add Service A$', filePath: 'declarations' })).to.equal(firstCommitSha);
+        expect(await Git.getLatestCommit(repositoryPath, { grep: '^Add Service A$', filePath: 'declarations' })).to.deep.equal({ hash: firstCommitSha, trailers: {} });
       });
 
       it('returns null when no commit matches', async () => {
-        expect(await Git.getLatestCommitSha(repositoryPath, { grep: '^Remove', filePath: 'declarations' })).to.be.null;
+        expect(await Git.getLatestCommit(repositoryPath, { grep: '^Remove', filePath: 'declarations' })).to.be.null;
+      });
+
+      context('when the commit carries trailers', () => {
+        const RUN_ID = 'ota-run-f47ac10b-58cc-4372-a567-0e02b2c3d479';
+        let thirdCommitSha;
+
+        before(async () => {
+          const thirdFilePath = path.join(subdirectoryPath, 'Service C.json');
+
+          await fs.writeFile(thirdFilePath, '{ "name": "Service C" }');
+          await git.add(thirdFilePath);
+          thirdCommitSha = await git.commit({ filePath: thirdFilePath, message: 'Add Service C', trailers: { 'x-run-id': RUN_ID } });
+        });
+
+        it('returns the trailers along with the hash', async () => {
+          expect(await Git.getLatestCommit(repositoryPath, { grep: '^Add Service C$', filePath: 'declarations' })).to.deep.equal({ hash: thirdCommitSha, trailers: { 'x-run-id': RUN_ID } });
+        });
       });
 
       context('when the git configuration makes patterns fixed strings', () => { // Operators may set `grep.patternType` in their own git configuration, and git log honours it
@@ -396,7 +414,7 @@ describe('Git', () => {
         });
 
         it('still matches the message as a regular expression', async () => {
-          expect(await Git.getLatestCommitSha(repositoryPath, { grep: '^Add Service [AB]$', filePath: 'declarations' })).to.equal(secondCommitSha);
+          expect(await Git.getLatestCommit(repositoryPath, { grep: '^Add Service [AB]$', filePath: 'declarations' })).to.deep.equal({ hash: secondCommitSha, trailers: {} });
         });
       });
 
@@ -411,7 +429,7 @@ describe('Git', () => {
         after(() => fs.rm(directory, { recursive: true, force: true }));
 
         it('returns null', async () => {
-          expect(await Git.getLatestCommitSha(directory, { grep: '^Add', filePath: 'declarations' })).to.be.null;
+          expect(await Git.getLatestCommit(directory, { grep: '^Add', filePath: 'declarations' })).to.be.null;
         });
       });
     });

@@ -2,6 +2,7 @@ import Run, { RUN_STATUSES } from './index.js';
 
 export const FILE_NAME = 'run.json';
 export const COMPLETED_RUN_MESSAGE_PREFIX = 'Complete run '; // Shared with readers, which find the latest completed run by the subject of its commit
+export const RUN_ID_TRAILER_KEY = 'x-run-id'; // Git trailer tying every commit of a run to its runId, so run membership stays greppable without relying on commit ranges between two run.json commits; parseTrailers lowercases keys, hence the casing. Shared with readers, which identify the completed run by the trailer of its completion commit
 
 export function toPersistence(run) {
   return {
@@ -9,6 +10,7 @@ export function toPersistence(run) {
     content: `${JSON.stringify(toJSON(run), null, 2)}\n`,
     filePath: FILE_NAME,
     date: run.lastRun.endDate || run.lastRun.startDate,
+    trailers: { [RUN_ID_TRAILER_KEY]: run.runId }, // Every commit of the run file identifies its run, so that readers can tell which run a completion commit closes without reading the file
   };
 }
 

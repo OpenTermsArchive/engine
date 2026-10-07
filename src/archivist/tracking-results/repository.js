@@ -71,10 +71,10 @@ export default class TrackingResultsRepository {
     return { sha, eventType: persistence.eventType };
   }
 
-  saveRun(run, { trailers = {} } = {}) {
+  saveRun(run) {
     run.validate();
 
-    return this.commit({ ...RunMapper.toPersistence(run), trailers });
+    return this.commit(RunMapper.toPersistence(run));
   }
 
   async findLatestTermsResult(serviceId, termsType) {
@@ -95,14 +95,14 @@ export default class TrackingResultsRepository {
     return commit?.hash ?? null;
   }
 
-  async findLatestCompletedRunCommit() { // Readers serve the state recorded by the latest completed run, as a run in progress or crashed has only partially updated the terms results
+  async findLatestCompletedRunCommit() { // Readers serve the state recorded by the latest completed run, as a run in progress or crashed has only partially updated the terms results. The run ID comes from the trailer the run mapper puts on every commit of the run file, so that listing results never depends on reading that file
     if (!fsApi.existsSync(path.join(this.path, '.git'))) { // Checked at each call so that readers started before the first run do not need a restart, and so that git never falls back on an enclosing repository
       return null;
     }
 
-    const commit = await Git.getLatestCommitSha(this.path, { grep: `^${RunMapper.COMPLETED_RUN_MESSAGE_PREFIX}`, filePath: RunMapper.FILE_NAME });
+    const commit = await Git.getLatestCommit(this.path, { grep: `^${RunMapper.COMPLETED_RUN_MESSAGE_PREFIX}`, filePath: RunMapper.FILE_NAME });
 
-    return commit;
+    return commit ? { sha: commit.hash, runId: commit.trailers[RunMapper.RUN_ID_TRAILER_KEY] ?? null } : null;
   }
 
   async findRunAt(commit) {

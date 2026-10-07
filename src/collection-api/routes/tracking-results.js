@@ -103,6 +103,10 @@ const VALID_STATUSES = Object.values(STATUSES);
  *     PaginatedTrackingResultsResponse:
  *       type: object
  *       properties:
+ *         runId:
+ *           type: string
+ *           nullable: true
+ *           description: The ID of the completed tracking run whose state the list reflects, null until a first run completes. Consumers paginating through the list should start over when it changes between two pages, as the pages then come from different runs.
  *         data:
  *           type: array
  *           description: The list of tracking results.
@@ -217,9 +221,13 @@ export default function trackingResultsRouter(trackingResultsRepository, service
   }
 
   async function findTermsResults(filter) { // Every read of a request is pinned to the same commit, so that a run completing meanwhile cannot mix the states of two runs
-    const commit = await trackingResultsRepository.findLatestCompletedRunCommit();
+    const latestRun = await trackingResultsRepository.findLatestCompletedRunCommit();
 
-    return commit ? trackingResultsRepository.findTermsResultsAt(commit, filter) : [];
+    if (!latestRun) {
+      return { runId: null, results: [] };
+    }
+
+    return { runId: latestRun.runId, results: await trackingResultsRepository.findTermsResultsAt(latestRun.sha, filter) };
   }
 
   function paginate(results, { limit, offset }) {
@@ -273,9 +281,9 @@ export default function trackingResultsRouter(trackingResultsRepository, service
       return res.status(400).json({ error: `Invalid status parameter. Must be one of "${VALID_STATUSES.join('", "')}".` });
     }
 
-    const results = await findTermsResults();
+    const { runId, results } = await findTermsResults();
 
-    return res.status(200).json(paginate(status === undefined ? results : results.filter(result => result.status === status), { limit, offset }));
+    return res.status(200).json({ runId, ...paginate(status === undefined ? results : results.filter(result => result.status === status), { limit, offset }) });
   });
 
   /**
@@ -298,13 +306,13 @@ export default function trackingResultsRouter(trackingResultsRepository, service
    *         $ref: '#/components/responses/NotFoundError'
    */
   router.get('/tracking-results/run', async (req, res) => {
-    const commit = await trackingResultsRepository.findLatestCompletedRunCommit();
+    const latestRun = await trackingResultsRepository.findLatestCompletedRunCommit();
 
-    if (!commit) {
+    if (!latestRun) {
       return res.status(404).json({ error: 'No tracking run has completed yet' });
     }
 
-    return res.status(200).json(await trackingResultsRepository.findRunAt(commit));
+    return res.status(200).json(await trackingResultsRepository.findRunAt(latestRun.sha));
   });
 
   /**
@@ -346,13 +354,13 @@ export default function trackingResultsRouter(trackingResultsRepository, service
       return res.status(400).json(validationError);
     }
 
-    const results = await findTermsResults({ serviceId });
+    const { runId, results } = await findTermsResults({ serviceId });
 
     if (!results.length) {
       return res.status(404).json({ error: `No tracking results found for service "${serviceId}"` });
     }
 
-    return res.status(200).json(paginate(results, { limit, offset }));
+    return res.status(200).json({ runId, ...paginate(results, { limit, offset }) });
   });
 
   /**
@@ -389,8 +397,8 @@ export default function trackingResultsRouter(trackingResultsRepository, service
    */
   router.get('/tracking-result/:serviceId/:termsType', async (req, res) => {
     const { serviceId, termsType } = req.params;
-    const commit = await trackingResultsRepository.findLatestCompletedRunCommit();
-    const result = commit && await trackingResultsRepository.findTermsResultAt(commit, serviceId, termsType);
+    const latestRun = await trackingResultsRepository.findLatestCompletedRunCommit();
+    const result = latestRun && await trackingResultsRepository.findTermsResultAt(latestRun.sha, serviceId, termsType);
 
     if (!result) {
       return res.status(404).json({ error: `No tracking result found for service "${serviceId}" and terms type "${termsType}"` });

@@ -3,6 +3,7 @@ import config from 'config';
 import supertest from 'supertest';
 
 import TrackingResultsRepository from '../../archivist/tracking-results/repository.js';
+import { COMPLETED_RUN_MESSAGE_PREFIX, RUN_ID_TRAILER_KEY } from '../../archivist/tracking-results/run/dataMapper.js';
 import Run from '../../archivist/tracking-results/run/index.js';
 import TermsResult, { STATUSES } from '../../archivist/tracking-results/terms-result/index.js';
 import app from '../server.js';
@@ -73,7 +74,7 @@ describe('Tracking results API', () => {
       });
 
       it('returns an empty list', () => {
-        expect(response.body).to.deep.equal({ data: [], count: 0, limit: 100, offset: 0 });
+        expect(response.body).to.deep.equal({ runId: null, data: [], count: 0, limit: 100, offset: 0 });
       });
     });
 
@@ -157,6 +158,10 @@ describe('Tracking results API', () => {
 
       it('returns pagination metadata', () => {
         expect(response.body).to.include({ count: 3, limit: 100, offset: 0 });
+      });
+
+      it('identifies the completed run the list reflects', () => {
+        expect(response.body.runId).to.equal(COMPLETED_RUN_ID);
       });
 
       context('with a status filter', () => {
@@ -260,6 +265,10 @@ describe('Tracking results API', () => {
 
         it('returns pagination metadata', () => {
           expect(response.body).to.include({ count: 2, limit: 100, offset: 0 });
+        });
+
+        it('identifies the completed run the list reflects', () => {
+          expect(response.body.runId).to.equal(COMPLETED_RUN_ID);
         });
       });
 
@@ -416,6 +425,67 @@ describe('Tracking results API', () => {
 
     it('returns a generic error message', () => {
       expect(response.body).to.deep.equal({ error: 'Internal Server Error' });
+    });
+  });
+
+  context('when a run completes between two pages', () => {
+    const NEXT_RUN_ID = 'ota-run-33333333-58cc-4372-a567-0e02b2c3d479';
+    let firstPage;
+    let secondPage;
+
+    async function completeRun(runId, results) {
+      await repository.saveRun(makeRun(runId));
+
+      for (const result of results) {
+        await repository.saveTermsResult(result);
+      }
+
+      const run = makeRun(runId);
+
+      run.markCompleted('2026-04-06T10:42:34Z');
+      await repository.saveRun(run);
+    }
+
+    before(async () => {
+      await completeRun(COMPLETED_RUN_ID, [ makeResult({ serviceId: 'Facebook', termsType: 'Terms of Service' }), makeResult({ serviceId: 'Google', termsType: 'Terms of Service' }) ]);
+      firstPage = (await request.get(`${basePath}/v1/tracking-results?limit=1&offset=0`)).body;
+      await completeRun(NEXT_RUN_ID, [makeResult({ serviceId: 'Google', termsType: 'Privacy Policy' })]);
+      secondPage = (await request.get(`${basePath}/v1/tracking-results?limit=1&offset=1`)).body;
+    });
+
+    after(() => repository.removeAll());
+
+    it('serves the first page as of the run completed at the time', () => {
+      expect(firstPage).to.include({ runId: COMPLETED_RUN_ID, count: 2 });
+    });
+
+    it('serves the second page as of the run that completed meanwhile, which its run ID reveals', () => {
+      expect(secondPage).to.include({ runId: NEXT_RUN_ID, count: 3 });
+    });
+  });
+
+  context('when the run file of the completed run cannot be read', () => { // The lists only need the run ID, which the completion commit carries as a trailer
+    let listResponse;
+    let runResponse;
+
+    before(async () => {
+      await repository.saveRun(makeRun(COMPLETED_RUN_ID));
+      await repository.saveTermsResult(makeResult({ serviceId: 'Facebook', termsType: 'Terms of Service' }));
+      await repository.commit({ filePath: 'run.json', content: '{ broken json', message: `${COMPLETED_RUN_MESSAGE_PREFIX}ota-run-11111111 (1 ok, 0 failed)`, trailers: { [RUN_ID_TRAILER_KEY]: COMPLETED_RUN_ID } });
+
+      listResponse = await request.get(`${basePath}/v1/tracking-results`);
+      runResponse = await request.get(`${basePath}/v1/tracking-results/run`);
+    });
+
+    after(() => repository.removeAll());
+
+    it('still serves the tracking results with their run ID', () => {
+      expect(listResponse.status).to.equal(200);
+      expect(listResponse.body).to.include({ runId: COMPLETED_RUN_ID, count: 1 });
+    });
+
+    it('fails to serve the run itself', () => {
+      expect(runResponse.status).to.equal(500);
     });
   });
 });

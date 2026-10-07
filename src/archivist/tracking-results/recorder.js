@@ -1,9 +1,8 @@
 import { UnreadableRunError } from './errors.js';
+import { RUN_ID_TRAILER_KEY } from './run/dataMapper.js';
 import Run, { RUN_STATUSES } from './run/index.js';
 import { TRANSITIONS_BY_EVENT_TYPE, termsKey } from './terms-result/dataMapper.js';
 import TermsResult, { STATUSES } from './terms-result/index.js';
-
-export const RUN_ID_TRAILER_KEY = 'x-run-id'; // Git trailer tying every commit of a run to its runId, so run membership stays greppable without relying on commit ranges between two run.json commits; parseTrailers lowercases keys, hence the casing
 
 export default class TrackingResultsRecorder {
   constructor({ repository, collectionId, schedule, engineVersion }) {
@@ -36,7 +35,7 @@ export default class TrackingResultsRecorder {
 
     skippedTerms.forEach(skipped => run.addSkipped(skipped)); // Skips known at run start (e.g. terms not selected by a partial run) are persisted in the run-start commit: a crash during the run must not let recovery attribute them to the crash
 
-    await this.repository.saveRun(run, { trailers: runTrailers(run) });
+    await this.repository.saveRun(run);
 
     this.currentRun = run; // Assigned only once the run-start commit landed: a failed start must not leave a half-open run that later recordings would attach to
 
@@ -82,7 +81,7 @@ export default class TrackingResultsRecorder {
 
     run.markCompleted(new Date().toISOString());
 
-    await this.repository.saveRun(run, { trailers: runTrailers(run) });
+    await this.repository.saveRun(run);
 
     this.currentRun = null;
   }
@@ -112,7 +111,7 @@ export default class TrackingResultsRecorder {
     run.coverage = { processed: committedTerms.length, skipped: [ ...persistedSkipped, ...crashSkipped ] };
     ({ tracked: run.tracked, transientErrors: run.transientErrors } = await this.deriveCounts(committedTerms));
     run.markCrashed(new Date().toISOString()); // run.transitions is left as persisted by the run-start commit (empty): deriving it back would mean parsing commit subjects, and the transitions of a crashed run remain derivable by consumers from its per-terms commits
-    await this.repository.saveRun(run, { trailers: runTrailers(run) }); // Carries the crashed run's id, so the finalization commit is greppable alongside the run it closes
+    await this.repository.saveRun(run);
 
     return run;
   }
@@ -151,6 +150,6 @@ export default class TrackingResultsRecorder {
   }
 }
 
-function runTrailers(run) {
+function runTrailers(run) { // Ties the commits of terms results to the run that produced them; the commits of the run file carry the same trailer through their mapper
   return { [RUN_ID_TRAILER_KEY]: run.runId };
 }
