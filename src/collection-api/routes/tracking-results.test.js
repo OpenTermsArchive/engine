@@ -426,4 +426,40 @@ describe('Tracking results API', () => {
       expect(response.body).to.deep.equal({ error: 'Internal Server Error' });
     });
   });
+
+  context('when a run completes between two pages', () => {
+    const NEXT_RUN_ID = 'ota-run-33333333-58cc-4372-a567-0e02b2c3d479';
+    let firstPage;
+    let secondPage;
+
+    async function completeRun(runId, results) {
+      await repository.saveRun(makeRun(runId));
+
+      for (const result of results) {
+        await repository.saveTermsResult(result);
+      }
+
+      const run = makeRun(runId);
+
+      run.markCompleted('2026-04-06T10:42:34Z');
+      await repository.saveRun(run);
+    }
+
+    before(async () => {
+      await completeRun(COMPLETED_RUN_ID, [ makeResult({ serviceId: 'Facebook', termsType: 'Terms of Service' }), makeResult({ serviceId: 'Google', termsType: 'Terms of Service' }) ]);
+      firstPage = (await request.get(`${basePath}/v1/tracking-results?limit=1&offset=0`)).body;
+      await completeRun(NEXT_RUN_ID, [makeResult({ serviceId: 'Google', termsType: 'Privacy Policy' })]);
+      secondPage = (await request.get(`${basePath}/v1/tracking-results?limit=1&offset=1`)).body;
+    });
+
+    after(() => repository.removeAll());
+
+    it('serves the first page as of the run completed at the time', () => {
+      expect(firstPage).to.include({ runId: COMPLETED_RUN_ID, count: 2 });
+    });
+
+    it('serves the second page as of the run that completed meanwhile, which its run ID reveals', () => {
+      expect(secondPage).to.include({ runId: NEXT_RUN_ID, count: 3 });
+    });
+  });
 });
