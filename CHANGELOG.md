@@ -2,6 +2,20 @@
 
 All changes that impact users of this module are documented in this file, in the [Common Changelog](https://common-changelog.org) format with some additional specifications defined in the CONTRIBUTING file. This codebase adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased [patch]
+
+> Development of this release was supported by [Anthelia](https://anthelia.tech).
+
+### Fixed
+
+- Create new versions, snapshots and tracking-results repositories on the `main` branch expected by the deployment, instead of the default branch of the Git configuration of the server, often `master`; to move an existing repository to `main`, stop the tracker and run in its local directory:
+
+  ```bash
+  git branch -m master main
+  git push origin main # Add --force if the remote main branch only holds its initial README
+  git push origin --delete master # After making main the default branch of the remote repository
+  ```
+
 ## 16.3.1 - 2026-10-07
 
 > Development of this release was supported by [Anthelia](https://anthelia.tech).
