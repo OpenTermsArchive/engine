@@ -100,9 +100,9 @@ export default class TrackingResultsRepository {
       return null;
     }
 
-    const commit = await Git.getLatestCommitSha(this.path, { grep: `^${RunMapper.COMPLETED_RUN_MESSAGE_PREFIX}`, filePath: RunMapper.FILE_NAME });
+    const commit = await Git.getLatestCommit(this.path, { grep: `^${RunMapper.COMPLETED_RUN_MESSAGE_PREFIX}`, filePath: RunMapper.FILE_NAME });
 
-    return commit;
+    return commit?.hash ?? null;
   }
 
   async findRunAt(commit) {
