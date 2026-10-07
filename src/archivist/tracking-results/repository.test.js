@@ -451,6 +451,10 @@ describe('TrackingResultsRepository', () => {
       it('persists run.json at the root of the repository', () => {
         expect(fsApi.existsSync(path.join(REPOSITORY_PATH, 'run.json'))).to.be.true;
       });
+
+      it('tags the commit with the run ID trailer', () => {
+        expect(commit.trailers['x-run-id']).to.equal('ota-run-f47ac10b-58cc-4372-a567-0e02b2c3d479');
+      });
     });
 
     context('called twice in a row with identical content', () => {
@@ -862,7 +866,7 @@ describe('TrackingResultsRepository', () => {
           });
 
           it('returns the commit that completed the run to the same reader', async () => {
-            expect(await reader.findLatestCompletedRunCommit()).to.equal(completionCommit);
+            expect(await reader.findLatestCompletedRunCommit()).to.deep.equal({ sha: completionCommit, runId: 'ota-run-f47ac10b-58cc-4372-a567-0e02b2c3d479' });
           });
         });
       });
@@ -896,8 +900,8 @@ describe('TrackingResultsRepository', () => {
 
         after(() => subject.removeAll());
 
-        it('returns the commit that completed the run', async () => {
-          expect(await subject.findLatestCompletedRunCommit()).to.equal(completionCommit.hash);
+        it('returns the commit that completed the run along with the run ID', async () => {
+          expect(await subject.findLatestCompletedRunCommit()).to.deep.equal({ sha: completionCommit.hash, runId: FIRST_RUN_ID });
         });
       });
 
@@ -918,7 +922,7 @@ describe('TrackingResultsRepository', () => {
         after(() => subject.removeAll());
 
         it('returns the commit that completed the previous run', async () => {
-          expect(await subject.findLatestCompletedRunCommit()).to.equal(completionCommit.hash);
+          expect(await subject.findLatestCompletedRunCommit()).to.deep.equal({ sha: completionCommit.hash, runId: FIRST_RUN_ID });
         });
       });
 
@@ -934,7 +938,7 @@ describe('TrackingResultsRepository', () => {
         after(() => subject.removeAll());
 
         it('returns the commit that completed the latest one', async () => {
-          expect(await subject.findLatestCompletedRunCommit()).to.equal(latestCompletionCommit.hash);
+          expect(await subject.findLatestCompletedRunCommit()).to.deep.equal({ sha: latestCompletionCommit.hash, runId: SECOND_RUN_ID });
         });
       });
     });
@@ -947,7 +951,7 @@ describe('TrackingResultsRepository', () => {
         await subject.saveTermsResult(makeResult({ serviceId: 'Facebook', termsType: 'Terms of Service' }));
         await subject.saveTermsResult(makeResult({ serviceId: 'Google', termsType: 'Privacy Policy', status: STATUSES.failed, reasons: ['[fetch] HTTP code 404'] }));
         await completeRun(makeRun({ runId: FIRST_RUN_ID }));
-        commit = await subject.findLatestCompletedRunCommit();
+        ({ sha: commit } = await subject.findLatestCompletedRunCommit());
 
         await subject.saveRun(makeRun({ runId: SECOND_RUN_ID }));
         await subject.saveTermsResult(makeResult({ serviceId: 'Facebook', termsType: 'Terms of Service', status: STATUSES.failed, reasons: ['[fetch] HTTP code 503'] }));

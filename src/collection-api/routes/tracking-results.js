@@ -221,15 +221,13 @@ export default function trackingResultsRouter(trackingResultsRepository, service
   }
 
   async function findTermsResults(filter) { // Every read of a request is pinned to the same commit, so that a run completing meanwhile cannot mix the states of two runs
-    const commit = await trackingResultsRepository.findLatestCompletedRunCommit();
+    const latestRun = await trackingResultsRepository.findLatestCompletedRunCommit();
 
-    if (!commit) {
+    if (!latestRun) {
       return { runId: null, results: [] };
     }
 
-    const [ run, results ] = await Promise.all([ trackingResultsRepository.findRunAt(commit), trackingResultsRepository.findTermsResultsAt(commit, filter) ]);
-
-    return { runId: run.runId, results };
+    return { runId: latestRun.runId, results: await trackingResultsRepository.findTermsResultsAt(latestRun.sha, filter) };
   }
 
   function paginate({ runId, results }, { limit, offset }) {
@@ -309,13 +307,13 @@ export default function trackingResultsRouter(trackingResultsRepository, service
    *         $ref: '#/components/responses/NotFoundError'
    */
   router.get('/tracking-results/run', async (req, res) => {
-    const commit = await trackingResultsRepository.findLatestCompletedRunCommit();
+    const latestRun = await trackingResultsRepository.findLatestCompletedRunCommit();
 
-    if (!commit) {
+    if (!latestRun) {
       return res.status(404).json({ error: 'No tracking run has completed yet' });
     }
 
-    return res.status(200).json(await trackingResultsRepository.findRunAt(commit));
+    return res.status(200).json(await trackingResultsRepository.findRunAt(latestRun.sha));
   });
 
   /**
@@ -400,8 +398,8 @@ export default function trackingResultsRouter(trackingResultsRepository, service
    */
   router.get('/tracking-result/:serviceId/:termsType', async (req, res) => {
     const { serviceId, termsType } = req.params;
-    const commit = await trackingResultsRepository.findLatestCompletedRunCommit();
-    const result = commit && await trackingResultsRepository.findTermsResultAt(commit, serviceId, termsType);
+    const latestRun = await trackingResultsRepository.findLatestCompletedRunCommit();
+    const result = latestRun && await trackingResultsRepository.findTermsResultAt(latestRun.sha, serviceId, termsType);
 
     if (!result) {
       return res.status(404).json({ error: `No tracking result found for service "${serviceId}" and terms type "${termsType}"` });

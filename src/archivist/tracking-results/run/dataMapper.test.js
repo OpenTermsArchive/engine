@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 
-import { FILE_NAME, formatMessage, toDomain, toPersistence } from './dataMapper.js';
+import { FILE_NAME, RUN_ID_TRAILER_KEY, formatMessage, toDomain, toPersistence } from './dataMapper.js';
 
 import Run from './index.js';
 
@@ -82,6 +82,10 @@ describe('run/dataMapper', () => {
       it('uses the start date when no end date is set', () => {
         expect(persistence.date).to.equal('2026-04-06T10:30:00Z');
       });
+
+      it('tags the commit with the run ID as a trailer', () => {
+        expect(persistence.trailers).to.deep.equal({ [RUN_ID_TRAILER_KEY]: 'ota-run-f47ac10b-58cc-4372-a567-0e02b2c3d479' });
+      });
     });
 
     context('with a completed run', () => {
@@ -101,6 +105,10 @@ describe('run/dataMapper', () => {
 
       it('uses the end date once it is set', () => {
         expect(persistence.date).to.equal('2026-04-06T10:42:34Z');
+      });
+
+      it('tags the completion commit with the run ID as a trailer, for readers to identify the run it completes', () => {
+        expect(persistence.trailers).to.deep.equal({ [RUN_ID_TRAILER_KEY]: 'ota-run-f47ac10b-58cc-4372-a567-0e02b2c3d479' });
       });
     });
 
