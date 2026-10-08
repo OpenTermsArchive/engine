@@ -10,7 +10,7 @@ export default async function publishRelease({ archivePath, releaseDate, stats }
   // If both GitHub and GitLab tokens are defined, GitHub takes precedence
   if (process.env.OTA_ENGINE_GITHUB_TOKEN) {
     platforms.push({ name: 'GitHub', publish: () => publishGitHub({ archivePath, releaseDate, stats }) });
-  } else if (process.env.OTA_ENGINE_GITLAB_TOKEN) {
+  } else if (process.env.OTA_ENGINE_GITLAB_RELEASES_TOKEN) {
     platforms.push({ name: 'GitLab', publish: () => publishGitLab({ archivePath, releaseDate, stats }) });
   }
 
@@ -19,7 +19,7 @@ export default async function publishRelease({ archivePath, releaseDate, stats }
   }
 
   if (!platforms.length) {
-    throw new Error('No publishing platform configured. Please configure at least one of: GitHub (OTA_ENGINE_GITHUB_TOKEN), GitLab (OTA_ENGINE_GITLAB_TOKEN), or data.gouv.fr (OTA_ENGINE_DATAGOUV_API_KEY + datasetId or organizationIdOrSlug in config).');
+    throw new Error('No publishing platform configured. Please configure at least one of: GitHub (OTA_ENGINE_GITHUB_TOKEN), GitLab (OTA_ENGINE_GITLAB_RELEASES_TOKEN), or data.gouv.fr (OTA_ENGINE_DATAGOUV_API_KEY + datasetId or organizationIdOrSlug in config).');
   }
 
   const succeeded = [];

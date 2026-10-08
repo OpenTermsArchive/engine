@@ -13,7 +13,8 @@ All changes that impact users of this module are documented in this file, in the
 
 ### Changed
 
-- Use the `OTA_ENGINE_GITHUB_TOKEN` and `OTA_ENGINE_GITLAB_TOKEN` environment variables only to publish datasets, as the engine no longer needs them to track terms
+- Use the `OTA_ENGINE_GITHUB_TOKEN` environment variable only to publish datasets, as the engine no longer needs it to track terms
+- Publish datasets to GitLab when the `OTA_ENGINE_GITLAB_RELEASES_TOKEN` environment variable is defined, as it is the token that authenticates the publishing requests; the `OTA_ENGINE_GITLAB_TOKEN` environment variable is no longer used and can be removed
 
 ## 16.4.0 - 2026-10-07
 
