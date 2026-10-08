@@ -4,9 +4,11 @@ import { fileURLToPath } from 'url';
 
 import { expect } from 'chai';
 import config from 'config';
+import { HttpProxyAgent } from 'http-proxy-agent';
+import { HttpsProxyAgent } from 'https-proxy-agent';
 import nock from 'nock';
 
-import publish from './index.js';
+import publish, { baseOptionsHttpReq } from './index.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -87,6 +89,55 @@ describe('GitLab dataset publisher', () => {
 
     it('returns the direct asset URL', () => {
       expect(result).to.equal(DIRECT_ASSET_URL);
+    });
+  });
+
+  describe('#baseOptionsHttpReq', () => {
+    const PROXY_VARIABLES = [ 'HTTP_PROXY', 'HTTPS_PROXY', 'http_proxy', 'https_proxy' ];
+    const PROXY_URL = 'http://proxy.example.test:8080';
+    let previousValues;
+
+    beforeEach(() => {
+      previousValues = Object.fromEntries(PROXY_VARIABLES.map(name => [ name, process.env[name] ]));
+      PROXY_VARIABLES.forEach(name => delete process.env[name]);
+    });
+
+    afterEach(() => {
+      PROXY_VARIABLES.forEach(name => {
+        if (previousValues[name] === undefined) {
+          delete process.env[name];
+        } else {
+          process.env[name] = previousValues[name];
+        }
+      });
+    });
+
+    context('without any proxy', () => {
+      it('does not set any agent', () => {
+        expect(baseOptionsHttpReq('https://gitlab.example.test/api/v4').agent).to.be.undefined;
+      });
+    });
+
+    context('with a lowercase HTTPS proxy', () => {
+      it('reaches an HTTPS API through it', () => {
+        process.env.https_proxy = PROXY_URL;
+
+        expect(baseOptionsHttpReq('https://gitlab.example.test/api/v4').agent).to.be.an.instanceof(HttpsProxyAgent);
+      });
+    });
+
+    context('with an HTTP proxy only', () => {
+      it('reaches an HTTPS API by tunnelling through it', () => {
+        process.env.HTTP_PROXY = PROXY_URL;
+
+        expect(baseOptionsHttpReq('https://gitlab.example.test/api/v4').agent).to.be.an.instanceof(HttpsProxyAgent);
+      });
+
+      it('reaches an HTTP API through it', () => {
+        process.env.HTTP_PROXY = PROXY_URL;
+
+        expect(baseOptionsHttpReq('http://gitlab.example.test/api/v4').agent).to.be.an.instanceof(HttpProxyAgent);
+      });
     });
   });
 });

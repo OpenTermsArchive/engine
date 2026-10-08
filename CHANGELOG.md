@@ -16,6 +16,10 @@ All changes that impact users of this module are documented in this file, in the
 - Use the `OTA_ENGINE_GITHUB_TOKEN` environment variable only to publish datasets, as the engine no longer needs it to track terms
 - Publish datasets to GitLab when the `OTA_ENGINE_GITLAB_RELEASES_TOKEN` environment variable is defined, as it is the token that authenticates the publishing requests; the `OTA_ENGINE_GITLAB_TOKEN` environment variable is no longer used and can be removed
 
+### Fixed
+
+- Publish datasets to GitLab through the proxy defined by the lowercase `http_proxy` or `https_proxy` environment variables, or by `HTTP_PROXY` alone, as the fetching of terms already does
+
 ## 16.4.0 - 2026-10-07
 
 > Development of this release was supported by the [NGI0 Commons Fund](https://nlnet.nl/project/Modular-OTA/), a fund established by [NLnet](https://nlnet.nl/) with financial support from the European Commission's [Next Generation Internet](https://www.ngi.eu) programme, under the aegis of DG CNECT under grant agreement N°101069594.

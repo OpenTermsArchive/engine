@@ -8,6 +8,7 @@ import { HttpProxyAgent } from 'http-proxy-agent';
 import { HttpsProxyAgent } from 'https-proxy-agent';
 import nodeFetch from 'node-fetch';
 
+import { resolveProxyConfiguration } from '../../../../src/archivist/fetcher/proxyUtils.js';
 import * as readme from '../../assets/README.template.js';
 import { createModuleLogger } from '../../logger/index.js';
 
@@ -32,7 +33,7 @@ export default async function publish({
   try {
     const repositoryPath = `${commonParams.owner}/${commonParams.repo}`;
 
-    const options = baseOptionsHttpReq(process.env.OTA_ENGINE_GITLAB_RELEASES_TOKEN);
+    const options = baseOptionsHttpReq(gitlabAPIUrl);
 
     options.method = 'GET';
     options.headers = {
@@ -56,7 +57,7 @@ export default async function publish({
   const tagName = path.basename(archiveFilename, path.extname(archiveFilename)); // use archive filename as Git tag
 
   try {
-    let options = baseOptionsHttpReq(process.env.OTA_ENGINE_GITLAB_RELEASES_TOKEN);
+    let options = baseOptionsHttpReq(gitlabAPIUrl);
 
     options.method = 'POST';
     options.body = {
@@ -83,7 +84,7 @@ export default async function publish({
     logger.info(`Created release with releaseId: ${releaseId}`);
 
     // Upload the package
-    options = baseOptionsHttpReq(process.env.OTA_ENGINE_GITLAB_RELEASES_TOKEN);
+    options = baseOptionsHttpReq(gitlabAPIUrl);
     options.method = 'PUT';
     options.body = fsApi.createReadStream(archivePath);
 
@@ -114,7 +115,7 @@ export default async function publish({
     formData.append('url', publishedPackageUrl);
     formData.append('file', fsApi.createReadStream(archivePath), { filename: archiveFilename });
 
-    options = baseOptionsHttpReq(process.env.OTA_ENGINE_GITLAB_RELEASES_TOKEN);
+    options = baseOptionsHttpReq(gitlabAPIUrl);
     options.method = 'POST';
     options.headers = {
       ...formData.getHeaders(),
@@ -136,13 +137,14 @@ export default async function publish({
   }
 }
 
-function baseOptionsHttpReq(token) { // Authenticated request options honouring the proxy environment variables, as the GitLab API is reached through node-fetch
-  const options = { headers: { Authorization: `Bearer ${token}` } };
+export function baseOptionsHttpReq(apiURL) { // Authenticated request options honouring the proxy environment variables, as the GitLab API is reached through node-fetch
+  const options = { headers: { Authorization: `Bearer ${process.env.OTA_ENGINE_GITLAB_RELEASES_TOKEN}` } };
+  const { httpProxy, httpsProxy } = resolveProxyConfiguration();
 
-  if (process.env.HTTPS_PROXY) {
-    options.agent = new HttpsProxyAgent(process.env.HTTPS_PROXY);
-  } else if (process.env.HTTP_PROXY) {
-    options.agent = new HttpProxyAgent(process.env.HTTP_PROXY);
+  if (apiURL.startsWith('https:') && httpsProxy) {
+    options.agent = new HttpsProxyAgent(httpsProxy);
+  } else if (apiURL.startsWith('http:') && httpProxy) {
+    options.agent = new HttpProxyAgent(httpProxy);
   }
 
   return options;
