@@ -8,7 +8,7 @@ All changes that impact users of this module are documented in this file, in the
 
 ### Removed
 
-- **Breaking:** Remove the reporter that created issues on GitHub or GitLab when tracking failed, along with its `reporter` configuration; install the [`@opentermsarchive/issue-reporter`](https://github.com/OpenTermsArchive/issue-reporter) module in the collection, move the `reporter` configuration to its `@opentermsarchive/issue-reporter` key with an additional `collectionApi.url` entry, rename the token environment variable to `OTA_ISSUE_REPORTER_GITHUB_TOKEN` or `OTA_ISSUE_REPORTER_GITLAB_TOKEN`, and run `ota-issue-reporter sync --schedule` alongside the engine, as described in [how to report tracking failures](https://docs.opentermsarchive.org/collections/how-to/report-tracking-failures/)
+- **Breaking:** Remove the reporter that created issues on GitHub or GitLab when tracking failed, along with its `reporter` configuration; install the [`@opentermsarchive/issue-reporter`](https://github.com/OpenTermsArchive/issue-reporter) module in the collection, move the `reporter` configuration to its `@opentermsarchive/issue-reporter` key with an additional `collectionApi.url` entry, replacing any legacy `githubIssues` entry with `"type": "github"` next to the same `repositories`, rename the token environment variable to `OTA_ISSUE_REPORTER_GITHUB_TOKEN` or `OTA_ISSUE_REPORTER_GITLAB_TOKEN`, and run `ota-issue-reporter sync --schedule` alongside the engine, as described in [how to report tracking failures](https://docs.opentermsarchive.org/collections/how-to/report-tracking-failures/)
 - **Breaking:** Remove the `scripts/reporter/duplicate` script, which closed the duplicate issues that engines older than v2.3.2 could create
 
 ### Changed

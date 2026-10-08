@@ -46,7 +46,9 @@ export default async function track({ services, types, schedule }) {
   const { archivist, services: filteredServices } = await initialize(services, { trackingResultsConfig: config.get('@opentermsarchive/engine.tracking-results') });
 
   if (config.has('@opentermsarchive/engine.reporter')) { // Issues reporting moved to its own module, so a configuration left in place would silently stop reporting
-    logger.warn('The "reporter" configuration is no longer used by the engine; move it to the "@opentermsarchive/issue-reporter" key and run the @opentermsarchive/issue-reporter module alongside the engine, see https://github.com/OpenTermsArchive/issue-reporter');
+    const legacyFormatHint = config.has('@opentermsarchive/engine.reporter.githubIssues') ? ', replacing its legacy "githubIssues" entry with "type": "github" next to the same "repositories"' : '';
+
+    logger.warn(`The "reporter" configuration is no longer used by the engine; move it to the "@opentermsarchive/issue-reporter" key${legacyFormatHint} and run the @opentermsarchive/issue-reporter module alongside the engine, see https://github.com/OpenTermsArchive/issue-reporter`);
   }
 
   // Technical upgrade pass: apply changes from engine, dependency, or declaration upgrades.
