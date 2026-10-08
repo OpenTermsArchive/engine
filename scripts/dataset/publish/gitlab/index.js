@@ -4,9 +4,11 @@ import path from 'path';
 import config from 'config';
 import dotenv from 'dotenv';
 import FormData from 'form-data';
+import { HttpProxyAgent } from 'http-proxy-agent';
+import { HttpsProxyAgent } from 'https-proxy-agent';
 import nodeFetch from 'node-fetch';
 
-import GitLab from '../../../../src/reporter/gitlab/index.js';
+import { resolveProxyConfiguration } from '../../../../src/archivist/fetcher/proxyUtils.js';
 import * as readme from '../../assets/README.template.js';
 import { createModuleLogger } from '../../logger/index.js';
 
@@ -31,7 +33,7 @@ export default async function publish({
   try {
     const repositoryPath = `${commonParams.owner}/${commonParams.repo}`;
 
-    const options = GitLab.baseOptionsHttpReq(process.env.OTA_ENGINE_GITLAB_RELEASES_TOKEN);
+    const options = baseOptionsHttpReq(gitlabAPIUrl);
 
     options.method = 'GET';
     options.headers = {
@@ -55,7 +57,7 @@ export default async function publish({
   const tagName = path.basename(archiveFilename, path.extname(archiveFilename)); // use archive filename as Git tag
 
   try {
-    let options = GitLab.baseOptionsHttpReq(process.env.OTA_ENGINE_GITLAB_RELEASES_TOKEN);
+    let options = baseOptionsHttpReq(gitlabAPIUrl);
 
     options.method = 'POST';
     options.body = {
@@ -82,7 +84,7 @@ export default async function publish({
     logger.info(`Created release with releaseId: ${releaseId}`);
 
     // Upload the package
-    options = GitLab.baseOptionsHttpReq(process.env.OTA_ENGINE_GITLAB_RELEASES_TOKEN);
+    options = baseOptionsHttpReq(gitlabAPIUrl);
     options.method = 'PUT';
     options.body = fsApi.createReadStream(archivePath);
 
@@ -113,7 +115,7 @@ export default async function publish({
     formData.append('url', publishedPackageUrl);
     formData.append('file', fsApi.createReadStream(archivePath), { filename: archiveFilename });
 
-    options = GitLab.baseOptionsHttpReq(process.env.OTA_ENGINE_GITLAB_RELEASES_TOKEN);
+    options = baseOptionsHttpReq(gitlabAPIUrl);
     options.method = 'POST';
     options.headers = {
       ...formData.getHeaders(),
@@ -133,4 +135,17 @@ export default async function publish({
     logger.error('Failed to create release or upload ZIP file:', error);
     throw error;
   }
+}
+
+export function baseOptionsHttpReq(apiURL) { // Authenticated request options honouring the proxy environment variables, as the GitLab API is reached through node-fetch
+  const options = { headers: { Authorization: `Bearer ${process.env.OTA_ENGINE_GITLAB_RELEASES_TOKEN}` } };
+  const { httpProxy, httpsProxy } = resolveProxyConfiguration();
+
+  if (apiURL.startsWith('https:') && httpsProxy) {
+    options.agent = new HttpsProxyAgent(httpsProxy);
+  } else if (apiURL.startsWith('http:') && httpProxy) {
+    options.agent = new HttpProxyAgent(httpProxy);
+  }
+
+  return options;
 }

@@ -7,7 +7,6 @@ import cronstrue from 'cronstrue';
 import { getCollection } from './archivist/collection/index.js';
 import Archivist from './archivist/index.js';
 import logger from './logger/index.js';
-import Reporter from './reporter/index.js';
 
 const require = createRequire(import.meta.url);
 const { version: PACKAGE_VERSION } = require('../package.json');
@@ -46,24 +45,17 @@ async function initialize(services, { trackingResultsConfig } = {}) {
 export default async function track({ services, types, schedule }) {
   const { archivist, services: filteredServices } = await initialize(services, { trackingResultsConfig: config.get('@opentermsarchive/engine.tracking-results') });
 
+  if (config.has('@opentermsarchive/engine.reporter')) { // Issues reporting moved to its own module, so a configuration left in place would silently stop reporting
+    const legacyFormatHint = config.has('@opentermsarchive/engine.reporter.githubIssues') ? ', replacing its legacy "githubIssues" entry with "type": "github" next to the same "repositories"' : '';
+
+    logger.warn(`The "reporter" configuration is no longer used by the engine; move it to the "@opentermsarchive/issue-reporter" key${legacyFormatHint} and run the @opentermsarchive/issue-reporter module alongside the engine, see https://github.com/OpenTermsArchive/issue-reporter`);
+  }
+
   // Technical upgrade pass: apply changes from engine, dependency, or declaration upgrades.
   // This regenerates versions from existing snapshots with updated extraction logic.
   // For terms with combined source documents, if a new document was added to the declaration, it will be fetched and combined with existing snapshots to regenerate the complete version.
   // All versions from this pass are labeled as technical upgrades to avoid false notifications about content changes.
   await archivist.applyTechnicalUpgrades({ services: filteredServices, types });
-
-  if (process.env.OTA_ENGINE_GITHUB_TOKEN || process.env.OTA_ENGINE_GITLAB_TOKEN) {
-    try {
-      const reporter = new Reporter(config.get('@opentermsarchive/engine.reporter'));
-
-      await reporter.initialize();
-      archivist.attach(reporter);
-    } catch (error) {
-      logger.error('Cannot instantiate the Reporter module; it will be ignored:', error);
-    }
-  } else {
-    logger.warn('Environment variable with token for GitHub or GitLab was not found; the Reporter module will be ignored');
-  }
 
   if (!schedule) {
     await archivist.track({ services: filteredServices, types });
