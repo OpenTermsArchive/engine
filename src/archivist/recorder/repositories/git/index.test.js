@@ -989,6 +989,45 @@ describe('GitRepository', () => {
       });
     });
 
+    describe('#getDiffStatsBatch', () => {
+      const INVALID_RECORD_IDS = [ 'not-a-record-id', '--output=injected' ];
+      let firstRecordId;
+      let secondRecordId;
+      let stats;
+
+      before(async () => {
+        ({ id: firstRecordId } = await subject.save(new Version({
+          serviceId: SERVICE_PROVIDER_ID,
+          termsType: TERMS_TYPE,
+          content: 'first line\n',
+          fetchDate: FETCH_DATE,
+          snapshotIds: [SNAPSHOT_ID],
+        })));
+        ({ id: secondRecordId } = await subject.save(new Version({
+          serviceId: SERVICE_PROVIDER_ID,
+          termsType: TERMS_TYPE,
+          content: 'first line updated\nsecond line\n',
+          fetchDate: FETCH_DATE_LATER,
+          snapshotIds: [SNAPSHOT_ID],
+        })));
+
+        stats = await subject.getDiffStatsBatch([ firstRecordId, secondRecordId, ...INVALID_RECORD_IDS ]);
+      });
+
+      after(() => subject.removeAll());
+
+      it('returns the lines added and deleted by each record', () => {
+        expect(stats.get(firstRecordId)).to.deep.equal({ additions: 1, deletions: 0 });
+        expect(stats.get(secondRecordId)).to.deep.equal({ additions: 2, deletions: 1 });
+      });
+
+      it('reports the diff stats of invalid record IDs as unavailable', () => {
+        for (const invalidRecordId of INVALID_RECORD_IDS) {
+          expect(stats.get(invalidRecordId)).to.deep.equal({ additions: null, deletions: null });
+        }
+      });
+    });
+
     describe('#getNavigationIds', () => {
       let firstVersion;
       let middleVersion;

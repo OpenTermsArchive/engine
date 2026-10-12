@@ -17,6 +17,8 @@ const fs = fsApi.promises;
 const WRITER_LOCK_FILE_NAME = 'ota-writer.lock';
 const DEFAULT_BRANCH = 'main';
 const READER_MAX_CONCURRENT_PROCESSES = 4; // Read-only commands write neither the index nor the commit-graph, so a reader can run several of them at once; the limit keeps a burst of API requests from taking all the CPU away from the tracker
+const DIFF_STATS_BATCH_SIZE = 200; // Bounds the length of the command line, which is limited on some platforms
+const COMMIT_HASH_REGEXP = /^[0-9a-f]{40}$/;
 
 const OBJECT_NOT_FOUND_MESSAGES = /bad object|not a tree|invalid object name|unknown revision|does not exist|exists on disk, but not in/i;
 
@@ -330,34 +332,60 @@ export default class Git {
   }
 
   async getDiffStats(commitHash) {
-    const output = await this.git.raw([
+    const [stats] = (await this.getDiffStatsBatch([commitHash])).values(); // Taken as the only entry rather than by key, as git prints the full hash of an abbreviated one
+
+    return stats;
+  }
+
+  async getDiffStatsBatch(commitHashes) {
+    const outputs = await Promise.all(splitIntoBatches(commitHashes, DIFF_STATS_BATCH_SIZE).map(batch => this.git.raw([
       'show',
       '--numstat', // Report added/deleted line counts per file as tab-separated numbers, instead of a textual diff
-      '--format=', // Drop the commit header so the output holds only the numstat lines
-      commitHash,
-    ]);
+      '--format=%H', // Print the hash of each commit before its numstat lines, to tell which commit they belong to
+      '--end-of-options', // Everything after is a revision, never an option
+      ...batch,
+    ])));
 
-    let additions = 0;
-    let deletions = 0;
+    return new Map(outputs.flatMap(parseNumstatOutput));
+  }
+}
 
-    for (const line of output.trim().split('\n')) {
-      if (!line) {
-        continue;
-      }
+function splitIntoBatches(items, batchSize) {
+  const batches = [];
 
-      const [ added, deleted ] = line.split('\t');
+  for (let start = 0; start < items.length; start += batchSize) {
+    batches.push(items.slice(start, start + batchSize));
+  }
 
-      // Binary files show '-' for additions/deletions
-      if (added !== '-') {
-        additions += parseInt(added, 10);
-      }
-      if (deleted !== '-') {
-        deletions += parseInt(deleted, 10);
-      }
+  return batches;
+}
+
+function parseNumstatOutput(output) {
+  const entries = [];
+
+  for (const line of output.split('\n')) {
+    if (COMMIT_HASH_REGEXP.test(line)) {
+      entries.push([ line, { additions: 0, deletions: 0 }]);
+      continue;
     }
 
-    return { additions, deletions };
+    if (!line) {
+      continue;
+    }
+
+    const [ added, deleted ] = line.split('\t');
+    const [ , stats ] = entries.at(-1);
+
+    // Binary files show '-' for additions/deletions
+    if (added !== '-') {
+      stats.additions += parseInt(added, 10);
+    }
+    if (deleted !== '-') {
+      stats.deletions += parseInt(deleted, 10);
+    }
   }
+
+  return entries;
 }
 
 async function readObjectAtCommit(repositoryPath, args) {

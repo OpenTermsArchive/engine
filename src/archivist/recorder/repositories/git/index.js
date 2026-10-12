@@ -236,6 +236,12 @@ export default class GitRepository extends RepositoryInterface {
     return this.git.getDiffStats(recordId);
   }
 
+  async getDiffStatsBatch(recordIds) {
+    const statsByHash = await this.git.getDiffStatsBatch(recordIds.filter(recordId => RECORD_ID_REGEXP.test(recordId))); // Only well-formed IDs reach git, as a single invalid one would fail the whole batch
+
+    return new Map(recordIds.map(recordId => [ recordId, statsByHash.get(recordId) || { additions: null, deletions: null } ]));
+  }
+
   async #getCommits({ pathFilter, reverse = false, limit, offset, includeTechnicalUpgrades = true } = {}) {
     const prefixes = includeTechnicalUpgrades
       ? DataMapper.COMMIT_MESSAGE_PREFIXES

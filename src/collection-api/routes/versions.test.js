@@ -1,5 +1,6 @@
 import { expect } from 'chai';
 import config from 'config';
+import sinon from 'sinon';
 import supertest from 'supertest';
 
 import RepositoryFactory from '../../archivist/recorder/repositories/factory.js';
@@ -116,6 +117,22 @@ describe('Versions API', () => {
         expect(response.body.data[0].fetchDate).to.equal(toISODateWithoutMilliseconds(version3.fetchDate));
         expect(response.body.data[1].fetchDate).to.equal(toISODateWithoutMilliseconds(version2.fetchDate));
         expect(response.body.data[2].fetchDate).to.equal(toISODateWithoutMilliseconds(version1.fetchDate));
+      });
+    });
+
+    context('when reading the diff stats of the listed versions', () => {
+      let getDiffStatsBatchSpy;
+
+      before(async () => {
+        getDiffStatsBatchSpy = sinon.spy(Object.getPrototypeOf(versionsRepository), 'getDiffStatsBatch');
+        await request.get(`${basePath}/v1/versions/service-1/Terms%20of%20Service`);
+      });
+
+      after(() => getDiffStatsBatchSpy.restore());
+
+      it('reads them for all the versions at once', () => {
+        expect(getDiffStatsBatchSpy.callCount).to.equal(1);
+        expect(getDiffStatsBatchSpy.firstCall.args[0]).to.deep.equal([ version3.id, version2.id, version1.id ]);
       });
     });
 

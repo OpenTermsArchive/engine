@@ -379,6 +379,69 @@ describe('Git', () => {
     });
   });
 
+  describe('diff statistics', () => {
+    let repositoryPath;
+    let git;
+    let creationSha;
+    let updateSha;
+    let binarySha;
+
+    before(async () => {
+      repositoryPath = await fs.mkdtemp(path.join(os.tmpdir(), 'ota-git-test-'));
+      git = new Git({ path: repositoryPath, author: { name: 'Test', email: 'test@example.com' } });
+
+      await git.initialize();
+
+      const textFilePath = path.join(repositoryPath, 'Terms of Service.md');
+      const binaryFilePath = path.join(repositoryPath, 'Terms of Service.pdf');
+
+      await fs.writeFile(textFilePath, 'first\nsecond\nthird\n');
+      await git.add(textFilePath);
+      creationSha = await git.commit({ filePath: textFilePath, message: 'Create terms' });
+
+      await fs.writeFile(textFilePath, 'first\nsecond updated\nthird\nfourth\n');
+      await git.add(textFilePath);
+      updateSha = await git.commit({ filePath: textFilePath, message: 'Update terms' });
+
+      await fs.writeFile(binaryFilePath, Buffer.from([ 0x25, 0x50, 0x44, 0x46, 0x00, 0xFF ]));
+      await git.add(binaryFilePath);
+      binarySha = await git.commit({ filePath: binaryFilePath, message: 'Add binary terms' });
+    });
+
+    after(() => fs.rm(repositoryPath, { recursive: true, force: true }));
+
+    describe('#getDiffStatsBatch', () => {
+      let stats;
+
+      before(async () => {
+        stats = await git.getDiffStatsBatch([ creationSha, updateSha, binarySha, creationSha ]);
+      });
+
+      it('counts the lines added and deleted by each commit', () => {
+        expect(stats.get(creationSha)).to.deep.equal({ additions: 3, deletions: 0 });
+        expect(stats.get(updateSha)).to.deep.equal({ additions: 2, deletions: 1 });
+      });
+
+      it('counts no line for a binary file', () => {
+        expect(stats.get(binarySha)).to.deep.equal({ additions: 0, deletions: 0 });
+      });
+
+      it('returns a single entry per commit', () => {
+        expect([...stats.keys()]).to.have.members([ creationSha, updateSha, binarySha ]);
+      });
+
+      it('returns no entry when no commit is given', async () => {
+        expect((await git.getDiffStatsBatch([])).size).to.equal(0);
+      });
+    });
+
+    describe('#getDiffStats', () => {
+      it('accepts an abbreviated commit SHA', async () => {
+        expect(await git.getDiffStats(updateSha.slice(0, 7))).to.deep.equal({ additions: 2, deletions: 1 });
+      });
+    });
+  });
+
   describe('reading at a specific commit', () => {
     let repositoryPath;
     let subdirectoryPath;
