@@ -6,6 +6,7 @@ import { expect, use } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import config from 'config';
 import mime from 'mime';
+import simpleGit from 'simple-git';
 
 import Git from '../../../../git/index.js';
 import Snapshot from '../../snapshot.js';
@@ -2157,6 +2158,28 @@ describe('GitRepository', () => {
       });
 
       await expect(missingRepository.initialize()).to.be.rejectedWith(Error, /does not exist/);
+    });
+
+    context('when the repository configuration quotes non-ASCII file names, as in a plain clone', () => {
+      const NON_ASCII_SERVICE_ID = 'service·A';
+
+      before(async () => {
+        await simpleGit(RECORDER_PATH).raw([ 'config', '--file', path.join(RECORDER_PATH, '.git', 'config'), 'core.quotePath', 'true' ]); // Set rather than unset, as an unset value would fall back on the global configuration of the machine, which often disables quoting
+
+        await writer.save(new Version({
+          serviceId: NON_ASCII_SERVICE_ID,
+          termsType: TERMS_TYPE,
+          content: CONTENT,
+          fetchDate: FETCH_DATE_LATER,
+          snapshotIds: [SNAPSHOT_ID],
+        }));
+      });
+
+      it('reads their service ID verbatim', async () => {
+        const records = await subject.findAll();
+
+        expect(records.map(({ serviceId }) => serviceId)).to.include(NON_ASCII_SERVICE_ID);
+      });
     });
   });
 });

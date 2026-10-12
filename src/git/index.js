@@ -144,7 +144,7 @@ export default class Git {
       throw new Error(`Repository ${this.path} does not exist, it has to be created by a writer such as the tracker first`); // Without this check, git would silently walk up to an enclosing repository, such as the collection one
     }
 
-    this.#connect({ maxConcurrentProcesses: READER_MAX_CONCURRENT_PROCESSES });
+    this.#connect({ maxConcurrentProcesses: READER_MAX_CONCURRENT_PROCESSES, config: ['core.quotePath=false'] }); // Disable pathname quoting for the same reason Git.initialize sets it on managed repositories, as a repository opened for reading may not have been configured by a writer, such as a plain clone
   }
 
   #connect(options) {
