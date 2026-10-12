@@ -16,6 +16,7 @@ const fs = fsApi.promises;
 
 const WRITER_LOCK_FILE_NAME = 'ota-writer.lock';
 const DEFAULT_BRANCH = 'main';
+const READER_MAX_CONCURRENT_PROCESSES = 4; // Read-only commands write neither the index nor the commit-graph, so a reader can run several of them at once; the limit keeps a burst of API requests from taking all the CPU away from the tracker
 
 const OBJECT_NOT_FOUND_MESSAGES = /bad object|not a tree|invalid object name|unknown revision|does not exist|exists on disk, but not in/i;
 
@@ -103,7 +104,7 @@ export default class Git {
       await fs.mkdir(this.path, { recursive: true }); // simple-git cannot be instantiated on a missing directory
     }
 
-    this.#connect();
+    this.#connect({ maxConcurrentProcesses: 1 }); // Concurrent runs on the same repository race the index and the commit-graph and can corrupt them
     await this.git.init([`--initial-branch=${DEFAULT_BRANCH}`]); // Otherwise the branch of a new repository would depend on the `init.defaultBranch` setting of the server, which is often `master`, whereas the published repositories and the deployment use `main`. Git ignores this option for an existing repository, which thus keeps its branch, as renaming it would diverge from its remote
     await this.#acquireWriterLock();
 
@@ -143,14 +144,11 @@ export default class Git {
       throw new Error(`Repository ${this.path} does not exist, it has to be created by a writer such as the tracker first`); // Without this check, git would silently walk up to an enclosing repository, such as the collection one
     }
 
-    this.#connect();
+    this.#connect({ maxConcurrentProcesses: READER_MAX_CONCURRENT_PROCESSES });
   }
 
-  #connect() {
-    this.git = simpleGit(this.path, {
-      trimmed: true,
-      maxConcurrentProcesses: 1, // Concurrent runs on the same repository race the index and the commit-graph and can corrupt them
-    });
+  #connect(options) {
+    this.git = simpleGit(this.path, { trimmed: true, ...options });
   }
 
   add(filePath) {

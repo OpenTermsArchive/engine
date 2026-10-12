@@ -1,6 +1,7 @@
-import { spawn } from 'child_process';
+import childProcess, { spawn } from 'child_process';
 import crypto from 'crypto';
 import fs from 'fs/promises';
+import { syncBuiltinESMExports } from 'module';
 import os from 'os';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -9,6 +10,7 @@ import { expect, use } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import config from 'config';
 import simpleGit from 'simple-git';
+import sinon from 'sinon';
 
 import Git, { GitObjectNotFoundError } from './index.js';
 
@@ -307,6 +309,72 @@ describe('Git', () => {
 
       it('returns the SHA of HEAD', async () => {
         expect(await Git.getHeadSha(RECORDER_PATH)).to.equal(commitId);
+      });
+    });
+  });
+
+  describe('running git processes', () => {
+    const AUTHOR = { name: 'Test', email: 'test@example.com' };
+    const SIMULTANEOUS_READS = 4;
+    let repositoryPath;
+    let maxRunningProcesses;
+
+    before(async () => {
+      repositoryPath = await fs.mkdtemp(path.join(os.tmpdir(), 'ota-git-test-'));
+
+      const git = new Git({ path: repositoryPath, author: AUTHOR });
+      const filePath = path.join(repositoryPath, 'Service A.json');
+
+      await git.initialize();
+      await fs.writeFile(filePath, '{ "name": "Service A" }');
+      await git.add(filePath);
+      await git.commit({ filePath, message: 'Add Service A' });
+    });
+
+    after(() => fs.rm(repositoryPath, { recursive: true, force: true }));
+
+    beforeEach(() => {
+      const originalSpawn = childProcess.spawn; // Kept aside, as syncing the stub below also replaces the `spawn` imported by this file
+      let runningProcesses = 0;
+
+      maxRunningProcesses = 0;
+
+      sinon.stub(childProcess, 'spawn').callsFake((...args) => {
+        const gitProcess = originalSpawn(...args);
+
+        runningProcesses++;
+        maxRunningProcesses = Math.max(maxRunningProcesses, runningProcesses);
+        gitProcess.on('close', () => runningProcesses--);
+
+        return gitProcess;
+      });
+      syncBuiltinESMExports(); // simple-git imports `spawn` by name, which only follows the stub once the exports of the builtin module are synced
+    });
+
+    afterEach(() => {
+      childProcess.spawn.restore();
+      syncBuiltinESMExports();
+    });
+
+    context('when the repository is opened for reading', () => {
+      it('runs several processes at once', async () => {
+        const reader = new Git({ path: repositoryPath });
+
+        reader.open();
+        await Promise.all(Array.from({ length: SIMULTANEOUS_READS }, () => reader.log()));
+
+        expect(maxRunningProcesses).to.be.above(1);
+      });
+    });
+
+    context('when the repository is initialized for writing', () => {
+      it('runs one process at a time', async () => {
+        const writer = new Git({ path: repositoryPath, author: AUTHOR });
+
+        await writer.initialize();
+        await Promise.all(Array.from({ length: SIMULTANEOUS_READS }, () => writer.log()));
+
+        expect(maxRunningProcesses).to.equal(1);
       });
     });
   });

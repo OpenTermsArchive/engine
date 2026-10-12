@@ -119,6 +119,24 @@ describe('Versions API', () => {
       });
     });
 
+    context('when requested several times at once', () => {
+      const URL = `${basePath}/v1/versions/service-1/Terms%20of%20Service`;
+      let expectedBody;
+      let responses;
+
+      before(async () => {
+        ({ body: expectedBody } = await request.get(URL));
+        responses = await Promise.all(Array.from({ length: 5 }, () => request.get(URL)));
+      });
+
+      it('responds to each request as to a single one', () => {
+        for (const { status, body } of responses) {
+          expect(status).to.equal(200);
+          expect(body).to.deep.equal(expectedBody);
+        }
+      });
+    });
+
     context('with pagination', () => {
       context('with default limit (no query parameters)', () => {
         before(async () => {
