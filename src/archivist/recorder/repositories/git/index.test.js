@@ -1004,6 +1004,10 @@ describe('GitRepository', () => {
         expect(count).to.equal(3);
       });
 
+      it('counts as many records as are listed', async () => {
+        expect(count).to.equal((await subject.findAll()).length);
+      });
+
       context('with serviceId and termsType filters', () => {
         it('returns count for specific service and terms type', async () => {
           const filteredCount = await subject.count(SERVICE_PROVIDER_ID, TERMS_TYPE);

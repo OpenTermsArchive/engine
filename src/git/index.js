@@ -341,6 +341,18 @@ export default class Git {
     });
   }
 
+  async countCommits(options) {
+    try {
+      return Number(await this.git.raw([ 'rev-list', '--count', '--no-merges', ...options ])); // Counted by git rather than by listing every commit to count them in memory, which takes seconds on large histories
+    } catch (error) {
+      if (/unknown revision or path not in the working tree|does not have any commits yet|bad revision 'HEAD'/.test(error.message)) {
+        return 0;
+      }
+
+      throw error;
+    }
+  }
+
   async getCommitsByHashes(commitHashes, filePaths) {
     const literalPathspecs = filePaths.map(filePath => `:(literal)${filePath}`);
     const batches = await Promise.all(splitIntoBatches(commitHashes, COMMITS_BATCH_SIZE).map(batch => this.listCommits([

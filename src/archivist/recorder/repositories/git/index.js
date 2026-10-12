@@ -27,6 +27,12 @@ function sortByFetchDate(revisions) {
   return revisions.sort((a, b) => b.timestamp - a.timestamp); // Stable, so revisions sharing a fetch date keep the order of the history, as with the previous date sort of the commits read from Git
 }
 
+function getRecordsGrepOptions({ includeTechnicalUpgrades = true } = {}) {
+  const prefixes = includeTechnicalUpgrades ? DataMapper.COMMIT_MESSAGE_PREFIXES : DataMapper.CHANGE_COMMIT_MESSAGE_PREFIXES;
+
+  return Object.values(prefixes).map(prefix => `--grep=${prefix}`);
+}
+
 export default class GitRepository extends RepositoryInterface {
   constructor({ path, author, publish, snapshotIdentiferTemplate, readOnly = false }) {
     super();
@@ -200,9 +206,7 @@ export default class GitRepository extends RepositoryInterface {
       return (await this.#listRecords(serviceId, { termsType })).length;
     }
 
-    const grepOptions = Object.values(DataMapper.COMMIT_MESSAGE_PREFIXES).map(prefix => `--grep=${prefix}`);
-
-    return (await this.git.log([ ...grepOptions, '--', '*/*' ])).length; // Count all records (exclude root directory files)
+    return this.git.countCommits([ ...getRecordsGrepOptions(), 'HEAD', '--', '*/*' ]); // Count all records (exclude root directory files)
   }
 
   async* iterate() {
@@ -277,12 +281,7 @@ export default class GitRepository extends RepositoryInterface {
   }
 
   async #getCommits({ reverse = false, limit, offset, includeTechnicalUpgrades = true } = {}) {
-    const prefixes = includeTechnicalUpgrades
-      ? DataMapper.COMMIT_MESSAGE_PREFIXES
-      : DataMapper.CHANGE_COMMIT_MESSAGE_PREFIXES;
-    const grepOptions = Object.values(prefixes).flatMap(prefix => [ '--grep', prefix ]);
-
-    const options = [ ...grepOptions, '--', '*/*' ]; // Exclude root directory files by only matching files in subdirectories
+    const options = [ ...getRecordsGrepOptions({ includeTechnicalUpgrades }), '--', '*/*' ]; // Exclude root directory files by only matching files in subdirectories
 
     // Use git-level pagination for performance: `--skip` and `--max-count` count in topological order, not strictly chronological.
     // In records history, the only commits whose author date is out of step with their topological position are technical upgrades.

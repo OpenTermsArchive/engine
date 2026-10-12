@@ -531,6 +531,35 @@ describe('Git', () => {
         expect(await git.getCommitsByHashes([], [TERMS_FILE_PATH])).to.deep.equal([]);
       });
     });
+
+    describe('#countCommits', () => {
+      it('counts the commits that changed the given path', async () => {
+        expect(await git.countCommits([ 'HEAD', '--', ':(literal)Other service' ])).to.equal(1);
+      });
+
+      it('counts the commits whose message matches', async () => {
+        expect(await git.countCommits([ '--grep=Record', 'HEAD' ])).to.equal(2);
+      });
+
+      context('with a repository that has no commits yet', () => {
+        let directory;
+
+        before(async () => {
+          directory = await fs.mkdtemp(path.join(os.tmpdir(), 'ota-git-test-'));
+          await new Git({ path: directory, author: { name: 'Test', email: 'test@example.com' } }).initialize();
+        });
+
+        after(() => fs.rm(directory, { recursive: true, force: true }));
+
+        it('returns zero', async () => {
+          const emptyRepositoryGit = new Git({ path: directory });
+
+          emptyRepositoryGit.open();
+
+          expect(await emptyRepositoryGit.countCommits([ 'HEAD', '--', '*/*' ])).to.equal(0);
+        });
+      });
+    });
   });
 
   describe('reading at a specific commit', () => {
