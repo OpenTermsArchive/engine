@@ -379,6 +379,44 @@ describe('Git', () => {
     });
   });
 
+  describe('reading with a Git process killed before it answers', () => {
+    let repositoryPath;
+    let reader;
+
+    before(async () => {
+      repositoryPath = await fs.mkdtemp(path.join(os.tmpdir(), 'ota-git-test-'));
+
+      const writer = new Git({ path: repositoryPath, author: { name: 'Test', email: 'test@example.com' } });
+      const filePath = path.join(repositoryPath, 'Service A.json');
+
+      await writer.initialize();
+      await fs.writeFile(filePath, '{ "name": "Service A" }');
+      await writer.add(filePath);
+      await writer.commit({ filePath, message: 'Add Service A' });
+
+      reader = new Git({ path: repositoryPath });
+      reader.open();
+    });
+
+    after(() => fs.rm(repositoryPath, { recursive: true, force: true }));
+
+    beforeEach(() => {
+      const originalSpawn = childProcess.spawn; // Kept aside, as syncing the stub below also replaces the `spawn` imported by this file
+
+      sinon.stub(childProcess, 'spawn').callsFake((command, args, options) => (args.includes('rev-list') ? originalSpawn('sh', [ '-c', 'kill -9 $$' ], options) : originalSpawn(command, args, options))); // A process killed by a signal, such as by the out-of-memory killer, exits without writing any error
+      syncBuiltinESMExports(); // simple-git imports `spawn` by name, which only follows the stub once the exports of the builtin module are synced
+    });
+
+    afterEach(() => {
+      childProcess.spawn.restore();
+      syncBuiltinESMExports();
+    });
+
+    it('fails instead of reading an empty output', async () => {
+      await expect(reader.countCommits(['HEAD'])).to.be.rejected;
+    });
+  });
+
   describe('diff statistics', () => {
     let repositoryPath;
     let git;
@@ -494,6 +532,10 @@ describe('Git', () => {
         expect(await git.listPathRevisions(':(literal)Unknown service')).to.deep.equal([]);
       });
 
+      it('lists the commits reachable from the given revision', async () => {
+        expect((await git.listPathRevisions(`:(literal)${SERVICE_DIRECTORY}`, { revision: secondSha })).map(({ hash }) => hash)).to.deep.equal([ secondSha, firstSha ]);
+      });
+
       context('with a repository that has no commits yet', () => {
         let directory;
 
@@ -532,6 +574,20 @@ describe('Git', () => {
       });
     });
 
+    describe('#isAncestor', () => {
+      it('returns true for an ancestor', async () => {
+        expect(await git.isAncestor(firstSha, twoFilesSha)).to.be.true;
+      });
+
+      it('returns false for a descendant', async () => {
+        expect(await git.isAncestor(twoFilesSha, firstSha)).to.be.false;
+      });
+
+      it('returns false for a commit that does not exist', async () => {
+        expect(await git.isAncestor('f'.repeat(40), twoFilesSha)).to.be.false;
+      });
+    });
+
     describe('#countCommits', () => {
       it('counts the commits that changed the given path', async () => {
         expect(await git.countCommits([ 'HEAD', '--', ':(literal)Other service' ])).to.equal(1);
@@ -539,6 +595,10 @@ describe('Git', () => {
 
       it('counts the commits whose message matches', async () => {
         expect(await git.countCommits([ '--grep=Record', 'HEAD' ])).to.equal(2);
+      });
+
+      it('counts the commits of a range', async () => {
+        expect(await git.countCommits([`${firstSha}..${twoFilesSha}`])).to.equal(2);
       });
 
       context('with a repository that has no commits yet', () => {

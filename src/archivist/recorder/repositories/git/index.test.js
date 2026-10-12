@@ -1,4 +1,5 @@
 import fs from 'fs';
+import os from 'os';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
@@ -7,6 +8,7 @@ import chaiAsPromised from 'chai-as-promised';
 import config from 'config';
 import mime from 'mime';
 import simpleGit from 'simple-git';
+import sinon from 'sinon';
 
 import Git from '../../../../git/index.js';
 import Snapshot from '../../snapshot.js';
@@ -2530,6 +2532,138 @@ describe('GitRepository', () => {
         const records = await subject.findAll();
 
         expect(records.map(({ serviceId }) => serviceId)).to.include(NON_ASCII_SERVICE_ID);
+      });
+    });
+
+    context('when reading the same history several times', () => {
+      let reader;
+      let listPathRevisionsSpy;
+      let countCommitsSpy;
+      let savedVersionsCount = 0;
+
+      function saveNewVersion() {
+        savedVersionsCount++;
+
+        return writer.save(new Version({
+          serviceId: SERVICE_PROVIDER_ID,
+          termsType: TERMS_TYPE,
+          content: `${CONTENT} ${savedVersionsCount}`,
+          fetchDate: new Date(FETCH_DATE_LATER.getTime() + savedVersionsCount * 1000),
+          snapshotIds: [SNAPSHOT_ID],
+        }));
+      }
+
+      beforeEach(async () => {
+        reader = new GitRepository({
+          ...config.get('@opentermsarchive/engine.recorder.versions.storage.git'),
+          path: RECORDER_PATH,
+          readOnly: true,
+        });
+        await reader.initialize();
+
+        listPathRevisionsSpy = sinon.spy(Git.prototype, 'listPathRevisions');
+        countCommitsSpy = sinon.spy(Git.prototype, 'countCommits');
+      });
+
+      afterEach(() => sinon.restore());
+
+      it('reads the history of a service once for all its terms', async () => {
+        await reader.count(SERVICE_PROVIDER_ID, TERMS_TYPE);
+        await reader.findByServiceAndTermsType(SERVICE_PROVIDER_ID, TERMS_TYPE);
+        await reader.getNavigationIds(SERVICE_PROVIDER_ID, 'Privacy Policy', record.id);
+
+        expect(listPathRevisionsSpy.callCount).to.equal(1);
+      });
+
+      it('shares a single read between simultaneous calls', async () => {
+        await Promise.all(Array.from({ length: 5 }, () => reader.count(SERVICE_PROVIDER_ID, TERMS_TYPE)));
+
+        expect(listPathRevisionsSpy.callCount).to.equal(1);
+      });
+
+      it('reads HEAD once for simultaneous calls, within the limit of the Git processes of the reader', async () => {
+        const staticGetHeadShaSpy = sinon.spy(Git, 'getHeadSha');
+        const getHeadShaSpy = sinon.spy(Git.prototype, 'getHeadSha');
+
+        await Promise.all(Array.from({ length: 5 }, () => reader.count(SERVICE_PROVIDER_ID, TERMS_TYPE)));
+
+        expect(getHeadShaSpy.callCount).to.equal(1);
+        expect(staticGetHeadShaSpy.called).to.be.false;
+      });
+
+      it('sees the records saved by the writer since the previous read', async () => {
+        const previousCount = await reader.count(SERVICE_PROVIDER_ID, TERMS_TYPE);
+
+        await saveNewVersion();
+
+        expect(await reader.count(SERVICE_PROVIDER_ID, TERMS_TYPE)).to.equal(previousCount + 1);
+      });
+
+      it('only counts the commits added since the previous count of all records', async () => {
+        const previousCount = await reader.count();
+        const previousHead = await Git.getHeadSha(RECORDER_PATH);
+
+        await saveNewVersion();
+
+        expect(await reader.count()).to.equal(previousCount + 1);
+        expect(countCommitsSpy.lastCall.args[0]).to.include(`${previousHead}..${await Git.getHeadSha(RECORDER_PATH)}`);
+      });
+
+      it('counts all records again after the history was rewritten', async () => {
+        const headBeforeRewrite = await Git.getHeadSha(RECORDER_PATH);
+
+        await saveNewVersion();
+        await reader.count();
+        await simpleGit(RECORDER_PATH).reset([ '--hard', headBeforeRewrite ]);
+        await saveNewVersion();
+
+        expect(await reader.count()).to.equal((await reader.findAll()).length);
+      });
+
+      context('when the repository has no commits yet', () => {
+        let emptyRepositoryPath;
+        let emptyRepositoryWriter;
+        let emptyRepositoryReader;
+
+        before(async () => {
+          emptyRepositoryPath = fs.mkdtempSync(path.join(os.tmpdir(), 'ota-git-test-'));
+          emptyRepositoryWriter = new GitRepository({
+            ...config.get('@opentermsarchive/engine.recorder.versions.storage.git'),
+            path: emptyRepositoryPath,
+          });
+          await emptyRepositoryWriter.git.initialize();
+          emptyRepositoryReader = new GitRepository({
+            ...config.get('@opentermsarchive/engine.recorder.versions.storage.git'),
+            path: emptyRepositoryPath,
+            readOnly: true,
+          });
+          await emptyRepositoryReader.initialize();
+        });
+
+        after(() => fs.rmSync(emptyRepositoryPath, { recursive: true, force: true }));
+
+        it('counts no record, then the records saved since', async () => {
+          expect(await emptyRepositoryReader.count()).to.equal(0);
+
+          await emptyRepositoryWriter.save(new Version({
+            serviceId: SERVICE_PROVIDER_ID,
+            termsType: TERMS_TYPE,
+            content: CONTENT,
+            fetchDate: FETCH_DATE,
+            snapshotIds: [SNAPSHOT_ID],
+          }));
+
+          expect(await emptyRepositoryReader.count()).to.equal(1);
+        });
+      });
+
+      context('when the repository is opened for writing', () => {
+        it('reads the history of a service again at each call', async () => {
+          await writer.count(SERVICE_PROVIDER_ID, TERMS_TYPE);
+          await writer.count(SERVICE_PROVIDER_ID, TERMS_TYPE);
+
+          expect(listPathRevisionsSpy.callCount).to.equal(2);
+        });
       });
     });
 

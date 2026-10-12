@@ -24,18 +24,8 @@ const COMMIT_HASH_REGEXP = /^[0-9a-f]{40}$/;
 const OBJECT_NOT_FOUND_MESSAGES = /bad object|not a tree|invalid object name|unknown revision|does not exist|exists on disk, but not in/i;
 
 export default class Git {
-  static async getHeadSha(repositoryPath) { // Used by callers that need to capture the current state of a repository without instantiating a full Git wrapper (which would mutate the repo via `init`).
-    try {
-      const git = simpleGit(repositoryPath, { trimmed: true });
-
-      return await git.revparse(['HEAD']);
-    } catch (error) {
-      if (/not a git repository|does not exist|unknown revision|ambiguous argument|does not have any commits/i.test(error.message)) {
-        return null; // Not a repository, or an empty one: a legitimate "no commit to reference" answer
-      }
-
-      throw error; // An actual git failure, which callers must not conflate with the absence of a repository
-    }
+  static getHeadSha(repositoryPath) { // Used by callers that need to capture the current state of a repository without instantiating a full Git wrapper (which would mutate the repo via `init`).
+    return readHeadSha(() => simpleGit(repositoryPath, { trimmed: true }));
   }
 
   static async listFilesAtCommit(repositoryPath, commit, { recursive = false } = {}) {
@@ -147,7 +137,11 @@ export default class Git {
       throw new Error(`Repository ${this.path} does not exist, it has to be created by a writer such as the tracker first`); // Without this check, git would silently walk up to an enclosing repository, such as the collection one
     }
 
-    this.#connect({ maxConcurrentProcesses: READER_MAX_CONCURRENT_PROCESSES, config: ['core.quotePath=false'] }); // Disable pathname quoting for the same reason Git.initialize sets it on managed repositories, as a repository opened for reading may not have been configured by a writer, such as a plain clone
+    this.#connect({
+      maxConcurrentProcesses: READER_MAX_CONCURRENT_PROCESSES,
+      config: ['core.quotePath=false'], // Disable pathname quoting for the same reason Git.initialize sets it on managed repositories, as a repository opened for reading may not have been configured by a writer, such as a plain clone
+      errors: (error, { exitCode }) => error || (exitCode === 0 ? undefined : Buffer.from(`git exited with code ${exitCode} without any error message`)), // simple-git only fails on errors that git writes, whereas a process killed by a signal, such as by the out-of-memory killer, writes none: its truncated output would otherwise be read, and kept by the cache of readers
+    });
   }
 
   #connect(options) {
@@ -301,7 +295,7 @@ export default class Git {
     ]);
   }
 
-  async listPathRevisions(pathspec) {
+  async listPathRevisions(pathspec, { revision = 'HEAD' } = {}) {
     let output;
 
     try {
@@ -312,11 +306,13 @@ export default class Git {
         '-z', // Print file names verbatim and NUL-terminated, whatever characters they hold
         '--name-only', // List the files changed by each commit under the pathspec, to tell apart the terms of a service in memory
         '--format=%x00%H%x09%at%x09%ct%x09%B', // Tab-separated hash, author date, committer date and message; the leading NUL sets each commit apart from the NUL-terminated names of the files changed by the previous one
+        '--end-of-options', // Everything after is a revision or a pathspec, never an option
+        revision,
         '--', // Everything after is a pathspec, never a revision or an option
         pathspec,
       ]);
     } catch (error) {
-      if (/unknown revision or path not in the working tree|does not have any commits yet/.test(error.message)) {
+      if (/unknown revision or path not in the working tree|does not have any commits yet|bad revision 'HEAD'/.test(error.message)) {
         return [];
       }
 
@@ -341,6 +337,10 @@ export default class Git {
     });
   }
 
+  getHeadSha() {
+    return readHeadSha(() => this.git);
+  }
+
   async countCommits(options) {
     try {
       return Number(await this.git.raw([ 'rev-list', '--count', '--no-merges', ...options ])); // Counted by git rather than by listing every commit to count them in memory, which takes seconds on large histories
@@ -350,6 +350,14 @@ export default class Git {
       }
 
       throw error;
+    }
+  }
+
+  async isAncestor(ancestor, descendant) {
+    try {
+      return await this.git.raw([ 'merge-base', '--end-of-options', ancestor, descendant ]) === ancestor; // Rather than `merge-base --is-ancestor`, which answers with its exit code only, and simple-git does not report a failing exit code without an error output
+    } catch {
+      return false; // An ancestor that no longer exists, such as after a history rewrite, cannot be one
     }
   }
 
@@ -382,6 +390,18 @@ export default class Git {
     ])));
 
     return new Map(outputs.flatMap(parseNumstatOutput));
+  }
+}
+
+async function readHeadSha(connect) {
+  try {
+    return await connect().revparse(['HEAD']); // Connected within the try, as simple-git throws on a missing directory
+  } catch (error) {
+    if (/not a git repository|does not exist|unknown revision|ambiguous argument|does not have any commits/i.test(error.message)) {
+      return null; // Not a repository, or an empty one: a legitimate "no commit to reference" answer
+    }
+
+    throw error; // An actual git failure, which callers must not conflate with the absence of a repository
   }
 }
 

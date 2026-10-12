@@ -13,6 +13,7 @@ import { isPlainPathSegment } from '../../../../git/pathSegment.js';
 import RepositoryInterface from '../interface.js';
 
 import * as DataMapper from './dataMapper.js';
+import HeadScopedCache from './headScopedCache.js';
 
 const fs = fsApi.promises;
 
@@ -41,6 +42,7 @@ export default class GitRepository extends RepositoryInterface {
     this.readOnly = readOnly; // Readers share the repository with the tracker, so they must never touch the working tree nor the commit-graph: both race the tracker, and the commit-graph write then fails with `commit-graph.lock: File exists`
     this.git = new Git({ path: this.path, author });
     this.snapshotIdentiferTemplate = snapshotIdentiferTemplate;
+    this.cache = readOnly ? new HeadScopedCache() : null; // Only readers cache, as the writer moves HEAD at each record it saves
   }
 
   async initialize() {
@@ -206,7 +208,7 @@ export default class GitRepository extends RepositoryInterface {
       return (await this.#listRecords(serviceId, { termsType })).length;
     }
 
-    return this.git.countCommits([ ...getRecordsGrepOptions(), 'HEAD', '--', '*/*' ]); // Count all records (exclude root directory files)
+    return this.#readAtHead('count:all', (revision, previous) => this.#countAllRecords(revision, previous));
   }
 
   async* iterate() {
@@ -262,15 +264,47 @@ export default class GitRepository extends RepositoryInterface {
     return (await this.#listRevisions(serviceId, { termsType })).filter(revision => revision.filePaths.length == 1 && (includeTechnicalUpgrades ? revision.isRecord : revision.isChange)); // A commit that changed several files of the requested terms or service cannot be read as a single record
   }
 
-  async #listServiceRevisions(serviceId) {
-    const revisions = await this.git.listPathRevisions(`:(literal)${serviceId}`); // A literal pathspec matches the directory of the service as is, whatever characters its name holds, such as `*` or `[`, and lets git use the changed-path Bloom filters of the commit-graph, which wildcards disable
+  async #readAtHead(key, read) {
+    const head = this.cache && await this.#readHead();
 
-    return revisions.map(({ message, ...revision }) => ({
-      ...revision,
-      isRecord: DataMapper.hasRecordPrefix(message),
-      isChange: DataMapper.hasRecordPrefix(message, { includeTechnicalUpgrades: false }),
-      isTechnicalUpgrade: DataMapper.isTechnicalUpgrade(message),
-    })); // Messages are reduced to the flags read from them, as a history can hold hundreds of thousands of them
+    if (!head) {
+      return read('HEAD');
+    }
+
+    return this.cache.get(key, head, previous => read(head, previous)); // Read at the SHA rather than at HEAD, so that the result is stored under the exact state it was read from, even if the tracker records meanwhile
+  }
+
+  #readHead() {
+    this.pendingHeadRead ??= this.git.getHeadSha().finally(() => { this.pendingHeadRead = null; }); // Shared by simultaneous calls and run by the reader's own Git, so that a burst of requests spawns a single process, within the limit of the reader
+
+    return this.pendingHeadRead;
+  }
+
+  async #countAllRecords(revision, previous) {
+    const grepOptions = getRecordsGrepOptions();
+
+    if (previous && await this.git.isAncestor(previous.head, revision)) { // Only the commits added since the previous count need counting when the history was extended, unlike a rewritten one, such as after a force push
+      const previousCount = await previous.promise.catch(() => null);
+
+      if (previousCount !== null) {
+        return previousCount + await this.git.countCommits([ ...grepOptions, `${previous.head}..${revision}`, '--', '*/*' ]);
+      }
+    }
+
+    return this.git.countCommits([ ...grepOptions, revision, '--', '*/*' ]); // Count all records (exclude root directory files)
+  }
+
+  #listServiceRevisions(serviceId) {
+    return this.#readAtHead(`revisions:${serviceId}`, async revision => {
+      const revisions = await this.git.listPathRevisions(`:(literal)${serviceId}`, { revision }); // A literal pathspec matches the directory of the service as is, whatever characters its name holds, such as `*` or `[`, and lets git use the changed-path Bloom filters of the commit-graph, which wildcards disable
+
+      return revisions.map(({ message, ...serviceRevision }) => ({
+        ...serviceRevision,
+        isRecord: DataMapper.hasRecordPrefix(message),
+        isChange: DataMapper.hasRecordPrefix(message, { includeTechnicalUpgrades: false }),
+        isTechnicalUpgrade: DataMapper.isTechnicalUpgrade(message),
+      })); // Messages are reduced to the flags read from them, as the cache keeps the histories of hundreds of services
+    });
   }
 
   async #loadRevisions(revisions, { limit, offset = 0 } = {}) {
