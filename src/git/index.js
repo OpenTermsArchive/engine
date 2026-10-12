@@ -18,6 +18,7 @@ const WRITER_LOCK_FILE_NAME = 'ota-writer.lock';
 const DEFAULT_BRANCH = 'main';
 const READER_MAX_CONCURRENT_PROCESSES = 4; // Read-only commands write neither the index nor the commit-graph, so a reader can run several of them at once; the limit keeps a burst of API requests from taking all the CPU away from the tracker
 const DIFF_STATS_BATCH_SIZE = 200; // Bounds the length of the command line, which is limited on some platforms
+const COMMITS_BATCH_SIZE = 500; // Bounds the length of the command line, which is limited on some platforms
 const COMMIT_HASH_REGEXP = /^[0-9a-f]{40}$/;
 
 const OBJECT_NOT_FOUND_MESSAGES = /bad object|not a tree|invalid object name|unknown revision|does not exist|exists on disk, but not in/i;
@@ -300,17 +301,19 @@ export default class Git {
     ]);
   }
 
-  async listPathRevisions(pathFilter) {
+  async listPathRevisions(pathspec) {
     let output;
 
     try {
-      // Ordering and technical-upgrade filtering are done by the caller in memory, so `--author-date-order`/`--grep`/`--name-only` are deliberately omitted to keep this walk lean
+      // Ordering and filtering are done by the caller in memory, so `--author-date-order` and `--grep` are deliberately omitted to keep this walk lean
       output = await this.git.raw([
         'log',
         '--no-merges',
-        '--format=%H%x09%at%x09%s', // Tab-separated hash, author date and subject: the minimum needed to order versions and detect technical upgrades, with no diff or message body loaded
+        '-z', // Print file names verbatim and NUL-terminated, whatever characters they hold
+        '--name-only', // List the files changed by each commit under the pathspec, to tell apart the terms of a service in memory
+        '--format=%x00%H%x09%at%x09%ct%x09%B', // Tab-separated hash, author date, committer date and message; the leading NUL sets each commit apart from the NUL-terminated names of the files changed by the previous one
         '--', // Everything after is a pathspec, never a revision or an option
-        pathFilter,
+        pathspec,
       ]);
     } catch (error) {
       if (/unknown revision or path not in the working tree|does not have any commits yet/.test(error.message)) {
@@ -324,11 +327,31 @@ export default class Git {
       return [];
     }
 
-    return output.trim().split('\n').filter(Boolean).map(line => {
-      const [ hash, timestamp, ...subjectParts ] = line.split('\t');
+    return output.replace(/^\0|\0$/g, '').split('\0\0').map(commitOutput => {
+      const [ header, ...filePaths ] = commitOutput.split('\0');
+      const [ hash, timestamp, commitTimestamp, ...messageParts ] = header.split('\t');
 
-      return { hash, timestamp: parseInt(timestamp, 10), subject: subjectParts.join('\t') };
+      return {
+        hash,
+        timestamp: parseInt(timestamp, 10),
+        commitTimestamp: parseInt(commitTimestamp, 10),
+        message: messageParts.join('\t').trimEnd(),
+        filePaths: filePaths.map(filePath => filePath.replace(/^\n/, '')), // Git separates the names of the changed files from the commit header with a line feed
+      };
     });
+  }
+
+  async getCommitsByHashes(commitHashes, filePaths) {
+    const literalPathspecs = filePaths.map(filePath => `:(literal)${filePath}`);
+    const batches = await Promise.all(splitIntoBatches(commitHashes, COMMITS_BATCH_SIZE).map(batch => this.listCommits([
+      '--no-walk=unsorted', // Show only the given commits, in the given order
+      '--end-of-options', // Everything after is a revision or a pathspec, never an option
+      ...batch,
+      '--', // Everything after is a pathspec, never a revision
+      ...literalPathspecs, // Only list the given files among the changed ones, as a record is read from a single file even when its commit also changed others
+    ], { reverse: false })));
+
+    return batches.flat();
   }
 
   async getDiffStats(commitHash) {

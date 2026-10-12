@@ -442,6 +442,97 @@ describe('Git', () => {
     });
   });
 
+  describe('history of paths', () => {
+    const SERVICE_DIRECTORY = 'Service·A [beta]';
+    const TERMS_FILE_PATH = `${SERVICE_DIRECTORY}/Terms #1.md`;
+    const OTHER_FILE_PATH = 'Other service/Terms.md';
+    const FIRST_DATE = new Date('2024-01-01T00:00:00.000Z');
+    const SECOND_DATE = new Date('2024-01-02T00:00:00.000Z');
+    const THIRD_DATE = new Date('2024-01-03T00:00:00.000Z');
+    let repositoryPath;
+    let git;
+    let firstSha;
+    let secondSha;
+    let twoFilesSha;
+
+    async function writeFile(relativeFilePath, content) {
+      const filePath = path.join(repositoryPath, relativeFilePath);
+
+      await fs.mkdir(path.dirname(filePath), { recursive: true });
+      await fs.writeFile(filePath, content);
+      await git.add(filePath);
+
+      return filePath;
+    }
+
+    before(async () => {
+      repositoryPath = await fs.mkdtemp(path.join(os.tmpdir(), 'ota-git-test-'));
+      git = new Git({ path: repositoryPath, author: { name: 'Test', email: 'test@example.com' } });
+
+      await git.initialize();
+
+      firstSha = await git.commit({ filePath: await writeFile(TERMS_FILE_PATH, 'first'), message: 'First record of Service·A [beta] Terms #1', date: FIRST_DATE });
+      secondSha = await git.commit({ filePath: await writeFile(TERMS_FILE_PATH, 'second'), message: 'Record new changes\twith a tab\n\nAnd a body', date: SECOND_DATE });
+
+      await writeFile(TERMS_FILE_PATH, 'third');
+      await writeFile(OTHER_FILE_PATH, 'other');
+      twoFilesSha = await git.commit({ message: 'Record two files at once', date: THIRD_DATE });
+    });
+
+    after(() => fs.rm(repositoryPath, { recursive: true, force: true }));
+
+    describe('#listPathRevisions', () => {
+      it('lists the commits that changed the path, with their changed files under that path', async () => {
+        expect(await git.listPathRevisions(`:(literal)${SERVICE_DIRECTORY}`)).to.deep.equal([
+          { hash: twoFilesSha, timestamp: THIRD_DATE.getTime() / 1000, commitTimestamp: THIRD_DATE.getTime() / 1000, message: 'Record two files at once', filePaths: [TERMS_FILE_PATH] },
+          { hash: secondSha, timestamp: SECOND_DATE.getTime() / 1000, commitTimestamp: SECOND_DATE.getTime() / 1000, message: 'Record new changes\twith a tab\n\nAnd a body', filePaths: [TERMS_FILE_PATH] },
+          { hash: firstSha, timestamp: FIRST_DATE.getTime() / 1000, commitTimestamp: FIRST_DATE.getTime() / 1000, message: 'First record of Service·A [beta] Terms #1', filePaths: [TERMS_FILE_PATH] },
+        ]);
+      });
+
+      it('returns an empty list when no commit changed the path', async () => {
+        expect(await git.listPathRevisions(':(literal)Unknown service')).to.deep.equal([]);
+      });
+
+      context('with a repository that has no commits yet', () => {
+        let directory;
+
+        before(async () => {
+          directory = await fs.mkdtemp(path.join(os.tmpdir(), 'ota-git-test-'));
+          await new Git({ path: directory, author: { name: 'Test', email: 'test@example.com' } }).initialize();
+        });
+
+        after(() => fs.rm(directory, { recursive: true, force: true }));
+
+        it('returns an empty list', async () => {
+          const emptyRepositoryGit = new Git({ path: directory });
+
+          emptyRepositoryGit.open();
+
+          expect(await emptyRepositoryGit.listPathRevisions(`:(literal)${SERVICE_DIRECTORY}`)).to.deep.equal([]);
+        });
+      });
+    });
+
+    describe('#getCommitsByHashes', () => {
+      it('returns the commits in the given order', async () => {
+        const commits = await git.getCommitsByHashes([ firstSha, twoFilesSha, secondSha ], [TERMS_FILE_PATH]);
+
+        expect(commits.map(({ hash }) => hash)).to.deep.equal([ firstSha, twoFilesSha, secondSha ]);
+      });
+
+      it('lists only the given files among the changed ones', async () => {
+        const [commit] = await git.getCommitsByHashes([twoFilesSha], [TERMS_FILE_PATH]);
+
+        expect(commit.diff.files.map(({ file }) => file)).to.deep.equal([TERMS_FILE_PATH]);
+      });
+
+      it('returns no commit when no hash is given', async () => {
+        expect(await git.getCommitsByHashes([], [TERMS_FILE_PATH])).to.deep.equal([]);
+      });
+    });
+  });
+
   describe('reading at a specific commit', () => {
     let repositoryPath;
     let subdirectoryPath;

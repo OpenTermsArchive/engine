@@ -120,6 +120,16 @@ describe('Versions API', () => {
       });
     });
 
+    context('when the service ID is a pattern matching other services', () => {
+      before(async () => {
+        response = await request.get(`${basePath}/v1/versions/*/Terms%20of%20Service`);
+      });
+
+      it('responds with 404 status code', () => {
+        expect(response.status).to.equal(404);
+      });
+    });
+
     context('when reading the diff stats of the listed versions', () => {
       let getDiffStatsBatchSpy;
 

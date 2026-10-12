@@ -34,6 +34,12 @@ export function isTechnicalUpgrade(message) {
   return message.startsWith(COMMIT_MESSAGE_PREFIXES.technicalUpgrade) || message.startsWith(COMMIT_MESSAGE_PREFIXES.deprecated_refilter);
 }
 
+export function hasRecordPrefix(message, { includeTechnicalUpgrades = true } = {}) {
+  const prefixes = includeTechnicalUpgrades ? COMMIT_MESSAGE_PREFIXES : CHANGE_COMMIT_MESSAGE_PREFIXES;
+
+  return Object.values(prefixes).some(prefix => message.includes(prefix)); // Anywhere in the message, as `git log --grep` matches, so that records are selected as when Git filtered them
+}
+
 export function toPersistence(record, snapshotIdentiferTemplate) {
   const { serviceId, termsType, documentId, snapshotIds = [], mimeType, metadata } = record;
 
@@ -108,4 +114,12 @@ export function generateFilePath(serviceId, termsType, documentId, mimeType) {
   const extension = mime.getExtension(mimeType) || '*'; // If mime type is undefined, an asterisk is set as an extension. Used to match all files for the given service ID, terms type and document ID when mime type is unknown
 
   return `${serviceId}/${generateFileName(termsType, documentId, extension)}`; // Do not use `path.join` as even for Windows, the path should be with `/` and not `\`
+}
+
+export function generateFilePathPrefix(serviceId, termsType, documentId) {
+  if (termsType === undefined) {
+    return `${serviceId}/`;
+  }
+
+  return `${serviceId}/${generateFileName(termsType, documentId, '')}`;
 }
