@@ -1,6 +1,7 @@
-import { spawn } from 'child_process';
+import childProcess, { spawn } from 'child_process';
 import crypto from 'crypto';
 import fs from 'fs/promises';
+import { syncBuiltinESMExports } from 'module';
 import os from 'os';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -9,6 +10,7 @@ import { expect, use } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import config from 'config';
 import simpleGit from 'simple-git';
+import sinon from 'sinon';
 
 import Git, { GitObjectNotFoundError } from './index.js';
 
@@ -307,6 +309,315 @@ describe('Git', () => {
 
       it('returns the SHA of HEAD', async () => {
         expect(await Git.getHeadSha(RECORDER_PATH)).to.equal(commitId);
+      });
+    });
+  });
+
+  describe('running git processes', () => {
+    const AUTHOR = { name: 'Test', email: 'test@example.com' };
+    const SIMULTANEOUS_READS = 4;
+    let repositoryPath;
+    let maxRunningProcesses;
+
+    before(async () => {
+      repositoryPath = await fs.mkdtemp(path.join(os.tmpdir(), 'ota-git-test-'));
+
+      const git = new Git({ path: repositoryPath, author: AUTHOR });
+      const filePath = path.join(repositoryPath, 'Service A.json');
+
+      await git.initialize();
+      await fs.writeFile(filePath, '{ "name": "Service A" }');
+      await git.add(filePath);
+      await git.commit({ filePath, message: 'Add Service A' });
+    });
+
+    after(() => fs.rm(repositoryPath, { recursive: true, force: true }));
+
+    beforeEach(() => {
+      const originalSpawn = childProcess.spawn; // Kept aside, as syncing the stub below also replaces the `spawn` imported by this file
+      let runningProcesses = 0;
+
+      maxRunningProcesses = 0;
+
+      sinon.stub(childProcess, 'spawn').callsFake((...args) => {
+        const gitProcess = originalSpawn(...args);
+
+        runningProcesses++;
+        maxRunningProcesses = Math.max(maxRunningProcesses, runningProcesses);
+        gitProcess.on('close', () => runningProcesses--);
+
+        return gitProcess;
+      });
+      syncBuiltinESMExports(); // simple-git imports `spawn` by name, which only follows the stub once the exports of the builtin module are synced
+    });
+
+    afterEach(() => {
+      childProcess.spawn.restore();
+      syncBuiltinESMExports();
+    });
+
+    context('when the repository is opened for reading', () => {
+      it('runs several processes at once', async () => {
+        const reader = new Git({ path: repositoryPath });
+
+        reader.open();
+        await Promise.all(Array.from({ length: SIMULTANEOUS_READS }, () => reader.log()));
+
+        expect(maxRunningProcesses).to.be.above(1);
+      });
+    });
+
+    context('when the repository is initialized for writing', () => {
+      it('runs one process at a time', async () => {
+        const writer = new Git({ path: repositoryPath, author: AUTHOR });
+
+        await writer.initialize();
+        await Promise.all(Array.from({ length: SIMULTANEOUS_READS }, () => writer.log()));
+
+        expect(maxRunningProcesses).to.equal(1);
+      });
+    });
+  });
+
+  describe('reading with a Git process killed before it answers', () => {
+    let repositoryPath;
+    let reader;
+
+    before(async () => {
+      repositoryPath = await fs.mkdtemp(path.join(os.tmpdir(), 'ota-git-test-'));
+
+      const writer = new Git({ path: repositoryPath, author: { name: 'Test', email: 'test@example.com' } });
+      const filePath = path.join(repositoryPath, 'Service A.json');
+
+      await writer.initialize();
+      await fs.writeFile(filePath, '{ "name": "Service A" }');
+      await writer.add(filePath);
+      await writer.commit({ filePath, message: 'Add Service A' });
+
+      reader = new Git({ path: repositoryPath });
+      reader.open();
+    });
+
+    after(() => fs.rm(repositoryPath, { recursive: true, force: true }));
+
+    beforeEach(() => {
+      const originalSpawn = childProcess.spawn; // Kept aside, as syncing the stub below also replaces the `spawn` imported by this file
+
+      sinon.stub(childProcess, 'spawn').callsFake((command, args, options) => (args.includes('rev-list') ? originalSpawn('sh', [ '-c', 'kill -9 $$' ], options) : originalSpawn(command, args, options))); // A process killed by a signal, such as by the out-of-memory killer, exits without writing any error
+      syncBuiltinESMExports(); // simple-git imports `spawn` by name, which only follows the stub once the exports of the builtin module are synced
+    });
+
+    afterEach(() => {
+      childProcess.spawn.restore();
+      syncBuiltinESMExports();
+    });
+
+    it('fails instead of reading an empty output', async () => {
+      await expect(reader.countCommits(['HEAD'])).to.be.rejected;
+    });
+  });
+
+  describe('diff statistics', () => {
+    let repositoryPath;
+    let git;
+    let creationSha;
+    let updateSha;
+    let binarySha;
+
+    before(async () => {
+      repositoryPath = await fs.mkdtemp(path.join(os.tmpdir(), 'ota-git-test-'));
+      git = new Git({ path: repositoryPath, author: { name: 'Test', email: 'test@example.com' } });
+
+      await git.initialize();
+
+      const textFilePath = path.join(repositoryPath, 'Terms of Service.md');
+      const binaryFilePath = path.join(repositoryPath, 'Terms of Service.pdf');
+
+      await fs.writeFile(textFilePath, 'first\nsecond\nthird\n');
+      await git.add(textFilePath);
+      creationSha = await git.commit({ filePath: textFilePath, message: 'Create terms' });
+
+      await fs.writeFile(textFilePath, 'first\nsecond updated\nthird\nfourth\n');
+      await git.add(textFilePath);
+      updateSha = await git.commit({ filePath: textFilePath, message: 'Update terms' });
+
+      await fs.writeFile(binaryFilePath, Buffer.from([ 0x25, 0x50, 0x44, 0x46, 0x00, 0xFF ]));
+      await git.add(binaryFilePath);
+      binarySha = await git.commit({ filePath: binaryFilePath, message: 'Add binary terms' });
+    });
+
+    after(() => fs.rm(repositoryPath, { recursive: true, force: true }));
+
+    describe('#getDiffStatsBatch', () => {
+      let stats;
+
+      before(async () => {
+        stats = await git.getDiffStatsBatch([ creationSha, updateSha, binarySha, creationSha ]);
+      });
+
+      it('counts the lines added and deleted by each commit', () => {
+        expect(stats.get(creationSha)).to.deep.equal({ additions: 3, deletions: 0 });
+        expect(stats.get(updateSha)).to.deep.equal({ additions: 2, deletions: 1 });
+      });
+
+      it('counts no line for a binary file', () => {
+        expect(stats.get(binarySha)).to.deep.equal({ additions: 0, deletions: 0 });
+      });
+
+      it('returns a single entry per commit', () => {
+        expect([...stats.keys()]).to.have.members([ creationSha, updateSha, binarySha ]);
+      });
+
+      it('returns no entry when no commit is given', async () => {
+        expect((await git.getDiffStatsBatch([])).size).to.equal(0);
+      });
+    });
+
+    describe('#getDiffStats', () => {
+      it('accepts an abbreviated commit SHA', async () => {
+        expect(await git.getDiffStats(updateSha.slice(0, 7))).to.deep.equal({ additions: 2, deletions: 1 });
+      });
+    });
+  });
+
+  describe('history of paths', () => {
+    const SERVICE_DIRECTORY = 'Service·A [beta]';
+    const TERMS_FILE_PATH = `${SERVICE_DIRECTORY}/Terms #1.md`;
+    const OTHER_FILE_PATH = 'Other service/Terms.md';
+    const FIRST_DATE = new Date('2024-01-01T00:00:00.000Z');
+    const SECOND_DATE = new Date('2024-01-02T00:00:00.000Z');
+    const THIRD_DATE = new Date('2024-01-03T00:00:00.000Z');
+    let repositoryPath;
+    let git;
+    let firstSha;
+    let secondSha;
+    let twoFilesSha;
+
+    async function writeFile(relativeFilePath, content) {
+      const filePath = path.join(repositoryPath, relativeFilePath);
+
+      await fs.mkdir(path.dirname(filePath), { recursive: true });
+      await fs.writeFile(filePath, content);
+      await git.add(filePath);
+
+      return filePath;
+    }
+
+    before(async () => {
+      repositoryPath = await fs.mkdtemp(path.join(os.tmpdir(), 'ota-git-test-'));
+      git = new Git({ path: repositoryPath, author: { name: 'Test', email: 'test@example.com' } });
+
+      await git.initialize();
+
+      firstSha = await git.commit({ filePath: await writeFile(TERMS_FILE_PATH, 'first'), message: 'First record of Service·A [beta] Terms #1', date: FIRST_DATE });
+      secondSha = await git.commit({ filePath: await writeFile(TERMS_FILE_PATH, 'second'), message: 'Record new changes\twith a tab\n\nAnd a body', date: SECOND_DATE });
+
+      await writeFile(TERMS_FILE_PATH, 'third');
+      await writeFile(OTHER_FILE_PATH, 'other');
+      twoFilesSha = await git.commit({ message: 'Record two files at once', date: THIRD_DATE });
+    });
+
+    after(() => fs.rm(repositoryPath, { recursive: true, force: true }));
+
+    describe('#listPathRevisions', () => {
+      it('lists the commits that changed the path, with their changed files under that path', async () => {
+        expect(await git.listPathRevisions(`:(literal)${SERVICE_DIRECTORY}`)).to.deep.equal([
+          { hash: twoFilesSha, timestamp: THIRD_DATE.getTime() / 1000, commitTimestamp: THIRD_DATE.getTime() / 1000, message: 'Record two files at once', filePaths: [TERMS_FILE_PATH] },
+          { hash: secondSha, timestamp: SECOND_DATE.getTime() / 1000, commitTimestamp: SECOND_DATE.getTime() / 1000, message: 'Record new changes\twith a tab\n\nAnd a body', filePaths: [TERMS_FILE_PATH] },
+          { hash: firstSha, timestamp: FIRST_DATE.getTime() / 1000, commitTimestamp: FIRST_DATE.getTime() / 1000, message: 'First record of Service·A [beta] Terms #1', filePaths: [TERMS_FILE_PATH] },
+        ]);
+      });
+
+      it('returns an empty list when no commit changed the path', async () => {
+        expect(await git.listPathRevisions(':(literal)Unknown service')).to.deep.equal([]);
+      });
+
+      it('lists the commits reachable from the given revision', async () => {
+        expect((await git.listPathRevisions(`:(literal)${SERVICE_DIRECTORY}`, { revision: secondSha })).map(({ hash }) => hash)).to.deep.equal([ secondSha, firstSha ]);
+      });
+
+      context('with a repository that has no commits yet', () => {
+        let directory;
+
+        before(async () => {
+          directory = await fs.mkdtemp(path.join(os.tmpdir(), 'ota-git-test-'));
+          await new Git({ path: directory, author: { name: 'Test', email: 'test@example.com' } }).initialize();
+        });
+
+        after(() => fs.rm(directory, { recursive: true, force: true }));
+
+        it('returns an empty list', async () => {
+          const emptyRepositoryGit = new Git({ path: directory });
+
+          emptyRepositoryGit.open();
+
+          expect(await emptyRepositoryGit.listPathRevisions(`:(literal)${SERVICE_DIRECTORY}`)).to.deep.equal([]);
+        });
+      });
+    });
+
+    describe('#getCommitsByHashes', () => {
+      it('returns the commits in the given order', async () => {
+        const commits = await git.getCommitsByHashes([ firstSha, twoFilesSha, secondSha ], [TERMS_FILE_PATH]);
+
+        expect(commits.map(({ hash }) => hash)).to.deep.equal([ firstSha, twoFilesSha, secondSha ]);
+      });
+
+      it('lists only the given files among the changed ones', async () => {
+        const [commit] = await git.getCommitsByHashes([twoFilesSha], [TERMS_FILE_PATH]);
+
+        expect(commit.diff.files.map(({ file }) => file)).to.deep.equal([TERMS_FILE_PATH]);
+      });
+
+      it('returns no commit when no hash is given', async () => {
+        expect(await git.getCommitsByHashes([], [TERMS_FILE_PATH])).to.deep.equal([]);
+      });
+    });
+
+    describe('#isAncestor', () => {
+      it('returns true for an ancestor', async () => {
+        expect(await git.isAncestor(firstSha, twoFilesSha)).to.be.true;
+      });
+
+      it('returns false for a descendant', async () => {
+        expect(await git.isAncestor(twoFilesSha, firstSha)).to.be.false;
+      });
+
+      it('returns false for a commit that does not exist', async () => {
+        expect(await git.isAncestor('f'.repeat(40), twoFilesSha)).to.be.false;
+      });
+    });
+
+    describe('#countCommits', () => {
+      it('counts the commits that changed the given path', async () => {
+        expect(await git.countCommits([ 'HEAD', '--', ':(literal)Other service' ])).to.equal(1);
+      });
+
+      it('counts the commits whose message matches', async () => {
+        expect(await git.countCommits([ '--grep=Record', 'HEAD' ])).to.equal(2);
+      });
+
+      it('counts the commits of a range', async () => {
+        expect(await git.countCommits([`${firstSha}..${twoFilesSha}`])).to.equal(2);
+      });
+
+      context('with a repository that has no commits yet', () => {
+        let directory;
+
+        before(async () => {
+          directory = await fs.mkdtemp(path.join(os.tmpdir(), 'ota-git-test-'));
+          await new Git({ path: directory, author: { name: 'Test', email: 'test@example.com' } }).initialize();
+        });
+
+        after(() => fs.rm(directory, { recursive: true, force: true }));
+
+        it('returns zero', async () => {
+          const emptyRepositoryGit = new Git({ path: directory });
+
+          emptyRepositoryGit.open();
+
+          expect(await emptyRepositoryGit.countCommits([ 'HEAD', '--', '*/*' ])).to.equal(0);
+        });
       });
     });
   });

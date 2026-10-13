@@ -1162,6 +1162,26 @@ describe('MongoRepository', () => {
       });
     });
 
+    describe('#getDiffStatsBatch', () => {
+      let versionId;
+
+      before(async () => {
+        ({ id: versionId } = await subject.save(new Version({
+          serviceId: SERVICE_PROVIDER_ID,
+          termsType: TERMS_TYPE,
+          content: CONTENT,
+          fetchDate: FETCH_DATE,
+          snapshotIds: [SNAPSHOT_ID],
+        })));
+      });
+
+      after(() => subject.removeAll());
+
+      it('reports additions and deletions as unavailable for each record', async () => {
+        expect(await subject.getDiffStatsBatch([versionId])).to.deep.equal(new Map([[ versionId, { additions: null, deletions: null }]]));
+      });
+    });
+
     describe('#findLatest', () => {
       context('when there are records for the given service', () => {
         let lastSnapshotId;

@@ -13,6 +13,7 @@ import { isPlainPathSegment } from '../../../../git/pathSegment.js';
 import RepositoryInterface from '../interface.js';
 
 import * as DataMapper from './dataMapper.js';
+import HeadScopedCache from './headScopedCache.js';
 
 const fs = fsApi.promises;
 
@@ -23,6 +24,16 @@ function canMatchRecordFilePath(...pathSegments) {
   return pathSegments.every(segment => typeof segment !== 'string' || isPlainPathSegment(segment));
 }
 
+function sortByFetchDate(revisions) {
+  return revisions.sort((a, b) => b.timestamp - a.timestamp); // Stable, so revisions sharing a fetch date keep the order of the history, as with the previous date sort of the commits read from Git
+}
+
+function getRecordsGrepOptions({ includeTechnicalUpgrades = true } = {}) {
+  const prefixes = includeTechnicalUpgrades ? DataMapper.COMMIT_MESSAGE_PREFIXES : DataMapper.CHANGE_COMMIT_MESSAGE_PREFIXES;
+
+  return Object.values(prefixes).map(prefix => `--grep=${prefix}`);
+}
+
 export default class GitRepository extends RepositoryInterface {
   constructor({ path, author, publish, snapshotIdentiferTemplate, readOnly = false }) {
     super();
@@ -31,6 +42,7 @@ export default class GitRepository extends RepositoryInterface {
     this.readOnly = readOnly; // Readers share the repository with the tracker, so they must never touch the working tree nor the commit-graph: both race the tracker, and the commit-graph write then fails with `commit-graph.lock: File exists`
     this.git = new Git({ path: this.path, author });
     this.snapshotIdentiferTemplate = snapshotIdentiferTemplate;
+    this.cache = readOnly ? new HeadScopedCache() : null; // Only readers cache, as the writer moves HEAD at each record it saves
   }
 
   async initialize() {
@@ -89,13 +101,14 @@ export default class GitRepository extends RepositoryInterface {
       return null;
     }
 
-    const matchingFilesPaths = await this.git.listFiles(DataMapper.generateFilePath(serviceId, termsType, documentId));
+    const filePathPrefix = DataMapper.generateFilePathPrefix(serviceId, termsType, documentId);
+    const matchingFilesPaths = (await this.git.listFiles(`:(literal)${serviceId}/`)).filter(filePath => filePath.startsWith(filePathPrefix)); // A literal pathspec matches the directory of the service as is, whatever characters its name holds, such as `*` or `[`; the files of the requested terms are then picked in memory
 
     if (!matchingFilesPaths.length) {
       return null;
     }
 
-    const commit = await this.git.getCommit([...matchingFilesPaths]); // Returns the most recent commit that modified any of the matching files. If multiple files match the path pattern (e.g. both HTML and PDF versions exist), returns the commit that last modified any of them
+    const commit = await this.git.getCommit([ '--', ...matchingFilesPaths.map(filePath => `:(literal)${filePath}`) ]); // Returns the most recent commit that modified any of the matching files. If multiple files match the path pattern (e.g. both HTML and PDF versions exist), returns the commit that last modified any of them
 
     return this.#toDomain(commit);
   }
@@ -105,8 +118,14 @@ export default class GitRepository extends RepositoryInterface {
       return null;
     }
 
-    const filePath = DataMapper.generateFilePath(serviceId, termsType, documentId);
-    const commit = await this.git.getCommit([ `--until=${date?.toISOString()}`, '--', filePath ]);
+    const revisions = await this.#listRevisions(serviceId, { termsType, documentId });
+    const revision = revisions.find(({ commitTimestamp }) => commitTimestamp * 1000 <= date?.getTime()); // The latest commit of the history up to the date, as `git log -1 --until` returned; an invalid date matches none
+
+    if (!revision) {
+      return null;
+    }
+
+    const [commit] = await this.git.getCommitsByHashes([revision.hash], revision.filePaths);
 
     return this.#toDomain(commit);
   }
@@ -140,9 +159,7 @@ export default class GitRepository extends RepositoryInterface {
       return [];
     }
 
-    const pathPattern = DataMapper.generateFilePath(serviceId, termsType);
-
-    return Promise.all((await this.#getCommits({ pathFilter: pathPattern, limit, offset, includeTechnicalUpgrades })).map(commit => this.#toDomain(commit, { deferContentLoading: true })));
+    return this.#loadRevisions(await this.#listRecords(serviceId, { termsType, includeTechnicalUpgrades }), { limit, offset });
   }
 
   async findByService(serviceId, { limit, offset, includeTechnicalUpgrades = true } = {}) {
@@ -150,9 +167,7 @@ export default class GitRepository extends RepositoryInterface {
       return [];
     }
 
-    const pathPattern = DataMapper.generateFilePath(serviceId);
-
-    return Promise.all((await this.#getCommits({ pathFilter: pathPattern, limit, offset, includeTechnicalUpgrades })).map(commit => this.#toDomain(commit, { deferContentLoading: true })));
+    return this.#loadRevisions(await this.#listRecords(serviceId, { includeTechnicalUpgrades }), { limit, offset });
   }
 
   async getNavigationIds(serviceId, termsType, versionId, { includeTechnicalUpgrades = true } = {}) {
@@ -160,11 +175,10 @@ export default class GitRepository extends RepositoryInterface {
       return { first: null, prev: null, next: null, last: null };
     }
 
-    const pathPattern = DataMapper.generateFilePath(serviceId, termsType);
-    let revisions = await this.git.listPathRevisions(pathPattern); // single lean walk of the terms history
+    let revisions = await this.#listRevisions(serviceId, { termsType });
 
     if (!includeTechnicalUpgrades) {
-      revisions = revisions.filter(revision => !DataMapper.isTechnicalUpgrade(revision.subject));
+      revisions = revisions.filter(revision => !revision.isTechnicalUpgrade);
     }
 
     // Deterministic total order: most recent first, commit SHA as a stable tiebreaker for versions sharing the same fetch date (git stores second precision).
@@ -190,22 +204,11 @@ export default class GitRepository extends RepositoryInterface {
       return 0;
     }
 
-    const grepOptions = Object.values(DataMapper.COMMIT_MESSAGE_PREFIXES).map(prefix => `--grep=${prefix}`);
-    const pathOptions = [];
-
-    if (serviceId && termsType) {
-      const pathPattern = DataMapper.generateFilePath(serviceId, termsType);
-
-      pathOptions.push('--', pathPattern);
-    } else if (serviceId) {
-      const pathPattern = DataMapper.generateFilePath(serviceId);
-
-      pathOptions.push('--', pathPattern);
-    } else {
-      pathOptions.push('--', '*/*'); // Count all records (exclude root directory files)
+    if (serviceId) {
+      return (await this.#listRecords(serviceId, { termsType })).length;
     }
 
-    return (await this.git.log([ ...grepOptions, ...pathOptions ])).length;
+    return this.#readAtHead('count:all', (revision, previous) => this.#countAllRecords(revision, previous));
   }
 
   async* iterate() {
@@ -236,16 +239,83 @@ export default class GitRepository extends RepositoryInterface {
     return this.git.getDiffStats(recordId);
   }
 
-  async #getCommits({ pathFilter, reverse = false, limit, offset, includeTechnicalUpgrades = true } = {}) {
-    const prefixes = includeTechnicalUpgrades
-      ? DataMapper.COMMIT_MESSAGE_PREFIXES
-      : DataMapper.CHANGE_COMMIT_MESSAGE_PREFIXES;
-    const grepOptions = Object.values(prefixes).flatMap(prefix => [ '--grep', prefix ]);
-    const pathOptions = pathFilter
-      ? [ '--', pathFilter ]
-      : [ '--', '*/*' ]; // Exclude root directory files by only matching files in subdirectories
+  async getDiffStatsBatch(recordIds) {
+    const statsByHash = await this.git.getDiffStatsBatch(recordIds.filter(recordId => RECORD_ID_REGEXP.test(recordId))); // Only well-formed IDs reach git, as a single invalid one would fail the whole batch
 
-    const options = [ ...grepOptions, ...pathOptions ];
+    return new Map(recordIds.map(recordId => [ recordId, statsByHash.get(recordId) || { additions: null, deletions: null } ]));
+  }
+
+  async #listRevisions(serviceId, { termsType, documentId } = {}) {
+    const filePathPrefix = DataMapper.generateFilePathPrefix(serviceId, termsType, documentId);
+    const revisions = [];
+
+    for (const { filePaths, ...revision } of await this.#listServiceRevisions(serviceId)) {
+      const matchingFilePaths = filePaths.filter(filePath => filePath.startsWith(filePathPrefix)); // The files of the requested terms are picked in memory, including files deleted since, so that a single read serves all the terms of the service
+
+      if (matchingFilePaths.length) {
+        revisions.push({ ...revision, filePaths: matchingFilePaths });
+      }
+    }
+
+    return revisions;
+  }
+
+  async #listRecords(serviceId, { termsType, includeTechnicalUpgrades = true } = {}) {
+    return (await this.#listRevisions(serviceId, { termsType })).filter(revision => revision.filePaths.length == 1 && (includeTechnicalUpgrades ? revision.isRecord : revision.isChange)); // A commit that changed several files of the requested terms or service cannot be read as a single record
+  }
+
+  async #readAtHead(key, read) {
+    const head = this.cache && await this.#readHead();
+
+    if (!head) {
+      return read('HEAD');
+    }
+
+    return this.cache.get(key, head, previous => read(head, previous)); // Read at the SHA rather than at HEAD, so that the result is stored under the exact state it was read from, even if the tracker records meanwhile
+  }
+
+  #readHead() {
+    this.pendingHeadRead ??= this.git.getHeadSha().finally(() => { this.pendingHeadRead = null; }); // Shared by simultaneous calls and run by the reader's own Git, so that a burst of requests spawns a single process, within the limit of the reader
+
+    return this.pendingHeadRead;
+  }
+
+  async #countAllRecords(revision, previous) {
+    const grepOptions = getRecordsGrepOptions();
+
+    if (previous && await this.git.isAncestor(previous.head, revision)) { // Only the commits added since the previous count need counting when the history was extended, unlike a rewritten one, such as after a force push
+      const previousCount = await previous.promise.catch(() => null);
+
+      if (previousCount !== null) {
+        return previousCount + await this.git.countCommits([ ...grepOptions, `${previous.head}..${revision}`, '--', '*/*' ]);
+      }
+    }
+
+    return this.git.countCommits([ ...grepOptions, revision, '--', '*/*' ]); // Count all records (exclude root directory files)
+  }
+
+  #listServiceRevisions(serviceId) {
+    return this.#readAtHead(`revisions:${serviceId}`, async revision => {
+      const revisions = await this.git.listPathRevisions(`:(literal)${serviceId}`, { revision }); // A literal pathspec matches the directory of the service as is, whatever characters its name holds, such as `*` or `[`, and lets git use the changed-path Bloom filters of the commit-graph, which wildcards disable
+
+      return revisions.map(({ message, ...serviceRevision }) => ({
+        ...serviceRevision,
+        isRecord: DataMapper.hasRecordPrefix(message),
+        isChange: DataMapper.hasRecordPrefix(message, { includeTechnicalUpgrades: false }),
+        isTechnicalUpgrade: DataMapper.isTechnicalUpgrade(message),
+      })); // Messages are reduced to the flags read from them, as the cache keeps the histories of hundreds of services
+    });
+  }
+
+  async #loadRevisions(revisions, { limit, offset = 0 } = {}) {
+    const page = sortByFetchDate(revisions.slice(offset, limit === undefined ? undefined : offset + limit)); // Paginated in the order of the history, as `#getCommits` does, until https://github.com/OpenTermsArchive/engine/issues/1243 settles how records should be paginated
+    const commits = await this.git.getCommitsByHashes(page.map(({ hash }) => hash), [...new Set(page.flatMap(({ filePaths }) => filePaths))]);
+
+    return Promise.all(commits.map(commit => this.#toDomain(commit, { deferContentLoading: true })));
+  }
+
+  async #getCommits({ reverse = false, limit, offset, includeTechnicalUpgrades = true } = {}) {
+    const options = [ ...getRecordsGrepOptions({ includeTechnicalUpgrades }), '--', '*/*' ]; // Exclude root directory files by only matching files in subdirectories
 
     // Use git-level pagination for performance: `--skip` and `--max-count` count in topological order, not strictly chronological.
     // In records history, the only commits whose author date is out of step with their topological position are technical upgrades.

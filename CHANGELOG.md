@@ -2,6 +2,22 @@
 
 All changes that impact users of this module are documented in this file, in the [Common Changelog](https://common-changelog.org) format with some additional specifications defined in the CONTRIBUTING file. This codebase adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased [minor]
+
+> Development of this release was supported by [Anthelia](https://anthelia.tech).
+
+### Changed
+
+- Speed up the versions endpoints of the Collection API
+- Compress the responses of the Collection API
+
+### Fixed
+
+- Match service IDs and terms types literally in the versions endpoints of the Collection API
+- Respond with a `404` error to `/version/{serviceId}/{termsType}/{date}` requests with an invalid date
+- Stop failing on `/versions/{serviceId}` and `/feed/{serviceId}` when a commit recorded several files of a service
+- Keep service IDs with non-ASCII characters intact when reading a repository not created by the engine, such as a clone
+
 ## 16.4.0 - 2026-10-07
 
 > Development of this release was supported by the [NGI0 Commons Fund](https://nlnet.nl/project/Modular-OTA/), a fund established by [NLnet](https://nlnet.nl/) with financial support from the European Commission's [Next Generation Internet](https://www.ngi.eu) programme, under the aegis of DG CNECT under grant agreement N°101069594.

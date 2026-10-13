@@ -16,22 +16,16 @@ const fs = fsApi.promises;
 
 const WRITER_LOCK_FILE_NAME = 'ota-writer.lock';
 const DEFAULT_BRANCH = 'main';
+const READER_MAX_CONCURRENT_PROCESSES = 4; // Read-only commands write neither the index nor the commit-graph, so a reader can run several of them at once; the limit keeps a burst of API requests from taking all the CPU away from the tracker
+const DIFF_STATS_BATCH_SIZE = 200; // Bounds the length of the command line, which is limited on some platforms
+const COMMITS_BATCH_SIZE = 500; // Bounds the length of the command line, which is limited on some platforms
+const COMMIT_HASH_REGEXP = /^[0-9a-f]{40}$/;
 
 const OBJECT_NOT_FOUND_MESSAGES = /bad object|not a tree|invalid object name|unknown revision|does not exist|exists on disk, but not in/i;
 
 export default class Git {
-  static async getHeadSha(repositoryPath) { // Used by callers that need to capture the current state of a repository without instantiating a full Git wrapper (which would mutate the repo via `init`).
-    try {
-      const git = simpleGit(repositoryPath, { trimmed: true });
-
-      return await git.revparse(['HEAD']);
-    } catch (error) {
-      if (/not a git repository|does not exist|unknown revision|ambiguous argument|does not have any commits/i.test(error.message)) {
-        return null; // Not a repository, or an empty one: a legitimate "no commit to reference" answer
-      }
-
-      throw error; // An actual git failure, which callers must not conflate with the absence of a repository
-    }
+  static getHeadSha(repositoryPath) { // Used by callers that need to capture the current state of a repository without instantiating a full Git wrapper (which would mutate the repo via `init`).
+    return readHeadSha(() => simpleGit(repositoryPath, { trimmed: true }));
   }
 
   static async listFilesAtCommit(repositoryPath, commit, { recursive = false } = {}) {
@@ -103,7 +97,7 @@ export default class Git {
       await fs.mkdir(this.path, { recursive: true }); // simple-git cannot be instantiated on a missing directory
     }
 
-    this.#connect();
+    this.#connect({ maxConcurrentProcesses: 1 }); // Concurrent runs on the same repository race the index and the commit-graph and can corrupt them
     await this.git.init([`--initial-branch=${DEFAULT_BRANCH}`]); // Otherwise the branch of a new repository would depend on the `init.defaultBranch` setting of the server, which is often `master`, whereas the published repositories and the deployment use `main`. Git ignores this option for an existing repository, which thus keeps its branch, as renaming it would diverge from its remote
     await this.#acquireWriterLock();
 
@@ -143,14 +137,15 @@ export default class Git {
       throw new Error(`Repository ${this.path} does not exist, it has to be created by a writer such as the tracker first`); // Without this check, git would silently walk up to an enclosing repository, such as the collection one
     }
 
-    this.#connect();
+    this.#connect({
+      maxConcurrentProcesses: READER_MAX_CONCURRENT_PROCESSES,
+      config: ['core.quotePath=false'], // Disable pathname quoting for the same reason Git.initialize sets it on managed repositories, as a repository opened for reading may not have been configured by a writer, such as a plain clone
+      errors: (error, { exitCode }) => error || (exitCode === 0 ? undefined : Buffer.from(`git exited with code ${exitCode} without any error message`)), // simple-git only fails on errors that git writes, whereas a process killed by a signal, such as by the out-of-memory killer, writes none: its truncated output would otherwise be read, and kept by the cache of readers
+    });
   }
 
-  #connect() {
-    this.git = simpleGit(this.path, {
-      trimmed: true,
-      maxConcurrentProcesses: 1, // Concurrent runs on the same repository race the index and the commit-graph and can corrupt them
-    });
+  #connect(options) {
+    this.git = simpleGit(this.path, { trimmed: true, ...options });
   }
 
   add(filePath) {
@@ -300,20 +295,24 @@ export default class Git {
     ]);
   }
 
-  async listPathRevisions(pathFilter) {
+  async listPathRevisions(pathspec, { revision = 'HEAD' } = {}) {
     let output;
 
     try {
-      // Ordering and technical-upgrade filtering are done by the caller in memory, so `--author-date-order`/`--grep`/`--name-only` are deliberately omitted to keep this walk lean
+      // Ordering and filtering are done by the caller in memory, so `--author-date-order` and `--grep` are deliberately omitted to keep this walk lean
       output = await this.git.raw([
         'log',
         '--no-merges',
-        '--format=%H%x09%at%x09%s', // Tab-separated hash, author date and subject: the minimum needed to order versions and detect technical upgrades, with no diff or message body loaded
+        '-z', // Print file names verbatim and NUL-terminated, whatever characters they hold
+        '--name-only', // List the files changed by each commit under the pathspec, to tell apart the terms of a service in memory
+        '--format=%x00%H%x09%at%x09%ct%x09%B', // Tab-separated hash, author date, committer date and message; the leading NUL sets each commit apart from the NUL-terminated names of the files changed by the previous one
+        '--end-of-options', // Everything after is a revision or a pathspec, never an option
+        revision,
         '--', // Everything after is a pathspec, never a revision or an option
-        pathFilter,
+        pathspec,
       ]);
     } catch (error) {
-      if (/unknown revision or path not in the working tree|does not have any commits yet/.test(error.message)) {
+      if (/unknown revision or path not in the working tree|does not have any commits yet|bad revision 'HEAD'/.test(error.message)) {
         return [];
       }
 
@@ -324,42 +323,124 @@ export default class Git {
       return [];
     }
 
-    return output.trim().split('\n').filter(Boolean).map(line => {
-      const [ hash, timestamp, ...subjectParts ] = line.split('\t');
+    return output.replace(/^\0|\0$/g, '').split('\0\0').map(commitOutput => {
+      const [ header, ...filePaths ] = commitOutput.split('\0');
+      const [ hash, timestamp, commitTimestamp, ...messageParts ] = header.split('\t');
 
-      return { hash, timestamp: parseInt(timestamp, 10), subject: subjectParts.join('\t') };
+      return {
+        hash,
+        timestamp: parseInt(timestamp, 10),
+        commitTimestamp: parseInt(commitTimestamp, 10),
+        message: messageParts.join('\t').trimEnd(),
+        filePaths: filePaths.map(filePath => filePath.replace(/^\n/, '')), // Git separates the names of the changed files from the commit header with a line feed
+      };
     });
   }
 
+  getHeadSha() {
+    return readHeadSha(() => this.git);
+  }
+
+  async countCommits(options) {
+    try {
+      return Number(await this.git.raw([ 'rev-list', '--count', '--no-merges', ...options ])); // Counted by git rather than by listing every commit to count them in memory, which takes seconds on large histories
+    } catch (error) {
+      if (/unknown revision or path not in the working tree|does not have any commits yet|bad revision 'HEAD'/.test(error.message)) {
+        return 0;
+      }
+
+      throw error;
+    }
+  }
+
+  async isAncestor(ancestor, descendant) {
+    try {
+      return await this.git.raw([ 'merge-base', '--end-of-options', ancestor, descendant ]) === ancestor; // Rather than `merge-base --is-ancestor`, which answers with its exit code only, and simple-git does not report a failing exit code without an error output
+    } catch {
+      return false; // An ancestor that no longer exists, such as after a history rewrite, cannot be one
+    }
+  }
+
+  async getCommitsByHashes(commitHashes, filePaths) {
+    const literalPathspecs = filePaths.map(filePath => `:(literal)${filePath}`);
+    const batches = await Promise.all(splitIntoBatches(commitHashes, COMMITS_BATCH_SIZE).map(batch => this.listCommits([
+      '--no-walk=unsorted', // Show only the given commits, in the given order
+      '--end-of-options', // Everything after is a revision or a pathspec, never an option
+      ...batch,
+      '--', // Everything after is a pathspec, never a revision
+      ...literalPathspecs, // Only list the given files among the changed ones, as a record is read from a single file even when its commit also changed others
+    ], { reverse: false })));
+
+    return batches.flat();
+  }
+
   async getDiffStats(commitHash) {
-    const output = await this.git.raw([
+    const [stats] = (await this.getDiffStatsBatch([commitHash])).values(); // Taken as the only entry rather than by key, as git prints the full hash of an abbreviated one
+
+    return stats;
+  }
+
+  async getDiffStatsBatch(commitHashes) {
+    const outputs = await Promise.all(splitIntoBatches(commitHashes, DIFF_STATS_BATCH_SIZE).map(batch => this.git.raw([
       'show',
       '--numstat', // Report added/deleted line counts per file as tab-separated numbers, instead of a textual diff
-      '--format=', // Drop the commit header so the output holds only the numstat lines
-      commitHash,
-    ]);
+      '--format=%H', // Print the hash of each commit before its numstat lines, to tell which commit they belong to
+      '--end-of-options', // Everything after is a revision, never an option
+      ...batch,
+    ])));
 
-    let additions = 0;
-    let deletions = 0;
+    return new Map(outputs.flatMap(parseNumstatOutput));
+  }
+}
 
-    for (const line of output.trim().split('\n')) {
-      if (!line) {
-        continue;
-      }
-
-      const [ added, deleted ] = line.split('\t');
-
-      // Binary files show '-' for additions/deletions
-      if (added !== '-') {
-        additions += parseInt(added, 10);
-      }
-      if (deleted !== '-') {
-        deletions += parseInt(deleted, 10);
-      }
+async function readHeadSha(connect) {
+  try {
+    return await connect().revparse(['HEAD']); // Connected within the try, as simple-git throws on a missing directory
+  } catch (error) {
+    if (/not a git repository|does not exist|unknown revision|ambiguous argument|does not have any commits/i.test(error.message)) {
+      return null; // Not a repository, or an empty one: a legitimate "no commit to reference" answer
     }
 
-    return { additions, deletions };
+    throw error; // An actual git failure, which callers must not conflate with the absence of a repository
   }
+}
+
+function splitIntoBatches(items, batchSize) {
+  const batches = [];
+
+  for (let start = 0; start < items.length; start += batchSize) {
+    batches.push(items.slice(start, start + batchSize));
+  }
+
+  return batches;
+}
+
+function parseNumstatOutput(output) {
+  const entries = [];
+
+  for (const line of output.split('\n')) {
+    if (COMMIT_HASH_REGEXP.test(line)) {
+      entries.push([ line, { additions: 0, deletions: 0 }]);
+      continue;
+    }
+
+    if (!line) {
+      continue;
+    }
+
+    const [ added, deleted ] = line.split('\t');
+    const [ , stats ] = entries.at(-1);
+
+    // Binary files show '-' for additions/deletions
+    if (added !== '-') {
+      stats.additions += parseInt(added, 10);
+    }
+    if (deleted !== '-') {
+      stats.deletions += parseInt(deleted, 10);
+    }
+  }
+
+  return entries;
 }
 
 async function readObjectAtCommit(repositoryPath, args) {

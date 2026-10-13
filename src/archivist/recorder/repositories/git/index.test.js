@@ -1,4 +1,5 @@
 import fs from 'fs';
+import os from 'os';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
@@ -6,6 +7,8 @@ import { expect, use } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import config from 'config';
 import mime from 'mime';
+import simpleGit from 'simple-git';
+import sinon from 'sinon';
 
 import Git from '../../../../git/index.js';
 import Snapshot from '../../snapshot.js';
@@ -594,6 +597,22 @@ describe('GitRepository', () => {
           expect(await subject.findByDate('../../outside', TERMS_TYPE, FETCH_DATE)).to.equal(null);
         });
       });
+
+      context('when the date is invalid', () => {
+        before(() => subject.save(new Version({
+          serviceId: SERVICE_PROVIDER_ID,
+          termsType: TERMS_TYPE,
+          content: CONTENT,
+          fetchDate: FETCH_DATE,
+          snapshotIds: [SNAPSHOT_ID],
+        })));
+
+        after(() => subject.removeAll());
+
+        it('returns null instead of erroring', async () => {
+          expect(await subject.findByDate(SERVICE_PROVIDER_ID, TERMS_TYPE, new Date('not a date'))).to.equal(null);
+        });
+      });
     });
 
     describe('#findAll', () => {
@@ -788,6 +807,43 @@ describe('GitRepository', () => {
           }
         });
       });
+
+      context('when the service ID is a pattern matching other services', () => {
+        it('returns no record', async () => {
+          expect(await subject.findByServiceAndTermsType('*', TERMS_TYPE)).to.be.an('array').that.is.empty;
+        });
+      });
+
+      context('when the service ID contains special characters', () => {
+        const SPECIAL_SERVICE_ID = 'Service·A [beta]';
+        const SERVICE_ID_MATCHING_THE_BRACKETS_AS_A_PATTERN = 'Service·A b';
+        let specialServiceRecordId;
+
+        before(async () => {
+          ({ id: specialServiceRecordId } = await subject.save(new Version({
+            serviceId: SPECIAL_SERVICE_ID,
+            termsType: TERMS_TYPE,
+            content: CONTENT,
+            fetchDate: FETCH_DATE,
+            snapshotIds: [SNAPSHOT_ID],
+          })));
+          await subject.save(new Version({
+            serviceId: SERVICE_ID_MATCHING_THE_BRACKETS_AS_A_PATTERN,
+            termsType: TERMS_TYPE,
+            content: CONTENT,
+            fetchDate: FETCH_DATE,
+            snapshotIds: [SNAPSHOT_ID],
+          }));
+        });
+
+        it('returns its records', async () => {
+          expect((await subject.findByServiceAndTermsType(SPECIAL_SERVICE_ID, TERMS_TYPE)).map(({ id }) => id)).to.deep.equal([specialServiceRecordId]);
+        });
+
+        it('counts its records', async () => {
+          expect(await subject.count(SPECIAL_SERVICE_ID, TERMS_TYPE)).to.equal(1);
+        });
+      });
     });
 
     describe('#findByService', () => {
@@ -950,6 +1006,10 @@ describe('GitRepository', () => {
         expect(count).to.equal(3);
       });
 
+      it('counts as many records as are listed', async () => {
+        expect(count).to.equal((await subject.findAll()).length);
+      });
+
       context('with serviceId and termsType filters', () => {
         it('returns count for specific service and terms type', async () => {
           const filteredCount = await subject.count(SERVICE_PROVIDER_ID, TERMS_TYPE);
@@ -970,6 +1030,12 @@ describe('GitRepository', () => {
         });
       });
 
+      context('when the service ID is a pattern matching other services', () => {
+        it('returns zero', async () => {
+          expect(await subject.count('*', TERMS_TYPE)).to.equal(0);
+        });
+      });
+
       context('with only serviceId filter', () => {
         it('returns count for all terms types of a service', async () => {
           // Add a version with different terms type
@@ -985,6 +1051,45 @@ describe('GitRepository', () => {
 
           expect(filteredCount).to.equal(4); // 3 from TERMS_TYPE + 1 from 'Different Terms'
         });
+      });
+    });
+
+    describe('#getDiffStatsBatch', () => {
+      const INVALID_RECORD_IDS = [ 'not-a-record-id', '--output=injected' ];
+      let firstRecordId;
+      let secondRecordId;
+      let stats;
+
+      before(async () => {
+        ({ id: firstRecordId } = await subject.save(new Version({
+          serviceId: SERVICE_PROVIDER_ID,
+          termsType: TERMS_TYPE,
+          content: 'first line\n',
+          fetchDate: FETCH_DATE,
+          snapshotIds: [SNAPSHOT_ID],
+        })));
+        ({ id: secondRecordId } = await subject.save(new Version({
+          serviceId: SERVICE_PROVIDER_ID,
+          termsType: TERMS_TYPE,
+          content: 'first line updated\nsecond line\n',
+          fetchDate: FETCH_DATE_LATER,
+          snapshotIds: [SNAPSHOT_ID],
+        })));
+
+        stats = await subject.getDiffStatsBatch([ firstRecordId, secondRecordId, ...INVALID_RECORD_IDS ]);
+      });
+
+      after(() => subject.removeAll());
+
+      it('returns the lines added and deleted by each record', () => {
+        expect(stats.get(firstRecordId)).to.deep.equal({ additions: 1, deletions: 0 });
+        expect(stats.get(secondRecordId)).to.deep.equal({ additions: 2, deletions: 1 });
+      });
+
+      it('reports the diff stats of invalid record IDs as unavailable', () => {
+        for (const invalidRecordId of INVALID_RECORD_IDS) {
+          expect(stats.get(invalidRecordId)).to.deep.equal({ additions: null, deletions: null });
+        }
       });
     });
 
@@ -1146,6 +1251,204 @@ describe('GitRepository', () => {
         }
 
         expect(walked).to.have.lengthOf(ids.length);
+      });
+    });
+
+    describe('records sharing the same fetch date', () => {
+      let ids;
+
+      before(async () => {
+        ids = [];
+        for (const [ index, content ] of [ 'version', 'first upgrade', 'second upgrade', 'third upgrade', 'fourth upgrade' ].entries()) { // Technical upgrades reuse the fetch date of the snapshot they are extracted from
+          ids.push((await subject.save(new Version({ serviceId: SERVICE_PROVIDER_ID, termsType: TERMS_TYPE, content, fetchDate: FETCH_DATE, isTechnicalUpgrade: index > 0, snapshotIds: [SNAPSHOT_ID] }))).id);
+        }
+      });
+
+      after(() => subject.removeAll());
+
+      it('are found by date as the last one recorded', async () => {
+        expect((await subject.findByDate(SERVICE_PROVIDER_ID, TERMS_TYPE, FETCH_DATE_LATER)).id).to.equal(ids.at(-1));
+      });
+
+      it('are listed from the last one recorded', async () => {
+        expect((await subject.findByServiceAndTermsType(SERVICE_PROVIDER_ID, TERMS_TYPE)).map(({ id }) => id)).to.deep.equal(ids.toReversed());
+      });
+    });
+
+    describe('pagination of the records of some terms', () => {
+      let newerRecordId;
+      let technicalUpgradeId;
+
+      before(async () => {
+        await subject.save(new Version({
+          serviceId: SERVICE_PROVIDER_ID,
+          termsType: TERMS_TYPE,
+          content: 'older content',
+          fetchDate: FETCH_DATE_EARLIER,
+          snapshotIds: [SNAPSHOT_ID],
+        }));
+        ({ id: newerRecordId } = await subject.save(new Version({
+          serviceId: SERVICE_PROVIDER_ID,
+          termsType: TERMS_TYPE,
+          content: 'newer content',
+          fetchDate: FETCH_DATE_LATER,
+          snapshotIds: [SNAPSHOT_ID],
+        })));
+        ({ id: technicalUpgradeId } = await subject.save(new Version({
+          serviceId: SERVICE_PROVIDER_ID,
+          termsType: TERMS_TYPE,
+          content: 'technical upgrade content',
+          fetchDate: FETCH_DATE,
+          isTechnicalUpgrade: true,
+          snapshotIds: [SNAPSHOT_ID],
+        })));
+      });
+
+      after(() => subject.removeAll());
+
+      it('pages in the order the records were saved', async () => {
+        expect((await subject.findByServiceAndTermsType(SERVICE_PROVIDER_ID, TERMS_TYPE, { limit: 1 })).map(({ id }) => id)).to.deep.equal([technicalUpgradeId]);
+        expect((await subject.findByServiceAndTermsType(SERVICE_PROVIDER_ID, TERMS_TYPE, { limit: 1, offset: 1 })).map(({ id }) => id)).to.deep.equal([newerRecordId]);
+      });
+
+      it('sorts each page by fetch date', async () => {
+        expect((await subject.findByServiceAndTermsType(SERVICE_PROVIDER_ID, TERMS_TYPE, { limit: 2 })).map(({ id }) => id)).to.deep.equal([ newerRecordId, technicalUpgradeId ]);
+      });
+    });
+
+    describe('commits that are not records', () => {
+      let firstRecordId;
+      let manualFixId;
+      let manualFixWithPrefixId;
+      let lastRecordId;
+
+      before(async () => {
+        ({ id: firstRecordId } = await subject.save(new Version({
+          serviceId: SERVICE_PROVIDER_ID,
+          termsType: TERMS_TYPE,
+          content: 'first content',
+          fetchDate: FETCH_DATE_EARLIER,
+          snapshotIds: [SNAPSHOT_ID],
+        })));
+        manualFixId = await commitFiles(git, { [`${SERVICE_PROVIDER_ID}/${TERMS_TYPE}.md`]: 'fixed content' }, { message: 'Fix a typo', date: FETCH_DATE });
+        manualFixWithPrefixId = await commitFiles(git, { [`${SERVICE_PROVIDER_ID}/${TERMS_TYPE}.md`]: 'fixed content again' }, { message: 'Fix another typo\n\nUpdate the wording', date: new Date(FETCH_DATE.getTime() + 1000) }); // A record prefix in the body only, which `git log --grep` matches
+        ({ id: lastRecordId } = await subject.save(new Version({
+          serviceId: SERVICE_PROVIDER_ID,
+          termsType: TERMS_TYPE,
+          content: 'last content',
+          fetchDate: FETCH_DATE_LATER,
+          snapshotIds: [SNAPSHOT_ID],
+        })));
+      });
+
+      after(() => subject.removeAll());
+
+      it('are counted only when a record prefix appears anywhere in their message', async () => {
+        expect(await subject.count(SERVICE_PROVIDER_ID, TERMS_TYPE)).to.equal(3);
+      });
+
+      it('are listed only when a record prefix appears anywhere in their message', async () => {
+        expect((await subject.findByServiceAndTermsType(SERVICE_PROVIDER_ID, TERMS_TYPE)).map(({ id }) => id)).to.deep.equal([ lastRecordId, manualFixWithPrefixId, firstRecordId ]);
+      });
+
+      it('are navigated, as any commit that changed the terms', async () => {
+        expect((await subject.getNavigationIds(SERVICE_PROVIDER_ID, TERMS_TYPE, firstRecordId)).next).to.equal(manualFixId);
+      });
+
+      it('are found by date, as any commit that changed the terms', async () => {
+        expect((await subject.findByDate(SERVICE_PROVIDER_ID, TERMS_TYPE, FETCH_DATE)).id).to.equal(manualFixId);
+      });
+    });
+
+    describe('records that also change files outside their service', () => {
+      let recordId;
+
+      before(async () => {
+        await subject.save(new Version({
+          serviceId: SERVICE_PROVIDER_ID,
+          termsType: TERMS_TYPE,
+          content: CONTENT,
+          fetchDate: FETCH_DATE_EARLIER,
+          snapshotIds: [SNAPSHOT_ID],
+        }));
+        recordId = await commitFiles(git, {
+          [`${SERVICE_PROVIDER_ID}/${TERMS_TYPE}.md`]: `${CONTENT} - updated`,
+          'README.md': 'A file outside of any service',
+        }, { message: `Record new changes of ${SERVICE_PROVIDER_ID} ${TERMS_TYPE}`, date: FETCH_DATE_LATER });
+      });
+
+      after(() => subject.removeAll());
+
+      it('are counted with their terms', async () => {
+        expect(await subject.count(SERVICE_PROVIDER_ID, TERMS_TYPE)).to.equal(2);
+      });
+
+      it('are listed with their terms', async () => {
+        expect((await subject.findByServiceAndTermsType(SERVICE_PROVIDER_ID, TERMS_TYPE)).map(({ id }) => id)).to.include(recordId);
+      });
+
+      it('are listed with their service', async () => {
+        expect((await subject.findByService(SERVICE_PROVIDER_ID)).map(({ id }) => id)).to.include(recordId);
+      });
+
+      it('are found by date', async () => {
+        expect((await subject.findByDate(SERVICE_PROVIDER_ID, TERMS_TYPE, FETCH_DATE_LATER)).id).to.equal(recordId);
+      });
+    });
+
+    describe('commits that record several files of a service', () => {
+      const OTHER_TERMS_TYPE = 'Privacy Policy';
+      let recordId;
+      let multipleFilesCommitId;
+
+      before(async () => {
+        ({ id: recordId } = await subject.save(new Version({
+          serviceId: SERVICE_PROVIDER_ID,
+          termsType: TERMS_TYPE,
+          content: CONTENT,
+          fetchDate: FETCH_DATE_EARLIER,
+          snapshotIds: [SNAPSHOT_ID],
+        })));
+        multipleFilesCommitId = await commitFiles(git, {
+          [`${SERVICE_PROVIDER_ID}/${TERMS_TYPE}.md`]: `${CONTENT} - updated`,
+          [`${SERVICE_PROVIDER_ID}/${OTHER_TERMS_TYPE}.md`]: CONTENT,
+        }, { message: `Record new changes of ${SERVICE_PROVIDER_ID} ${TERMS_TYPE}`, date: FETCH_DATE });
+      });
+
+      after(() => subject.removeAll());
+
+      it('are listed with each of the terms they changed', async () => {
+        expect((await subject.findByServiceAndTermsType(SERVICE_PROVIDER_ID, TERMS_TYPE)).map(({ id }) => id)).to.deep.equal([ multipleFilesCommitId, recordId ]);
+      });
+
+      it('are left out of the records of the service instead of failing', async () => {
+        expect((await subject.findByService(SERVICE_PROVIDER_ID)).map(({ id }) => id)).to.deep.equal([recordId]);
+      });
+    });
+
+    describe('records of terms whose file was deleted', () => {
+      let recordId;
+
+      before(async () => {
+        ({ id: recordId } = await subject.save(new Version({
+          serviceId: SERVICE_PROVIDER_ID,
+          termsType: TERMS_TYPE,
+          content: CONTENT,
+          fetchDate: FETCH_DATE,
+          snapshotIds: [SNAPSHOT_ID],
+        })));
+        await simpleGit(RECORDER_PATH).rm([`${SERVICE_PROVIDER_ID}/${TERMS_TYPE}.md`]);
+        await git.commit({ message: `Stop tracking ${SERVICE_PROVIDER_ID} ${TERMS_TYPE}`, date: FETCH_DATE_LATER });
+      });
+
+      after(() => subject.removeAll());
+
+      it('are still counted', async () => {
+        expect(await subject.count(SERVICE_PROVIDER_ID, TERMS_TYPE)).to.equal(1);
+      });
+
+      it('are still listed', async () => {
+        expect((await subject.findByServiceAndTermsType(SERVICE_PROVIDER_ID, TERMS_TYPE)).map(({ id }) => id)).to.deep.equal([recordId]);
       });
     });
 
@@ -1732,6 +2035,57 @@ describe('GitRepository', () => {
       it('returns the proper count', () => {
         expect(count).to.equal(3);
       });
+
+      context('with terms recorded in several formats', () => {
+        before(async () => {
+          await subject.save(new Snapshot({
+            serviceId: SERVICE_PROVIDER_ID,
+            termsType: TERMS_TYPE,
+            content: PDF_CONTENT,
+            mimeType: PDF_MIME_TYPE,
+            fetchDate: FETCH_DATE_LATER,
+          }));
+        });
+
+        it('counts the records of every format of the terms', async () => {
+          expect(await subject.count(SERVICE_PROVIDER_ID, TERMS_TYPE)).to.equal(4);
+        });
+      });
+    });
+
+    describe('#findByDate', () => {
+      context('with terms extracted from several source documents', () => {
+        let recordWithoutDocumentIdId;
+        let recordWithDocumentIdId;
+
+        before(async () => {
+          ({ id: recordWithoutDocumentIdId } = await subject.save(new Snapshot({
+            serviceId: SERVICE_PROVIDER_ID,
+            termsType: TERMS_TYPE,
+            content: CONTENT,
+            mimeType: HTML_MIME_TYPE,
+            fetchDate: FETCH_DATE_EARLIER,
+          })));
+          ({ id: recordWithDocumentIdId } = await subject.save(new Snapshot({
+            serviceId: SERVICE_PROVIDER_ID,
+            termsType: TERMS_TYPE,
+            documentId: DOCUMENT_ID,
+            content: CONTENT,
+            mimeType: HTML_MIME_TYPE,
+            fetchDate: FETCH_DATE,
+          })));
+        });
+
+        after(() => subject.removeAll());
+
+        it('finds the record of the given source document', async () => {
+          expect((await subject.findByDate(SERVICE_PROVIDER_ID, TERMS_TYPE, FETCH_DATE_LATER, DOCUMENT_ID)).id).to.equal(recordWithDocumentIdId);
+        });
+
+        it('finds the record without source document when none is given', async () => {
+          expect((await subject.findByDate(SERVICE_PROVIDER_ID, TERMS_TYPE, FETCH_DATE_LATER)).id).to.equal(recordWithoutDocumentIdId);
+        });
+      });
     });
 
     describe('#findLatest', () => {
@@ -2158,5 +2512,185 @@ describe('GitRepository', () => {
 
       await expect(missingRepository.initialize()).to.be.rejectedWith(Error, /does not exist/);
     });
+
+    context('when the repository configuration quotes non-ASCII file names, as in a plain clone', () => {
+      const NON_ASCII_SERVICE_ID = 'service·A';
+
+      before(async () => {
+        await simpleGit(RECORDER_PATH).raw([ 'config', '--file', path.join(RECORDER_PATH, '.git', 'config'), 'core.quotePath', 'true' ]); // Set rather than unset, as an unset value would fall back on the global configuration of the machine, which often disables quoting
+
+        await writer.save(new Version({
+          serviceId: NON_ASCII_SERVICE_ID,
+          termsType: TERMS_TYPE,
+          content: CONTENT,
+          fetchDate: FETCH_DATE_LATER,
+          snapshotIds: [SNAPSHOT_ID],
+        }));
+      });
+
+      it('reads their service ID verbatim', async () => {
+        const records = await subject.findAll();
+
+        expect(records.map(({ serviceId }) => serviceId)).to.include(NON_ASCII_SERVICE_ID);
+      });
+    });
+
+    context('when reading the same history several times', () => {
+      let reader;
+      let listPathRevisionsSpy;
+      let countCommitsSpy;
+      let savedVersionsCount = 0;
+
+      function saveNewVersion() {
+        savedVersionsCount++;
+
+        return writer.save(new Version({
+          serviceId: SERVICE_PROVIDER_ID,
+          termsType: TERMS_TYPE,
+          content: `${CONTENT} ${savedVersionsCount}`,
+          fetchDate: new Date(FETCH_DATE_LATER.getTime() + savedVersionsCount * 1000),
+          snapshotIds: [SNAPSHOT_ID],
+        }));
+      }
+
+      beforeEach(async () => {
+        reader = new GitRepository({
+          ...config.get('@opentermsarchive/engine.recorder.versions.storage.git'),
+          path: RECORDER_PATH,
+          readOnly: true,
+        });
+        await reader.initialize();
+
+        listPathRevisionsSpy = sinon.spy(Git.prototype, 'listPathRevisions');
+        countCommitsSpy = sinon.spy(Git.prototype, 'countCommits');
+      });
+
+      afterEach(() => sinon.restore());
+
+      it('reads the history of a service once for all its terms', async () => {
+        await reader.count(SERVICE_PROVIDER_ID, TERMS_TYPE);
+        await reader.findByServiceAndTermsType(SERVICE_PROVIDER_ID, TERMS_TYPE);
+        await reader.getNavigationIds(SERVICE_PROVIDER_ID, 'Privacy Policy', record.id);
+
+        expect(listPathRevisionsSpy.callCount).to.equal(1);
+      });
+
+      it('shares a single read between simultaneous calls', async () => {
+        await Promise.all(Array.from({ length: 5 }, () => reader.count(SERVICE_PROVIDER_ID, TERMS_TYPE)));
+
+        expect(listPathRevisionsSpy.callCount).to.equal(1);
+      });
+
+      it('reads HEAD once for simultaneous calls, within the limit of the Git processes of the reader', async () => {
+        const staticGetHeadShaSpy = sinon.spy(Git, 'getHeadSha');
+        const getHeadShaSpy = sinon.spy(Git.prototype, 'getHeadSha');
+
+        await Promise.all(Array.from({ length: 5 }, () => reader.count(SERVICE_PROVIDER_ID, TERMS_TYPE)));
+
+        expect(getHeadShaSpy.callCount).to.equal(1);
+        expect(staticGetHeadShaSpy.called).to.be.false;
+      });
+
+      it('sees the records saved by the writer since the previous read', async () => {
+        const previousCount = await reader.count(SERVICE_PROVIDER_ID, TERMS_TYPE);
+
+        await saveNewVersion();
+
+        expect(await reader.count(SERVICE_PROVIDER_ID, TERMS_TYPE)).to.equal(previousCount + 1);
+      });
+
+      it('only counts the commits added since the previous count of all records', async () => {
+        const previousCount = await reader.count();
+        const previousHead = await Git.getHeadSha(RECORDER_PATH);
+
+        await saveNewVersion();
+
+        expect(await reader.count()).to.equal(previousCount + 1);
+        expect(countCommitsSpy.lastCall.args[0]).to.include(`${previousHead}..${await Git.getHeadSha(RECORDER_PATH)}`);
+      });
+
+      it('counts all records again after the history was rewritten', async () => {
+        const headBeforeRewrite = await Git.getHeadSha(RECORDER_PATH);
+
+        await saveNewVersion();
+        await reader.count();
+        await simpleGit(RECORDER_PATH).reset([ '--hard', headBeforeRewrite ]);
+        await saveNewVersion();
+
+        expect(await reader.count()).to.equal((await reader.findAll()).length);
+      });
+
+      context('when the repository has no commits yet', () => {
+        let emptyRepositoryPath;
+        let emptyRepositoryWriter;
+        let emptyRepositoryReader;
+
+        before(async () => {
+          emptyRepositoryPath = fs.mkdtempSync(path.join(os.tmpdir(), 'ota-git-test-'));
+          emptyRepositoryWriter = new GitRepository({
+            ...config.get('@opentermsarchive/engine.recorder.versions.storage.git'),
+            path: emptyRepositoryPath,
+          });
+          await emptyRepositoryWriter.git.initialize();
+          emptyRepositoryReader = new GitRepository({
+            ...config.get('@opentermsarchive/engine.recorder.versions.storage.git'),
+            path: emptyRepositoryPath,
+            readOnly: true,
+          });
+          await emptyRepositoryReader.initialize();
+        });
+
+        after(() => fs.rmSync(emptyRepositoryPath, { recursive: true, force: true }));
+
+        it('counts no record, then the records saved since', async () => {
+          expect(await emptyRepositoryReader.count()).to.equal(0);
+
+          await emptyRepositoryWriter.save(new Version({
+            serviceId: SERVICE_PROVIDER_ID,
+            termsType: TERMS_TYPE,
+            content: CONTENT,
+            fetchDate: FETCH_DATE,
+            snapshotIds: [SNAPSHOT_ID],
+          }));
+
+          expect(await emptyRepositoryReader.count()).to.equal(1);
+        });
+      });
+
+      context('when the repository is opened for writing', () => {
+        it('reads the history of a service again at each call', async () => {
+          await writer.count(SERVICE_PROVIDER_ID, TERMS_TYPE);
+          await writer.count(SERVICE_PROVIDER_ID, TERMS_TYPE);
+
+          expect(listPathRevisionsSpy.callCount).to.equal(2);
+        });
+      });
+    });
+
+    context('when finding the latest record of some terms', () => {
+      const SERVICE_ID_HOLDING_A_PATTERN = 'Service [beta]';
+
+      before(async () => {
+        for (const serviceId of [ SERVICE_ID_HOLDING_A_PATTERN, 'Service b' ]) {
+          await writer.save(new Version({ serviceId, termsType: TERMS_TYPE, content: CONTENT, fetchDate: FETCH_DATE_LATER, snapshotIds: [SNAPSHOT_ID] }));
+        }
+      });
+
+      it('matches the service ID literally', async () => {
+        expect((await subject.findLatest(SERVICE_ID_HOLDING_A_PATTERN, TERMS_TYPE)).serviceId).to.equal(SERVICE_ID_HOLDING_A_PATTERN);
+        expect(await subject.findLatest('*', TERMS_TYPE)).to.be.null;
+      });
+    });
   });
 });
+
+async function commitFiles(git, filesContents, { message, date }) {
+  for (const [ relativeFilePath, content ] of Object.entries(filesContents)) {
+    const filePath = path.join(RECORDER_PATH, relativeFilePath);
+
+    await GitRepository.writeFile({ filePath, content });
+    await git.add(filePath);
+  }
+
+  return git.commit({ message, date });
+}

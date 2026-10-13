@@ -416,14 +416,11 @@ export default function versionsRouter(versionsRepository, snapshotsRepository) 
     }
 
     const paginatedVersions = await versionsRepository.findByServiceAndTermsType(serviceId, termsType, { limit, offset });
+    const statsByVersionId = await versionsRepository.getDiffStatsBatch(paginatedVersions.map(version => version.id));
 
-    const versionsList = await Promise.all(paginatedVersions.map(async version => {
-      const stats = await versionsRepository.getDiffStats(version.id);
-
-      return {
-        ...mapVersionToListItem(version),
-        ...stats,
-      };
+    const versionsList = paginatedVersions.map(version => ({
+      ...mapVersionToListItem(version),
+      ...statsByVersionId.get(version.id),
     }));
 
     const response = {

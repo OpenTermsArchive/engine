@@ -186,6 +186,18 @@ class RepositoryInterface {
   getDiffStats(recordId) {
     return { additions: null, deletions: null };
   }
+
+  /**
+   * Get the number of lines added and deleted by each of the given records, relative to the previous state of the same terms
+   * This is an optional capability, with the same default as #getDiffStats
+   * @see     RepositoryInterface#getDiffStats
+   * @param   {Array<string>}                                                  recordIds - Record IDs to get diff stats for
+   * @returns {Promise<Map<string, {additions: ?number, deletions: ?number}>>}           Promise resolved with the diff stats of each record, keyed by record ID
+   */
+  // eslint-disable-next-line class-methods-use-this
+  getDiffStatsBatch(recordIds) {
+    return new Map(recordIds.map(recordId => [ recordId, { additions: null, deletions: null }]));
+  }
 }
 
 export default RepositoryInterface;
