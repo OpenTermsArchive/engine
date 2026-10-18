@@ -14,12 +14,12 @@ export default class Terms {
   }
 
   get duplicateSourceDocuments() {
-    const seenLocations = new Set();
+    const seenIds = new Set();
 
-    return this.sourceDocuments.filter(({ location }) => {
-      const isDuplicate = seenLocations.has(location);
+    return this.sourceDocuments.filter(({ id }) => {
+      const isDuplicate = seenIds.has(id);
 
-      seenLocations.add(location);
+      seenIds.add(id);
 
       return isDuplicate;
     });

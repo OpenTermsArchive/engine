@@ -127,9 +127,12 @@ export default async options => {
 
                 if (terms.hasMultipleSourceDocuments) {
                   it('does not declare the same source document more than once', () => {
-                    const duplicateLocations = [...new Set(terms.duplicateSourceDocuments.map(sourceDocument => sourceDocument.location))];
+                    const duplicateIds = [...new Set(terms.duplicateSourceDocuments.map(sourceDocument => sourceDocument.id))];
+                    const conflictingSourceDocuments = terms.sourceDocuments
+                      .filter(sourceDocument => duplicateIds.includes(sourceDocument.id))
+                      .map(({ id, location }) => `"${id}" from "${location}"`);
 
-                    expect(duplicateLocations, `The same source document is declared more than once within the "${type}" combine: ${duplicateLocations.join(', ')}`).to.be.empty;
+                    expect(duplicateIds, `Source document IDs must be unique within the "${type}" combine: ${conflictingSourceDocuments.join(', ')}`).to.be.empty;
                   });
                 }
 

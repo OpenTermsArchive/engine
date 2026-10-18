@@ -82,10 +82,22 @@ describe('Terms', () => {
   });
 
   describe('#duplicateSourceDocuments', () => {
-    it('returns the source documents that repeat a location', () => {
+    it('returns the source documents that repeat a snapshot ID', () => {
       const terms = new Terms({ service, type: termsType, sourceDocuments: [ document1, document2 ] });
 
       expect(terms.duplicateSourceDocuments).to.deep.equal([document2]);
+    });
+
+    it('returns source documents that share a snapshot ID even when their locations differ', () => {
+      const sourceDocuments = [
+        new SourceDocument({ location: 'https://m.vk.ru/terms' }),
+        new SourceDocument({ location: 'https://id.vk.ru/terms' }),
+        new SourceDocument({ location: 'https://vk.ru/ads?country=ru' }),
+        new SourceDocument({ location: 'https://vk.ru/ads?country=ua' }),
+      ];
+      const terms = new Terms({ service, type: termsType, sourceDocuments });
+
+      expect(terms.duplicateSourceDocuments).to.deep.equal([ sourceDocuments[1], sourceDocuments[3] ]);
     });
   });
 });
