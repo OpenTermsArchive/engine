@@ -1,0 +1,23 @@
+{
+  "name": "Service",
+  "terms": {
+    "Terms of Service": {
+      "select": "body",
+      "combine": [
+        {
+          "fetch": "https://domain.example/tos/ads"
+        },
+        {
+          "fetch": "https://domain.example/tos/community"
+        },
+        {
+          "fetch": "https://domain.example/tos"
+        }
+      ]
+    },
+    "Privacy Policy": {
+      "fetch": "https://domain.example/privacy",
+      "select": "body"
+    }
+  }
+}

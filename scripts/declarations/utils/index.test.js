@@ -20,6 +20,13 @@ const FIXTURES = {
   serviceATermsAdded: { path: './fixtures/serviceATermsAdded.json' },
   serviceATermsRemoved: { path: './fixtures/serviceATermsRemoved.json' },
   serviceB: { path: './fixtures/serviceB.json' },
+  serviceACombine: { path: './fixtures/serviceACombine.json' },
+  serviceACombineDocumentAdded: { path: './fixtures/serviceACombineDocumentAdded.json' },
+  serviceACombineDocumentUpdated: { path: './fixtures/serviceACombineDocumentUpdated.json' },
+  serviceACombineSelectUpdated: { path: './fixtures/serviceACombineSelectUpdated.json' },
+  serviceACombineDocumentsReordered: { path: './fixtures/serviceACombineDocumentsReordered.json' },
+  serviceACombineLocationUpdated: { path: './fixtures/serviceACombineLocationUpdated.json' },
+  serviceACombineSingleSourceDocumentUpdated: { path: './fixtures/serviceACombineSingleSourceDocumentUpdated.json' },
 };
 
 const COMMIT_PATHS = {
@@ -76,7 +83,7 @@ describe('DeclarationUtils', () => {
       });
 
       it('returns the service ID and the updated terms type', async () => {
-        expect(await declarationUtils.getModifiedServicesAndTermsTypes()).to.deep.equal({
+        expect(await declarationUtils.getModifiedServicesAndTermsTypes()).to.deep.include({
           services: ['ServiceA'],
           servicesTermsTypes: { ServiceA: ['Terms of Service'] },
         });
@@ -88,7 +95,7 @@ describe('DeclarationUtils', () => {
       after(removeLatestCommit);
 
       it('returns the service ID and the added terms type', async () => {
-        expect(await declarationUtils.getModifiedServicesAndTermsTypes()).to.deep.equal({
+        expect(await declarationUtils.getModifiedServicesAndTermsTypes()).to.deep.include({
           services: ['ServiceA'],
           servicesTermsTypes: { ServiceA: ['Imprint'] },
         });
@@ -100,7 +107,7 @@ describe('DeclarationUtils', () => {
       after(removeLatestCommit);
 
       it('returns the added service ID along with the associated terms type', async () => {
-        expect(await declarationUtils.getModifiedServicesAndTermsTypes()).to.deep.equal({
+        expect(await declarationUtils.getModifiedServicesAndTermsTypes()).to.deep.include({
           services: ['ServiceB'],
           servicesTermsTypes: { ServiceB: ['Terms of Service'] },
         });
@@ -115,7 +122,7 @@ describe('DeclarationUtils', () => {
       });
 
       it('returns no services and no terms types', async () => {
-        expect(await declarationUtils.getModifiedServicesAndTermsTypes()).to.deep.equal({
+        expect(await declarationUtils.getModifiedServicesAndTermsTypes()).to.deep.include({
           services: [],
           servicesTermsTypes: {},
         });
@@ -127,7 +134,7 @@ describe('DeclarationUtils', () => {
       after(removeLatestCommit);
 
       it('returns no services and no terms types', async () => {
-        expect(await declarationUtils.getModifiedServicesAndTermsTypes()).to.deep.equal({
+        expect(await declarationUtils.getModifiedServicesAndTermsTypes()).to.deep.include({
           services: [],
           servicesTermsTypes: {},
         });
@@ -146,7 +153,7 @@ describe('DeclarationUtils', () => {
       });
 
       it('returns the services IDs and the updated terms types', async () => {
-        expect(await declarationUtils.getModifiedServicesAndTermsTypes()).to.deep.equal({
+        expect(await declarationUtils.getModifiedServicesAndTermsTypes()).to.deep.include({
           services: [ 'ServiceA', 'ServiceB' ],
           servicesTermsTypes: {
             ServiceA: [ 'Imprint', 'Privacy Policy', 'Terms of Service' ],
@@ -198,7 +205,7 @@ describe('DeclarationUtils', () => {
       after(removeLatestCommit);
 
       it('returns the added service ID along with all its terms types', async () => {
-        expect(await declarationUtils.getModifiedServicesAndTermsTypes()).to.deep.equal({
+        expect(await declarationUtils.getModifiedServicesAndTermsTypes()).to.deep.include({
           services: ['ServiceB'],
           servicesTermsTypes: { ServiceB: ['Terms of Service'] },
         });
@@ -210,9 +217,112 @@ describe('DeclarationUtils', () => {
       after(removeLatestCommit);
 
       it('returns no services and no terms types', async () => {
-        expect(await declarationUtils.getModifiedServicesAndTermsTypes()).to.deep.equal({
+        expect(await declarationUtils.getModifiedServicesAndTermsTypes()).to.deep.include({
           services: [],
           servicesTermsTypes: {},
+        });
+      });
+    });
+    context('when terms combine several source documents', () => {
+      before(async () => {
+        await declarationUtils.git.checkout('main');
+        await commitChanges(COMMIT_PATHS.serviceA, FIXTURES.serviceACombine.content);
+        await declarationUtils.git.checkout('updated');
+        await declarationUtils.git.reset('hard', ['main']);
+      });
+
+      after(async () => {
+        await declarationUtils.git.checkout('main');
+        await removeLatestCommit();
+        await declarationUtils.git.checkout('updated');
+        await declarationUtils.git.reset('hard', ['main']);
+      });
+
+      context('when a source document is added', () => {
+        before(() => commitChanges(COMMIT_PATHS.serviceA, FIXTURES.serviceACombineDocumentAdded.content));
+        after(removeLatestCommit);
+
+        it('returns only the added source document', async () => {
+          expect(await declarationUtils.getModifiedServicesAndTermsTypes()).to.deep.equal({
+            services: ['ServiceA'],
+            servicesTermsTypes: { ServiceA: ['Terms of Service'] },
+            servicesTermsSourceDocuments: { ServiceA: { 'Terms of Service': ['https://domain.example/tos/payments'] } },
+          });
+        });
+      });
+
+      context('when a property of a source document is modified', () => {
+        before(() => commitChanges(COMMIT_PATHS.serviceA, FIXTURES.serviceACombineDocumentUpdated.content));
+        after(removeLatestCommit);
+
+        it('returns only the modified source document', async () => {
+          const { servicesTermsSourceDocuments } = await declarationUtils.getModifiedServicesAndTermsTypes();
+
+          expect(servicesTermsSourceDocuments).to.deep.equal({ ServiceA: { 'Terms of Service': ['https://domain.example/tos/community'] } });
+        });
+      });
+
+      context('when a property shared by all source documents is modified', () => {
+        before(() => commitChanges(COMMIT_PATHS.serviceA, FIXTURES.serviceACombineSelectUpdated.content));
+        after(removeLatestCommit);
+
+        it('returns all source documents', async () => {
+          const { servicesTermsSourceDocuments } = await declarationUtils.getModifiedServicesAndTermsTypes();
+
+          expect(servicesTermsSourceDocuments.ServiceA['Terms of Service']).to.have.members([ 'https://domain.example/tos', 'https://domain.example/tos/community', 'https://domain.example/tos/ads' ]);
+        });
+      });
+
+      context('when source documents are only reordered', () => {
+        before(() => commitChanges(COMMIT_PATHS.serviceA, FIXTURES.serviceACombineDocumentsReordered.content));
+        after(removeLatestCommit);
+
+        it('returns the terms type with no source documents', async () => {
+          expect(await declarationUtils.getModifiedServicesAndTermsTypes()).to.deep.equal({
+            services: ['ServiceA'],
+            servicesTermsTypes: { ServiceA: ['Terms of Service'] },
+            servicesTermsSourceDocuments: { ServiceA: { 'Terms of Service': [] } },
+          });
+        });
+      });
+
+      context('when the location of a source document is modified', () => {
+        before(() => commitChanges(COMMIT_PATHS.serviceA, FIXTURES.serviceACombineLocationUpdated.content));
+        after(removeLatestCommit);
+
+        it('returns only the new location', async () => {
+          const { servicesTermsSourceDocuments } = await declarationUtils.getModifiedServicesAndTermsTypes();
+
+          expect(servicesTermsSourceDocuments).to.deep.equal({ ServiceA: { 'Terms of Service': ['https://domain.example/tos/advertising'] } });
+        });
+      });
+
+      context('when terms with a single source document are modified', () => {
+        before(() => commitChanges(COMMIT_PATHS.serviceA, FIXTURES.serviceACombineSingleSourceDocumentUpdated.content));
+        after(removeLatestCommit);
+
+        it('returns its source document', async () => {
+          expect(await declarationUtils.getModifiedServicesAndTermsTypes()).to.deep.equal({
+            services: ['ServiceA'],
+            servicesTermsTypes: { ServiceA: ['Privacy Policy'] },
+            servicesTermsSourceDocuments: { ServiceA: { 'Privacy Policy': ['https://domain.example/privacy'] } },
+          });
+        });
+      });
+
+      context('when the filters file is modified along with a source document', () => {
+        before(async () => {
+          await fs.writeFile(path.resolve(SUBJECT_PATH, COMMIT_PATHS.serviceA), JSON.stringify(FIXTURES.serviceACombineDocumentAdded.content, null, 2));
+          await fs.writeFile(path.resolve(SUBJECT_PATH, './declarations/ServiceA.filters.js'), 'module.exports = {};');
+          await declarationUtils.git.add([ COMMIT_PATHS.serviceA, './declarations/ServiceA.filters.js' ]);
+          await declarationUtils.git.commit('Add source document and filters file');
+        });
+        after(removeLatestCommit);
+
+        it('does not restrict the source documents to validate', async () => {
+          const { servicesTermsSourceDocuments } = await declarationUtils.getModifiedServicesAndTermsTypes();
+
+          expect(servicesTermsSourceDocuments).to.deep.equal({});
         });
       });
     });
