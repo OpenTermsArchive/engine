@@ -5,7 +5,7 @@ import SourceDocument from './sourceDocument.js';
 describe('SourceDocument', () => {
   const URL = 'https://www.service.example/terms';
 
-  describe('#getCssSelectors', () => {
+  describe('#cssSelectors', () => {
     context('with "select" property', () => {
       context('with string selector', () => {
         it('extracts selectors', () => {
@@ -48,21 +48,46 @@ describe('SourceDocument', () => {
     });
 
     context('with "remove" property', () => {
+      it('ignores remove selectors', () => {
+        const result = new SourceDocument({
+          location: URL,
+          insignificantContentSelectors: [
+            {
+              startBefore: '#startBefore',
+              endBefore: '#endBefore',
+            },
+            'body',
+          ],
+        }).cssSelectors;
+
+        expect(result).to.deep.equal([]);
+      });
+    });
+
+    context('with both "select" and "remove" property', () => {
       context('with string selector', () => {
-        it('extracts selectors', () => {
-          const result = new SourceDocument({ location: URL, insignificantContentSelectors: 'body' }).cssSelectors;
+        it('extracts only select selectors', () => {
+          const result = new SourceDocument({
+            location: URL,
+            contentSelectors: 'body',
+            insignificantContentSelectors: 'h1',
+          }).cssSelectors;
 
           expect(result).to.deep.equal(['body']);
         });
       });
 
       context('with range selector', () => {
-        it('extracts selectors', () => {
+        it('extracts only select selectors', () => {
           const result = new SourceDocument({
             location: URL,
-            insignificantContentSelectors: {
+            contentSelectors: {
               startBefore: '#startBefore',
               endBefore: '#endBefore',
+            },
+            insignificantContentSelectors: {
+              startBefore: '#removeStartBefore',
+              endBefore: '#removeEndBefore',
             },
           }).cssSelectors;
 
@@ -71,61 +96,7 @@ describe('SourceDocument', () => {
       });
 
       context('with an array of mixed selectors', () => {
-        it('extracts selectors', () => {
-          const result = new SourceDocument({
-            location: URL,
-            insignificantContentSelectors: [
-              {
-                startBefore: '#startBefore',
-                endBefore: '#endBefore',
-              },
-              'body',
-            ],
-          }).cssSelectors;
-
-          expect(result).to.deep.equal([ '#startBefore', '#endBefore', 'body' ]);
-        });
-      });
-    });
-
-    context('with both "select" and "remove" property', () => {
-      context('with string selector', () => {
-        it('extracts selectors', () => {
-          const result = new SourceDocument({
-            location: URL,
-            contentSelectors: 'body',
-            insignificantContentSelectors: 'h1',
-          }).cssSelectors;
-
-          expect(result).to.deep.equal([ 'body', 'h1' ]);
-        });
-      });
-
-      context('with range selector', () => {
-        it('extracts selectors', () => {
-          const result = new SourceDocument({
-            location: URL,
-            contentSelectors: {
-              startBefore: '#startBefore',
-              endBefore: '#endBefore',
-            },
-            insignificantContentSelectors: {
-              startBefore: '#startBefore',
-              endBefore: '#endBefore',
-            },
-          }).cssSelectors;
-
-          expect(result).to.deep.equal([
-            '#startBefore',
-            '#endBefore',
-            '#startBefore',
-            '#endBefore',
-          ]);
-        });
-      });
-
-      context('with an array of mixed selectors', () => {
-        it('extracts selectors', () => {
+        it('extracts only select selectors', () => {
           const result = new SourceDocument({
             location: URL,
             contentSelectors: [
@@ -137,21 +108,14 @@ describe('SourceDocument', () => {
             ],
             insignificantContentSelectors: [
               {
-                startBefore: '#startBefore',
-                endBefore: '#endBefore',
+                startBefore: '#removeStartBefore',
+                endBefore: '#removeEndBefore',
               },
-              'body',
+              'h1',
             ],
           }).cssSelectors;
 
-          expect(result).to.deep.equal([
-            '#startBefore',
-            '#endBefore',
-            'body',
-            '#startBefore',
-            '#endBefore',
-            'body',
-          ]);
+          expect(result).to.deep.equal([ '#startBefore', '#endBefore', 'body' ]);
         });
       });
     });

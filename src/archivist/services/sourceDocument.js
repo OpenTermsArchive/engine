@@ -29,14 +29,7 @@ export default class SourceDocument {
   }
 
   get cssSelectors() {
-    const { contentSelectors, insignificantContentSelectors } = this;
-
-    const result = [
-      ...SourceDocument.extractCssSelectorsFromProperty(contentSelectors),
-      ...SourceDocument.extractCssSelectorsFromProperty(insignificantContentSelectors),
-    ];
-
-    return result.filter(selector => selector);
+    return SourceDocument.extractCssSelectorsFromProperty(this.contentSelectors).filter(selector => selector); // Only the content selectors are awaited by the browser fetcher: an insignificant content selector can be absent from the page or match an element without text, which would make every fetch wait for the whole timeout
   }
 
   clearContent() {
