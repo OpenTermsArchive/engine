@@ -83,9 +83,10 @@ describe('DeclarationUtils', () => {
       });
 
       it('returns the service ID and the updated terms type', async () => {
-        expect(await declarationUtils.getModifiedServicesAndTermsTypes()).to.deep.include({
+        expect(await declarationUtils.getModifiedServicesAndTermsTypes()).to.deep.equal({
           services: ['ServiceA'],
           servicesTermsTypes: { ServiceA: ['Terms of Service'] },
+          servicesTermsSourceDocuments: { ServiceA: { 'Terms of Service': ['https://domain.example/tos'] } },
         });
       });
     });
@@ -95,9 +96,10 @@ describe('DeclarationUtils', () => {
       after(removeLatestCommit);
 
       it('returns the service ID and the added terms type', async () => {
-        expect(await declarationUtils.getModifiedServicesAndTermsTypes()).to.deep.include({
+        expect(await declarationUtils.getModifiedServicesAndTermsTypes()).to.deep.equal({
           services: ['ServiceA'],
           servicesTermsTypes: { ServiceA: ['Imprint'] },
+          servicesTermsSourceDocuments: {},
         });
       });
     });
@@ -107,9 +109,10 @@ describe('DeclarationUtils', () => {
       after(removeLatestCommit);
 
       it('returns the added service ID along with the associated terms type', async () => {
-        expect(await declarationUtils.getModifiedServicesAndTermsTypes()).to.deep.include({
+        expect(await declarationUtils.getModifiedServicesAndTermsTypes()).to.deep.equal({
           services: ['ServiceB'],
           servicesTermsTypes: { ServiceB: ['Terms of Service'] },
+          servicesTermsSourceDocuments: {},
         });
       });
     });
@@ -122,9 +125,10 @@ describe('DeclarationUtils', () => {
       });
 
       it('returns no services and no terms types', async () => {
-        expect(await declarationUtils.getModifiedServicesAndTermsTypes()).to.deep.include({
+        expect(await declarationUtils.getModifiedServicesAndTermsTypes()).to.deep.equal({
           services: [],
           servicesTermsTypes: {},
+          servicesTermsSourceDocuments: {},
         });
       });
     });
@@ -134,9 +138,10 @@ describe('DeclarationUtils', () => {
       after(removeLatestCommit);
 
       it('returns no services and no terms types', async () => {
-        expect(await declarationUtils.getModifiedServicesAndTermsTypes()).to.deep.include({
+        expect(await declarationUtils.getModifiedServicesAndTermsTypes()).to.deep.equal({
           services: [],
           servicesTermsTypes: {},
+          servicesTermsSourceDocuments: {},
         });
       });
     });
@@ -153,11 +158,17 @@ describe('DeclarationUtils', () => {
       });
 
       it('returns the services IDs and the updated terms types', async () => {
-        expect(await declarationUtils.getModifiedServicesAndTermsTypes()).to.deep.include({
+        expect(await declarationUtils.getModifiedServicesAndTermsTypes()).to.deep.equal({
           services: [ 'ServiceA', 'ServiceB' ],
           servicesTermsTypes: {
             ServiceA: [ 'Imprint', 'Privacy Policy', 'Terms of Service' ],
             ServiceB: ['Terms of Service'],
+          },
+          servicesTermsSourceDocuments: {
+            ServiceA: {
+              'Terms of Service': ['https://domain.example/tos'],
+              'Privacy Policy': ['https://domain.example/privacy'],
+            },
           },
         });
       });
@@ -205,9 +216,10 @@ describe('DeclarationUtils', () => {
       after(removeLatestCommit);
 
       it('returns the added service ID along with all its terms types', async () => {
-        expect(await declarationUtils.getModifiedServicesAndTermsTypes()).to.deep.include({
+        expect(await declarationUtils.getModifiedServicesAndTermsTypes()).to.deep.equal({
           services: ['ServiceB'],
           servicesTermsTypes: { ServiceB: ['Terms of Service'] },
+          servicesTermsSourceDocuments: {},
         });
       });
     });
@@ -217,9 +229,10 @@ describe('DeclarationUtils', () => {
       after(removeLatestCommit);
 
       it('returns no services and no terms types', async () => {
-        expect(await declarationUtils.getModifiedServicesAndTermsTypes()).to.deep.include({
+        expect(await declarationUtils.getModifiedServicesAndTermsTypes()).to.deep.equal({
           services: [],
           servicesTermsTypes: {},
+          servicesTermsSourceDocuments: {},
         });
       });
     });
