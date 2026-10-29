@@ -2,6 +2,8 @@ import path from 'path';
 
 import simpleGit from 'simple-git';
 
+const SOURCE_DOCUMENT_PROPERTIES = [ 'fetch', 'select', 'remove', 'filter', 'executeClientScripts' ];
+
 export default class DeclarationUtils {
   constructor(instancePath, defaultBranch = 'remotes/origin/main') {
     this.git = simpleGit(instancePath, { maxConcurrentProcesses: 1 });
@@ -10,6 +12,23 @@ export default class DeclarationUtils {
 
   static getServiceIdFromFilePath(filePath) {
     return path.parse(filePath.replace(/\.history|\.filters/g, '')).name;
+  }
+
+  static getSourceDocumentsDeclarations(termsDeclaration) {
+    const sourceDocumentsDeclarations = termsDeclaration.combine || [{}];
+
+    return Object.fromEntries(sourceDocumentsDeclarations.map(sourceDocumentDeclaration => {
+      const declaration = Object.fromEntries(SOURCE_DOCUMENT_PROPERTIES.map(property => [ property, sourceDocumentDeclaration[property] ?? termsDeclaration[property] ])); // Mirror the inheritance of terms properties applied when loading the declaration, with keys in a fixed order so that serializations can be compared
+
+      return [ declaration.fetch, JSON.stringify(declaration) ];
+    }));
+  }
+
+  static getModifiedSourceDocuments(originalTermsDeclaration, modifiedTermsDeclaration) {
+    const originalSourceDocuments = DeclarationUtils.getSourceDocumentsDeclarations(originalTermsDeclaration);
+    const modifiedSourceDocuments = DeclarationUtils.getSourceDocumentsDeclarations(modifiedTermsDeclaration);
+
+    return Object.keys(modifiedSourceDocuments).filter(location => originalSourceDocuments[location] !== modifiedSourceDocuments[location]);
   }
 
   async getJSONFromFile(ref, filePath) {
@@ -39,6 +58,8 @@ export default class DeclarationUtils {
   async getModifiedServicesAndTermsTypes() {
     const { modifiedFilePaths } = await this.getModifiedData();
     const servicesTermsTypes = {};
+    const servicesTermsSourceDocuments = {};
+    const servicesWithModifiedFilters = new Set();
 
     await Promise.all(modifiedFilePaths.map(async modifiedFilePath => {
       const serviceId = DeclarationUtils.getServiceIdFromFilePath(modifiedFilePath);
@@ -48,6 +69,8 @@ export default class DeclarationUtils {
       }
 
       if (modifiedFilePath.endsWith('.filters.js') || modifiedFilePath.endsWith('.filters.history.js')) {
+        servicesWithModifiedFilters.add(serviceId);
+
         const declaration = await this.getJSONFromFile(this.defaultBranch, `declarations/${serviceId}.json`);
 
         if (!declaration) { // Happens when the file declaration exists in the branch but not in the default branch
@@ -80,12 +103,22 @@ export default class DeclarationUtils {
         }
 
         servicesTermsTypes[serviceId] = [termsType].concat(servicesTermsTypes[serviceId] || []);
+
+        if (!areTermsAdded) {
+          servicesTermsSourceDocuments[serviceId] = {
+            ...servicesTermsSourceDocuments[serviceId],
+            [termsType]: DeclarationUtils.getModifiedSourceDocuments(originalService.terms[termsType], modifiedService.terms[termsType]),
+          };
+        }
       });
     }));
+
+    servicesWithModifiedFilters.forEach(serviceId => delete servicesTermsSourceDocuments[serviceId]); // A filter change can impact any source document of the service, whatever its declaration
 
     return {
       services: Object.keys(servicesTermsTypes),
       servicesTermsTypes,
+      servicesTermsSourceDocuments,
     };
   }
 }

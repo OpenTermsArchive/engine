@@ -30,6 +30,7 @@ export default async options => {
   let servicesToValidate = options.services || [];
   const termsTypes = options.types || [];
   let servicesTermsTypes = {};
+  let servicesTermsSourceDocuments = {};
 
   const serviceDeclarations = await services.loadWithHistory(servicesToValidate);
 
@@ -40,7 +41,7 @@ export default async options => {
   if (options.modified) {
     const declarationUtils = new DeclarationUtils(instancePath);
 
-    ({ services: servicesToValidate, servicesTermsTypes } = await declarationUtils.getModifiedServicesAndTermsTypes());
+    ({ services: servicesToValidate, servicesTermsTypes, servicesTermsSourceDocuments } = await declarationUtils.getModifiedServicesAndTermsTypes());
   }
 
   describe('Service declarations validation', function () {
@@ -137,7 +138,15 @@ export default async options => {
                   return; // Remaining checks require fetching the source documents
                 }
 
-                terms.sourceDocuments.forEach(sourceDocument => {
+                const modifiedLocations = servicesTermsSourceDocuments[serviceId]?.[type];
+                const sourceDocumentsToFetch = modifiedLocations ? terms.sourceDocuments.filter(({ location }) => modifiedLocations.includes(location)) : terms.sourceDocuments;
+                const skippedSourceDocumentsCount = terms.sourceDocuments.length - sourceDocumentsToFetch.length;
+
+                if (skippedSourceDocumentsCount) {
+                  before(() => console.log(`        (${skippedSourceDocumentsCount} of ${terms.sourceDocuments.length} source documents skipped as unchanged)`));
+                }
+
+                sourceDocumentsToFetch.forEach(sourceDocument => {
                   let filteredContent;
 
                   context(sourceDocument.location, () => {
