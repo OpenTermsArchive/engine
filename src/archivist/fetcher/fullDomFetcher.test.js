@@ -16,6 +16,8 @@ use(chaiAsPromised);
 
 const dynamicHTML = '<!DOCTYPE html><html><head><title>Dynamic Page</title><script>setTimeout(() => { document.body.innerHTML += "<div class=\'dynamic\'>Loaded</div>"; }, 100);</script></head><body></body></html>';
 const delayedContentHTML = '<!DOCTYPE html><html><head><title>Delayed Content</title><script>setTimeout(() => { document.querySelector(".content").textContent = "Final content"; }, 100);</script></head><body><div class="content"></div></body></html>';
+const lateInjectionHTML = '<!DOCTYPE html><html><head><title>Late Injection</title></head><body><div class="content">Initial content</div><div class="ticker"></div><script>let ticks = 0; const ticker = setInterval(() => { ticks += 1; document.querySelector(".ticker").textContent = ticks; if (ticks === 6) { clearInterval(ticker); document.body.innerHTML += "<div class=\'late\'>Injected</div>"; } }, 50);</script></body></html>';
+const neverSettlingHTML = '<!DOCTYPE html><html><head><title>Never Settling</title><script>setInterval(() => { document.querySelector(".ticker").textContent = Date.now(); }, 50);</script></head><body><div class="content">Content</div><div class="ticker"></div></body></html>';
 const langEchoHTML = '<!DOCTYPE html><html><body><script>document.body.setAttribute("data-language", navigator.language); document.body.setAttribute("data-languages", navigator.languages.join(","));</script></body></html>';
 const stealthProbeHTML = '<!DOCTYPE html><html><body><script>document.body.setAttribute("data-webdriver", String(navigator.webdriver)); document.body.setAttribute("data-user-agent", navigator.userAgent); document.body.setAttribute("data-platform", navigator.platform); document.body.setAttribute("data-ua-brands", navigator.userAgentData ? navigator.userAgentData.brands.map(entry => entry.brand).join(",") : ""); document.body.setAttribute("data-plugin-count", String(navigator.plugins.length)); document.body.setAttribute("data-viewport-width", String(window.innerWidth)); document.body.setAttribute("data-viewport-height", String(window.innerHeight)); (() => { const canvas = document.createElement("canvas"); const gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl"); if (!gl) { document.body.setAttribute("data-webgl-vendor", "none"); return; } const ext = gl.getExtension("WEBGL_debug_renderer_info"); document.body.setAttribute("data-webgl-vendor", ext ? gl.getParameter(ext.UNMASKED_VENDOR_WEBGL) : ""); document.body.setAttribute("data-webgl-renderer", ext ? gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) : ""); })();</script></body></html>';
 
@@ -34,6 +36,12 @@ describe('Full DOM Fetcher', function () {
       }
       if (request.url === '/delayed-content') {
         response.writeHead(200, { 'Content-Type': 'text/html' }).write(delayedContentHTML);
+      }
+      if (request.url === '/late-injection') {
+        response.writeHead(200, { 'Content-Type': 'text/html' }).write(lateInjectionHTML);
+      }
+      if (request.url === '/never-settling') {
+        response.writeHead(200, { 'Content-Type': 'text/html' }).write(neverSettlingHTML);
       }
       if (request.url === '/lang-header') {
         const acceptLanguage = request.headers['accept-language'] || '';
@@ -127,6 +135,22 @@ describe('Full DOM Fetcher', function () {
         const timeout = 10;
 
         await expect(fetch(url, ['.content'], { ...config, navigationTimeout: timeout })).to.be.rejectedWith(`Timed out after ${timeout / 1000} seconds when trying to fetch '${url}'`);
+      });
+    });
+
+    context('when scripts change the page after the expected elements appeared', () => {
+      it('waits for the DOM to stop changing before returning the content', async () => {
+        const result = await fetch(`http://127.0.0.1:${SERVER_PORT}/late-injection`, ['.content'], { ...config, domIdleDelay: 200, domIdleTimeout: 2000 });
+
+        expect(result.content).to.match(/<div class="late">Injected<\/div>/);
+      });
+
+      it('returns the content once the DOM idle timeout is reached', async () => {
+        const start = Date.now();
+        const result = await fetch(`http://127.0.0.1:${SERVER_PORT}/never-settling`, ['.content'], { ...config, domIdleDelay: 200, domIdleTimeout: 1000 });
+
+        expect(Date.now() - start).to.be.below(5000);
+        expect(result.content).to.match(/<div class="content">Content<\/div>/);
       });
     });
 

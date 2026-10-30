@@ -2,6 +2,18 @@
 
 All changes that impact users of this module are documented in this file, in the [Common Changelog](https://common-changelog.org) format with some additional specifications defined in the CONTRIBUTING file. This codebase adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased [minor]
+
+> Development of this release was supported by [Anthelia](https://anthelia.tech).
+
+### Added
+
+- Wait for the DOM to stay unchanged for `fetcher.domIdleDelay` milliseconds (500 by default), up to `fetcher.domIdleTimeout` milliseconds (2000 by default), after the expected elements appeared when fetching with a headless browser, so that content injected by scripts after the selected elements is captured consistently; set `fetcher.domIdleTimeout` to `0` to disable it
+
+### Fixed
+
+- Stop waiting for `remove` selectors when fetching with a headless browser, which made every fetch wait for the whole `waitForElementsTimeout` (10 seconds by default) when one of them was absent or had no text, both in tracking and in `ota validate`
+
 ## 17.0.0 - 2026-10-14
 
 > Development of this release was supported by the [NGI0 Commons Fund](https://nlnet.nl/project/Modular-OTA/), a fund established by [NLnet](https://nlnet.nl/) with financial support from the European Commission's [Next Generation Internet](https://www.ngi.eu) programme, under the aegis of DG CNECT under grant agreement N°101069594.

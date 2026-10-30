@@ -51,6 +51,8 @@
     },
     "fetcher": {
       "waitForElementsTimeout": 10000,
+      "domIdleDelay": 500,
+      "domIdleTimeout": 2000,
       "navigationTimeout": 30000,
       "language": "en"
     },

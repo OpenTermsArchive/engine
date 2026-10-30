@@ -97,6 +97,7 @@ export default async function fetch(url, cssSelectors, config) {
     }
 
     await waitForSelectors(page, selectors, config.waitForElementsTimeout);
+    await waitForDomToSettle(page, config.domIdleDelay, config.domIdleTimeout);
 
     return {
       mimeType: 'text/html',
@@ -288,6 +289,33 @@ async function waitForSelectors(page, selectors, timeout) {
     if (error.name == 'TimeoutError') {
       // however, if they are not, this is not considered as an error since selectors may be out of date
       // and the whole content of the page should still be returned.
+      return;
+    }
+
+    throw error;
+  });
+}
+
+async function waitForDomToSettle(page, idleDelay, timeout) {
+  if (!timeout) { // A timeout of 0 would make waitForFunction wait forever
+    return;
+  }
+
+  await page.waitForFunction(
+    /* eslint-disable no-undef */ // The function runs in the page, where these browser globals exist
+    delay => {
+      if (!window.otaDomSettle) { // The observer is installed from within the awaited function rather than by a separate evaluate call, so that a navigation triggered by the page does not fail the wait: the function is re-run in the new execution context, where it installs a new observer
+        window.otaDomSettle = { lastMutation: performance.now() };
+        new MutationObserver(() => { window.otaDomSettle.lastMutation = performance.now(); }).observe(document, { subtree: true, childList: true, characterData: true, attributes: true });
+      }
+
+      return performance.now() - window.otaDomSettle.lastMutation >= delay;
+    },
+    /* eslint-enable no-undef */
+    { timeout, polling: 100 },
+    idleDelay,
+  ).catch(error => {
+    if (error.name == 'TimeoutError') { // The page keeps changing, for instance because of an animation or a carousel; its current state is returned
       return;
     }
 

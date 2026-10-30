@@ -23,6 +23,8 @@ export const FETCHER_TYPES = {
  * @param   {number}                                                                   [params.config.navigationTimeout]      Maximum time (in milliseconds) to wait before considering the fetch failed
  * @param   {string}                                                                   [params.config.language]               Accept-Language value applied to the browser context. Accepts a comma-separated list of [BCP 47](https://www.rfc-editor.org/rfc/rfc5646) language tags in priority order, without quality factors (for example `fr`, `en-US`, or `en-IE,en-GB,en`). The tag list drives `navigator.language` and `navigator.languages` in the headless browser, and the browser derives the `Accept-Language` HTTP header from the tag order
  * @param   {number}                                                                   [params.config.waitForElementsTimeout] Maximum time (in milliseconds) to wait for selectors to exist on page before considering the fetch failed. Only relevant when `executeClientScripts` is enabled
+ * @param   {number}                                                                   [params.config.domIdleDelay]           Time (in milliseconds) during which the DOM must stay unchanged, once the selectors exist, before the content is read, so that content injected by scripts afterwards is captured. Only relevant when `executeClientScripts` is enabled
+ * @param   {number}                                                                   [params.config.domIdleTimeout]         Maximum time (in milliseconds) to wait for the DOM to stay unchanged before reading the content anyway; `0` disables this wait. Only relevant when `executeClientScripts` is enabled
  * @returns {Promise<{ mimeType: string, content: string | Buffer, fetcher: string }>}                                        Promise containing the fetched resource's MIME type, content, and fetcher type
  * @throws {FetchDocumentError} When the fetch operation fails
  * @async
@@ -35,6 +37,8 @@ export default function fetch({
     navigationTimeout = config.get('@opentermsarchive/engine.fetcher.navigationTimeout'),
     language = config.get('@opentermsarchive/engine.fetcher.language'),
     waitForElementsTimeout = config.get('@opentermsarchive/engine.fetcher.waitForElementsTimeout'),
+    domIdleDelay = config.get('@opentermsarchive/engine.fetcher.domIdleDelay'),
+    domIdleTimeout = config.get('@opentermsarchive/engine.fetcher.domIdleTimeout'),
   } = {},
 }) {
   if (!url) {
@@ -45,6 +49,8 @@ export default function fetch({
     navigationTimeout,
     language,
     waitForElementsTimeout,
+    domIdleDelay,
+    domIdleTimeout,
     executeClientScripts,
   };
 
