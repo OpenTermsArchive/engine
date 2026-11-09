@@ -2,6 +2,14 @@
 
 All changes that impact users of this module are documented in this file, in the [Common Changelog](https://common-changelog.org) format with some additional specifications defined in the CONTRIBUTING file. This codebase adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased [patch]
+
+> Development of this release was supported by [Anthelia](https://anthelia.tech).
+
+### Fixed
+
+- Relaunch the headless browser when it crashes, instead of failing every following fetch of the run on its closed connection; the terms being fetched when it crashes get a new attempt at the end of the tracking run
+
 ## 17.0.0 - 2026-10-14
 
 > Development of this release was supported by the [NGI0 Commons Fund](https://nlnet.nl/project/Modular-OTA/), a fund established by [NLnet](https://nlnet.nl/) with financial support from the European Commission's [Next Generation Internet](https://www.ngi.eu) programme, under the aegis of DG CNECT under grant agreement N°101069594.
