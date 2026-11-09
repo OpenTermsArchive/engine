@@ -7,6 +7,7 @@ import userAgentOverride from 'puppeteer-extra-plugin-stealth/evasions/user-agen
 import { resolveProxyConfiguration, extractProxyCredentials } from './proxyUtils.js';
 
 let browser;
+let relaunchPromise;
 
 export function parseLanguage(value) {
   if (typeof value !== 'string') {
@@ -29,6 +30,10 @@ export function parseLanguage(value) {
 export default async function fetch(url, cssSelectors, config) {
   if (!browser) {
     throw new Error('The headless browser should be controlled manually with "launchHeadlessBrowser" and "stopHeadlessBrowser".');
+  }
+
+  if (!browser.connected) {
+    await relaunchHeadlessBrowser();
   }
 
   let context;
@@ -103,6 +108,10 @@ export default async function fetch(url, cssSelectors, config) {
       content: await page.content(),
     };
   } catch (error) {
+    if (browser && !browser.connected) {
+      throw new Error(`Headless browser crashed when trying to fetch '${url}'`);
+    }
+
     if (error.name === 'TimeoutError') {
       throw new Error(`Timed out after ${config.navigationTimeout / 1000} seconds when trying to fetch '${url}'`);
     }
@@ -121,7 +130,7 @@ export default async function fetch(url, cssSelectors, config) {
  * @async
  */
 export async function launchHeadlessBrowser(language) {
-  if (browser) {
+  if (browser?.connected) {
     return browser;
   }
 
@@ -170,6 +179,8 @@ export async function launchHeadlessBrowser(language) {
     launchedBrowser.proxyCredentials = proxyCredentials;
   }
 
+  launchedBrowser.language = language;
+
   browser = launchedBrowser; // Set only once fully configured, so that no caller gets a browser without its user agent override
 
   return browser;
@@ -186,8 +197,21 @@ export async function stopHeadlessBrowser() {
     return;
   }
 
-  await browser.close();
-  browser = null;
+  const stoppedBrowser = browser;
+
+  browser = null; // Unset before closing, so that the fetches in progress do not mistake the stop for a crash
+  await stoppedBrowser.close();
+}
+
+function relaunchHeadlessBrowser() {
+  relaunchPromise ||= (async () => { // Memoised so that concurrent fetches await the same relaunch
+    const crashedBrowser = browser;
+
+    await crashedBrowser.close().catch(() => {}); // Kill the process of the crashed browser if it outlived its connection
+    await launchHeadlessBrowser(crashedBrowser.language);
+  })().finally(() => { relaunchPromise = null; });
+
+  return relaunchPromise;
 }
 
 function isValidHttpStatus(status) {
