@@ -147,9 +147,9 @@ describe('Full DOM Fetcher', function () {
       });
 
       it('relaunches a single browser for concurrent fetches', async () => {
-        const launch = sinon.spy(puppeteer, 'launch');
-
         await crashHeadlessBrowser();
+
+        const launch = sinon.spy(puppeteer, 'launch');
 
         await Promise.all([
           fetch(`http://127.0.0.1:${SERVER_PORT}/dynamic`, [], config),
