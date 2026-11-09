@@ -205,9 +205,10 @@ export async function stopHeadlessBrowser() {
 
 function relaunchHeadlessBrowser() {
   relaunchPromise ||= (async () => { // Memoised so that concurrent fetches await the same relaunch
-    await browser.close().catch(() => {}); // Kill the process of the crashed browser if it outlived its connection
+    const crashedBrowser = browser;
 
-    await launchHeadlessBrowser(browser.language);
+    await crashedBrowser.close().catch(() => {}); // Kill the process of the crashed browser if it outlived its connection
+    await launchHeadlessBrowser(crashedBrowser.language);
   })().finally(() => { relaunchPromise = null; });
 
   return relaunchPromise;
