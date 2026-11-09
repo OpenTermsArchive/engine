@@ -5,6 +5,8 @@ import { fileURLToPath } from 'url';
 
 import { expect, use } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
+import puppeteer from 'puppeteer';
+import sinon from 'sinon';
 
 import fetch, { launchHeadlessBrowser, stopHeadlessBrowser, parseLanguage } from './fullDomFetcher.js';
 
@@ -24,6 +26,7 @@ describe('Full DOM Fetcher', function () {
 
   let temporaryServer;
   let expectedPDFContent;
+  let onPendingRequest = () => {};
 
   before(async () => {
     await launchHeadlessBrowser('en');
@@ -50,6 +53,9 @@ describe('Full DOM Fetcher', function () {
       }
       if (request.url === '/stealth-probe') {
         response.writeHead(200, { 'Content-Type': 'text/html' }).write(stealthProbeHTML);
+      }
+      if (request.url === '/pending') {
+        return onPendingRequest(); // Never responds, to keep the fetch in progress
       }
       if (request.url === '/terms.pdf') {
         expectedPDFContent = fs.readFileSync(path.resolve(__dirname, '../../../test/fixtures/terms.pdf'));
@@ -90,6 +96,68 @@ describe('Full DOM Fetcher', function () {
       const relaunchedBrowser = await launchHeadlessBrowser('en');
 
       expect(relaunchedBrowser.listenerCount('targetcreated')).to.equal(initialListenerCount);
+    });
+
+    context('when the browser is stopped during a fetch', () => {
+      after(() => launchHeadlessBrowser('en'));
+
+      it('does not report a crash', async () => {
+        const requested = new Promise(resolve => { onPendingRequest = resolve; });
+        const fetching = fetch(`http://127.0.0.1:${SERVER_PORT}/pending`, [], { navigationTimeout: 5000, waitForElementsTimeout: 5000, language: 'en' });
+        const rejection = expect(fetching).to.be.rejected.and.eventually.have.property('message').that.does.not.include('Headless browser crashed');
+
+        await requested;
+        await stopHeadlessBrowser();
+
+        await rejection;
+      });
+    });
+
+    context('when the browser crashes', () => {
+      const config = { navigationTimeout: 5000, waitForElementsTimeout: 5000, language: 'en' };
+
+      async function crashHeadlessBrowser() {
+        const browser = await launchHeadlessBrowser('en');
+        const disconnected = new Promise(resolve => { browser.once('disconnected', resolve); });
+
+        browser.process().kill('SIGKILL');
+
+        await disconnected;
+      }
+
+      afterEach(() => {
+        sinon.restore();
+      });
+
+      it('fails the fetch in progress with a crash error', async () => {
+        const url = `http://127.0.0.1:${SERVER_PORT}/pending`;
+        const rejection = expect(fetch(url, [], config)).to.be.rejectedWith(`Headless browser crashed when trying to fetch '${url}'`);
+
+        await crashHeadlessBrowser();
+
+        await rejection;
+      });
+
+      it('relaunches the browser with the same language for the next fetch', async () => {
+        await crashHeadlessBrowser();
+
+        const result = await fetch(`http://127.0.0.1:${SERVER_PORT}/lang-header`, [], config);
+
+        expect(result.content).to.match(/data-accept-language="en"/);
+      });
+
+      it('relaunches a single browser for concurrent fetches', async () => {
+        const launch = sinon.spy(puppeteer, 'launch');
+
+        await crashHeadlessBrowser();
+
+        await Promise.all([
+          fetch(`http://127.0.0.1:${SERVER_PORT}/dynamic`, [], config),
+          fetch(`http://127.0.0.1:${SERVER_PORT}/dynamic`, [], config),
+        ]);
+
+        expect(launch.callCount).to.equal(1);
+      });
     });
   });
 
