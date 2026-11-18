@@ -2,6 +2,20 @@
 
 All changes that impact users of this module are documented in this file, in the [Common Changelog](https://common-changelog.org) format with some additional specifications defined in the CONTRIBUTING file. This codebase adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased [minor]
+
+> Development of this release was supported by [Anthelia](https://anthelia.tech).
+
+### Changed
+
+- Generate the same Markdown for markup variations that render the same (bold or italic applied around or inside a link, bold and italic nested in either order or applied several times to the same content, text wrapped or not in `span` elements or split by comments), so that websites alternating between them from one fetch to the next no longer produce new versions; versions already recorded are updated by a technical upgrade on the next run
+- Remove trailing whitespace and repeated blank lines from versions, as Markdown does not render them, so that their variations no longer produce new versions; hard line breaks and blank lines of code blocks are kept, and versions already recorded are updated by a technical upgrade on the next run
+- Remove the `dpl` query parameter, a deployment identifier that changes each time a website is deployed, in addition to tracking parameters when the built-in `removeQueryParams` filter is declared without parameters; see the [built-in filters documentation](https://docs.opentermsarchive.org/terms/reference/built-in-filters/)
+
+### Fixed
+
+- Render bold and italic applied to content that starts or ends with a line break or a block element, such as a `div` in a link, instead of displaying their `**` and `_` delimiters as text, which also broke the link
+
 ## 17.0.1 - 2026-11-10
 
 > Development of this release was supported by [Anthelia](https://anthelia.tech).
