@@ -58,6 +58,12 @@ describe('Git', () => {
       await expect(new Git({ path: repositoryPath, author: AUTHOR }).initialize()).to.be.fulfilled;
     });
 
+    it('makes commits wait for the automatic maintenance of Git', async () => {
+      await new Git({ path: repositoryPath, author: AUTHOR }).initialize();
+
+      expect(await runGit(repositoryPath, [ 'config', '--local', '--get', 'maintenance.autoDetach' ])).to.equal('false');
+    });
+
     context('when the repository does not exist', () => {
       const GIT_CONFIG_ENVIRONMENT = { GIT_CONFIG_COUNT: '1', GIT_CONFIG_KEY_0: 'init.defaultBranch', GIT_CONFIG_VALUE_0: 'master' };
 
