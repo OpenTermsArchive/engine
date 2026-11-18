@@ -135,5 +135,73 @@ describe('Markdown', () => {
         });
       });
     });
+
+    describe('Insignificant whitespace', () => {
+      context('with whitespace at the end of a block', () => {
+        it('removes it', () => {
+          expect(transform('<p>First paragraph.&nbsp;</p><p>Second paragraph. </p>')).to.equal('First paragraph.\n\nSecond paragraph.');
+        });
+      });
+
+      context('with a line break at the end of a block', () => {
+        it('removes it', () => {
+          expect(transform('<p>First paragraph.<br></p><p>Second paragraph.</p>')).to.equal('First paragraph.\n\nSecond paragraph.');
+        });
+      });
+
+      context('with a line break inside a block', () => {
+        it('keeps it', () => {
+          expect(transform('<p>First line<br>Second line</p>')).to.equal('First line  \nSecond line');
+        });
+      });
+
+      context('with whitespace only content between blocks', () => {
+        it('separates the blocks with a single blank line', () => {
+          expect(transform('<p>First paragraph.</p><span>&nbsp;</span><div>&nbsp;</div><p><br></p><p>Second paragraph.</p>')).to.equal('First paragraph.\n\nSecond paragraph.');
+        });
+      });
+
+      context('with two line breaks between lines', () => {
+        it('results in the same Markdown as two paragraphs', () => {
+          expect(transform('<p>First paragraph.<br><br>Second paragraph.</p>')).to.equal(transform('<p>First paragraph.</p><p>Second paragraph.</p>'));
+        });
+      });
+
+      context('with blank lines in an indented code block', () => {
+        it('keeps them', () => {
+          expect(transform('<p>Before</p><pre><code>first\n\n\nsecond</code></pre><p>After</p>')).to.equal('Before\n\n    first\n\n\n    second\n\nAfter');
+        });
+      });
+
+      context('with blank lines in an indented code block that starts a list item', () => {
+        it('keeps them', () => {
+          expect(transform('<ul><li><pre><code>first\n\n\nsecond</code></pre></li></ul>')).to.equal('*       first\n\n\n        second');
+        });
+      });
+
+      context('with blank lines in a fenced code block', () => {
+        it('keeps them', () => {
+          expect(transform('<p>Before</p><div class="highlight-source-js"><pre>first\n\n\nsecond</pre></div><p>After</p>')).to.equal('Before\n\n```js\nfirst\n\n\nsecond\n```\n\nAfter');
+        });
+      });
+
+      context('with blank lines at the start of a fenced code block in a list item', () => {
+        it('keeps them', () => {
+          expect(transform('<ul><li><div class="highlight-source-js"><pre>\n\n\n\nfirst</pre></div></li></ul>')).to.equal('*   ```js\n\n\n\n    first\n    ```');
+        });
+      });
+
+      context('with a code fence followed by a language in a fenced code block', () => {
+        it('keeps the blank lines that follow it', () => {
+          expect(transform('<p>Before</p><div class="highlight-source-md"><pre>```js\n\n\ncode</pre></div><p>After</p>')).to.equal('Before\n\n```md\n```js\n\n\ncode\n```\n\nAfter');
+        });
+      });
+
+      context('with whitespace only content', () => {
+        it('results in an empty Markdown', () => {
+          expect(transform('<p>&nbsp;</p><p> </p>')).to.equal('');
+        });
+      });
+    });
   });
 });
