@@ -8,7 +8,7 @@ All changes that impact users of this module are documented in this file, in the
 
 ### Fixed
 
-- Stop aborting tracking runs with a `cannot lock ref 'HEAD'` error on servers that run Git 2.47 to 2.50, such as Debian 13, by making the commit that triggers the automatic maintenance of Git wait for it instead of leaving it to a background process; the tracking run pauses meanwhile, about a minute on a repository of several gigabytes
+- Stop aborting tracking runs with a `cannot lock ref 'HEAD'` error on servers that run Git 2.47 to 2.50, such as Debian 13, by making the commit that triggers the automatic maintenance of Git wait for it instead of leaving it to a background process; the tracking run pauses meanwhile, usually about a minute on a repository of several gigabytes, and occasionally several minutes when Git consolidates its packs
 
 ## 17.0.1 - 2026-11-10
 
