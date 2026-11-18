@@ -584,7 +584,9 @@ describe('TrackingResultsRepository', () => {
   });
 
   describe('#initialize', () => {
-    it('is idempotent: calling it twice does not throw and leaves the repo usable', async () => {
+    it('is idempotent: calling it twice does not throw and leaves the repo usable', async function () {
+      this.timeout(5000); // The repository is initialized three times, each time with a dozen Git processes
+
       await subject.initialize();
       await subject.initialize();
       await subject.saveTermsResult(makeResult());
