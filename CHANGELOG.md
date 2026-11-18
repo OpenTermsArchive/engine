@@ -2,6 +2,14 @@
 
 All changes that impact users of this module are documented in this file, in the [Common Changelog](https://common-changelog.org) format with some additional specifications defined in the CONTRIBUTING file. This codebase adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased [patch]
+
+> Development of this release was supported by [Anthelia](https://anthelia.tech).
+
+### Fixed
+
+- Stop aborting tracking runs with a `cannot lock ref 'HEAD'` error on servers that run Git 2.47 to 2.50, such as Debian 13, by making the commit that triggers the automatic maintenance of Git wait for it instead of leaving it to a background process; the tracking run pauses meanwhile, about a minute on a repository of several gigabytes
+
 ## 17.0.1 - 2026-11-10
 
 > Development of this release was supported by [Anthelia](https://anthelia.tech).
