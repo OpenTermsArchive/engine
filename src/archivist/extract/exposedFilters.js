@@ -1,10 +1,13 @@
-const DEFAULT_TRACKING_QUERY_PARAMS = Object.freeze([
-  'utm_source', // Campaign parameters, see https://en.wikipedia.org/wiki/UTM_parameters
+const DEFAULT_QUERY_PARAMS_TO_REMOVE = Object.freeze([ // Query parameters whose value varies while the linked resource stays the same
+  // Campaign parameters, see https://en.wikipedia.org/wiki/UTM_parameters
+  'utm_source',
   'utm_medium',
   'utm_campaign',
   'utm_term',
   'utm_content',
-  'fbclid', // Click and user identifiers, see https://github.com/privacytests/privacytests/blob/dda473a462e5c37f9f2c8b2367fbc5f834796be4/live/results.js#L31-L65
+
+  // Click and user identifiers, see https://github.com/privacytests/privacytests/blob/dda473a462e5c37f9f2c8b2367fbc5f834796be4/live/results.js#L31-L65
+  'fbclid',
   'gclid',
   'msclkid',
   'mc_eid',
@@ -27,9 +30,12 @@ const DEFAULT_TRACKING_QUERY_PARAMS = Object.freeze([
   '__hsfp',
   'hsCtaTracking',
   'mkt_tok',
+
+  // Deployment identifiers, appended to assets URLs and renewed each time the website is deployed, see https://nextjs.org/docs/app/api-reference/config/next-config-js/deploymentId
+  'dpl',
 ]);
 
-export function removeQueryParams(webPageDOM, paramsToRemove = DEFAULT_TRACKING_QUERY_PARAMS) {
+export function removeQueryParams(webPageDOM, paramsToRemove = DEFAULT_QUERY_PARAMS_TO_REMOVE) {
   const normalizedParams = Array.isArray(paramsToRemove) ? paramsToRemove : [paramsToRemove];
 
   if (!normalizedParams.length) {

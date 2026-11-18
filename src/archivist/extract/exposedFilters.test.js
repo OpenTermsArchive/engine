@@ -53,21 +53,31 @@ describe('exposedFilters', () => {
 
     describe('without parameters', () => {
       let link;
+      let img;
 
       before(() => {
         link = webPageDOM.createElement('a');
         link.setAttribute('href', 'https://example.com/page?utm_source=newsletter&utm_campaign=spring&fbclid=abc&gclid=def&mkt_tok=ghi&keep=value');
-        webPageDOM.body.appendChild(link);
+        img = webPageDOM.createElement('img');
+        img.setAttribute('src', 'https://example.com/_next/image?url=%2Flogo.svg&w=3840&dpl=dpl_5WJWYSyB7BpG');
+        webPageDOM.body.append(link, img);
       });
 
       after(() => {
         link.remove();
+        img.remove();
       });
 
       it('removes well-known tracking parameters', () => {
         removeQueryParams(webPageDOM);
 
         expect(link.getAttribute('href')).to.equal('https://example.com/page?keep=value');
+      });
+
+      it('removes deployment identifiers', () => {
+        removeQueryParams(webPageDOM);
+
+        expect(img.getAttribute('src')).to.equal('https://example.com/_next/image?url=%2Flogo.svg&w=3840');
       });
     });
 
