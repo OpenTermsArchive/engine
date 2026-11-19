@@ -150,6 +150,10 @@ describe('Error mail', () => {
           expect(transports[0].render({ message: 'Error', level: 'error' }).html).to.include('<!DOCTYPE html>');
         });
 
+        it('sends a plain text alternative', () => {
+          expect(transports[0].render({ message: 'Error', level: 'error' }).text).to.include('Error details');
+        });
+
         it('handles unhandled rejections', () => {
           expect(transports[0].handleRejections).to.be.true;
         });
@@ -242,7 +246,7 @@ describe('Error mail', () => {
         });
       });
 
-      context('email body', () => {
+      context('HTML body', () => {
         let render;
         let body;
 
@@ -325,6 +329,62 @@ describe('Error mail', () => {
           it('omits the command to connect to the server', () => {
             expect(body).to.not.include('ssh ');
           });
+        });
+      });
+
+      context('plain text body', () => {
+        let render;
+        let text;
+
+        beforeEach(() => {
+          [{ render }] = createErrorMailTransports(logger, { collection, component, subject, warningSubject });
+        });
+
+        context('for an error', () => {
+          beforeEach(() => {
+            ({ text } = render({ message: 'Error: <boom> & co', level: 'error' }));
+          });
+
+          it('is titled as an error', () => {
+            expect(text).to.include('Error details');
+          });
+
+          it('includes the message as it is', () => {
+            expect(text).to.include('Error: <boom> & co');
+          });
+
+          it('names the component and the collection', () => {
+            expect(text).to.include(`Open Terms Archive ${component} error report — ${collection.name} Collection`);
+          });
+
+          it('includes the hostname', () => {
+            expect(text).to.include(os.hostname());
+          });
+
+          it('includes the command to connect to the server', () => {
+            expect(text).to.include(`ssh ${collection.hostConfig.ansible_user}@${collection.host}`);
+          });
+
+          it('links to the deployment documentation', () => {
+            expect(text).to.include('https://github.com/OpenTermsArchive/deployment');
+          });
+        });
+
+        context('for a warning', () => {
+          beforeEach(() => {
+            ({ text } = render({ message: 'Inaccessible content', level: 'warn' }));
+          });
+
+          it('is titled as a warning', () => {
+            expect(text).to.include('Warning details');
+          });
+        });
+
+        it('contains no HTML markup', () => {
+          ({ text } = render({ message: 'Error', level: 'error' }));
+
+          expect(text).to.not.match(/<\/?(!DOCTYPE|html|head|body|div|h1|h2|ul|li|strong|code|a|br)\b/i);
+          expect(text).to.not.match(/&(lt|gt|amp);/);
         });
       });
 

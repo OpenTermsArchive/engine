@@ -94,6 +94,27 @@ function formatHtml({ isError, title, detailsTitle, message, systemInformation, 
         `;
 }
 
+const heading = text => `${text}\n${'-'.repeat(text.length)}`;
+
+function formatText({ title, detailsTitle, message, systemInformation, commands }) {
+  return [
+    title,
+    heading(detailsTitle),
+    message,
+    heading('System information'),
+    systemInformation.map(([ label, value ]) => `${label}: ${value}`).join('\n'),
+    heading('Helpful commands'),
+    [ ...commands, [ DOCUMENTATION_LABEL, DOCUMENTATION_URL ]].map(([ label, code ]) => `${label}\n  ${code}`).join('\n\n'),
+    FOOTER,
+  ].join('\n\n');
+}
+
+function formatBodies(context, info) {
+  const report = getReport(context, info);
+
+  return { text: formatText(report), html: formatHtml(report) };
+}
+
 export function createErrorMailTransports(logger, { collection, component, subject, warningSubject }) {
   if (!config.get('@opentermsarchive/engine.logger.sendMailOnError')) {
     return [];
@@ -124,7 +145,7 @@ export function createErrorMailTransports(logger, { collection, component, subje
       greetingTimeout: SMTP_TIMEOUT,
       socketTimeout: SMTP_TIMEOUT,
     },
-    render: info => ({ html: formatHtml(getReport({ collection, component, environmentPrefix }, info)) }),
+    render: info => formatBodies({ collection, component, environmentPrefix }, info),
     handleRejections: true,
   };
 
