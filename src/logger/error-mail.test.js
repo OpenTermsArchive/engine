@@ -3,6 +3,7 @@ import os from 'node:os';
 
 import { expect, use } from 'chai';
 import config from 'config';
+import nodemailer from 'nodemailer';
 import sinon from 'sinon';
 import sinonChai from 'sinon-chai';
 import winston from 'winston';
@@ -128,16 +129,25 @@ describe('Error mail', () => {
         });
 
         it('uses the given subject', () => {
-          expect(transports[0].mailTransport.subject).to.equal(subject);
+          expect(transports[0].subject).to.equal(subject);
         });
 
         it('uses the configured recipient and sender', () => {
-          expect(transports[0].mailTransport.to).to.equal(SEND_MAIL_ON_ERROR.to);
-          expect(transports[0].mailTransport.from).to.equal(SEND_MAIL_ON_ERROR.from);
+          expect(transports[0].to).to.equal(SEND_MAIL_ON_ERROR.to);
+          expect(transports[0].from).to.equal(SEND_MAIL_ON_ERROR.from);
+        });
+
+        it('connects to the configured SMTP server and requires STARTTLS', () => {
+          const createTransportSpy = sinon.spy(nodemailer, 'createTransport');
+
+          createErrorMailTransports(logger, { collection, component, subject, warningSubject });
+
+          expect(createTransportSpy.firstCall.args[0]).to.include({ host: 'smtp.example.com', port: 587, secure: false, requireTLS: true });
+          expect(createTransportSpy.firstCall.args[0].auth).to.deep.equal({ user: 'user', pass: 'secret' });
         });
 
         it('sends HTML emails', () => {
-          expect(transports[0].mailTransport.html).to.be.true;
+          expect(transports[0].render({ message: 'Error', level: 'error' }).html).to.include('<!DOCTYPE html>');
         });
 
         it('handles unhandled rejections', () => {
@@ -160,7 +170,7 @@ describe('Error mail', () => {
         });
 
         it('uses the warning subject for the second transport', () => {
-          expect(transports[1].mailTransport.subject).to.equal(warningSubject);
+          expect(transports[1].subject).to.equal(warningSubject);
         });
 
         context('when logging through both transports', () => {
@@ -169,12 +179,10 @@ describe('Error mail', () => {
           beforeEach(() => {
             sent = [];
             transports.forEach((transport, index) => {
-              sinon.stub(transport.mailTransport, 'log').callsFake((info, callback) => {
+              sinon.stub(transport.transporter, 'sendMail').callsFake(() => {
                 sent.push(index);
-                setImmediate(() => {
-                  transport.mailTransport.emit('logged');
-                  callback();
-                });
+
+                return Promise.resolve({});
               });
             });
           });
@@ -235,16 +243,16 @@ describe('Error mail', () => {
       });
 
       context('email body', () => {
-        let formatter;
+        let render;
         let body;
 
         beforeEach(() => {
-          [{ mailTransport: { formatter } }] = createErrorMailTransports(logger, { collection, component, subject, warningSubject });
+          [{ render }] = createErrorMailTransports(logger, { collection, component, subject, warningSubject });
         });
 
         context('for an error', () => {
           beforeEach(() => {
-            body = formatter({ message: 'Error: <boom> & co', level: 'error' });
+            ({ html: body } = render({ message: 'Error: <boom> & co', level: 'error' }));
           });
 
           it('is titled as an error', () => {
@@ -275,7 +283,7 @@ describe('Error mail', () => {
 
         context('for a warning', () => {
           beforeEach(() => {
-            body = formatter({ message: 'Inaccessible content', level: 'warn' });
+            ({ html: body } = render({ message: 'Inaccessible content', level: 'warn' }));
           });
 
           it('is titled as a warning', () => {
@@ -285,8 +293,8 @@ describe('Error mail', () => {
 
         context('when interpolated values contain HTML characters', () => {
           beforeEach(() => {
-            [{ mailTransport: { formatter } }] = createErrorMailTransports(logger, { collection: { id: 'test', name: 'R&D <beta>', host: '203.0.113.1', hostConfig: { ansible_user: 'ota<x>' } }, component: 'API <v2>', subject, warningSubject });
-            body = formatter({ message: 'Error', level: 'error' });
+            [{ render }] = createErrorMailTransports(logger, { collection: { id: 'test', name: 'R&D <beta>', host: '203.0.113.1', hostConfig: { ansible_user: 'ota<x>' } }, component: 'API <v2>', subject, warningSubject });
+            ({ html: body } = render({ message: 'Error', level: 'error' }));
           });
 
           it('escapes the collection name', () => {
@@ -310,8 +318,8 @@ describe('Error mail', () => {
 
         context('when the collection has no deployment inventory', () => {
           beforeEach(() => {
-            [{ mailTransport: { formatter } }] = createErrorMailTransports(logger, { collection: { id: 'test', name: 'Test' }, component, subject, warningSubject });
-            body = formatter({ message: 'Error', level: 'error' });
+            [{ render }] = createErrorMailTransports(logger, { collection: { id: 'test', name: 'Test' }, component, subject, warningSubject });
+            ({ html: body } = render({ message: 'Error', level: 'error' }));
           });
 
           it('omits the command to connect to the server', () => {
@@ -328,15 +336,15 @@ describe('Error mail', () => {
         });
 
         it('prefixes the error subject with the environment', () => {
-          expect(transports[0].mailTransport.subject).to.equal(`[staging] ${subject}`);
+          expect(transports[0].subject).to.equal(`[staging] ${subject}`);
         });
 
         it('prefixes the warning subject with the environment', () => {
-          expect(transports[1].mailTransport.subject).to.equal(`[staging] ${warningSubject}`);
+          expect(transports[1].subject).to.equal(`[staging] ${warningSubject}`);
         });
 
         it('prefixes the title of the body with the environment', () => {
-          expect(transports[0].mailTransport.formatter({ message: 'Error', level: 'error' })).to.include(`[staging] Open Terms Archive ${component} error report`);
+          expect(transports[0].render({ message: 'Error', level: 'error' }).html).to.include(`[staging] Open Terms Archive ${component} error report`);
         });
       });
 
@@ -347,7 +355,7 @@ describe('Error mail', () => {
         });
 
         it('prefixes the subject with the development environment', () => {
-          expect(transports[0].mailTransport.subject).to.equal(`[development] ${subject}`);
+          expect(transports[0].subject).to.equal(`[development] ${subject}`);
         });
       });
     });
@@ -375,8 +383,8 @@ describe('Error mail', () => {
       });
 
       it('names the collection in the subjects', () => {
-        expect(logger.transports[1].mailTransport.subject).to.equal('Server error on test collection');
-        expect(logger.transports[2].mailTransport.subject).to.equal('Inaccessible content on test collection');
+        expect(logger.transports[1].subject).to.equal('Server error on test collection');
+        expect(logger.transports[2].subject).to.equal('Inaccessible content on test collection');
       });
     });
 

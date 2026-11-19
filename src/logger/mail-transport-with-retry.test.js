@@ -1,244 +1,293 @@
-import { EventEmitter } from 'node:events';
+import net from 'node:net';
 
 import { expect } from 'chai';
 import sinon from 'sinon';
-import winston from 'winston';
 
 import MailTransportWithRetry, { RETRY_DELAYS } from './mail-transport-with-retry.js';
 
-class MockMailTransport extends EventEmitter {
-  log() {} // eslint-disable-line
-}
+const MESSAGE_OPTIONS = {
+  from: 'noreply@example.com',
+  to: 'test@example.com',
+  subject: 'Test subject',
+  render: ({ message }) => ({ text: message, html: `<p>${message}</p>` }),
+};
 
 describe('MailTransportWithRetry', () => {
-  let clock;
-  let mockMailTransport;
   let transport;
-  let consoleWarnStub;
 
-  beforeEach(() => {
-    clock = sinon.useFakeTimers();
-    mockMailTransport = new MockMailTransport();
-    sinon.stub(winston.transports, 'Mail').returns(mockMailTransport);
-    consoleWarnStub = sinon.stub(console, 'warn');
-    transport = new MailTransportWithRetry({ to: 'test@example.com' });
-  });
+  context('when sending', () => {
+    let clock;
+    let sendMail;
+    let consoleWarnStub;
 
-  afterEach(() => {
-    sinon.restore();
-    clock.restore();
-  });
+    beforeEach(() => {
+      clock = sinon.useFakeTimers();
+      consoleWarnStub = sinon.stub(console, 'warn');
+      transport = new MailTransportWithRetry({ ...MESSAGE_OPTIONS, smtp: { host: 'smtp.example.com' } });
+      sendMail = sinon.stub(transport.transporter, 'sendMail');
+    });
 
-  describe('#flush', () => {
-    it('resolves once pending emails are sent', async () => {
-      let flushed = false;
+    afterEach(() => {
+      sinon.restore();
+      clock.restore();
+      transport.transporter.close();
+    });
 
-      transport.log({ message: 'test' }, () => {});
+    const failAllAttempts = async logPromise => {
+      await clock.tickAsync(RETRY_DELAYS.reduce((total, delay) => total + delay));
+      await logPromise;
+    };
 
-      const flushPromise = transport.flush().then(() => { flushed = true; });
+    describe('#flush', () => {
+      it('resolves once pending emails are sent', async () => {
+        let sent;
+        let flushed = false;
 
-      await clock.tickAsync(0);
-      expect(flushed).to.be.false;
+        sendMail.returns(new Promise(resolve => { sent = resolve; }));
+        transport.log({ message: 'test' }, () => {});
 
-      mockMailTransport.emit('logged');
-      await flushPromise;
+        const flushPromise = transport.flush().then(() => { flushed = true; });
 
-      expect(flushed).to.be.true;
-      expect(transport.pending).to.be.empty;
+        await clock.tickAsync(0);
+        expect(flushed).to.be.false;
+
+        sent();
+        await flushPromise;
+
+        expect(flushed).to.be.true;
+        expect(transport.pending).to.be.empty;
+      });
+    });
+
+    describe('#log', () => {
+      context('when email is sent successfully on first attempt', () => {
+        beforeEach(() => {
+          sendMail.resolves({});
+        });
+
+        it('calls callback without error', async () => {
+          const callback = sinon.spy();
+
+          await transport.log({ message: 'test' }, callback);
+
+          expect(callback).to.have.been.calledOnce;
+        });
+
+        it('sends the rendered message', async () => {
+          await transport.log({ message: 'test' }, () => {});
+
+          expect(sendMail).to.have.been.calledOnceWithExactly({
+            from: MESSAGE_OPTIONS.from,
+            to: MESSAGE_OPTIONS.to,
+            subject: MESSAGE_OPTIONS.subject,
+            text: 'test',
+            html: '<p>test</p>',
+          });
+        });
+
+        it('does not emit error event', async () => {
+          const errorHandler = sinon.spy();
+
+          transport.on('error', errorHandler);
+          await transport.log({ message: 'test' }, () => {});
+
+          expect(errorHandler).not.to.have.been.called;
+        });
+
+        it('does not log any warning', async () => {
+          await transport.log({ message: 'test' }, () => {});
+
+          expect(consoleWarnStub).not.to.have.been.called;
+        });
+
+        it('calls callback before the email is sent', () => {
+          const callback = sinon.spy();
+
+          sendMail.returns(new Promise(() => {}));
+          transport.log({ message: 'test' }, callback);
+
+          expect(callback).to.have.been.calledOnce;
+        });
+      });
+
+      context('when email fails then succeeds on retry', () => {
+        beforeEach(() => {
+          sendMail.onFirstCall().rejects(new Error('SMTP timeout'));
+          sendMail.onSecondCall().resolves({});
+        });
+
+        it('retries and eventually succeeds', async () => {
+          const callback = sinon.spy();
+          const logPromise = transport.log({ message: 'test' }, callback);
+
+          await clock.tickAsync(RETRY_DELAYS[0]);
+          await logPromise;
+
+          expect(sendMail).to.have.been.calledTwice;
+          expect(callback).to.have.been.calledOnce;
+        });
+
+        it('logs warning for failed attempt', async () => {
+          const logPromise = transport.log({ message: 'test' }, () => {});
+
+          await clock.tickAsync(RETRY_DELAYS[0]);
+          await logPromise;
+
+          expect(consoleWarnStub).to.have.been.calledOnce;
+          expect(consoleWarnStub.firstCall.args[0]).to.include('SMTP mail sending failed');
+          expect(consoleWarnStub.firstCall.args[0]).to.include('SMTP timeout');
+        });
+      });
+
+      context('when email fails after all retry attempts', () => {
+        beforeEach(() => {
+          sendMail.rejects(new Error('SMTP timeout'));
+        });
+
+        it('does not emit an error event after all retries are exhausted', async () => {
+          const errorHandler = sinon.spy();
+
+          transport.on('error', errorHandler);
+          await failAllAttempts(transport.log({ message: 'test' }, () => {}));
+
+          expect(errorHandler).not.to.have.been.called;
+        });
+
+        it('calls callback even after failure', async () => {
+          const callback = sinon.spy();
+
+          await failAllAttempts(transport.log({ message: 'test' }, callback));
+
+          expect(callback).to.have.been.calledOnce;
+        });
+
+        it('logs final failure warning', async () => {
+          await failAllAttempts(transport.log({ message: 'test' }, () => {}));
+
+          expect(consoleWarnStub.lastCall.args[0]).to.include(`failed after ${RETRY_DELAYS.length + 1} attempts`);
+          expect(consoleWarnStub.lastCall.args[0]).to.include('Error: SMTP timeout');
+        });
+      });
+
+      context('when email succeeds after multiple failures', () => {
+        it('succeeds on third attempt', async () => {
+          const callback = sinon.spy();
+          const errorHandler = sinon.spy();
+
+          sendMail.onFirstCall().rejects(new Error('SMTP timeout'));
+          sendMail.onSecondCall().rejects(new Error('Connection refused'));
+          sendMail.onThirdCall().resolves({});
+          transport.on('error', errorHandler);
+
+          const logPromise = transport.log({ message: 'test' }, callback);
+
+          await clock.tickAsync(RETRY_DELAYS[0]);
+          await clock.tickAsync(RETRY_DELAYS[1]);
+          await logPromise;
+
+          expect(sendMail).to.have.been.calledThrice;
+          expect(callback).to.have.been.calledOnce;
+          expect(errorHandler).not.to.have.been.called;
+        });
+      });
     });
   });
 
-  describe('#log', () => {
-    context('when email is sent successfully on first attempt', () => {
-      it('calls callback without error', async () => {
-        const callback = sinon.spy();
-        const logPromise = transport.log({ message: 'test' }, callback);
+  context('when the message reaches the SMTP server', () => {
+    const MESSAGE_WITH_PITFALLS = [
+      'Line with a bare CR\rcontinued after it',
+      '.Line starting with a dot',
+      '.',
+      'Line after a line made of a single dot',
+      'Non-ASCII characters: é — 日本',
+      `Long line: ${'x'.repeat(1200)}`,
+    ].join('\n');
 
-        mockMailTransport.emit('logged');
-        await logPromise;
+    let server;
+    let received;
+    let lines;
 
-        expect(callback).to.have.been.calledOnce;
+    before(async () => {
+      server = net.createServer(socket => {
+        let buffer = Buffer.alloc(0);
+        let inData = false;
+        const reply = text => socket.write(`${text}\r\n`);
+
+        socket.on('data', chunk => {
+          buffer = Buffer.concat([ buffer, chunk ]);
+
+          while (buffer.length) {
+            if (inData) {
+              const end = buffer.indexOf('\r\n.\r\n');
+
+              if (end == -1) {
+                return;
+              }
+              received = buffer.subarray(0, end + 2);
+              buffer = buffer.subarray(end + 5);
+              inData = false;
+              reply('250 OK');
+              continue;
+            }
+
+            const lineEnd = buffer.indexOf('\r\n');
+
+            if (lineEnd == -1) {
+              return;
+            }
+
+            const command = buffer.subarray(0, lineEnd).toString().split(' ')[0].toUpperCase();
+
+            buffer = buffer.subarray(lineEnd + 2);
+
+            if (command == 'DATA') {
+              inData = true;
+              reply('354 Go ahead');
+            } else if (command == 'QUIT') {
+              reply('221 Bye');
+              socket.end();
+            } else {
+              reply('250 OK');
+            }
+          }
+        });
+        reply('220 localhost ESMTP');
       });
 
-      it('does not emit error event', async () => {
-        const errorHandler = sinon.spy();
+      await new Promise(resolve => { server.listen(0, '127.0.0.1', resolve); });
 
-        transport.on('error', errorHandler);
-
-        const logPromise = transport.log({ message: 'test' }, () => {});
-
-        mockMailTransport.emit('logged');
-        await logPromise;
-
-        expect(errorHandler).not.to.have.been.called;
-      });
-
-      it('does not log any warning', async () => {
-        const logPromise = transport.log({ message: 'test' }, () => {});
-
-        mockMailTransport.emit('logged');
-        await logPromise;
-
-        expect(consoleWarnStub).not.to.have.been.called;
-      });
-
-      it('calls callback before the email is sent', () => {
-        const callback = sinon.spy();
-
-        transport.log({ message: 'test' }, callback);
-
-        expect(callback).to.have.been.calledOnce;
-      });
-
-      it('removes its listeners from the mail transport', async () => {
-        const logPromise = transport.log({ message: 'test' }, () => {});
-
-        mockMailTransport.emit('logged');
-        await logPromise;
-
-        expect(mockMailTransport.listenerCount('logged')).to.equal(0);
-        expect(mockMailTransport.listenerCount('error')).to.equal(0);
-      });
+      transport = new MailTransportWithRetry({ ...MESSAGE_OPTIONS, smtp: { host: '127.0.0.1', port: server.address().port, ignoreTLS: true } });
+      await transport.log({ message: MESSAGE_WITH_PITFALLS }, () => {});
+      lines = received.toString('latin1').split('\r\n');
     });
 
-    context('when email fails then succeeds on retry', () => {
-      it('retries and eventually succeeds', async () => {
-        const callback = sinon.spy();
-        const logSpy = sinon.spy(mockMailTransport, 'log');
-        const logPromise = transport.log({ message: 'test' }, callback);
-
-        mockMailTransport.emit('error', new Error('SMTP timeout'));
-
-        await clock.tickAsync(RETRY_DELAYS[0]);
-
-        mockMailTransport.emit('logged');
-        await logPromise;
-
-        expect(logSpy).to.have.been.calledTwice;
-        expect(callback).to.have.been.calledOnce;
-      });
-
-      it('logs warning for failed attempt', async () => {
-        const logPromise = transport.log({ message: 'test' }, () => {});
-
-        mockMailTransport.emit('error', new Error('SMTP timeout'));
-
-        await clock.tickAsync(RETRY_DELAYS[0]);
-
-        mockMailTransport.emit('logged');
-        await logPromise;
-
-        expect(consoleWarnStub).to.have.been.calledOnce;
-        expect(consoleWarnStub.firstCall.args[0]).to.include('SMTP mail sending failed');
-        expect(consoleWarnStub.firstCall.args[0]).to.include('SMTP timeout');
-      });
+    after(() => {
+      transport.transporter.close();
+      server.close();
     });
 
-    context('when email fails after all retry attempts', () => {
-      it('does not emit an error event after all retries are exhausted', async () => {
-        const errorHandler = sinon.spy();
-
-        transport.on('error', errorHandler);
-
-        const logPromise = transport.log({ message: 'test' }, () => {});
-
-        mockMailTransport.emit('error', new Error('SMTP timeout'));
-        await clock.tickAsync(RETRY_DELAYS[0]);
-
-        mockMailTransport.emit('error', new Error('SMTP timeout'));
-        await clock.tickAsync(RETRY_DELAYS[1]);
-
-        mockMailTransport.emit('error', new Error('SMTP timeout'));
-        await clock.tickAsync(RETRY_DELAYS[2]);
-
-        mockMailTransport.emit('error', new Error('SMTP timeout'));
-        await logPromise;
-
-        expect(errorHandler).not.to.have.been.called;
-      });
-
-      it('calls callback even after failure', async () => {
-        const callback = sinon.spy();
-
-        const logPromise = transport.log({ message: 'test' }, callback);
-
-        mockMailTransport.emit('error', new Error('SMTP timeout'));
-        await clock.tickAsync(RETRY_DELAYS[0]);
-
-        mockMailTransport.emit('error', new Error('SMTP timeout'));
-        await clock.tickAsync(RETRY_DELAYS[1]);
-
-        mockMailTransport.emit('error', new Error('SMTP timeout'));
-        await clock.tickAsync(RETRY_DELAYS[2]);
-
-        mockMailTransport.emit('error', new Error('SMTP timeout'));
-        await logPromise;
-
-        expect(callback).to.have.been.calledOnce;
-      });
-
-      it('logs final failure warning', async () => {
-        const logPromise = transport.log({ message: 'test' }, () => {});
-
-        mockMailTransport.emit('error', new Error('SMTP timeout'));
-        await clock.tickAsync(RETRY_DELAYS[0]);
-
-        mockMailTransport.emit('error', new Error('SMTP timeout'));
-        await clock.tickAsync(RETRY_DELAYS[1]);
-
-        mockMailTransport.emit('error', new Error('SMTP timeout'));
-        await clock.tickAsync(RETRY_DELAYS[2]);
-
-        mockMailTransport.emit('error', new Error('SMTP timeout'));
-        await logPromise;
-
-        expect(consoleWarnStub.lastCall.args[0]).to.include(`failed after ${RETRY_DELAYS.length + 1} attempts`);
-        expect(consoleWarnStub.lastCall.args[0]).to.include('Error: SMTP timeout');
-      });
-
-      it('removes its listeners from the mail transport', async () => {
-        const logPromise = transport.log({ message: 'test' }, () => {});
-
-        mockMailTransport.emit('error', new Error('SMTP timeout'));
-        await clock.tickAsync(RETRY_DELAYS[0]);
-
-        mockMailTransport.emit('error', new Error('SMTP timeout'));
-        await clock.tickAsync(RETRY_DELAYS[1]);
-
-        mockMailTransport.emit('error', new Error('SMTP timeout'));
-        await clock.tickAsync(RETRY_DELAYS[2]);
-
-        mockMailTransport.emit('error', new Error('SMTP timeout'));
-        await logPromise;
-
-        expect(mockMailTransport.listenerCount('logged')).to.equal(0);
-        expect(mockMailTransport.listenerCount('error')).to.equal(0);
-      });
+    it('uses CRLF line endings only', () => {
+      expect(received.toString('latin1')).not.to.match(/\r(?!\n)|(?<!\r)\n/);
     });
 
-    context('when email succeeds after multiple failures', () => {
-      it('succeeds on third attempt', async () => {
-        const callback = sinon.spy();
-        const errorHandler = sinon.spy();
-        const logSpy = sinon.spy(mockMailTransport, 'log');
+    it('keeps lines within the 998 characters limit', () => {
+      expect(Math.max(...lines.map(line => line.length))).to.be.at.most(998);
+    });
 
-        transport.on('error', errorHandler);
+    it('sends ASCII bytes only, so that no part declared 7bit holds anything else', () => {
+      expect([...received].filter(byte => byte > 0x7F)).to.be.empty;
+    });
 
-        const logPromise = transport.log({ message: 'test' }, callback);
+    it('escapes the dots at the start of lines, so that none ends the data early', () => {
+      expect(lines.filter(line => line.startsWith('.') && !line.startsWith('..'))).to.be.empty;
+    });
 
-        mockMailTransport.emit('error', new Error('SMTP timeout'));
-        await clock.tickAsync(RETRY_DELAYS[0]);
+    it('sends a plain text part', () => {
+      expect(received.toString('latin1')).to.match(/^Content-Type: text\/plain/m);
+    });
 
-        mockMailTransport.emit('error', new Error('Connection refused'));
-        await clock.tickAsync(RETRY_DELAYS[1]);
-
-        mockMailTransport.emit('logged');
-        await logPromise;
-
-        expect(logSpy).to.have.been.calledThrice;
-        expect(callback).to.have.been.calledOnce;
-        expect(errorHandler).not.to.have.been.called;
-      });
+    it('sends an HTML part', () => {
+      expect(received.toString('latin1')).to.match(/^Content-Type: text\/html/m);
     });
   });
 });

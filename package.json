@@ -91,6 +91,7 @@
     "mongodb": "^6.19.0",
     "morgan": "^1.10.1",
     "node-fetch": "^3.3.2",
+    "nodemailer": "^10.6.0",
     "octokit": "^5.0.3",
     "puppeteer": "^25.2.0",
     "puppeteer-extra": "^3.3.6",
@@ -100,7 +101,6 @@
     "swagger-ui-express": "^5.0.1",
     "turndown": "^7.2.1",
     "winston": "^3.17.0",
-    "winston-mail": "^2.0.0",
     "xml-js": "^1.6.11"
   },
   "devDependencies": {

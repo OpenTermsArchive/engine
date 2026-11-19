@@ -97,14 +97,20 @@ export function createErrorMailTransports(logger, { collection, component, subje
   const mailerOptions = {
     to: config.get('@opentermsarchive/engine.logger.sendMailOnError.to'),
     from: config.get('@opentermsarchive/engine.logger.sendMailOnError.from'),
-    host: config.get('@opentermsarchive/engine.logger.smtp.host'),
-    port: config.get('@opentermsarchive/engine.logger.smtp.port'),
-    username: config.get('@opentermsarchive/engine.logger.smtp.username'),
-    password: process.env.OTA_ENGINE_SMTP_PASSWORD,
-    tls: true,
-    timeout: SMTP_TIMEOUT,
-    html: true,
-    formatter: info => formatBody({ collection, component, environmentPrefix }, info),
+    smtp: {
+      host: config.get('@opentermsarchive/engine.logger.smtp.host'),
+      port: config.get('@opentermsarchive/engine.logger.smtp.port'),
+      secure: false,
+      requireTLS: true, // Upgrade the connection with STARTTLS, and refuse to send the credentials and the email in clear text if the relay does not offer it
+      auth: {
+        user: config.get('@opentermsarchive/engine.logger.smtp.username'),
+        pass: process.env.OTA_ENGINE_SMTP_PASSWORD,
+      },
+      connectionTimeout: SMTP_TIMEOUT,
+      greetingTimeout: SMTP_TIMEOUT,
+      socketTimeout: SMTP_TIMEOUT,
+    },
+    render: info => ({ html: formatBody({ collection, component, environmentPrefix }, info) }),
     handleRejections: true,
   };
 
