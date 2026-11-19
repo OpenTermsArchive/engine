@@ -2,6 +2,15 @@
 
 All changes that impact users of this module are documented in this file, in the [Common Changelog](https://common-changelog.org) format with some additional specifications defined in the CONTRIBUTING file. This codebase adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased [patch]
+
+> Development of this release was supported by [Anthelia](https://anthelia.tech).
+
+### Fixed
+
+- Date versions of terms made of several source documents with their most recently fetched snapshot, instead of the snapshot whose reading happened to finish last, which often backdated them by hours or days; versions already recorded keep their date
+- Navigate versions sharing the same date in the order they were recorded through the `prev` and `next` links of the Collection API, instead of an arbitrary order that could offer a previous version with identical content
+
 ## 17.0.2 - 2026-11-18
 
 > Development of this release was supported by [Anthelia](https://anthelia.tech).

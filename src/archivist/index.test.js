@@ -1061,6 +1061,51 @@ describe('Archivist', function () {
         expect(error.errors.map(extractError => extractError.message)).to.deep.equal([ 'Extract failed: extraction failure of doc1', 'Extract failed: extraction failure of doc2' ]);
       });
     });
+
+    context('when the source documents have snapshots fetched at different dates', () => {
+      const RECENT_FETCH_DATE = new Date('2000-01-03T12:00:00.000Z');
+      const OLD_FETCH_DATE = new Date('2000-01-01T12:00:00.000Z');
+      let app;
+      let terms;
+      let getLatestSnapshotStub;
+
+      before(async () => {
+        app = await createAndInitializeArchivist();
+
+        const recentlyChangedDocument = new SourceDocument({ location: 'https://example.com/recently-changed', contentSelectors: 'body' });
+        const unchangedDocument = new SourceDocument({ location: 'https://example.com/unchanged', contentSelectors: 'body' });
+
+        terms = {
+          service: { id: 'test-service' },
+          type: 'test-type',
+          sourceDocuments: [ recentlyChangedDocument, unchangedDocument ],
+        };
+
+        getLatestSnapshotStub = sinon.stub(app.recorder, 'getLatestSnapshot').callsFake((_, sourceDocumentId) => {
+          const isRecent = sourceDocumentId === recentlyChangedDocument.id;
+          const snapshot = {
+            id: `snapshot-of-${sourceDocumentId}`,
+            content: 'content',
+            mimeType: 'text/html',
+            fetchDate: isRecent ? RECENT_FETCH_DATE : OLD_FETCH_DATE,
+          };
+
+          return new Promise(resolve => {
+            setTimeout(() => resolve(snapshot), isRecent ? 0 : 20); // Make the oldest snapshot resolve last, so a date taken from the last resolved read would be exposed
+          });
+        });
+
+        app.extract = sourceDocument => Promise.resolve(`extracted ${sourceDocument.id}`);
+
+        await app.extractContentsFromSnapshots(terms);
+      });
+
+      after(() => getLatestSnapshotStub.restore());
+
+      it('dates the terms with the most recent snapshot fetch date', () => {
+        expect(terms.fetchDate).to.deep.equal(RECENT_FETCH_DATE);
+      });
+    });
   });
 
   describe('#fetchSourceDocument', () => {

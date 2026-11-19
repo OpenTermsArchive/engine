@@ -167,9 +167,9 @@ export default class GitRepository extends RepositoryInterface {
       revisions = revisions.filter(revision => !DataMapper.isTechnicalUpgrade(revision.subject));
     }
 
-    // Deterministic total order: most recent first, commit SHA as a stable tiebreaker for versions sharing the same fetch date (git stores second precision).
-    // prev/next are then adjacent entries in this single order, so navigation always round-trips, unlike the previous chronological/topological mix.
-    revisions.sort((a, b) => b.timestamp - a.timestamp || (a.hash < b.hash ? -1 : 1));
+    // Single total order, most recent first, so prev/next are adjacent entries and navigation always round-trips.
+    // Versions sharing a fetch date, such as a technical upgrade and the version recorded from the same snapshot, keep the `git log` order thanks to the stable sort: it is their recording order, while their SHAs are random with respect to time.
+    revisions.sort((a, b) => b.timestamp - a.timestamp);
 
     const index = revisions.findIndex(revision => revision.hash === versionId);
 

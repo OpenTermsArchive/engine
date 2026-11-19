@@ -187,6 +187,7 @@ export default class MongoRepository extends RepositoryInterface {
 
     // Deterministic total order (fetchDate, then _id) ascending; prev is the greatest record strictly before the current one, next the least strictly after.
     // Using _id as a tiebreaker makes prev and next well-defined even for versions sharing the same fetch date, so navigation always round-trips.
+    // It also navigates them in recording order, as the driver generates each _id at insertion from a timestamp and an increasing counter; this holds as long as `save` never provides its own _id.
     const [ oldest, newest, previous, next ] = await Promise.all([
       this.collection.find(filter, idOnly).sort({ fetchDate: 1, _id: 1 }).limit(1).next(),
       this.collection.find(filter, idOnly).sort({ fetchDate: -1, _id: -1 }).limit(1).next(),
