@@ -361,7 +361,6 @@ export default class Archivist extends events.EventEmitter {
         sourceDocument.content = snapshot.content;
         sourceDocument.mimeType = snapshot.mimeType;
         sourceDocument.snapshotId = snapshot.id;
-        terms.fetchDate = snapshot.fetchDate;
 
         if (!sourceDocument.content) {
           throw new ExtractDocumentError(`Empty content for source document ${sourceDocument.location} in snapshot ${snapshot.id}`);
@@ -371,7 +370,7 @@ export default class Archivist extends events.EventEmitter {
 
         sourceDocument.clearContent(); // Reduce memory usage by clearing no longer needed large content strings
 
-        return { content };
+        return { content, fetchDate: snapshot.fetchDate };
       } catch (error) {
         if (!(error instanceof ExtractDocumentError)) {
           throw error;
@@ -385,6 +384,12 @@ export default class Archivist extends events.EventEmitter {
 
     if (extractDocumentErrors.length) {
       throw new InaccessibleContentError(extractDocumentErrors);
+    }
+
+    const fetchDates = results.map(({ fetchDate }) => fetchDate).filter(Boolean);
+
+    if (fetchDates.length) {
+      terms.fetchDate = new Date(Math.max(...fetchDates)); // The assembled content was first observed when its most recently fetched source document was, so an unchanged source document must not backdate the version
     }
 
     return results.map(({ content }) => content);
