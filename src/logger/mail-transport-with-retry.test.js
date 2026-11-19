@@ -1,3 +1,4 @@
+import { once } from 'node:events';
 import net from 'node:net';
 
 import { expect } from 'chai';
@@ -203,12 +204,17 @@ describe('MailTransportWithRetry', () => {
       `Long line: ${'x'.repeat(1200)}`,
     ].join('\n');
 
+    const connections = [];
     let server;
     let received;
     let lines;
 
+    const createTransport = () => new MailTransportWithRetry({ ...MESSAGE_OPTIONS, smtp: { host: '127.0.0.1', port: server.address().port, ignoreTLS: true } });
+
     before(async () => {
       server = net.createServer(socket => {
+        connections.push(socket);
+
         let buffer = Buffer.alloc(0);
         let inData = false;
         const reply = text => socket.write(`${text}\r\n`);
@@ -256,7 +262,7 @@ describe('MailTransportWithRetry', () => {
 
       await new Promise(resolve => { server.listen(0, '127.0.0.1', resolve); });
 
-      transport = new MailTransportWithRetry({ ...MESSAGE_OPTIONS, smtp: { host: '127.0.0.1', port: server.address().port, ignoreTLS: true } });
+      transport = createTransport();
       await transport.log({ message: MESSAGE_WITH_PITFALLS }, () => {});
       lines = received.toString('latin1').split('\r\n');
     });
@@ -288,6 +294,29 @@ describe('MailTransportWithRetry', () => {
 
     it('sends an HTML part', () => {
       expect(received.toString('latin1')).to.match(/^Content-Type: text\/html/m);
+    });
+
+    it('sends a burst of emails over a single connection', async () => {
+      const burstTransport = createTransport();
+      const connectionCount = connections.length;
+
+      await Promise.all([ 1, 2, 3 ].map(index => burstTransport.log({ message: `Warning ${index}` }, () => {})));
+      burstTransport.transporter.close();
+
+      expect(connections.length - connectionCount).to.equal(1);
+    });
+
+    it('closes the connection once idle, so that it does not keep a finished process alive', async () => {
+      const idleTransport = createTransport();
+      const connectionCount = connections.length;
+
+      await idleTransport.log({ message: 'test' }, () => {});
+
+      const connection = connections[connectionCount];
+
+      if (!connection.destroyed) {
+        await once(connection, 'close');
+      }
     });
   });
 });

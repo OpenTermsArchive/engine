@@ -14,10 +14,16 @@ const RETRY_OPTIONS = {
   },
 };
 
+const POOL_OPTIONS = {
+  pool: true,
+  maxConnections: 1, // A burst of warnings during a tracking run is sent over a single connection instead of opening one per email on the relay
+  idleTimeout: 1000, // An open connection would keep a process that has finished its work alive until the relay drops it
+};
+
 class MailTransportWithRetry extends winston.Transport {
   constructor({ smtp, from, to, subject, render, ...options }) {
     super(options);
-    this.transporter = nodemailer.createTransport(smtp);
+    this.transporter = nodemailer.createTransport({ ...POOL_OPTIONS, ...smtp });
     this.from = from;
     this.to = to;
     this.subject = subject;
