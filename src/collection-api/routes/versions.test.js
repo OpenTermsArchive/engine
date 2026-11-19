@@ -694,6 +694,68 @@ describe('Versions API', () => {
       });
     });
 
+    context('when the requested date has no time', () => {
+      before(async () => {
+        response = await request.get(`${basePath}/v1/version/service-1/Terms%20of%20Service/2023-01-02`);
+      });
+
+      it('responds with 200 status code', () => {
+        expect(response.status).to.equal(200);
+      });
+
+      it('returns the version applicable at the start of that day', () => {
+        expect(response.body.id).to.equal(lastVersion.id);
+      });
+    });
+
+    context('when the requested date has a timezone offset', () => {
+      before(async () => {
+        response = await request.get(`${basePath}/v1/version/service-1/Terms%20of%20Service/${encodeURIComponent('2023-01-01T13:30:00+01:00')}`); // 12:30 UTC, between the middle and last versions: ignoring the offset would return the last version
+      });
+
+      it('responds with 200 status code', () => {
+        expect(response.status).to.equal(200);
+      });
+
+      it('returns the version applicable at that time in UTC', () => {
+        expect(response.body.id).to.equal(middleVersion.id);
+      });
+    });
+
+    context('when the requested date is not a date', () => {
+      const VERSION_ID = '7d44151738979cef26f25dee10cd0bbe7c56621e';
+
+      before(async () => {
+        response = await request.get(`${basePath}/v1/version/service-1/Terms%20of%20Service/${VERSION_ID}`);
+      });
+
+      it('responds with 400 status code', () => {
+        expect(response.status).to.equal(400);
+      });
+
+      it('responds with Content-Type application/json', () => {
+        expect(response.type).to.equal('application/json');
+      });
+
+      it('returns an error message', () => {
+        expect(response.body.error).to.contain('Invalid date').and.to.contain(VERSION_ID);
+      });
+    });
+
+    context('when the requested date and time has no timezone', () => {
+      before(async () => {
+        response = await request.get(`${basePath}/v1/version/service-1/Terms%20of%20Service/2023-01-01T12:00:00`);
+      });
+
+      it('responds with 400 status code', () => {
+        expect(response.status).to.equal(400);
+      });
+
+      it('returns an error message', () => {
+        expect(response.body.error).to.contain('Invalid date').and.to.contain('timezone');
+      });
+    });
+
     context('when the requested date is anterior to the first available version', () => {
       before(async () => {
         response = await request.get(`${basePath}/v1/version/service-1/Terms%20of%20Service/2000-01-01T12:00:00Z`);
