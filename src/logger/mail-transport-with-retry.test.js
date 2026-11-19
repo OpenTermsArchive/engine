@@ -81,6 +81,7 @@ describe('MailTransportWithRetry', () => {
             from: MESSAGE_OPTIONS.from,
             to: MESSAGE_OPTIONS.to,
             subject: MESSAGE_OPTIONS.subject,
+            encoding: 'base64',
             text: 'test',
             html: '<p>test</p>',
           });
@@ -284,16 +285,16 @@ describe('MailTransportWithRetry', () => {
       expect([...received].filter(byte => byte > 0x7F)).to.be.empty;
     });
 
-    it('escapes the dots at the start of lines, so that none ends the data early', () => {
-      expect(lines.filter(line => line.startsWith('.') && !line.startsWith('..'))).to.be.empty;
+    it('starts no line with a dot, so that no relay can end the data early or add a dot to it', () => {
+      expect(lines.filter(line => line.startsWith('.'))).to.be.empty;
     });
 
-    it('sends a plain text part', () => {
-      expect(received.toString('latin1')).to.match(/^Content-Type: text\/plain/m);
+    it('sends a plain text part encoded in base64', () => {
+      expect(received.toString('latin1')).to.match(/^Content-Type: text\/plain; charset=utf-8\r\nContent-Transfer-Encoding: base64\r\n/m);
     });
 
-    it('sends an HTML part', () => {
-      expect(received.toString('latin1')).to.match(/^Content-Type: text\/html/m);
+    it('sends an HTML part encoded in base64', () => {
+      expect(received.toString('latin1')).to.match(/^Content-Type: text\/html; charset=utf-8\r\nContent-Transfer-Encoding: base64\r\n/m);
     });
 
     it('sends a burst of emails over a single connection', async () => {

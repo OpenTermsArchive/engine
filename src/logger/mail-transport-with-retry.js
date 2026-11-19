@@ -14,6 +14,8 @@ const RETRY_OPTIONS = {
   },
 };
 
+const MESSAGE_ENCODING = 'base64'; // Relays and redirections passing the email along were seen adding a dot to lines that start with one, which alters the message and breaks its DKIM signature; no base64 line starts with a dot
+
 const POOL_OPTIONS = {
   pool: true,
   maxConnections: 1, // A burst of warnings during a tracking run is sent over a single connection instead of opening one per email on the relay
@@ -43,7 +45,7 @@ class MailTransportWithRetry extends winston.Transport {
 
   async send(info) {
     try {
-      await async.retry(RETRY_OPTIONS, async () => { await this.transporter.sendMail({ from: this.from, to: this.to, subject: this.subject, ...this.render(info) }); }); // The task must be an async function for async.retry to await it rather than wait for a callback
+      await async.retry(RETRY_OPTIONS, async () => { await this.transporter.sendMail({ from: this.from, to: this.to, subject: this.subject, encoding: MESSAGE_ENCODING, ...this.render(info) }); }); // The task must be an async function for async.retry to await it rather than wait for a callback
     } catch (error) {
       console.warn(`SMTP mail sending failed after ${RETRY_OPTIONS.times} attempts; giving up on this email:\n${error.stack}`);
     }
