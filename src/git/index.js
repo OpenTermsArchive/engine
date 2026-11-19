@@ -306,6 +306,7 @@ export default class Git {
 
     try {
       // Ordering and technical-upgrade filtering are done by the caller in memory, so `--author-date-order`/`--grep`/`--name-only` are deliberately omitted to keep this walk lean
+      // The default most-recently-committed-first order must be kept: callers rely on it to order revisions sharing an author date
       output = await this.git.raw([
         'log',
         '--no-merges',

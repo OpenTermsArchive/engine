@@ -110,7 +110,7 @@ class RepositoryInterface {
 
   /**
    * Get the IDs locating a version within the history of its terms: the first (oldest) and last (newest) versions, as well as the immediately previous (older) and next (newer) ones
-   * These IDs are computed from a single deterministic chronological order (by fetch date, with the record ID as a stable tiebreaker), so navigating prev/next always round-trips
+   * These IDs are computed from a single deterministic chronological order (by fetch date, then by recording order for versions sharing a fetch date), so navigating prev/next always round-trips
    * @param   {string}                                                                 serviceId                          - Service ID of the version
    * @param   {string}                                                                 termsType                          - Terms type of the version
    * @param   {string}                                                                 versionId                          - ID of the version to locate within its terms history

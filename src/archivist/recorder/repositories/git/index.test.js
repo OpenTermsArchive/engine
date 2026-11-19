@@ -1110,9 +1110,21 @@ describe('GitRepository', () => {
       });
     });
 
+    async function walkNavigationChain(versionId, options) {
+      const chain = [];
+      let cursor = (await subject.getNavigationIds(SERVICE_PROVIDER_ID, TERMS_TYPE, versionId, options)).first;
+
+      while (cursor) {
+        chain.push(cursor);
+        cursor = (await subject.getNavigationIds(SERVICE_PROVIDER_ID, TERMS_TYPE, cursor, options)).next;
+      }
+
+      return chain;
+    }
+
     describe('#getNavigationIds with versions sharing the same fetch date', () => {
-      // Git stores commit dates at second precision, so distinct versions can share a fetch date.
-      // The record ID tiebreaker must keep the order deterministic so prev/next still round-trip.
+      // Distinct versions can share a fetch date, for example a technical upgrade and the version recorded from the same snapshot.
+      // They must be navigated in the order they were recorded, which is the only order that reflects time between them.
       let ids;
 
       before(async function () {
@@ -1146,6 +1158,33 @@ describe('GitRepository', () => {
         }
 
         expect(walked).to.have.lengthOf(ids.length);
+      });
+
+      it('navigates them in the order they were recorded', async () => {
+        expect(await walkNavigationChain(ids[0])).to.deep.equal(ids);
+      });
+    });
+
+    describe('#getNavigationIds with a technical upgrade sharing the fetch date of an older version', () => {
+      let upgradedVersion;
+      let laterVersion;
+      let technicalUpgrade;
+
+      before(async function () {
+        this.timeout(5000);
+        upgradedVersion = await subject.save(new Version({ serviceId: SERVICE_PROVIDER_ID, termsType: TERMS_TYPE, content: 'upgraded content', fetchDate: FETCH_DATE, snapshotIds: [SNAPSHOT_ID] }));
+        laterVersion = await subject.save(new Version({ serviceId: SERVICE_PROVIDER_ID, termsType: TERMS_TYPE, content: 'later content', fetchDate: FETCH_DATE_LATER, snapshotIds: [SNAPSHOT_ID] }));
+        technicalUpgrade = await subject.save(new Version({ serviceId: SERVICE_PROVIDER_ID, termsType: TERMS_TYPE, content: 'technical upgrade', fetchDate: FETCH_DATE, isTechnicalUpgrade: true, snapshotIds: [SNAPSHOT_ID] }));
+      });
+
+      after(() => subject.removeAll());
+
+      it('places the technical upgrade right after the version sharing its date', async () => {
+        expect(await walkNavigationChain(laterVersion.id)).to.deep.equal([ upgradedVersion.id, technicalUpgrade.id, laterVersion.id ]);
+      });
+
+      it('leaves the technical upgrade out when excluded', async () => {
+        expect(await walkNavigationChain(laterVersion.id, { includeTechnicalUpgrades: false })).to.deep.equal([ upgradedVersion.id, laterVersion.id ]);
       });
     });
 
