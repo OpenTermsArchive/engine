@@ -756,6 +756,30 @@ describe('Versions API', () => {
       });
     });
 
+    context('when the requested date is before 1970', () => {
+      before(async () => {
+        response = await request.get(`${basePath}/v1/version/service-1/Terms%20of%20Service/1960-01-01T00:00:00Z`);
+      });
+
+      it('responds with 400 status code', () => {
+        expect(response.status).to.equal(400);
+      });
+
+      it('returns an error message', () => {
+        expect(response.body.error).to.contain('Invalid date').and.to.contain('1970');
+      });
+    });
+
+    context('when the requested date is the first instant of 1970', () => {
+      before(async () => {
+        response = await request.get(`${basePath}/v1/version/service-1/Terms%20of%20Service/1970-01-01T00:00:00Z`);
+      });
+
+      it('responds with 404 status code', () => {
+        expect(response.status).to.equal(404);
+      });
+    });
+
     context('when the requested date is anterior to the first available version', () => {
       before(async () => {
         response = await request.get(`${basePath}/v1/version/service-1/Terms%20of%20Service/2000-01-01T12:00:00Z`);
