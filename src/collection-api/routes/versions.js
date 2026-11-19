@@ -2,7 +2,10 @@ import express from 'express';
 
 import { toISODateWithoutMilliseconds } from '../../archivist/utils/date.js';
 import logger from '../logger.js';
+import { parseISODate } from '../utils/date.js';
 import { parsePaginationParams, validatePaginationParams } from '../utils/pagination.js';
+
+const UNIX_EPOCH = new Date(0);
 
 /**
  * @param   {object}         versionsRepository  The versions repository instance
@@ -542,10 +545,12 @@ export default function versionsRouter(versionsRepository, snapshotsRepository) 
    *         required: true
    *       - in: path
    *         name: date
-   *         description: The date and time for which the version is requested, in ISO 8601 format.
+   *         description: The date for which the version is requested, in ISO 8601 format. Either a date and time with a timezone, such as `2023-06-01T12:00:00Z` or `2023-06-01T14:00:00+02:00`, or a date alone, such as `2023-06-01`, which is read as midnight UTC. Must not be before `1970-01-01T00:00:00Z`.
    *         schema:
    *           type: string
-   *           format: date-time
+   *           oneOf:
+   *             - format: date
+   *             - format: date-time
    *         required: true
    *     responses:
    *       200:
@@ -554,6 +559,12 @@ export default function versionsRouter(versionsRepository, snapshotsRepository) 
    *           application/json:
    *             schema:
    *               $ref: '#/components/schemas/VersionWithLinks'
+   *       400:
+   *         description: The requested date is neither an ISO 8601 date nor an ISO 8601 date and time with a timezone, or is before 1970.
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/ErrorResponse'
    *       404:
    *         $ref: '#/components/responses/NotFoundError'
    *       416:
@@ -565,7 +576,15 @@ export default function versionsRouter(versionsRepository, snapshotsRepository) 
    */
   router.get('/version/:serviceId/:termsType/:date', async (req, res) => {
     const { serviceId, termsType, date } = req.params;
-    const requestedDate = new Date(date);
+    const requestedDate = parseISODate(date);
+
+    if (!requestedDate) {
+      return res.status(400).json({ error: `Invalid date "${date}". Must be an ISO 8601 date (2023-06-01) or date and time with a timezone (2023-06-01T12:00:00Z).` });
+    }
+
+    if (requestedDate < UNIX_EPOCH) { // Git misreads some dates before 1970 as the current year, which would return a version recorded long after the requested date
+      return res.status(400).json({ error: `Invalid date "${date}". Must not be before 1970-01-01T00:00:00Z.` });
+    }
 
     if (requestedDate > new Date()) {
       return res.status(416).json({ error: 'Requested version is in the future' });

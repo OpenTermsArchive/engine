@@ -2,6 +2,19 @@
 
 All changes that impact users of this module are documented in this file, in the [Common Changelog](https://common-changelog.org) format with some additional specifications defined in the CONTRIBUTING file. This codebase adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased [major]
+
+> Development of this release was supported by [Anthelia](https://anthelia.tech).
+
+### Removed
+
+- **Breaking:** Reject with a 400 error the dates given to the `/version/{serviceId}/{termsType}/{date}` endpoint of the Collection API that are neither an ISO 8601 date nor an ISO 8601 date and time with seconds and a timezone, such as `2023`, `2023-06`, `2023-06-01T12:00Z` or `2023-06-01T12:00:00`, which were read loosely and, without a timezone, in the timezone of the server; send a date such as `2023-06-01`, read as midnight UTC, or a date and time such as `2023-06-01T12:00:00Z` instead
+
+### Fixed
+
+- Respond with a 400 error instead of a 500 error on the `/version/{serviceId}/{termsType}/{date}` endpoint of the Collection API when the date is not a date, such as a version ID, which also stops sending an error email to administrators for each such request
+- Respond with a 400 error on the `/version/{serviceId}/{termsType}/{date}` endpoint of the Collection API for dates before 1970, instead of a version recorded decades later when the versions are stored in Git
+
 ## 17.0.2 - 2026-11-18
 
 > Development of this release was supported by [Anthelia](https://anthelia.tech).
