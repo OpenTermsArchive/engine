@@ -2,6 +2,14 @@
 
 All changes that impact users of this module are documented in this file, in the [Common Changelog](https://common-changelog.org) format with some additional specifications defined in the CONTRIBUTING file. This codebase adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased [patch]
+
+> Development of this release was supported by [Anthelia](https://anthelia.tech).
+
+### Fixed
+
+- Send error emails that comply with email standards, with CRLF line endings, a transfer encoding that matches their content and a plain text alternative instead of a copy of the HTML document, which some mail clients and relays displayed as raw HTML
+
 ## 17.0.2 - 2026-11-18
 
 > Development of this release was supported by [Anthelia](https://anthelia.tech).
