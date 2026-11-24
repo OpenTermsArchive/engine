@@ -1,7 +1,6 @@
 import async from 'async';
+import nodemailer from 'nodemailer';
 import winston from 'winston';
-
-import 'winston-mail';
 
 export const RETRY_DELAYS = [ 5000, 20000, 60000 ];
 
@@ -15,10 +14,22 @@ const RETRY_OPTIONS = {
   },
 };
 
+const MESSAGE_ENCODING = 'base64'; // Relays and redirections passing the email along were seen adding a dot to lines that start with one, which alters the message and breaks its DKIM signature; no base64 line starts with a dot
+
+const POOL_OPTIONS = {
+  pool: true,
+  maxConnections: 1, // A burst of warnings during a tracking run is sent over a single connection instead of opening one per email on the relay
+  idleTimeout: 1000, // An open connection would keep a process that has finished its work alive until the relay drops it
+};
+
 class MailTransportWithRetry extends winston.Transport {
-  constructor(options) {
+  constructor({ smtp, from, to, subject, render, ...options }) {
     super(options);
-    this.mailTransport = new winston.transports.Mail(options);
+    this.transporter = nodemailer.createTransport({ ...POOL_OPTIONS, ...smtp });
+    this.from = from;
+    this.to = to;
+    this.subject = subject;
+    this.render = render;
     this.pending = new Set();
   }
 
@@ -34,33 +45,10 @@ class MailTransportWithRetry extends winston.Transport {
 
   async send(info) {
     try {
-      await async.retry(RETRY_OPTIONS, async () => { await this.attempt(info); }); // The task must be an async function for async.retry to await it rather than wait for a callback
+      await async.retry(RETRY_OPTIONS, async () => { await this.transporter.sendMail({ from: this.from, to: this.to, subject: this.subject, encoding: MESSAGE_ENCODING, ...this.render(info) }); }); // The task must be an async function for async.retry to await it rather than wait for a callback
     } catch (error) {
       console.warn(`SMTP mail sending failed after ${RETRY_OPTIONS.times} attempts; giving up on this email:\n${error.stack}`);
     }
-  }
-
-  attempt(info) {
-    return new Promise((resolve, reject) => {
-      const removeListeners = () => {
-        this.mailTransport.off('logged', onLogged);
-        this.mailTransport.off('error', onError);
-      };
-
-      function onLogged() {
-        removeListeners();
-        resolve();
-      }
-
-      function onError(error) {
-        removeListeners();
-        reject(error);
-      }
-
-      this.mailTransport.once('logged', onLogged);
-      this.mailTransport.once('error', onError);
-      this.mailTransport.log(info, () => {});
-    });
   }
 
   async flush() {

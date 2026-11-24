@@ -26,19 +26,39 @@ const command = (label, code) => `
                     <code style="${CODE_STYLE}">${escapeHtml(code)}</code>
                   </li>`;
 
-function formatBody({ collection, component, environmentPrefix }, { message, level }) {
+const DOCUMENTATION_LABEL = 'View deployment documentation to see how to start, stop, and restart the server:';
+const DOCUMENTATION_URL = 'https://github.com/OpenTermsArchive/deployment';
+const FOOTER = 'This is an automated message from the Open Terms Archive engine. Please do not reply to this email.';
+
+function getReport({ collection, component, environmentPrefix }, { message, level }) {
   const isError = level.includes('error');
-  const titleColor = isError ? '#dc3545' : '#ffc107';
-  const titleText = isError ? 'Error details' : 'Warning details';
   const cpuCount = os.cpus().length;
 
-  const commands = [
-    ...(collection.host && collection.hostConfig?.ansible_user ? [[ 'Connect to the server:', `ssh ${collection.hostConfig.ansible_user}@${collection.host}` ]] : []),
-    [ 'List processes on the server:', 'pm2 list' ],
-    [ 'View the logs on the server:', 'pm2 logs <process-name>' ],
-    [ 'View additional logging options:', 'pm2 logs <process-name> --help' ],
-  ];
+  return {
+    isError,
+    title: `${environmentPrefix}Open Terms Archive ${component} error report — ${collection.name} Collection`,
+    detailsTitle: isError ? 'Error details' : 'Warning details',
+    message,
+    systemInformation: [
+      [ 'Hostname', os.hostname() ],
+      [ 'Platform', `${os.platform()} ${os.release()}` ],
+      [ 'Architecture', os.arch() ],
+      [ 'CPU Cores', cpuCount ],
+      [ 'CPU Load (1/5/15 min)', os.loadavg().map(load => `${Math.min(100, (load / cpuCount) * 100).toFixed(1)}%`).join(' / ') ],
+      [ 'Total Memory', `${(os.totalmem() / (1024 * 1024 * 1024)).toFixed(2)} GB` ],
+      [ 'Free Memory', `${(os.freemem() / (1024 * 1024 * 1024)).toFixed(2)} GB` ],
+      ...(collection.host ? [[ 'Server IP', collection.host ]] : []),
+    ],
+    commands: [
+      ...(collection.host && collection.hostConfig?.ansible_user ? [[ 'Connect to the server:', `ssh ${collection.hostConfig.ansible_user}@${collection.host}` ]] : []),
+      [ 'List processes on the server:', 'pm2 list' ],
+      [ 'View the logs on the server:', 'pm2 logs <process-name>' ],
+      [ 'View additional logging options:', 'pm2 logs <process-name> --help' ],
+    ],
+  };
+}
 
+function formatHtml({ isError, title, detailsTitle, message, systemInformation, commands }) {
   return `
           <!DOCTYPE html>
           <html lang="en">
@@ -49,35 +69,50 @@ function formatBody({ collection, component, environmentPrefix }, { message, lev
               <title>OTA Error Report</title>
             </head>
             <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; color: #333333; max-width: 800px; margin: 0 auto; padding: 0px 20px 20px 20px;">
-              <h1 style="color: #212529; font-size: 24px; margin: 10px 0; text-align: center; padding-bottom: 10px;">${escapeHtml(`${environmentPrefix}Open Terms Archive ${component} error report — ${collection.name} Collection`)}</h1>
-              ${section(titleText, titleColor, `
+              <h1 style="color: #212529; font-size: 24px; margin: 10px 0; text-align: center; padding-bottom: 10px;">${escapeHtml(title)}</h1>
+              ${section(detailsTitle, isError ? '#dc3545' : '#ffc107', `
                 <div style="background-color: #ffffff; border: 1px solid #dee2e6; border-radius: 4px; padding: 12px; margin: 8px 0;">
                   <code style="margin: 0; font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace; font-size: 14px; color: #212529; white-space: pre-wrap; display: block;">${escapeHtml(message)}</code>
                 </div>`)}
               ${section('System information', '#212529', `
                 <div style="color: #6c757d; font-size: 14px; margin: 0;">
-                  Hostname: ${escapeHtml(os.hostname())}<br>
-                  Platform: ${escapeHtml(`${os.platform()} ${os.release()}`)}<br>
-                  Architecture: ${os.arch()}<br>
-                  CPU Cores: ${cpuCount}<br>
-                  CPU Load (1/5/15 min): ${os.loadavg().map(load => `${Math.min(100, (load / cpuCount) * 100).toFixed(1)}%`).join(' / ')}<br>
-                  Total Memory: ${(os.totalmem() / (1024 * 1024 * 1024)).toFixed(2)} GB<br>
-                  Free Memory: ${(os.freemem() / (1024 * 1024 * 1024)).toFixed(2)} GB${collection.host ? `<br>
-                  Server IP: ${escapeHtml(collection.host)}` : ''}
+                  ${systemInformation.map(([ label, value ]) => `${label}: ${escapeHtml(value)}`).join(`<br>
+                  `)}
                 </div>`)}
               ${section('Helpful commands', '#198754', `
                 <ul style="list-style-type: none; padding-left: 0; margin: 0;">${commands.map(([ label, code ]) => command(label, code)).join('')}
                   <li style="margin: 0; padding: 0">
-                    <strong style="display: block; margin-bottom: 0;">View deployment documentation to see how to start, stop, and restart the server:</strong>
-                    <a href="https://github.com/OpenTermsArchive/deployment" style="color: #198754; text-decoration: none; border-bottom: 1px solid #198754;">github.com/OpenTermsArchive/deployment</a>
+                    <strong style="display: block; margin-bottom: 0;">${DOCUMENTATION_LABEL}</strong>
+                    <a href="${DOCUMENTATION_URL}" style="color: #198754; text-decoration: none; border-bottom: 1px solid #198754;">${DOCUMENTATION_URL.replace('https://', '')}</a>
                   </li>
                 </ul>`)}
               <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #dee2e6; font-size: 12px; color: #6c757d; text-align: center;">
-                This is an automated message from the Open Terms Archive engine. Please do not reply to this email.
+                ${FOOTER}
               </div>
             </body>
           </html>
         `;
+}
+
+const heading = text => `${text}\n${'-'.repeat(text.length)}`;
+
+function formatText({ title, detailsTitle, message, systemInformation, commands }) {
+  return [
+    title,
+    heading(detailsTitle),
+    message,
+    heading('System information'),
+    systemInformation.map(([ label, value ]) => `${label}: ${value}`).join('\n'),
+    heading('Helpful commands'),
+    [ ...commands, [ DOCUMENTATION_LABEL, DOCUMENTATION_URL ]].map(([ label, code ]) => `${label}\n  ${code}`).join('\n\n'),
+    FOOTER,
+  ].join('\n\n');
+}
+
+function formatBodies(context, info) {
+  const report = getReport(context, info);
+
+  return { text: formatText(report), html: formatHtml(report) };
 }
 
 export function createErrorMailTransports(logger, { collection, component, subject, warningSubject }) {
@@ -97,14 +132,20 @@ export function createErrorMailTransports(logger, { collection, component, subje
   const mailerOptions = {
     to: config.get('@opentermsarchive/engine.logger.sendMailOnError.to'),
     from: config.get('@opentermsarchive/engine.logger.sendMailOnError.from'),
-    host: config.get('@opentermsarchive/engine.logger.smtp.host'),
-    port: config.get('@opentermsarchive/engine.logger.smtp.port'),
-    username: config.get('@opentermsarchive/engine.logger.smtp.username'),
-    password: process.env.OTA_ENGINE_SMTP_PASSWORD,
-    tls: true,
-    timeout: SMTP_TIMEOUT,
-    html: true,
-    formatter: info => formatBody({ collection, component, environmentPrefix }, info),
+    smtp: {
+      host: config.get('@opentermsarchive/engine.logger.smtp.host'),
+      port: config.get('@opentermsarchive/engine.logger.smtp.port'),
+      secure: false,
+      requireTLS: true, // Upgrade the connection with STARTTLS, and refuse to send the credentials and the email in clear text if the relay does not offer it
+      auth: {
+        user: config.get('@opentermsarchive/engine.logger.smtp.username'),
+        pass: process.env.OTA_ENGINE_SMTP_PASSWORD,
+      },
+      connectionTimeout: SMTP_TIMEOUT,
+      greetingTimeout: SMTP_TIMEOUT,
+      socketTimeout: SMTP_TIMEOUT,
+    },
+    render: info => formatBodies({ collection, component, environmentPrefix }, info),
     handleRejections: true,
   };
 
